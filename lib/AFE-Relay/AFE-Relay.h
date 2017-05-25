@@ -1,10 +1,3 @@
-/*
- Name:		AFE_Relay.h
- Created:	23.05.2017 21:34:00
- Author:	Adrian
- Editor:	http://www.visualmicro.com
-*/
-
 #ifndef _AFE_Relay_h
 #define _AFE_Relay_h
 

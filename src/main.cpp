@@ -8,5 +8,7 @@ void setup() {
 }
 
 void loop() {
-
+   Relay.on();
+   delay(1000);
+   Relay.off();
 }
