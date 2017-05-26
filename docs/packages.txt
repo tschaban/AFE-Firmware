@@ -1,0 +1,3 @@
+# Packages to install
+* DallasTemperature
+* Streaming (for debugging purpose)
