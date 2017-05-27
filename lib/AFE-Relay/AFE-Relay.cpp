@@ -1,12 +1,12 @@
 #include "AFE-Relay.h"
 
 
-AFERelay::AFERelay(uint8_t gpio) {
+AFERelay::AFERelay(byte gpio) {
 	_gpio = gpio;
 	pinMode(_gpio, OUTPUT);
 }
 
-uint8_t AFERelay::get() {
+byte AFERelay::get() {
 	return digitalRead(_gpio) == HIGH ? RELAY_ON : RELAY_OFF;
 }
 

@@ -1,10 +1,10 @@
 #include "AFE-Sensor-DS18B20.h"
 
-AFESensorDS18B20::AFESensorDS18B20(uint8_t gpio) {
+AFESensorDS18B20::AFESensorDS18B20(byte gpio) {
    _gpio = gpio;
 }
 
-float AFESensorDS18B20::get(uint8_t unit) {
+float AFESensorDS18B20::get(byte unit) {
 
   OneWire wireProtocol(_gpio);
   DallasTemperature sensor(&wireProtocol);

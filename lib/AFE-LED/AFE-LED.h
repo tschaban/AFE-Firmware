@@ -17,14 +17,14 @@
 class AFELED {
 
 private:
-	uint8_t _gpio;
+	byte _gpio;
   boolean _blinking = false;
   unsigned long _interval;
   unsigned long _previousMillis = 0;
 
 public:
   /* Constructor: gpio is GPIO to where LED is connected to */
-	AFELED(uint8_t gpio);
+	AFELED(byte gpio);
 
   /* Turns on LED */
   void on();

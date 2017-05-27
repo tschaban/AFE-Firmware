@@ -1,6 +1,6 @@
 #include "AFE-LED.h"
 
-AFELED::AFELED(uint8_t gpio) {
+AFELED::AFELED(byte gpio) {
 	_gpio = gpio;
   pinMode(_gpio, OUTPUT);
   digitalWrite(_gpio, HIGH);
