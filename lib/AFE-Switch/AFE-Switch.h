@@ -1,5 +1,5 @@
 /*
-  Switch component
+  Switch mono and bi stable component
   AFE Firmware for smart home devices build on ESP8266
   More info: https://github.com/tschaban/AFE-Firmware
   LICENCE: http://opensource.org/licenses/MIT
@@ -15,26 +15,26 @@
 #endif
 
 /* Types of switch */
-#define SWITCH_TYPE_MONO 0
-#define SWITCH_TYPE_BI 1
+#define SWITCH_TYPE_MONO 0 // Mono stable switch
+#define SWITCH_TYPE_BI 1   // Bi stabe switch
 
 
 class AFESwitch
 {
 
 private:
-	byte _gpio;
+  byte _gpio;
   byte _type;
   boolean _state;
-	boolean _pressed = false;
+  boolean _pressed = false;
 
 
 public:
 
-	/* Constructor: entry parameter is GPIO number where Switch is connected to
-		second parameter defiens if the switch is mono or bi
-	*/
-	AFESwitch(byte gpio, byte type=SWITCH_TYPE_MONO);
+  /* Constructor: entry parameter is GPIO number where Switch is connected to
+     second parameter defiens if the switch is mono or bi
+  */
+  AFESwitch(byte gpio, byte type=SWITCH_TYPE_MONO);
 
   /* Returns TRUE if switch is ON */
   boolean isON();
