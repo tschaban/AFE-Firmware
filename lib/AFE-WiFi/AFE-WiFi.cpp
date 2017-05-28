@@ -2,7 +2,7 @@
 
 AFEWiFi::AFEWiFi() {}
 
-void AFEWiFi::connect(char* ssid, char* password) {
+void AFEWiFi::connect(const char* ssid, const char* password) {
     uint8_t connection_try = 0;
     WiFi.hostname("TEST");
     WiFi.begin(ssid,password);

@@ -29,7 +29,7 @@ private:
 public:
 	AFEWiFi();
 
-	void connect(char* ssid, char* password);
+	void connect(const char* ssid, const char* password);
 
 };
 
