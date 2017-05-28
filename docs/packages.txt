@@ -1,3 +1,4 @@
 # Packages to install
-* DallasTemperature
-* Streaming (for debugging purpose)
+* DallasTemperature.h
+* Streaming.h (for debugging purpose)
+* PubSubClient.h
