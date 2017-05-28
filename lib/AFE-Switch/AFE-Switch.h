@@ -23,8 +23,8 @@ class AFESwitch
 {
 
 private:
-  byte _gpio;
-  byte _type;
+  uint8_t _gpio;
+  uint8_t _type;
   boolean _state;
   boolean _pressed = false;
 
@@ -34,7 +34,7 @@ public:
   /* Constructor: entry parameter is GPIO number where Switch is connected to
      second parameter defiens if the switch is mono or bi
   */
-  AFESwitch(byte gpio, byte type=SWITCH_TYPE_MONO);
+  AFESwitch(uint8_t gpio, uint8_t type=SWITCH_TYPE_MONO);
 
   /* Returns TRUE if switch is ON */
   boolean isON();

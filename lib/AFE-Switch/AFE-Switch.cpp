@@ -1,7 +1,7 @@
 #include "AFE-Switch.h"
 
 
-AFESwitch::AFESwitch(byte gpio,byte type) {
+AFESwitch::AFESwitch(uint8_t gpio,uint8_t type) {
   _gpio = gpio;
   pinMode(_gpio, INPUT_PULLUP);
   _state = digitalRead(_gpio);

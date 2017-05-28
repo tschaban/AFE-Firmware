@@ -1,7 +1,7 @@
 #include "AFE-Relay.h"
 
 
-AFERelay::AFERelay(byte gpio) {
+AFERelay::AFERelay(uint8_t gpio) {
 	_gpio = gpio;
 	pinMode(_gpio, OUTPUT);
 }

@@ -27,7 +27,7 @@ private:
 public:
 
 	/* Constructor: entry parameter is GPIO number where Relay is connected to */
-	AFERelay(byte gpio);
+	AFERelay(uint8_t gpio);
 
 	/* Returns 0 if relay is OFF, 1 if relay is ON */
 	byte get();
