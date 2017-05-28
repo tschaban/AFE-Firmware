@@ -23,23 +23,33 @@ class AFEMQTT {
 private:
   WiFiClient 		esp;
 	PubSubClient 	Broker;
-  const char*  	mqttTopicForSubscription;
+    char* 			mqttTopicForSubscription;
 	const char*  	mqttUser;
 	const char*  	mqttPassword;
+	const char*  	mqttTopic = "/sonoff/light/";
+
+	uint8_t 		noConnectionAttempts = 20;
+	uint8_t 		durationBetweenConnectionAttempts = 1;
+	uint8_t 	    durationBetweenNextConnectionAttemptsSeries = 60;
+	unsigned long   sleepStartTime = 0;
+	boolean			sleepMode = false;
+
+	void publishToMQTTBroker(const char* topic, const char* message);
 
 public:
   AFEMQTT();
-  void begin(
-    const char * domain,
-    uint16_t port,
-    const char* user,
-    const char* password,
-    const char* subscribeTo);
+    void begin(
+    	const char * domain,
+    	uint16_t port,
+    	const char* user,
+    	const char* password,
+    	const char* subscribeTo);
 
-  void connect();
-//  void publish(char* type, char* message);
-  boolean connected();
-//  void loop();
+    void 		connect();
+    void 		publish(const char* type, const char* message);
+    void 		publish(const char* topic, const char* type, const char* message);
+    boolean     connected();
+    void 		loop();
 
 };
 

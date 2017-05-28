@@ -1,4 +1,5 @@
 #include "AFE-MQTT.h"
+#include "AFE-MQTT-callback.cpp"
 
 AFEMQTT::AFEMQTT() {
 
@@ -14,17 +15,25 @@ void AFEMQTT::begin(
   Serial << endl << "INFO: Initializaing MQTT: ";
   mqttUser = user;
   mqttPassword = password;
-  mqttTopicForSubscription = subscribeTo;
+//  sprintf(mqttTopicForSubscription, "%s#", subscribeTo);
+  mqttTopicForSubscription = (char*)subscribeTo;
   Broker.setClient(esp);
   Broker.setServer(domain, port);
-//  Broker.setCallback(callbackMQTT);
+  Broker.setCallback(callbackMQTT);
   Serial << "done";
 }
 
 
 void AFEMQTT::connect() {
+
+ if (sleepMode) {
+   if (millis() - sleepStartTime >= durationBetweenNextConnectionAttemptsSeries*1000) {
+      sleepMode = false;
+   }
+ } else {
+
   char  mqttString[60] = "Device Name";
-  uint8_t connection_try = 0;
+  uint8_t connections = 0;
 
 //  sprintf(mqttString, "Sonoff (Device name: %s)", Configuration.device_name);
   Serial << endl << "INFO: Connecting to MQTT";
@@ -32,25 +41,51 @@ void AFEMQTT::connect() {
   while (!Broker.connected()) {
     if (Broker.connect(mqttString, mqttUser, mqttPassword)) {
       Serial << endl << "INFO: Connected";
-    //  sprintf(mqttString, "%scmd", Configuration.mqtt_topic);
       Serial << endl << "INFO: Subscribing to : " << mqttTopicForSubscription;
-      Broker.subscribe(mqttTopicForSubscription);
+      Broker.subscribe((char*)mqttTopicForSubscription);
       Serial << endl << "INFO: Subsribed";
     } else {
-  //    connection_try++;
-  //    Serial << endl << "INFO: MQTT Connection attempt: " << connection_try << " from " << Configuration.number_connection_attempts;
-  //    if (connection_try == Configuration.number_connection_attempts) {
-  //      Sonoff.runSleepMode();
-  //      break;
-  //    }
-//      delay(Configuration.duration_between_connection_attempts*1000);
-        delay(1000);
+      connections++;
+      Serial << endl << "INFO: MQTT Connection attempt: " << connections << " from " << noConnectionAttempts;
+      if (connections >= noConnectionAttempts) {
+        sleepMode = true;
+        sleepStartTime = millis();
+        break;
+      }
+        delay(durationBetweenConnectionAttempts*1000);
         Serial << ".";
     }
   }
   Serial << endl << "INFO: MQTT connection status: " << Broker.state();
+  }
 }
 
 boolean AFEMQTT::connected() {
   return Broker.connected();
+}
+
+void  AFEMQTT::loop() {
+  Broker.loop();
+}
+
+void AFEMQTT::publish(const char* type, const char* message) {
+    char _mqttTopic[50];
+    sprintf(_mqttTopic, "%s%s", mqttTopic, type);
+    publishToMQTTBroker(_mqttTopic, message);
+}
+
+void AFEMQTT::publish(const char* topic, const char* type, const char* message) {
+  char _mqttTopic[50];
+  sprintf(_mqttTopic, "%s%s", topic, type);
+  publishToMQTTBroker(_mqttTopic, message);
+}
+
+
+void AFEMQTT::publishToMQTTBroker(const char* topic, const char* message) {
+  if (Broker.state() == MQTT_CONNECTED) {
+    Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " << message;
+    Broker.publish(topic, message);
+  } else {
+    Serial << endl << "WARN: MQTT not connected. State:  " << Broker.state();
+  }
 }
