@@ -1,4 +1,4 @@
-This folder contains available to download firmwares in different configurations
+This folder (will) contains available to download firmwares in different configurations
 
 ## Basic Switch MQTT controlled
 Functionalities:
