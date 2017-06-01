@@ -1,26 +1,24 @@
 #include "AFE-MQTT.h"
 #include "AFE-MQTT-callback.cpp"
 
-AFEMQTT::AFEMQTT() {
-
-}
+AFEMQTT::AFEMQTT() {}
 
 void AFEMQTT::begin(
   const char * domain,
   uint16_t port,
   const char* user,
   const char* password,
-  const char* subscribeTo) {
+  const char* subscribe_to,
+  const char* device_name) {
 
   Serial << endl << "INFO: Initializaing MQTT: ";
   mqttUser = user;
   mqttPassword = password;
-//  sprintf(mqttTopicForSubscription, "%s#", subscribeTo);
-  mqttTopicForSubscription = (char*)subscribeTo;
+  sprintf(mqttTopicForSubscription, "%s#", (char*)subscribe_to);
+  deviceName = device_name;
   Broker.setClient(esp);
   Broker.setServer(domain, port);
   Broker.setCallback(callbackMQTT);
-  Serial << "done";
 }
 
 
@@ -32,24 +30,23 @@ void AFEMQTT::connect() {
    }
  } else {
 
-  char  mqttString[60] = "Device Name";
   uint8_t connections = 0;
 
-//  sprintf(mqttString, "Sonoff (Device name: %s)", Configuration.device_name);
   Serial << endl << "INFO: Connecting to MQTT";
 
   while (!Broker.connected()) {
-    if (Broker.connect(mqttString, mqttUser, mqttPassword)) {
+    if (Broker.connect(deviceName, mqttUser, mqttPassword)) {
       Serial << endl << "INFO: Connected";
       Serial << endl << "INFO: Subscribing to : " << mqttTopicForSubscription;
       Broker.subscribe((char*)mqttTopicForSubscription);
       Serial << endl << "INFO: Subsribed";
     } else {
       connections++;
-      Serial << endl << "INFO: MQTT Connection attempt: " << connections << " from " << noConnectionAttempts;
+      Serial << endl << "INFO: MQTT Connection attempt: " << connections+1 << " from " << noConnectionAttempts;
       if (connections >= noConnectionAttempts) {
         sleepMode = true;
         sleepStartTime = millis();
+        Serial << endl << "WARN: Not able to connect to MQTT.Going to sleep mode for " << durationBetweenNextConnectionAttemptsSeries << "sec.";
         break;
       }
         delay(durationBetweenConnectionAttempts*1000);
@@ -58,6 +55,16 @@ void AFEMQTT::connect() {
   }
   Serial << endl << "INFO: MQTT connection status: " << Broker.state();
   }
+}
+
+
+void AFEMQTT::setReconnectionParams(
+  uint8_t no_connection_attempts,
+  uint8_t duration_between_connection_attempts,
+  uint8_t duration_between_next_connection_attempts_series) {
+    noConnectionAttempts = no_connection_attempts;
+    durationBetweenConnectionAttempts = duration_between_connection_attempts;
+    durationBetweenNextConnectionAttemptsSeries = duration_between_next_connection_attempts_series;
 }
 
 boolean AFEMQTT::connected() {
