@@ -20,16 +20,35 @@
 class AFEWiFi {
 
 private:
-   boolean _accessPoint = false;
-	 uint8_t _no_connection_attempts = 20;
-   uint8_t _duration_between_connection_attempts = 1;
-   uint8_t _duration_between_next_connection_attempts_series = 60;
-	 boolean _sleepMode = false;
+	 const char* 		ssid;
+	 const char*		password;
+   boolean 				accessPoint = false;
+	 uint8_t 				noConnectionAttempts = 20;
+   uint8_t 				durationBetweenConnectionAttempts = 1;
+   uint8_t 				durationBetweenNextConnectionAttemptsSeries = 60;
+	 unsigned long  sleepStartTime = 0;
+	 boolean 				sleepMode = false;
 
 public:
+
+	/* Constructor: no actions */
 	AFEWiFi();
 
-	void connect(const char* ssid, const char* password);
+  /* Sets connectionparameters and host name. Must be invoked before connect method */
+	void begin(const char* network_ssid, const char* network_password, const char* netowork_hostname);
+
+  /* Sets parameters related to reconnection to WiFi Network if there was problems to connect to it */
+	void setReconnectionParams(
+		uint8_t no_connection_attempts,
+		uint8_t duration_between_connection_attempts,
+		uint8_t duration_between_next_connection_attempts_series);
+
+  /* Connecting to WiFi Access point */
+	void connect();
+
+	/* Return TRUE if device is connected to WiFi Acces Point */
+	boolean connected();
+
 
 };
 
