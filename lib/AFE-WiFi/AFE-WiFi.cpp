@@ -3,10 +3,21 @@
 AFEWiFi::AFEWiFi() {
 }
 
-void AFEWiFi::begin(const char* network_ssid, const char* network_password, const char* network_hostname) {
+void AFEWiFi::begin(const char* network_ssid, const char* network_password, const char* network_hostname, uint8_t mode) {
         ssid = network_ssid;
         password = network_password;
         WiFi.hostname(network_hostname);
+        if (mode==WIFI_MODE_AP) {
+                IPAddress apIP(192, 168, 5, 1);
+                WiFi.mode(WIFI_AP);
+                WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+                WiFi.softAP(network_hostname);
+                dnsServer.setTTL(300);
+                dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
+                dnsServer.start(53, "www.example.com", apIP);
+        } else {
+          WiFi.mode(WIFI_STA);
+        }
 }
 
 void AFEWiFi::setReconnectionParams(

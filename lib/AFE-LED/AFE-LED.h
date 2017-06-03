@@ -22,6 +22,7 @@ boolean blinking = false;
 unsigned long interval;
 unsigned long previousMillis = 0;
 
+
 public:
 /* Constructor: gpio is GPIO to where LED is connected to */
 AFELED(uint8_t led_gpio);
