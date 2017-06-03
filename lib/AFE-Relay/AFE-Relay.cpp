@@ -1,32 +1,32 @@
 #include "AFE-Relay.h"
 
 
-AFERelay::AFERelay(uint8_t gpio) {
-	_gpio = gpio;
-	pinMode(_gpio, OUTPUT);
+AFERelay::AFERelay(uint8_t relay_gpio) {
+	gpio = relay_gpio;
+	pinMode(gpio, OUTPUT);
 }
 
 byte AFERelay::get() {
-	return digitalRead(_gpio) == HIGH ? RELAY_ON : RELAY_OFF;
+	return digitalRead(gpio) == HIGH ? RELAY_ON : RELAY_OFF;
 }
 
 /* Set relay to ON */
 void AFERelay::on() {
 	if (get() == RELAY_OFF) {
-		digitalWrite(_gpio, HIGH);
+		digitalWrite(gpio, HIGH);
 	}
 }
 
 /* Set relay to OFF */
 void AFERelay::off() {
 	if (get() == RELAY_ON) {
-		digitalWrite(_gpio, LOW);
+		digitalWrite(gpio, LOW);
 	}
 }
 
 /* Toggle relay */
 void AFERelay::toggle() {
-	if (digitalRead(_gpio) == LOW) {
+	if (digitalRead(gpio) == LOW) {
 		on();
 	}
 	else {

@@ -22,12 +22,12 @@ class AFERelay
 {
 
 private:
-	uint8_t _gpio;
+	uint8_t gpio;
 
 public:
 
 	/* Constructor: entry parameter is GPIO number where Relay is connected to */
-	AFERelay(uint8_t gpio);
+	AFERelay(uint8_t relay_gpio);
 
 	/* Returns 0 if relay is OFF, 1 if relay is ON */
 	byte get();

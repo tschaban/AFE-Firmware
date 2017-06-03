@@ -24,13 +24,13 @@ class AFESensorDS18B20
 {
 
 private:
-  uint8_t _gpio;
-	float _correction = 0;
+  uint8_t gpio;
+	float correction = 0;
 
 public:
 
 	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
-	AFESensorDS18B20(uint8_t gpio);
+	AFESensorDS18B20(uint8_t sensor_gpio);
 
   /* Get current temp in Celsius (default) possible options:
      - UNIT_CELCIUS
@@ -39,7 +39,7 @@ public:
 	float get(uint8_t unit=0);
 
   /* If needed set temperature correction value */
-	void setCorrection(float correction);
+	void setCorrection(float sensor_correction);
 
 };
 

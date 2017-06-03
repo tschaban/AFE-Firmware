@@ -1,12 +1,12 @@
 #include "AFE-Sensor-DS18B20.h"
 
-AFESensorDS18B20::AFESensorDS18B20(uint8_t gpio) {
-   _gpio = gpio;
+AFESensorDS18B20::AFESensorDS18B20(uint8_t sensor_gpio) {
+   gpio = sensor_gpio;
 }
 
 float AFESensorDS18B20::get(uint8_t unit) {
 
-  OneWire wireProtocol(_gpio);
+  OneWire wireProtocol(gpio);
   DallasTemperature sensor(&wireProtocol);
   sensor.begin();
 
@@ -15,9 +15,9 @@ float AFESensorDS18B20::get(uint8_t unit) {
     sensor.requestTemperatures();
     temperature = unit==UNIT_CELCIUS?sensor.getTempCByIndex(0):sensor.getTempFByIndex(0);
   } while (temperature == 85.0 || temperature == (-127.0));
-  return temperature + _correction;
+  return temperature + correction;
 }
 
-void AFESensorDS18B20::setCorrection(float correction) {
-  _correction = correction;
+void AFESensorDS18B20::setCorrection(float sensor_correction) {
+  correction = sensor_correction;
 }

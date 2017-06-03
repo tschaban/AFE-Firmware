@@ -1,33 +1,33 @@
 #include "AFE-Switch.h"
 
 
-AFESwitch::AFESwitch(uint8_t gpio,uint8_t type) {
-  _gpio = gpio;
-  pinMode(_gpio, INPUT_PULLUP);
-  _state = digitalRead(_gpio);
-  _type = type;
+AFESwitch::AFESwitch(uint8_t switch_gpio,uint8_t switch_type) {
+  gpio = switch_gpio;
+  pinMode(gpio, INPUT_PULLUP);
+  state = digitalRead(gpio);
+  type = switch_type;
 }
 
 boolean AFESwitch::isON() {
-  return _state?false:true;
+  return state?false:true;
 }
 
 boolean AFESwitch::isOFF() {
-  return _state?true:false;
+  return state?true:false;
 }
 
 void AFESwitch::listener() {
-   boolean currentState = digitalRead(_gpio);
-   if (_type==SWITCH_TYPE_MONO) {
-     _state = currentState;
+   boolean currentState = digitalRead(gpio);
+   if (type==SWITCH_TYPE_MONO) {
+     state = currentState;
    } else {
      if (!currentState) {
-        if (!_pressed) {
-          _pressed = true;
-          _state = !_state;
+        if (!pressed) {
+          pressed = true;
+          state = !state;
         }
      } else {
-       _pressed = false;
+       pressed = false;
      }
    }
 }
