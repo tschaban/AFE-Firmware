@@ -1,23 +1,25 @@
 #include "AFE-Web-Server.h"
-#include "AFE-Sites-Handlers.cpp"
+
 
 AFEWebServer::AFEWebServer() {
 }
 
 void AFEWebServer::begin() {
         Serial << endl << "INFO: Starting web server";
-        server.on("/", handleRoot);
-        server.on("/favicon.ico",handleFavicon);
-        server.onNotFound(handleNotFound);
         server.begin();
         Serial << endl << "INFO: Web server is working";
         Serial << endl << "INFO: Ready for configuration. Open http://" << WiFi.localIP();
 }
 
-void  AFEWebServer::handleRequest() {
+void  AFEWebServer::listener() {
   server.handleClient();
 }
 
-void AFEWebServer::generatePage() {
-  server.send(200, "text/html", "PAGE");
+void AFEWebServer::generatePage(const String &page) {
+  server.send(200, "text/html", page);
+}
+
+void AFEWebServer::handle(const char* uri,ESP8266WebServer::THandlerFunction handler) {
+  Serial << endl << "INFO: Added url : " << uri << " for listening";
+  server.on(uri, handler);
 }

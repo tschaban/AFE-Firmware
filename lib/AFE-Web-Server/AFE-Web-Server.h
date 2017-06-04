@@ -24,13 +24,13 @@ private:
 	ESP8266WebServer server;
 
 public:
-
+  typedef std::function<void(void)> THandlerFunction;
 	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
 	AFEWebServer();
 	void begin();
-  void handleRequest();
-	void generatePage();
-
+  void listener();
+	void generatePage(const String &page);
+  void handle(const char* uri,ESP8266WebServer::THandlerFunction handler);
 
 };
 
