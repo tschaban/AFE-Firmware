@@ -127,7 +127,7 @@ String AFEWebSites::addConfigurationBlock(const String title,const String descri
 String AFEWebSites::addLabel(uint8_t id) {
   if (id==0) {
     return "<span class=\"post-category post-category-js\">Wymagana konfigurcja</span>";
-  } else {
-    return "<span class=\"post-category post-category-js\">" + String(id) + "</span>";
+  } else if (id==1) {
+    return "<span class=\"post-category post-category-design\">Konfiguracja opcjonalna</span>";
   }
 }

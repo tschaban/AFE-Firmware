@@ -71,8 +71,8 @@
                         <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="device_name">Nazwa urządzenia</label>
-                                    <input id="device_name"name="device_name" type="text" maxlength="32" value="SONOFF_12345678">
+                                    <label>Nazwa urządzenia</label>
+                                    <input name="device_name" type="text" maxlength="32" value="SONOFF_12345678">
                                     <span class="pure-form-message-inline">Max 32 znaki. Informacja wymagana</span>
                                 </div>
                             </fieldset>
@@ -97,8 +97,8 @@
                         <form class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="controlling_mode">Sterowanie</label>
-                                    <select name="controlling_mode" id="controlling_mode"
+                                    <label>Sterowanie</label>
+                                    <select name="controlling_mode"
                                             onchange="document.getElementById('controlling_mode').value==0?hide('MQTTConfig'):show('MQTTConfig');">
                                         <option value="0">Ręczne</option>
                                         <option value="1">MQTT</option>
@@ -119,30 +119,24 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category" href="#">Tylko dla sterowania zdalnego</a><a class="post-category post-category-js" href="#">Wymagana konfiguracja</a>
+                            <span class="post-category post-category-js">Wymagana konfiguracja</span>
                         </p>
                     </header>
                     <div class="post-description">
                         <p>Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania ręcznego</p>
-
-                        <form class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="wifi_ssid">Nazwa sieci WiFI</label>
-                                    <input id="wifi_ssid" type="text" placeholder="Nazwa">
-                                    <span class="pure-form-message-inline">Informacja wymagana</span>
-                                </div>
+                                    <label>Nazwa sieci WiFI</label>
+                                    <input name="wifi_name" type="text" maxlength="32" >
+                                    <span class="pure-form-message-inline">Max 32 znaków. Informacja wymagana</span>
+                                </div>Ma
 
                                 <div class="pure-control-group">
-                                    <label for="wifi_password">Hasło</label>
-                                    <input id="wifi_password" type="password" placeholder="Hasło">
+                                    <label>Hasło</label>
+                                    <input type="password" name="wifi_password" maxlength="16">
+                                    <span class="pure-form-message-inline">Max 16 znaków./span>
                                 </div>
-
-
                             </fieldset>
-                        </form>
-
-
                     </div>
                 </section>
             </div>
@@ -154,41 +148,38 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
+                            <span class="post-category post-category-design">Konfiguracja opcjonalna</span>
                         </p>
                     </header>
                     <div class="post-description">
                         <p>Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/</p>
 
-                        <form class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="internal_relay_name">Nazwa</label>
-                                    <input id="internal_relay_name" type="text" value="przekaznik">
-                                    <span class="pure-form-message-inline">Informacja wymagana dla sterowania MQTT</span>
+                                    <label>Nazwa</label>
+                                    <input name="internal_relay_name" type="text" maxlength="16" value="przekaznik">
+                                    <span class="pure-form-message-inline">Informacja wymagana. Max 16 znaków</span>
                                 </div>
                                 <p>Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>
                                 <div class="pure-control-group">
-                                    <label for="internal_relay_power_restored" class="pure-checkbox">Przywrócenie zasilania</label>
-                                    <select id="internal_relay_power_restored">
+                                    <label class="pure-checkbox">Przywrócenie zasilania</label>
+                                    <select name="internal_relay_power_restored">
                                         <option value="0">Wyłączony</option>
                                         <option value="1">Włączony</option>
-                                        <option value="2" selected="selected">Ostatnia zapamiętana wartość</option>
+                                        <option value="2">Ostatnia zapamiętana wartość</option>
                                     </select>
                                 </div>
                                 <div class="pure-control-group">
-                                    <label for="internal_relay_mqtt_connected" class="pure-checkbox">Podłączony do MQTT</label>
-                                    <select id="internal_relay_mqtt_connected">
+                                    <label class="pure-checkbox">Podłączony do MQTT</label>
+                                    <select>
                                         <option value="0">Wyłączony</option>
                                         <option value="1">Włączony</option>
-                                        <option value="2" selected="selected">Ostatnia zapamiętana wartość</option>
+                                        <option value="2">Ostatnia zapamiętana wartość</option>
                                         <option value="3">Wartość z systemu sterowania</option>
                                     </select>
                                 </div>
 
                             </fieldset>
-                        </form>
-
                     </div>
                 </section>
             </div>
@@ -201,44 +192,44 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category" href="#">Tylko dla sterowania MQTT</a><a  class="post-category post-category-js" href="#">Wymagana konfiguracja</a>
+                            <span class="post-category">Tylko dla sterowania MQTT</span><span class="post-category post-category-js">Wymagana konfiguracja</>
                         </p>
                     </header>
 
                     <div class="post-description">
-                        <p>Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania ręcznego</p>
+                        <p>Urządzenie bez skonfigurowanego MQTT Brokera może być sterowany tylko ręcznie</p>
 
-                        <form class="pure-form pure-form-aligned">
+
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="mqtt_host">Adres lub IP serwera</label>
-                                    <input id="mqtt_host" type="text" placeholder="Nazwa hosta / adres IP">
-                                    <span class="pure-form-message-inline">Informacja jest wymagana.</span>
+                                    <label>Adres lub IP serwera</label>
+                                    <input name="mqtt_host" type="text" maxlength="32">
+                                    <span class="pure-form-message-inline">Informacja jest wymagana. Max 32 znaki/span>
                                 </div>
 
                                 <div class="pure-control-group">
-                                    <label for="mqtt_port">Port</label>
-                                    <input id="mqtt_port" type="number" value="1883">
-                                    <span class="pure-form-message-inline">Informacja jest wymagana.</span>
+                                    <label>Port</label>
+                                    <input name="mqtt_port" type="number" value="1883" maxlength="5">
+                                    <span class="pure-form-message-inline">Informacja jest wymagana</span>
                                 </div>
 
                                 <div class="pure-control-group">
-                                    <label for="mqtt_user">Użytkownik</label>
-                                    <input id="mqtt_user" type="number" placeholder="Użytkownik">
+                                    <label>Użytkownik</label>
+                                    <input name="mqtt_user" type="number">
                                 </div>
 
                                 <div class="pure-control-group">
-                                    <label for="mqtt_password">Hasło</label>
-                                    <input id="mqtt_password" type="number" placeholder="Hasło">
+                                    <label>Hasło</label>
+                                    <input name="mqtt_password" type="password">
                                 </div>
 
                                 <div class="pure-control-group">
-                                    <label for="mqtt_topic">Temat wiadomości</label>
-                                    <input id="mqtt_topic" type="text" value="/sonoff/">
-                                    <span class="pure-form-message-inline">Informacja jest wymagana. Format: /abc/def/</span>
+                                    <label>Temat wiadomości</label>
+                                    <input name="mqtt_topic" type="text" value="/sonoff/" maxlength="32">
+                                    <span class="pure-form-message-inline">Informacja jest wymagana. Format: /abc/def/. Max 32 znaki.</span>
                                 </div>
                             </fieldset>
-                        </form>
+
 
 
                     </div>
