@@ -6,8 +6,12 @@
     <title>AFE Firmware</title>
     <link rel="stylesheet" href="style.min.css">
     <script type="text/javascript">
-        hide=function(e){document.getElementById(e).style.display = 'none';};
-        show=function(e){document.getElementById(e).style.display = 'inline';};
+        hide = function (e) {
+            document.getElementById(e).style.display = 'none';
+        };
+        show = function (e) {
+            document.getElementById(e).style.display = 'inline';
+        };
     </script>
 </head>
 <body>
@@ -15,12 +19,14 @@
     <div class="sidebar pure-u-1 pure-u-md-1-4">
         <div class="header">
             <h2 class="brand-title">AFE Firmware</h2>
+
             <h3 class="brand-tagline">dla urządzeń zbudowanych o ESP8266</h3>
 
             <nav class="nav">
                 <ul class="nav-list">
                     <li class="nav-item">
-                        <a class="pure-button" href="http://smart-house.adrian.czabanowski.com/firmware-sonoff/" target="_blank">Dokumentacja</a>
+                        <a class="pure-button" href="http://smart-house.adrian.czabanowski.com/firmware-sonoff/"
+                           target="_blank">Dokumentacja</a>
                     </li>
                     <li class="nav-item">
                         <a class="pure-button" href="https://smart-house.adrian.czabanowski.com/forum/" target="_blank">Forum</a>
@@ -54,11 +60,12 @@
 
     <div class="content pure-u-1 pure-u-md-3-4">
 
-            <form>
+        <form>
 
             <!-- Device name -->
             <div class="posts">
                 <a name="devicename"></a>
+
                 <h1 class="content-subhead">Nazwa urządzenia</h1>
                 <section class="post">
                     <header class="post-header">
@@ -67,7 +74,9 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Nazwa jest wykorzystywana jako nazwa hosta w Twojej lokalnej sieci WiFi oraz jako nazwa punktu dostępowego WiFi dla konfiguracji urządzenia</p>
+                        <p>Nazwa jest wykorzystywana jako nazwa hosta w Twojej lokalnej sieci WiFi oraz jako nazwa
+                            punktu dostępowego WiFi dla konfiguracji urządzenia</p>
+
                         <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
@@ -84,6 +93,7 @@
             <!-- Controlling mode -->
             <div class="posts">
                 <a name="devicemode"></a>
+
                 <h1 class="content-subhead">Tryb sterowania urządzeniem </h1>
                 <!-- A single blog post -->
                 <section class="post">
@@ -93,8 +103,10 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Dostępne jest sterowanie ręczne poprzez wbudowany lub zewnętrzny włącznik lub zdalne z wykorzystaniem protokołu MQTT lub HTTP </p>
-                        <form class="pure-form pure-form-aligned">
+                        <p>Dostępne jest sterowanie ręczne poprzez wbudowany lub zewnętrzny włącznik lub zdalne z
+                            wykorzystaniem protokołu MQTT lub HTTP </p>
+
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
                                     <label>Sterowanie</label>
@@ -106,8 +118,7 @@
                                     </select>
                                 </div>
                             </fieldset>
-                        </form>
-
+                        </div>
 
                     </div>
                 </section>
@@ -123,20 +134,23 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania ręcznego</p>
+                        <p>Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania
+                            ręcznego</p>
+
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
                                     <label>Nazwa sieci WiFI</label>
-                                    <input name="wifi_name" type="text" maxlength="32" >
+                                    <input name="wifi_name" type="text" maxlength="32">
                                     <span class="pure-form-message-inline">Max 32 znaków. Informacja wymagana</span>
-                                </div>Ma
-
+                                </div>
                                 <div class="pure-control-group">
                                     <label>Hasło</label>
                                     <input type="password" name="wifi_password" maxlength="16">
-                                    <span class="pure-form-message-inline">Max 16 znaków./span>
+                                    <span class="pure-form-message-inline">Max 16 znaków.</span>
                                 </div>
                             </fieldset>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -152,15 +166,20 @@
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/</p>
+                        <p>Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat
+                            MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np
+                            /sonoff/lampa/</p>
 
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
                                     <label>Nazwa</label>
                                     <input name="internal_relay_name" type="text" maxlength="16" value="przekaznik">
                                     <span class="pure-form-message-inline">Informacja wymagana. Max 16 znaków</span>
                                 </div>
-                                <p>Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>
+                                <p>Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do
+                                    brokera MQTT (tyko dla sterowania przez MQTT)</p>
+
                                 <div class="pure-control-group">
                                     <label class="pure-checkbox">Przywrócenie zasilania</label>
                                     <select name="internal_relay_power_restored">
@@ -180,6 +199,7 @@
                                 </div>
 
                             </fieldset>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -192,19 +212,20 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <span class="post-category">Tylko dla sterowania MQTT</span><span class="post-category post-category-js">Wymagana konfiguracja</>
+                            <span class="post-category">Tylko dla sterowania MQTT</span><span
+                                class="post-category post-category-js">Wymagana konfiguracja</span>
                         </p>
                     </header>
 
                     <div class="post-description">
                         <p>Urządzenie bez skonfigurowanego MQTT Brokera może być sterowany tylko ręcznie</p>
 
-
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label>Adres lub IP serwera</label>
+                                    <label>Host lub IP serwera</label>
                                     <input name="mqtt_host" type="text" maxlength="32">
-                                    <span class="pure-form-message-inline">Informacja jest wymagana. Max 32 znaki/span>
+                                    <span class="pure-form-message-inline">Informacja jest wymagana. Max 32 znaki</span>
                                 </div>
 
                                 <div class="pure-control-group">
@@ -229,8 +250,7 @@
                                     <span class="pure-form-message-inline">Informacja jest wymagana. Format: /abc/def/. Max 32 znaki.</span>
                                 </div>
                             </fieldset>
-
-
+                        </div>
 
                     </div>
                 </section>
@@ -244,113 +264,86 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category post-category-yui" href="#">Tylko dla Domoticz</a><a class="post-category" href="#">Dla dla sterowania HTTP</a>
-                            <a class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
+                            <span class="post-category post-category-yui" href="#">Tylko dla Domoticz</span><span
+                                class="post-category" href="#">Dla dla sterowania HTTP</span>
+                            <span class="post-category post-category-design" href="#">Konfiguracja opcjonalna</span>
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Konfiguracja jest konieczna tylko w przypadku kiedy urządzeniem steruje się również ręcznie i konieczne jest informowanie Domoticz o takich zdarzeniach</p>
-                        <form class="pure-form pure-form-aligned">
+                        <p>Konfiguracja wymagana jedynie kiedy jest potrzeba wysyałania stanu przekaźnika do serwera
+                            Domoticz</p>
+
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="domoticz_host">Adres lub IP serwera</label>
-                                    <input id="domoticz_host" type="text" placeholder="np: http://192.168.1.10">
+                                    <label>IP serwera</label>
+                                    <input name="domoticz_ip1" type="number" maxlength="3" style="width:70px">.
+                                    <input name="domoticz_ip2" type="number" maxlength="3" style="width:70px">.
+                                    <input name="domoticz_ip3" type="number" maxlength="3" style="width:70px">.
+                                    <input name="domoticz_ip4" type="number" maxlength="3" style="width:70px">.
                                     <span class="pure-form-message-inline">Informacja wymagana</span>
                                 </div>
                                 <div class="pure-control-group">
-                                    <label for="domoticz_port">Port</label>
-                                    <input id="domoticz_port" type="number" value="8080">
+                                    <label>Port</label>
+                                    <input name="domoticz_port" type="number" value="8080" maxlength="5">
                                     <span class="pure-form-message-inline">Informacja wymagana</span>
                                 </div>
                                 <div class="pure-control-group">
-                                    <label for="domoticz_device_idx">IDX urządzeniaz</label>
-                                    <input id="domoticz_device_idx" type="number">
+                                    <label>IDX urządzenia</label>
+                                    <input name="domoticz_device_idx" type="number">
                                     <span class="pure-form-message-inline">Informacja wymagana. Do odczytania z konfiguracji Domoticz</span>
                                 </div>
                             </fieldset>
-                        </form>
+                        </div>
                     </div>
                 </section>
             </div>
 
-            <!-- GPIOs -->
-            <div class="posts">
-                <h1 class="content-subhead">Dodatkowe urządzenia i czujnik podpięte do GPIO</h1>
-
-                <!-- A single blog post -->
-                <section class="post">
-                    <header class="post-header">
-                        <p class="post-meta">
-                            <a class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
-                        </p>
-                    </header>
-                    <div class="post-description">
-                        <p><a class="post-category post-category-pure" href="#">Uwaga</a> na dzień dzisiejszy możliwe jest podłączenie tylko jednego czujnika temperatury DS18B20. Dla sterowania HTML zaimplementowany jest tylko zewnętrzny włącznik</p>
-                        <form class="pure-form pure-form-aligned">
-                            <fieldset>
-                                <div class="pure-control-group">
-                                    <label for="pin_2_mode">PIN 2 [GPIO3]</label>
-                                    <select id="pin_2_mode">
-                                        <option value="0" selected="selected">Brak</option>
-                                        <option value="1">Przekaźnik</option>
-                                        <option value="2">Zewnętrzny włącznik</option>
-                                        <option value="3">Czujnik temperatury DS18B20</option>
-                                    </select>
-                                </div>
-                                <div class="pure-control-group">
-                                    <label for="pin_3_mode">PIN 3 [GPIO1]</label>
-                                    <select id="pin_3_mode">
-                                        <option value="0" selected="selected">Brak</option>
-                                        <option value="1">Przekaźnik</option>
-                                        <option value="2">Zewnętrzny włącznik</option>
-                                        <option value="3">Czujnik temperatury DS18B20</option>
-                                    </select>
-                                </div>
-                                <div class="pure-control-group">
-                                    <label for="pin_5_mode">PIN 5 [GPIO14]</label>
-                                    <select id="pin_5_mode">
-                                        <option value="0" selected="selected">Brak</option>
-                                        <option value="1">Przekaźnik</option>
-                                        <option value="2">Zewnętrzny włącznik</option>
-                                        <option value="3">Czujnik temperatury DS18B20</option>
-                                    </select>
-                                </div>
-
-                            </fieldset>
-                        </form>
-                    </div>
-                </section>
-            </div>
 
             <!-- DS18B20 -->
             <div class="posts">
-                <h1 class="content-subhead">Czujnik temperatury</h1>
+                <h1 class="content-subhead">Czujnik temperatury DS18B20</h1>
 
                 <!-- A single blog post -->
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category" href="#">Tylko dla sterowania MQTT</a><a class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
+                            <a class="post-category" href="#">Tylko dla sterowania MQTT</a><a
+                                class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
                         </p>
                     </header>
-
                     <div class="post-description">
-                        <p>DS18B20 jest obsługiwanym czujnikiem temperatury. Możliwe jest podłaczenie tylko jednego czujnika temperatury.</p>
+                        <p>DS18B20 jest obsługiwanym czujnikiem temperatury. Możliwe jest podłaczenie tylko jednego
+                            czujnika temperatury.</p>
 
-                        <form class="pure-form pure-form-aligned">
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
-                                <div class="pure-control-group">
-                                    <label for="ds18b20_interval">Odczyty co</label>
-                                    <input id="ds18b20_interval" type="number" value="600">
-                                    <span class="pure-form-message-inline">sekund</span>
+                                <div class="pure-controls">
+                                    <label class="pure-checkbox">
+                                        <input name="ds18b20_present" type="checkbox"> Podączony?
+                                    </label>
                                 </div>
                                 <div class="pure-control-group">
-                                    <label for="ds18b20_correction">Korekta wartości o</label>
-                                    <input id="ds18b20_correction" type="number" value="0">
-                                    <span class="pure-form-message-inline">stopni</span>
+                                    <label>GPIO</label>
+                                    <select name="ds18b20_gpio">
+                                        <option value="0">GPIO1</option>
+                                        <option value="1">GPIO2</option>
+                                        <option value="2">GPIO3</option>
+                                        <option value="3">GPIO4</option>
+                                    </select>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label>Odczyty co</label>
+                                    <input name="ds18b20_interval" type="number" value="600" maxlength="5">
+                                    <span class="pure-form-message-inline">sekund. Zakres 10sek do 99999sek</span>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label>Korekta wartości o</label>
+                                    <input name="ds18b20_correction" type="number" value="0" maxlength="6">
+                                    <span class="pure-form-message-inline">stopni. Zakres -9.99 do 9.99, </span>
                                 </div>
                             </fieldset>
-                        </form>
+                        </div>
 
 
                     </div>
@@ -364,39 +357,43 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category" href="#">Tylko dla sterowania MQTT</a><a class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
+                            <span class="post-category" href="#">Tylko dla sterowania MQTT</span><a
+                                class="post-category post-category-design" href="#">Konfiguracja opcjonalna</a>
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Każdy dodatkowy przekaźnik powinnien mieć unikalną nazwę. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/nazwa_przekaznika/</p>                        </p>
+                        <p>Każdy dodatkowy przekaźnik powinnien mieć unikalną nazwę. Nazwa przekaźnika jest częścio tematu MQTT. np /esp/nazwa_przekaznika/</p>                        </p>
 
-                        <form class="pure-form pure-form-aligned">
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
                                 <div class="pure-control-group">
-                                    <label for="external_relay_name">Nazwa</label>
-                                    <input id="external_relay_name" type="text" value="przekaznik-1">
-                                    <span class="pure-form-message-inline">Informacja jest wymagana</span>
+                                    <label>Nazwa</label>
+                                    <input name="external_relay_name" type="text" value="przekaznik-1" maxlength="16">
+                                    <span class="pure-form-message-inline">Informacja jest wymagana. Tylko litery i cyfry. Max 16 znaki</span>
                                 </div>
-                                <p>Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>
+                                <p>Zachowanie  przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do
+                                    brokera MQTT</p>
+
                                 <div class="pure-control-group">
-                                    <label for="external_relay_power_restored" class="pure-checkbox">Przywrócenie zasilania</label>
-                                    <select id="external_relay_power_restored">
+                                    <label>Przywrócenie zasilania</label>
+                                    <select name="external_relay_power_restored">
                                         <option value="0">Wyłączony</option>
                                         <option value="1">Włączony</option>
-                                        <option value="2" selected="selected">Ostatnia zapamiętana wartość</option>
+                                        <option value="2">Ostatnia zapamiętana wartość</option>
                                     </select>
                                 </div>
                                 <div class="pure-control-group">
-                                    <label for="external_relay_mqtt_connected" class="pure-checkbox">Podłączony do MQTT</label>
-                                    <select id="external_relay_mqtt_connected">
+                                    <label>Podłączony do MQTT</label>
+                                    <select name="external_relay_mqtt_connected">
                                         <option value="0">Wyłączony</option>
                                         <option value="1">Włączony</option>
-                                        <option value="2" selected="selected">Ostatnia zapamiętana wartość</option>
+                                        <option value="2">Ostatnia zapamiętana wartość</option>
                                         <option value="3">Wartość z systemu sterowania</option>
-                                    </select>                                </div>
+                                    </select>
+                                </div>
 
                             </fieldset>
-                        </form>
+                        </div>
 
                     </div>
                 </section>
@@ -408,22 +405,46 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category post-category-design" href="#">Opcjonalne</a><a class="post-category" href="#">Dla sterowania MQTT</a>
+                            <span class="post-category post-category-design" href="#">Opcjonalne</span><a
+                                class="post-category" href="#">Dla sterowania MQTT</a>
                         </p>
                     </header>
                     <div class="post-description">
-                        <p>Zewnętrzny przełącznik steruje tylko wbudowanym przekaźnikiem. Ustawienie czułości włącznika należy ustawić pod indywidulane potrzeby. Wysoka czułości może powodować, że przekaźnik może zmieniać swój stan nadmiernie dla niektórych włączników</p>
+                        <p>Zewnętrzny przełącznik steruje tylko wbudowanym przekaźnikiem. Ustawienie czułości włącznika
+                            należy ustawić pod indywidulane potrzeby. Wysoka czułości może powodować, że przekaźnik może
+                            zmieniać swój stan nadmiernie dla niektórych włączników</p>
 
                         <div class="pure-form pure-form-aligned">
                             <fieldset>
-                                    <div class="pure-control-group">
-                                        <label for="sensitivity">Czułość</label>
-                                        <select id="sensitivity">
-                                            <option value="0">Niska</option>
-                                            <option value="1" selected="selected">Średnia</option>
-                                            <option value="2">Wysoka</option>
-                                        </select>
-                                    </div>
+                                <div class="pure-controls">
+                                    <label class="pure-checkbox">
+                                        <input name="switch_present" type="checkbox"> Podączony?
+                                    </label>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label>GPIO</label>
+                                    <select name="switch_gpio">
+                                        <option value="0">GPIO1</option>
+                                        <option value="1">GPIO2</option>
+                                        <option value="2">GPIO3</option>
+                                        <option value="3">GPIO4</option>
+                                    </select>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label>Typ</label>
+                                    <select name="switch_type">
+                                        <option value="0">Mono-stabilny</option>
+                                        <option value="1">Bi-stabilny</option>
+                                    </select>
+                                </div>
+                                <div class="pure-control-group">
+                                    <label>Czułość</label>
+                                    <select name="switch_sensitivity">
+                                        <option value="0">Niska</option>
+                                        <option value="1">Średnia</option>
+                                        <option value="2">Wysoka</option>
+                                    </select>
+                                </div>
                             </fieldset>
 
                         </div>
@@ -437,28 +458,36 @@
                 <section class="post">
                     <header class="post-header">
                         <p class="post-meta">
-                            <a class="post-category post-category-pure" href="#">Tylko dla zaawansowanych</a>
+                            <span class="post-category post-category-pure" href="#">Tylko dla zaawansowanych</span>
                         </p>
                     </header>
                     <div class="post-description">
-                        <p><a class="post-category post-category-js" href="#">Uwaga</a> Upewnij się że wgrywasz odpowiednie oprogramowanie. Podczas aktualizacji firmware nie można odłączać urządzenia od zasilania.</p>
+                        <p>
+                            <span class="post-category post-category-js">Uwaga</span> Upewnij się że wgrywasz
+                            odpowiednie oprogramowanie. Podczas aktualizacji firmware nie można odłączać urządzenia od
+                            zasilania.
+                        </p>
+
                         <p> Po zakończeniu aktualizacji urządzenie zostanie automatycznie zresetowane.</p>
-                        <form class="pure-form pure-form-aligned">
+
+                        <div class="pure-form pure-form-aligned">
                             <fieldset>
+
                                 <div class="pure-control-group">
-                                    <label for="sensitivity">Wybierz firmware</label>
+                                    <label>Wybierz firmware</label>
                                     <input type="file" name="firmware_file" accept=".bin">
                                 </div>
 
-                            <div class="pure-controls">
-                                <label for="ce" class="pure-checkbox">
-                                    <input id="ce" name="clear_eeprom" type="checkbox"> Wyczyścić zawartośc pamięci przy aktualizacji?
-                                </label>
-                            </div>
+                                <div class="pure-controls">
+                                    <label>
+                                    <input name="clear_eeprom" type="checkbox"> Wyczyścić zawartośc pamięci
+                                        przy aktualizacji?
+                                    </label>
+                                </div>
                             </fieldset>
 
                             <button type="submit" class="button-success pure-button">Aktualizuj</button>
-                        </form>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -468,23 +497,28 @@
             <button type="submit" class="button-warning pure-button">Zapisz</button>
             <button type="submit" class="button-success pure-button">Zapisz i wyjdź z konfiguracji</button>
 
-            </form>
+        </form>
 
 
-            <script type="text/javascript">
-               hide('MQTTConfig');
-            </script>
+        <script type="text/javascript">
+            hide('MQTTConfig');
+        </script>
 
-            <div class="footer">
-                <div class="pure-menu pure-menu-horizontal">
-                    <ul>
-                        <li class="pure-menu-item"><a href="http://twitter.com/yuilibrary/" class="pure-menu-link">Wersja beta 1</a></li>
-                        <li class="pure-menu-item"><a href="https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE" class="pure-menu-link">Licencja</a></li>
-                        <li class="pure-menu-item"><a href="http://smart-house.adrian.czabanowski.com/forum/firmware-do-przelacznika-sonoff/" class="pure-menu-link">Pomoc</a></li>
-                        <li class="pure-menu-item"><a href="https://github.com/tschaban/AFE-Firmware" class="pure-menu-link">GitHub</a></li>
-                    </ul>
-                </div>
+        <div class="footer">
+            <div class="pure-menu pure-menu-horizontal">
+                <ul>
+                    <li class="pure-menu-item"><a href="http://twitter.com/yuilibrary/" class="pure-menu-link">Wersja
+                        beta 1</a></li>
+                    <li class="pure-menu-item"><a href="https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE"
+                                                  class="pure-menu-link">Licencja</a></li>
+                    <li class="pure-menu-item"><a
+                            href="http://smart-house.adrian.czabanowski.com/forum/firmware-do-przelacznika-sonoff/"
+                            class="pure-menu-link">Pomoc</a></li>
+                    <li class="pure-menu-item"><a href="https://github.com/tschaban/AFE-Firmware"
+                                                  class="pure-menu-link">GitHub</a></li>
+                </ul>
             </div>
+        </div>
 
 
     </div>
