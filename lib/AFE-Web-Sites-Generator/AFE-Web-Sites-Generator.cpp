@@ -131,3 +131,15 @@ String AFEWebSites::addLabel(uint8_t id) {
     return "<span class=\"post-category post-category-design\">Konfiguracja opcjonalna</span>";
   }
 }
+
+String AFEWebSites::generateConfigParameter_GPIO(const char* label, const char* field, uint8_t selected) {
+  String body = "<div class=\"pure-control-group\">";
+  body+="<label>"+String(label)+"</label>";
+  body+="<select name=\"" + String(field) + "\">";
+  for (uint8_t i=0; i<=16 ; i++) {
+    body+="<option value=\"" + String(i) + "\"" + (i==selected?"selected=\"selected\"":"") + ">GPIO" + String(i) + "</option>";
+  }
+  body+="</select>";
+ body+="</div>";
+  return body;
+}

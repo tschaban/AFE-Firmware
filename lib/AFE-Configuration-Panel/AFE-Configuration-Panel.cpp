@@ -51,6 +51,12 @@ String AFEConfigurationPanel::generateMainSite() {
   labels[0] = {0};
 
   body="<fieldset>";
+  body+="<div class=\"pure-controls\">";
+  body+="<label class=\"pure-checkbox\">";
+  body+="<input name=\"Internal_relay_present\" type=\"checkbox\"> Podączony?";
+  body+="</label>";
+  body+="</div>";
+  body+=Site.generateConfigParameter_GPIO("GPIO","internal_relay_gpio",1);
   body+="<div class=\"pure-control-group\">";
   body+="<label>Nazwa</label>";
   body+="<input name=\"internal_relay_name\" type=\"text\" maxlength=\"16\" value=\"przekaznik\">";
@@ -161,15 +167,7 @@ String AFEConfigurationPanel::generateMainSite() {
   body+="<input name=\"ds18b20_present\" type=\"checkbox\"> Podączony?";
   body+="</label>";
   body+="</div>";
-  body+="<div class=\"pure-control-group\">";
-  body+="<label>GPIO</label>";
-  body+="<select name=\"ds18b20_gpio\">";
-  body+="<option value=\"0\">GPIO1</option>";
-  body+="<option value=\"1\">GPIO2</option>";
-  body+="<option value=\"2\">GPIO3</option>";
-  body+="<option value=\"3\">GPIO4</option>";
-  body+="</select>";
-  body+="</div>";
+  body+=Site.generateConfigParameter_GPIO("GPIO","ds18b20_gpio",1);
   body+="<div class=\"pure-control-group\">";
   body+="<label>Odczyty co</label>";
   body+="<input name=\"ds18b20_interval\" type=\"number\" value=\"600\" maxlength=\"5\">";
@@ -193,6 +191,13 @@ String AFEConfigurationPanel::generateMainSite() {
   labels[0] = {1};
 
   body="<fieldset>";
+
+  body+="<div class=\"pure-controls\">";
+  body+="<label class=\"pure-checkbox\">";
+  body+="<input name=\"external_relay_present\" type=\"checkbox\"> Podączony?";
+  body+="</label>";
+  body+="</div>";
+  body+=Site.generateConfigParameter_GPIO("GPIO","external_relay_gpio",1);
   body+="<div class=\"pure-control-group\">";
   body+="<label>Nazwa</label>";
   body+="<input name=\"external_relay_name\" type=\"text\" value=\"przekaznik-1\" maxlength=\"16\">";
@@ -234,15 +239,7 @@ String AFEConfigurationPanel::generateMainSite() {
   body+="<input name=\"switch_present\" type=\"checkbox\"> Podączony?";
   body+="</label>";
   body+="</div>";
-  body+="<div class=\"pure-control-group\">";
-  body+="<label>GPIO</label>";
-  body+="<select name=\"switch_gpio\">";
-  body+="<option value=\"0\">GPIO1</option>";
-  body+="<option value=\"1\">GPIO2</option>";
-  body+="<option value=\"2\">GPIO3</option>";
-  body+="<option value=\"3\">GPIO4</option>";
-  body+="</select>";
-  body+="</div>";
+  body+=Site.generateConfigParameter_GPIO("GPIO","switch_gpio",1);
   body+="<div class=\"pure-control-group\">";
   body+="<label>Typ</label>";
   body+="<select name=\"switch_type\">";

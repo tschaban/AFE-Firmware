@@ -32,6 +32,7 @@ public:
 	String generateLeftPanel();
 	String generateRightPanel();
 	String generateFooter();
+	String generateConfigParameter_GPIO(const char* label, const char* field, uint8_t selected);
 
 };
 
