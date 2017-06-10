@@ -14,20 +14,27 @@
 	#include "WProgram.h"
 #endif
 
-#include <AFE-Web-Sites-Generator.h>
+#include "AFE-Sites-Generator.h"
 
 #include <Streaming.h>
 
 class AFEConfigurationPanel {
 
 private:
-  AFEWebSites Site;
+  AFESitesGenerator Site;
 
 public:
 	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
 	AFEConfigurationPanel();
-  String generateMainSite();
-
+  String getDeviceConfigurationSite();
+	String getMQTTConfigurationSite();
+	String getRelayConfigurationSite();
+	String getDS18B20ConfigurationSite();
+	String getSwitchConfigurationSite();
+	String getDomoticzConfigurationSite();
+	String getUpdateConfigurationSite();
+	String getResetConfigurationSite();
+	String getExitConfigurationSite();
 
 };
 
