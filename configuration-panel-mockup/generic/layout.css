@@ -1,0 +1,204 @@
+body {
+    margin: 0;
+}
+
+
+#c { /* Container */
+    display: table;
+    width: 100%;
+}
+
+#l, #r {
+    display: table-cell;
+}
+
+#l { /* Left panel */
+    width: 300px;
+    background: #282828;
+    padding: 20px;
+    color: #EEEEEE;
+
+}
+
+#r { /* Right panel */
+    padding: 20px;
+}
+
+p,a,input, h1,h3,h4, span, label, button {
+    font-family: sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Left panel */
+
+.ltit,
+.ltag {
+    margin: 0;
+}
+
+.ltag {
+   font-weight: 300;
+   color: #B0CADB;
+   margin-bottom: 20px;
+}
+
+/* Left panel menu */
+
+.lst {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.itm a {
+    display: block;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 0.2em 1em;
+    color: #777;
+    font-size: 95%;
+}
+
+.itm a:hover,
+.itm a:focus {
+    background-color: #eee;
+    text-decoration: none;
+    padding: 0.2em 1.5em;
+    color: #000;
+}
+
+
+/* Configuration item */
+
+.ci {
+    margin-bottom: 2em;
+}
+
+/* Configuration item: header */
+
+.ci h1 {
+    color: #aaa;
+    border-bottom: 1px solid #eee;
+    font-size: 110%;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+}
+
+/* Configuration item: description */
+.ci .cd {
+    color: #444;
+    line-height: 1.8em;
+    font-size: 80%;
+    font-style: italic;
+}
+
+/* Configuration item: labels */
+
+.cm {
+    color: #999;
+    font-size: 90%;
+    margin: 0 0 20px 0;
+}
+
+
+.la {
+    margin: 0 0.1em;
+    padding: 0.3em 1em;
+    color: #fff;
+    background: #999;
+    font-size: 80%;
+}
+
+.lr {
+    background: #CA3C3C;
+}
+
+.lg {
+    background: #2FB548;
+}
+
+
+/* Configuration item: form */
+
+fieldset {
+    margin: 0;
+    padding: 0.35em 0 0.75em;
+    border: 0;
+}
+
+
+.cf { /* Control block for input and select items */
+    margin-bottom: 0.5em;
+}
+
+.cc { /* Control block for checkbox items */
+    margin: 1em 0 0.5em 9.4em;
+}
+
+
+.cf label {
+    text-align: right;
+    display: inline-block;
+    vertical-align: middle;
+    width: 10em;
+    margin: 0 1em 0 0;
+    font-size: 0.875em;
+
+}
+
+.cc label {
+    font-size: 0.875em;
+
+}
+
+input,select {
+    padding: 0.5em 0.6em;
+    display: inline-block;
+    border: 1px solid #ccc;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+.hint {
+    display: inline-block;
+    padding-left: 0.3em;
+    color: #aaa;
+    vertical-align: middle;
+    font-size: 80%;
+}
+
+/* Buttons */
+
+.b
+{
+    font-size: 100%;
+    padding: 0.5em 1em;
+    border: 1px solid #999;  /*IE 6/7/8*/
+    border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
+    text-decoration: none;
+    color: white;
+}
+
+.bs {
+    background: #2FB548;
+}
+
+.be {
+    background: #CA3C3C;
+}
+.bw {
+    background: #DF7514;
+}
+
+.bc {
+    background: #42B8DD;
+}
+
+.b:hover,
+.b:focus {
+    filter: alpha(opacity=90);
+    background-image: -webkit-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+}
