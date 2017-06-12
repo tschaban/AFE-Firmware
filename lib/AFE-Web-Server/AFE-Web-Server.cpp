@@ -22,3 +22,12 @@ void AFEWebServer::handle(const char* uri,ESP8266WebServer::THandlerFunction han
         Serial << endl << "INFO: Added url : " << uri << " for listening";
         server.on(uri, handler);
 }
+
+uint8_t AFEWebServer::getUrlCommand() {
+        if (server.hasArg("command")) {
+                if (server.arg(0).toInt()==SERVER_CMD_SAVE) {
+                        return SERVER_CMD_SAVE;
+                }
+        }
+        return SERVER_CMD_NONE;
+}

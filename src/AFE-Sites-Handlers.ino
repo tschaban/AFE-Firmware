@@ -11,10 +11,14 @@
 #include <Streaming.h>
 
 
-void handleFavicon() {}
+void handleFavicon() {
+}
 
 void handleRoot() {
     AFEConfigurationPanel ConfigurationPanel;
+		if (WebServer.getUrlCommand()==SERVER_CMD_SAVE) {
+			Serial << endl << "INFO: Saveing";
+		}
     String site = ConfigurationPanel.getDeviceConfigurationSite();
 		WebServer.publishHTML(site);
 }
@@ -70,6 +74,10 @@ void handleExitConfiguration() {
 	AFEConfigurationPanel ConfigurationPanel;
 	String site = ConfigurationPanel.getExitConfigurationSite();
 	WebServer.publishHTML(site);
+}
+
+void handleSave() {
+	
 }
 
 #endif
