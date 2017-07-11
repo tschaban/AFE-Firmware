@@ -73,7 +73,7 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char* field, 
 
 String AFESitesGenerator::addDeviceNameConfiguration() {
 
-  char name[32] = "SONOFF";
+  char name[32] = "AFEDevice";
 
   String body="<fieldset>"
                "<div class=\"cf\">"
@@ -187,8 +187,9 @@ String AFESitesGenerator::addRelayConfiguration() {
   char name[16] = "przekaznik";
   boolean present = true;
   uint8_t gpio = 12;
-  uint8_t powerRestored = 1;
-  uint8_t connectedToMqtt = 2;
+  uint8_t powerRestored = 2;
+  uint8_t connectedToMqtt = 0;
+  uint16_t interval = 0;
 
   String body="<fieldset>";
   body+="<div class=\"cc\">";
@@ -215,13 +216,23 @@ String AFESitesGenerator::addRelayConfiguration() {
   body+="<div class=\"cf\">";
   body+="<label>Włączony do MQTT</label>";
   body+="<select  name=\"relay1_mqtt_connected\">";
-  body+="<option value=\"1\""; body+=(connectedToMqtt==0?" selected=\"selected\"":""); body+=">-- Wybierz --</option>";
+  body+="<option value=\"0\""; body+=(connectedToMqtt==0?" selected=\"selected\"":""); body+=">Brak akcji</option>";
   body+="<option value=\"1\""; body+=(connectedToMqtt==1?" selected=\"selected\"":""); body+=">Wyłączony</option>";
   body+="<option value=\"2\""; body+=(connectedToMqtt==2?" selected=\"selected\"":""); body+=">Włączony</option>";
   body+="<option value=\"3\""; body+=(connectedToMqtt==3?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
   body+="<option value=\"4\""; body+=(connectedToMqtt==4?" selected=\"selected\"":""); body+=">Wartość z systemu sterowania</option>";
   body+="</select>";
   body+="</div>";
+
+  body+="<p class=\"cd\">Ustaw poniższy parametr jeśli przekaźnik ma się wyłączyc automatycznie po zadanym czasie. Domyślnie 0 - przekaźnik nie zmienia stanu automatycznie</p>";
+
+  body+="<div class=\"cf\">";
+  body+="<label>Wyłącz po</label>";
+  body+="<input name=\"relay1_off_time\" type=\"number\" maxlength=\"5\" value=\""; body+=interval; body+="\">";
+  body+="<span class=\"hint\">sekundach. Zakres 0.5sek do 99999sek</span>";
+  body+="</div>";
+
+
   body+="</fieldset>";
 
   return addConfigurationBlock(
