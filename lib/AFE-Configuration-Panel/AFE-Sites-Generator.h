@@ -29,15 +29,21 @@ public:
 	String addConfigurationBlock(const String title,const String description, const String body,  const String link);
 	const char* generateHeader();
 	const char* generateFooter();
-	const String  generateConfigParameter_GPIO(const char* label, const char* field, uint8_t selected);
+	const String  generateConfigParameter_GPIO(const char* field, uint8_t selected);
 
   String addDeviceNameConfiguration();
 	String addWiFiConfiguration();
+	String addNetworkConfiguration();
   String addRelayConfiguration();
 	String addMQTTBrokerConfiguration();
 	String addDomoticzConfiguration();
 	String addDS18B20Configuration();
-	String addSwitchConfiguration();
+	String addSwitchConfiguration(const char* id);
+
+  String addUpgradeSection();
+	String addResetSection();
+	String addExitSection();
+
 
 };
 
