@@ -38,7 +38,8 @@ void write(uint16_t address, boolean in);
 String  read(uint16_t address, uint16_t size);
 boolean read(uint16_t address);
 
-/* Returns IP Address */
+/* Used to read / write IP Address */
+void writeIP(uint16_t address,uint8_t ip[4]);
 IPAddress readIP(uint16_t address);
 
 /* Those two could be used to store 0-255 int under one address */
