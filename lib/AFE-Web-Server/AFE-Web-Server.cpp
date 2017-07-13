@@ -14,7 +14,7 @@ void AFEWebServer::listener() {
         server.handleClient();
 }
 
-void AFEWebServer::publishHTML(String &page) {
+void AFEWebServer::publishHTML(String page) {
         server.send(200, "text/html", page);
 }
 
@@ -23,11 +23,23 @@ void AFEWebServer::handle(const char* uri,ESP8266WebServer::THandlerFunction han
         server.on(uri, handler);
 }
 
-uint8_t AFEWebServer::getUrlCommand() {
+void AFEWebServer::generate() {
+        publishHTML(ConfigurationPanel.getSite(getOptionName(),isSave()));
+}
+
+String AFEWebServer::getOptionName() {
+        if (server.hasArg("option")) {
+                return server.arg(0);
+        } else {
+                return "basic";
+        }
+}
+
+uint8_t AFEWebServer::isSave() {
         if (server.hasArg("command")) {
-                if (server.arg(0).toInt()==SERVER_CMD_SAVE) {
-                        return SERVER_CMD_SAVE;
+                if (server.arg(1).toInt()==SERVER_CMD_SAVE) {
+                        return true;
                 }
         }
-        return SERVER_CMD_NONE;
+        return false;
 }
