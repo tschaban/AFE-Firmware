@@ -21,16 +21,16 @@ const char* AFESitesGenerator::generateHeader() {
                "<h4 class=\"ltag\">dla urządzeń zbudowanych o ESP8266</h4>"
                "<h4>MENU</h4>"
                "<ul class=\"lst\">"
-               "<li class=\"itm\"><a href=\"\\\">Konfiguracja podstawowa</a></li>"
-               "<li class=\"itm\"><a href=\"\\mqtt\">MQTT Broker</a></li>"
-               "<li class=\"itm\"><a href=\"\\domoticz\">Domoticz</a></li>"
-               "<li class=\"itm\"><a href=\"\\relay\">Przekaźnik</a></li>"
-               "<li class=\"itm\"><a href=\"\\ds18b20\">Czujnik DS18B20</a></li>"
-               "<li class=\"itm\"><a href=\"\\switch\">Przycisk / Włącznik</a></li>"
-               "<li class=\"itm\"><a href=\"\\upgrade\">Aktulizacja</a></li>"
-               "<li class=\"itm\"><a href=\"\\reset\">Przywracanie ustawień</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja podstawowa</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=relay\">Przekaźnik</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik DS18B20</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / Włącznik</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=upgrade\">Aktulizacja</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=reset\">Przywracanie ustawień</a></li>"
                "<br><br>"
-               "<li class=\"itm\"><a href=\"\\exit\">Zakończ konfigurację</a></li>"
+               "<li class=\"itm\"><a href=\"\\?option=exit\">Zakończ konfigurację</a></li>"
                "</ul>"
                "<br><br>"
                "<h4>INFORMACJE</h4>"
@@ -103,8 +103,8 @@ String AFESitesGenerator::addWiFiConfiguration() {
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Hasło</label>";
-  body+="<input type=\"password\" name=\"wifi_password\" maxlength=\"16\" value=\""; body+=password; body+="\">";
-  body+="<span class=\"hint\">Max 16 znaków.</span>";
+  body+="<input type=\"password\" name=\"wifi_password\" maxlength=\"32\" value=\""; body+=password; body+="\">";
+  body+="<span class=\"hint\">Max 32 znaków.</span>";
   body+="</div>";
   body+="</fieldset>";
 
@@ -115,8 +115,6 @@ String AFESitesGenerator::addWiFiConfiguration() {
           ,"wifi"
           );
 }
-
-
 
 String AFESitesGenerator::addNetworkConfiguration() {
 
@@ -181,7 +179,6 @@ String AFESitesGenerator::addNetworkConfiguration() {
           ,"network"
           );
 }
-
 
 String AFESitesGenerator::addRelayConfiguration() {
   char name[16] = "przekaznik";
@@ -250,12 +247,27 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   char password[16] = "password";
   char topic[32] = "/AFEDevice/";
 
+  uint8_t mqtt_ip1 = 0;
+  uint8_t mqtt_ip2 = 0;
+  uint8_t mqtt_ip3 = 0;
+  uint8_t mqtt_ip4 = 0;
+
   String body="<fieldset>";
   body+="<div class=\"cf\">";
-  body+="<label>Adres lub IP serwera</label>";
+  body+="<label>Adres MQTT Brokera (hostname))</label>";
   body+="<input name=\"mqtt_host\" type=\"text\" maxlength=\"32\" value=\""; body+=host; body+="\">";
-  body+="<span class=\"hint\">Informacja jest wymagana. Max 32 znaki</span>";
+  body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
+
+  body+="<div class=\"cf\">";
+  body+="<label>Adres IP MQTT Brokera</label>";
+  body+="<input name=\"mqtt_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=mqtt_ip1; body+="\">.";
+  body+="<input name=\"mqtt_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=mqtt_ip2; body+="\">.";
+  body+="<input name=\"mqtt_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=mqtt_ip3; body+="\">.";
+  body+="<input name=\"mqtt_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=mqtt_ip4; body+="\">";
+  body+="<span class=\"hint\">Opcjonalne jeśli wprowadzony został adres MQTT powyżej</span>";
+  body+="</div>";
+
   body+="<div class=\"cf\">";
   body+="<label>Port</label>";
   body+="<input name=\"mqtt_port\" type=\"number\" value=\"1883\" maxlength=\"5\" value=\""; body+=port; body+="\">";
@@ -263,13 +275,13 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Użytkownik</label>";
-  body+="<input name=\"mqtt_user\" type=\"text\"  maxlength=\"16\" value=\""; body+=user; body+="\">";
-  body+="<span class=\"hint\">Max 16 znaki</span>";
+  body+="<input name=\"mqtt_user\" type=\"text\"  maxlength=\"32\" value=\""; body+=user; body+="\">";
+  body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Hasło</label>";
-  body+="<input name=\"mqtt_password\" type=\"password\"  maxlength=\"16\" value=\""; body+=password; body+="\">";
-  body+="<span class=\"hint\">Max 16 znaki</span>";
+  body+="<input name=\"mqtt_password\" type=\"password\"  maxlength=\"32\" value=\""; body+=password; body+="\">";
+  body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Temat wiadomości</label>";
@@ -281,7 +293,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   return addConfigurationBlock(
           "MQTT Broker"
-          ,"Urządzenie bez skonfigurowanego MQTT Brokera może być sterowany tylko ręcznie"
+          ,"Urządzenie bez skonfigurowanego MQTT Brokera może być sterowany tylko ręcznie. Wprowadź adres hosta np. localhost lub adres IP"
           ,body
           ,"mqtt"
           );
@@ -316,13 +328,13 @@ String AFESitesGenerator::addDomoticzConfiguration() {
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Użytkownik</label>";
-  body+="<input name=\"domoticz_user\" type=\"text\"  maxlength=\"16\" value=\""; body+=user; body+="\">";
-  body+="<span class=\"hint\">Max 16 znaki</span>";
+  body+="<input name=\"domoticz_user\" type=\"text\"  maxlength=\"32\" value=\""; body+=user; body+="\">";
+  body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Hasło</label>";
-  body+="<input name=\"domoticz_password\" type=\"password\"  maxlength=\"16\" value=\""; body+=password; body+="\">";
-  body+="<span class=\"hint\">Max 16 znaki</span>";
+  body+="<input name=\"domoticz_password\" type=\"password\"  maxlength=\"32\" value=\""; body+=password; body+="\">";
+  body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>IDX urządzenia</label>";
@@ -441,7 +453,6 @@ String AFESitesGenerator::addSwitchConfiguration(const char* id) {
           );
 
 }
-
 
 String AFESitesGenerator::addUpgradeSection() {
   String body="<fieldset>";

@@ -1,9 +1,9 @@
 /*
-  Configuration Panel
-  AFE Firmware for smart home devices build on ESP8266
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+   Configuration Panel
+   AFE Firmware for smart home devices build on ESP8266
+   More info: https://github.com/tschaban/AFE-Firmware
+   LICENCE: http://opensource.org/licenses/MIT
+ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h
@@ -21,20 +21,23 @@
 class AFEConfigurationPanel {
 
 private:
-  AFESitesGenerator Site;
+AFESitesGenerator Site;
+String getDeviceConfigurationSite();
+String getMQTTConfigurationSite();
+String getRelayConfigurationSite();
+String getDS18B20ConfigurationSite();
+String getSwitchConfigurationSite();
+String getDomoticzConfigurationSite();
+String getUpdateConfigurationSite();
+String getResetConfigurationSite();
+String getExitConfigurationSite();
 
 public:
-	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
-	AFEConfigurationPanel();
-  String getDeviceConfigurationSite();
-	String getMQTTConfigurationSite();
-	String getRelayConfigurationSite();
-	String getDS18B20ConfigurationSite();
-	String getSwitchConfigurationSite();
-	String getDomoticzConfigurationSite();
-	String getUpdateConfigurationSite();
-	String getResetConfigurationSite();
-	String getExitConfigurationSite();
+/* Constructor: entry parameter is GPIO number where Sensor is connected to */
+AFEConfigurationPanel();
+
+/* It returns configuration site */
+String getSite(const String option,boolean save);
 
 };
 
