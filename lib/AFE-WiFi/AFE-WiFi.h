@@ -35,6 +35,10 @@ uint8_t durationBetweenNextConnectionAttemptsSeries = 60;
 unsigned long sleepStartTime = 0;
 boolean sleepMode = false;
 DNSServer dnsServer;
+boolean staticIP = false;
+IPAddress ip;
+IPAddress gateway;
+IPAddress subnet;
 
 public:
 
@@ -49,6 +53,10 @@ void setReconnectionParams(
 								uint8_t no_connection_attempts,
 								uint8_t duration_between_connection_attempts,
 								uint8_t duration_between_next_connection_attempts_series);
+
+
+/* Setting static IP Addrees */
+void setStaticIP(IPAddress address_ip, IPAddress address_gateway, IPAddress address_subnet);
 
 /* Connecting to WiFi Access point */
 void connect();

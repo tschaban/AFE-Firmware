@@ -16,14 +16,10 @@ void AFEWiFi::begin(const char* network_ssid, const char* network_password, cons
                 dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
                 dnsServer.start(53, "www.example.com", apIP);
         } else {
-
-          IPAddress ip(192, 168, 0, 126);
-          IPAddress gateway(192, 168, 0, 1);
-          IPAddress subnet(255, 255, 255, 0);
-          WiFi.config(ip, gateway, subnet);
-
-
-          WiFi.mode(WIFI_STA);
+                if (staticIP) {
+                        WiFi.config(ip, gateway, subnet);
+                }
+                WiFi.mode(WIFI_STA);
         }
 }
 
@@ -36,6 +32,12 @@ void AFEWiFi::setReconnectionParams(
         durationBetweenNextConnectionAttemptsSeries = duration_between_next_connection_attempts_series;
 }
 
+void AFEWiFi::setStaticIP(IPAddress address_ip, IPAddress address_gateway, IPAddress address_subnet) {
+        staticIP = true;
+        ip = address_ip;
+        gateway = address_gateway;
+        subnet = address_subnet;
+}
 
 void AFEWiFi::connect() {
 
