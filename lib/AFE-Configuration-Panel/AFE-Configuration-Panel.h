@@ -15,7 +15,6 @@
 #endif
 
 #include "AFE-Sites-Generator.h"
-
 #include <Streaming.h>
 
 class AFEConfigurationPanel {

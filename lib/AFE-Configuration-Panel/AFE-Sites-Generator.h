@@ -16,6 +16,8 @@
 
 #include <Streaming.h>
 #include <AFE-EEPROM.h>
+#include <AFE-Data-Structures.h>
+#include <AFE-Data-Access.h>
 
 class AFESitesGenerator {
 
