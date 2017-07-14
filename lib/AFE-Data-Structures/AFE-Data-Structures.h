@@ -1,0 +1,67 @@
+/*
+   Data structures
+   AFE Firmware for smart home devices build on ESP8266
+   More info: https://github.com/tschaban/AFE-Firmware
+   LICENCE: http://opensource.org/licenses/MIT
+ */
+
+#ifndef _AFE_Data_Structures_h
+#define _AFE_Data_Structures_h
+
+#if defined(ARDUINO) && ARDUINO >= 100
+	#include "arduino.h"
+#else
+	#include "WProgram.h"
+#endif
+
+#include <ESP8266WiFi.h>
+
+struct NETWORK {
+								char ssid[32];
+								char password[32];
+								char host[32];
+								boolean dhcp;
+								IPAddress ip;
+								IPAddress gateway;
+								IPAddress subnet;
+								uint8_t noConnectionAttempts;
+								uint8_t durationBetweenConnectionAttempts;
+								uint8_t durationBetweenNextConnectionAttemptsSeries;
+};
+
+struct MQTT {
+								char host[32];
+								IPAddress ip;
+								uint16_t port;
+								char user[32];
+								char password[32];
+								char topic[32];
+};
+
+struct RELAY {
+								boolean present;
+								uint8_t gpio;
+								boolean state;
+								float timeToOff;
+								uint8_t statePowerOn;
+								char name[16];
+								uint8_t stateMQTTConnected;
+};
+
+struct SWITCH {
+								boolean present;
+								uint8_t gpio;
+								uint8_t type;
+								uint8_t sensitiveness;
+								uint8_t functionality;
+};
+
+struct DS18B20 {
+								boolean present;
+								uint8_t gpio;
+								float correction;
+								uint16_t interval;
+								uint16_t unit;
+};
+
+#endif
