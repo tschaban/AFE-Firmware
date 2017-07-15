@@ -14,10 +14,8 @@
 	#include "WProgram.h"
 #endif
 
-
-#include <AFE-EEPROM.h>
-#include <Streaming.h>
-
+#include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 
 class AFEDefaults
 {
