@@ -41,7 +41,6 @@ struct MQTT {
 struct RELAY {
 								boolean present;
 								uint8_t gpio;
-								boolean state;
 								float timeToOff;
 								uint8_t statePowerOn;
 								char name[16];
@@ -62,6 +61,13 @@ struct DS18B20 {
 								float correction;
 								uint16_t interval;
 								uint16_t unit;
+};
+
+struct FIRMWARE {
+	 char version[7];
+	 uint8_t type;
+	 uint8_t autoUpgrade;
+	 char	upgradeURL[120];
 };
 
 #endif
