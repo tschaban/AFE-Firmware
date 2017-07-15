@@ -3,11 +3,16 @@
 AFESitesGenerator::AFESitesGenerator() {}
 
 const char* AFESitesGenerator::generateHeader() {
-        return "<!doctype html>"
+
+  FIRMWARE configuration;
+  configuration = Data.getFirmwareConfiguration();
+
+
+        String page = "<!doctype html>"
                "<html lang=\"en\">"
                "<head>"
                "<meta charset=\"utf-8\">"
-               "<title>AFE Firmware</title>"
+               "<title>AFE Firmware "; page+=configuration.version; page+=" [T."; page+=configuration.type; page+="]</title>"
                "<style>body{margin:0}#c{display:table;width:100%}#l,#r{display:table-cell}#l{width:300px;background:#282828;padding:20px;color:#eee}#r{padding:20px}p,a,input,h1,h3,h4,span,label,button{font-family:sans-serif}a{text-decoration:none}.ltit,.ltag{margin:0}.ltag{font-weight:300;color:#b0cadb;margin-bottom:20px}.lst{list-style:none;margin:0;padding:0}.itm a{display:block;text-decoration:none;white-space:nowrap;padding:.2em 1em;color:#777;font-size:95%}.itm a:hover,.itm a:focus{background-color:#eee;text-decoration:none;padding:.2em 1.5em;color:#000}.ci{margin-bottom:2em}.ci h1{color:#aaa;border-bottom:1px solid #eee;font-size:110%;font-weight:500;letter-spacing:.1em}.ci .cd{color:#444;line-height:1.8em;font-size:80%;font-style:italic}.cm{color:#999;font-size:90%;margin:0 0 20px 0}.la{margin:0 .1em;padding:.3em 1em;color:#fff;background:#999;font-size:80%}.lr{background:#ca3c3c}.lg{background:#2fb548}fieldset{margin:0;padding:.35em 0 .75em;border:0}.cf{margin-bottom:.5em}.cc{margin:1em 0 .5em 9.4em}.cf label{text-align:right;display:inline-block;vertical-align:middle;width:10em;margin:0 1em 0 0;font-size:.875em}.cc label{font-size:.875em}input,select{padding:.5em .6em;display:inline-block;border:1px solid #ccc;vertical-align:middle;box-sizing:border-box}.hint{display:inline-block;padding-left:.3em;color:#aaa;vertical-align:middle;font-size:80%}.b{font-size:100%;padding:.5em 1em;border:1px solid #999;border:none rgba(0,0,0,0);text-decoration:none;color:white}.bs{background:#2fb548}.be{background:#ca3c3c}.bw{background:#df7514}.bc{background:#42b8dd}.b:hover,.b:focus{filter:alpha(opacity=90);background-image:-webkit-linear-gradient(transparent,rgba(0,0,0,0.05) 40%,rgba(0,0,0,0.10));background-image:linear-gradient(transparent,rgba(0,0,0,0.05) 40%,rgba(0,0,0,0.10))}</style>"
                "<script type=\"text/javascript\">"
                "hide=function(e){document.getElementById(e).style.display='none';};"
@@ -38,7 +43,7 @@ const char* AFESitesGenerator::generateHeader() {
                "<li class=\"itm\"><a href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/\" target=\"_blank\">Dokumentacja</a></li>"
                "<li class=\"itm\"><a href=\"http://smart-house.adrian.czabanowski.com/forum/firmware-do-przelacznika-sonoff/\" target=\"_blank\">Pomoc</a></li>"
                "<li class=\"itm\"><a href=\"https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE\" target=\"_blank\">Licencja</a></li>"
-               "<li class=\"itm\"><a href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/historia-zmian/\" target=\"_blank\">Wersja 1.0.0</a></li>"
+               "<li class=\"itm\"><a href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/historia-zmian/\" target=\"_blank\">Wersja "; page+=configuration.version; page+="</a></li>"
                "</ul>"
                "</div>"
                "<div id=\"r\">";
@@ -73,15 +78,18 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char* field, 
 
 String AFESitesGenerator::addDeviceNameConfiguration() {
 
-  char name[32] = "AFEDevice";
+  NETWORK configuration;
+  configuration = Data.getNetworkConfiguration();
 
   String body="<fieldset>"
                "<div class=\"cf\">"
                "<label>Nazwa urządzenia</label>"
-               "<input name=\"device_name\" type=\"text\" maxlength=\"32\" value=\""; body+=name; body+="\">"
+               "<input name=\"device_name\" type=\"text\" maxlength=\"32\" value=\""; body+=configuration.host; body+="\">"
                "<span class=\"hint\">Max 32 znaki. Informacja wymagana</span>"
                "</div>"
                "</fieldset>";
+
+
 
   return addConfigurationBlock(
           "Nazwa urządzenia"
@@ -93,7 +101,6 @@ String AFESitesGenerator::addDeviceNameConfiguration() {
 
 String AFESitesGenerator::addWiFiConfiguration() {
 
-  AFEDataAccess Data;
   NETWORK configuration;
   configuration = Data.getNetworkConfiguration();
 
@@ -120,7 +127,6 @@ String AFESitesGenerator::addWiFiConfiguration() {
 
 String AFESitesGenerator::addNetworkConfiguration() {
 
-  AFEDataAccess Data;
   NETWORK configuration;
   configuration = Data.getNetworkConfiguration();
 
@@ -171,7 +177,6 @@ String AFESitesGenerator::addNetworkConfiguration() {
 
 String AFESitesGenerator::addRelayConfiguration() {
 
-  AFEDataAccess Data;
   RELAY configuration;
   configuration = Data.getRelayConfiguration(0);
 
@@ -229,7 +234,6 @@ String AFESitesGenerator::addRelayConfiguration() {
 
 String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
-  AFEDataAccess Data;
   MQTT configuration;
   configuration = Data.getMQTTConfiguration();
 
@@ -334,7 +338,6 @@ String AFESitesGenerator::addDomoticzConfiguration() {
 
 String AFESitesGenerator::addDS18B20Configuration() {
 
-  AFEDataAccess Data;
   DS18B20 configuration;
   configuration = Data.getDS18B20Configuration();
 
@@ -367,7 +370,6 @@ String AFESitesGenerator::addDS18B20Configuration() {
 
 String AFESitesGenerator::addSwitchConfiguration(const char* id) {
 
-  AFEDataAccess Data;
   SWITCH configuration;
   configuration = Data.getSwitchConfiguration(0);
 

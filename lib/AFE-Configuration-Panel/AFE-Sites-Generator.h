@@ -23,6 +23,7 @@ class AFESitesGenerator {
 
 private:
 	AFEEEPROM Eeprom;
+	AFEDataAccess Data;
 
 public:
 	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
