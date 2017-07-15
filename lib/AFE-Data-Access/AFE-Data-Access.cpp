@@ -38,11 +38,10 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
         configuration.present = Eeprom.read(365);
         configuration.gpio = Eeprom.readUInt8(366);
-        configuration.state = Eeprom.read(367);
         configuration.timeToOff = Eeprom.read(368, 5).toFloat();
         configuration.statePowerOn =  Eeprom.readUInt8(373);
         Eeprom.read(374,16).toCharArray(configuration.name,sizeof(configuration.name));
-        configuration.statePowerOn = Eeprom.readUInt8(390);
+        configuration.stateMQTTConnected = Eeprom.readUInt8(390);
 
         return configuration;
 }
@@ -69,4 +68,108 @@ DS18B20 AFEDataAccess::getDS18B20Configuration() {
         configuration.unit = Eeprom.readUInt8(408);
 
         return configuration;
+}
+
+FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
+        FIRMWARE configuration;
+
+        Eeprom.read(0,7).toCharArray(configuration.version,sizeof(configuration.version));
+        Eeprom.read(28,120).toCharArray(configuration.upgradeURL,sizeof(configuration.upgradeURL));
+        configuration.type = Eeprom.readUInt8(7);
+        configuration.autoUpgrade = Eeprom.readUInt8(27);
+
+        return configuration;
+}
+
+void AFEDataAccess::saveNetworkConfiguration(NETWORK configuration) {
+        Eeprom.write(148,32,configuration.ssid);
+        Eeprom.write(180,32,configuration.password);
+        Eeprom.write(9,16,configuration.host);
+        Eeprom.write(212,configuration.dhcp);
+        Eeprom.writeIP(213,configuration.ip);
+        Eeprom.writeIP(217,configuration.gateway);
+        Eeprom.writeIP(221,configuration.subnet);
+        Eeprom.writeUInt8(225,configuration.noConnectionAttempts);
+        Eeprom.writeUInt8(226,configuration.durationBetweenConnectionAttempts);
+        Eeprom.writeUInt8(227,configuration.durationBetweenNextConnectionAttemptsSeries);
+}
+
+void AFEDataAccess::saveMQTTConfiguration(MQTT configuration) {
+        Eeprom.write(228,32,configuration.host);
+        Eeprom.writeIP(260,configuration.ip);
+        Eeprom.write(264,5,(long)configuration.port);
+        Eeprom.write(269,32,configuration.user);
+        Eeprom.write(301,32,configuration.password);
+        Eeprom.write(333,32,configuration.topic);
+}
+
+void AFEDataAccess::saveRelayConfiguration(uint8_t id, RELAY configuration) {
+        Eeprom.write(365,configuration.present);
+        Eeprom.writeUInt8(366,configuration.gpio);
+        Eeprom.write(368,5,configuration.timeToOff);
+        Eeprom.writeUInt8(373,configuration.statePowerOn);
+        Eeprom.write(374,16,configuration.name);
+        Eeprom.writeUInt8(390,configuration.stateMQTTConnected);
+
+}
+
+void AFEDataAccess::saveSwitchConfiguration(uint8_t id, SWITCH configuration) {
+        Eeprom.write(391,configuration.present);
+        Eeprom.writeUInt8(392,configuration.gpio);
+        Eeprom.writeUInt8(393,configuration.type);
+        Eeprom.writeUInt8(394,configuration.sensitiveness);
+        Eeprom.writeUInt8(395,configuration.functionality);
+}
+
+void AFEDataAccess::saveDS18B20Configuration(DS18B20 configuration) {
+        Eeprom.write(396,configuration.present);
+        Eeprom.writeUInt8(397,configuration.gpio);
+        Eeprom.write(398,5,(float)configuration.correction);
+        Eeprom.write(403,5,(long)configuration.interval);
+        Eeprom.writeUInt8(408,configuration.unit);
+}
+
+void AFEDataAccess::saveFirmwareConfiguration(FIRMWARE configuration) {
+        Eeprom.write(0,7,configuration.version);
+        Eeprom.writeUInt8(7,configuration.type);
+        Eeprom.writeUInt8(27,configuration.autoUpgrade);
+        Eeprom.write(28,120,configuration.upgradeURL);
+}
+
+const char AFEDataAccess::getVersion() {
+        char version[7];
+        sprintf(version,"1.0.0");
+        return *version;
+}
+
+boolean AFEDataAccess::getRelayState(uint8_t id) {
+        return Eeprom.read(367);
+}
+
+void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
+        Eeprom.write(367,state);
+}
+
+uint8_t AFEDataAccess::getDeviceMode() {
+        return Eeprom.readUInt8(26);
+}
+
+void AFEDataAccess::saveDeviceMode(uint8_t mode) {
+        Eeprom.writeUInt8(26,mode);
+}
+
+uint8_t AFEDataAccess::getLanguage() {
+        return Eeprom.readUInt8(8);
+}
+
+void AFEDataAccess::saveLanguage(uint8_t language) {
+        Eeprom.writeUInt8(8,language);
+}
+
+boolean AFEDataAccess::isDebuggable() {
+        return Eeprom.read(25);
+}
+
+void AFEDataAccess::setDebuggable(boolean state) {
+        Eeprom.write(25,state);
 }
