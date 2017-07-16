@@ -31,6 +31,7 @@ struct NETWORK {
 								uint8_t waitTimeSeries;
 };
 
+/* @TODO Only for MQTT */
 struct MQTT {
 								char host[32];
 								IPAddress ip;
@@ -40,6 +41,7 @@ struct MQTT {
 								char topic[32];
 };
 
+/* @TODO Only for Domoticz */
 struct DOMOTICZ {
 								char host[32];
 								IPAddress ip;
@@ -53,8 +55,13 @@ struct RELAY {
 								uint8_t gpio;
 								float timeToOff;
 								uint8_t statePowerOn;
+								/* @TODO Only for MQTT */
 								char name[16];
 								uint8_t stateMQTTConnected;
+								/* @TODO Only for Domoticz */
+								uint16_t idx;
+								boolean publishToDomoticz;
+
 };
 
 struct SWITCH {
