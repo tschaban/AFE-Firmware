@@ -29,19 +29,18 @@ public:
 	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
 	AFESitesGenerator();
 	String generateHTMLPage(String &page);
-	String addConfigurationBlock(const String title,const String description, const String body,  const String link);
+	String addConfigurationBlock(const String title,const String description, const String body);
 	const char* generateHeader();
 	const char* generateFooter();
 	const String  generateConfigParameter_GPIO(const char* field, uint8_t selected);
 
-  String addDeviceNameConfiguration();
-	String addWiFiConfiguration();
-	String addNetworkConfiguration();
-  String addRelayConfiguration();
+  String addNetworkConfiguration();
 	String addMQTTBrokerConfiguration();
 	String addDomoticzConfiguration();
+  String addRelayConfiguration(uint8_t id);
+	String addSwitchConfiguration(uint8_t id);
 	String addDS18B20Configuration();
-	String addSwitchConfiguration(const char* id);
+
 
   String addUpgradeSection();
 	String addResetSection();

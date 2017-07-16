@@ -31,6 +31,7 @@ AFEConfigurationPanel();
 /* It returns configuration site */
 String getSite(const String option,uint8_t command,NETWORK *data);
 String getSite(const String option,uint8_t command,MQTT *data);
+String getSite(const String option,uint8_t command,DOMOTICZ *data);
 String getSite(const String option,uint8_t command,RELAY *data);
 String getSite(const String option,uint8_t command,SWITCH *data);
 String getSite(const String option,uint8_t command,DS18B20 *data);

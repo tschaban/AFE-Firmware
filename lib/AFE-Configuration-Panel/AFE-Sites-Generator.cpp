@@ -54,9 +54,8 @@ const char* AFESitesGenerator::generateFooter() {
         return "</div></body></html>";
 }
 
-String AFESitesGenerator::addConfigurationBlock(const String title,const String description, const String body,  const String link) {
+String AFESitesGenerator::addConfigurationBlock(const String title,const String description, const String body) {
         String page ="<div class=\"ci\">";
-        page+="<a name=\""+link+"\"></a>";
         page+="<h1>" + title + "</h1>";
         page+="<p class=\"cd\">" + description + "</p>";
         page+= body;
@@ -76,7 +75,7 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char* field, 
         return page;
 }
 
-String AFESitesGenerator::addDeviceNameConfiguration() {
+String AFESitesGenerator::addNetworkConfiguration() {
 
   NETWORK configuration;
   configuration = Data.getNetworkConfiguration();
@@ -89,90 +88,98 @@ String AFESitesGenerator::addDeviceNameConfiguration() {
                "</div>"
                "</fieldset>";
 
-
-
-  return addConfigurationBlock(
+  String page=addConfigurationBlock(
           "Nazwa urządzenia"
           ,"Nazwa jest wykorzystywana jako nazwa hosta w Twojej lokalnej sieci WiFi oraz jako nazwa punktu dostępowego WiFi dla konfiguracji urządzenia"
           ,body
-          ,"dev-name"
           );
-}
 
-String AFESitesGenerator::addWiFiConfiguration() {
+          body="<fieldset>";
+          body+="<div class=\"cf\">";
+          body+="<label>Nazwa sieci WiFI</label>";
+          body+="<input name=\"wifi_name\" type=\"text\" maxlength=\"32\" value=\""; body+=configuration.ssid; body+="\">";
+          body+="<span class=\"hint\">Max 32 znaków. Informacja wymagana</span>";
+          body+="</div>";
+          body+="<div class=\"cf\">";
+          body+="<label>Hasło</label>";
+          body+="<input type=\"password\" name=\"wifi_password\" maxlength=\"32\" value=\""; body+=configuration.password; body+="\">";
+          body+="<span class=\"hint\">Max 32 znaków.</span>";
+          body+="</div>";
+          body+="</fieldset>";
 
-  NETWORK configuration;
-  configuration = Data.getNetworkConfiguration();
+          page+=addConfigurationBlock(
+                  "Konfiguracja dostępu do sieci WiFi"
+                  ,"Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania ręcznego"
+                  ,body
+                  );
 
-  String body="<fieldset>";
-  body+="<div class=\"cf\">";
-  body+="<label>Nazwa sieci WiFI</label>";
-  body+="<input name=\"wifi_name\" type=\"text\" maxlength=\"32\" value=\""; body+=configuration.ssid; body+="\">";
-  body+="<span class=\"hint\">Max 32 znaków. Informacja wymagana</span>";
-  body+="</div>";
-  body+="<div class=\"cf\">";
-  body+="<label>Hasło</label>";
-  body+="<input type=\"password\" name=\"wifi_password\" maxlength=\"32\" value=\""; body+=configuration.password; body+="\">";
-  body+="<span class=\"hint\">Max 32 znaków.</span>";
-  body+="</div>";
-  body+="</fieldset>";
+          body="<fieldset>";
+          body+="<div class=\"cc\">";
+          body+="<label>";
+          body+="<input name=\"dhcp_config\" type=\"checkbox\" value=\"1\""; body+=(configuration.dhcp?" checked=\"checked\"":""); body+="> Automatyczna konfiguracja przez DHCP?";
+          body+="</label>";
+          body+="</div>";
 
-  return addConfigurationBlock(
-          "Konfiguracja dostępu do sieci WiFi"
-          ,"Urządzenie bez skonfigurowanej sieci WiFi będzie działać tylko w trybie sterowania ręcznego"
-          ,body
-          ,"wifi"
-          );
-}
+          body+="<div class=\"cf\">";
+          body+="<label>Adres IP urządzenia</label>";
+          body+="<input name=\"device_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[0]; body+="\">.";
+          body+="<input name=\"device_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[1]; body+="\">.";
+          body+="<input name=\"device_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[2]; body+="\">.";
+          body+="<input name=\"device_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[3]; body+="\">";
+          body+="<span class=\"hint\">Informacja wymagana</span>";
+          body+="</div>";
 
-String AFESitesGenerator::addNetworkConfiguration() {
+          body+="<div class=\"cf\">";
+          body+="<label>Bramka</label>";
+          body+="<input name=\"gateway_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[0]; body+="\">.";
+          body+="<input name=\"gateway_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[1]; body+="\">.";
+          body+="<input name=\"gateway_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[2]; body+="\">.";
+          body+="<input name=\"gateway_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[3]; body+="\">";
+          body+="<span class=\"hint\">Informacja wymagana</span>";
+          body+="</div>";
 
-  NETWORK configuration;
-  configuration = Data.getNetworkConfiguration();
+          body+="<div class=\"cf\">";
+          body+="<label>Maska sieci</label>";
+          body+="<input name=\"subnet_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[0]; body+="\">.";
+          body+="<input name=\"subnet_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[1]; body+="\">.";
+          body+="<input name=\"subnet_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[2]; body+="\">.";
+          body+="<input name=\"subnet_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[3]; body+="\">";
+          body+="<span class=\"hint\">Informacja wymagana</span>";
+          body+="</div>";
 
-  String body="<fieldset>";
+          body+="</fieldset>";
 
-  body+="<div class=\"cc\">";
-  body+="<label>";
-  body+="<input name=\"dhcp_config\" type=\"checkbox\" value=\"1\""; body+=(configuration.dhcp?" checked=\"checked\"":""); body+="> Automatyczna konfiguracja przez DHCP?";
-  body+="</label>";
-  body+="</div>";
+          page+= addConfigurationBlock(
+                    "Konfiguracja sieci"
+                    ,"Parametery sieci moga byc skonfigurowane automatycznie przez serwer DHCP rutera lub manualnie"
+                    ,body
+                    );
 
-  body+="<div class=\"cf\">";
-  body+="<label>Adres IP urządzenia</label>";
-  body+="<input name=\"device_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[0]; body+="\">.";
-  body+="<input name=\"device_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[1]; body+="\">.";
-  body+="<input name=\"device_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[2]; body+="\">.";
-  body+="<input name=\"device_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[3]; body+="\">";
-  body+="<span class=\"hint\">Informacja wymagana</span>";
-  body+="</div>";
+          body="<fieldset>";
+          body+="<div class=\"cf\">";
+          body+="<label>Ilośc prób łączania się</label>";
+          body+="<input name=\"no_connection_attempts\" type=\"number\" maxlength=\"3\" value=\""; body+=configuration.noConnectionAttempts; body+="\">";
+          body+="<span class=\"hint\">Od 1-255. Informacja wymagana</span>";
+          body+="</div>";
+          body+="<div class=\"cf\">";
+          body+="<label>Czas oczekiwania między próbami</label>";
+          body+="<input type=\"number\" name=\"wait_time_connections\" maxlength=\"3\" value=\""; body+=configuration.waitTimeConnections; body+="\">";
+          body+="<span class=\"hint\">1-255 sekund. Informacja wymagana</span>";
+          body+="</div>";
+          body+="<div class=\"cf\">";
+          body+="<label>Czas po jakim powtórzyc próby łaczenia się</label>";
+          body+="<input type=\"number\" name=\"wait_time_series\" maxlength=\"3\" value=\""; body+=configuration.waitTimeSeries; body+="\">";
+          body+="<span class=\"hint\">Od 1-255 sekund. Informacja wymagana.</span>";
+          body+="</div>";
+          body+="</fieldset>";
 
-  body+="<div class=\"cf\">";
-  body+="<label>Bramka</label>";
-  body+="<input name=\"gateway_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[0]; body+="\">.";
-  body+="<input name=\"gateway_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[1]; body+="\">.";
-  body+="<input name=\"gateway_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[2]; body+="\">.";
-  body+="<input name=\"gateway_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[3]; body+="\">";
-  body+="<span class=\"hint\">Informacja wymagana</span>";
-  body+="</div>";
+          page+=addConfigurationBlock(
+                "Ustawienia dotyczące połączeń"
+                ,"Zaawansowane ustawienia dotyczące łączeniem się do sieci WiFi oraz MQTT Brokera"
+                ,body
+                );
 
-  body+="<div class=\"cf\">";
-  body+="<label>Maska sieci</label>";
-  body+="<input name=\"subnet_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[0]; body+="\">.";
-  body+="<input name=\"subnet_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[1]; body+="\">.";
-  body+="<input name=\"subnet_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[2]; body+="\">.";
-  body+="<input name=\"subnet_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[3]; body+="\">";
-  body+="<span class=\"hint\">Informacja wymagana</span>";
-  body+="</div>";
-
-  body+="</fieldset>";
-
-  return addConfigurationBlock(
-          "Konfiguracja sieci"
-          ,"Parametery sieci moga byc skonfigurowane automatycznie przez serwer DHCP rutera lub manualnie"
-          ,body
-          ,"network"
-          );
+          return page;
 }
 
 String AFESitesGenerator::addMQTTBrokerConfiguration() {
@@ -223,63 +230,51 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
           "MQTT Broker"
           ,"Urządzenie bez skonfigurowanego MQTT Brokera może być sterowany tylko ręcznie. Wprowadź adres hosta np. localhost lub adres IP"
           ,body
-          ,"mqtt"
           );
 
 }
 
 String AFESitesGenerator::addDomoticzConfiguration() {
-  uint8_t ip1 = 255;
-  uint8_t ip2 = 10;
-  uint8_t ip3 = 50;
-  uint8_t ip4 = 0;
-  uint16_t port = 8080;
-  uint16_t idx = 12345;
 
-  char user[16] = "user";
-  char password[16] = "password";
+  DOMOTICZ configuration;
+  configuration = Data.getDomoticzConfiguration();
 
 
   String body="<fieldset>";
   body+="<div class=\"cf\">";
   body+="<label>IP serwera</label>";
-  body+="<input name=\"domoticz_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=ip1; body+="\">.";
-  body+="<input name=\"domoticz_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=ip2; body+="\">.";
-  body+="<input name=\"domoticz_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=ip3; body+="\">.";
-  body+="<input name=\"domoticz_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=ip4; body+="\">";
+  body+="<input name=\"domoticz_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[0]; body+="\">.";
+  body+="<input name=\"domoticz_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[1]; body+="\">.";
+  body+="<input name=\"domoticz_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[2]; body+="\">.";
+  body+="<input name=\"domoticz_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.ip[3]; body+="\">";
   body+="<span class=\"hint\">Informacja wymagana</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Port</label>";
-  body+="<input name=\"domoticz_port\" type=\"number\" value=\"8080\" maxlength=\"5\" value=\""; body+=port; body+="\">";
+  body+="<input name=\"domoticz_port\" type=\"number\" value=\"8080\" maxlength=\"5\" value=\""; body+=configuration.port; body+="\">";
   body+="<span class=\"hint\">Informacja wymagana</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Użytkownik</label>";
-  body+="<input name=\"domoticz_user\" type=\"text\"  maxlength=\"32\" value=\""; body+=user; body+="\">";
+  body+="<input name=\"domoticz_user\" type=\"text\"  maxlength=\"32\" value=\""; body+=configuration.user; body+="\">";
   body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
   body+="<div class=\"cf\">";
   body+="<label>Hasło</label>";
-  body+="<input name=\"domoticz_password\" type=\"password\"  maxlength=\"32\" value=\""; body+=password; body+="\">";
+  body+="<input name=\"domoticz_password\" type=\"password\"  maxlength=\"32\" value=\""; body+=configuration.password; body+="\">";
   body+="<span class=\"hint\">Max 32 znaki</span>";
   body+="</div>";
-  body+="<div class=\"cf\">";
-  body+="<label>IDX urządzenia</label>";
-  body+="<input name=\"domoticz_device_idx\" type=\"number\" value=\""; body+=idx; body+="\">";
-  body+="<span class=\"hint\">Informacja wymagana. Do odczytania z konfiguracji Domoticz</span>";
-  body+="</div>";
+
   body+="</fieldset>";
 
   return addConfigurationBlock(
           "Serwer Domoticz"
           ,"Konfiguracja wymagana jest jedynie kiedy jest potrzeba wysyłania stanu przekaźnika do serwera Domoticz"
           ,body
-          ,"domoticz"
           );
 }
 
-String AFESitesGenerator::addRelayConfiguration() {
+String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration;
   configuration = Data.getRelayConfiguration(0);
@@ -287,28 +282,51 @@ String AFESitesGenerator::addRelayConfiguration() {
   String body="<fieldset>";
   body+="<div class=\"cc\">";
   body+="<label>";
-  body+="<input name=\"relay1_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
+  body+="<input name=\"relay"+String(id)+"_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
   body+="</label>";
   body+="</div>";
-  body+=generateConfigParameter_GPIO("relay1_gpio",configuration.gpio);
+
+  char filed[13];
+  sprintf(filed, "field%s_gpio", id);
+
+  body+=generateConfigParameter_GPIO(filed,configuration.gpio);
+
+  /* @TODO For MQTT only */
   body+="<div class=\"cf\">";
   body+="<label>Nazwa</label>";
-  body+="<input name=\"relay1_name\" type=\"text\" maxlength=\"16\" value=\""; body+=configuration.name; body+="\">";
+  body+="<input name=\"relay"+String(id)+"_name\" type=\"text\" maxlength=\"16\" value=\""; body+=configuration.name; body+="\">";
   body+="<span class=\"hint\">Informacja wymagana. Max 16 znaków</span>";
   body+="</div>";
+
+  /* @TODO For Domoticz only*/
+  body+="<div class=\"cf\">";
+  body+="<label>IDX urządzenia</label>";
+  body+="<input name=\"relay"+String(id)+"_idx\" type=\"number\" maxlength=\"3\" value=\""; body+=configuration.idx; body+="\">";
+  body+="<span class=\"hint\">Informacja wymagana. Do odczytania z konfiguracji Domoticz</span>";
+  body+="</div>";
+
+  /* @TODO For Domoticz only*/
+  body+="<div class=\"cc\">";
+  body+="<label>";
+  body+="<input name=\"relay"+String(id)+"_publish_to_domoticz\" type=\"checkbox\" value=\"1\""; body+=(configuration.publishToDomoticz?" checked=\"checked\"":""); body+="> Włączony?";
+  body+="</label>";
+  body+="</div>";
+
   body+="<p class=\"cd\">Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>";
   body+="<div class=\"cf\">";
   body+="<label>Przywrócenie zasilania</label>";
-  body+="<select name=\"relay1_power_restored\">";
+  body+="<select name=\"relay"+String(id)+"_power_restored\">";
   body+="<option value=\"0\""; body+=(configuration.statePowerOn==0?" selected=\"selected\"":""); body+=">Wyłączony</option>";
   body+="<option value=\"1\""; body+=(configuration.statePowerOn==1?" selected=\"selected\"":""); body+=">Włączony</option>";
   body+="<option value=\"2\""; body+=(configuration.statePowerOn==2?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
   body+="<option value=\"3\""; body+=(configuration.statePowerOn==3?" selected=\"selected\"":""); body+=">Przeciwna do ostatniej zapamiętanej wartości</option>";
   body+="</select>";
   body+="</div>";
+
+  /* @TODO For MQTT only */
   body+="<div class=\"cf\">";
   body+="<label>Włączony do MQTT</label>";
-  body+="<select  name=\"relay1_mqtt_connected\">";
+  body+="<select  name=\"relay"+String(id)+"_mqtt_connected\">";
   body+="<option value=\"0\""; body+=(configuration.stateMQTTConnected==0?" selected=\"selected\"":""); body+=">Brak akcji</option>";
   body+="<option value=\"1\""; body+=(configuration.stateMQTTConnected==1?" selected=\"selected\"":""); body+=">Wyłączony</option>";
   body+="<option value=\"2\""; body+=(configuration.stateMQTTConnected==2?" selected=\"selected\"":""); body+=">Włączony</option>";
@@ -321,19 +339,80 @@ String AFESitesGenerator::addRelayConfiguration() {
 
   body+="<div class=\"cf\">";
   body+="<label>Wyłącz po</label>";
-  body+="<input name=\"relay1_off_time\" type=\"number\" maxlength=\"5\" value=\""; body+=configuration.timeToOff; body+="\">";
+  body+="<input name=\"relay"+String(id)+"_off_time\" type=\"number\" maxlength=\"5\" value=\""; body+=configuration.timeToOff; body+="\">";
   body+="<span class=\"hint\">sekundach. Zakres 0.5sek do 99999sek</span>";
   body+="</div>";
 
+  body+="</fieldset>";
+
+  char title[22];
+  sprintf(title, "Przkeźnik #%s", id);
+
+  return addConfigurationBlock(
+          title
+          /* @TODO Set the description for MQTT or Domoticz */
+          ,"Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/"
+          ,body
+          );
+}
+
+String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
+
+  SWITCH configuration;
+  configuration = Data.getSwitchConfiguration(0);
+
+  String body="<fieldset>";
+  body+="<div class=\"cc\">";
+  body+="<label>";
+  body+="<input name=\"switch"+String(id)+"_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
+  body+="</label>";
+  body+="</div>";
+
+  body+="<div class=\"cf\">";
+  body+="<label>Funkcja</label>";
+  body+="<select name=\"switch"+String(id)+"_functionality\">";
+  body+="<option value=\"0\""; body+=(configuration.functionality==0?" selected=\"selected\"":""); body+=">-- Wybierz -- </option>";
+  body+="<option value=\"1\""; body+=(configuration.functionality==1?" selected=\"selected\"":""); body+=">Sterowanie przekaźnikiem</option>";
+  body+="<option value=\"2\""; body+=(configuration.functionality==2?" selected=\"selected\"":""); body+=">Multifunkcyjny</option>";
+  body+="<option value=\"3\""; body+=(configuration.functionality==3?" selected=\"selected\"":""); body+=">Reboot</option>";
+  body+="<option value=\"4\""; body+=(configuration.functionality==4?" selected=\"selected\"":""); body+=">Tryb konfiguracji</option>";
+  body+="<option value=\"5\""; body+=(configuration.functionality==5?" selected=\"selected\"":""); body+=">Aktualizacja oprogramowania</option>";
+  body+="</select>";
+  body+="<span class=\"hint\">Informacja wymagana.</span>";
+  body+="</div>";
+
+  char filed[13];
+  sprintf(filed, "switch%s_gpio", id);
+
+  body+=generateConfigParameter_GPIO(filed,configuration.gpio);
+  body+="<div class=\"cf\">";
+  body+="<label>Typ</label>";
+  body+="<select name=\"switch"+String(id)+"_type\">";
+  body+="<option value=\"0\""; body+=(configuration.type==0?" selected=\"selected\"":""); body+=">Mono-stabilny</option>";
+  body+="<option value=\"1\""; body+=(configuration.type==1?" selected=\"selected\"":""); body+=">Bi-stabilny</option>";
+  body+="</select>";
+  body+="</div>";
+  body+="<div class=\"cf\">";
+  body+="<label>Czułość</label>";
+  body+="<select name=\"switch"+String(id)+"_sensitivity\">";
+  body+="<option value=\"0\""; body+=(configuration.sensitiveness==0?" selected=\"selected\"":""); body+=">Niska</option>";
+  body+="<option value=\"1\""; body+=(configuration.sensitiveness==1?" selected=\"selected\"":""); body+=">Średnia</option>";
+  body+="<option value=\"2\""; body+=(configuration.sensitiveness==2?" selected=\"selected\"":""); body+=">Wysoka</option>";
+  body+="</select>";
+  body+="</div>";
 
   body+="</fieldset>";
 
+  char title[22];
+  sprintf(title, "Przycisk / włącznik #%s", id);
+
+
   return addConfigurationBlock(
-          "Przekaźnik"
-          ,"Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/"
+          title
+          ,"Ustawienie czułości włącznika należy ustawić pod indywidulane potrzeby. Wysoka czułości może powodować, że przekaźnik może zmieniać swój stan nadmiernie dla niektórych włączników"
           ,body
-          ,"relay-1"
           );
+
 }
 
 String AFESitesGenerator::addDS18B20Configuration() {
@@ -372,76 +451,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
           "Czujnik temperatury DS18B20"
           ,"DS18B20 jest obsługiwanym czujnikiem temperatury. Możliwe jest podłaczenie tylko jednego czujnika temperatury"
           ,body
-          ,"ds18b20"
           );
-}
-
-String AFESitesGenerator::addSwitchConfiguration(const char* id) {
-
-  SWITCH configuration;
-  configuration = Data.getSwitchConfiguration(0);
-
-  String body="<fieldset>";
-  body+="<div class=\"cc\">";
-  body+="<label>";
-  body+="<input name=\"switch";
-  body+=id;
-  body+="_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
-  body+="</label>";
-  body+="</div>";
-
-  body+="<div class=\"cf\">";
-  body+="<label>Funkcja</label>";
-  body+="<select name=\"switch";
-  body+=id;
-  body+="_functionality\">";
-  body+="<option value=\"0\""; body+=(configuration.functionality==0?" selected=\"selected\"":""); body+=">-- Wybierz -- </option>";
-  body+="<option value=\"1\""; body+=(configuration.functionality==1?" selected=\"selected\"":""); body+=">Sterowanie przekaźnikiem</option>";
-  body+="<option value=\"2\""; body+=(configuration.functionality==2?" selected=\"selected\"":""); body+=">Multifunkcyjny</option>";
-  body+="<option value=\"3\""; body+=(configuration.functionality==3?" selected=\"selected\"":""); body+=">Reboot</option>";
-  body+="<option value=\"4\""; body+=(configuration.functionality==4?" selected=\"selected\"":""); body+=">Tryb konfiguracji</option>";
-  body+="<option value=\"5\""; body+=(configuration.functionality==5?" selected=\"selected\"":""); body+=">Aktualizacja oprogramowania</option>";
-  body+="</select>";
-  body+="<span class=\"hint\">Informacja wymagana.</span>";
-  body+="</div>";
-
-  char filed[13];
-  sprintf(filed, "switch%s_gpio", id);
-
-  body+=generateConfigParameter_GPIO(filed,configuration.gpio);
-  body+="<div class=\"cf\">";
-  body+="<label>Typ</label>";
-  body+="<select name=\"switch";
-  body+=id;
-  body+="_type\">";
-  body+="<option value=\"0\""; body+=(configuration.type==0?" selected=\"selected\"":""); body+=">Mono-stabilny</option>";
-  body+="<option value=\"1\""; body+=(configuration.type==1?" selected=\"selected\"":""); body+=">Bi-stabilny</option>";
-  body+="</select>";
-  body+="</div>";
-  body+="<div class=\"cf\">";
-  body+="<label>Czułość</label>";
-  body+="<select name=\"switch";
-  body+=id;
-  body+="_sensitivity\">";
-  body+="<option value=\"0\""; body+=(configuration.sensitiveness==0?" selected=\"selected\"":""); body+=">Niska</option>";
-  body+="<option value=\"1\""; body+=(configuration.sensitiveness==1?" selected=\"selected\"":""); body+=">Średnia</option>";
-  body+="<option value=\"2\""; body+=(configuration.sensitiveness==2?" selected=\"selected\"":""); body+=">Wysoka</option>";
-  body+="</select>";
-  body+="</div>";
-
-  body+="</fieldset>";
-
-  char title[22];
-  sprintf(title, "Przycisk / włącznik #%s", id);
-
-
-  return addConfigurationBlock(
-          title
-          ,"Ustawienie czułości włącznika należy ustawić pod indywidulane potrzeby. Wysoka czułości może powodować, że przekaźnik może zmieniać swój stan nadmiernie dla niektórych włączników"
-          ,body
-          ,"switch"
-          );
-
 }
 
 String AFESitesGenerator::addUpgradeSection() {
@@ -457,7 +467,6 @@ String AFESitesGenerator::addUpgradeSection() {
           "Aktualizacja oprogramowania"
           ,"<strong>UWAGA</strong>: funkcjonalnośc tylko dla zaawansowanych użytkowników. Nie odłączaj urządzenia od zasilania podczas aktualizacji."
           ,body
-          ,"upgrade"
           );
 }
 
@@ -469,7 +478,6 @@ String AFESitesGenerator::addResetSection() {
           "Przywracanie ustawień początkowych"
           ,"<strong>Uwaga</strong>: przywracanie ustawień początkowych kasuje wszystkie ustawienia urządzenia, włącznie z konfiguracją sieci WiFi"
           ,body
-          ,"reset"
           );
 }
 
@@ -481,6 +489,5 @@ String AFESitesGenerator::addExitSection() {
           "Panek konfiguracyjny"
           ,""
           ,body
-          ,"exit"
           );
 }
