@@ -21,22 +21,22 @@ class AFEConfigurationPanel {
 
 private:
 AFESitesGenerator Site;
-String getDeviceConfigurationSite();
-String getMQTTConfigurationSite();
-String getRelayConfigurationSite();
-String getDS18B20ConfigurationSite();
-String getSwitchConfigurationSite();
 String getDomoticzConfigurationSite();
-String getUpdateConfigurationSite();
-String getResetConfigurationSite();
-String getExitConfigurationSite();
+
 
 public:
 /* Constructor: entry parameter is GPIO number where Sensor is connected to */
 AFEConfigurationPanel();
 
 /* It returns configuration site */
-String getSite(const String option,boolean save);
+String getSite(const String option,uint8_t command,NETWORK *data);
+String getSite(const String option,uint8_t command,MQTT *data);
+String getSite(const String option,uint8_t command,RELAY *data);
+String getSite(const String option,uint8_t command,SWITCH *data);
+String getSite(const String option,uint8_t command,DS18B20 *data);
+String getSite(const String option,uint8_t command,boolean data);
+
+
 
 };
 

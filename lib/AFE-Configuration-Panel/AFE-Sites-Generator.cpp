@@ -84,7 +84,7 @@ String AFESitesGenerator::addDeviceNameConfiguration() {
   String body="<fieldset>"
                "<div class=\"cf\">"
                "<label>Nazwa urządzenia</label>"
-               "<input name=\"device_name\" type=\"text\" maxlength=\"32\" value=\""; body+=configuration.host; body+="\">"
+               "<input name=\"hostname\" type=\"text\" maxlength=\"32\" value=\""; body+=configuration.host; body+="\">"
                "<span class=\"hint\">Max 32 znaki. Informacja wymagana</span>"
                "</div>"
                "</fieldset>";
@@ -149,19 +149,19 @@ String AFESitesGenerator::addNetworkConfiguration() {
 
   body+="<div class=\"cf\">";
   body+="<label>Bramka</label>";
-  body+="<input name=\"gate_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[0]; body+="\">.";
-  body+="<input name=\"gate_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[1]; body+="\">.";
-  body+="<input name=\"gate_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[2]; body+="\">.";
-  body+="<input name=\"gate_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[3]; body+="\">";
+  body+="<input name=\"gateway_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[0]; body+="\">.";
+  body+="<input name=\"gateway_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[1]; body+="\">.";
+  body+="<input name=\"gateway_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[2]; body+="\">.";
+  body+="<input name=\"gateway_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.gateway[3]; body+="\">";
   body+="<span class=\"hint\">Informacja wymagana</span>";
   body+="</div>";
 
   body+="<div class=\"cf\">";
-  body+="<label>DNS</label>";
-  body+="<input name=\"dns_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[0]; body+="\">.";
-  body+="<input name=\"dns_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[1]; body+="\">.";
-  body+="<input name=\"dns_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[2]; body+="\">.";
-  body+="<input name=\"dns_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[3]; body+="\">";
+  body+="<label>Maska sieci</label>";
+  body+="<input name=\"subnet_ip1\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[0]; body+="\">.";
+  body+="<input name=\"subnet_ip2\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[1]; body+="\">.";
+  body+="<input name=\"subnet_ip3\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[2]; body+="\">.";
+  body+="<input name=\"subnet_ip4\" type=\"number\" maxlength=\"3\" style=\"width:70px\" value=\""; body+=configuration.subnet[3]; body+="\">";
   body+="<span class=\"hint\">Informacja wymagana</span>";
   body+="</div>";
 
@@ -172,63 +172,6 @@ String AFESitesGenerator::addNetworkConfiguration() {
           ,"Parametery sieci moga byc skonfigurowane automatycznie przez serwer DHCP rutera lub manualnie"
           ,body
           ,"network"
-          );
-}
-
-String AFESitesGenerator::addRelayConfiguration() {
-
-  RELAY configuration;
-  configuration = Data.getRelayConfiguration(0);
-
-  String body="<fieldset>";
-  body+="<div class=\"cc\">";
-  body+="<label>";
-  body+="<input name=\"relay1_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
-  body+="</label>";
-  body+="</div>";
-  body+=generateConfigParameter_GPIO("relay1_gpio",configuration.gpio);
-  body+="<div class=\"cf\">";
-  body+="<label>Nazwa</label>";
-  body+="<input name=\"relay1_name\" type=\"text\" maxlength=\"16\" value=\""; body+=configuration.name; body+="\">";
-  body+="<span class=\"hint\">Informacja wymagana. Max 16 znaków</span>";
-  body+="</div>";
-  body+="<p class=\"cd\">Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>";
-  body+="<div class=\"cf\">";
-  body+="<label>Przywrócenie zasilania</label>";
-  body+="<select name=\"relay1_power_restored\">";
-  body+="<option value=\"0\""; body+=(configuration.statePowerOn==0?" selected=\"selected\"":""); body+=">Wyłączony</option>";
-  body+="<option value=\"1\""; body+=(configuration.statePowerOn==1?" selected=\"selected\"":""); body+=">Włączony</option>";
-  body+="<option value=\"2\""; body+=(configuration.statePowerOn==2?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
-  body+="<option value=\"3\""; body+=(configuration.statePowerOn==3?" selected=\"selected\"":""); body+=">Przeciwna do ostatniej zapamiętanej wartości</option>";
-  body+="</select>";
-  body+="</div>";
-  body+="<div class=\"cf\">";
-  body+="<label>Włączony do MQTT</label>";
-  body+="<select  name=\"relay1_mqtt_connected\">";
-  body+="<option value=\"0\""; body+=(configuration.stateMQTTConnected==0?" selected=\"selected\"":""); body+=">Brak akcji</option>";
-  body+="<option value=\"1\""; body+=(configuration.stateMQTTConnected==1?" selected=\"selected\"":""); body+=">Wyłączony</option>";
-  body+="<option value=\"2\""; body+=(configuration.stateMQTTConnected==2?" selected=\"selected\"":""); body+=">Włączony</option>";
-  body+="<option value=\"3\""; body+=(configuration.stateMQTTConnected==3?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
-  body+="<option value=\"4\""; body+=(configuration.stateMQTTConnected==4?" selected=\"selected\"":""); body+=">Wartość z systemu sterowania</option>";
-  body+="</select>";
-  body+="</div>";
-
-  body+="<p class=\"cd\">Ustaw poniższy parametr jeśli przekaźnik ma się wyłączyc automatycznie po zadanym czasie. Domyślnie 0 - przekaźnik nie zmienia stanu automatycznie</p>";
-
-  body+="<div class=\"cf\">";
-  body+="<label>Wyłącz po</label>";
-  body+="<input name=\"relay1_off_time\" type=\"number\" maxlength=\"5\" value=\""; body+=configuration.timeToOff; body+="\">";
-  body+="<span class=\"hint\">sekundach. Zakres 0.5sek do 99999sek</span>";
-  body+="</div>";
-
-
-  body+="</fieldset>";
-
-  return addConfigurationBlock(
-          "Przekaźnik"
-          ,"Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/"
-          ,body
-          ,"relay-1"
           );
 }
 
@@ -336,6 +279,63 @@ String AFESitesGenerator::addDomoticzConfiguration() {
           );
 }
 
+String AFESitesGenerator::addRelayConfiguration() {
+
+  RELAY configuration;
+  configuration = Data.getRelayConfiguration(0);
+
+  String body="<fieldset>";
+  body+="<div class=\"cc\">";
+  body+="<label>";
+  body+="<input name=\"relay1_present\" type=\"checkbox\" value=\"1\""; body+=(configuration.present?" checked=\"checked\"":""); body+="> Włączony?";
+  body+="</label>";
+  body+="</div>";
+  body+=generateConfigParameter_GPIO("relay1_gpio",configuration.gpio);
+  body+="<div class=\"cf\">";
+  body+="<label>Nazwa</label>";
+  body+="<input name=\"relay1_name\" type=\"text\" maxlength=\"16\" value=\""; body+=configuration.name; body+="\">";
+  body+="<span class=\"hint\">Informacja wymagana. Max 16 znaków</span>";
+  body+="</div>";
+  body+="<p class=\"cd\">Zachowanie się przekaźnia po przywróceniu zasilania lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania przez MQTT)</p>";
+  body+="<div class=\"cf\">";
+  body+="<label>Przywrócenie zasilania</label>";
+  body+="<select name=\"relay1_power_restored\">";
+  body+="<option value=\"0\""; body+=(configuration.statePowerOn==0?" selected=\"selected\"":""); body+=">Wyłączony</option>";
+  body+="<option value=\"1\""; body+=(configuration.statePowerOn==1?" selected=\"selected\"":""); body+=">Włączony</option>";
+  body+="<option value=\"2\""; body+=(configuration.statePowerOn==2?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
+  body+="<option value=\"3\""; body+=(configuration.statePowerOn==3?" selected=\"selected\"":""); body+=">Przeciwna do ostatniej zapamiętanej wartości</option>";
+  body+="</select>";
+  body+="</div>";
+  body+="<div class=\"cf\">";
+  body+="<label>Włączony do MQTT</label>";
+  body+="<select  name=\"relay1_mqtt_connected\">";
+  body+="<option value=\"0\""; body+=(configuration.stateMQTTConnected==0?" selected=\"selected\"":""); body+=">Brak akcji</option>";
+  body+="<option value=\"1\""; body+=(configuration.stateMQTTConnected==1?" selected=\"selected\"":""); body+=">Wyłączony</option>";
+  body+="<option value=\"2\""; body+=(configuration.stateMQTTConnected==2?" selected=\"selected\"":""); body+=">Włączony</option>";
+  body+="<option value=\"3\""; body+=(configuration.stateMQTTConnected==3?" selected=\"selected\"":""); body+=">Ostatnia zapamiętana wartość</option>";
+  body+="<option value=\"4\""; body+=(configuration.stateMQTTConnected==4?" selected=\"selected\"":""); body+=">Wartość z systemu sterowania</option>";
+  body+="</select>";
+  body+="</div>";
+
+  body+="<p class=\"cd\">Ustaw poniższy parametr jeśli przekaźnik ma się wyłączyc automatycznie po zadanym czasie. Domyślnie 0 - przekaźnik nie zmienia stanu automatycznie</p>";
+
+  body+="<div class=\"cf\">";
+  body+="<label>Wyłącz po</label>";
+  body+="<input name=\"relay1_off_time\" type=\"number\" maxlength=\"5\" value=\""; body+=configuration.timeToOff; body+="\">";
+  body+="<span class=\"hint\">sekundach. Zakres 0.5sek do 99999sek</span>";
+  body+="</div>";
+
+
+  body+="</fieldset>";
+
+  return addConfigurationBlock(
+          "Przekaźnik"
+          ,"Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/"
+          ,body
+          ,"relay-1"
+          );
+}
+
 String AFESitesGenerator::addDS18B20Configuration() {
 
   DS18B20 configuration;
@@ -358,6 +358,14 @@ String AFESitesGenerator::addDS18B20Configuration() {
   body+="<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"6\" value=\""; body+=configuration.correction; body+="\">";
   body+="<span class=\"hint\">stopni. Zakres -9.99 do 9.99, </span>";
   body+="</div>";
+  body+="<div class=\"cf\">";
+  body+="<label>Jednostka</label>";
+  body+="<select  name=\"ds18b20_unit\">";
+  body+="<option value=\"0\""; body+=(configuration.unit==0?" selected=\"selected\"":""); body+=">celsjusz</option>";
+  body+="<option value=\"1\""; body+=(configuration.unit==1?" selected=\"selected\"":""); body+=">fahrenheit</option>";
+  body+="</select>";
+  body+="</div>";
+
   body+="</fieldset>";
 
   return addConfigurationBlock(
