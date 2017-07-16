@@ -33,20 +33,22 @@ void AFEWebServer::generate() {
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                /* @TODO For MQTT only*/
         } else if (getOptionName()=="mqtt") {
                 MQTT *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                /* @TODO For Domoticz only*/
         } else if (getOptionName()=="domoticz") {
-                // @TODO Domoticz Config page+=getDomoticzConfigurationSite();
+                DOMOTICZ *data;
+                if (getCommand()==SERVER_CMD_SAVE) {
+                        getData(data);
+                }
         } else if (getOptionName()=="relay") {
                 RELAY *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(0,data);
-                        if (getCommand()==SERVER_CMD_SAVE) {
-                                getData(0,data);
-                        }
                 }
         } else if (getOptionName()=="ds18b20") {
                 DS18B20 *data;
@@ -146,6 +148,7 @@ void AFEWebServer::getData(NETWORK *data) {
         }
 }
 
+/* @TODO For MQTT only*/
 void AFEWebServer::getData(MQTT *data) {
 
         if (server.arg("mqtt_host").length() > 0 ) {
@@ -184,6 +187,38 @@ void AFEWebServer::getData(MQTT *data) {
 
 }
 
+/* @TODO For Domoticz only*/
+void AFEWebServer::getData(DOMOTICZ *data) {
+
+        if (server.arg("domoticz_host").length() > 0 ) {
+                server.arg("domoticz_host").toCharArray(data->host,sizeof(data->host));
+        }
+
+        if (server.arg("domoticz_ip1").length() > 0 &&
+            server.arg("domoticz_ip2").length() > 0 &&
+            server.arg("domoticz_ip3").length() > 0 &&
+            server.arg("domoticz_ip4").length() > 0) {
+
+                data->ip = IPAddress(server.arg("domoticz_ip1").toInt(),
+                                     server.arg("domoticz_ip2").toInt(),
+                                     server.arg("domoticz_ip3").toInt(),
+                                     server.arg("domoticz_ip4").toInt());
+
+        }
+
+        if (server.arg("domoticz_port").length() > 0 ) {
+                data->port=server.arg("domoticz_port").toInt();
+        }
+
+        if (server.arg("domoticz_user").length() > 0 ) {
+                server.arg("domoticz_user").toCharArray(data->user,sizeof(data->user));
+        }
+
+        if (server.arg("domoticz_password").length() > 0 ) {
+                server.arg("domoticz_password").toCharArray(data->password,sizeof(data->password));
+        }
+}
+
 void AFEWebServer::getData(uint8_t id, RELAY *data) {
 
         if (server.arg("relay"+String(id)+"_present").length() > 0 ) {
@@ -202,14 +237,22 @@ void AFEWebServer::getData(uint8_t id, RELAY *data) {
         if (server.arg("relay"+String(id)+"_power_restored").length() > 0 ) {
                 data->statePowerOn  = server.arg("relay"+String(id)+"_power_restored").toInt();
         }
-        if (server.arg("mqtt_host").length() > 0 ) {
-                server.arg("mqtt_host").toCharArray(data->name,sizeof(data->name));
+
+        /* @TODO For MQTT only*/
+        if (server.arg("relay"+String(id)+"_name").length() > 0 ) {
+                server.arg("relay"+String(id)+"_name").toCharArray(data->name,sizeof(data->name));
         }
 
         if (server.arg("relay"+String(id)+"_mqtt_connected").length() > 0 ) {
                 data->stateMQTTConnected = server.arg("relay"+String(id)+"_mqtt_connected").toInt();
         }
-
+        /* @TODO For Domoticz only*/
+        if (server.arg("relay"+String(id)+"_idx").length() > 0 ) {
+                data->idx = server.arg("relay"+String(id)+"_idx").toInt();
+        }
+        if (server.arg("relay"+String(id)+"_publish_to_domoticz").length() > 0 ) {
+                data->publishToDomoticz = server.arg("relay"+String(id)+"_publish_to_domoticz").toInt();
+        }
 }
 
 void AFEWebServer::getData(uint8_t id, SWITCH *data) {

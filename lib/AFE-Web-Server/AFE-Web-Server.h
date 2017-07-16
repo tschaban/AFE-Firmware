@@ -30,7 +30,10 @@ private:
 	boolean getCommand();
 
 	void getData(NETWORK *data);
+	/* @TODO For MQTT only*/
 	void getData(MQTT *data);
+	/* @TODO For Domoticz only*/
+	void getData(DOMOTICZ *data);
 	void getData(uint8_t id, RELAY *data);
 	void getData(uint8_t id, SWITCH *data);
 	void getData(DS18B20 *data);
