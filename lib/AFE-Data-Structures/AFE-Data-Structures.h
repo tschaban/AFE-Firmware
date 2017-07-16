@@ -16,6 +16,8 @@
 
 #include <ESP8266WiFi.h>
 
+#define SERVER_CMD_SAVE 	1
+
 struct NETWORK {
 								char ssid[32];
 								char password[32];
@@ -25,8 +27,8 @@ struct NETWORK {
 								IPAddress gateway;
 								IPAddress subnet;
 								uint8_t noConnectionAttempts;
-								uint8_t durationBetweenConnectionAttempts;
-								uint8_t durationBetweenNextConnectionAttemptsSeries;
+								uint8_t waitTimeConnections;
+								uint8_t waitTimeSeries;
 };
 
 struct MQTT {
@@ -36,6 +38,14 @@ struct MQTT {
 								char user[32];
 								char password[32];
 								char topic[32];
+};
+
+struct DOMOTICZ {
+								char host[32];
+								IPAddress ip;
+								uint16_t port;
+								char user[32];
+								char password[32];
 };
 
 struct RELAY {
