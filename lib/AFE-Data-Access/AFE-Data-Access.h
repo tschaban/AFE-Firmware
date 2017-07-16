@@ -33,12 +33,12 @@ SWITCH		getSwitchConfiguration(uint8_t id);
 DS18B20   getDS18B20Configuration();
 FIRMWARE  getFirmwareConfiguration();
 
-void saveNetworkConfiguration(NETWORK configuration);
-void saveMQTTConfiguration(MQTT configuration);
-void saveRelayConfiguration(uint8_t id, RELAY configuration);
-void saveSwitchConfiguration(uint8_t id, SWITCH configuration);
-void saveDS18B20Configuration(DS18B20 configuration);
-void saveFirmwareConfiguration(FIRMWARE configuration);
+void saveConfiguration(NETWORK configuration);
+void saveConfiguration(MQTT configuration);
+void saveConfiguration(uint8_t id, RELAY configuration);
+void saveConfiguration(uint8_t id, SWITCH configuration);
+void saveConfiguration(DS18B20 configuration);
+void saveConfiguration(FIRMWARE configuration);
 
 const char getVersion();
 

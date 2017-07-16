@@ -14,8 +14,8 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
         configuration.gateway = Eeprom.readIP(217);
         configuration.subnet = Eeprom.readIP(221);
         configuration.noConnectionAttempts = Eeprom.readUInt8(225);
-        configuration.durationBetweenConnectionAttempts = Eeprom.readUInt8(226);
-        configuration.durationBetweenNextConnectionAttemptsSeries = Eeprom.readUInt8(227);
+        configuration.waitTimeConnections = Eeprom.readUInt8(226);
+        configuration.waitTimeSeries = Eeprom.readUInt8(227);
 
         return configuration;
 }
@@ -81,7 +81,7 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
         return configuration;
 }
 
-void AFEDataAccess::saveNetworkConfiguration(NETWORK configuration) {
+void AFEDataAccess::saveConfiguration(NETWORK configuration) {
         Eeprom.write(148,32,configuration.ssid);
         Eeprom.write(180,32,configuration.password);
         Eeprom.write(9,16,configuration.host);
@@ -90,11 +90,11 @@ void AFEDataAccess::saveNetworkConfiguration(NETWORK configuration) {
         Eeprom.writeIP(217,configuration.gateway);
         Eeprom.writeIP(221,configuration.subnet);
         Eeprom.writeUInt8(225,configuration.noConnectionAttempts);
-        Eeprom.writeUInt8(226,configuration.durationBetweenConnectionAttempts);
-        Eeprom.writeUInt8(227,configuration.durationBetweenNextConnectionAttemptsSeries);
+        Eeprom.writeUInt8(226,configuration.waitTimeConnections);
+        Eeprom.writeUInt8(227,configuration.waitTimeSeries);
 }
 
-void AFEDataAccess::saveMQTTConfiguration(MQTT configuration) {
+void AFEDataAccess::saveConfiguration(MQTT configuration) {
         Eeprom.write(228,32,configuration.host);
         Eeprom.writeIP(260,configuration.ip);
         Eeprom.write(264,5,(long)configuration.port);
@@ -103,7 +103,7 @@ void AFEDataAccess::saveMQTTConfiguration(MQTT configuration) {
         Eeprom.write(333,32,configuration.topic);
 }
 
-void AFEDataAccess::saveRelayConfiguration(uint8_t id, RELAY configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
         Eeprom.write(365,configuration.present);
         Eeprom.writeUInt8(366,configuration.gpio);
         Eeprom.write(368,5,configuration.timeToOff);
@@ -113,7 +113,7 @@ void AFEDataAccess::saveRelayConfiguration(uint8_t id, RELAY configuration) {
 
 }
 
-void AFEDataAccess::saveSwitchConfiguration(uint8_t id, SWITCH configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
         Eeprom.write(391,configuration.present);
         Eeprom.writeUInt8(392,configuration.gpio);
         Eeprom.writeUInt8(393,configuration.type);
@@ -121,7 +121,7 @@ void AFEDataAccess::saveSwitchConfiguration(uint8_t id, SWITCH configuration) {
         Eeprom.writeUInt8(395,configuration.functionality);
 }
 
-void AFEDataAccess::saveDS18B20Configuration(DS18B20 configuration) {
+void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
         Eeprom.write(396,configuration.present);
         Eeprom.writeUInt8(397,configuration.gpio);
         Eeprom.write(398,5,(float)configuration.correction);
@@ -129,7 +129,7 @@ void AFEDataAccess::saveDS18B20Configuration(DS18B20 configuration) {
         Eeprom.writeUInt8(408,configuration.unit);
 }
 
-void AFEDataAccess::saveFirmwareConfiguration(FIRMWARE configuration) {
+void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
         Eeprom.write(0,7,configuration.version);
         Eeprom.writeUInt8(7,configuration.type);
         Eeprom.writeUInt8(27,configuration.autoUpgrade);
