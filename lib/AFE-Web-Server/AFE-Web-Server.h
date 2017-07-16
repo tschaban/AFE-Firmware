@@ -16,9 +16,8 @@
 
 #include <ESP8266WebServer.h>
 #include <AFE-Configuration-Panel.h>
+#include <AFE-Data-Structures.h>
 #include <Streaming.h>
-
-#define SERVER_CMD_SAVE 	1
 
 class AFEWebServer {
 
@@ -28,8 +27,13 @@ private:
 
 	void publishHTML(String page);
 	String getOptionName();
-	boolean isSave();
+	boolean getCommand();
 
+	void getData(NETWORK *data);
+	void getData(MQTT *data);
+	void getData(uint8_t id, RELAY *data);
+	void getData(uint8_t id, SWITCH *data);
+	void getData(DS18B20 *data);
 
 public:
 	AFEWebServer();
