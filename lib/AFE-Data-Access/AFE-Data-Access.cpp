@@ -20,6 +20,7 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
         return configuration;
 }
 
+/* @TODO Only for MQTT */
 MQTT AFEDataAccess::getMQTTConfiguration() {
         MQTT configuration;
 
@@ -33,6 +34,19 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
         return configuration;
 }
 
+/* @TODO Only for Domoticz */
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+        DOMOTICZ configuration;
+
+        Eeprom.read(228,32).toCharArray(configuration.host,sizeof(configuration.host));
+        configuration.ip = Eeprom.readIP(260);
+        configuration.port  = Eeprom.read(264, 5).toInt();
+        Eeprom.read(269,32).toCharArray(configuration.user,sizeof(configuration.user));
+        Eeprom.read(301,32).toCharArray(configuration.password,sizeof(configuration.password));
+
+        return configuration;
+}
+
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
         RELAY configuration;
 
@@ -40,8 +54,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
         configuration.gpio = Eeprom.readUInt8(366);
         configuration.timeToOff = Eeprom.read(368, 5).toFloat();
         configuration.statePowerOn =  Eeprom.readUInt8(373);
+        /* @TODO Only for MQTT */
         Eeprom.read(374,16).toCharArray(configuration.name,sizeof(configuration.name));
         configuration.stateMQTTConnected = Eeprom.readUInt8(390);
+        /* @TODO Only for Domoticz */
+        configuration.idx = Eeprom.read(374,4).toInt();
+        configuration.publishToDomoticz = Eeprom.readUInt8(378);
 
         return configuration;
 }
@@ -103,13 +121,25 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
         Eeprom.write(333,32,configuration.topic);
 }
 
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+        Eeprom.write(228,32,configuration.host);
+        Eeprom.writeIP(260,configuration.ip);
+        Eeprom.write(264,5,(long)configuration.port);
+        Eeprom.write(269,32,configuration.user);
+        Eeprom.write(301,32,configuration.password);
+}
+
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
         Eeprom.write(365,configuration.present);
         Eeprom.writeUInt8(366,configuration.gpio);
         Eeprom.write(368,5,configuration.timeToOff);
         Eeprom.writeUInt8(373,configuration.statePowerOn);
+        /* @TODO For MQTT only */
         Eeprom.write(374,16,configuration.name);
         Eeprom.writeUInt8(390,configuration.stateMQTTConnected);
+        /* @TODO For Domoticz only */
+        Eeprom.write(374,4,(long)configuration.idx);
+        Eeprom.writeUInt8(378,configuration.publishToDomoticz);
 
 }
 
