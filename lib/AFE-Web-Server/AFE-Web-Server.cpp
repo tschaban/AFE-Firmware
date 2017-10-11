@@ -24,45 +24,55 @@ void AFEWebServer::handle(const char* uri,ESP8266WebServer::THandlerFunction han
 }
 
 void AFEWebServer::generate() {
-        boolean data; /* @TODO No so good coding: just used to overload AFEConfigurationPanel.getSite() method */
+      /* @TODO this method is not writen well */
 
         Serial << endl << "INFO: Site : " << getOptionName() << " requested. Command :  " << getCommand();
+
+
 
         if (getOptionName()=="basic") {
                 NETWORK *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
+
                 /* @TODO For MQTT only*/
         } else if (getOptionName()=="mqtt") {
                 MQTT *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
                 /* @TODO For Domoticz only*/
         } else if (getOptionName()=="domoticz") {
                 DOMOTICZ *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
         } else if (getOptionName()=="relay") {
                 RELAY *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(0,data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
         } else if (getOptionName()=="ds18b20") {
                 DS18B20 *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
         } else if (getOptionName()=="switch") {
                 SWITCH *data;
                 if (getCommand()==SERVER_CMD_SAVE) {
                         getData(0,data);
                 }
+                publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
         }
 
-        publishHTML(ConfigurationPanel.getSite(getOptionName(),getCommand(),data));
+
+
 }
 
 String AFEWebServer::getOptionName() {
@@ -80,6 +90,7 @@ uint8_t AFEWebServer::getCommand() {
 }
 
 void AFEWebServer::getData(NETWORK *data) {
+
 
         if (server.arg("wifi_ssid").length() > 0 ) {
                 server.arg("wifi_ssid").toCharArray(data->ssid,sizeof(data->ssid));

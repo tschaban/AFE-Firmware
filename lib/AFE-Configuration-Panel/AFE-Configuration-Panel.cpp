@@ -5,6 +5,8 @@ AFEConfigurationPanel::AFEConfigurationPanel() {
 
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,boolean data) {
 
+        Serial << endl << "INFO: Generating site";
+
         String page = Site.generateHeader();
 
         if (option=="upgrade") {
@@ -17,10 +19,14 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,boolea
                 page+="<h1>Page Not Found</h1>";
         }
         page+=Site.generateFooter();
+
+        Serial << endl << "INFO: Site generated";
         return page;
 }
 
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,NETWORK *data){
+
+        Serial << endl << "INFO: Generating Network configuration site";
 
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;
@@ -39,6 +45,8 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,NETWOR
 /* @TODO Only for MQTT */
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,MQTT *data){
 
+        Serial << endl << "INFO: Generating MQTT configuration site";
+
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;
                 save.saveConfiguration(*data);
@@ -56,6 +64,8 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,MQTT *
 /* @TODO Only for Domoticz */
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,DOMOTICZ *data) {
 
+        Serial << endl << "INFO: Generating Domoticz configuration site";
+
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;
                 save.saveConfiguration(*data);
@@ -71,6 +81,8 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,DOMOTI
 }
 
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,RELAY *data){
+
+        Serial << endl << "INFO: Generating Relay configuration site";
 
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;
@@ -89,6 +101,8 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,RELAY 
 
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,SWITCH *data){
 
+        Serial << endl << "INFO: Generating Switch configuration site";
+
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;
                 save.saveConfiguration(0,*data);
@@ -105,6 +119,8 @@ String AFEConfigurationPanel::getSite(const String option,uint8_t command,SWITCH
 }
 
 String AFEConfigurationPanel::getSite(const String option,uint8_t command,DS18B20 *data) {
+
+        Serial << endl << "INFO: Generating DS18B20 configuration site";  
 
         if (command==SERVER_CMD_SAVE) {
                 AFEDataAccess save;

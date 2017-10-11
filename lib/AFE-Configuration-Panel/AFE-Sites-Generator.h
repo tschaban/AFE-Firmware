@@ -30,7 +30,7 @@ public:
 	AFESitesGenerator();
 	String generateHTMLPage(String &page);
 	String addConfigurationBlock(const String title,const String description, const String body);
-	const char* generateHeader();
+	const String generateHeader();
 	const char* generateFooter();
 	const String  generateConfigParameter_GPIO(const char* field, uint8_t selected);
 

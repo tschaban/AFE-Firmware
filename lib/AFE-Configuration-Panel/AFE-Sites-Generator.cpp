@@ -2,11 +2,10 @@
 
 AFESitesGenerator::AFESitesGenerator() {}
 
-const char* AFESitesGenerator::generateHeader() {
+const String AFESitesGenerator::generateHeader() {
 
   FIRMWARE configuration;
   configuration = Data.getFirmwareConfiguration();
-
 
         String page = "<!doctype html>"
                "<html lang=\"en\">"
@@ -47,7 +46,7 @@ const char* AFESitesGenerator::generateHeader() {
                "</ul>"
                "</div>"
                "<div id=\"r\">";
-
+        return page;
 }
 
 const char* AFESitesGenerator::generateFooter() {
