@@ -9,42 +9,41 @@
 #define _AFE_Web_Server_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
-#include <ESP8266WebServer.h>
 #include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Structures.h>
+#include <ESP8266WebServer.h>
 #include <Streaming.h>
 
 class AFEWebServer {
 
 private:
-	ESP8266WebServer server;
-	AFEConfigurationPanel ConfigurationPanel;
+  ESP8266WebServer server;
+  AFEConfigurationPanel ConfigurationPanel;
 
-	void publishHTML(String page);
-	String getOptionName();
-	boolean getCommand();
+  void publishHTML(String page);
+  String getOptionName();
+  boolean getCommand();
 
-	void getData(NETWORK *data);
-	/* @TODO For MQTT only*/
-	void getData(MQTT *data);
-	/* @TODO For Domoticz only*/
-	void getData(DOMOTICZ *data);
-	void getData(uint8_t id, RELAY *data);
-	void getData(uint8_t id, SWITCH *data);
-	void getData(DS18B20 *data);
+  NETWORK getNetworkData();
+  /* @TODO For MQTT only*/
+  MQTT getMQTTData();
+  /* @TODO For Domoticz only*/
+  DOMOTICZ getDomoticzData();
+  RELAY getRelayData(uint8_t id);
+  SWITCH getSwitchData(uint8_t id);
+  DS18B20 getDS18B20Data();
 
 public:
-	AFEWebServer();
-	void begin();
+  AFEWebServer();
+  void begin();
   void listener();
-	void handle(const char* uri,ESP8266WebServer::THandlerFunction handler);
-	void generate();
-
+  void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
+  void generate();
 };
 
 #endif

@@ -9,9 +9,9 @@
 #define _AFE_Configuration_Panel_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #include "AFE-Sites-Generator.h"
@@ -20,25 +20,21 @@
 class AFEConfigurationPanel {
 
 private:
-AFESitesGenerator Site;
-String getDomoticzConfigurationSite();
-
+  AFESitesGenerator Site;
+  String getDomoticzConfigurationSite();
 
 public:
-/* Constructor: entry parameter is GPIO number where Sensor is connected to */
-AFEConfigurationPanel();
+  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
+  AFEConfigurationPanel();
 
-/* It returns configuration site */
-String getSite(const String option,uint8_t command,NETWORK *data);
-String getSite(const String option,uint8_t command,MQTT *data);
-String getSite(const String option,uint8_t command,DOMOTICZ *data);
-String getSite(const String option,uint8_t command,RELAY *data);
-String getSite(const String option,uint8_t command,SWITCH *data);
-String getSite(const String option,uint8_t command,DS18B20 *data);
-String getSite(const String option,uint8_t command,boolean data);
-
-
-
+  /* It returns configuration site */
+  String getSite(const String option, uint8_t command, NETWORK data);
+  String getSite(const String option, uint8_t command, MQTT data);
+  String getSite(const String option, uint8_t command, DOMOTICZ data);
+  String getSite(const String option, uint8_t command, RELAY data);
+  String getSite(const String option, uint8_t command, SWITCH data);
+  String getSite(const String option, uint8_t command, DS18B20 data);
+  String getSite(const String option, uint8_t command, boolean data);
 };
 
 #endif
