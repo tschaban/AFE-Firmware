@@ -327,7 +327,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   body += "<div class=\"cf\">";
   body += "<label>Port</label>";
-  body += "<input name=\"mqtt_port\" type=\"number\" value=\"1883\" "
+  body += "<input name=\"mqtt_port\" type=\"number\""
           "maxlength=\"5\" value=\"";
   body += configuration.port;
   body += "\">";
@@ -350,7 +350,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>Temat wiadomości</label>";
-  body += "<input name=\"mqtt_topic\" type=\"text\" value=\"/sonoff/\" "
+  body += "<input name=\"mqtt_topic\" type=\"text\""
           "maxlength=\"32\" value=\"";
   body += configuration.topic;
   body += "\">";
@@ -394,7 +394,7 @@ String AFESitesGenerator::addDomoticzConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>Port</label>";
-  body += "<input name=\"domoticz_port\" type=\"number\" value=\"8080\" "
+  body += "<input name=\"domoticz_port\" type=\"number\" "
           "maxlength=\"5\" value=\"";
   body += configuration.port;
   body += "\">";
@@ -429,7 +429,7 @@ String AFESitesGenerator::addDomoticzConfiguration() {
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration;
-  configuration = Data.getRelayConfiguration(0);
+  configuration = Data.getRelayConfiguration(id);
 
   String body = "<fieldset>";
   body += "<div class=\"cc\">";
@@ -442,7 +442,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
   char filed[13];
-  sprintf(filed, "field%d_gpio", id);
+  sprintf(filed, "relay%d_gpio", id);
 
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
@@ -473,7 +473,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<input name=\"relay" + String(id) +
           "_publish_to_domoticz\" type=\"checkbox\" value=\"1\"";
   body += (configuration.publishToDomoticz ? " checked=\"checked\"" : "");
-  body += "> Włączony?";
+  body += "> Publikowac stan przekaźnika do Domoticz?";
   body += "</label>";
   body += "</div>";
 
@@ -596,7 +596,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   char filed[13];
   sprintf(filed, "switch%d_gpio", id);
 
-  body += generateConfigParameter_GPIO("as", configuration.gpio);
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "<div class=\"cf\">";
   body += "<label>Typ</label>";
   body += "<select name=\"switch" + String(id) + "_type\">";

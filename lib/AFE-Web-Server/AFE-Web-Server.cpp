@@ -54,12 +54,14 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
   } else if (getOptionName() == "relay") {
-    RELAY data;
+    RELAY data1 = {};
+    RELAY data2 = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data = getRelayData(0);
+      data1 = getRelayData(0);
+      //  data2 = getRelayData(1);
     }
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
+    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
+                                           data2));
   } else if (getOptionName() == "ds18b20") {
     DS18B20 data;
     if (getCommand() == SERVER_CMD_SAVE) {
@@ -68,12 +70,16 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
   } else if (getOptionName() == "switch") {
-    SWITCH data;
+    SWITCH data1 = {};
+    SWITCH data2 = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data = getSwitchData(0);
+      data1 = getSwitchData(0);
+      //    data2 = getSwitchData(1);
     }
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
+    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
+                                           data2));
+  } else if (getOptionName() == "exit") {
+    ESP.restart();
   }
 }
 
@@ -96,21 +102,20 @@ NETWORK AFEWebServer::getNetworkData() {
   Serial << endl << "INFO: Reading network data";
   NETWORK data;
 
-  if (server.hasArg("wifi_ssid") && server.arg("wifi_ssid").length() > 0) {
+  if (server.arg("wifi_ssid").length() > 0) {
     server.arg("wifi_ssid").toCharArray(data.ssid, sizeof(data.ssid));
   }
 
-  if (server.hasArg("wifi_password") &&
-      server.arg("wifi_password").length() > 0) {
+  if (server.arg("wifi_password").length() > 0) {
     server.arg("wifi_password")
         .toCharArray(data.password, sizeof(data.password));
   }
 
-  if (server.hasArg("hostname") && server.arg("hostname").length() > 0) {
+  if (server.arg("hostname").length() > 0) {
     server.arg("hostname").toCharArray(data.host, sizeof(data.host));
   }
 
-  if (server.arg("dhcp").length() > 0) {
+  if (server.arg("dhcp_config").length() > 0) {
     data.isDHCP = true;
   } else {
     data.isDHCP = false;
@@ -237,6 +242,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   Serial << endl << "INFO:  Reading relay  data";
 
   RELAY data;
+
   if (server.arg("relay" + String(id) + "_present").length() > 0) {
     data.present = true;
   } else {
@@ -293,15 +299,20 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
     data.type = server.arg("switch" + String(id) + "_type").toInt();
   }
 
-  if (server.arg("switch" + String(id) + "_sensitiveness").length() > 0) {
+  if (server.arg("switch" + String(id) + "_sensitivity").length() > 0) {
     data.sensitiveness =
-        server.arg("switch" + String(id) + "_sensitiveness").toInt();
+        server.arg("switch" + String(id) + "_sensitivity").toInt();
   }
 
   if (server.arg("switch" + String(id) + "_functionality").length() > 0) {
     data.functionality =
         server.arg("switch" + String(id) + "_functionality").toInt();
   }
+
+  if (server.arg("switch" + String(id) + "_gpio").length() > 0) {
+    data.gpio = server.arg("switch" + String(id) + "_gpio").toInt();
+  }
+
   return data;
 }
 

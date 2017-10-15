@@ -82,21 +82,22 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   page += Site.generateFooter();
   return page;
 }
-
+//
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      RELAY data) {
+                                      RELAY data1, RELAY data2) {
 
   Serial << endl << "INFO: Generating Relay configuration site";
 
   if (command == SERVER_CMD_SAVE) {
     AFEDataAccess save;
-    save.saveConfiguration(0, data);
+    save.saveConfiguration(0, data1);
+    //    save.saveConfiguration(1, data2);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=relay&command=1\"  method=\"post\">";
-  page += Site.addRelayConfiguration(1);
-  page += Site.addRelayConfiguration(2);
+  page += Site.addRelayConfiguration(0);
+  //  page += Site.addRelayConfiguration(1);
   page += "<input type=\"submit\" class=\"b bs\" value=\"Zapisz\">";
   page += "</form>";
   page += Site.generateFooter();
@@ -104,20 +105,21 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
 }
 
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      SWITCH data) {
+                                      SWITCH data1, SWITCH data2) {
 
   Serial << endl << "INFO: Generating Switch configuration site";
 
   if (command == SERVER_CMD_SAVE) {
     AFEDataAccess save;
-    save.saveConfiguration(0, data);
+    save.saveConfiguration(0, data1);
+    //  save.saveConfiguration(1, data2);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=switch&command=1\"  method=\"post\">";
 
-  page += Site.addSwitchConfiguration(1);
-  page += Site.addSwitchConfiguration(2);
+  page += Site.addSwitchConfiguration(0);
+  //  page += Site.addSwitchConfiguration(1);
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"Zapisz\">";
   page += "</form>";

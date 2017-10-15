@@ -14,11 +14,6 @@ void setup() {
   delay(10);
 
   AFEDataAccess Data;
-  AFEDefaults Defaults;
-  Defaults.set();
-
-  /* Reading EEPROM */
-  //  AFEEEPROM Eeprom;
 
   FIRMWARE firmwareConfiguration;
   firmwareConfiguration = Data.getFirmwareConfiguration();
@@ -70,13 +65,12 @@ void setup() {
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration = Data.getDomoticzConfiguration();
 
-  Serial << endl << " - MQTT Broker";
-  Serial << endl << "    - Host : " << MQTTConfiguration.host;
-  Serial << endl << "    - IP : " << MQTTConfiguration.ip;
-  Serial << endl << "    - Port : " << MQTTConfiguration.port;
-  Serial << endl << "    - User : " << MQTTConfiguration.user;
-  Serial << endl << "    - Password : " << MQTTConfiguration.password;
-  Serial << endl << "    - Topic : " << MQTTConfiguration.topic;
+  Serial << endl << " - Domoticz";
+  Serial << endl << "    - Host : " << DomoticzConfiguration.host;
+  Serial << endl << "    - IP : " << DomoticzConfiguration.ip;
+  Serial << endl << "    - Port : " << DomoticzConfiguration.port;
+  Serial << endl << "    - User : " << DomoticzConfiguration.user;
+  Serial << endl << "    - Password : " << DomoticzConfiguration.password;
 
   RELAY RelayConfiguration;
   RelayConfiguration = Data.getRelayConfiguration(0);
