@@ -1,22 +1,65 @@
 /*
+ Source taken from:
+ https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266HTTPUpdateServer
+ Credits to all authors !!!!
+
+ Modifications by tschaban https://github.com/tschaban
+*/
+
+/*
   WebServer component
   AFE Firmware for smart home devices build on ESP8266
   More info: https://github.com/tschaban/AFE-Firmware
   LICENCE: http://opensource.org/licenses/MIT
 */
 
-#ifndef _AFE_Globals_h
-#define _AFE_Globals_h
+#ifndef _AFE_OTH_h
+#define _AFE_OTH_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
+#include "StreamString.h"
+#include <AFE-Configuration-Panel.h>
+#include <ESP8266WebServer.h>
+#include <WiFiClient.h>
+#include <WiFiServer.h>
+#include <WiFiUdp.h>
 
+class ESP8266WebServer;
 
+class ESP8266HTTPUpdateServer {
+public:
+  ESP8266HTTPUpdateServer(bool serial_debug = false);
 
+  void setup(ESP8266WebServer *server) { setup(server, NULL, NULL); }
 
+  void setup(ESP8266WebServer *server, const char *path) {
+    setup(server, path, NULL, NULL);
+  }
+
+  void setup(ESP8266WebServer *server, const char *username,
+             const char *password) {
+    setup(server, "/update", username, password);
+  }
+
+  void setup(ESP8266WebServer *server, const char *path, const char *username,
+             const char *password);
+
+protected:
+  void _setUpdaterError();
+
+private:
+  bool _serial_output;
+  ESP8266WebServer *_server;
+  char *_username;
+  char *_password;
+  bool _authenticated;
+  String _updaterError;
+  AFEConfigurationPanel ConfigurationPanel;
+};
 
 #endif

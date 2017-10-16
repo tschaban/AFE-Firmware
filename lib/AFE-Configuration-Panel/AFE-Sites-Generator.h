@@ -9,44 +9,44 @@
 #define _AFE_Sites_Generator_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
-#include <Streaming.h>
-#include <AFE-EEPROM.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
+#include <AFE-EEPROM.h>
+#include <Streaming.h>
 
 class AFESitesGenerator {
 
 private:
-	AFEEEPROM Eeprom;
-	AFEDataAccess Data;
+  AFEEEPROM Eeprom;
+  AFEDataAccess Data;
 
 public:
-	/* Constructor: entry parameter is GPIO number where Sensor is connected to */
-	AFESitesGenerator();
-	String generateHTMLPage(String &page);
-	String addConfigurationBlock(const String title,const String description, const String body);
-	const String generateHeader();
-	const char* generateFooter();
-	const String  generateConfigParameter_GPIO(const char* field, uint8_t selected);
+  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
+  AFESitesGenerator();
+  String generateHTMLPage(String &page);
+  String addConfigurationBlock(const String title, const String description,
+                               const String body);
+  const String generateHeader(uint8_t redirect = 0);
+  const char *generateFooter();
+  const String generateConfigParameter_GPIO(const char *field,
+                                            uint8_t selected);
 
   String addNetworkConfiguration();
-	String addMQTTBrokerConfiguration();
-	String addDomoticzConfiguration();
+  String addMQTTBrokerConfiguration();
+  String addDomoticzConfiguration();
   String addRelayConfiguration(uint8_t id);
-	String addSwitchConfiguration(uint8_t id);
-	String addDS18B20Configuration();
-
+  String addSwitchConfiguration(uint8_t id);
+  String addDS18B20Configuration();
 
   String addUpgradeSection();
-	String addResetSection();
-	String addExitSection();
-
-
+  String addPostUpgradeSection(boolean status);
+  String addResetSection();
+  String addExitSection();
 };
 
 #endif

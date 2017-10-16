@@ -2,7 +2,7 @@
 
 AFESitesGenerator::AFESitesGenerator() {}
 
-const String AFESitesGenerator::generateHeader() {
+const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
   FIRMWARE configuration;
   configuration = Data.getFirmwareConfiguration();
@@ -10,8 +10,15 @@ const String AFESitesGenerator::generateHeader() {
   String page = "<!doctype html>"
                 "<html lang=\"en\">"
                 "<head>"
-                "<meta charset=\"utf-8\">"
-                "<title>AFE Firmware ";
+                "<meta charset=\"utf-8\">";
+
+  if (redirect > 0) {
+    page += "<meta http-equiv=\"refresh\" content=\"";
+    page += String(redirect);
+    page += ";URL=/\">";
+  }
+
+  page += "<title>AFE Firmware ";
   page += configuration.version;
   page += " [T.";
   page += configuration.type;
@@ -68,7 +75,7 @@ const String AFESitesGenerator::generateHeader() {
       "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik DS18B20</a></li>"
       "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / "
       "Włącznik</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=upgrade\">Aktulizacja</a></li>"
+      "<li class=\"itm\"><a href=\"\\update\">Aktulizacja</a></li>"
       "<li class=\"itm\"><a href=\"\\?option=reset\">Przywracanie "
       "ustawień</a></li>"
       "<br><br>"
@@ -691,18 +698,31 @@ String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<label>Wybierz firmware</label>";
-  body += "<input class=\"bs\" name=\"firmware_file\" type=\"file\" "
-          "accept=\".bin\">";
+  body += "<input class=\"bs\" name=\"update\" type=\"file\" "
+          "accept=\".bin\" "
+          "value=\"W:\\AFE-Firmware\\.pioenvs\\esp01_1m\\firmware.bin\">";
   body += "</div>";
   body += "<p class=\"cd\">Po zakończeniu aktualizacji urządzenie zostanie "
           "automatycznie zresetowane</p>";
-  body += "<button class=\"b be\">Aktualizuj</button>";
+  body += "<button type=\"submit\" class=\"b be\">Aktualizuj</button>";
   body += "</fieldset>";
   return addConfigurationBlock("Aktualizacja oprogramowania",
                                "<strong>UWAGA</strong>: funkcjonalnośc tylko "
                                "dla zaawansowanych użytkowników. Nie odłączaj "
                                "urządzenia od zasilania podczas aktualizacji.",
                                body);
+}
+
+String AFESitesGenerator::addPostUpgradeSection(boolean status) {
+
+  String body = "<fieldset>";
+  body += status ? "<h3 style=\"color:red\">Aktualizacja nie powiodła się</h3>"
+                 : "<h3>Aktualizacja zakończona pomyślnie!</h3><p>Po 10 "
+                   "sekundach przełącznik zostanie przeładowany z wgranym "
+                   "oprogramowaniem. Proszę czekać.</p>";
+  body += "</fieldset>";
+  return addConfigurationBlock("Aktualizacja oprogramowania",
+                               "Status aktualizacji", body);
 }
 
 String AFESitesGenerator::addResetSection() {

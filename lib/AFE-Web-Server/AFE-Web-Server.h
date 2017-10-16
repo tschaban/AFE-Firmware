@@ -16,6 +16,7 @@
 
 #include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
 #include <Streaming.h>
 
@@ -24,6 +25,8 @@ class AFEWebServer {
 private:
   ESP8266WebServer server;
   AFEConfigurationPanel ConfigurationPanel;
+
+  ESP8266HTTPUpdateServer httpUpdater;
 
   void publishHTML(String page);
   String getOptionName();

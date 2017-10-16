@@ -145,3 +145,20 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+
+String AFEConfigurationPanel::firmwareUpgradeSite() {
+  String page = Site.generateHeader();
+  page += "<form method=\"post\" action=\"\" "
+          "enctype=\"multipart/form-data\">";
+  page += Site.addUpgradeSection();
+  page += "</form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::postFirmwareUpgradeSite(boolean status) {
+  String page = Site.generateHeader(10);
+  page += Site.addPostUpgradeSection(status);
+  page += Site.generateFooter();
+  return page;
+}

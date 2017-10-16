@@ -4,8 +4,11 @@ AFEWebServer::AFEWebServer() {}
 
 void AFEWebServer::begin() {
   Serial << endl << "INFO: Starting web server";
+  Serial << endl << "INFO: Starting OTA upgrade server";
+  httpUpdater.setup(&server);
   server.begin();
   Serial << endl << "INFO: Web server is working";
+  Serial << endl << "INFO: OTA upgrade server started";
   Serial << endl
          << "INFO: Ready for configuration. Open http://" << WiFi.localIP();
 }

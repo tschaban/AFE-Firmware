@@ -37,6 +37,8 @@ public:
                  RELAY data2);
   String getSite(const String option, uint8_t command, SWITCH data1,
                  SWITCH data2);
+  String firmwareUpgradeSite();
+  String postFirmwareUpgradeSite(boolean status);
 };
 
 #endif

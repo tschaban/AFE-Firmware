@@ -1,6 +1,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
+
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
@@ -15,8 +16,13 @@ void setup() {
 
   AFEDataAccess Data;
 
+  AFEDefaults Defaults;
+  Defaults.set();
+
   FIRMWARE firmwareConfiguration;
   firmwareConfiguration = Data.getFirmwareConfiguration();
+
+  Serial << endl << "INFO: START";
 
   Serial << endl << "INFO: Reading data from EEPROM";
   Serial << endl << " - Version : " << firmwareConfiguration.version;
