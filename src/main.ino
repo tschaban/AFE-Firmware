@@ -1,18 +1,27 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
+#include <AFE-Relay.h>
+#include <AFE-Switch.h>
 
+#include <AFE-LED.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
 
 AFEWiFi Network;
 AFEWebServer WebServer;
+AFELED LED;
+AFESwitch Switch;
+AFERelay Relay(12);
 
 void setup() {
 
   Serial.begin(115200);
   delay(10);
+
+  LED.begin(13);
+  Switch.begin(0);
 
   AFEDataAccess Data;
 
@@ -140,9 +149,22 @@ void setup() {
 }
 
 void loop() {
+
   if (Network.connected()) {
     WebServer.listener();
   } else {
     Network.connect();
+  }
+
+  Switch.listener();
+
+  if (Switch.isON()) {
+    LED.on();
+    Relay.on();
+  }
+
+  if (Switch.isOFF()) {
+    LED.off();
+    Relay.off();
   }
 }

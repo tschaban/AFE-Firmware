@@ -716,8 +716,8 @@ String AFESitesGenerator::addUpgradeSection() {
 String AFESitesGenerator::addPostUpgradeSection(boolean status) {
 
   String body = "<fieldset>";
-  body += status ? "<h3 style=\"color:red\">Aktualizacja nie powiodła się</h3>"
-                 : "<h3>Aktualizacja zakończona pomyślnie!</h3><p>Po 10 "
+  body += status ? "<p style=\"color:red\">Aktualizacja nie powiodła się</p>"
+                 : "<p>Aktualizacja zakończona pomyślnie!</p><p>Po 10 "
                    "sekundach przełącznik zostanie przeładowany z wgranym "
                    "oprogramowaniem. Proszę czekać.</p>";
   body += "</fieldset>";
