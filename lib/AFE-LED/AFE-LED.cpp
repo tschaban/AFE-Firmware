@@ -1,7 +1,11 @@
 #include "AFE-LED.h"
 
-AFELED::AFELED(uint8_t led_gpio) {
-	gpio = led_gpio;
+AFELED::AFELED() {}
+
+AFELED::AFELED(uint8_t led_gpio) { begin(led_gpio); }
+
+void AFELED::begin(uint8_t led_gpio) {
+  gpio = led_gpio;
   pinMode(gpio, OUTPUT);
   digitalWrite(gpio, HIGH);
 }
@@ -25,24 +29,22 @@ void AFELED::blink(unsigned int duration) {
 }
 
 void AFELED::blinkingOn(unsigned long blinking_interval) {
-   interval = blinking_interval;
-   blinking = true;
+  interval = blinking_interval;
+  blinking = true;
 }
 
-void AFELED::blinkingOff() {
-   blinking = false;
-}
+void AFELED::blinkingOff() { blinking = false; }
 
 void AFELED::loop() {
-  if (blinking==true) {
+  if (blinking == true) {
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
-       previousMillis = currentMillis;
-       if (digitalRead(gpio) == LOW) {
-         off();
-       } else {
-         on();
-       }
-     }
+      previousMillis = currentMillis;
+      if (digitalRead(gpio) == LOW) {
+        off();
+      } else {
+        on();
+      }
+    }
   }
 }

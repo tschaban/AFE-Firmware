@@ -9,41 +9,49 @@
 #define _AFE_LED_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 class AFELED {
 
 private:
-uint8_t gpio;
-boolean blinking = false;
-unsigned long interval;
-unsigned long previousMillis = 0;
-
+  uint8_t gpio;
+  boolean blinking = false;
+  unsigned long interval;
+  unsigned long previousMillis = 0;
 
 public:
-/* Constructor: gpio is GPIO to where LED is connected to */
-AFELED(uint8_t led_gpio);
+  /* Constructor */
+  AFELED();
 
-/* Turns on LED */
-void on();
+  /* Constructor with GPIO init. GPIO is GPIO to where LED is connected to */
+  AFELED(uint8_t led_gpio);
 
-/* Turn off LED */
-void off();
+  /* Constructor: gpio is GPIO to where LED is connected to */
+  void begin(uint8_t led_gpio);
 
-/* Blink LED. Duration how lon LED is ON can be set by input parameter (in milli)*/
-void blink(unsigned int duration = 100);
+  /* Turns on LED */
+  void on();
 
-/* Turns on LED blinking with interval as input paramters. It's in milliseconds */
-void blinkingOn(unsigned long blinking_interval);
+  /* Turn off LED */
+  void off();
 
-/* Turns off LED blinking */
-void blinkingOff();
+  /* Blink LED. Duration how lon LED is ON can be set by input parameter (in
+   * milli)*/
+  void blink(unsigned int duration = 100);
 
-/* Method must be added to main loop in order to enable continues LED blinking */
-void loop();
+  /* Turns on LED blinking with interval as input paramters. It's in
+   * milliseconds */
+  void blinkingOn(unsigned long blinking_interval);
+
+  /* Turns off LED blinking */
+  void blinkingOff();
+
+  /* Method must be added to main loop in order to enable continues LED blinking
+   */
+  void loop();
 };
 
 #endif
