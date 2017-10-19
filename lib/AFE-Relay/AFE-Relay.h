@@ -9,37 +9,40 @@
 #define _AFE_Relay_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
+
+#include <Streaming.h>
 
 /* Relay states */
 #define RELAY_ON 1
 #define RELAY_OFF 0
 
-class AFERelay
-{
+class AFERelay {
 
 private:
-	uint8_t gpio;
+  uint8_t gpio;
 
 public:
+  /* Constructor: entry parameter is GPIO number where Relay is connected to */
+  AFERelay();
+  AFERelay(uint8_t relay_gpio);
 
-	/* Constructor: entry parameter is GPIO number where Relay is connected to */
-	AFERelay(uint8_t relay_gpio);
+  void begin(uint8_t relay_gpio);
 
-	/* Returns 0 if relay is OFF, 1 if relay is ON */
-	byte get();
+  /* Returns 0 if relay is OFF, 1 if relay is ON */
+  byte get();
 
-	/* Turns on relay */
-	void on();
+  /* Turns on relay */
+  void on();
 
-	/* Turns off relay */
-	void off();
+  /* Turns off relay */
+  void off();
 
-	/* Toggles relay state from ON to OFF or from OFF to ON */
-	void toggle();
+  /* Toggles relay state from ON to OFF or from OFF to ON */
+  void toggle();
 };
 
 #endif
