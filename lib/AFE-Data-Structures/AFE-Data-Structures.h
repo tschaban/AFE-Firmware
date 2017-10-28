@@ -86,4 +86,9 @@ struct FIRMWARE {
   char upgradeURL[120];
 };
 
+struct LED {
+  boolean present;
+  uint8_t gpio;
+};
+
 #endif
