@@ -14,6 +14,8 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 #include <AFE-LED.h>
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
@@ -26,20 +28,12 @@
 class AFEWiFi {
 
 private:
-  const char *ssid;
-  const char *password;
+  NETWORK networkConfiguration;
   boolean accessPoint = false;
-  uint8_t noConnectionAttempts = 20;
-  uint8_t durationBetweenConnectionAttempts = 1;
-  uint8_t durationBetweenNextConnectionAttemptsSeries = 60;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false;
   DNSServer dnsServer;
-  boolean staticIP = false;
-  IPAddress ip;
-  IPAddress gateway;
-  IPAddress subnet;
-  AFELED LED;
+  AFELED Led;
 
 public:
   /* Constructor: no actions */
@@ -47,19 +41,7 @@ public:
 
   /* Sets connectionparameters and host name. Must be invoked before connect
    * method */
-  void begin(const char *network_ssid, const char *network_password,
-             const char *netowork_hostname, uint8_t mode = WIFI_MODE_CLIENT);
-
-  /* Sets parameters related to reconnection to WiFi Network if there was
-   * problems to connect to it */
-  void setReconnectionParams(
-      uint8_t no_connection_attempts,
-      uint8_t duration_between_connection_attempts,
-      uint8_t duration_between_next_connection_attempts_series);
-
-  /* Setting static IP Addrees */
-  void setStaticIP(IPAddress address_ip, IPAddress address_gateway,
-                   IPAddress address_subnet);
+  void begin(uint8_t mode = WIFI_MODE_CLIENT);
 
   /* Connecting to WiFi Access point */
   void connect();

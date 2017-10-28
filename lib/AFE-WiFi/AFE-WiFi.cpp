@@ -1,73 +1,69 @@
 #include "AFE-Wifi.h"
 
-AFEWiFi::AFEWiFi() { LED.begin(13); }
+AFEWiFi::AFEWiFi() {
+  AFEDataAccess Data;
+  LED LEDConfiguration;
 
-void AFEWiFi::begin(const char *network_ssid, const char *network_password,
-                    const char *network_hostname, uint8_t mode) {
-  ssid = network_ssid;
-  password = network_password;
-  WiFi.hostname(network_hostname);
+  // Reading configuration from the EEPROM
+  LEDConfiguration = Data.getLEDConfiguration();
+  networkConfiguration = Data.getNetworkConfiguration();
+
+  // Init LED
+  if (LEDConfiguration.present) {
+    Led.begin(LEDConfiguration.gpio);
+  }
+
+  // Cleaning @TODO is it neded?
+  Data = {};
+  LEDConfiguration = {};
+}
+
+void AFEWiFi::begin(uint8_t mode) {
+  WiFi.hostname(networkConfiguration.host);
   if (mode == WIFI_MODE_AP) {
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    WiFi.softAP(network_hostname);
+    WiFi.softAP(networkConfiguration.host);
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
     dnsServer.start(53, "www.example.com", apIP);
   } else {
-    if (staticIP) {
-      WiFi.config(ip, gateway, subnet);
+    if (!networkConfiguration.isDHCP) {
+      WiFi.config(networkConfiguration.ip, networkConfiguration.gateway,
+                  networkConfiguration.subnet);
     }
     WiFi.mode(WIFI_STA);
   }
-}
-
-void AFEWiFi::setReconnectionParams(
-    uint8_t no_connection_attempts,
-    uint8_t duration_between_connection_attempts,
-    uint8_t duration_between_next_connection_attempts_series) {
-  noConnectionAttempts = no_connection_attempts;
-  durationBetweenConnectionAttempts = duration_between_connection_attempts;
-  durationBetweenNextConnectionAttemptsSeries =
-      duration_between_next_connection_attempts_series;
-}
-
-void AFEWiFi::setStaticIP(IPAddress address_ip, IPAddress address_gateway,
-                          IPAddress address_subnet) {
-  staticIP = true;
-  ip = address_ip;
-  gateway = address_gateway;
-  subnet = address_subnet;
 }
 
 void AFEWiFi::connect() {
 
   if (sleepMode) {
     if (millis() - sleepStartTime >=
-        durationBetweenNextConnectionAttemptsSeries * 1000) {
+        networkConfiguration.waitTimeSeries * 1000) {
       sleepMode = false;
     }
   } else {
     uint8_t connections = 0;
-    WiFi.begin(ssid, password);
+    WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
     Serial << endl << "INFO: WiFi connection status: " << WiFi.status();
     while (WiFi.status() != WL_CONNECTED) {
-      LED.on();
+      Led.on();
       Serial << endl
              << "INFO: WiFi connection attempt: " << connections + 1 << " from "
-             << noConnectionAttempts;
+             << networkConfiguration.noConnectionAttempts;
       connections++;
-      delay(durationBetweenConnectionAttempts * 500);
-      LED.off();
-      delay(durationBetweenConnectionAttempts * 500);
-      if (connections == noConnectionAttempts) {
+      delay(networkConfiguration.waitTimeConnections * 500);
+      Led.off();
+      delay(networkConfiguration.waitTimeConnections * 500);
+      if (connections == networkConfiguration.noConnectionAttempts) {
         sleepMode = true;
         WiFi.disconnect();
         sleepStartTime = millis();
         Serial << endl
                << "WARN: Not able to connect.Going to sleep mode for "
-               << durationBetweenNextConnectionAttemptsSeries << "sec.";
+               << networkConfiguration.waitTimeSeries << "sec.";
         break;
       }
     }
