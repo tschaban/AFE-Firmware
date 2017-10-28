@@ -31,6 +31,7 @@ public:
   SWITCH getSwitchConfiguration(uint8_t id);
   DS18B20 getDS18B20Configuration();
   FIRMWARE getFirmwareConfiguration();
+  LED getLEDConfiguration();
 
   void saveConfiguration(NETWORK configuration);
 
@@ -43,6 +44,7 @@ public:
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(DS18B20 configuration);
   void saveConfiguration(FIRMWARE configuration);
+  void saveConfiguration(LED configuration);
 
   const char getVersion();
 
