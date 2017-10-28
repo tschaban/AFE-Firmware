@@ -9,21 +9,19 @@
 #define _AFE_Defaults_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
+#include "arduino.h"
 #else
-	#include "WProgram.h"
+#include "WProgram.h"
 #endif
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <Streaming.h>
 
-class AFEDefaults
-{
+class AFEDefaults {
 private:
-
 public:
-AFEDefaults();
-void set();
-
+  AFEDefaults();
+  void set();
 };
 #endif
