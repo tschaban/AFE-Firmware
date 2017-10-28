@@ -8,24 +8,27 @@ void AFELED::begin(uint8_t led_gpio) {
   gpio = led_gpio;
   pinMode(gpio, OUTPUT);
   digitalWrite(gpio, HIGH);
+  ready = true;
 }
 
 void AFELED::on() {
-  if (digitalRead(gpio) == HIGH) {
+  if (ready && digitalRead(gpio) == HIGH) {
     digitalWrite(gpio, LOW);
   }
 }
 
 void AFELED::off() {
-  if (digitalRead(gpio) == LOW) {
+  if (ready && digitalRead(gpio) == LOW) {
     digitalWrite(gpio, HIGH);
   }
 }
 
 void AFELED::blink(unsigned int duration) {
-  on();
-  delay(duration);
-  off();
+  if (ready) {
+    on();
+    delay(duration);
+    off();
+  }
 }
 
 void AFELED::blinkingOn(unsigned long blinking_interval) {
@@ -36,7 +39,7 @@ void AFELED::blinkingOn(unsigned long blinking_interval) {
 void AFELED::blinkingOff() { blinking = false; }
 
 void AFELED::loop() {
-  if (blinking == true) {
+  if (ready && blinking) {
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;

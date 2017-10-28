@@ -17,6 +17,7 @@
 class AFELED {
 
 private:
+  boolean ready = false;
   uint8_t gpio;
   boolean blinking = false;
   unsigned long interval;
