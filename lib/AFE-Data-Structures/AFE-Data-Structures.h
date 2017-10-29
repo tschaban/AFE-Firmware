@@ -67,7 +67,7 @@ struct SWITCH {
   boolean present;
   uint8_t gpio;
   uint8_t type;
-  uint8_t sensitiveness;
+  uint16_t sensitiveness;
   uint8_t functionality;
 };
 

@@ -82,8 +82,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.present = Eeprom.read(393 + id * next);
   configuration.gpio = Eeprom.readUInt8(394 + id * next);
   configuration.type = Eeprom.readUInt8(395 + id * next);
-  configuration.sensitiveness = Eeprom.readUInt8(396 + id * next);
-  configuration.functionality = Eeprom.readUInt8(397 + id * next);
+  configuration.sensitiveness = Eeprom.read(396 + id * next, 3).toInt();
+  configuration.functionality = Eeprom.readUInt8(399 + id * next);
 
   return configuration;
 }
@@ -91,11 +91,11 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 DS18B20 AFEDataAccess::getDS18B20Configuration() {
   DS18B20 configuration;
 
-  configuration.present = Eeprom.read(398);
-  configuration.gpio = Eeprom.readUInt8(399);
-  configuration.correction = Eeprom.read(400, 5).toFloat();
-  configuration.interval = Eeprom.read(405, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(410);
+  configuration.present = Eeprom.read(400);
+  configuration.gpio = Eeprom.readUInt8(401);
+  configuration.correction = Eeprom.read(402, 5).toFloat();
+  configuration.interval = Eeprom.read(407, 5).toInt();
+  configuration.unit = Eeprom.readUInt8(412);
 
   return configuration;
 }
@@ -170,16 +170,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.write(393 + id * next, configuration.present);
   Eeprom.writeUInt8(394 + id * next, configuration.gpio);
   Eeprom.writeUInt8(395 + id * next, configuration.type);
-  Eeprom.writeUInt8(396 + id * next, configuration.sensitiveness);
-  Eeprom.writeUInt8(397 + id * next, configuration.functionality);
+  Eeprom.write(396 + id * next, 3, (long)configuration.sensitiveness);
+  Eeprom.writeUInt8(399 + id * next, configuration.functionality);
 }
 
 void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
-  Eeprom.write(398, configuration.present);
-  Eeprom.writeUInt8(399, configuration.gpio);
-  Eeprom.write(400, 5, (float)configuration.correction);
-  Eeprom.write(405, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(410, configuration.unit);
+  Eeprom.write(400, configuration.present);
+  Eeprom.writeUInt8(401, configuration.gpio);
+  Eeprom.write(402, 5, (float)configuration.correction);
+  Eeprom.write(407, 5, (long)configuration.interval);
+  Eeprom.writeUInt8(412, configuration.unit);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {

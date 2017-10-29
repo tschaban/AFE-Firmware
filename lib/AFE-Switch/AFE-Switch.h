@@ -14,6 +14,8 @@
 #include "WProgram.h"
 #endif
 
+#include <Streaming.h>
+
 /* Types of switch */
 #define SWITCH_TYPE_MONO 0 // Mono stable switch
 #define SWITCH_TYPE_BI 1   // Bi stabe switch
@@ -24,16 +26,21 @@ private:
   uint8_t gpio;
   uint8_t type;
   boolean state;
+  boolean previousState;
   boolean pressed = false;
+  unsigned long startTime = 0;
+  uint16_t sensitiveness = 0;
 
 public:
   /* Constructor: entry parameter is GPIO number where Switch is connected to
      second parameter defiens if the switch is mono or bi
   */
   AFESwitch();
-  AFESwitch(uint8_t switch_gpio, uint8_t switch_type = SWITCH_TYPE_MONO);
+  AFESwitch(uint8_t switch_gpio, uint8_t switch_type,
+            uint16_t switch_sensitiveness);
 
-  void begin(uint8_t switch_gpio, uint8_t switch_type = SWITCH_TYPE_MONO);
+  void begin(uint8_t switch_gpio, uint8_t switch_type,
+             uint16_t switch_sensitiveness);
 
   /* Returns TRUE if switch is ON */
   boolean isON();

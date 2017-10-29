@@ -616,20 +616,14 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "</select>";
   body += "</div>";
   body += "<div class=\"cf\">";
-  body += "<label>Czułość</label>";
-  body += "<select name=\"switch" + String(id) + "_sensitivity\">";
-  body += "<option value=\"0\"";
-  body += (configuration.sensitiveness == 0 ? " selected=\"selected\"" : "");
-  body += ">Niska</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.sensitiveness == 1 ? " selected=\"selected\"" : "");
-  body += ">Średnia</option>";
-  body += "<option value=\"2\"";
-  body += (configuration.sensitiveness == 2 ? " selected=\"selected\"" : "");
-  body += ">Wysoka</option>";
-  body += "</select>";
+  body += "<label>Czułośc</label>";
+  body += "<input name=\"switch" + String(id) +
+          "_sensitivity\" type=\"number\" maxlength=\"3\" "
+          "value=\"";
+  body += configuration.sensitiveness;
+  body += "\">";
+  body += "<span class=\"hint\">msek. Zakres 0 do 999 msek</span>";
   body += "</div>";
-
   body += "</fieldset>";
 
   char title[23];
