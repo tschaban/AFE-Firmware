@@ -27,9 +27,14 @@ private:
   uint8_t type;
   boolean state;
   boolean previousState;
-  boolean pressed = false;
+
   unsigned long startTime = 0;
   uint16_t sensitiveness = 0;
+
+  boolean _pressed = false;
+  boolean pressed = false;
+  boolean pressed4fiveSeconds = false;
+  boolean pressed4tenSeconds = false;
 
 public:
   /* Constructor: entry parameter is GPIO number where Switch is connected to
@@ -42,11 +47,10 @@ public:
   void begin(uint8_t switch_gpio, uint8_t switch_type,
              uint16_t switch_sensitiveness);
 
-  /* Returns TRUE if switch is ON */
-  boolean isON();
-
-  /* Returns TRUE if switch is OFF */
-  boolean isOFF();
+  boolean getState();
+  boolean isPressed();
+  boolean is5s();
+  boolean is10s();
 
   /* It has to be added to the loop in order to listen for switch changes */
   void listener();

@@ -17,53 +17,76 @@ void AFESwitch::begin(uint8_t switch_gpio, uint8_t switch_type,
   previousState = state;
 }
 
-boolean AFESwitch::isON() { return state ? false : true; }
+boolean AFESwitch::getState() { return state; }
 
-boolean AFESwitch::isOFF() { return state ? true : false; }
+boolean AFESwitch::isPressed() {
+  if (pressed) {
+    pressed = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean AFESwitch::is5s() {
+  if (pressed4fiveSeconds) {
+    pressed4fiveSeconds = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean AFESwitch::is10s() {
+  if (pressed4tenSeconds) {
+    pressed4tenSeconds = false;
+    return true;
+  } else {
+    return false;
+  }
+}
 
 void AFESwitch::listener() {
+
   boolean currentState = digitalRead(gpio);
+  unsigned long time = millis();
+
   if (currentState != previousState) {
-    /*
-        Serial << endl
-               << "Current = " << currentState << " : Previous = " <<
-       previousState
-               << " : State = " << state << " millis() = " << millis()
-               << " : startTime = " << startTime;
-    */
+
     if (startTime == 0) {
-      startTime = millis();
+      Serial << endl << "INFO: Switch timer started";
+      startTime = time;
     }
 
-    if (millis() - startTime >= sensitiveness) {
+    if (time - startTime >= sensitiveness) {
 
       if (type == SWITCH_TYPE_MONO) {
-        if (!pressed) {
+
+        if (!_pressed) {
           state = !state;
+          _pressed = true;
           pressed = true;
         }
-      } else {
+
+        if (time - startTime >= 10000 && !pressed4tenSeconds) {
+          pressed4tenSeconds = true;
+        }
+
+      } else { // This is BI-stable code
         state = !state;
         previousState = currentState;
+        pressed = true;
       }
-
-      /*
-            if (type == SWITCH_TYPE_BI) {
-              state = currentState;
-            } else {
-              if (!currentState) {
-                if (!pressed) {
-                  pressed = true;
-                  state = !state;
-                }
-              } else {
-                pressed = false;
-              }
-            }
-      */
     }
   } else if (currentState == previousState && startTime > 0) {
+    Serial << endl << "INFO: Pressed for " << time - startTime;
+
+    if (type == SWITCH_TYPE_MONO && time - startTime >= 5000 &&
+        time - startTime < 10000) {
+      pressed4fiveSeconds = true;
+    }
+
     startTime = 0;
-    pressed = false;
+    _pressed = false;
   }
 }

@@ -69,13 +69,21 @@ void loop() {
 
   Switch.listener();
 
-  if (Switch.isON()) {
-    Led.on();
-    Relay.on();
+  if (Switch.is10s()) {
+    Serial << endl << "INFO: Button pressed for  10s";
   }
 
-  if (Switch.isOFF()) {
-    Led.off();
-    Relay.off();
+  if (Switch.is5s()) {
+    Serial << endl << "INFO: Button pressed for 5s";
+  }
+
+  if (Switch.isPressed()) {
+    Serial << endl << "INFO: pressed";
+    Serial << endl << "INFO: state " << Switch.getState();
+    if (Switch.getState()) {
+      Led.on();
+    } else {
+      Led.off();
+    }
   }
 }
