@@ -1,6 +1,9 @@
 #include "AFE-Wifi.h"
 
-AFEWiFi::AFEWiFi() {
+AFEWiFi::AFEWiFi() {}
+
+void AFEWiFi::begin(uint8_t mode) {
+
   AFEDataAccess Data;
   LED LEDConfiguration;
 
@@ -16,9 +19,7 @@ AFEWiFi::AFEWiFi() {
   // Cleaning @TODO is it neded?
   Data = {};
   LEDConfiguration = {};
-}
 
-void AFEWiFi::begin(uint8_t mode) {
   WiFi.hostname(networkConfiguration.host);
   if (mode == WIFI_MODE_AP) {
     IPAddress apIP(192, 168, 5, 1);

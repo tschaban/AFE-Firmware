@@ -1,9 +1,8 @@
 #include "AFE-MQTT.h"
-#include "AFE-MQTT-callback.cpp"
 
-AFEMQTT::AFEMQTT() {
-  AFEDataAccess Data;
-  MQTTConfiguration = Data.getMQTTConfiguration();
+AFEMQTT::AFEMQTT() {}
+
+void AFEMQTT::begin() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
   sprintf(deviceName, "%s", NetworkConfiguration.host);
@@ -17,7 +16,7 @@ AFEMQTT::AFEMQTT() {
 
   Broker.setClient(esp);
   Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
-  Broker.setCallback(callbackMQTT);
+  Broker.setCallback(MQTTMessagesListener);
   sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);
   Data = {};
   NetworkConfiguration = {};

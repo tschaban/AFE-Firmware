@@ -14,7 +14,6 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <PubSubClient.h>
 #include <Streaming.h>
@@ -26,7 +25,7 @@ private:
   WiFiClient esp;
   PubSubClient Broker;
 
-  MQTT MQTTConfiguration;
+  //  MQTT MQTTConfiguration;
 
   char mqttTopicForSubscription[34];
   char deviceName[32];
@@ -35,8 +34,6 @@ private:
   uint8_t durationBetweenNextConnectionAttemptsSeries;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false;
-
-  void publishToMQTTBroker(const char *topic, const char *message);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -49,6 +46,8 @@ public:
       uint8_t duration_between_connection_attempts,
       uint8_t duration_between_next_connection_attempts_series);
 
+  void begin();
+
   /* Connecting to MQTT Broker */
   void connect();
 
@@ -58,6 +57,8 @@ public:
   /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
    * publishToMQTTBroker  */
   void publish(const char *topic, const char *type, const char *message);
+
+  void publishToMQTTBroker(const char *topic, const char *message);
 
   /* Returns TRUE if connected to MQTT Broker */
   boolean connected();

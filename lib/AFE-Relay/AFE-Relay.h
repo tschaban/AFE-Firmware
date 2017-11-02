@@ -14,6 +14,7 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Data-Access.h>
 #include <Streaming.h>
 
 /* Relay states */
@@ -24,13 +25,18 @@ class AFERelay {
 
 private:
   uint8_t gpio;
+  AFEDataAccess Data;
+  RELAY RelayConfiguration;
+  char mqttTopic[50];
 
 public:
   /* Constructor: entry parameter is GPIO number where Relay is connected to */
   AFERelay();
-  AFERelay(uint8_t relay_gpio);
+  AFERelay(uint8_t id);
 
-  void begin(uint8_t relay_gpio);
+  void begin(uint8_t id);
+
+  const char *getMQTTTopic();
 
   /* Returns 0 if relay is OFF, 1 if relay is ON */
   byte get();

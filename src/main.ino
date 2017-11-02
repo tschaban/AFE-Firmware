@@ -4,20 +4,16 @@
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 
+#include "AFE-MQTT.h"
 #include <AFE-LED.h>
-#include <AFE-MQTT.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
 
 AFEDataAccess Data;
-FIRMWARE firmwareConfiguration;
-NETWORK networkConfiguration;
 MQTT MQTTConfiguration;
-DOMOTICZ DomoticzConfiguration;
-RELAY RelayConfiguration;
+
 SWITCH SwitchConfiguration;
-DS18B20 DS18B20Configuration;
 LED LEDConfiguration;
 
 AFEWiFi Network;
@@ -32,26 +28,37 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  AFEDefaults Defaults;
-  Defaults.set();
+  // AFEDefaults Defaults;
+  // Defaults.set();
 
-  firmwareConfiguration = Data.getFirmwareConfiguration();
-  networkConfiguration = Data.getNetworkConfiguration();
   MQTTConfiguration = Data.getMQTTConfiguration();
-  DomoticzConfiguration = Data.getDomoticzConfiguration();
-  RelayConfiguration = Data.getRelayConfiguration(0);
   SwitchConfiguration = Data.getSwitchConfiguration(0);
-  DS18B20Configuration = Data.getDS18B20Configuration();
   LEDConfiguration = Data.getLEDConfiguration();
 
-  debugShowConfiguration();
+  // Setting Relay state on powerOn
+  Relay.begin(0);
+
+  Serial << endl << "DEBUG: Relay mqttTopic : " << Relay.getMQTTTopic();
+
+  /*
+    if (RelayConfiguration.statePowerOn == 0) {
+      Relay.off();
+    } else if (RelayConfiguration.statePowerOn == 1) {
+      Relay.on();
+    } else if (RelayConfiguration.statePowerOn == 2) {
+      Data.getRelayState(1) ? Relay.on() : Relay.off();
+    } else {
+      Data.getRelayState(1) ? Relay.off() : Relay.on();
+    }
+  */
+  Network.begin();
+  Mqtt.begin();
 
   Network.connect();
 
   Led.begin(LEDConfiguration.gpio);
   Switch.begin(SwitchConfiguration.gpio, SwitchConfiguration.type,
                SwitchConfiguration.sensitiveness);
-  Relay.begin(RelayConfiguration.gpio);
 
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
@@ -74,7 +81,7 @@ void loop() {
   }
 
   if (Switch.is5s()) {
-    Serial << endl << "INFO: Button pressed for 5s";
+    Serial << endl << "INFO: Button pressed 5s";
   }
 
   if (Switch.isPressed()) {
@@ -82,8 +89,12 @@ void loop() {
     Serial << endl << "INFO: state " << Switch.getState();
     if (Switch.getState()) {
       Led.on();
+      Relay.on();
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
     } else {
       Led.off();
+      Relay.off();
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
     }
   }
 }

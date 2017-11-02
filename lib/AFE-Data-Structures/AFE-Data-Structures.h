@@ -58,6 +58,7 @@ struct RELAY {
   /* @TODO Only for MQTT */
   char name[16];
   uint8_t stateMQTTConnected;
+  char mqttTopic[49];
   /* @TODO Only for Domoticz */
   uint16_t idx;
   boolean publishToDomoticz;
