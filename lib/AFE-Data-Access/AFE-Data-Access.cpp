@@ -233,18 +233,17 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
-  uint8_t next = 26;
 
-  Eeprom.write(367 + id * next, configuration.present);
-  Eeprom.writeUInt8(368 + id * next, configuration.gpio);
-  Eeprom.write(370 + id * next, 5, configuration.timeToOff);
-  Eeprom.writeUInt8(375 + id * next, configuration.statePowerOn);
+  Eeprom.write(367 + id * nextRelay, configuration.present);
+  Eeprom.writeUInt8(368 + id * nextRelay, configuration.gpio);
+  Eeprom.write(370 + id * nextRelay, 5, configuration.timeToOff);
+  Eeprom.writeUInt8(375 + id * nextRelay, configuration.statePowerOn);
   /* @TODO For MQTT only */
-  Eeprom.write(376 + id * next, 16, configuration.name);
-  Eeprom.writeUInt8(392 + id * next, configuration.stateMQTTConnected);
+  Eeprom.write(376 + id * nextRelay, 16, configuration.name);
+  Eeprom.writeUInt8(392 + id * nextRelay, configuration.stateMQTTConnected);
   /* @TODO For Domoticz only */
-  //  Eeprom.write(376 + id * next, 5, (long)configuration.idx);
-  //  Eeprom.writeUInt8(382 + id * next, configuration.publishToDomoticz);
+  //  Eeprom.write(376 + id * nextRelay, 5, (long)configuration.idx);
+  //  Eeprom.writeUInt8(382 + id * nextRelay, configuration.publishToDomoticz);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
@@ -282,10 +281,12 @@ const char AFEDataAccess::getVersion() {
   return *version;
 }
 
-boolean AFEDataAccess::getRelayState(uint8_t id) { return Eeprom.read(367); }
+boolean AFEDataAccess::getRelayState(uint8_t id) {
+  return Eeprom.read(369 + id * nextRelay);
+}
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-  Eeprom.write(369, state);
+  Eeprom.write(369 + id * nextRelay, state);
 }
 
 uint8_t AFEDataAccess::getDeviceMode() { return Eeprom.readUInt8(26); }

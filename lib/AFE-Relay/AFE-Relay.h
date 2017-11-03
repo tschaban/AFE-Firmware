@@ -24,10 +24,13 @@
 class AFERelay {
 
 private:
+  uint8_t _id;
   uint8_t gpio;
   AFEDataAccess Data;
   RELAY RelayConfiguration;
   char mqttTopic[50];
+  unsigned long turnOffCounter = 0;
+  void setRelayAfterRestore(uint8_t option);
 
 public:
   /* Constructor: entry parameter is GPIO number where Relay is connected to */
@@ -37,6 +40,9 @@ public:
   void begin(uint8_t id);
 
   const char *getMQTTTopic();
+
+  void setRelayAfterRestoringPower();
+  boolean setRelayAfterRestoringMQTTConnection();
 
   /* Returns 0 if relay is OFF, 1 if relay is ON */
   byte get();
@@ -49,6 +55,8 @@ public:
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
+
+  boolean autoTurnOff();
 };
 
 #endif

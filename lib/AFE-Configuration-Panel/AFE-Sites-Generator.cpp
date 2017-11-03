@@ -492,15 +492,18 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<select name=\"relay" + String(id) + "_power_restored\">";
   body += "<option value=\"0\"";
   body += (configuration.statePowerOn == 0 ? " selected=\"selected\"" : "");
-  body += ">Wyłączony</option>";
+  body += ">Brak akcji</option>";
   body += "<option value=\"1\"";
   body += (configuration.statePowerOn == 1 ? " selected=\"selected\"" : "");
-  body += ">Włączony</option>";
+  body += ">Wyłączony</option>";
   body += "<option value=\"2\"";
   body += (configuration.statePowerOn == 2 ? " selected=\"selected\"" : "");
-  body += ">Ostatnia zapamiętana wartość</option>";
+  body += ">Włączony</option>";
   body += "<option value=\"3\"";
   body += (configuration.statePowerOn == 3 ? " selected=\"selected\"" : "");
+  body += ">Ostatnia zapamiętana wartość</option>";
+  body += "<option value=\"4\"";
+  body += (configuration.statePowerOn == 4 ? " selected=\"selected\"" : "");
   body += ">Przeciwna do ostatniej zapamiętanej wartości</option>";
   body += "</select>";
   body += "</div>";
@@ -528,6 +531,10 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<option value=\"4\"";
   body +=
       (configuration.stateMQTTConnected == 4 ? " selected=\"selected\"" : "");
+  body += ">Przeciwna do ostatniej zapamiętanej wartości</option>";
+  body += "<option value=\"5\"";
+  body +=
+      (configuration.stateMQTTConnected == 5 ? " selected=\"selected\"" : "");
   body += ">Wartość z systemu sterowania</option>";
   body += "</select>";
   body += "</div>";

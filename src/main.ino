@@ -35,22 +35,10 @@ void setup() {
   SwitchConfiguration = Data.getSwitchConfiguration(0);
   LEDConfiguration = Data.getLEDConfiguration();
 
-  // Setting Relay state on powerOn
   Relay.begin(0);
+  // Setting Relay state on powerOn
+  Relay.setRelayAfterRestoringPower();
 
-  Serial << endl << "DEBUG: Relay mqttTopic : " << Relay.getMQTTTopic();
-
-  /*
-    if (RelayConfiguration.statePowerOn == 0) {
-      Relay.off();
-    } else if (RelayConfiguration.statePowerOn == 1) {
-      Relay.on();
-    } else if (RelayConfiguration.statePowerOn == 2) {
-      Data.getRelayState(1) ? Relay.on() : Relay.off();
-    } else {
-      Data.getRelayState(1) ? Relay.off() : Relay.on();
-    }
-  */
   Network.begin();
   Mqtt.begin();
 
@@ -88,13 +76,15 @@ void loop() {
     Serial << endl << "INFO: pressed";
     Serial << endl << "INFO: state " << Switch.getState();
     if (Switch.getState()) {
-      Led.on();
       Relay.on();
       Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
     } else {
-      Led.off();
       Relay.off();
       Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
     }
+  }
+
+  if (Relay.autoTurnOff()) {
+    Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
   }
 }

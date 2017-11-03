@@ -21,6 +21,7 @@
 class AFEDataAccess {
 private:
   AFEEEPROM Eeprom;
+  uint8_t nextRelay = 26;
 
 public:
   AFEDataAccess();
