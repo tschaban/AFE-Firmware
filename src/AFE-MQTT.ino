@@ -15,7 +15,12 @@ void AFEMQTT::begin() {
       NetworkConfiguration.waitTimeSeries;
 
   Broker.setClient(esp);
-  Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+  if (MQTTConfiguration.host.length() > 0) {
+    Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
+  } else {
+    Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+  }
+
   Broker.setCallback(MQTTMessagesListener);
   sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);
   Data = {};
