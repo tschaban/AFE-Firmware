@@ -25,16 +25,21 @@ class AFESwitch {
 private:
   uint8_t gpio;
   uint8_t type;
-  boolean state;
-  boolean previousState;
+  boolean state;         // It
+  boolean previousState; // This stores current switch state
 
   unsigned long startTime = 0;
   uint16_t sensitiveness = 0;
+  ;
 
+  boolean pressed = false; // It's set to true once button pressed haveing also
+                           // sensitiveness check
   boolean _pressed = false;
-  boolean pressed = false;
-  boolean pressed4fiveSeconds = false;
-  boolean pressed4tenSeconds = false;
+
+  boolean pressed4fiveSeconds =
+      false; // It's set to true when switch is pressed for 5s
+  boolean pressed4tenSeconds =
+      false; // It's set to true when switch is pressed for 10s
 
 public:
   /* Constructor: entry parameter is GPIO number where Switch is connected to
@@ -48,6 +53,7 @@ public:
              uint16_t switch_sensitiveness);
 
   boolean getState();
+  void toggleState();
   boolean isPressed();
   boolean is5s();
   boolean is10s();

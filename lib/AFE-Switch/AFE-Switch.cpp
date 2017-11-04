@@ -19,6 +19,8 @@ void AFESwitch::begin(uint8_t switch_gpio, uint8_t switch_type,
 
 boolean AFESwitch::getState() { return state; }
 
+void AFESwitch::toggleState() { state = !state; }
+
 boolean AFESwitch::isPressed() {
   if (pressed) {
     pressed = false;
