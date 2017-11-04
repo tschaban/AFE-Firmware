@@ -3,12 +3,14 @@
 AFEWebServer::AFEWebServer() {}
 
 void AFEWebServer::begin() {
-  Serial << endl << "INFO: Starting web server";
-  Serial << endl << "INFO: Starting OTA upgrade server";
+
+  Serial << endl << "INFO: Starting OTA upgrade server: ";
   httpUpdater.setup(&server);
+  Serial << "DONE";
+  Serial << endl << "INFO: Starting web server: ";
   server.begin();
-  Serial << endl << "INFO: Web server is working";
-  Serial << endl << "INFO: OTA upgrade server started";
+  Serial << "DONE";
+
   Serial << endl
          << "INFO: Ready for configuration. Open http://" << WiFi.localIP();
 }
@@ -82,7 +84,8 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
                                            data2));
   } else if (getOptionName() == "exit") {
-    ESP.restart();
+    AFEDevice Device;
+    Device.reboot(MODE_NORMAL);
   }
 }
 

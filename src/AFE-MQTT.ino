@@ -15,11 +15,12 @@ void AFEMQTT::begin() {
       NetworkConfiguration.waitTimeSeries;
 
   Broker.setClient(esp);
-  if (MQTTConfiguration.host.length() > 0) {
-    Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
-  } else {
-    Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
-  }
+  Serial << endl << "DEBUG: " << MQTTConfiguration.host[0];
+  //  if ((char)MQTTConfiguration.host[0] = "a") {
+  Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
+  //  } else {
+  Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+  //}
 
   Broker.setCallback(MQTTMessagesListener);
   sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);

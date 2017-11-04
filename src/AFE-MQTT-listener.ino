@@ -44,9 +44,10 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     if (String(topic) == String(_mqttTopic)) {
       if ((char)payload[2] == 'b') { // reboot
         Serial << endl << "INFO: Process: reboot";
-        ESP.restart();
+        Device.reboot(MODE_NORMAL);
       } else if ((char)payload[2] == 'n') { // configurationMode
         Serial << endl << "INFO: Process: configuration Mode";
+        Device.reboot(MODE_ACCESS_POINT);
       }
     }
   }

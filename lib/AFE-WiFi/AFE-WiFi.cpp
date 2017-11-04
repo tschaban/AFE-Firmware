@@ -21,7 +21,9 @@ void AFEWiFi::begin(uint8_t mode) {
   LEDConfiguration = {};
 
   WiFi.hostname(networkConfiguration.host);
-  if (mode == WIFI_MODE_AP) {
+  if (mode == MODE_ACCESS_POINT) {
+    Serial << endl << "INFO: Device mode: Access Point Configuration";
+    Serial << endl << "INFO: launching access point";
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
@@ -29,6 +31,7 @@ void AFEWiFi::begin(uint8_t mode) {
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
     dnsServer.start(53, "www.example.com", apIP);
+    Serial << endl << "INFO: Open: http://192.168.5.1/  ";
   } else {
     if (!networkConfiguration.isDHCP) {
       WiFi.config(networkConfiguration.ip, networkConfiguration.gateway,

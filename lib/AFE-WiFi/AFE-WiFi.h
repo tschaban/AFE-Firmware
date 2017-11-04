@@ -16,14 +16,11 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
 #include <Streaming.h>
-
-#define WIFI_MODE_CLIENT 0
-#define WIFI_MODE_SERVER 1
-#define WIFI_MODE_AP 2
 
 class AFEWiFi {
 
@@ -41,7 +38,7 @@ public:
 
   /* Sets connectionparameters and host name. Must be invoked before connect
    * method */
-  void begin(uint8_t mode = WIFI_MODE_CLIENT);
+  void begin(uint8_t mode);
 
   /* Connecting to WiFi Access point */
   void connect();
