@@ -84,16 +84,28 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
                                            data2));
   } else if (getOptionName() == "exit") {
-    AFEDevice Device;
+    publishHTML(ConfigurationPanel.getSite(getOptionName(), 1));
     Device.reboot(MODE_NORMAL);
+  } else if (getOptionName() == "help") {
+    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand()));
+    if (getCommand() == 1) {
+      Device.reboot(MODE_CONFIGURATION);
+    } else if (getCommand() == 2) {
+      Device.reboot(MODE_ACCESS_POINT);
+    }
   }
 }
 
 String AFEWebServer::getOptionName() {
-  if (server.hasArg("option")) {
-    return server.arg("option");
+
+  if (Device.getMode() == MODE_NORMAL) {
+    return "help";
   } else {
-    return "basic";
+    if (server.hasArg("option")) {
+      return server.arg("option");
+    } else {
+      return "basic";
+    }
   }
 }
 

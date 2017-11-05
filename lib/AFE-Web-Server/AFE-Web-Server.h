@@ -27,8 +27,8 @@ class AFEWebServer {
 private:
   ESP8266WebServer server;
   AFEConfigurationPanel ConfigurationPanel;
-
   ESP8266HTTPUpdateServer httpUpdater;
+  AFEDevice Device;
 
   void publishHTML(String page);
   String getOptionName();
