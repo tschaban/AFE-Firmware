@@ -20,13 +20,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
   page += "<title>AFE Firmware ";
   page += configuration.version;
-  page += " [T.";
+  page += " [T";
   page += configuration.type;
   page +=
       "]</title>"
       "<style>body{margin:0}#c{display:table;width:100%}#l,#r{display:table-"
       "cell}#l{width:300px;background:#282828;padding:20px;color:#eee}#r{"
-      "padding:20px}p,a,input,h1,h3,h4,span,label,button{font-family:sans-"
+      "padding:20px}p,a,input,h1,h3,h4,span,label,button,li{font-family:sans-"
       "serif}a{text-decoration:none}.ltit,.ltag{margin:0}.ltag{font-weight:300;"
       "color:#b0cadb;margin-bottom:20px}.lst{list-style:none;margin:0;padding:"
       "0}.itm "
@@ -66,27 +66,37 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">dla urządzeń zbudowanych o ESP8266</h4>"
       "<h4>MENU</h4>"
-      "<ul class=\"lst\">"
-      "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja "
-      "podstawowa</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=relay\">Przekaźnik</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik DS18B20</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / "
-      "Włącznik</a></li>"
-      "<li class=\"itm\"><a href=\"\\update\">Aktulizacja</a></li>"
-      "<li class=\"itm\"><a href=\"\\?option=reset\">Przywracanie "
-      "ustawień</a></li>"
-      "<br><br>"
-      "<li class=\"itm\"><a href=\"\\?option=exit\">Zakończ "
-      "konfigurację</a></li>"
+      "<ul class=\"lst\">";
+  if (Device.getMode() == MODE_CONFIGURATION) {
+    page += "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja "
+            "podstawowa</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=relay\">Przekaźnik</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik "
+            "DS18B20</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / "
+            "Włącznik</a></li>"
+            "<li class=\"itm\"><a href=\"\\update\">Aktulizacja</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=reset\">Przywracanie "
+            "ustawień</a></li>"
+            "<br><br>"
+            "<li class=\"itm\"><a href=\"\\?option=exit\">Zakończ "
+            "konfigurację</a></li>";
+  } else {
+    page += "<li class=\"itm\"><a href=\"\\?option=help&command=1\">Uruchom "
+            "konfigurację</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=help&command=2\">Uruchom "
+            "Access Point</a></li>";
+  }
+
+  page +=
       "</ul>"
       "<br><br>"
       "<h4>INFORMACJE</h4>"
       "<ul class=\"lst\">"
       "<li class=\"itm\"><a "
-      "href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/\" "
+      "href=\"http://smart-house.adrian.czabanowski.com/firmware-afe/\" "
       "target=\"_blank\">Dokumentacja</a></li>"
       "<li class=\"itm\"><a "
       "href=\"http://smart-house.adrian.czabanowski.com/forum/"
@@ -95,10 +105,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE\" "
       "target=\"_blank\">Licencja</a></li>"
       "<li class=\"itm\"><a "
-      "href=\"http://smart-house.adrian.czabanowski.com/firmware-sonoff/"
+      "href=\"http://smart-house.adrian.czabanowski.com/firmware-afe/"
       "historia-zmian/\" target=\"_blank\">Wersja ";
   page += configuration.version;
-  page += "</a></li>"
+  page += " [T";
+  page += configuration.type;
+  page += "]</a></li>"
           "</ul>"
           "</div>"
           "<div id=\"r\">";
@@ -703,7 +715,7 @@ String AFESitesGenerator::addUpgradeSection() {
           "accept=\".bin\" "
           "value=\"W:\\AFE-Firmware\\.pioenvs\\esp01_1m\\firmware.bin\">";
   body += "</div>";
-  body += "<p class=\"cd\">Po zakończeniu aktualizacji urządzenie zostanie "
+  body += "<p class=\"cm\">Po zakończeniu aktualizacji urządzenie zostanie "
           "automatycznie zresetowane</p>";
   body += "<button type=\"submit\" class=\"b be\">Aktualizuj</button>";
   body += "</fieldset>";
@@ -718,7 +730,8 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
 
   String body = "<fieldset>";
   body += status ? "<p style=\"color:red\">Aktualizacja nie powiodła się</p>"
-                 : "<p>Aktualizacja zakończona pomyślnie!</p><p>Po 10 "
+                 : "<p class=\"cm\">Aktualizacja zakończona pomyślnie!</p><p "
+                   "class=\"cm\">Po 10 "
                    "sekundach przełącznik zostanie przeładowany z wgranym "
                    "oprogramowaniem. Proszę czekać.</p>";
   body += "</fieldset>";
@@ -740,7 +753,110 @@ String AFESitesGenerator::addResetSection() {
 
 String AFESitesGenerator::addExitSection() {
   String body = "<fieldset>";
-  body += "<p class=\"cd\">Proszę czekac.... trwa restart urzadzenia.</p>";
+  body += "<div class=\"cf\">";
+  body += "<p class=\"cm\">Trwa restart urzadzenia.....</p>";
+  body += "<p class=\"cm\">Strona zostanie przeładowana automatycznie... "
+          "czekaj</p>";
+  body += "</div>";
   body += "</fieldset>";
-  return addConfigurationBlock("Panek konfiguracyjny", "", body);
+  return addConfigurationBlock("Restart urządzenia", "", body);
+}
+
+String AFESitesGenerator::addHelpSection() {
+  NETWORK NetworkConfiguration;
+  NetworkConfiguration = Data.getNetworkConfiguration();
+
+  String body = "<fieldset>";
+  body += "<div class=\"cf\">";
+  body += "<label>Nazwa urządzenia</label>";
+  body += "<span>";
+  body += NetworkConfiguration.host;
+  body += "</span>";
+  body += "</div>";
+  body += "</fieldset>";
+  return addConfigurationBlock("Urządzenie działa poprawnie", "", body);
+}
+
+const String AFESitesGenerator::generateMQTTHelp(const char *label,
+                                                 const char *topic,
+                                                 const char *command,
+                                                 const char *value) {
+  String body;
+
+  body += "<p></p><p class=\"cm\">";
+  body += label;
+  body += "</p><span><label>Temat : </label>";
+  body += topic;
+  body += command;
+  body += "</span><br><span><label>Wiadomośc :</label> ";
+  body += value;
+  body += "</span>";
+
+  return body;
+}
+
+String AFESitesGenerator::addHelpMQTTTopicSection() {
+  MQTT MQTTConfiguration;
+  MQTTConfiguration = Data.getMQTTConfiguration();
+
+  RELAY RelayConfiguration;
+  RelayConfiguration = Data.getRelayConfiguration(0);
+
+  String body = "<fieldset>";
+  body += "<div class=\"cf\">";
+
+  body += "<p class=\"cm\" style=\"color:black\"><strong>Urządzenie jest "
+          "zasubskrybowane do "
+          "następujących "
+          "tematów</strong></p>";
+
+  body += generateMQTTHelp("Restart urządzenia", MQTTConfiguration.topic, "cmd",
+                           "reboot");
+
+  body += generateMQTTHelp("Uruchomienie trybu konfiguracji",
+                           MQTTConfiguration.topic, "cmd", "configurationMode");
+
+  body += generateMQTTHelp("Włączenie przekaźnika",
+                           RelayConfiguration.mqttTopic, "cmd", "ON");
+  body += generateMQTTHelp("Wyłączenie przekaźnika",
+                           RelayConfiguration.mqttTopic, "cmd", "OFF");
+  body += generateMQTTHelp("Pobranie stanu przekaźnika",
+                           RelayConfiguration.mqttTopic, "cmd", "reportState");
+
+  body += "<p></p><p></p><p class=\"cm\" "
+          "style=\"color:black\"><strong>Urządzenie publikuje następujące "
+          "tematy</strong></p>";
+
+  body += generateMQTTHelp("Stan przekaźnika", RelayConfiguration.mqttTopic,
+                           "state", "ON lub OFF");
+  body += generateMQTTHelp("Pobierz wartośc przekaźnika z serwera",
+                           RelayConfiguration.mqttTopic, "get", "defaultState");
+
+  body += "</div>";
+  body += "</fieldset>";
+  return addConfigurationBlock("Tematy MQTT", "", body);
+}
+
+String AFESitesGenerator::addDonationSection() {
+
+  String body = "<fieldset>";
+  body += "<div class=\"cf\">";
+  body += "<p class=\"cm\">Oprogramowanie dostępne jest za darmo w ramach "
+          "licencji openSource <a "
+          "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
+          "LICENSE\" "
+          "target=\"_blank\">MIT</a></p>";
+  body += "<p class=\"cm\">Wesprzyj autora tego projektu</p>";
+  body += "<a "
+          "href=\"https://www.paypal.com/cgi-bin/"
+          "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
+          "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
+          "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
+          "3aNonHosted\" target=\"_blank\"><img "
+          "src=\"https://adrian.czabanowski.com/images/PayPalsmall.png\" "
+          "border=\"0\" alt=\"PayPal\"></a>";
+
+  body += "</div>";
+  body += "</fieldset>";
+  return addConfigurationBlock("Wsparcie", "", body);
 }

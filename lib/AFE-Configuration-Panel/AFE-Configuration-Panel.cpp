@@ -2,6 +2,27 @@
 
 AFEConfigurationPanel::AFEConfigurationPanel() {}
 
+String AFEConfigurationPanel::getSite(const String option, uint8_t command) {
+  Serial << endl << "INFO: Generating help site with command = " << command;
+  String page;
+  AFEDevice Device;
+
+  command == 0 ? page = Site.generateHeader(0) : page = Site.generateHeader(10);
+
+  if (command == 0) {
+    page += Site.addHelpSection();
+    page += Site.addHelpMQTTTopicSection();
+    page += Site.addDonationSection();
+  } else if (command == 1 || command == 2) {
+    page += Site.addExitSection();
+  }
+
+  page += Site.generateFooter();
+
+  Serial << endl << "INFO: Site generated";
+  return page;
+}
+
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       boolean data) {
 

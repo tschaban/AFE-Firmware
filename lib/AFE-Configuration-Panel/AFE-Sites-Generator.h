@@ -16,6 +16,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <Streaming.h>
 
@@ -24,6 +25,10 @@ class AFESitesGenerator {
 private:
   AFEEEPROM Eeprom;
   AFEDataAccess Data;
+  AFEDevice Device;
+
+  const String generateMQTTHelp(const char *label, const char *topic,
+                                const char *command, const char *value);
 
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
@@ -42,11 +47,13 @@ public:
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
   String addDS18B20Configuration();
-
   String addUpgradeSection();
   String addPostUpgradeSection(boolean status);
   String addResetSection();
   String addExitSection();
+  String addHelpSection();
+  String addHelpMQTTTopicSection();
+  String addDonationSection();
 };
 
 #endif

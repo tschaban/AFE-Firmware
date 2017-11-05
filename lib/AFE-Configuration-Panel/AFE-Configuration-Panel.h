@@ -14,7 +14,8 @@
 #include "WProgram.h"
 #endif
 
-#include "AFE-Sites-Generator.h"
+#include <AFE-Device.h>
+#include <AFE-Sites-Generator.h>
 #include <Streaming.h>
 
 class AFEConfigurationPanel {
@@ -28,6 +29,7 @@ public:
   AFEConfigurationPanel();
 
   /* It returns configuration site */
+  String getSite(const String option, uint8_t command);
   String getSite(const String option, uint8_t command, NETWORK data);
   String getSite(const String option, uint8_t command, MQTT data);
   String getSite(const String option, uint8_t command, DOMOTICZ data);
