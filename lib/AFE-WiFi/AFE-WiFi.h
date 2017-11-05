@@ -45,6 +45,8 @@ public:
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
+
+  void DNSListener();
 };
 
 #endif

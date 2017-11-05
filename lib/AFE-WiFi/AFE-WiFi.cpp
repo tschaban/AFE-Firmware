@@ -81,3 +81,5 @@ boolean AFEWiFi::connected() {
     return false;
   }
 }
+
+void AFEWiFi::DNSListener() { dnsServer.processNextRequest(); }
