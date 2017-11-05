@@ -66,6 +66,8 @@ void loop() {
       if (Device.getMode() == MODE_NORMAL) {
         Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
 
+        WebServer.listener();
+
         if (Relay.autoTurnOff()) {
           Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
           Switch.toggleState();
@@ -89,6 +91,7 @@ void loop() {
       Network.connect();
     }
   } else {
+    Network.DNSListener();
     WebServer.listener(); // Access Point
   }
 
