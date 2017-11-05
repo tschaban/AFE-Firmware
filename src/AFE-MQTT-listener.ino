@@ -47,7 +47,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         Device.reboot(MODE_NORMAL);
       } else if ((char)payload[2] == 'n') { // configurationMode
         Serial << endl << "INFO: Process: configuration Mode";
-        Device.reboot(MODE_ACCESS_POINT);
+        Device.reboot(MODE_CONFIGURATION);
       }
     }
   }
