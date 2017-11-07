@@ -26,7 +26,6 @@ class AFEWiFi {
 
 private:
   NETWORK networkConfiguration;
-  boolean accessPoint = false;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false;
   DNSServer dnsServer;
@@ -36,8 +35,7 @@ public:
   /* Constructor: no actions */
   AFEWiFi();
 
-  /* Sets connectionparameters and host name. Must be invoked before connect
-   * method */
+  /* Sets connection parameters and host name. Must be invoked before connect method */
   void begin(uint8_t mode);
 
   /* Connecting to WiFi Access point */
@@ -46,6 +44,7 @@ public:
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
 
+  /* Method listens for HTTP request while device is in Access Point mode */
   void DNSListener();
 };
 

@@ -40,8 +40,7 @@ void setup() {
   Led.begin(LEDConfiguration.gpio);
 
   SwitchConfiguration = Data.getSwitchConfiguration(0);
-  Switch.begin(SwitchConfiguration.gpio, SwitchConfiguration.type,
-               SwitchConfiguration.sensitiveness);
+  Switch.begin(SwitchConfiguration);
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
     MQTTConfiguration = Data.getMQTTConfiguration();

@@ -52,7 +52,7 @@ void AFEMQTT::connect() {
         Broker.subscribe((char *)mqttTopicForSubscription);
         Serial << endl << "INFO: Subsribed";
         // Setting Relay state after connection to MQTT
-        if (Relay.setRelayAfterRestoringMQTTConnection()) {
+        if (!Relay.setRelayAfterRestoringMQTTConnection()) {
           // Requesting state from MQTT Broker / service
           publish(Relay.getMQTTTopic(), "get", "defaultState");
         } else {

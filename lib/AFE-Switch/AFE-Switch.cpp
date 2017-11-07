@@ -2,18 +2,16 @@
 
 AFESwitch::AFESwitch(){};
 
-AFESwitch::AFESwitch(uint8_t switch_gpio, uint8_t switch_type,
-                     uint16_t switch_sensitiveness) {
-  begin(switch_gpio, switch_type, switch_sensitiveness);
+AFESwitch::AFESwitch(SWITCH configuration) {
+  begin(configuration);
 }
 
-void AFESwitch::begin(uint8_t switch_gpio, uint8_t switch_type,
-                      uint16_t switch_sensitiveness) {
-  gpio = switch_gpio;
-  type = switch_type;
-  sensitiveness = switch_sensitiveness;
-  pinMode(gpio, INPUT_PULLUP);
-  state = digitalRead(gpio);
+void AFESwitch::begin(SWITCH configuration) {
+
+  SWITCH SwitchConfiguration = SWITCH configuration;
+
+  pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
+  state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
 }
 
@@ -50,7 +48,7 @@ boolean AFESwitch::is10s() {
 
 void AFESwitch::listener() {
 
-  boolean currentState = digitalRead(gpio);
+  boolean currentState = digitalRead(SwitchConfiguration.gpio);
   unsigned long time = millis();
 
   if (currentState != previousState) {
@@ -60,9 +58,9 @@ void AFESwitch::listener() {
       startTime = time;
     }
 
-    if (time - startTime >= sensitiveness) {
+    if (time - startTime >= SwitchConfiguration.sensitiveness) {
 
-      if (type == SWITCH_TYPE_MONO) {
+      if (SwitchConfiguration.type == SWITCH_TYPE_MONO) {
 
         if (!_pressed) {
           state = !state;
@@ -83,7 +81,7 @@ void AFESwitch::listener() {
   } else if (currentState == previousState && startTime > 0) {
     Serial << endl << "INFO: Pressed for " << time - startTime;
 
-    if (type == SWITCH_TYPE_MONO && time - startTime >= 5000 &&
+    if (SwitchConfiguration.type == SWITCH_TYPE_MONO && time - startTime >= 5000 &&
         time - startTime < 10000) {
       pressed4fiveSeconds = true;
     }

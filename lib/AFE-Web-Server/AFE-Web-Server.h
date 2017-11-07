@@ -45,9 +45,17 @@ private:
 
 public:
   AFEWebServer();
+
+  /* Method initialize WebServer and Updater server */
   void begin();
+
+  /* Method listens for HTTP requests */
   void listener();
+
+  /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
+
+  /* Method generate HTML side. It reads also data from HTTP requests arguments and pass them to Configuration Panel class */
   void generate();
 };
 

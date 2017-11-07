@@ -14,51 +14,57 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Data-structures.h>
 #include <Streaming.h>
 
 /* Types of switch */
+
 #define SWITCH_TYPE_MONO 0 // Mono stable switch
-#define SWITCH_TYPE_BI 1   // Bi stabe switch
+#define SWITCH_TYPE_BI 1   // Bistable switch
 
 class AFESwitch {
 
 private:
-  uint8_t gpio;
-  uint8_t type;
-  boolean state;         // It
-  boolean previousState; // This stores current switch state
+
+  SWITCH SwitchConfiguration;
+  boolean state;
+  boolean previousState; // Actually this stores current switch state
 
   unsigned long startTime = 0;
-  uint16_t sensitiveness = 0;
-  ;
 
-  boolean pressed = false; // It's set to true once button pressed haveing also
-                           // sensitiveness check
+  boolean pressed = false; // It's set to true once button pressed physically
   boolean _pressed = false;
 
-  boolean pressed4fiveSeconds =
-      false; // It's set to true when switch is pressed for 5s
-  boolean pressed4tenSeconds =
-      false; // It's set to true when switch is pressed for 10s
+  boolean pressed4fiveSeconds =  false; // It's set to true when switch is pressed for 5s
+  boolean pressed4tenSeconds = false; // It's set to true when switch is pressed for 10s
 
 public:
-  /* Constructor: entry parameter is GPIO number where Switch is connected to
-     second parameter defiens if the switch is mono or bi
-  */
+
+  /* Constructors */
   AFESwitch();
-  AFESwitch(uint8_t switch_gpio, uint8_t switch_type,
-            uint16_t switch_sensitiveness);
+  AFESwitch(SWITCH configuration);
 
-  void begin(uint8_t switch_gpio, uint8_t switch_type,
-             uint16_t switch_sensitiveness);
+  /* Init switch */
+  void begin(SWITCH configuration);
 
+  /* Method: returns TRUE if state of the switch is pressed. It does not mean it has to be pressed physically (applicable for BiStable switch types */
   boolean getState();
+
+  /* Method toggles switch state */
   void toggleState();
+
+  /* Method returns true if switch has been pressed. Sensitiveness it taken into account.
+   * It does not mean switch is pressed physically. Once True capture getState() method
+   * should be called to get the state of the Switch */
   boolean isPressed();
+
+  /* Method returns true after switch is pressed for 5sec. */
   boolean is5s();
+
+  /* Method return trye after switch is pressed for 10sec */
   boolean is10s();
 
-  /* It has to be added to the loop in order to listen for switch changes */
+  /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 };
 

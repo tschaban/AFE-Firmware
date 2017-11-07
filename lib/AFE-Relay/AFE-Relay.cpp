@@ -61,10 +61,10 @@ void AFERelay::setRelayAfterRestoringPower() {
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
   if (RelayConfiguration.stateMQTTConnected ==
       5) { // request state from MQTT Broker
-    return true;
+    return false;
   } else {
     setRelayAfterRestore(RelayConfiguration.stateMQTTConnected);
-    return false;
+    return true;
   }
 }
 
