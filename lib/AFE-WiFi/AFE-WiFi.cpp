@@ -7,7 +7,6 @@ void AFEWiFi::begin(uint8_t mode) {
   AFEDataAccess Data;
   LED LEDConfiguration;
 
-  // Reading configuration from the EEPROM
   LEDConfiguration = Data.getLEDConfiguration();
   networkConfiguration = Data.getNetworkConfiguration();
 
@@ -82,4 +81,4 @@ boolean AFEWiFi::connected() {
   }
 }
 
-void AFEWiFi::DNSListener() { dnsServer.processNextRequest(); }
+void AFEWiFi::APListener() { dnsServer.processNextRequest(); }

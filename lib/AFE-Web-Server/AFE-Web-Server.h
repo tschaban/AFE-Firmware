@@ -32,16 +32,14 @@ private:
 
   void publishHTML(String page);
   String getOptionName();
-  boolean getCommand();
+  uint8_t getCommand();
 
   NETWORK getNetworkData();
-  /* @TODO For MQTT only*/
   MQTT getMQTTData();
-  /* @TODO For Domoticz only*/
-  DOMOTICZ getDomoticzData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
-  DS18B20 getDS18B20Data();
+  // @TODO DOMOTICZ getDomoticzData();
+  // @TODO DS18B20 getDS18B20Data();
 
 public:
   AFEWebServer();
@@ -55,7 +53,8 @@ public:
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
 
-  /* Method generate HTML side. It reads also data from HTTP requests arguments and pass them to Configuration Panel class */
+  /* Method generate HTML side. It reads also data from HTTP requests arguments
+   * and pass them to Configuration Panel class */
   void generate();
 };
 

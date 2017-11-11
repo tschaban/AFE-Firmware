@@ -67,15 +67,20 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<h4 class=\"ltag\">dla urządzeń zbudowanych o ESP8266</h4>"
       "<h4>MENU</h4>"
       "<ul class=\"lst\">";
-  if (Device.getMode() == MODE_CONFIGURATION) {
+  if (Device.getMode() != MODE_NORMAL) {
     page += "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja "
             "podstawowa</a></li>"
-            "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>"
-            "<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>"
-            "<li class=\"itm\"><a href=\"\\?option=relay\">Przekaźnik</a></li>"
-            "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik "
-            "DS18B20</a></li>"
-            "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / "
+            "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>";
+    /* @TODO DOMOTICZ
+page +=
+"<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>";
+*/
+    page += "<li class=\"itm\"><a href=\"\\?option=relay\">Przekaźnik</a></li>";
+    /* @TODO DS18B20
+    page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">Czujnik "
+            "DS18B20</a></li>";
+*/
+    page += "<li class=\"itm\"><a href=\"\\?option=switch\">Przycisk / "
             "Włącznik</a></li>"
             "<li class=\"itm\"><a href=\"\\update\">Aktulizacja</a></li>"
             "<li class=\"itm\"><a href=\"\\?option=reset\">Przywracanie "
@@ -111,8 +116,31 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += " [T";
   page += configuration.type;
   page += "]</a></li>"
-          "</ul>"
-          "</div>"
+          "</ul>";
+  if (Device.getMode() != MODE_ACCESS_POINT) {
+    page += "<br><br>"
+            "<h4>WSPARCIE</h4>";
+    page += "<p class=\"cm\">Oprogramowanie dostępne jest za darmo w ramach "
+            "licencji openSource <a "
+            "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
+            "LICENSE\" "
+            "target=\"_blank\"  style=\"color:#fff\">MIT</a></p>";
+    page += "<p class=\"cm\">Jeśli spełnia Twoje oczekiwania "
+            "to rozważ wsparcie <a "
+            "href=\"https://adrian.czabanowski.com\" "
+            "target=\"_blank\"  style=\"color:#fff\">autora</a>. Z góry "
+            "dzięki.</p>";
+    page +=
+        "<a "
+        "href=\"https://www.paypal.com/cgi-bin/"
+        "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
+        "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
+        "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
+        "3aNonHosted\" target=\"_blank\"><img "
+        "src=\"https://adrian.czabanowski.com/images/PayPalsmall.png\" "
+        "border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
+  }
+  page += "</div>"
           "<div id=\"r\">";
   return page;
 }
@@ -385,6 +413,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
                                body);
 }
 
+/* @TODO DOMOTICZ
 String AFESitesGenerator::addDomoticzConfiguration() {
 
   DOMOTICZ configuration;
@@ -444,7 +473,7 @@ String AFESitesGenerator::addDomoticzConfiguration() {
                                "serwera Domoticz",
                                body);
 }
-
+*/
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration;
@@ -475,7 +504,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<span class=\"hint\">Informacja wymagana. Max 16 znaków</span>";
   body += "</div>";
 
-  /* @TODO For Domoticz only*/
+  /* @TODO DOMOTICZ
   body += "<div class=\"cf\">";
   body += "<label>IDX urządzenia</label>";
   body += "<input name=\"relay" + String(id) +
@@ -486,7 +515,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
           "konfiguracji Domoticz</span>";
   body += "</div>";
 
-  /* @TODO For Domoticz only*/
   body += "<div class=\"cc\">";
   body += "<label>";
   body += "<input name=\"relay" + String(id) +
@@ -496,9 +524,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</label>";
   body += "</div>";
 
-  body += "<p class=\"cd\">Zachowanie się przekaźnia po przywróceniu zasilania "
-          "lub ponownego podłączenia się do brokera MQTT (tyko dla sterowania "
-          "przez MQTT)</p>";
+*/
+  body += "<p class=\"cd\">Zachowanie przekaźnia po przywróceniu zasilania "
+          "lub nawiązanie połączeni do brokera MQTT</p>";
   body += "<div class=\"cf\">";
   body += "<label>Przywrócenie zasilania</label>";
   body += "<select name=\"relay" + String(id) + "_power_restored\">";
@@ -552,8 +580,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
   body += "<p class=\"cd\">Ustaw poniższy parametr jeśli przekaźnik ma się "
-          "wyłączyc automatycznie po zadanym czasie. Domyślnie 0 - przekaźnik "
-          "nie zmienia stanu automatycznie</p>";
+          "wyłączyc automatycznie po zadanym czasie.</p>"
+          "<p class=\"cd\">Wartośc 0: brak automatycznego wyłączania "
+          "przekaźnika.</p>";
 
   body += "<div class=\"cf\">";
   body += "<label>Wyłącz po</label>";
@@ -561,7 +590,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
           "_off_time\" type=\"number\" maxlength=\"5\" value=\"";
   body += configuration.timeToOff;
   body += "\">";
-  body += "<span class=\"hint\">sekundach. Zakres 0.5sek do 99999sek</span>";
+  body += "<span class=\"hint\">sekundach. Zakres 0.01sek do 99999sek</span>";
   body += "</div>";
 
   body += "</fieldset>";
@@ -575,7 +604,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       ,
       "Przekaźnik musi miec nadaną nazwę np. lampa. Nazwa przekaźnika "
       "definiuje dedykowany temat MQTT dla przekaźnika z tematu zdefiniowanego "
-      "w sekcji MQTT broker oraz poniżej nazwy. np /sonoff/lampa/",
+      "w sekcji MQTT broker oraz poniżej nazwy. np. /afe/lampa/",
       body);
 }
 
@@ -655,7 +684,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
                                "swój stan nadmiernie dla niektórych włączników",
                                body);
 }
-
+/* @TODO DS18B20
 String AFESitesGenerator::addDS18B20Configuration() {
 
   DS18B20 configuration;
@@ -706,7 +735,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
                                "jednego czujnika temperatury",
                                body);
 }
-
+*/
 String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
@@ -739,15 +768,24 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
                                "Status aktualizacji", body);
 }
 
-String AFESitesGenerator::addResetSection() {
+String AFESitesGenerator::addResetSection(uint8_t command) {
   String body = "<fieldset>";
-  body += "<a href=\"\\?option=reset&command=1\" class=\"b be\">Przywróc "
-          "ustawienia początkowe</a>";
+  String subtitle;
+  if (command == 0) {
+    body += "<a href=\"\\?option=reset&command=1\" class=\"b be\">Przywróc "
+            "ustawienia początkowe</a>";
+    subtitle = "<strong>Uwaga</strong>: przywracanie ustawień "
+               "początkowych kasuje wszystkie ustawienia "
+               "urządzenia, włącznie z konfiguracją sieci WiFi";
+  } else {
+    subtitle += "Trwa przywracanie ustawień początkowych</strong>";
+    body += "<p class=\"cm\">Po 20 sekundach połącz się z siecią WiFi o "
+            "nazwie: <strong>AFE-Device</strong>, a następnie połącz się się z "
+            "panelem konfigurayjnym pod adresem: </p>";
+    body += "<a href=\"http://192.168.5.1\">http://192.168.5.1</a>";
+  }
   body += "</fieldset>";
-  return addConfigurationBlock("Przywracanie ustawień początkowych",
-                               "<strong>Uwaga</strong>: przywracanie ustawień "
-                               "początkowych kasuje wszystkie ustawienia "
-                               "urządzenia, włącznie z konfiguracją sieci WiFi",
+  return addConfigurationBlock("Przywracanie ustawień początkowych", subtitle,
                                body);
 }
 
@@ -806,9 +844,7 @@ String AFESitesGenerator::addHelpMQTTTopicSection() {
   body += "<div class=\"cf\">";
 
   body += "<p class=\"cm\" style=\"color:black\"><strong>Urządzenie jest "
-          "zasubskrybowane do "
-          "następujących "
-          "tematów</strong></p>";
+          "zasubskrybowane do następujących tematów MQTT</strong></p>";
 
   body += generateMQTTHelp("Restart urządzenia", MQTTConfiguration.topic, "cmd",
                            "reboot");
@@ -834,29 +870,5 @@ String AFESitesGenerator::addHelpMQTTTopicSection() {
 
   body += "</div>";
   body += "</fieldset>";
-  return addConfigurationBlock("Tematy MQTT", "", body);
-}
-
-String AFESitesGenerator::addDonationSection() {
-
-  String body = "<fieldset>";
-  body += "<div class=\"cf\">";
-  body += "<p class=\"cm\">Oprogramowanie dostępne jest za darmo w ramach "
-          "licencji openSource <a "
-          "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
-          "LICENSE\" "
-          "target=\"_blank\">MIT</a></p>";
-  body += "<p class=\"cm\">Wesprzyj autora tego projektu</p>";
-  body += "<a "
-          "href=\"https://www.paypal.com/cgi-bin/"
-          "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-          "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
-          "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
-          "3aNonHosted\" target=\"_blank\"><img "
-          "src=\"https://adrian.czabanowski.com/images/PayPalsmall.png\" "
-          "border=\"0\" alt=\"PayPal\"></a>";
-
-  body += "</div>";
-  body += "</fieldset>";
-  return addConfigurationBlock("Wsparcie", "", body);
+  return addConfigurationBlock("Pomoc: tematy MQTT", "", body);
 }

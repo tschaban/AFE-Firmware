@@ -35,7 +35,8 @@ public:
   /* Constructor: no actions */
   AFEWiFi();
 
-  /* Sets connection parameters and host name. Must be invoked before connect method */
+  /* Sets connection parameters and host name. Must be invoked before connect
+   * method */
   void begin(uint8_t mode);
 
   /* Connecting to WiFi Access point */
@@ -45,7 +46,7 @@ public:
   boolean connected();
 
   /* Method listens for HTTP request while device is in Access Point mode */
-  void DNSListener();
+  void APListener();
 };
 
 #endif

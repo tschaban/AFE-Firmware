@@ -3,16 +3,8 @@
 AFEWebServer::AFEWebServer() {}
 
 void AFEWebServer::begin() {
-
-  Serial << endl << "INFO: Starting OTA upgrade server: ";
   httpUpdater.setup(&server);
-  Serial << "DONE";
-  Serial << endl << "INFO: Starting web server: ";
   server.begin();
-  Serial << "DONE";
-
-  Serial << endl
-         << "INFO: Ready for configuration. Open http://" << WiFi.localIP();
 }
 
 void AFEWebServer::listener() { server.handleClient(); }
@@ -23,7 +15,7 @@ void AFEWebServer::publishHTML(String page) {
 
 void AFEWebServer::handle(const char *uri,
                           ESP8266WebServer::THandlerFunction handler) {
-  Serial << endl << "INFO: Added url : " << uri << " for listening";
+  // Serial << endl << "INFO: Added url : " << uri << " for listening";
   server.on(uri, handler);
 }
 
@@ -50,14 +42,14 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
-    /* @TODO For Domoticz only*/
+    /* @TODO DOMOTICZ
   } else if (getOptionName() == "domoticz") {
     DOMOTICZ data;
     if (getCommand() == SERVER_CMD_SAVE) {
       data = getDomoticzData();
     }
     publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
+        ConfigurationPanel.getSite(getOptionName(), getCommand(), data)); */
   } else if (getOptionName() == "relay") {
     RELAY data1 = {};
     RELAY data2 = {};
@@ -67,14 +59,14 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
                                            data2));
-  } else if (getOptionName() == "ds18b20") {
+  } /* @TODO DS18B20 else if (getOptionName() == "ds18b20") {
     DS18B20 data;
     if (getCommand() == SERVER_CMD_SAVE) {
       data = getDS18B20Data();
     }
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
-  } else if (getOptionName() == "switch") {
+  } */ else if (getOptionName() == "switch") {
     SWITCH data1 = {};
     SWITCH data2 = {};
     if (getCommand() == SERVER_CMD_SAVE) {
@@ -84,10 +76,19 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
                                            data2));
   } else if (getOptionName() == "exit") {
-    publishHTML(ConfigurationPanel.getSite(getOptionName(), 1));
+    publishHTML(
+        ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
     Device.reboot(MODE_NORMAL);
+  } else if (getOptionName() == "reset") {
+    publishHTML(
+        ConfigurationPanel.getSite(getOptionName(), getCommand(), false));
+    if (getCommand() == 1) {
+      Device.setDevice();
+      Device.reboot(MODE_ACCESS_POINT);
+    }
   } else if (getOptionName() == "help") {
-    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand()));
+    publishHTML(
+        ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
     if (getCommand() == 1) {
       Device.reboot(MODE_CONFIGURATION);
     } else if (getCommand() == 2) {
@@ -118,8 +119,8 @@ uint8_t AFEWebServer::getCommand() {
 NETWORK AFEWebServer::getNetworkData() {
 
   Serial << endl << "INFO: Reading network data";
-  NETWORK data;
 
+  NETWORK data;
   if (server.arg("wifi_ssid").length() > 0) {
     server.arg("wifi_ssid").toCharArray(data.ssid, sizeof(data.ssid));
   }
@@ -220,7 +221,7 @@ MQTT AFEWebServer::getMQTTData() {
   return data;
 }
 
-/* @TODO For Domoticz only*/
+/* @TODO DOMOTICZ
 DOMOTICZ AFEWebServer::getDomoticzData() {
   DOMOTICZ data;
 
@@ -254,7 +255,7 @@ DOMOTICZ AFEWebServer::getDomoticzData() {
   }
   return data;
 }
-
+*/
 RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   Serial << endl << "INFO:  Reading relay  data";
@@ -291,7 +292,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
         server.arg("relay" + String(id) + "_mqtt_connected").toInt();
   }
 
-  // @TODO For Domoticz only
+  /* @TODO DOMOTICZ
   if (server.arg("relay" + String(id) + "_idx").length() > 0) {
     data.idx = server.arg("relay" + String(id) + "_idx").toInt();
   }
@@ -299,6 +300,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.publishToDomoticz =
         server.arg("relay" + String(id) + "_publish_to_domoticz").toInt();
   }
+  */
 
   return data;
 }
@@ -334,6 +336,7 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   return data;
 }
 
+/* @TODO DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
 
   Serial << endl << "INFO: Reading ds18b20 data";
@@ -363,3 +366,4 @@ DS18B20 AFEWebServer::getDS18B20Data() {
   }
   return data;
 }
+*/

@@ -32,8 +32,10 @@ public:
   String getSite(const String option, uint8_t command);
   String getSite(const String option, uint8_t command, NETWORK data);
   String getSite(const String option, uint8_t command, MQTT data);
-  String getSite(const String option, uint8_t command, DOMOTICZ data);
-  String getSite(const String option, uint8_t command, DS18B20 data);
+  // @TODO DOMOTICZ String getSite(const String option, uint8_t command,
+  // DOMOTICZ data);
+  // @TODO DS18B20 String getSite(const String option, uint8_t command, DS18B20
+  // data);
   String getSite(const String option, uint8_t command, boolean data);
   String getSite(const String option, uint8_t command, RELAY data1,
                  RELAY data2);

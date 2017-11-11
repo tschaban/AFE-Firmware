@@ -2,43 +2,34 @@
 
 AFEConfigurationPanel::AFEConfigurationPanel() {}
 
-String AFEConfigurationPanel::getSite(const String option, uint8_t command) {
-  Serial << endl << "INFO: Generating help site with command = " << command;
-  String page;
-  AFEDevice Device;
-
-  command == 0 ? page = Site.generateHeader(0) : page = Site.generateHeader(10);
-
-  if (command == 0) {
-    page += Site.addHelpSection();
-    page += Site.addHelpMQTTTopicSection();
-    page += Site.addDonationSection();
-  } else if (command == 1 || command == 2) {
-    page += Site.addExitSection();
-  }
-
-  page += Site.generateFooter();
-
-  Serial << endl << "INFO: Site generated";
-  return page;
-}
-
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      boolean data) {
+                                      boolean redirect) {
 
-  Serial << endl << "INFO: Generating site";
+  Serial << endl
+         << "INFO: Generating site: " << option << ", command: " << command
+         << (redirect ? " with redirect " : " without redirect");
 
-  String page = Site.generateHeader();
+  String page;
+  redirect == 0 ? page = Site.generateHeader(0)
+                : page = Site.generateHeader(10);
 
   if (option == "upgrade") {
     page += Site.addUpgradeSection();
   } else if (option == "reset") {
-    page += Site.addResetSection();
+    page += Site.addResetSection(command);
   } else if (option == "exit") {
     page += Site.addExitSection();
+  } else if (option == "help") {
+    if (command == 0) {
+      page += Site.addHelpSection();
+      page += Site.addHelpMQTTTopicSection();
+    } else if (command == 1 || command == 2) {
+      page += Site.addExitSection();
+    }
   } else {
     page += "<h1>Page Not Found</h1>";
   }
+
   page += Site.generateFooter();
 
   Serial << endl << "INFO: Site generated";
@@ -84,7 +75,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-/* @TODO Only for Domoticz */
+/* @TODO DOMOTICZ
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       DOMOTICZ data) {
 
@@ -103,7 +94,8 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   page += Site.generateFooter();
   return page;
 }
-//
+*/
+
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       RELAY data1, RELAY data2) {
 
@@ -148,6 +140,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
+/* @TODO DS18B20
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       DS18B20 data) {
 
@@ -166,6 +159,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+*/
 
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page = Site.generateHeader();

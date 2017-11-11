@@ -92,18 +92,18 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
-  uint8_t next = 26;
+  uint8_t nextRelay = 26;
   char mqttTopic[49];
 
-  configuration.present = Eeprom.read(367 + id * next);
-  configuration.gpio = Eeprom.readUInt8(368 + id * next);
-  configuration.timeToOff = Eeprom.read(370 + id * next, 5).toFloat();
-  configuration.statePowerOn = Eeprom.readUInt8(375 + id * next);
+  configuration.present = Eeprom.read(367 + id * nextRelay);
+  configuration.gpio = Eeprom.readUInt8(368 + id * nextRelay);
+  configuration.timeToOff = Eeprom.read(370 + id * nextRelay, 5).toFloat();
+  configuration.statePowerOn = Eeprom.readUInt8(375 + id * nextRelay);
   /* @TODO Only for MQTT */
-  Eeprom.read(376 + id * next, 16)
+  Eeprom.read(376 + id * nextRelay, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 
-  configuration.stateMQTTConnected = Eeprom.readUInt8(392 + id * next);
+  configuration.stateMQTTConnected = Eeprom.readUInt8(392 + id * nextRelay);
 
   Eeprom.read(333, 32).toCharArray(configurationMQTT.topic,
                                    sizeof(configurationMQTT.topic));
@@ -139,12 +139,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
-  uint8_t next = 6;
-  configuration.present = Eeprom.read(393 + id * next);
-  configuration.gpio = Eeprom.readUInt8(394 + id * next);
-  configuration.type = Eeprom.readUInt8(395 + id * next);
-  configuration.sensitiveness = Eeprom.read(396 + id * next, 3).toInt();
-  configuration.functionality = Eeprom.readUInt8(399 + id * next);
+  uint8_t nextSwitch = 6;
+  configuration.present = Eeprom.read(393 + id * nextSwitch);
+  configuration.gpio = Eeprom.readUInt8(394 + id * nextSwitch);
+  configuration.type = Eeprom.readUInt8(395 + id * nextSwitch);
+  configuration.sensitiveness = Eeprom.read(396 + id * nextSwitch, 3).toInt();
+  configuration.functionality = Eeprom.readUInt8(399 + id * nextSwitch);
   Serial << endl << "INFO: Requested : Switch : ";
   Serial << endl << "    - Present : " << configuration.present;
   Serial << endl << "    - GPIO : " << configuration.gpio;
@@ -233,7 +233,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
-
+  uint8_t nextRelay = 26;
   Eeprom.write(367 + id * nextRelay, configuration.present);
   Eeprom.writeUInt8(368 + id * nextRelay, configuration.gpio);
   Eeprom.write(370 + id * nextRelay, 5, configuration.timeToOff);
@@ -247,12 +247,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
-  uint8_t next = 6;
-  Eeprom.write(393 + id * next, configuration.present);
-  Eeprom.writeUInt8(394 + id * next, configuration.gpio);
-  Eeprom.writeUInt8(395 + id * next, configuration.type);
-  Eeprom.write(396 + id * next, 3, (long)configuration.sensitiveness);
-  Eeprom.writeUInt8(399 + id * next, configuration.functionality);
+  uint8_t nextSwitch = 6;
+  Eeprom.write(393 + id * nextSwitch, configuration.present);
+  Eeprom.writeUInt8(394 + id * nextSwitch, configuration.gpio);
+  Eeprom.writeUInt8(395 + id * nextSwitch, configuration.type);
+  Eeprom.write(396 + id * nextSwitch, 3, (long)configuration.sensitiveness);
+  Eeprom.writeUInt8(399 + id * nextSwitch, configuration.functionality);
 }
 
 void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
@@ -282,10 +282,12 @@ const char AFEDataAccess::getVersion() {
 }
 
 boolean AFEDataAccess::getRelayState(uint8_t id) {
+  uint8_t nextRelay = 26;
   return Eeprom.read(369 + id * nextRelay);
 }
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
+  uint8_t nextRelay = 26;
   Eeprom.write(369 + id * nextRelay, state);
 }
 
@@ -301,6 +303,8 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-boolean AFEDataAccess::isDebuggable() { return Eeprom.read(25); }
+boolean AFEDataAccess::isDebuggable() {
+  return true; // Eeprom.read(25); @TODO enable debugger configuration
+}
 
 void AFEDataAccess::setDebuggable(boolean state) { Eeprom.write(25, state); }

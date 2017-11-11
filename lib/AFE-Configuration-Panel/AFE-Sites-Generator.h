@@ -43,17 +43,16 @@ public:
 
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
-  String addDomoticzConfiguration();
+  // @TODO DOMOTICZ String addDomoticzConfiguration();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
-  String addDS18B20Configuration();
+  // @TODO DS18B20 String addDS18B20Configuration();
   String addUpgradeSection();
   String addPostUpgradeSection(boolean status);
-  String addResetSection();
+  String addResetSection(uint8_t command);
   String addExitSection();
   String addHelpSection();
   String addHelpMQTTTopicSection();
-  String addDonationSection();
 };
 
 #endif

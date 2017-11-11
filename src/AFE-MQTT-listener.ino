@@ -7,15 +7,13 @@
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[50];
-
+  Led.blink(1000);
   Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
     for (uint8_t i = 0; i < length; i++) {
       Serial << (char)payload[i];
     }
-
-    // Relay
 
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
 

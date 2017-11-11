@@ -15,6 +15,8 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
+#include <AFE-Defaults.h>
 #include <Streaming.h>
 
 #define MODE_NORMAL 0
@@ -38,6 +40,15 @@ public:
 
   /* Method saves current device mode to EEPROM */
   void saveMode(uint8_t mode);
+
+  /* Method returns true if device is launched for a first time */
+  boolean isFirstTimeLaunch();
+
+  /* Method sets the device to it's default state */
+  void setDevice();
+
+  /* Is WiFi configured */
+  boolean isConfigured();
 };
 
 #endif
