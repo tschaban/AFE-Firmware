@@ -7,20 +7,21 @@
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[50];
-  Led.blink(1000);
-  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
+  Led.on();
+  //  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
-    for (uint8_t i = 0; i < length; i++) {
-      Serial << (char)payload[i];
-    }
-
+                     /*
+                         for (uint8_t i = 0; i < length; i++) {
+                           Serial << (char)payload[i];
+                         }
+                     */
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
-
-    Serial << endl
-           << "DEBUG: "
-           << "checking relay messages: " << _mqttTopic;
-
+    /*
+        Serial << endl
+               << "DEBUG: "
+               << "checking relay messages: " << _mqttTopic;
+    */
     if (String(topic) == String(_mqttTopic)) {
       if ((char)payload[1] == 'N') {
         Relay.on();
@@ -35,18 +36,20 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 
     sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
-    Serial << endl
-           << "DEBUG: "
-           << "checking device level messages: " << _mqttTopic;
-
+    /*
+        Serial << endl
+               << "DEBUG: "
+               << "checking device level messages: " << _mqttTopic;
+    */
     if (String(topic) == String(_mqttTopic)) {
       if ((char)payload[2] == 'b') { // reboot
-        Serial << endl << "INFO: Process: reboot";
+        //      Serial << endl << "INFO: Process: reboot";
         Device.reboot(MODE_NORMAL);
       } else if ((char)payload[2] == 'n') { // configurationMode
-        Serial << endl << "INFO: Process: configuration Mode";
+        //    Serial << endl << "INFO: Process: configuration Mode";
         Device.reboot(MODE_CONFIGURATION);
       }
     }
   }
+  Led.off();
 }
