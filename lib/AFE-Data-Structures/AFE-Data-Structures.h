@@ -18,6 +18,18 @@
 
 #define SERVER_CMD_SAVE 1
 
+struct FIRMWARE {
+  char version[7];
+  uint8_t type;
+  uint8_t autoUpgrade;
+  char upgradeURL[120];
+};
+
+struct LED {
+  boolean present;
+  uint8_t gpio;
+};
+
 struct NETWORK {
   char ssid[32];
   char password[32];
@@ -31,7 +43,6 @@ struct NETWORK {
   uint8_t waitTimeSeries;
 };
 
-/* @TODO Only for MQTT */
 struct MQTT {
   char host[32];
   IPAddress ip;
@@ -39,15 +50,6 @@ struct MQTT {
   char user[32];
   char password[32];
   char topic[32];
-};
-
-/* @TODO Only for Domoticz */
-struct DOMOTICZ {
-  char host[32];
-  IPAddress ip;
-  uint16_t port;
-  char user[32];
-  char password[32];
 };
 
 struct RELAY {
@@ -72,6 +74,8 @@ struct SWITCH {
   uint8_t functionality;
 };
 
+/* @TODO DS18B20
+
 struct DS18B20 {
   boolean present;
   uint8_t gpio;
@@ -79,17 +83,16 @@ struct DS18B20 {
   uint16_t interval;
   uint16_t unit;
 };
+*/
 
-struct FIRMWARE {
-  char version[7];
-  uint8_t type;
-  uint8_t autoUpgrade;
-  char upgradeURL[120];
+/* @TODO DOMOTICZ
+struct DOMOTICZ {
+  char host[32];
+  IPAddress ip;
+  uint16_t port;
+  char user[32];
+  char password[32];
 };
-
-struct LED {
-  boolean present;
-  uint8_t gpio;
-};
+*/
 
 #endif
