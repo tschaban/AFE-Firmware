@@ -9,15 +9,15 @@ void AFEDefaults::set() {
   NETWORK networkConfiguration;
   FIRMWARE firmwareConfiguration;
   MQTT MQTTConfiguration;
-  DOMOTICZ DomoticzConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  DS18B20 DS18B20Configuration;
   LED LEDConfiguration;
+  // @TODO DOMOTICZ DomoticzConfiguration;
+  // @TODO DS18B20 DS18B20Configuration;
 
   Serial << endl << "INFO: Setting defaults: firmware";
 
-  sprintf(firmwareConfiguration.version, "1.0.0");
+  sprintf(firmwareConfiguration.version, "1.0.1");
   firmwareConfiguration.type = 0;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
