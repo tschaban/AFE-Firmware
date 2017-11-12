@@ -11,8 +11,6 @@
 
 AFEDataAccess Data;
 MQTT MQTTConfiguration;
-
-SWITCH SwitchConfiguration;
 LED LEDConfiguration;
 
 AFEDevice Device;
@@ -50,10 +48,7 @@ void setup() {
     }
   }
 
-  SwitchConfiguration = Data.getSwitchConfiguration(0);
-  if (SwitchConfiguration.present) {
-    Switch.begin(SwitchConfiguration);
-  }
+  Switch.begin(0);
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
     MQTTConfiguration = Data.getMQTTConfiguration();
