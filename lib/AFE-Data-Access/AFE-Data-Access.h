@@ -26,25 +26,22 @@ public:
   AFEDataAccess();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
-  DOMOTICZ getDomoticzConfiguration();
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
-  DS18B20 getDS18B20Configuration();
   FIRMWARE getFirmwareConfiguration();
   LED getLEDConfiguration();
 
+  // @TODO DOMOTICZ getDomoticzConfiguration();
+  // @TODO DS18B20 getDS18B20Configuration();
+
   void saveConfiguration(NETWORK configuration);
-
-  /* @TODO Only for MQTT */
   void saveConfiguration(MQTT configuration);
-
-  /* @TODO Only for Domoticz only */
-  void saveConfiguration(DOMOTICZ configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
-  void saveConfiguration(DS18B20 configuration);
   void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(LED configuration);
+  // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
+  // @TODO DS18B20 void saveConfiguration(DS18B20 configuration);
 
   const char getVersion();
 
