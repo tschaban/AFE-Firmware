@@ -16,11 +16,13 @@ void AFEMQTT::begin() {
 
   Broker.setClient(esp);
   Serial << endl << "DEBUG: " << MQTTConfiguration.host[0];
-  //  if ((char)MQTTConfiguration.host[0] = "a") {
-  Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
-  //  } else {
-  Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
-  //}
+  if (strlen(MQTTConfiguration.host) > 0) {
+    Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
+  } else if (MQTTConfiguration.ip[0] > 0) {
+    Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+  } else {
+    isConfigured = false;
+  }
 
   Broker.setCallback(MQTTMessagesListener);
   sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);
@@ -30,55 +32,59 @@ void AFEMQTT::begin() {
 
 void AFEMQTT::connect() {
 
-  if (sleepMode) {
-    if (millis() - sleepStartTime >=
-        durationBetweenNextConnectionAttemptsSeries * 1000) {
-      sleepMode = false;
-    }
-  } else {
-
-    uint8_t connections = 0;
-
-    Serial << endl
-           << "INFO: Connecting to MQTT: " << MQTTConfiguration.host << ":"
-           << MQTTConfiguration.port << " " << MQTTConfiguration.user << "@"
-           << MQTTConfiguration.password;
-
-    while (!Broker.connected()) {
-      if (Broker.connect(deviceName, MQTTConfiguration.user,
-                         MQTTConfiguration.password)) {
-        Serial << endl << "INFO: Connected";
-        Serial << endl << "INFO: Subscribing to : " << mqttTopicForSubscription;
-        Broker.subscribe((char *)mqttTopicForSubscription);
-        Serial << endl << "INFO: Subsribed";
-        // Setting Relay state after connection to MQTT
-        if (!Relay.setRelayAfterRestoringMQTTConnection()) {
-          // Requesting state from MQTT Broker / service
-          publish(Relay.getMQTTTopic(), "get", "defaultState");
-        } else {
-          // Updating relay state after setting default value after MQTT
-          // connected
-          publish(Relay.getMQTTTopic(), "state",
-                  Relay.get() == RELAY_ON ? "ON" : "OFF");
-        }
-      } else {
-        connections++;
-        Serial << endl
-               << "INFO: MQTT Connection attempt: " << connections + 1
-               << " from " << noConnectionAttempts;
-        if (connections >= noConnectionAttempts) {
-          sleepMode = true;
-          sleepStartTime = millis();
-          Serial << endl
-                 << "WARN: Not able to connect to MQTT.Going to sleep mode for "
-                 << durationBetweenNextConnectionAttemptsSeries << "sec.";
-          break;
-        }
-        delay(durationBetweenConnectionAttempts * 1000);
-        Serial << ".";
+  if (isConfigured) {
+    if (sleepMode) {
+      if (millis() - sleepStartTime >=
+          durationBetweenNextConnectionAttemptsSeries * 1000) {
+        sleepMode = false;
       }
+    } else {
+
+      uint8_t connections = 0;
+
+      Serial << endl
+             << "INFO: Connecting to MQTT: " << MQTTConfiguration.host << ":"
+             << MQTTConfiguration.port << " " << MQTTConfiguration.user << "@"
+             << MQTTConfiguration.password;
+
+      while (!Broker.connected()) {
+        if (Broker.connect(deviceName, MQTTConfiguration.user,
+                           MQTTConfiguration.password)) {
+          Serial << endl << "INFO: Connected";
+          Serial << endl
+                 << "INFO: Subscribing to : " << mqttTopicForSubscription;
+          Broker.subscribe((char *)mqttTopicForSubscription);
+          Serial << endl << "INFO: Subsribed";
+          // Setting Relay state after connection to MQTT
+          if (!Relay.setRelayAfterRestoringMQTTConnection()) {
+            // Requesting state from MQTT Broker / service
+            publish(Relay.getMQTTTopic(), "get", "defaultState");
+          } else {
+            // Updating relay state after setting default value after MQTT
+            // connected
+            publish(Relay.getMQTTTopic(), "state",
+                    Relay.get() == RELAY_ON ? "ON" : "OFF");
+          }
+        } else {
+          connections++;
+          Serial << endl
+                 << "INFO: MQTT Connection attempt: " << connections + 1
+                 << " from " << noConnectionAttempts;
+          if (connections >= noConnectionAttempts) {
+            sleepMode = true;
+            sleepStartTime = millis();
+            Serial
+                << endl
+                << "WARN: Not able to connect to MQTT.Going to sleep mode for "
+                << durationBetweenNextConnectionAttemptsSeries << "sec.";
+            break;
+          }
+          delay(durationBetweenConnectionAttempts * 1000);
+          Serial << ".";
+        }
+      }
+      Serial << endl << "INFO: MQTT connection status: " << Broker.state();
     }
-    Serial << endl << "INFO: MQTT connection status: " << Broker.state();
   }
 }
 

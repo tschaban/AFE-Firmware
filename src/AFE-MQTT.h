@@ -34,6 +34,8 @@ private:
   uint8_t durationBetweenNextConnectionAttemptsSeries;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false;
+  boolean isConfigured =
+      true; // if it's falsed it does not connect to MQTT Broker
 
 public:
   /* Constructor: it sets all necessary parameters */
