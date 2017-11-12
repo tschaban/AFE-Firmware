@@ -14,7 +14,8 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Data-structures.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 #include <Streaming.h>
 
 /* Types of switch */
@@ -25,7 +26,6 @@
 class AFESwitch {
 
 private:
-
   SWITCH SwitchConfiguration;
   boolean state;
   boolean previousState; // Actually this stores current switch state
@@ -35,27 +35,29 @@ private:
   boolean pressed = false; // It's set to true once button pressed physically
   boolean _pressed = false;
 
-  boolean pressed4fiveSeconds =  false; // It's set to true when switch is pressed for 5s
-  boolean pressed4tenSeconds = false; // It's set to true when switch is pressed for 10s
+  boolean pressed4fiveSeconds =
+      false; // It's set to true when switch is pressed for 5s
+  boolean pressed4tenSeconds =
+      false; // It's set to true when switch is pressed for 10s
 
 public:
-
   /* Constructors */
   AFESwitch();
-  AFESwitch(SWITCH configuration);
+  AFESwitch(uint8_t id);
 
   /* Init switch */
-  void begin(SWITCH configuration);
+  void begin(uint8_t id);
 
-  /* Method: returns TRUE if state of the switch is pressed. It does not mean it has to be pressed physically (applicable for BiStable switch types */
+  /* Method: returns TRUE if state of the switch is pressed. It does not mean it
+   * has to be pressed physically (applicable for BiStable switch types */
   boolean getState();
 
   /* Method toggles switch state */
   void toggleState();
 
-  /* Method returns true if switch has been pressed. Sensitiveness it taken into account.
-   * It does not mean switch is pressed physically. Once True capture getState() method
-   * should be called to get the state of the Switch */
+  /* Method returns true if switch has been pressed. Sensitiveness it taken into
+   * account. It does not mean switch is pressed physically. Once True capture
+   * getState() method should be called to get the state of the Switch */
   boolean isPressed();
 
   /* Method returns true after switch is pressed for 5sec. */
