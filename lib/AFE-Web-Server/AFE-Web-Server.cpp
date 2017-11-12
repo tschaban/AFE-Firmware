@@ -87,8 +87,8 @@ void AFEWebServer::generate() {
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (getOptionName() == "help") {
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
+    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(),
+                                           getCommand() == 0 ? false : true));
     if (getCommand() == 1) {
       Device.reboot(MODE_CONFIGURATION);
     } else if (getCommand() == 2) {
