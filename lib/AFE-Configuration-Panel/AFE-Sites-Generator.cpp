@@ -101,7 +101,7 @@ page +=
       "<h4>INFORMACJE</h4>"
       "<ul class=\"lst\">"
       "<li class=\"itm\"><a "
-      "href=\"http://smart-house.adrian.czabanowski.com/firmware-afe/\" "
+      "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-pl/\" "
       "target=\"_blank\">Dokumentacja</a></li>"
       "<li class=\"itm\"><a "
       "href=\"http://smart-house.adrian.czabanowski.com/forum/"
@@ -110,7 +110,8 @@ page +=
       "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE\" "
       "target=\"_blank\">Licencja</a></li>"
       "<li class=\"itm\"><a "
-      "href=\"http://smart-house.adrian.czabanowski.com/firmware-afe/"
+      "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-pl/t0/"
+      "change-log"
       "historia-zmian/\" target=\"_blank\">Wersja ";
   page += configuration.version;
   page += " [T";
@@ -137,7 +138,7 @@ page +=
         "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
         "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
         "3aNonHosted\" target=\"_blank\"><img "
-        "src=\"https://adrian.czabanowski.com/images/PayPalsmall.png\" "
+        "src=\"https://adrian.czabanowski.com/images/paypal.png\" "
         "border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
   }
   page += "</div>"
