@@ -1,6 +1,8 @@
 #include "AFE-Sites-Generator.h"
 
-AFESitesGenerator::AFESitesGenerator() {}
+AFESitesGenerator::AFESitesGenerator() { refreshLanguage(); }
+
+void AFESitesGenerator::refreshLanguage() { language = Data.getLanguage(); }
 
 const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
@@ -64,11 +66,15 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"c\">"
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
-      "<h4 class=\"ltag\">dla urządzeń zbudowanych o ESP8266</h4>"
-      "<h4>MENU</h4>"
-      "<ul class=\"lst\">";
+      "<h4 class=\"ltag\">";
+  page += language == 0 ? "dla urządzeń zbudowanych o" : "for devices built on";
+  page += " ESP8266</h4>"
+          "<h4>MENU</h4>"
+          "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
-    page += "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja "
+    page += "<li class=\"itm\"><a href=\"\\?option=language\">Język / "
+            "Language</a></li>"
+            "<li class=\"itm\"><a href=\"\\?option=basic\">Konfiguracja "
             "podstawowa</a></li>"
             "<li class=\"itm\"><a href=\"\\?option=mqtt\">MQTT Broker</a></li>";
     /* @TODO DOMOTICZ
@@ -176,19 +182,43 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
   return page;
 }
 
+String AFESitesGenerator::addLanguageConfiguration() {
+
+  String body = "<fieldset>";
+  body += "<div class=\"cf\">";
+  body += "<label>Language / Język";
+  body += ": </label>";
+  body += "<select name=\"language\">";
+  body += "<option value=\"0\"";
+  body += language == 0 ? " selected=\"selected\"" : "";
+  body += ">Polski</option>";
+  body += "<option value=\"1\"";
+  body += language == 1 ? " selected=\"selected\"" : "";
+  body += ">English</option>";
+  body += "</select>";
+  body += "</div>";
+
+  String page = addConfigurationBlock("Language / Język",
+                                      "Choose Configuration Panel language / "
+                                      "Wybierz język Panelu Konfiguracyjnego",
+                                      body);
+  return page;
+}
+
 String AFESitesGenerator::addNetworkConfiguration() {
 
   NETWORK configuration;
   configuration = Data.getNetworkConfiguration();
 
-  String body =
-      "<fieldset>"
-      "<div class=\"cf\">"
-      "<label>Nazwa urządzenia</label>"
-      "<input name=\"hostname\" type=\"text\" maxlength=\"32\" value=\"";
+  String body = "<fieldset>"
+                "<div class=\"cf\">"
+                "<label>";
+  body += language == 0 ? "Nazwa urządzenia" : "Device name";
+  body += "</label>"
+          "<input name=\"hostname\" type=\"text\" maxlength=\"16\" value=\"";
   body += configuration.host;
   body += "\">"
-          "<span class=\"hint\">Max 32 znaki. Informacja wymagana</span>"
+          "<span class=\"hint\">Max 16 znaki. Informacja wymagana</span>"
           "</div>"
           "</fieldset>";
 

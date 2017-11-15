@@ -26,22 +26,28 @@ void AFEWebServer::generate() {
          << "INFO: Site : " << getOptionName()
          << " requested. Command :  " << getCommand();
 
-  if (getOptionName() == "basic") {
+  if (getOptionName() == "language") {
+    uint8_t data;
+    if (getCommand() == SERVER_CMD_SAVE) {
+      data = getLanguageData();
+    }
+    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(
+        getOptionName(), getCommand(), data));
+  } else if (getOptionName() == "basic") {
     NETWORK data;
     if (getCommand() == SERVER_CMD_SAVE) {
       data = getNetworkData();
     }
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
+    publishHTML(ConfigurationPanel.getBasicConfigurationSite(
+        getOptionName(), getCommand(), data));
 
-    /* @TODO For MQTT only*/
   } else if (getOptionName() == "mqtt") {
     MQTT data;
     if (getCommand() == SERVER_CMD_SAVE) {
       data = getMQTTData();
     }
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), data));
+    publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
+        getOptionName(), getCommand(), data));
     /* @TODO DOMOTICZ
   } else if (getOptionName() == "domoticz") {
     DOMOTICZ data;
@@ -57,8 +63,8 @@ void AFEWebServer::generate() {
       data1 = getRelayData(0);
       //  data2 = getRelayData(1);
     }
-    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
-                                           data2));
+    publishHTML(ConfigurationPanel.getRelayConfigurationSite(
+        getOptionName(), getCommand(), data1, data2));
   } /* @TODO DS18B20 else if (getOptionName() == "ds18b20") {
     DS18B20 data;
     if (getCommand() == SERVER_CMD_SAVE) {
@@ -73,8 +79,8 @@ void AFEWebServer::generate() {
       data1 = getSwitchData(0);
       //    data2 = getSwitchData(1);
     }
-    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(), data1,
-                                           data2));
+    publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
+        getOptionName(), getCommand(), data1, data2));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -334,6 +340,11 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   }
 
   return data;
+}
+
+uint8_t AFEWebServer::getLanguageData() {
+  return server.arg("language").length() > 0 ? server.arg("language").toInt()
+                                             : 1;
 }
 
 /* @TODO DS18B20

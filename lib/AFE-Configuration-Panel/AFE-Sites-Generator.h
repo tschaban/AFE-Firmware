@@ -26,6 +26,7 @@ private:
   AFEEEPROM Eeprom;
   AFEDataAccess Data;
   AFEDevice Device;
+  uint8_t language;
 
   const String generateMQTTHelp(const char *label, const char *topic,
                                 const char *command, const char *value);
@@ -33,6 +34,7 @@ private:
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESitesGenerator();
+  void refreshLanguage();
   String generateHTMLPage(String &page);
   String addConfigurationBlock(const String title, const String description,
                                const String body);
@@ -40,19 +42,19 @@ public:
   const char *generateFooter();
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
-
+  String addLanguageConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
-  // @TODO DOMOTICZ String addDomoticzConfiguration();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
-  // @TODO DS18B20 String addDS18B20Configuration();
   String addUpgradeSection();
   String addPostUpgradeSection(boolean status);
   String addResetSection(uint8_t command);
   String addExitSection();
   String addHelpSection();
   String addHelpMQTTTopicSection();
+  // @TODO DOMOTICZ String addDomoticzConfiguration();
+  // @TODO DS18B20 String addDS18B20Configuration();
 };
 
 #endif

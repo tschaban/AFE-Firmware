@@ -36,8 +36,29 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      NETWORK data) {
+String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
+                                                           uint8_t command,
+                                                           uint8_t language) {
+  Serial << endl << "INFO: Generating language configuration site";
+
+  if (command == SERVER_CMD_SAVE) {
+    AFEDataAccess save;
+    save.saveLanguage(language);
+    Site.refreshLanguage();
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=language&command=1\"  method=\"post\">";
+  page += Site.addLanguageConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"Zapisz\">";
+  page += "</form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getBasicConfigurationSite(const String option,
+                                                        uint8_t command,
+                                                        NETWORK data) {
 
   Serial << endl << "INFO: Generating Network configuration site";
 
@@ -56,8 +77,9 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
 }
 
 /* @TODO Only for MQTT */
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      MQTT data) {
+String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
+                                                       uint8_t command,
+                                                       MQTT data) {
 
   Serial << endl << "INFO: Generating MQTT configuration site";
 
@@ -96,8 +118,10 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
 }
 */
 
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      RELAY data1, RELAY data2) {
+String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
+                                                        uint8_t command,
+                                                        RELAY data1,
+                                                        RELAY data2) {
 
   Serial << endl << "INFO: Generating Relay configuration site";
 
@@ -117,8 +141,10 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      SWITCH data1, SWITCH data2) {
+String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
+                                                         uint8_t command,
+                                                         SWITCH data1,
+                                                         SWITCH data2) {
 
   Serial << endl << "INFO: Generating Switch configuration site";
 

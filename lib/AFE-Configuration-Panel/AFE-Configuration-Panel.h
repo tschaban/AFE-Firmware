@@ -30,17 +30,22 @@ public:
 
   /* It returns configuration site */
   String getSite(const String option, uint8_t command);
-  String getSite(const String option, uint8_t command, NETWORK data);
-  String getSite(const String option, uint8_t command, MQTT data);
+  String getSite(const String option, uint8_t command, boolean data);
+  String getBasicConfigurationSite(const String option, uint8_t command,
+                                   NETWORK data);
+  String getMQTTConfigurationSite(const String option, uint8_t command,
+                                  MQTT data);
+
+  String getRelayConfigurationSite(const String option, uint8_t command,
+                                   RELAY data1, RELAY data2);
+  String getSwitchConfigurationSite(const String option, uint8_t command,
+                                    SWITCH data1, SWITCH data2);
+  String getLanguageConfigurationSite(const String option, uint8_t command,
+                                      uint8_t language);
   // @TODO DOMOTICZ String getSite(const String option, uint8_t command,
   // DOMOTICZ data);
   // @TODO DS18B20 String getSite(const String option, uint8_t command, DS18B20
   // data);
-  String getSite(const String option, uint8_t command, boolean data);
-  String getSite(const String option, uint8_t command, RELAY data1,
-                 RELAY data2);
-  String getSite(const String option, uint8_t command, SWITCH data1,
-                 SWITCH data2);
   String firmwareUpgradeSite();
   String postFirmwareUpgradeSite(boolean status);
 };
