@@ -17,7 +17,7 @@ void AFEDefaults::set() {
 
   Serial << endl << "INFO: Setting defaults: firmware";
 
-  sprintf(firmwareConfiguration.version, "1.0.1");
+  sprintf(firmwareConfiguration.version, "1.0.2");
   firmwareConfiguration.type = 0;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");

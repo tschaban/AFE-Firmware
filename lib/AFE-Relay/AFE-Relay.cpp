@@ -10,11 +10,7 @@ void AFERelay::begin(uint8_t id) {
   _id = id;
   RelayConfiguration = Data.getRelayConfiguration(_id);
   pinMode(RelayConfiguration.gpio, OUTPUT);
-
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
-
-  Serial << endl << "INFO: Relay #" << id << " has been initialized";
-  Serial << endl << "INFO: Relay #" << id << " MQTT Topic: " << mqttTopic;
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
@@ -32,7 +28,6 @@ void AFERelay::on() {
       turnOffCounter = millis();
     }
     Data.saveRelayState(_id, RELAY_ON);
-    Serial << endl << "INFO: Relay set to ON";
   }
 }
 
@@ -41,7 +36,6 @@ void AFERelay::off() {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
     Data.saveRelayState(_id, RELAY_OFF);
-    Serial << endl << "INFO: Relay set to OFF";
   }
 }
 
@@ -69,11 +63,6 @@ boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
 }
 
 void AFERelay::setRelayAfterRestore(uint8_t option) {
-  Serial << endl << "DEBUG: Setting relay state";
-  Serial << endl
-         << " - Current state=" << get() << endl
-         << " - Saved=" << Data.getRelayState(_id) << endl
-         << " - Option=" << option;
   if (option == 1) {
     off();
   } else if (option == 2) {
@@ -83,15 +72,11 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 4) {
     Data.getRelayState(_id) == RELAY_ON ? off() : on();
   }
-  Serial << endl << " - New:" << Data.getRelayState(_id);
 }
 
 boolean AFERelay::autoTurnOff() {
   if (RelayConfiguration.timeToOff > 0 && get() == RELAY_ON &&
       millis() - turnOffCounter >= RelayConfiguration.timeToOff * 1000) {
-    Serial << endl
-           << "INFO: Automatically relay switched off after "
-           << (millis() - turnOffCounter) / 1000 << "sek.";
     off();
     return true;
   } else {

@@ -37,6 +37,12 @@ void setup() {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
+  // @TODO add checking present of a relay
+  if (Device.getMode() == MODE_NORMAL) {
+    Relay.begin(0);
+    Relay.setRelayAfterRestoringPower();
+  }
+
   Network.begin(Device.getMode());
 
   LEDConfiguration = Data.getLEDConfiguration();
@@ -54,12 +60,6 @@ void setup() {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
     Network.connect();
-
-    // @TODO add checking present of a relay
-    if (Device.getMode() == MODE_NORMAL) {
-      Relay.begin(0);
-      Relay.setRelayAfterRestoringPower();
-    }
   }
 
   WebServer.handle("/", handleHTTPRequests);
