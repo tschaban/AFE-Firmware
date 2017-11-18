@@ -12,6 +12,7 @@
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
+#include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
@@ -37,6 +38,13 @@ void setup() {
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
+
+  /* Perform post upgrade changes (if any) */
+  AFEUpgrader Upgrader;
+  if (Upgrader.upgraded()) {
+    Upgrader.upgrade();
+  }
+  Upgrader = {};
 
   /* Checking if WiFi is onfigured, if not than it runs access point mode */
   if (Device.getMode() != MODE_ACCESS_POINT && !Device.isConfigured()) {
