@@ -65,15 +65,12 @@ void setup() {
   Network.begin(Device.getMode());
 
   /* Initializing LED */
-  LED LEDConfiguration;
-  LEDConfiguration = Data.getLEDConfiguration();
-  if (LEDConfiguration.present) {
-    Led.begin(LEDConfiguration.gpio);
-    /* If device in configuration mode then start LED blinking */
-    if (Device.getMode() != MODE_NORMAL) {
-      Led.blinkingOn(100);
-    }
+  Led.begin(0);
+  /* If device in configuration mode then start LED blinking */
+  if (Device.getMode() != MODE_NORMAL) {
+    Led.blinkingOn(100);
   }
+
   /* Initializing Swich */
   SWITCH SwitchConfiguration;
   SwitchConfiguration = Data.getSwitchConfiguration(0);
