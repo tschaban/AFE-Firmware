@@ -7,10 +7,10 @@ AFESwitch::AFESwitch(uint8_t id) { begin(id); }
 void AFESwitch::begin(uint8_t id) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
-
   pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
+  Led.begin(0);
 }
 
 boolean AFESwitch::getState() { return state; }
@@ -19,6 +19,7 @@ void AFESwitch::toggleState() { state = !state; }
 
 boolean AFESwitch::isPressed() {
   if (pressed) {
+    Led.blink(50);
     pressed = false;
     return true;
   } else {
@@ -38,6 +39,7 @@ boolean AFESwitch::is5s() {
 boolean AFESwitch::is10s() {
   if (pressed4tenSeconds) {
     pressed4tenSeconds = false;
+    Led.blink(50);
     return true;
   } else {
     return false;
@@ -68,12 +70,18 @@ void AFESwitch::listener() {
           pressed4tenSeconds = true;
         }
 
+        if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
+          Led.blink(500);
+          _pressed4fiveSeconds = true;
+        }
+
       } else { // This is BI-stable code
         state = !state;
         previousState = currentState;
         pressed = true;
       }
     }
+
   } else if (currentState == previousState && startTime > 0) {
     if (SwitchConfiguration.type == SWITCH_TYPE_MONO &&
         time - startTime >= 5000 && time - startTime < 10000) {
@@ -82,5 +90,6 @@ void AFESwitch::listener() {
 
     startTime = 0;
     _pressed = false;
+    _pressed4fiveSeconds = false;
   }
 }

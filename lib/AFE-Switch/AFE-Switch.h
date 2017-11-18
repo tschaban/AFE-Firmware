@@ -16,6 +16,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-LED.h>
 #include <Streaming.h>
 
 /* Types of switch */
@@ -37,8 +38,10 @@ private:
 
   boolean pressed4fiveSeconds =
       false; // It's set to true when switch is pressed for 5s
+  boolean _pressed4fiveSeconds = false; // used to control LED
   boolean pressed4tenSeconds =
       false; // It's set to true when switch is pressed for 10s
+  AFELED Led;
 
 public:
   /* Constructors */
