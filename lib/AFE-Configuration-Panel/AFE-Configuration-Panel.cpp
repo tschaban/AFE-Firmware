@@ -32,15 +32,12 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   page += Site.generateFooter();
-
-  Serial << endl << "INFO: Site generated";
   return page;
 }
 
 String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
                                                            uint8_t command,
                                                            uint8_t lang) {
-  Serial << endl << "INFO: Generating language configuration site";
   String page;
   if (command == SERVER_CMD_SAVE) {
     Data.saveLanguage(lang);
@@ -62,8 +59,6 @@ String AFEConfigurationPanel::getBasicConfigurationSite(const String option,
                                                         uint8_t command,
                                                         NETWORK data) {
 
-  Serial << endl << "INFO: Generating Network configuration site";
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -82,9 +77,6 @@ String AFEConfigurationPanel::getBasicConfigurationSite(const String option,
 String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
                                                        uint8_t command,
                                                        MQTT data) {
-
-  Serial << endl << "INFO: Generating MQTT configuration site";
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -103,9 +95,6 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
                                                         uint8_t command,
                                                         RELAY data1,
                                                         RELAY data2) {
-
-  Serial << endl << "INFO: Generating Relay configuration site";
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(0, data1);
     //    Data.saveConfiguration(1, data2);
@@ -126,9 +115,6 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          uint8_t command,
                                                          SWITCH data1,
                                                          SWITCH data2) {
-
-  Serial << endl << "INFO: Generating Switch configuration site";
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(0, data1);
     //  Data.saveConfiguration(1, data2);
