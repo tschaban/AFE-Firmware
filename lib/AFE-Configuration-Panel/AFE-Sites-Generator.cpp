@@ -55,10 +55,6 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "gradient(transparent,rgba(0,0,0,0.05) "
       "40%,rgba(0,0,0,0.10));background-image:linear-gradient(transparent,rgba("
       "0,0,0,0.05) 40%,rgba(0,0,0,0.10))}</style>"
-      "<script type=\"text/javascript\">"
-      "hide=function(e){document.getElementById(e).style.display='none';};"
-      "show=function(e){document.getElementById(e).style.display='inline';};"
-      "</script>"
       "</head>"
       "<body>"
       "<div id=\"c\">"
@@ -171,7 +167,7 @@ page +=
 }
 
 const char *AFESitesGenerator::generateFooter() {
-  return "</div></body></html>";
+  return "</div></div></body></html>";
 }
 
 String AFESitesGenerator::addConfigurationBlock(const String title,
