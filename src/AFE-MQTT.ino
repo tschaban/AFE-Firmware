@@ -1,3 +1,10 @@
+/*
+  AFE Firmware for smart home devices build on ESP8266
+  Version: T0
+  More info: https://github.com/tschaban/AFE-Firmware
+  LICENCE: http://opensource.org/licenses/MIT
+*/
+
 #include "AFE-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
@@ -15,12 +22,9 @@ void AFEMQTT::begin() {
       NetworkConfiguration.waitTimeSeries;
 
   Broker.setClient(esp);
-  Serial << endl << "DEBUG: " << MQTTConfiguration.host[0];
   if (strlen(MQTTConfiguration.host) > 0) {
-    Serial << endl << "INFO: MQTT configured using host name ";
     Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
   } else if (MQTTConfiguration.ip[0] > 0) {
-    Serial << endl << "INFO: MQTT configured using IP";
     Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
   } else {
     isConfigured = false;
@@ -41,24 +45,31 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-
       uint8_t connections = 0;
-
-      Serial << endl
-             << "INFO: Connecting to MQTT: " << MQTTConfiguration.host
-             << MQTTConfiguration.ip[0] << "." << MQTTConfiguration.ip[1] << "."
-             << MQTTConfiguration.ip[2] << "." << MQTTConfiguration.ip[3] << ":"
-             << MQTTConfiguration.port << " " << MQTTConfiguration.user << "@"
-             << MQTTConfiguration.password;
-
+      /*
+            Serial << endl
+                   << "INFO: Connecting to MQTT: " << MQTTConfiguration.host
+                   << MQTTConfiguration.ip[0] << "." << MQTTConfiguration.ip[1]
+         << "."
+                   << MQTTConfiguration.ip[2] << "." << MQTTConfiguration.ip[3]
+         << ":"
+                   << MQTTConfiguration.port << " " << MQTTConfiguration.user <<
+         "@"
+                   << MQTTConfiguration.password;
+      */
       while (!Broker.connected()) {
         if (Broker.connect(deviceName, MQTTConfiguration.user,
                            MQTTConfiguration.password)) {
-          Serial << endl << "INFO: Connected";
-          Serial << endl
-                 << "INFO: Subscribing to : " << mqttTopicForSubscription;
+          /*
+                    Serial << endl << "INFO: Connected";
+                    Serial << endl
+                           << "INFO: Subscribing to : " <<
+             mqttTopicForSubscription;
+          */
           Broker.subscribe((char *)mqttTopicForSubscription);
-          Serial << endl << "INFO: Subsribed";
+          /*
+                      Serial << endl << "INFO: Subsribed";
+          */
           // Setting Relay state after connection to MQTT
           if (!Relay.setRelayAfterRestoringMQTTConnection()) {
             // Requesting state from MQTT Broker / service
@@ -71,23 +82,31 @@ void AFEMQTT::connect() {
           }
         } else {
           connections++;
-          Serial << endl
-                 << "INFO: MQTT Connection attempt: " << connections + 1
-                 << " from " << noConnectionAttempts;
+          /*
+                    Serial << endl
+                           << "INFO: MQTT Connection attempt: " << connections +
+             1
+                           << " from " << noConnectionAttempts;
+          */
           if (connections >= noConnectionAttempts) {
             sleepMode = true;
             sleepStartTime = millis();
-            Serial
-                << endl
-                << "WARN: Not able to connect to MQTT.Going to sleep mode for "
-                << durationBetweenNextConnectionAttemptsSeries << "sec.";
+            /*
+                        Serial
+                            << endl
+                            << "WARN: Not able to connect to MQTT.Going to sleep
+               mode for "
+                            << durationBetweenNextConnectionAttemptsSeries <<
+               "sec.";
+            */
             break;
           }
           delay(durationBetweenConnectionAttempts * 1000);
-          Serial << ".";
+          /* Serial << "."; */
         }
       }
-      Serial << endl << "INFO: MQTT connection status: " << Broker.state();
+      /* Serial << endl << "INFO: MQTT connection status: " << Broker.state();
+       */
     }
   }
 }
@@ -121,9 +140,8 @@ void AFEMQTT::publish(const char *topic, const char *type,
 
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-    Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " << message;
+    //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
+    //  message;
     Broker.publish(topic, message);
-  } else {
-    Serial << endl << "WARN: MQTT not connected. State:  " << Broker.state();
   }
 }

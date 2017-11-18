@@ -19,24 +19,27 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
   configuration.waitTimeConnections = Eeprom.readUInt8(226);
   configuration.waitTimeSeries = Eeprom.readUInt8(227);
 
-  Serial << endl << "INFO: Requested : Network configuration";
-  Serial << endl << "   - WiFi SSID : " << configuration.ssid;
-  Serial << endl << "   - WiFi Password : " << configuration.password;
-  Serial << endl << "   - Host name : " << configuration.host;
-  Serial << endl << "   - LAN by DHCP? : " << configuration.isDHCP;
-  Serial << endl << "   - IP : " << configuration.ip;
-  Serial << endl << "   - Gateway : " << configuration.gateway;
-  Serial << endl << "   - Subnet : " << configuration.subnet;
-  Serial << endl
-         << "   - Number of connection attempts : "
-         << configuration.noConnectionAttempts;
-  Serial << endl
-         << "   - Duration between connecton attempts : "
-         << configuration.waitTimeConnections;
-  Serial << endl
-         << "   - Duration between next connection attempts series : "
-         << configuration.waitTimeSeries;
+  /*
 
+    Serial << endl << "INFO: Requested : Network configuration";
+    Serial << endl << "   - WiFi SSID : " << configuration.ssid;
+    Serial << endl << "   - WiFi Password : " << configuration.password;
+    Serial << endl << "   - Host name : " << configuration.host;
+    Serial << endl << "   - LAN by DHCP? : " << configuration.isDHCP;
+    Serial << endl << "   - IP : " << configuration.ip;
+    Serial << endl << "   - Gateway : " << configuration.gateway;
+    Serial << endl << "   - Subnet : " << configuration.subnet;
+    Serial << endl
+           << "   - Number of connection attempts : "
+           << configuration.noConnectionAttempts;
+    Serial << endl
+           << "   - Duration between connecton attempts : "
+           << configuration.waitTimeConnections;
+    Serial << endl
+           << "   - Duration between next connection attempts series : "
+           << configuration.waitTimeSeries;
+
+  */
   return configuration;
 }
 
@@ -54,40 +57,17 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   Eeprom.read(333, 32).toCharArray(configuration.topic,
                                    sizeof(configuration.topic));
 
-  Serial << endl << "INFO: Requested : MQTT Broker";
-  Serial << endl << "    - Host : " << configuration.host;
-  Serial << endl << "    - IP : " << configuration.ip;
-  Serial << endl << "    - Port : " << configuration.port;
-  Serial << endl << "    - User : " << configuration.user;
-  Serial << endl << "    - Password : " << configuration.password;
-  Serial << endl << "    - Topic : " << configuration.topic;
-
+  /*
+    Serial << endl << "INFO: Requested : MQTT Broker";
+    Serial << endl << "    - Host : " << configuration.host;
+    Serial << endl << "    - IP : " << configuration.ip;
+    Serial << endl << "    - Port : " << configuration.port;
+    Serial << endl << "    - User : " << configuration.user;
+    Serial << endl << "    - Password : " << configuration.password;
+    Serial << endl << "    - Topic : " << configuration.topic;
+  */
   return configuration;
 }
-
-/* @TODO DOMOTICZ
-DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
-  DOMOTICZ configuration;
-
-  Eeprom.read(228, 32).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(260);
-  configuration.port = Eeprom.read(264, 5).toInt();
-  Eeprom.read(269, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
-  Eeprom.read(301, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
-
-  Serial << endl << "INFO: Requested : Domoticz";
-  Serial << endl << "    - Host : " << configuration.host;
-  Serial << endl << "    - IP : " << configuration.ip;
-  Serial << endl << "    - Port : " << configuration.port;
-  Serial << endl << "    - User : " << configuration.user;
-  Serial << endl << "    - Password : " << configuration.password;
-
-  return configuration;
-}
-*/
 
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
@@ -115,6 +95,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
     configuration.idx = Eeprom.read(376 + id * next, 5).toInt();
     configuration.publishToDomoticz = Eeprom.readUInt8(382 + id * next);
 */
+
+  /* DEBUG
   Serial << endl << "INFO: Requested : Relay : ";
   Serial << endl << "    - Present : " << configuration.present;
   Serial << endl << "    - GPIO : " << configuration.gpio;
@@ -127,7 +109,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
          << "    - Relay state after mqtt connected : "
          << configuration.stateMQTTConnected;
   Serial << endl << "    - Relay mqtt topic : " << configuration.mqttTopic;
-
+*/
   return configuration;
 }
 
@@ -139,34 +121,16 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(395 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(396 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(399 + id * nextSwitch);
-  Serial << endl << "INFO: Requested : Switch : ";
-  Serial << endl << "    - Present : " << configuration.present;
-  Serial << endl << "    - GPIO : " << configuration.gpio;
-  Serial << endl << "    - Type : " << configuration.type;
-  Serial << endl << "    - Sensitiveness : " << configuration.sensitiveness;
-  Serial << endl << "    - Functionality : " << configuration.functionality;
+  /* DEBUG
+    Serial << endl << "INFO: Requested : Switch : ";
+    Serial << endl << "    - Present : " << configuration.present;
+    Serial << endl << "    - GPIO : " << configuration.gpio;
+    Serial << endl << "    - Type : " << configuration.type;
+    Serial << endl << "    - Sensitiveness : " << configuration.sensitiveness;
+    Serial << endl << "    - Functionality : " << configuration.functionality;
+  */
   return configuration;
 }
-
-/* @TODO DS18B20
-DS18B20 AFEDataAccess::getDS18B20Configuration() {
-  DS18B20 configuration;
-
-  configuration.present = Eeprom.read(400);
-  configuration.gpio = Eeprom.readUInt8(401);
-  configuration.correction = Eeprom.read(402, 5).toFloat();
-  configuration.interval = Eeprom.read(407, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(412);
-  Serial << endl << "INFO: Requested : DS18B20 : ";
-  Serial << endl << "    - Present : " << configuration.present;
-  Serial << endl << "    - GPIO : " << configuration.gpio;
-  Serial << endl << "    - Correction by : " << configuration.correction;
-  Serial << endl << "    - Read interval : " << configuration.interval;
-  Serial << endl << "    - Unit : " << configuration.unit;
-  return configuration;
-}
-
-*/
 
 FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
   FIRMWARE configuration;
@@ -177,13 +141,13 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
                                    sizeof(configuration.upgradeURL));
   configuration.type = Eeprom.readUInt8(7);
   configuration.autoUpgrade = Eeprom.readUInt8(27);
-
-  Serial << endl << "INFO: Requested : Firmware info";
-  Serial << endl << " - Version : " << configuration.version;
-  Serial << endl << " - Firmware type : " << configuration.type;
-  Serial << endl << " - Auto update : " << configuration.autoUpgrade;
-  Serial << endl << " - Update url : " << configuration.upgradeURL;
-
+  /* DEBUG
+    Serial << endl << "INFO: Requested : Firmware info";
+    Serial << endl << " - Version : " << configuration.version;
+    Serial << endl << " - Firmware type : " << configuration.type;
+    Serial << endl << " - Auto update : " << configuration.autoUpgrade;
+    Serial << endl << " - Update url : " << configuration.upgradeURL;
+  */
   return configuration;
 }
 
@@ -191,11 +155,11 @@ LED AFEDataAccess::getLEDConfiguration() {
   LED configuration;
   configuration.present = Eeprom.read(365);
   configuration.gpio = Eeprom.readUInt8(366);
-
-  Serial << endl << "INFO: Requested : LED : ";
-  Serial << endl << "    - Present : " << configuration.present;
-  Serial << endl << "    - gpio : " << configuration.gpio;
-
+  /* DEBUG
+    Serial << endl << "INFO: Requested : LED : ";
+    Serial << endl << "    - Present : " << configuration.present;
+    Serial << endl << "    - gpio : " << configuration.gpio;
+  */
   return configuration;
 }
 
@@ -221,15 +185,6 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Eeprom.write(333, 32, configuration.topic);
 }
 
-/* @TODO DOMOTICZ
-void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
-  Eeprom.write(228, 32, configuration.host);
-  Eeprom.writeIP(260, configuration.ip);
-  Eeprom.write(264, 5, (long)configuration.port);
-  Eeprom.write(269, 32, configuration.user);
-  Eeprom.write(301, 32, configuration.password);
-}
-*/
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 26;
   Eeprom.write(367 + id * nextRelay, configuration.present);
@@ -303,8 +258,54 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-boolean AFEDataAccess::isDebuggable() {
-  return true; // Eeprom.read(25); @TODO enable debugger configuration
+/* @TODO DOMOTICZ
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+  DOMOTICZ configuration;
+
+  Eeprom.read(228, 32).toCharArray(configuration.host,
+                                   sizeof(configuration.host));
+  configuration.ip = Eeprom.readIP(260);
+  configuration.port = Eeprom.read(264, 5).toInt();
+  Eeprom.read(269, 32).toCharArray(configuration.user,
+                                   sizeof(configuration.user));
+  Eeprom.read(301, 32).toCharArray(configuration.password,
+                                   sizeof(configuration.password));
+
+  Serial << endl << "INFO: Requested : Domoticz";
+  Serial << endl << "    - Host : " << configuration.host;
+  Serial << endl << "    - IP : " << configuration.ip;
+  Serial << endl << "    - Port : " << configuration.port;
+  Serial << endl << "    - User : " << configuration.user;
+  Serial << endl << "    - Password : " << configuration.password;
+
+  return configuration;
+}
+*/
+/* @TODO DS18B20
+DS18B20 AFEDataAccess::getDS18B20Configuration() {
+  DS18B20 configuration;
+
+  configuration.present = Eeprom.read(400);
+  configuration.gpio = Eeprom.readUInt8(401);
+  configuration.correction = Eeprom.read(402, 5).toFloat();
+  configuration.interval = Eeprom.read(407, 5).toInt();
+  configuration.unit = Eeprom.readUInt8(412);
+  Serial << endl << "INFO: Requested : DS18B20 : ";
+  Serial << endl << "    - Present : " << configuration.present;
+  Serial << endl << "    - GPIO : " << configuration.gpio;
+  Serial << endl << "    - Correction by : " << configuration.correction;
+  Serial << endl << "    - Read interval : " << configuration.interval;
+  Serial << endl << "    - Unit : " << configuration.unit;
+  return configuration;
 }
 
-void AFEDataAccess::setDebuggable(boolean state) { Eeprom.write(25, state); }
+*/
+/* @TODO DOMOTICZ
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+  Eeprom.write(228, 32, configuration.host);
+  Eeprom.writeIP(260, configuration.ip);
+  Eeprom.write(264, 5, (long)configuration.port);
+  Eeprom.write(269, 32, configuration.user);
+  Eeprom.write(301, 32, configuration.password);
+}
+*/

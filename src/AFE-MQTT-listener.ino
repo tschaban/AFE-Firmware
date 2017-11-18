@@ -1,3 +1,11 @@
+/*
+  AFE Firmware for smart home devices build on ESP8266
+  Version: T0
+  MQTT Messages listener
+  More info: https://github.com/tschaban/AFE-Firmware
+  LICENCE: http://opensource.org/licenses/MIT
+*/
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
 #else

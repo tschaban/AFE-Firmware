@@ -21,8 +21,6 @@ void AFEWiFi::begin(uint8_t mode) {
 
   WiFi.hostname(networkConfiguration.host);
   if (mode == MODE_ACCESS_POINT) {
-    Serial << endl << "INFO: Device mode: Access Point Configuration";
-    Serial << endl << "INFO: launching access point";
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
@@ -30,7 +28,6 @@ void AFEWiFi::begin(uint8_t mode) {
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
     dnsServer.start(53, "www.example.com", apIP);
-    Serial << endl << "INFO: Open: http://192.168.5.1/  ";
   } else {
     if (!networkConfiguration.isDHCP) {
       WiFi.config(networkConfiguration.ip, networkConfiguration.gateway,
@@ -50,12 +47,14 @@ void AFEWiFi::connect() {
   } else {
     uint8_t connections = 0;
     WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
-    Serial << endl << "INFO: WiFi connection status: " << WiFi.status();
     while (WiFi.status() != WL_CONNECTED) {
       Led.on();
-      Serial << endl
-             << "INFO: WiFi connection attempt: " << connections + 1 << " from "
-             << networkConfiguration.noConnectionAttempts;
+      /*
+            Serial << endl
+                   << "INFO: WiFi connection attempt: " << connections + 1 << "
+         from "
+                   << networkConfiguration.noConnectionAttempts;
+      */
       connections++;
       delay(networkConfiguration.waitTimeConnections * 500);
       Led.off();
@@ -64,9 +63,11 @@ void AFEWiFi::connect() {
         sleepMode = true;
         WiFi.disconnect();
         sleepStartTime = millis();
-        Serial << endl
-               << "WARN: Not able to connect.Going to sleep mode for "
-               << networkConfiguration.waitTimeSeries << "sec.";
+        /*
+                Serial << endl
+                       << "WARN: Not able to connect.Going to sleep mode for "
+                       << networkConfiguration.waitTimeSeries << "sec.";
+        */
         break;
       }
     }

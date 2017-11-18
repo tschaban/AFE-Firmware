@@ -21,11 +21,6 @@ void AFEWebServer::handle(const char *uri,
 
 void AFEWebServer::generate() {
   /* @TODO this method is not writen well */
-
-  Serial << endl
-         << "INFO: Site : " << getOptionName()
-         << " requested. Command :  " << getCommand();
-
   if (getOptionName() == "language") {
     uint8_t data;
     if (getCommand() == SERVER_CMD_SAVE) {
@@ -128,9 +123,6 @@ uint8_t AFEWebServer::getCommand() {
 }
 
 NETWORK AFEWebServer::getNetworkData() {
-
-  Serial << endl << "INFO: Reading network data";
-
   NETWORK data;
   if (server.arg("wifi_ssid").length() > 0) {
     server.arg("wifi_ssid").toCharArray(data.ssid, sizeof(data.ssid));
@@ -193,11 +185,7 @@ NETWORK AFEWebServer::getNetworkData() {
 
 /* @TODO For MQTT only*/
 MQTT AFEWebServer::getMQTTData() {
-
   MQTT data;
-
-  Serial << endl << "INFO: Reading mqtt data";
-
   if (server.arg("mqtt_host").length() > 0) {
     server.arg("mqtt_host").toCharArray(data.host, sizeof(data.host));
   }
@@ -232,45 +220,7 @@ MQTT AFEWebServer::getMQTTData() {
   return data;
 }
 
-/* @TODO DOMOTICZ
-DOMOTICZ AFEWebServer::getDomoticzData() {
-  DOMOTICZ data;
-
-  Serial << endl << "INFO: Reading domoticz data";
-
-  if (server.arg("domoticz_host").length() > 0) {
-    server.arg("domoticz_host").toCharArray(data.host, sizeof(data.host));
-  }
-
-  if (server.arg("domoticz_ip1").length() > 0 &&
-      server.arg("domoticz_ip2").length() > 0 &&
-      server.arg("domoticz_ip3").length() > 0 &&
-      server.arg("domoticz_ip4").length() > 0) {
-
-    data.ip = IPAddress(
-        server.arg("domoticz_ip1").toInt(), server.arg("domoticz_ip2").toInt(),
-        server.arg("domoticz_ip3").toInt(), server.arg("domoticz_ip4").toInt());
-  }
-
-  if (server.arg("domoticz_port").length() > 0) {
-    data.port = server.arg("domoticz_port").toInt();
-  }
-
-  if (server.arg("domoticz_user").length() > 0) {
-    server.arg("domoticz_user").toCharArray(data.user, sizeof(data.user));
-  }
-
-  if (server.arg("domoticz_password").length() > 0) {
-    server.arg("domoticz_password")
-        .toCharArray(data.password, sizeof(data.password));
-  }
-  return data;
-}
-*/
 RELAY AFEWebServer::getRelayData(uint8_t id) {
-
-  Serial << endl << "INFO:  Reading relay  data";
-
   RELAY data;
 
   if (server.arg("relay" + String(id) + "_present").length() > 0) {
@@ -317,9 +267,6 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 }
 
 SWITCH AFEWebServer::getSwitchData(uint8_t id) {
-
-  Serial << endl << "INFO:  Reading switch data";
-
   SWITCH data;
   if (server.arg("switch" + String(id) + "_present").length() > 0) {
     data.present = true;
@@ -354,9 +301,6 @@ uint8_t AFEWebServer::getLanguageData() {
 
 /* @TODO DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
-
-  Serial << endl << "INFO: Reading ds18b20 data";
-
   DS18B20 data;
 
   if (server.arg("ds18b20_present").length() > 0) {
@@ -379,6 +323,39 @@ DS18B20 AFEWebServer::getDS18B20Data() {
 
   if (server.arg("ds18b20_unit").length() > 0) {
     data.unit = server.arg("ds18b20_unit").toInt();
+  }
+  return data;
+}
+*/
+/* @TODO DOMOTICZ
+DOMOTICZ AFEWebServer::getDomoticzData() {
+  DOMOTICZ data;
+
+  if (server.arg("domoticz_host").length() > 0) {
+    server.arg("domoticz_host").toCharArray(data.host, sizeof(data.host));
+  }
+
+  if (server.arg("domoticz_ip1").length() > 0 &&
+      server.arg("domoticz_ip2").length() > 0 &&
+      server.arg("domoticz_ip3").length() > 0 &&
+      server.arg("domoticz_ip4").length() > 0) {
+
+    data.ip = IPAddress(
+        server.arg("domoticz_ip1").toInt(), server.arg("domoticz_ip2").toInt(),
+        server.arg("domoticz_ip3").toInt(), server.arg("domoticz_ip4").toInt());
+  }
+
+  if (server.arg("domoticz_port").length() > 0) {
+    data.port = server.arg("domoticz_port").toInt();
+  }
+
+  if (server.arg("domoticz_user").length() > 0) {
+    server.arg("domoticz_user").toCharArray(data.user, sizeof(data.user));
+  }
+
+  if (server.arg("domoticz_password").length() > 0) {
+    server.arg("domoticz_password")
+        .toCharArray(data.password, sizeof(data.password));
   }
   return data;
 }

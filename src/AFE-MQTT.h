@@ -1,6 +1,7 @@
 /*
-  MQTT component
   AFE Firmware for smart home devices build on ESP8266
+  Version: T0
+  MQTT class
   More info: https://github.com/tschaban/AFE-Firmware
   LICENCE: http://opensource.org/licenses/MIT
 */
@@ -24,9 +25,6 @@ class AFEMQTT {
 private:
   WiFiClient esp;
   PubSubClient Broker;
-
-  //  MQTT MQTTConfiguration;
-
   char mqttTopicForSubscription[34];
   char deviceName[32];
   uint8_t noConnectionAttempts;

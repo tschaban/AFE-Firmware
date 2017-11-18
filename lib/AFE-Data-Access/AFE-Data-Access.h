@@ -53,8 +53,5 @@ public:
 
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
-
-  boolean isDebuggable();
-  void setDebuggable(boolean state);
 };
 #endif
