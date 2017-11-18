@@ -33,6 +33,11 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getLanguageConfigurationSite(
         getOptionName(), getCommand(), data));
+
+    if (getCommand() == SERVER_CMD_SAVE) {
+      Device.reboot(Device.getMode());
+    }
+
   } else if (getOptionName() == "basic") {
     NETWORK data;
     if (getCommand() == SERVER_CMD_SAVE) {

@@ -34,7 +34,7 @@ private:
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESitesGenerator();
-  void refreshLanguage();
+
   String generateHTMLPage(String &page);
   String addConfigurationBlock(const String title, const String description,
                                const String body);
