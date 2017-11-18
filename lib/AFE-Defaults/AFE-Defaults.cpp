@@ -2,7 +2,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getVersion() { return "1.0rc2"; }
+const char *AFEDefaults::getVersion() { return "1.0rc3"; }
 
 void AFEDefaults::set() {
 
