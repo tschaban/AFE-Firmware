@@ -26,6 +26,7 @@ private:
 public:
   AFEDefaults();
   void set();
+  const char *getVersion();
   void eraseConfiguration();
 };
 #endif

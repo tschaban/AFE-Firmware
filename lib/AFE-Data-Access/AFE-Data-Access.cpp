@@ -232,9 +232,11 @@ void AFEDataAccess::saveConfiguration(LED configuration) {
 
 const char AFEDataAccess::getVersion() {
   char version[7];
-  sprintf(version, "1.0.0");
+  Eeprom.read(0, 7).toCharArray(version, sizeof(version));
   return *version;
 }
+
+void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
 
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   uint8_t nextRelay = 26;

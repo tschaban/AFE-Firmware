@@ -44,6 +44,7 @@ public:
   // @TODO DS18B20 void saveConfiguration(DS18B20 configuration);
 
   const char getVersion();
+  void saveVersion(String version);
 
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);

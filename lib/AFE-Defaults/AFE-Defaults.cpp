@@ -2,6 +2,8 @@
 
 AFEDefaults::AFEDefaults() {}
 
+const char *AFEDefaults::getVersion() { return "1.0.0"; }
+
 void AFEDefaults::set() {
 
   AFEDataAccess *Data;
@@ -15,7 +17,7 @@ void AFEDefaults::set() {
   // @TODO DOMOTICZ DomoticzConfiguration;
   // @TODO DS18B20 DS18B20Configuration;
 
-  sprintf(firmwareConfiguration.version, "1.0.2");
+  sprintf(firmwareConfiguration.version, getVersion());
   firmwareConfiguration.type = 0;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
