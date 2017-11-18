@@ -98,7 +98,7 @@ page +=
     page += "<li class=\"itm\"><a href=\"\\?option=help&command=1\">";
     page += language == 0 ? "Ustawienia" : "Settings";
     page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&command=2\">";
-    page += language == 0 ? "Ustawiania (tryb:" : "Settings (mode:";
+    page += language == 0 ? "Ustawienia (tryb:" : "Settings (mode:";
     page += " Access Point)";
   }
   page += "</a></li></ul><br><br><h4>INFORMA";
@@ -134,22 +134,21 @@ page +=
     page += "</h4><p class=\"cm\">";
     page += language == 0
                 ? "Oprogramowanie dostępne jest za darmo w ramach licencji "
-                : "Software is available for free within the terms of ";
+                : "Software is available for free within terms of ";
     page += " <a "
             "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
             "LICENSE\" "
             "target=\"_blank\"  style=\"color:#fff\">MIT</a>";
     page += language == 1 ? " licence" : "";
     page += "</p><p class=\"cm\">";
-    page +=
-        language == 0
-            ? "Jeśli spełnia Twoje oczekiwania to rozważ wsparcie"
-            : "If it meets your expectations then consider donation to it's";
+    page += language == 0 ? "Jeśli spełnia Twoje oczekiwania to rozważ wsparcie"
+                          : "If the firmware meets your expectations then "
+                            "consider donation to it's";
     page += " <a href=\"https://adrian.czabanowski.com\" "
             "target=\"_blank\" style=\"color:#fff\">aut";
     page += language == 0 ? "ora" : "hor";
     page += "</a>. ";
-    page += language == 0 ? "Z góry dzięki" : "Thanks in advance";
+    page += language == 0 ? "Z góry dziękuję" : "Thank you";
     page += "</p>";
     page +=
         "<a "
@@ -213,8 +212,8 @@ String AFESitesGenerator::addLanguageConfiguration() {
   body += "</div>";
 
   String page = addConfigurationBlock("Language / Język",
-                                      "Choose Configuration Panel language / "
-                                      "Wybierz język Panelu Konfiguracyjnego",
+                                      "Choose language / "
+                                      "Wybierz język",
                                       body);
   return page;
 }
@@ -239,14 +238,15 @@ String AFESitesGenerator::addNetworkConfiguration() {
           "</fieldset>";
 
   String page = addConfigurationBlock(
-      language == 0 ? "Nawa urządzenie" : "Device name",
+      language == 0 ? "Nazwa urządzenia" : "Device name",
       language == 0
           ? "Nazwa jest wykorzystywana jako nazwa hosta w Twojej "
             "lokalnej sieci WiFi "
-            "oraz jako nazwa punktu dostępowego WiFi dla "
+            "oraz jako nazwa punktu dostępowego WiFi do "
             "konfiguracji urządzenia"
-          : "Device name is used as its hostname within your LAN "
-            "and device's Access Point name to connect to Configuration Panel",
+          : "Device name is used within your LAN as the device's hostname "
+            "and device's Access Point name which allows to connect to "
+            "Configuration Panel",
       body);
 
   body = "<fieldset>";
@@ -276,8 +276,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "</fieldset>";
 
   page += addConfigurationBlock(
-      language == 0 ? "Konfiguracja dostępu do sieci WiFi"
-                    : "WiFi network configuration",
+      language == 0 ? "Konfiguracja dostępu do sieci WiFi" : "WiFi network",
       language == 0 ? "Urządzenie bez dostępu do sieci WiFi będzie "
                       "działać tylko w trybie sterowania ręcznego"
                     : "Device without access to WiFi network will only work in "
@@ -364,17 +363,17 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "</fieldset>";
 
   page += addConfigurationBlock(
-      language == 0 ? "Ustawienia sieci" : "Network configuration",
-      language == 0 ? "Możesz skonfigurowac siec ręcznie lub automatycznie za "
-                      "pośrednictwem DHCP"
-                    : "You can set up manual or automatic network "
-                      "configuration over DHCP",
+      language == 0 ? "Adres IP urządzenia" : "Device's IP address",
+      language == 0 ? "Możesz skonfigurować adres IP urządzenia ręcznie lub "
+                      "automatycznie za pośrednictwem DHCP"
+                    : "You can set up device's IP address manually or "
+                      "automatically by DHCP",
       body);
 
   body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Ilośc prób łączania się"
+  body += language == 0 ? "Ilość prób łączenia się"
                         : "Number of connection attempts";
   body += "*</label>";
   body += "<input name=\"no_connection_attempts\" type=\"number\" "
@@ -398,7 +397,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Czas po jakim powtórzyc próby łaczenia się"
+  body += language == 0 ? "Czas po jakim powtórzyć próby łączenia się"
                         : "Sleep time before next connection attempts";
   body += "*</label>";
   body += "<input type=\"number\" name=\"wait_time_series\" maxlength=\"3\" "
@@ -414,9 +413,10 @@ String AFESitesGenerator::addNetworkConfiguration() {
   page += addConfigurationBlock(
       language == 0 ? "Konfiguracja nawiązywania połączeń z siecią WiFi"
                     : "Network connection's configuration",
-      language == 0 ? "Zaawansowane ustawienia dotyczące łączeniem "
-                      "się do sieci WiFi oraz MQTT Brokera"
-                    : "Advanced configuration of network connections process",
+      language == 0
+          ? "Zaawansowane ustawienia dotyczące łączenia "
+            "się do sieci WiFi oraz MQTT Brokera"
+          : "Advanced configuration of the network connections process",
       body);
 
   return page;
@@ -429,7 +429,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
-  body += "<label>Broker hostname</label>";
+  body += "<label>Hostname</label>";
   body += "<input name=\"mqtt_host\" type=\"text\" maxlength=\"32\" value=\"";
   body += configuration.host;
   body += "\">";
@@ -439,7 +439,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Adres IP Brokera" : "Broker IP address";
+  body += language == 0 ? "Adres IP" : "IP address";
   body += "</label>";
   body += "<input name=\"mqtt_ip1\" type=\"number\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
@@ -496,7 +496,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
           "maxlength=\"32\" value=\"";
   body += configuration.topic;
   body += "\">";
-  body += "<span class=\"hint\">Format /abc/def/. Max 32 ";
+  body += "<span class=\"hint\">Format <strong>/abc/def/</strong>. Max 32 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
@@ -505,9 +505,9 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   return addConfigurationBlock(
       "MQTT Broker",
       language == 0 ? "Urządzenie bez skonfigurowanego MQTT Brokera "
-                      "może być sterowany tylko ręcznie. Wprowadź "
+                      "może być sterowane tylko ręcznie. Wprowadź "
                       "adres hosta np. localhost lub adres IP"
-                    : "Device without MQTT Broker configured can be only "
+                    : "Device without MQTT Broker configured can only be "
                       "controled manually. Enter MQTT Broker hostname or its "
                       "IP address",
       body);
@@ -524,7 +524,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
           "_present\" type=\"checkbox\" value=\"1\"";
   body += (configuration.present ? " checked=\"checked\"" : "");
   body += "> ";
-  body += language == 0 ? "Podłaczony" : "Present";
+  body += language == 0 ? "Podłączony" : "Present";
   body += "?";
   body += "</label>";
   body += "</div>";
@@ -547,10 +547,13 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</span>";
   body += "</div>";
 
-  body += "<p class=\"cd\">";
-  body += language == 0 ? "Zachowanie przekaźnia po przywróceniu zasilania "
-                          "lub nawiązanie połączeni do brokera MQTT"
-                        : "";
+  body += "<p class=\"cm\">";
+  body +=
+      language == 0
+          ? "Konfiguracja zachowania się przekaźnika po przywróceniu zasilania "
+            "lub nawiązaniu połączenia do brokera MQTT"
+          : "Relay behaviour configuration after power is restored "
+            "or the device connected to MQTT Broker";
   body += "</p>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -629,15 +632,16 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body +=
       (configuration.stateMQTTConnected == 5 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Wartość z systemu sterowania (przez MQTT)"
-                        : "Get state from automation system (over MQTT)";
+  body += language == 0
+              ? "Wartość z systemu sterowania przekaźnikiem (przez MQTT)"
+              : "Get state from a relay's controlling system (over MQTT)";
   body += "</option>";
   body += "</select>";
   body += "</div>";
 
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Automayczne wyłączenie przekaźnika "
-                        : "Automatic relay switch off";
+  body += language == 0 ? "Funkcjonalność automaycznego wyłączenie przekaźnika "
+                        : "Automatic relay turning off functionality";
   body += "</p>";
 
   body += "<div class=\"cf\">";
@@ -645,7 +649,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += language == 0 ? "Wyłącz po" : "Turn relay OFF after";
   body += "*</label>";
   body += "<input name=\"relay" + String(id) +
-          "_off_time\" type=\"number\" maxlength=\"5\" value=\"";
+          "_off_time\" type=\"number\" step=\"0.01\" maxlength=\"5\" value=\"";
   body += configuration.timeToOff;
   body += "\">";
   body += "<span class=\"hint\">0.01 - 99999 (";
@@ -657,21 +661,24 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</fieldset>";
 
   char title[23];
-  language == 0 ? sprintf(title, "Przkeźnik #%d", id + 1)
+  language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
                 : sprintf(title, "Relay #%d", id + 1);
 
   return addConfigurationBlock(
       title,
       language == 0
-          ? "Przekaźnik musi miec unikalną nazwę np. <strong>lampa</strong>. "
-            "Nazwa przekaźnika "
-            "składa się na dedykowany temat MQTT do sterowania przekaźnikiem "
-            "np. /sypialnia/lampa/ gdzie /sypialnia/ jest definiowana w "
-            "sekcji konfiguracji MQTT Brokera jako MQTT Temat"
+          ? "Przekaźnik musi posiadać unikalną nazwę np. "
+            "<strong>lampa</strong>. "
+            "Nazwa przekaźnika składa się na temat MQTT "
+            "wykorzystywany do sterowania przekaźnikiem "
+            "np. <strong>/sypialnia/lampa/</strong> gdzie "
+            "<strong>/sypialnia/</strong> jest definiowane w "
+            "sekcji konfiguracji MQTT Brokera (pole MQTT Temat)"
           : "Relay must have unique name, for example: <strong>lamp</strong>. "
-            "Relay name is a part of dedicated MQTT Topic to control the relay "
-            "eg.: /bedroom/lamp/ where /bedroom/ is configured in MQTT "
-            "Configuration section as MQTT Topic",
+            "Relay name is a part of MQTT Topic used to control the "
+            "relay eg.: <strong>/bedroom/lamp/</strong> where "
+            "<strong>/bedroom/</strong> is configured in MQTT "
+            "Configuration section (MQTT Topic field)",
       body);
 }
 
@@ -753,13 +760,15 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "</div>";
   */
   body += "<br><p class=\"cm\">";
-  body += language == 0
-              ? "Czułości włącznika należy ustawić pod indywidulane potrzeby"
-              : "Button's sensitiveness should set based on individual needs";
+  body +=
+      language == 0
+          ? "Czułość włącznika należy ustawić metodą prób, aż uzyska się "
+            "porządane jego działanie "
+          : "Button's sensitiveness should be set based on individual needs";
 
   body += "</p><div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Czułośc" : "Sensitiveness";
+  body += language == 0 ? "Czułość" : "Sensitiveness";
   body += "*</label>";
   body += "<input name=\"switch" + String(id) +
           "_sensitivity\" type=\"number\" maxlength=\"3\" "
@@ -787,9 +796,10 @@ String AFESitesGenerator::addUpgradeSection() {
   body += "<input class=\"bs\" name=\"update\" type=\"file\" accept=\".bin\">";
   body += "</div>";
   body += "<p class=\"cm\">";
-  body += language == 0 ? "Po zakończeniu aktualizacji urządzenie zostanie "
-                          "automatycznie zresetowane"
-                        : "Device will be automatically rebooted after upgrade";
+  body += language == 0
+              ? "Po zakończeniu aktualizacji urządzenie zostanie "
+                "automatycznie zresetowane"
+              : "Device will be automatically rebooted after an upgrade";
   body += "</p>";
   body += "<button type=\"submit\" class=\"b be\">";
   body += language == 0 ? "Aktualizuj" : "Upgrade";
@@ -799,8 +809,8 @@ String AFESitesGenerator::addUpgradeSection() {
       language == 0 ? "Aktualizacja firmware" : "Firmware upgrade",
       language == 0 ? "<strong>UWAGA</strong>: nie odłączaj "
                       "urządzenia od źródła zasilania podczas aktualizacji"
-                    : "<strong>Warning</strong>: don't switch off the device "
-                      "from power source while upgrading",
+                    : "<strong>Warning</strong>: don't plug off the device "
+                      "from a power source while upgrading",
       body);
 }
 
@@ -834,18 +844,19 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
   String subtitle;
   if (command == 0) {
     body += "<a href=\"\\?option=reset&command=1\" class=\"b be\">";
-    body +=
-        language == 0 ? "Przywróc ustawienia początkowe" : "Restore settings";
+    body += language == 0 ? "Przywróć ustawienia początkowe"
+                          : "Restore default settings";
     body += "</a>";
     subtitle = "<strong>";
     subtitle += language == 0 ? "Uwaga" : "Warning";
     subtitle += "</strong>: ";
-    subtitle += language == 0
-                    ? "przywracanie ustawień "
-                      "początkowych kasuje wszystkie ustawienia "
-                      "urządzenia, włącznie z konfiguracją sieci WiFi"
-                    : "restoring settings will remove all configuration "
-                      "information, incl. WiFi configuration";
+    subtitle +=
+        language == 0
+            ? "przywrócenie ustawień "
+              "początkowych usuwa wszystkie ustawienia "
+              "urządzenia, włącznie z konfiguracją sieci WiFi"
+            : "restoring to default settings will remove all configuration's "
+              "information, incl. WiFi configuration";
   } else {
     subtitle += "";
     body += language == 0 ? "Trwa przywracanie ustawień początkowych"
@@ -854,8 +865,8 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
     body += "<p class=\"cm\">";
     body += language == 0 ? "Po 20 sekundach połącz się z siecią WiFi o "
                             "nazwie: <strong>AFE-Device</strong>, a następnie "
-                            "połącz się się z "
-                            "panelem konfigurayjnym pod adresem"
+                            "połącz się z "
+                            "panelem konfiguracyjnym pod adresem"
                           : "After 20 seconds connect to WiFi network called "
                             "<strong>AFE-Device</strong> and open "
                             "configuration panel";
@@ -865,7 +876,7 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
   body += "</fieldset>";
   return addConfigurationBlock(language == 0
                                    ? "Przywracanie ustawień początkowych"
-                                   : "Restoring default settings",
+                                   : "Restoring to default settings",
                                subtitle, body);
 }
 
@@ -873,7 +884,7 @@ String AFESitesGenerator::addExitSection() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<p class=\"cm\">";
-  body += language == 0 ? "Trwa restart urzadzenia" : "Reboot in progress";
+  body += language == 0 ? "Trwa restart urządzenia" : "Reboot in progress";
   body += ".....</p>";
   body += "<p class=\"cm\">";
   body += language == 0 ? "Strona zostanie przeładowana automatycznie... czekaj"
@@ -901,7 +912,7 @@ String AFESitesGenerator::addHelpSection() {
   body += "</fieldset>";
   return addConfigurationBlock(language == 0
                                    ? "Urządzenie jest w trybie operacyjnym"
-                                   : "Device in working mode",
+                                   : "Device is in working mode",
                                "", body);
 }
 
@@ -919,7 +930,7 @@ const String AFESitesGenerator::generateMQTTHelp(const char *label,
   body += topic;
   body += command;
   body += "</span><br><span><label>";
-  body += language == 0 ? "Wiadomośc" : "Message";
+  body += language == 0 ? "Wiadomość" : "Message";
   body += " :</label> ";
   body += value;
   body += "</span>";
@@ -955,7 +966,7 @@ String AFESitesGenerator::addHelpMQTTTopicSection() {
                                          : "Turning relay ON",
                            RelayConfiguration.mqttTopic, "cmd", "ON");
   body += generateMQTTHelp(language == 0 ? "Wyłączenie przekaźnika"
-                                         : "Turning relay off",
+                                         : "Turning relay OFF",
                            RelayConfiguration.mqttTopic, "cmd", "OFF");
   body += generateMQTTHelp(language == 0 ? "Pobranie stanu przekaźnika"
                                          : "Get relay state",
@@ -963,23 +974,23 @@ String AFESitesGenerator::addHelpMQTTTopicSection() {
 
   body += "<p></p><p></p><p class=\"cm\" "
           "style=\"color:black\"><strong>";
-  body += language == 0
-              ? "Urządzenie publikuje następujące "
-                "tematy"
-              : "Device is publising following messages to listed MQTT topics";
+  body += language == 0 ? "Urządzenie publikuje następujące "
+                          "wiadomości na poniższe tematy MQTT"
+                        : "Device is publising following messages to listed "
+                          "below MQTT topics";
   body += "</strong></p>";
 
   body += generateMQTTHelp(language == 0 ? "Stan przekaźnika" : "Relay state",
                            RelayConfiguration.mqttTopic, "state", "ON / OFF");
   body += generateMQTTHelp(
-      language == 0 ? "Pobierz wartośc przekaźnika do ustawienia z serwera MQTT"
-                    : "Request state of the relay to set from MQTT Broker",
+      language == 0 ? "Pobierz i ustaw wartość przekaźnika z serwera MQTT"
+                    : "Request and set relay state from MQTT Broker",
       RelayConfiguration.mqttTopic, "get", "defaultState");
 
   body += "</div>";
   body += "</fieldset>";
-  return addConfigurationBlock(
-      language == 0 ? "Pomoc: tematy MQTT" : "Help: MQTT topics", "", body);
+  return addConfigurationBlock(language == 0 ? "Tematy MQTT" : "MQTT topics",
+                               "", body);
 }
 
 /* @TODO DOMOTICZ
