@@ -2,24 +2,28 @@
 
 AFELED::AFELED() {}
 
-AFELED::AFELED(uint8_t led_gpio) { begin(led_gpio); }
+AFELED::AFELED(uint8_t id) { begin(id); }
 
-void AFELED::begin(uint8_t led_gpio) {
-  gpio = led_gpio;
-  pinMode(gpio, OUTPUT);
-  digitalWrite(gpio, HIGH);
-  ready = true;
+void AFELED::begin(uint8_t id) {
+  AFEDataAccess Data;
+  LEDConfiguration = Data.getLEDConfiguration();
+  Data = {};
+  if (LEDConfiguration.present) {
+    pinMode(LEDConfiguration.gpio, OUTPUT);
+    digitalWrite(LEDConfiguration.gpio, HIGH);
+    ready = true;
+  }
 }
 
 void AFELED::on() {
-  if (ready && digitalRead(gpio) == HIGH) {
-    digitalWrite(gpio, LOW);
+  if (ready && digitalRead(LEDConfiguration.gpio) == HIGH) {
+    digitalWrite(LEDConfiguration.gpio, LOW);
   }
 }
 
 void AFELED::off() {
-  if (ready && digitalRead(gpio) == LOW) {
-    digitalWrite(gpio, HIGH);
+  if (ready && digitalRead(LEDConfiguration.gpio) == LOW) {
+    digitalWrite(LEDConfiguration.gpio, HIGH);
   }
 }
 
@@ -43,7 +47,7 @@ void AFELED::loop() {
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
-      if (digitalRead(gpio) == LOW) {
+      if (digitalRead(LEDConfiguration.gpio) == LOW) {
         off();
       } else {
         on();

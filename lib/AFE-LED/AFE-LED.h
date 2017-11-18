@@ -14,11 +14,14 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
+
 class AFELED {
 
 private:
+  LED LEDConfiguration;
   boolean ready = false;
-  uint8_t gpio;
   boolean blinking = false;
   unsigned long interval;
   unsigned long previousMillis = 0;
@@ -28,10 +31,10 @@ public:
   AFELED();
 
   /* Constructor with GPIO init. GPIO is GPIO to where LED is connected to */
-  AFELED(uint8_t led_gpio);
+  AFELED(uint8_t id);
 
   /* Constructor: gpio is GPIO to where LED is connected to */
-  void begin(uint8_t led_gpio);
+  void begin(uint8_t id);
 
   /* Turns on LED */
   void on();
