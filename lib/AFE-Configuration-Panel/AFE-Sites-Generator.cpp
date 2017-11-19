@@ -120,7 +120,9 @@ page +=
   page += "</a></li><li class=\"itm\"><a "
           "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-";
   page += language == 0 ? "pl" : "en";
-  page += "/t0/historia-zmian\" target=\"_blank\">";
+  page += "/t";
+  page += configuration.type;
+  page += "/historia-zmian\" target=\"_blank\">";
   page += language == 0 ? "Wersja" : "Version";
   page += " ";
   page += configuration.version;

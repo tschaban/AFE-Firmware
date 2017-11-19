@@ -3,7 +3,7 @@
 AFEDefaults::AFEDefaults() {}
 
 const char *AFEDefaults::getFirmwareVersion() { return "1.0rc3"; }
-uint8_t AFEDefaults::getFirmwareType() { return 1; }
+uint8_t AFEDefaults::getFirmwareType() { return 0; }
 void AFEDefaults::set() {
 
   AFEDataAccess *Data;
@@ -97,7 +97,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
 
   Data->saveDeviceMode(2);
