@@ -21,7 +21,7 @@ class AFELED {
 
 private:
   LED LEDConfiguration;
-  boolean ready = false;
+  boolean _initialized = false;
   boolean blinking = false;
   unsigned long interval;
   unsigned long previousMillis = 0;
