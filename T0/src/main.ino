@@ -85,7 +85,7 @@ void setup() {
     Network.connect();
   }
 
-  /* Initializing HTTP API */
+  /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
