@@ -18,6 +18,15 @@
 
 #define SERVER_CMD_SAVE 1
 
+/* Functionalities of a switch */
+#define SWITCH_MULTI 0
+// Not used yet #define SWITCH_CONFIG 1
+// Not used yet #define SWITCH_REBOOT 2
+#define SWITCH_RELAY_1 11
+// Not used yet #define SWITCH_RELAY_2 12
+// Not used yet #define SWITCH_RELAY_3 13
+// Not used yet #define SWITCH_RELAY_4 14
+
 struct FIRMWARE {
   char version[7];
   uint8_t type;
