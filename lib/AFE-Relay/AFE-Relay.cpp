@@ -27,16 +27,16 @@ void AFERelay::on() {
         0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
-    Data.saveRelayState(_id, RELAY_ON);
   }
+  Data.saveRelayState(_id, RELAY_ON);
 }
 
 /* Set relay to OFF */
 void AFERelay::off() {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
-    Data.saveRelayState(_id, RELAY_OFF);
   }
+  Data.saveRelayState(_id, RELAY_OFF);
 }
 
 /* Toggle relay */
@@ -63,6 +63,7 @@ boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
 }
 
 void AFERelay::setRelayAfterRestore(uint8_t option) {
+
   if (option == 1) {
     off();
   } else if (option == 2) {
