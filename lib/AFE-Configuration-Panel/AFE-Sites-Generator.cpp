@@ -685,7 +685,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   SWITCH configuration;
-  configuration = Data.getSwitchConfiguration(0);
+  configuration = Data.getSwitchConfiguration(id);
 
   String body = "<fieldset>";
   body += "<div class=\"cc\">";
@@ -698,49 +698,43 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "?";
   body += "*</label>";
   body += "</div>";
-  /* This section is needed only where there is more than one relay
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += language == 0 ? "Funkcja" : "Functionality";
-    body += "</label>";
-    body += "<select name=\"switch" + String(id) + "_functionality\">";
-    body += "<option value=\"0\"";
-    body += (configuration.functionality == 0 ? " selected=\"selected\"" : "");
-    body += ">-- ";
-    body += language == 0 ? "Wybierz" : "Select";
-    body += " -- </option>";
-    body += "<option value=\"1\"";
-    body += (configuration.functionality == 1 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += language == 0 ? "Sterowanie przekaźnikiem" : "Relay control";
-    body += "</option>";
-    body += "<option value=\"2\"";
-    body += (configuration.functionality == 2 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += language == 0 ? "Multifunkcyjny" : "Multifunction";
-    body += "</option>";
-    body += "<option value=\"3\"";
-    body += (configuration.functionality == 3 ? " selected=\"selected\"" : "");
-    body += ">Reboot</option>";
-    body += "<option value=\"4\"";
-    body += (configuration.functionality == 4 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += language == 0 ? "Uruchamianie tryb konfiguracji"
-                          : "Launching configuration mode";
-    body += "</option>";
-    body += "<option value=\"5\"";
-    body += (configuration.functionality == 5 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += language == 0 ? "Aktualizacja oprogramowania" : "Firmware upgrade";
-    body += "</option>";
-    body += "</select>";
-    body += "</div>";
-  */
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Funkcja" : "Functionality";
+  body += "</label>";
+  body += "<select name=\"switch" + String(id) + "_functionality\">";
+  body += "<option value=\"11\"";
+  body += (configuration.functionality == 11 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Sterowanie przekaźnikiem" : "Relay control";
+  body += "</option>";
+  body += "<option value=\"0\"";
+  body += (configuration.functionality == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Multifunkcyjny" : "Multifunction";
+  body += "</option>";
+  /*
+  body += "<option value=\"3\"";
+  body += (configuration.functionality == 3 ? " selected=\"selected\"" : "");
+  body += ">Reboot</option>";
+  body += "<option value=\"4\"";
+  body += (configuration.functionality == 4 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Uruchamianie tryb konfiguracji"
+                        : "Launching configuration mode";
+  body += "</option>";
+  body += "<option value=\"5\"";
+  body += (configuration.functionality == 5 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Aktualizacja oprogramowania" : "Firmware upgrade";
+  body += "</option>";
+*/
+  body += "</select>";
+  body += "</div>";
   char filed[13];
   sprintf(filed, "switch%d_gpio", id);
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
-  /* This section is needed when there is more than one relay
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Typ" : "Type";
@@ -749,16 +743,15 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "<option value=\"0\"";
   body += (configuration.type == 0 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Mono-stabilny" : "Monostable";
+  body += language == 0 ? "Monostabilny" : "Monostable";
   body += "</option>";
   body += "<option value=\"1\"";
   body += (configuration.type == 1 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Bi-stabilny" : "Bistable";
+  body += language == 0 ? "Bistabilny" : "Bistable";
   body += "</option>";
   body += "</select>";
   body += "</div>";
-  */
   body += "<br><p class=\"cm\">";
   body +=
       language == 0

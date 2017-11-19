@@ -77,7 +77,7 @@ void AFEWebServer::generate() {
     SWITCH data2 = {};
     if (getCommand() == SERVER_CMD_SAVE) {
       data1 = getSwitchData(0);
-      //    data2 = getSwitchData(1);
+      data2 = getSwitchData(1);
     }
     publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
         getOptionName(), getCommand(), data1, data2));

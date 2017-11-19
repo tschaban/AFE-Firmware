@@ -201,7 +201,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
-  uint8_t nextSwitch = 6;
+  uint8_t nextSwitch = 7;
   Eeprom.write(393 + id * nextSwitch, configuration.present);
   Eeprom.writeUInt8(394 + id * nextSwitch, configuration.gpio);
   Eeprom.writeUInt8(395 + id * nextSwitch, configuration.type);

@@ -24,6 +24,8 @@ AFEMQTT Mqtt;
 AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch;
+AFESwitch ExternalSwitch;
+
 AFERelay Relay;
 
 MQTT MQTTConfiguration;
@@ -33,8 +35,11 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  /* Checking if the device is launched for a first time. If so it sets up the
-   * device (EEPROM) */
+  // Comment below if you needed to debug it through Serial
+  Serial.swap();
+
+  /* Checking if the device is launched for a first time. If so it sets up
+   * the device (EEPROM) */
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
@@ -71,12 +76,9 @@ void setup() {
     Led.blinkingOn(100);
   }
 
-  /* Initializing Swich */
-  SWITCH SwitchConfiguration;
-  SwitchConfiguration = Data.getSwitchConfiguration(0);
-  if (SwitchConfiguration.present) {
-    Switch.begin(0);
-  }
+  /* Initializing Switches */
+  Switch.begin(0);
+  ExternalSwitch.begin(1);
 
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT) {
@@ -106,16 +108,14 @@ void loop() {
         /* Relay turn off event launched */
         if (Relay.autoTurnOff()) {
           Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-          Switch.toggleState();
         }
 
-        /* Switch short press */
-        if (Switch.isPressed()) {
-          if (Switch.getState()) {
-            Relay.on();
+        /* One of the switches has been shortly pressed */
+        if (Switch.isPressed() || ExternalSwitch.isPressed()) {
+          Relay.toggle();
+          if (Relay.get() == RELAY_ON) {
             Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
           } else {
-            Relay.off();
             Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
           }
         }
@@ -131,15 +131,20 @@ void loop() {
   }
 
   Switch.listener();
+  ExternalSwitch.listener();
 
-  /* Switch pressed for 10 seconds */
-  if (Switch.is10s()) {
+  /* One of the Multifunction switches pressed for 10 seconds */
+  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is10s()) ||
+      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
+       ExternalSwitch.is10s())) {
     Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
                                     : Device.reboot(MODE_NORMAL);
   }
 
-  /* Switch pressed for 5 seconds */
-  if (Switch.is5s()) {
+  /* One of the Multifunction switches pressed for 5 seconds */
+  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is5s()) ||
+      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
+       ExternalSwitch.is5s())) {
     Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                     : Device.reboot(MODE_NORMAL);
   }

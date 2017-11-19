@@ -117,14 +117,14 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          SWITCH data2) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(0, data1);
-    //  Data.saveConfiguration(1, data2);
+    Data.saveConfiguration(1, data2);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=switch&command=1\"  method=\"post\">";
 
   page += Site.addSwitchConfiguration(0);
-  //  page += Site.addSwitchConfiguration(1);
+  page += Site.addSwitchConfiguration(1);
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";

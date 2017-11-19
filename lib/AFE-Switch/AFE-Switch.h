@@ -28,6 +28,7 @@ class AFESwitch {
 
 private:
   SWITCH SwitchConfiguration;
+  boolean _initialized = false;
   boolean state;
   boolean previousState; // Actually this stores current switch state
 
@@ -55,9 +56,6 @@ public:
    * has to be pressed physically (applicable for BiStable switch types */
   boolean getState();
 
-  /* Method toggles switch state */
-  void toggleState();
-
   /* Method returns true if switch has been pressed. Sensitiveness it taken into
    * account. It does not mean switch is pressed physically. Once True capture
    * getState() method should be called to get the state of the Switch */
@@ -71,6 +69,10 @@ public:
 
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
+
+  /* Methods returns type of switch functionality. See Data-Structure for
+   * SWITCH_.... constants */
+  uint8_t getFunctionality();
 };
 
 #endif
