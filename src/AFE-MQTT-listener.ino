@@ -16,14 +16,14 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[50];
   Led.on();
-  //  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
+  // Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
-                     /*
-                         for (uint8_t i = 0; i < length; i++) {
-                           Serial << (char)payload[i];
-                         }
-                     */
+
+    for (uint8_t i = 0; i < length; i++) {
+      Serial << (char)payload[i];
+    }
+
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
     /*
         Serial << endl
@@ -33,13 +33,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     if (String(topic) == String(_mqttTopic)) {
       if ((char)payload[1] == 'N') {
         Relay.on();
-        Mqtt.publish("state", "ON");
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
       } else if ((char)payload[1] == 'F') {
         Relay.off();
-        Mqtt.publish("state", "OFF");
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
       } else if ((char)payload[2] == 'p') { // reportState
-        Relay.get() ? Mqtt.publish("state", "ON")
-                    : Mqtt.publish("state", "OFF");
+        Mqtt.publish(Relay.getMQTTTopic(), "state",
+                     Relay.get() == RELAY_ON ? "ON" : "OFF");
       }
     }
 
