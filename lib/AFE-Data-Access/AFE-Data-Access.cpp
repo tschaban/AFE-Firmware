@@ -115,7 +115,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
-  uint8_t nextSwitch = 6;
+  uint8_t nextSwitch = 7;
   configuration.present = Eeprom.read(393 + id * nextSwitch);
   configuration.gpio = Eeprom.readUInt8(394 + id * nextSwitch);
   configuration.type = Eeprom.readUInt8(395 + id * nextSwitch);
