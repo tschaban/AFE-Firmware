@@ -26,7 +26,8 @@ private:
 public:
   AFEDefaults();
   void set();
-  const char *getVersion();
+  const char *getFirmwareVersion();
+  uint8_t getFirmwareType();
   void eraseConfiguration();
 };
 #endif

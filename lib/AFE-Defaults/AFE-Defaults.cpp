@@ -2,8 +2,8 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getVersion() { return "1.0rc3"; }
-
+const char *AFEDefaults::getFirmwareVersion() { return "1.0rc3"; }
+uint8_t AFEDefaults::getFirmwareType() { return 1; }
 void AFEDefaults::set() {
 
   AFEDataAccess *Data;
@@ -17,10 +17,12 @@ void AFEDefaults::set() {
   // @TODO DOMOTICZ DomoticzConfiguration;
   // @TODO DS18B20 DS18B20Configuration;
 
-  sprintf(firmwareConfiguration.version, getVersion());
-  firmwareConfiguration.type = 0;
+  sprintf(firmwareConfiguration.version, getFirmwareVersion());
+  firmwareConfiguration.type = getFirmwareType();
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
+
+  Data->saveConfiguration(firmwareConfiguration);
 
   sprintf(networkConfiguration.ssid, "");
   sprintf(networkConfiguration.password, "");
@@ -33,6 +35,8 @@ void AFEDefaults::set() {
   networkConfiguration.waitTimeConnections = 1;
   networkConfiguration.waitTimeSeries = 60;
 
+  Data->saveConfiguration(networkConfiguration);
+
   sprintf(MQTTConfiguration.host, "");
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
   sprintf(MQTTConfiguration.user, "");
@@ -40,27 +44,38 @@ void AFEDefaults::set() {
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
 
+  Data->saveConfiguration(MQTTConfiguration);
+
   RelayConfiguration.present = true;
   RelayConfiguration.gpio = 12;
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
+
+  Data->saveConfiguration(0, RelayConfiguration);
+
   /* @TODO DOMOTICZ
   RelayConfiguration.idx = 0;
   RelayConfiguration.publishToDomoticz = false;
   */
-
-  Serial << endl << "INFO: Setting defaults: switch";
 
   SwitchConfiguration.present = true;
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
+  Data->saveConfiguration(0, SwitchConfiguration);
+
+  SwitchConfiguration.present = false;
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.type = 1;
+  SwitchConfiguration.functionality = 11;
+  Data->saveConfiguration(1, SwitchConfiguration);
 
   LEDConfiguration.present = true;
   LEDConfiguration.gpio = 13;
+  Data->saveConfiguration(LEDConfiguration);
 
   /* @TODO DS18B20
     Serial << endl << "INFO: Setting defaults: ds18b20";
@@ -69,6 +84,8 @@ void AFEDefaults::set() {
     DS18B20Configuration.correction = 0;
     DS18B20Configuration.interval = 60;
     DS18B20Confi/guration.unit = 0;
+
+    DS18B20 Data->saveConfiguration(DS18B20Configuration);
   */
 
   /* @TODO DOMOTICZ
@@ -78,19 +95,10 @@ void AFEDefaults::set() {
   sprintf(DomoticzConfiguration.user, "");
   sprintf(DomoticzConfiguration.password, "");
   DomoticzConfiguration.port = 8080;
+
+Data->saveConfiguration(DomoticzConfiguration);
+  
   */
-
-  /* Saving data */
-  Data->saveConfiguration(networkConfiguration);
-  Data->saveConfiguration(firmwareConfiguration);
-  Data->saveConfiguration(MQTTConfiguration);
-
-  Data->saveConfiguration(LEDConfiguration);
-
-  Data->saveConfiguration(0, RelayConfiguration);
-  Data->saveConfiguration(0, SwitchConfiguration);
-  // @TODO DS18B20 Data->saveConfiguration(DS18B20Configuration);
-  // @TODO DOMOTICZ Data->saveConfiguration(DomoticzConfiguration);
 
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);

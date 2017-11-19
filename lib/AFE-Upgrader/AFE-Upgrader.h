@@ -15,6 +15,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
 
 class AFEUpgrader {
@@ -23,6 +24,7 @@ private:
   FIRMWARE FirmwareConfiguration;
   AFEDataAccess Data;
   AFEDefaults Defaults;
+  void upgradeTypeOfFirmware();
 
 public:
   /* Constructor */

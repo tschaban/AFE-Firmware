@@ -34,7 +34,7 @@ void setup() {
   delay(10);
 
   // Comment below if you needed to debug it through Serial
-  Serial.swap();
+  // Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
