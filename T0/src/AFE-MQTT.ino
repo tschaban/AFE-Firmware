@@ -101,7 +101,10 @@ void AFEMQTT::connect() {
             */
             break;
           }
-          delay(durationBetweenConnectionAttempts * 1000);
+          Led.on();
+          delay(durationBetweenConnectionAttempts * 500);
+          Led.off();
+          delay(durationBetweenConnectionAttempts * 500);
           /* Serial << "."; */
         }
       }
