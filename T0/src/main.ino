@@ -25,9 +25,7 @@ AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch;
 AFESwitch ExternalSwitch;
-
 AFERelay Relay;
-
 MQTT MQTTConfiguration;
 
 void setup() {
