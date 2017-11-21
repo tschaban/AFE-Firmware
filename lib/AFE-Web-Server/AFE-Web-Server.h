@@ -29,6 +29,8 @@ private:
   AFEConfigurationPanel ConfigurationPanel;
   ESP8266HTTPUpdateServer httpUpdater;
   AFEDevice Device;
+  HTTPCOMMAND httpCommand;
+  boolean receivedHTTPCommand = false;
 
   void publishHTML(String page);
   String getOptionName();
@@ -39,6 +41,7 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
   uint8_t getLanguageData();
+
   // @TODO DOMOTICZ getDomoticzData();
   // @TODO DS18B20 getDS18B20Data();
 
@@ -51,12 +54,17 @@ public:
   /* Method listens for HTTP requests */
   void listener();
 
+  boolean httpAPIlistener();
+
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
 
   /* Method generate HTML side. It reads also data from HTTP requests arguments
    * and pass them to Configuration Panel class */
   void generate();
+
+  HTTPCOMMAND getHTTPCommand();
+  void sendJSON(String json);
 };
 
 #endif

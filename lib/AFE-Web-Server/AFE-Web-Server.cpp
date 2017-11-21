@@ -9,14 +9,25 @@ void AFEWebServer::begin() {
 
 void AFEWebServer::listener() { server.handleClient(); }
 
+boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
+
 void AFEWebServer::publishHTML(String page) {
   server.send(200, "text/html", page);
+}
+
+void AFEWebServer::sendJSON(String json) {
+  server.send(200, "application/json", json);
 }
 
 void AFEWebServer::handle(const char *uri,
                           ESP8266WebServer::THandlerFunction handler) {
   // Serial << endl << "INFO: Added url : " << uri << " for listening";
   server.on(uri, handler);
+}
+
+HTTPCOMMAND AFEWebServer::getHTTPCommand() {
+  receivedHTTPCommand = false;
+  return httpCommand;
 }
 
 void AFEWebServer::generate() {
@@ -106,7 +117,30 @@ void AFEWebServer::generate() {
 String AFEWebServer::getOptionName() {
 
   if (Device.getMode() == MODE_NORMAL) {
-    return "help";
+    /* Recived HTTP API Command */
+    if (server.hasArg("cmd")) {
+      /* Constructing command */
+      server.arg("cmd").toCharArray(httpCommand.command,
+                                    sizeof(httpCommand.command));
+      if (server.arg("device")) {
+        server.arg("device").toCharArray(httpCommand.device,
+                                         sizeof(httpCommand.device));
+      } else {
+        memset(httpCommand.device, 0, sizeof httpCommand.device);
+      }
+      if (server.arg("name")) {
+        server.arg("name").toCharArray(httpCommand.name,
+                                       sizeof(httpCommand.name));
+      } else {
+        memset(httpCommand.name, 0, sizeof httpCommand.name);
+      }
+
+      receivedHTTPCommand = true;
+      return server.arg("cmd");
+
+    } else {
+      return "help";
+    }
   } else {
     if (server.hasArg("option")) {
       return server.arg("option");

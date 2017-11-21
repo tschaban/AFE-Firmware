@@ -83,6 +83,12 @@ struct SWITCH {
   uint8_t functionality;
 };
 
+struct HTTPCOMMAND {
+  char device[16];
+  char name[16];
+  char command[32];
+};
+
 /* @TODO DS18B20
 
 struct DS18B20 {
