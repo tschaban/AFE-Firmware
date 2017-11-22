@@ -54,5 +54,9 @@ public:
 
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
+
+  /* Those get and save information if HTTP API is turned On or Off */
+  boolean isHttpAPITurnedOn();
+  void saveHttpAPI(boolean state);
 };
 #endif

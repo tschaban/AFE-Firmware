@@ -260,6 +260,10 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
+boolean AFEDataAccess::isHttpAPITurnedOn() { return Eeprom.read(25); }
+
+void AFEDataAccess::saveHttpAPI(boolean state) { Eeprom.write(25, state); }
+
 /* @TODO DOMOTICZ
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
