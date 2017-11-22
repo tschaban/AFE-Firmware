@@ -97,9 +97,9 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
-
+  Data->saveHttpAPI(true);
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
