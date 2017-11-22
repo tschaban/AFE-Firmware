@@ -84,3 +84,5 @@ boolean AFERelay::autoTurnOff() {
     return false;
   }
 }
+
+const char *AFERelay::getName() { return RelayConfiguration.name; }
