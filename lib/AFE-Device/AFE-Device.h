@@ -49,6 +49,9 @@ public:
 
   /* Is WiFi configured */
   boolean isConfigured();
+
+  /* Returns true if HTTP API is turned On */
+  boolean isHttpAPITurnedOn();
 };
 
 #endif

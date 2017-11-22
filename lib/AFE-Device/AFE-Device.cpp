@@ -31,3 +31,5 @@ boolean AFEDevice::isConfigured() {
     return true;
   }
 }
+
+boolean AFEDevice::isHttpAPITurnedOn() { return Data.getHTTPAPI(); }

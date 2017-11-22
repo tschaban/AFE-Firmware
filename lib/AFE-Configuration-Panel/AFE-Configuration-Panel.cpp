@@ -91,6 +91,23 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
+String AFEConfigurationPanel::getHTTPAPIConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          boolean data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveHTTPAPI(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=http-api&command=1\"  method=\"post\">";
+  page += Site.addHTTPAPIConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
                                                         uint8_t command,
                                                         RELAY data1,

@@ -59,11 +59,19 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
+  } else if (getOptionName() == "http-api") {
+    boolean data;
+    if (getCommand() == SERVER_CMD_SAVE) {
+      data = getHTTPAPIData();
+    }
+    publishHTML(ConfigurationPanel.getHTTPAPIConfigurationSite(
+        getOptionName(), getCommand(), data));
     /* @TODO DOMOTICZ
   } else if (getOptionName() == "domoticz") {
     DOMOTICZ data;
     if (getCommand() == SERVER_CMD_SAVE) {
       data = getDomoticzData();
+
     }
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), data)); */
@@ -252,6 +260,14 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   return data;
+}
+
+boolean AFEWebServer::getHTTPAPIData() {
+  if (server.arg("http_api_on").length() > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 RELAY AFEWebServer::getRelayData(uint8_t id) {

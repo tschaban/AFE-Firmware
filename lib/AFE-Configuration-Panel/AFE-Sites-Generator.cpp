@@ -78,6 +78,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 page +=
 "<li class=\"itm\"><a href=\"\\?option=domoticz\">Domoticz</a></li>";
 */
+
+    page +=
+        "<li class=\"itm\"><a href=\"\\?option=http-api\">HTTP API</a></li>";
     page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
     page += language == 0 ? "Przekaźnik" : "Relay";
     page += "</a></li>";
@@ -514,6 +517,33 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
                       "IP address",
       body);
 }
+
+String AFESitesGenerator::addHTTPAPIConfiguration() {
+
+  boolean configuration;
+  configuration = Data.getHTTPAPI();
+
+  String body = "<fieldset>";
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"http_api_on\" type=\"checkbox\" value=\"1\"";
+  body += (configuration ? " checked=\"checked\"" : "");
+  body += ">HTTP API ";
+  body += language == 0 ? "włączone" : "turned ON";
+  body += "?";
+  body += "</label>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock(
+      "HTTP API",
+      language == 0 ? "HTTP API służy do kontrolowania urządzeniem poprzez "
+                      "protokół HTTP"
+                    : "HTTP API is used to control the device by HTTP Protocol",
+      body);
+}
+
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration;

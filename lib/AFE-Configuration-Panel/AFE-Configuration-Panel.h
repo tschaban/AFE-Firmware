@@ -37,6 +37,8 @@ public:
                                    NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
+  String getHTTPAPIConfigurationSite(const String option, uint8_t command,
+                                     boolean data);
 
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data1, RELAY data2);

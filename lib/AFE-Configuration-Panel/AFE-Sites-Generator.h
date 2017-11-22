@@ -53,6 +53,7 @@ public:
   String addExitSection();
   String addHelpSection();
   String addHelpMQTTTopicSection();
+  String addHTTPAPIConfiguration();
   // @TODO DOMOTICZ String addDomoticzConfiguration();
   // @TODO DS18B20 String addDS18B20Configuration();
 };

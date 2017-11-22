@@ -41,7 +41,7 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
   uint8_t getLanguageData();
-
+  boolean getHTTPAPIData();
   // @TODO DOMOTICZ getDomoticzData();
   // @TODO DS18B20 getDS18B20Data();
 
