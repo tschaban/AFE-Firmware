@@ -989,10 +989,13 @@ String AFESitesGenerator::addHelpMQTTTopicSection() {
 
   body += generateMQTTHelp(language == 0 ? "Włączenie przekaźnika"
                                          : "Turning relay ON",
-                           RelayConfiguration.mqttTopic, "cmd", "ON");
+                           RelayConfiguration.mqttTopic, "cmd", "on");
   body += generateMQTTHelp(language == 0 ? "Wyłączenie przekaźnika"
                                          : "Turning relay OFF",
-                           RelayConfiguration.mqttTopic, "cmd", "OFF");
+                           RelayConfiguration.mqttTopic, "cmd", "off");
+  body += generateMQTTHelp(language == 0 ? "Przełączenie na przeciwny stan"
+                                         : "Turning relay to oposite state",
+                           RelayConfiguration.mqttTopic, "cmd", "toggle");
   body += generateMQTTHelp(language == 0 ? "Pobranie stanu przekaźnika"
                                          : "Get relay state",
                            RelayConfiguration.mqttTopic, "cmd", "reportState");
