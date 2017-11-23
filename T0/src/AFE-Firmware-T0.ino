@@ -104,8 +104,10 @@ void loop() {
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
-        if (WebServer.httpAPIlistener()) {
-          processHTTPAPIRequest(WebServer.getHTTPCommand());
+        if (Device.isHttpAPITurnedOn()) {
+          if (WebServer.httpAPIlistener()) {
+            processHTTPAPIRequest(WebServer.getHTTPCommand());
+          }
         }
 
         /* Relay turn off event launched */
