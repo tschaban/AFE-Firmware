@@ -30,16 +30,20 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                << "DEBUG: "
                << "checking relay messages: " << _mqttTopic;
     */
-    if (String(topic) == String(_mqttTopic)) {
-      if ((char)payload[1] == 'N') {
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[1] == 'n') {
         Relay.on();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-      } else if ((char)payload[1] == 'F') {
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+      } else if ((char)payload[1] == 'f') {
         Relay.off();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-      } else if ((char)payload[2] == 'p') { // reportState
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+      } else if ((char)payload[1] == 'e') { // reportState
         Mqtt.publish(Relay.getMQTTTopic(), "state",
-                     Relay.get() == RELAY_ON ? "ON" : "OFF");
+                     Relay.get() == RELAY_ON ? "on" : "off");
+      } else if ((char)payload[1] == 'o') { // toggle
+        Relay.get() == RELAY_ON ? Relay.off() : Relay.on();
+        Mqtt.publish(Relay.getMQTTTopic(), "state",
+                     Relay.get() == RELAY_ON ? "on" : "off");
       }
     }
 
@@ -49,7 +53,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                << "DEBUG: "
                << "checking device level messages: " << _mqttTopic;
     */
-    if (String(topic) == String(_mqttTopic)) {
+    if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[2] == 'b') { // reboot
         //      Serial << endl << "INFO: Process: reboot";
         Device.reboot(MODE_NORMAL);
