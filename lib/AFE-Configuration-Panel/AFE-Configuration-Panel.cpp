@@ -23,7 +23,6 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   } else if (option == "help") {
     if (command == 0) {
       page += Site.addHelpSection();
-      page += Site.addHelpMQTTTopicSection();
     } else if (command == 1 || command == 2) {
       page += Site.addExitSection();
     }
@@ -55,16 +54,33 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getBasicConfigurationSite(const String option,
-                                                        uint8_t command,
-                                                        NETWORK data) {
+String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
+                                                         uint8_t command,
+                                                         DEVICE data) {
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=basic&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=device&command=1\"  method=\"post\">";
+  page += Site.addDeviceConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          NETWORK data) {
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=network&command=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -91,16 +107,19 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getHTTPAPIConfigurationSite(const String option,
-                                                          uint8_t command,
-                                                          boolean data) {
+String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
+                                                      uint8_t command,
+                                                      LED data) {
+
   if (command == SERVER_CMD_SAVE) {
-    Data.saveHTTPAPI(data);
+    Data.saveConfiguration(0, data);
+    //    Data.saveConfiguration(1, data2);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=http-api&command=1\"  method=\"post\">";
-  page += Site.addHTTPAPIConfiguration();
+  page += "<form action=\"/?option=led&command=1\"  method=\"post\">";
+  page += Site.addLEDConfiguration(0);
+  //  page += Site.addLEDConfiguration(1);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

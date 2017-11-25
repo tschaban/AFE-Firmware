@@ -7,13 +7,11 @@ AFESwitch::AFESwitch(uint8_t id) { begin(id); }
 void AFESwitch::begin(uint8_t id) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
-  if (SwitchConfiguration.present) {
-    pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
-    state = digitalRead(SwitchConfiguration.gpio);
-    previousState = state;
-    Led.begin(0);
-    _initialized = true;
-  }
+  pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
+  state = digitalRead(SwitchConfiguration.gpio);
+  previousState = state;
+  Led.begin(0);
+  _initialized = true;
 }
 
 boolean AFESwitch::getState() { return state; }

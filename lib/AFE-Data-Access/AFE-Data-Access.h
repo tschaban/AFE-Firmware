@@ -24,22 +24,23 @@ private:
 
 public:
   AFEDataAccess();
+  DEVICE getDeviceConfiguration();
+  FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
+  LED getLEDConfiguration(uint8_t id);
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
-  FIRMWARE getFirmwareConfiguration();
-  LED getLEDConfiguration();
-
   // @TODO DOMOTICZ getDomoticzConfiguration();
   // @TODO DS18B20 getDS18B20Configuration();
 
+  void saveConfiguration(DEVICE configuration);
+  void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
+  void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
-  void saveConfiguration(FIRMWARE configuration);
-  void saveConfiguration(LED configuration);
   // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
   // @TODO DS18B20 void saveConfiguration(DS18B20 configuration);
 
@@ -54,9 +55,5 @@ public:
 
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
-
-  /* Those get and save information if HTTP API is turned On or Off */
-  boolean getHTTPAPI();
-  void saveHTTPAPI(boolean state);
 };
 #endif

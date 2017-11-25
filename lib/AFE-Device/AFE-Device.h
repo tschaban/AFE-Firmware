@@ -30,6 +30,8 @@ private:
   uint8_t deviceMode;
 
 public:
+  DEVICE configuration;
+
   AFEDevice();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
@@ -49,9 +51,6 @@ public:
 
   /* Is WiFi configured */
   boolean isConfigured();
-
-  /* Returns true if HTTP API is turned On */
-  boolean isHttpAPITurnedOn();
 };
 
 #endif

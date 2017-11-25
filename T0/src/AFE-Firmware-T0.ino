@@ -38,6 +38,7 @@ void setup() {
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
+
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
@@ -56,9 +57,7 @@ void setup() {
 
   /* Initializing relay and setting it's default state at power on*/
   if (Device.getMode() == MODE_NORMAL) {
-    RELAY RelayConfiguration;
-    RelayConfiguration = Data.getRelayConfiguration(0);
-    if (RelayConfiguration.present) {
+    if (Device.configuration.isRelay[0]) {
       Relay.begin(0);
       Relay.setRelayAfterRestoringPower();
     }
@@ -69,21 +68,28 @@ void setup() {
 
   /* Initializing LED */
   Led.begin(0);
+
   /* If device in configuration mode then start LED blinking */
   if (Device.getMode() != MODE_NORMAL) {
     Led.blinkingOn(100);
   }
 
   /* Initializing Switches */
-  Switch.begin(0);
-  ExternalSwitch.begin(1);
+  if (Device.configuration.isSwitch[0]) {
+    Switch.begin(0);
+  }
+
+  if (Device.configuration.isSwitch[1]) {
+    ExternalSwitch.begin(1);
+  }
 
   /* Initializing MQTT */
-  if (Device.getMode() != MODE_ACCESS_POINT) {
+  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
-    Network.connect();
   }
+
+  Network.connect();
 
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
@@ -95,16 +101,16 @@ void loop() {
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
     if (Network.connected()) {
-
       if (Device.getMode() == MODE_NORMAL) {
-
         /* Connect to MQTT if not connected */
-        Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+        if (Device.configuration.mqttAPI) {
+          Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+        }
 
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
-        if (Device.isHttpAPITurnedOn()) {
+        if (Device.configuration.httpAPI) {
           if (WebServer.httpAPIlistener()) {
             processHTTPAPIRequest(WebServer.getHTTPCommand());
           }
@@ -118,10 +124,12 @@ void loop() {
         /* One of the switches has been shortly pressed */
         if (Switch.isPressed() || ExternalSwitch.isPressed()) {
           Relay.toggle();
-          if (Relay.get() == RELAY_ON) {
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-          } else {
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+          if (Device.configuration.mqttAPI) {
+            if (Relay.get() == RELAY_ON) {
+              Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
+            } else {
+              Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+            }
           }
         }
       } else { // Configuration Mode

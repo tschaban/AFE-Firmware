@@ -5,10 +5,11 @@ AFELED::AFELED() {}
 AFELED::AFELED(uint8_t id) { begin(id); }
 
 void AFELED::begin(uint8_t id) {
-  AFEDataAccess Data;
-  LEDConfiguration = Data.getLEDConfiguration();
-  Data = {};
-  if (LEDConfiguration.present) {
+  AFEDevice Device;
+  if (Device.configuration.isLED[id]) {
+    AFEDataAccess Data;
+    LEDConfiguration = Data.getLEDConfiguration(id);
+    Data = {};
     pinMode(LEDConfiguration.gpio, OUTPUT);
     digitalWrite(LEDConfiguration.gpio, HIGH);
     _initialized = true;

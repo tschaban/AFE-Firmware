@@ -16,6 +16,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Device.h>
 
 class AFELED {
 

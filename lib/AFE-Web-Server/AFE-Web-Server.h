@@ -36,10 +36,12 @@ private:
   String getOptionName();
   uint8_t getCommand();
 
+  DEVICE getDeviceData();
   NETWORK getNetworkData();
   MQTT getMQTTData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
+  LED getLEDData(uint8_t id);
   uint8_t getLanguageData();
   boolean getHTTPAPIData();
   // @TODO DOMOTICZ getDomoticzData();

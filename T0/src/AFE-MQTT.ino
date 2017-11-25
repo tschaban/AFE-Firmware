@@ -12,7 +12,7 @@ AFEMQTT::AFEMQTT() {}
 void AFEMQTT::begin() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
-  sprintf(deviceName, "%s", NetworkConfiguration.host);
+  sprintf(deviceName, "%s", Device.configuration.name);
 
   /* Defaults are taken from WiFi config. They can be set using
    * setReconnectionParams() */

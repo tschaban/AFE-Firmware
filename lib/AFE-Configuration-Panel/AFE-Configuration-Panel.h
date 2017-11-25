@@ -23,7 +23,6 @@ class AFEConfigurationPanel {
 private:
   AFESitesGenerator Site;
   AFEDataAccess Data;
-  String getDomoticzConfigurationSite();
   uint8_t language;
 
 public:
@@ -33,13 +32,14 @@ public:
   /* It returns configuration site */
   String getSite(const String option, uint8_t command);
   String getSite(const String option, uint8_t command, boolean data);
-  String getBasicConfigurationSite(const String option, uint8_t command,
-                                   NETWORK data);
+  String getDeviceConfigurationSite(const String option, uint8_t command,
+                                    DEVICE data);
+  String getNetworkConfigurationSite(const String option, uint8_t command,
+                                     NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
-  String getHTTPAPIConfigurationSite(const String option, uint8_t command,
-                                     boolean data);
-
+  String getLEDConfigurationSite(const String option, uint8_t command,
+                                 LED data);
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data1, RELAY data2);
   String getSwitchConfigurationSite(const String option, uint8_t command,

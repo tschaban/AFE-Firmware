@@ -1,6 +1,9 @@
 #include "AFE-Device.h"
 
-AFEDevice::AFEDevice() { deviceMode = Data.getDeviceMode(); }
+AFEDevice::AFEDevice() {
+  configuration = Data.getDeviceConfiguration();
+  deviceMode = Data.getDeviceMode();
+}
 
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);
@@ -31,5 +34,3 @@ boolean AFEDevice::isConfigured() {
     return true;
   }
 }
-
-boolean AFEDevice::isHttpAPITurnedOn() { return Data.getHTTPAPI(); }

@@ -8,8 +8,9 @@ void AFEDefaults::set() {
 
   AFEDataAccess *Data;
 
-  NETWORK networkConfiguration;
+  DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
+  NETWORK networkConfiguration;
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
@@ -24,9 +25,18 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(firmwareConfiguration);
 
+  sprintf(deviceConfiguration.name, "AFE-Device");
+  deviceConfiguration.isLED[0] = true;
+  deviceConfiguration.isRelay[0] = true;
+  deviceConfiguration.isSwitch[0] = true;
+  deviceConfiguration.isSwitch[1] = false;
+  deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.httpAPI = true;
+
+  Data->saveConfiguration(deviceConfiguration);
+
   sprintf(networkConfiguration.ssid, "");
   sprintf(networkConfiguration.password, "");
-  sprintf(networkConfiguration.host, "AFE-Device");
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
   networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
@@ -46,7 +56,6 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(MQTTConfiguration);
 
-  RelayConfiguration.present = true;
   RelayConfiguration.gpio = 12;
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
@@ -60,22 +69,19 @@ void AFEDefaults::set() {
   RelayConfiguration.publishToDomoticz = false;
   */
 
-  SwitchConfiguration.present = true;
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
   Data->saveConfiguration(0, SwitchConfiguration);
 
-  SwitchConfiguration.present = false;
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
   SwitchConfiguration.functionality = 11;
   Data->saveConfiguration(1, SwitchConfiguration);
 
-  LEDConfiguration.present = true;
   LEDConfiguration.gpio = 13;
-  Data->saveConfiguration(LEDConfiguration);
+  Data->saveConfiguration(0, LEDConfiguration);
 
   /* @TODO DS18B20
     Serial << endl << "INFO: Setting defaults: ds18b20";
@@ -97,9 +103,8 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
-  Data->saveHTTPAPI(true);
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
