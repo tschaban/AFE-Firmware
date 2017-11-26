@@ -1,4 +1,3 @@
-
 #include "AFE-OTA.h"
 
 static const char serverIndex[] PROGMEM =

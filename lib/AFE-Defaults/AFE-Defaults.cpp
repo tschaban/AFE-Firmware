@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+
 #include "AFE-Defaults.h"
 
 AFEDefaults::AFEDefaults() {}
@@ -104,7 +108,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);

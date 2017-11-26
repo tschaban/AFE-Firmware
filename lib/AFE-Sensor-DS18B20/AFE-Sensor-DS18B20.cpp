@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+
 #include "AFE-Sensor-DS18B20.h"
 
 AFESensorDS18B20::AFESensorDS18B20(){};

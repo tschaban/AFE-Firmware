@@ -1,9 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
 #include <AFE-Data-Access.h>
@@ -38,7 +35,7 @@ void setup() {
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
-
+  //  Device.setDevice();
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
@@ -56,17 +53,15 @@ void setup() {
   }
 
   /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL) {
-    if (Device.configuration.isRelay[0]) {
-      Relay.begin(0);
-      Relay.setRelayAfterRestoringPower();
-    }
+  if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
+    Relay.begin(0);
+    Relay.setRelayAfterRestoringPower();
   }
 
   /* Initialzing network */
   Network.begin(Device.getMode());
 
-  /* Initializing LED */
+  /* Initializing LED, checking if LED exists is made on Class level  */
   Led.begin(0);
 
   /* If device in configuration mode then start LED blinking */
@@ -116,19 +111,23 @@ void loop() {
           }
         }
 
-        /* Relay turn off event launched */
-        if (Relay.autoTurnOff()) {
-          Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-        }
+        /* Relay related code */
+        if (Device.configuration.isRelay[0]) {
 
-        /* One of the switches has been shortly pressed */
-        if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-          Relay.toggle();
-          if (Device.configuration.mqttAPI) {
-            if (Relay.get() == RELAY_ON) {
-              Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-            } else {
-              Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+          /* Relay turn off event launched */
+          if (Relay.autoTurnOff()) {
+            Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+          }
+
+          /* One of the switches has been shortly pressed */
+          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
+            Relay.toggle();
+            if (Device.configuration.mqttAPI) {
+              if (Relay.get() == RELAY_ON) {
+                Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
+              } else {
+                Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+              }
             }
           }
         }
