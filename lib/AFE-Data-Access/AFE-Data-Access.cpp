@@ -116,7 +116,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(369, configuration.isRelay[0]);
   Eeprom.write(395, configuration.isSwitch[0]);
   Eeprom.write(402, configuration.isSwitch[1]);
-  Eeprom.write(367, configuration.isLED[0]);
+  Eeprom.write(366, configuration.isLED[0]);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
   // Eeprom.write(413, configuration.isDS18B20);
