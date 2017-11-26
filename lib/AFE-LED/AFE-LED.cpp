@@ -11,41 +11,33 @@ void AFELED::begin(uint8_t id) {
     LEDConfiguration = Data.getLEDConfiguration(id);
     Data = {};
     pinMode(LEDConfiguration.gpio, OUTPUT);
-    digitalWrite(LEDConfiguration.gpio, HIGH);
+    LEDConfiguration.changeToOppositeValue
+        ? digitalWrite(LEDConfiguration.gpio, LOW)
+        : digitalWrite(LEDConfiguration.gpio, HIGH);
     _initialized = true;
   }
 }
 
 void AFELED::on() {
-  if (_initialized) {
-    if (LEDConfiguration.changeToOppositeValue) {
-      off();
-    } else {
-      if (digitalRead(LEDConfiguration.gpio) == HIGH) {
-        digitalWrite(LEDConfiguration.gpio, LOW);
-      }
-    }
+  if (LEDConfiguration.changeToOppositeValue) {
+    set(HIGH);
+  } else {
+    set(LOW);
   }
 }
 
 void AFELED::off() {
-  if (_initialized) {
-    if (LEDConfiguration.changeToOppositeValue) {
-      on();
-    } else {
-      if (digitalRead(LEDConfiguration.gpio) == LOW) {
-        digitalWrite(LEDConfiguration.gpio, HIGH);
-      }
-    }
+  if (LEDConfiguration.changeToOppositeValue) {
+    set(LOW);
+  } else {
+    set(HIGH);
   }
 }
 
 void AFELED::blink(unsigned int duration) {
-  if (_initialized) {
-    on();
-    delay(duration);
-    off();
-  }
+  on();
+  delay(duration);
+  off();
 }
 
 void AFELED::blinkingOn(unsigned long blinking_interval) {
@@ -60,11 +52,23 @@ void AFELED::loop() {
     unsigned long currentMillis = millis();
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
-      if (digitalRead(LEDConfiguration.gpio) == LOW) {
-        off();
-      } else {
-        on();
-      }
+      toggle();
     }
+  }
+}
+
+void AFELED::set(uint8_t state) {
+  if (_initialized) {
+    if (digitalRead(LEDConfiguration.gpio) != state) {
+      digitalWrite(LEDConfiguration.gpio, state);
+    }
+  }
+}
+
+void AFELED::toggle() {
+  if (_initialized) {
+    digitalRead(LEDConfiguration.gpio) == HIGH
+        ? digitalWrite(LEDConfiguration.gpio, LOW)
+        : digitalWrite(LEDConfiguration.gpio, HIGH);
   }
 }

@@ -27,6 +27,9 @@ private:
   unsigned long interval;
   unsigned long previousMillis = 0;
 
+  void set(uint8_t state);
+  void toggle();
+
 public:
   /* Constructor */
   AFELED();
