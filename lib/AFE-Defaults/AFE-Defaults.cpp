@@ -81,6 +81,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(1, SwitchConfiguration);
 
   LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
   Data->saveConfiguration(0, LEDConfiguration);
 
   /* @TODO DS18B20
@@ -103,7 +104,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
