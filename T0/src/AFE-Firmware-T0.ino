@@ -108,6 +108,8 @@ void loop() {
         if (Device.configuration.httpAPI) {
           if (WebServer.httpAPIlistener()) {
             processHTTPAPIRequest(WebServer.getHTTPCommand());
+
+
           }
         }
 
@@ -122,13 +124,7 @@ void loop() {
           /* One of the switches has been shortly pressed */
           if (Switch.isPressed() || ExternalSwitch.isPressed()) {
             Relay.toggle();
-            if (Device.configuration.mqttAPI) {
-              if (Relay.get() == RELAY_ON) {
-                Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
-              } else {
-                Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-              }
-            }
+            MQTTPublishRelayState(); // MQTT Listener library
           }
         }
       } else { // Configuration Mode

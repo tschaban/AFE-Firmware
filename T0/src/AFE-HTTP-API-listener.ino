@@ -42,17 +42,31 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (strcmp(request.name, Relay.getName()) == 0) {
       if (strcmp(request.command, "on") == 0) {
         Relay.on();
-        Relay.get() == RELAY_ON ? sendHTTPAPIRequestStatus(request, true)
-                                : sendHTTPAPIRequestStatus(request, false);
+        if (Relay.get() == RELAY_ON) {
+          sendHTTPAPIRequestStatus(request, true);
+          MQTTPublishRelayState(); // MQTT Listener library
+        } else {
+          sendHTTPAPIRequestStatus(request, false);
+        }
       } else if (strcmp(request.command, "off") == 0) { // Off
         Relay.off();
-        Relay.get() == RELAY_OFF ? sendHTTPAPIRequestStatus(request, true)
-                                 : sendHTTPAPIRequestStatus(request, false);
+        if (Relay.get() == RELAY_OFF) {
+          sendHTTPAPIRequestStatus(request, true);
+          MQTTPublishRelayState(); // MQTT Listener library
+        } else {
+          sendHTTPAPIRequestStatus(request, false);
+        }
+
       } else if (strcmp(request.command, "toggle") == 0) { // toggle
         uint8_t state = Relay.get();
         Relay.toggle();
-        state != Relay.get() ? sendHTTPAPIRequestStatus(request, true)
-                             : sendHTTPAPIRequestStatus(request, false);
+        if (state != Relay.get()) {
+          sendHTTPAPIRequestStatus(request, true);
+          MQTTPublishRelayState(); // MQTT Listener library
+        } else {
+          sendHTTPAPIRequestStatus(request, false);
+        }
+
       } else if (strcmp(request.command, "reportStatus") == 0) { // reportStatus
         sendHTTPAPIRequestStatus(request, true, Relay.get());
         /* Commend not implemented */

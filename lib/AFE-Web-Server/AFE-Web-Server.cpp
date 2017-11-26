@@ -50,7 +50,6 @@ void AFEWebServer::generate() {
   } else if (getOptionName() == "device") {
     DEVICE data;
     if (getCommand() == SERVER_CMD_SAVE) {
-      Serial << endl << "reading post data";
       data = getDeviceData();
     }
     publishHTML(ConfigurationPanel.getDeviceConfigurationSite(

@@ -61,3 +61,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   }
   Led.off();
 }
+
+void MQTTPublishRelayState() {
+  if (Device.configuration.mqttAPI) {
+    if (Relay.get() == RELAY_ON) {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+    } else {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+    }
+  }
+}
