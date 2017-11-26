@@ -7,9 +7,6 @@ AFEConfigurationPanel::AFEConfigurationPanel() {
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       boolean redirect) {
 
-  /* Serial << endl << "INFO: Generating site: " << option << ", command: " <<
-   command << (redirect ? " with redirect " : " without redirect"); */
-
   String page;
   redirect == 0 ? page = Site.generateHeader(0)
                 : page = Site.generateHeader(10);
@@ -89,7 +86,6 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
   return page;
 }
 
-/* @TODO Only for MQTT */
 String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
                                                        uint8_t command,
                                                        MQTT data) {
@@ -113,13 +109,11 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(0, data);
-    //    Data.saveConfiguration(1, data2);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=led&command=1\"  method=\"post\">";
   page += Site.addLEDConfiguration(0);
-  //  page += Site.addLEDConfiguration(1);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

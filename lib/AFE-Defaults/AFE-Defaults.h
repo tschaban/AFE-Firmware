@@ -22,9 +22,17 @@ private:
 
 public:
   AFEDefaults();
-  void set();
+
+  /* Method returns firmware version number */
   const char *getFirmwareVersion();
+
+  /* Method returns firmware version type */
   uint8_t getFirmwareType();
+
+  /* Method erases EEPROM */
   void eraseConfiguration();
+
+  /* Method set default values */
+  void set();
 };
 #endif

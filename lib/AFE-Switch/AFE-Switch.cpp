@@ -54,16 +54,19 @@ void AFESwitch::listener() {
     boolean currentState = digitalRead(SwitchConfiguration.gpio);
     unsigned long time = millis();
 
-    if (currentState != previousState) {
+    if (currentState != previousState) { // buttons has been pressed
 
-      if (startTime == 0) {
+      if (startTime == 0) { // starting timer. used for switch sensitiveness
         startTime = time;
       }
 
-      if (time - startTime >= SwitchConfiguration.sensitiveness) {
+      if (time - startTime >=
+          SwitchConfiguration.sensitiveness) { // switch prssed, sensitiveness
+                                               // taken into account, processing
+                                               // event
         if (SwitchConfiguration.type == SWITCH_TYPE_MONO) {
 
-          if (!_pressed) {
+          if (!_pressed) { // This is set only once when switch is pressed
             state = !state;
             _pressed = true;
             pressed = true;

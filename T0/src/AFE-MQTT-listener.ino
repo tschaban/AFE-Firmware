@@ -8,6 +8,7 @@
 #include "WProgram.h"
 #endif
 
+/* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[50];
@@ -62,6 +63,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   Led.off();
 }
 
+/* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState() {
   if (Device.configuration.mqttAPI) {
     if (Relay.get() == RELAY_ON) {

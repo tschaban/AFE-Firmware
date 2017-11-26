@@ -24,7 +24,9 @@ class AFEWiFi {
 private:
   NETWORK networkConfiguration;
   unsigned long sleepStartTime = 0;
-  boolean sleepMode = false;
+  boolean sleepMode =
+      false; // It's set to true after defined in configuration X number of
+             // connection failures
   DNSServer dnsServer;
   AFELED Led;
 

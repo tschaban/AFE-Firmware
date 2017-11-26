@@ -945,28 +945,6 @@ String AFESitesGenerator::addLanguageConfiguration() {
   return page;
 }
 
-const String AFESitesGenerator::generateMQTTHelp(const char *label,
-                                                 const char *topic,
-                                                 const char *command,
-                                                 const char *value) {
-  String body;
-
-  body += "<p></p><p class=\"cm\">";
-  body += label;
-  body += "</p><span><label>";
-  body += language == 0 ? "Temat" : "Topic";
-  body += " : </label>";
-  body += topic;
-  body += command;
-  body += "</span><br><span><label>";
-  body += language == 0 ? "Wiadomość" : "Message";
-  body += " :</label> ";
-  body += value;
-  body += "</span>";
-
-  return body;
-}
-
 const char *AFESitesGenerator::generateFooter() {
   return "</div></div></body></html>";
 }
