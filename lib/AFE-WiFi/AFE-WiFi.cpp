@@ -13,7 +13,7 @@ void AFEWiFi::begin(uint8_t mode) {
   if (Device.configuration.isLED[0]) {
     LED LEDConfiguration;
     LEDConfiguration = Data.getLEDConfiguration(0);
-    Led.begin(LEDConfiguration.gpio);
+    Led.begin(0);
     LEDConfiguration = {};
   }
 
@@ -50,12 +50,11 @@ void AFEWiFi::connect() {
     WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
     while (WiFi.status() != WL_CONNECTED) {
       Led.on();
-      /*
-            Serial << endl
-                   << "INFO: WiFi connection attempt: " << connections + 1 << "
-         from "
-                   << networkConfiguration.noConnectionAttempts;
-      */
+
+      /* Serial << endl
+             << "INFO: WiFi connection attempt: " << connections + 1 << "from "
+             << networkConfiguration.noConnectionAttempts; */
+
       connections++;
       delay(networkConfiguration.waitTimeConnections * 500);
       Led.off();
