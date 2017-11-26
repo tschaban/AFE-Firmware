@@ -529,6 +529,7 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   body += id;
   body += "_opposite\" type=\"checkbox\" value=\"1\"";
   body += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
+  body += ">";
   body += language == 0 ? "Zmień świecenie diody LED na odwrotne"
                         : "Change LED ligtning to opposite";
   body += "</label>";
