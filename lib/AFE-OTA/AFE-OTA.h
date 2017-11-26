@@ -1,5 +1,5 @@
 /*
- Source taken from:
+ Source code taken from:
  https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266HTTPUpdateServer
  Credits to all authors !!!!
 
