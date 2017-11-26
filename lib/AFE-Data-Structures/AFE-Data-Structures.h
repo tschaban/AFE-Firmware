@@ -69,6 +69,7 @@ struct MQTT {
 
 struct LED {
   uint8_t gpio;
+  boolean changeToOppositeValue;
 };
 
 struct RELAY {
