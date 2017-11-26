@@ -1,9 +1,6 @@
-/*
-  Switch mono and bi stable component
-  AFE Firmware for smart home devices build on ESP8266
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Switch_h
 #define _AFE_Switch_h

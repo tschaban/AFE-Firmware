@@ -1,9 +1,6 @@
-/*
-   Configuration Panel
-   AFE Firmware for smart home devices build on ESP8266
-   More info: https://github.com/tschaban/AFE-Firmware
-   LICENCE: http://opensource.org/licenses/MIT
- */
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h
@@ -23,7 +20,7 @@ class AFEConfigurationPanel {
 private:
   AFESitesGenerator Site;
   AFEDataAccess Data;
-  String getDomoticzConfigurationSite();
+  AFEDevice Device;
   uint8_t language;
 
 public:
@@ -33,11 +30,14 @@ public:
   /* It returns configuration site */
   String getSite(const String option, uint8_t command);
   String getSite(const String option, uint8_t command, boolean data);
-  String getBasicConfigurationSite(const String option, uint8_t command,
-                                   NETWORK data);
+  String getDeviceConfigurationSite(const String option, uint8_t command,
+                                    DEVICE data);
+  String getNetworkConfigurationSite(const String option, uint8_t command,
+                                     NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
-
+  String getLEDConfigurationSite(const String option, uint8_t command,
+                                 LED data);
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data1, RELAY data2);
   String getSwitchConfigurationSite(const String option, uint8_t command,

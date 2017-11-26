@@ -1,6 +1,15 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+
 #include "AFE-Device.h"
 
-AFEDevice::AFEDevice() { deviceMode = Data.getDeviceMode(); }
+AFEDevice::AFEDevice() {
+  deviceMode = Data.getDeviceMode();
+  begin();
+}
+
+void AFEDevice::begin() { configuration = Data.getDeviceConfiguration(); }
 
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);

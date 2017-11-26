@@ -1,9 +1,6 @@
-/*
-
-   AFE Firmware for smart home devices build on ESP8266
-   More info: https://github.com/tschaban/AFE-Firmware
-   LICENCE: http://opensource.org/licenses/MIT
- */
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Data_Access_h
 #define _AFE_Data_Access_h
@@ -24,22 +21,23 @@ private:
 
 public:
   AFEDataAccess();
+  DEVICE getDeviceConfiguration();
+  FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
+  LED getLEDConfiguration(uint8_t id);
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
-  FIRMWARE getFirmwareConfiguration();
-  LED getLEDConfiguration();
-
   // @TODO DOMOTICZ getDomoticzConfiguration();
   // @TODO DS18B20 getDS18B20Configuration();
 
+  void saveConfiguration(DEVICE configuration);
+  void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
+  void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
-  void saveConfiguration(FIRMWARE configuration);
-  void saveConfiguration(LED configuration);
   // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
   // @TODO DS18B20 void saveConfiguration(DS18B20 configuration);
 

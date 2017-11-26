@@ -23,7 +23,6 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   } else if (option == "help") {
     if (command == 0) {
       page += Site.addHelpSection();
-      page += Site.addHelpMQTTTopicSection();
     } else if (command == 1 || command == 2) {
       page += Site.addExitSection();
     }
@@ -55,16 +54,33 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getBasicConfigurationSite(const String option,
-                                                        uint8_t command,
-                                                        NETWORK data) {
+String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
+                                                         uint8_t command,
+                                                         DEVICE data) {
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=basic&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=device&command=1\"  method=\"post\">";
+  page += Site.addDeviceConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          NETWORK data) {
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=network&command=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -84,6 +100,26 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   String page = Site.generateHeader();
   page += "<form action=\"/?option=mqtt&command=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
+                                                      uint8_t command,
+                                                      LED data) {
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(0, data);
+    //    Data.saveConfiguration(1, data2);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=led&command=1\"  method=\"post\">";
+  page += Site.addLEDConfiguration(0);
+  //  page += Site.addLEDConfiguration(1);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -115,17 +151,27 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          uint8_t command,
                                                          SWITCH data1,
                                                          SWITCH data2) {
+
+  Device.begin(); // Reading configuration data
+
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(0, data1);
-    Data.saveConfiguration(1, data2);
+    if (Device.configuration.isSwitch[0]) {
+      Data.saveConfiguration(0, data1);
+    }
+    if (Device.configuration.isSwitch[1]) {
+      Data.saveConfiguration(1, data2);
+    }
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=switch&command=1\"  method=\"post\">";
 
-  page += Site.addSwitchConfiguration(0);
-  page += Site.addSwitchConfiguration(1);
-
+  if (Device.configuration.isSwitch[0]) {
+    page += Site.addSwitchConfiguration(0);
+  }
+  if (Device.configuration.isSwitch[1]) {
+    page += Site.addSwitchConfiguration(1);
+  }
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

@@ -1,10 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  MQTT Messages listener
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -19,27 +15,31 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   // Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
-
-    for (uint8_t i = 0; i < length; i++) {
-      Serial << (char)payload[i];
-    }
-
+                     /*
+                         for (uint8_t i = 0; i < length; i++) {
+                           Serial << (char)payload[i];
+                         }
+                     */
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
     /*
         Serial << endl
                << "DEBUG: "
                << "checking relay messages: " << _mqttTopic;
     */
-    if (String(topic) == String(_mqttTopic)) {
-      if ((char)payload[1] == 'N') {
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[1] == 'n') {
         Relay.on();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-      } else if ((char)payload[1] == 'F') {
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+      } else if ((char)payload[1] == 'f') {
         Relay.off();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-      } else if ((char)payload[2] == 'p') { // reportState
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+      } else if ((char)payload[1] == 'e') { // reportState
         Mqtt.publish(Relay.getMQTTTopic(), "state",
-                     Relay.get() == RELAY_ON ? "ON" : "OFF");
+                     Relay.get() == RELAY_ON ? "on" : "off");
+      } else if ((char)payload[1] == 'o') { // toggle
+        Relay.get() == RELAY_ON ? Relay.off() : Relay.on();
+        Mqtt.publish(Relay.getMQTTTopic(), "state",
+                     Relay.get() == RELAY_ON ? "on" : "off");
       }
     }
 
@@ -49,7 +49,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                << "DEBUG: "
                << "checking device level messages: " << _mqttTopic;
     */
-    if (String(topic) == String(_mqttTopic)) {
+    if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[2] == 'b') { // reboot
         //      Serial << endl << "INFO: Process: reboot";
         Device.reboot(MODE_NORMAL);
@@ -60,4 +60,14 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
   }
   Led.off();
+}
+
+void MQTTPublishRelayState() {
+  if (Device.configuration.mqttAPI) {
+    if (Relay.get() == RELAY_ON) {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+    } else {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+    }
+  }
 }

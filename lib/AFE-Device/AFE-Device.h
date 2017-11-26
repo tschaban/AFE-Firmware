@@ -1,9 +1,6 @@
-/*
-  Device
-  AFE Firmware for smart home devices build on ESP8266
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
@@ -30,12 +27,17 @@ private:
   uint8_t deviceMode;
 
 public:
+  DEVICE configuration;
+
   AFEDevice();
+
+  /* Method reads configuration data */
+  void begin();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
   void reboot(uint8_t mode = MODE_NORMAL);
 
-  /* Methods returns current device mode */
+  /* Method returns current device mode */
   uint8_t getMode();
 
   /* Method saves current device mode to EEPROM */

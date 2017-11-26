@@ -1,9 +1,6 @@
-/*
-  Relay component
-  AFE Firmware for smart home devices build on ESP8266
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Relay_h
 #define _AFE_Relay_h
@@ -30,11 +27,11 @@ private:
   char mqttTopic[50];
   unsigned long turnOffCounter = 0;
 
-  /* Method set relay state after power restore or connection to MQTT is established */
+  /* Method set relay state after power restore or connection to MQTT is
+   * established */
   void setRelayAfterRestore(uint8_t option);
 
 public:
-
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
@@ -45,11 +42,13 @@ public:
   /* Method returns MQTT topic for this relay */
   const char *getMQTTTopic();
 
-  /* Method sets relay state after device is turned on / power is restored / or after device has been crash */
+  /* Method sets relay state after device is turned on / power is restored / or
+   * after device has been crash */
   void setRelayAfterRestoringPower();
 
-  /* Method sets relay state after device is connected / reconnected to MQTT Broker.
-   * It returns TRUE if relay state has been set, false it relay state should be manged through MQTT Broker*/
+  /* Method sets relay state after device is connected / reconnected to MQTT
+   * Broker. It returns TRUE if relay state has been set, false it relay state
+   * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
 
   /* Method: Returns RELAY_OFF if relay is OFF, RELAY_ON if relay is ON */
@@ -64,8 +63,12 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-  /* Methods while added to main loop turns off relay automatically. Duration how long relay should be on must be configured */
+  /* Methods while added to main loop turns off relay automatically. Duration
+   * how long relay should be on must be configured */
   boolean autoTurnOff();
+
+  /* Methods returns relay name */
+  const char *getName();
 };
 
 #endif

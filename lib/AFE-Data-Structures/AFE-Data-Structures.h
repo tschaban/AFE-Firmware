@@ -1,9 +1,6 @@
-/*
-   Data structures
-   AFE Firmware for smart home devices build on ESP8266
-   More info: https://github.com/tschaban/AFE-Firmware
-   LICENCE: http://opensource.org/licenses/MIT
- */
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
@@ -34,15 +31,21 @@ struct FIRMWARE {
   char upgradeURL[120];
 };
 
-struct LED {
-  boolean present;
-  uint8_t gpio;
+struct DEVICE {
+  char name[32];
+  boolean mqttAPI;
+  boolean httpAPI;
+  //  boolean domoticzAPI;
+  boolean isLED[1];
+  boolean isRelay[1];
+  boolean isSwitch[2];
+  //  boolean isDS18B20;
+  //  boolean isDHT;
 };
 
 struct NETWORK {
   char ssid[32];
   char password[32];
-  char host[32];
   uint8_t isDHCP;
   IPAddress ip;
   IPAddress gateway;
@@ -61,8 +64,12 @@ struct MQTT {
   char topic[32];
 };
 
+struct LED {
+  uint8_t gpio;
+  boolean changeToOppositeValue;
+};
+
 struct RELAY {
-  boolean present;
   uint8_t gpio;
   float timeToOff;
   uint8_t statePowerOn;
@@ -76,17 +83,21 @@ struct RELAY {
 };
 
 struct SWITCH {
-  boolean present;
   uint8_t gpio;
   uint8_t type;
   uint16_t sensitiveness;
   uint8_t functionality;
 };
 
+struct HTTPCOMMAND {
+  char device[16];
+  char name[16];
+  char command[32];
+};
+
 /* @TODO DS18B20
 
 struct DS18B20 {
-  boolean present;
   uint8_t gpio;
   float correction;
   uint16_t interval;

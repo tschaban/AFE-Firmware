@@ -1,9 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
@@ -15,6 +12,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
 
 class AFEUpgrader {
@@ -23,6 +21,7 @@ private:
   FIRMWARE FirmwareConfiguration;
   AFEDataAccess Data;
   AFEDefaults Defaults;
+  void upgradeTypeOfFirmware();
 
 public:
   /* Constructor */

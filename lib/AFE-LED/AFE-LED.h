@@ -1,9 +1,6 @@
-/*
-   LED component
-   AFE Firmware for smart home devices build on ESP8266
-   More info: https://github.com/tschaban/AFE-Firmware
-   LICENCE: http://opensource.org/licenses/MIT
- */
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_LED_h
 #define _AFE_LED_h
@@ -16,6 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Device.h>
 
 class AFELED {
 
@@ -25,6 +23,9 @@ private:
   boolean blinking = false;
   unsigned long interval;
   unsigned long previousMillis = 0;
+
+  void set(uint8_t state);
+  void toggle();
 
 public:
   /* Constructor */

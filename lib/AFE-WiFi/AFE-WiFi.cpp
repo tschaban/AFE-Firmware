@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+
 #include "AFE-Wifi.h"
 
 AFEWiFi::AFEWiFi() {}
@@ -5,26 +9,27 @@ AFEWiFi::AFEWiFi() {}
 void AFEWiFi::begin(uint8_t mode) {
 
   AFEDataAccess Data;
-  LED LEDConfiguration;
+  AFEDevice Device;
 
-  LEDConfiguration = Data.getLEDConfiguration();
   networkConfiguration = Data.getNetworkConfiguration();
 
   // Init LED
-  if (LEDConfiguration.present) {
-    Led.begin(LEDConfiguration.gpio);
+  if (Device.configuration.isLED[0]) {
+    LED LEDConfiguration;
+    LEDConfiguration = Data.getLEDConfiguration(0);
+    Led.begin(0);
+    LEDConfiguration = {};
   }
 
   // Cleaning @TODO is it neded?
   Data = {};
-  LEDConfiguration = {};
 
-  WiFi.hostname(networkConfiguration.host);
+  WiFi.hostname(Device.configuration.name);
   if (mode == MODE_ACCESS_POINT) {
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    WiFi.softAP(networkConfiguration.host);
+    WiFi.softAP(Device.configuration.name);
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
     dnsServer.start(53, "www.example.com", apIP);
@@ -49,12 +54,11 @@ void AFEWiFi::connect() {
     WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
     while (WiFi.status() != WL_CONNECTED) {
       Led.on();
-      /*
-            Serial << endl
-                   << "INFO: WiFi connection attempt: " << connections + 1 << "
-         from "
-                   << networkConfiguration.noConnectionAttempts;
-      */
+
+      /* Serial << endl
+             << "INFO: WiFi connection attempt: " << connections + 1 << "from "
+             << networkConfiguration.noConnectionAttempts; */
+
       connections++;
       delay(networkConfiguration.waitTimeConnections * 500);
       Led.off();
