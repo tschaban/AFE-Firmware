@@ -17,14 +17,26 @@ void AFELED::begin(uint8_t id) {
 }
 
 void AFELED::on() {
-  if (_initialized && digitalRead(LEDConfiguration.gpio) == HIGH) {
-    digitalWrite(LEDConfiguration.gpio, LOW);
+  if (_initialized) {
+    if (LEDConfiguration.changeToOppositeValue) {
+      off();
+    } else {
+      if (digitalRead(LEDConfiguration.gpio) == HIGH) {
+        digitalWrite(LEDConfiguration.gpio, LOW);
+      }
+    }
   }
 }
 
 void AFELED::off() {
-  if (_initialized && digitalRead(LEDConfiguration.gpio) == LOW) {
-    digitalWrite(LEDConfiguration.gpio, HIGH);
+  if (_initialized) {
+    if (LEDConfiguration.changeToOppositeValue) {
+      on();
+    } else {
+      if (digitalRead(LEDConfiguration.gpio) == LOW) {
+        digitalWrite(LEDConfiguration.gpio, HIGH);
+      }
+    }
   }
 }
 
