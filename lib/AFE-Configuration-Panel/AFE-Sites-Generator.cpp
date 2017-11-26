@@ -66,23 +66,33 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
           "<h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
+    Device.begin(); // Reading configuration data
     page += "<li class=\"itm\"><a href=\"\\?option=device\">";
     page += language == 0 ? "Urządzenie" : "Device";
     page += "</a></li> "
             "<li class=\"itm\"><a href=\"\\?option=network\">";
     page += language == 0 ? "Sieć WiFi" : "Network";
-    page += "</a></li> "
-            "<li class=\"itm\"><a "
-            "href=\"\\?option=mqtt\">MQTT "
-            "Broker</a></li>";
-    page += "<li class=\"itm\"><a href=\"\\?option=led\">LED</a></li>";
-    page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
-    page += language == 0 ? "Przekaźnik" : "Relay";
     page += "</a></li>";
-    page += "<li class=\"itm\"><a href=\"\\?option=switch\">";
-    page += language == 0 ? "Przycisk / Włącznik" : "Switch / Button";
+    if (Device.configuration.mqttAPI) {
+      page += "<li class=\"itm\"><a "
+              "href=\"\\?option=mqtt\">MQTT "
+              "Broker</a></li>";
+    }
+    if (Device.configuration.isLED[0]) {
+      page += "<li class=\"itm\"><a href=\"\\?option=led\">LED</a></li>";
+    }
+    if (Device.configuration.isRelay[0]) {
+      page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
+      page += language == 0 ? "Przekaźnik" : "Relay";
+      page += "</a></li>";
+    }
+    if (Device.configuration.isSwitch[0] || Device.configuration.isSwitch[1]) {
+      page += "<li class=\"itm\"><a href=\"\\?option=switch\">";
+      page += language == 0 ? "Przycisk / Włącznik" : "Switch / Button";
+      page += "</a></li>";
+    }
     page +=
-        "</a><br><br></li><li class=\"itm\"><a "
+        "<br><br><li class=\"itm\"><a "
         "href=\"\\?option=language\">[PL] Język / "
         "[EN] Language</a></li><br><br><li class=\"itm\"><a href=\"\\update\">";
     page += language == 0 ? "Aktulizacja firmware" : "Firmware upgrade";

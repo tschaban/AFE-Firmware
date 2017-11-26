@@ -5,9 +5,11 @@
 #include "AFE-Device.h"
 
 AFEDevice::AFEDevice() {
-  configuration = Data.getDeviceConfiguration();
   deviceMode = Data.getDeviceMode();
+  begin();
 }
+
+void AFEDevice::begin() { configuration = Data.getDeviceConfiguration(); }
 
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);

@@ -20,6 +20,7 @@ class AFEConfigurationPanel {
 private:
   AFESitesGenerator Site;
   AFEDataAccess Data;
+  AFEDevice Device;
   uint8_t language;
 
 public:

@@ -31,10 +31,13 @@ public:
 
   AFEDevice();
 
+  /* Method reads configuration data */
+  void begin();
+
   /* Method reboots device to specyfic mode  define by MODE_.. */
   void reboot(uint8_t mode = MODE_NORMAL);
 
-  /* Methods returns current device mode */
+  /* Method returns current device mode */
   uint8_t getMode();
 
   /* Method saves current device mode to EEPROM */

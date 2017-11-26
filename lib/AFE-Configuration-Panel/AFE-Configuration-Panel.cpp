@@ -151,17 +151,27 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          uint8_t command,
                                                          SWITCH data1,
                                                          SWITCH data2) {
+
+  Device.begin(); // Reading configuration data
+
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(0, data1);
-    Data.saveConfiguration(1, data2);
+    if (Device.configuration.isSwitch[0]) {
+      Data.saveConfiguration(0, data1);
+    }
+    if (Device.configuration.isSwitch[1]) {
+      Data.saveConfiguration(1, data2);
+    }
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=switch&command=1\"  method=\"post\">";
 
-  page += Site.addSwitchConfiguration(0);
-  page += Site.addSwitchConfiguration(1);
-
+  if (Device.configuration.isSwitch[0]) {
+    page += Site.addSwitchConfiguration(0);
+  }
+  if (Device.configuration.isSwitch[1]) {
+    page += Site.addSwitchConfiguration(1);
+  }
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
