@@ -344,6 +344,11 @@ LED AFEWebServer::getLEDData(uint8_t id) {
   if (server.arg("led" + String(id) + "_gpio").length() > 0) {
     data.gpio = server.arg("led" + String(id) + "_gpio").toInt();
   }
+
+  server.arg("led" + String(id) + "_opposite").length() > 0
+      ? data.changeToOppositeValue = true
+      : data.changeToOppositeValue = false;
+
   return data;
 }
 
