@@ -75,7 +75,7 @@ void AFEMQTT::connect() {
             // Updating relay state after setting default value after MQTT
             // connected
             publish(Relay.getMQTTTopic(), "state",
-                    Relay.get() == RELAY_ON ? "ON" : "OFF");
+                    Relay.get() == RELAY_ON ? "on" : "off");
           }
         } else {
           connections++;

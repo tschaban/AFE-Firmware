@@ -116,7 +116,7 @@ void loop() {
 
           /* Relay turn off event launched */
           if (Relay.autoTurnOff()) {
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
           }
 
           /* One of the switches has been shortly pressed */
@@ -124,9 +124,9 @@ void loop() {
             Relay.toggle();
             if (Device.configuration.mqttAPI) {
               if (Relay.get() == RELAY_ON) {
-                Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
+                Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
               } else {
-                Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+                Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
               }
             }
           }
