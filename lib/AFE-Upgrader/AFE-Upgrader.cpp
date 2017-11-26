@@ -23,7 +23,13 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != Defaults.getFirmwareType()) {
     upgradeTypeOfFirmware();
   } else {
-    Data.saveVersion(String(Defaults.getFirmwareVersion()));
+    if (strcmp(Defaults.getFirmwareVersion(), "1.0rc3") ==
+        0) { // While upgrading to this version EPPROM is cleared
+      Defaults.eraseConfiguration();
+      Defaults.set();
+    } else {
+      Data.saveVersion(String(Defaults.getFirmwareVersion()));
+    }
   }
 }
 
