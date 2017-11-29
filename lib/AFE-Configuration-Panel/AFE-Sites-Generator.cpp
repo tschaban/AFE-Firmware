@@ -164,8 +164,11 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
         "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
         "3aNonHosted\" target=\"_blank\"><img "
-        "src=\"https://adrian.czabanowski.com/images/paypal.png\" "
-        "border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
+        "src=\"http://adrian.czabanowski.com/afe/donation/T";
+    page += configuration.type;
+    page += "/";
+    page += configuration.version;
+    page += "/\" border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
   }
   page += "</div>"
           "<div id=\"r\">";
