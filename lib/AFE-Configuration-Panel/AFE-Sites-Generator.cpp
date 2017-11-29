@@ -219,7 +219,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "<input name=\"mqttAPI\" type=\"checkbox\" value=\"1\"";
   body += configuration.mqttAPI ? " checked=\"checked\"" : "";
   body += ">MQTT API ";
-  body += language == 0 ? "włączone" : "turned ON";
+  body += language == 0 ? "włączone" : "enabled";
   body += "?";
   body += "</label>";
   body += "</div>";
@@ -229,7 +229,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "<input name=\"httpAPI\" type=\"checkbox\" value=\"1\"";
   body += configuration.httpAPI ? " checked=\"checked\"" : "";
   body += ">HTTP API ";
-  body += language == 0 ? "włączone" : "turned ON";
+  body += language == 0 ? "włączone" : "enabled";
   body += "?";
   body += "</label>";
   body += "</div>";
@@ -237,10 +237,10 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</fieldset>";
 
   page += addConfigurationBlock(
-      "Sterowanie urządzeniem",
+      language == 0 ? "Sterowanie urządzeniem" : "Device controlling mechanism",
       language == 0
           ? "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
-          : "Turning on/off methods to control the device",
+          : "Enable / Disable APIs",
       body);
 
   return page;
@@ -543,9 +543,8 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   return addConfigurationBlock(
       "LED",
       language == 0 ? "LED wykorzystywany jest do identyfikowania w jakim "
-                      "stanie jest urządzenie. Więcej informacji w dokumentacji"
-                    : "LED is used to identify the device state. Refer to the "
-                      "documentation for more details",
+                      "stanie jest urządzenie"
+                    : "LED helps to identify the state of the device",
       body);
 }
 
@@ -579,13 +578,13 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       language == 0
           ? "Konfiguracja zachowania się przekaźnika po przywróceniu zasilania "
             "lub nawiązaniu połączenia do brokera MQTT"
-          : "Relay behaviour configuration after power is restored "
+          : "Setting relay state after power is restored "
             "or the device connected to MQTT Broker";
   body += "</p>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body +=
-      language == 0 ? "Po przywróceniu zasilania" : "When power is restored";
+  body += language == 0 ? "Po przywróceniu zasilania"
+                        : "When power is restored set it to";
   body += "</label>";
   body += "<select name=\"relay" + String(id) + "_power_restored\">";
   body += "<option value=\"0\"";
@@ -668,7 +667,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Funkcjonalność automaycznego wyłączenie przekaźnika "
-                        : "Automatic relay turning off functionality";
+                        : "Automatic relay switching off functionality";
   body += "</p>";
 
   body += "<div class=\"cf\">";
@@ -696,16 +695,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       language == 0
           ? "Przekaźnik musi posiadać unikalną nazwę np. "
             "<strong>lampa</strong>. "
-            "Nazwa przekaźnika składa się na temat MQTT "
-            "wykorzystywany do sterowania przekaźnikiem "
-            "np. <strong>/sypialnia/lampa/</strong> gdzie "
-            "<strong>/sypialnia/</strong> jest definiowane w "
-            "sekcji konfiguracji MQTT Brokera (pole MQTT Temat)"
+            "Nazwa przekaźnika jest używana przez MQTT API"
           : "Relay must have unique name, for example: <strong>lamp</strong>. "
-            "Relay name is a part of MQTT Topic used to control the "
-            "relay eg.: <strong>/bedroom/lamp/</strong> where "
-            "<strong>/bedroom/</strong> is configured in MQTT "
-            "Configuration section (MQTT Topic field)",
+            "Relay name is used by MQTT API",
       body);
 }
 
@@ -768,11 +760,11 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "</select>";
   body += "</div>";
   body += "<br><p class=\"cm\">";
-  body +=
-      language == 0
-          ? "Czułość włącznika należy ustawić metodą prób, aż uzyska się "
-            "porządane jego działanie "
-          : "Button's sensitiveness should be set based on individual needs";
+  body += language == 0
+              ? "Czułość włącznika należy ustawić metodą prób, aż uzyska się "
+                "porządane jego działanie "
+              : "Button's sensitiveness should be adjusted if it didn't behave "
+                "as expected";
 
   body += "</p><div class=\"cf\">";
   body += "<label>";
