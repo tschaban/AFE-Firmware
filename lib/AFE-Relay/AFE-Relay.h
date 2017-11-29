@@ -12,7 +12,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 /* Relay states */
 #define RELAY_ON 1

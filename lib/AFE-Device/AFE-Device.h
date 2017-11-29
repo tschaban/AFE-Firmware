@@ -14,7 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 #define MODE_NORMAL 0        // Device is in operating mode
 #define MODE_CONFIGURATION 1 // Device is in configuration mode (within LAN)

@@ -13,7 +13,7 @@
 
 #include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
-#include <Streaming.h>
+// include <Streaming.h>
 
 class AFEConfigurationPanel {
 
