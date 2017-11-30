@@ -10,8 +10,8 @@ AFEUpgrader::AFEUpgrader() {
 
 boolean AFEUpgrader::upgraded() {
 
-  if (String(FirmwareConfiguration.version) ==
-          String(Defaults.getFirmwareVersion()) &&
+  if (strcmp(FirmwareConfiguration.version, Defaults.getFirmwareVersion()) ==
+          0 &&
       FirmwareConfiguration.type == Defaults.getFirmwareType()) {
     return false;
   } else {
@@ -23,8 +23,8 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != Defaults.getFirmwareType()) {
     upgradeTypeOfFirmware();
   } else {
-    if (strcmp(Defaults.getFirmwareVersion(), "1.0rc3") ==
-        0) { // While upgrading to this version EPPROM is cleared
+    if (strcmp(FirmwareConfiguration.version, "1.0rc1") == 0 &&
+        strcmp(FirmwareConfiguration.version, "1.0rc2") == 0) {
       Defaults.eraseConfiguration();
       Defaults.set();
     } else {

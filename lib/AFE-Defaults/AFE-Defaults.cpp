@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0rc3"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0.0"; }
 uint8_t AFEDefaults::getFirmwareType() { return 0; }
 void AFEDefaults::set() {
 
@@ -108,7 +108,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
