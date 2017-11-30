@@ -17,14 +17,16 @@
 #include <AFE-LED.h>
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEWiFi {
 
 private:
   NETWORK networkConfiguration;
   unsigned long sleepStartTime = 0;
-  boolean sleepMode = false;
+  boolean sleepMode =
+      false; // It's set to true after defined in configuration X number of
+             // connection failures
   DNSServer dnsServer;
   AFELED Led;
 

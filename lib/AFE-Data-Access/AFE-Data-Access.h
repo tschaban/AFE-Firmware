@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEDataAccess {
 private:
@@ -21,6 +21,8 @@ private:
 
 public:
   AFEDataAccess();
+
+  /* Methods read configuration from EEPROM */
   DEVICE getDeviceConfiguration();
   FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
@@ -31,6 +33,7 @@ public:
   // @TODO DOMOTICZ getDomoticzConfiguration();
   // @TODO DS18B20 getDS18B20Configuration();
 
+  /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
   void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
@@ -41,15 +44,19 @@ public:
   // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
   // @TODO DS18B20 void saveConfiguration(DS18B20 configuration);
 
+  /* Methods read and save firmware version from/to EEPROM */
   const char getVersion();
   void saveVersion(String version);
 
+  /* Methods read and save relay state from/to EEPROM */
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
 
+  /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
+  /* Methods read and save firmware Language from/to EEPROM */
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 };

@@ -17,22 +17,29 @@
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEWebServer {
 
 private:
   ESP8266WebServer server;
   AFEConfigurationPanel ConfigurationPanel;
-  ESP8266HTTPUpdateServer httpUpdater;
+  ESP8266HTTPUpdateServer httpUpdater; // Class used for firmware upgrade
   AFEDevice Device;
-  HTTPCOMMAND httpCommand;
-  boolean receivedHTTPCommand = false;
+  HTTPCOMMAND httpCommand; // It stores last HTTP API request
+  boolean receivedHTTPCommand =
+      false; // Once HTTP API requet is recieved it's set to true
 
+  /* Method pushes HTML site from WebServer */
   void publishHTML(String page);
+
+  /* Method gets url Option parameter value */
   String getOptionName();
+
+  /* Method gets url cmd parameter value */
   uint8_t getCommand();
 
+  /* Methods get POST data (for saveing) */
   DEVICE getDeviceData();
   NETWORK getNetworkData();
   MQTT getMQTTData();
@@ -40,7 +47,7 @@ private:
   SWITCH getSwitchData(uint8_t id);
   LED getLEDData(uint8_t id);
   uint8_t getLanguageData();
-  boolean getHTTPAPIData();
+
   // @TODO DOMOTICZ getDomoticzData();
   // @TODO DS18B20 getDS18B20Data();
 
@@ -53,8 +60,6 @@ public:
   /* Method listens for HTTP requests */
   void listener();
 
-  boolean httpAPIlistener();
-
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
 
@@ -62,7 +67,14 @@ public:
    * and pass them to Configuration Panel class */
   void generate();
 
+  /* Method listens for HTTP API requests. If get True command is in httpCommand
+   */
+  boolean httpAPIlistener();
+
+  /* Method reads HTTP API Command */
   HTTPCOMMAND getHTTPCommand();
+
+  /* Method pushes JSON response to HTTP API request */
   void sendJSON(String json);
 };
 

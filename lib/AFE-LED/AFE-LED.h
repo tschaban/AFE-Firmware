@@ -24,7 +24,10 @@ private:
   unsigned long interval;
   unsigned long previousMillis = 0;
 
+  /* Method turns on/off LED */
   void set(uint8_t state);
+
+  /* Method change the LED to opposite state */
   void toggle();
 
 public:

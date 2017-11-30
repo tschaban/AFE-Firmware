@@ -14,11 +14,12 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
-#define MODE_NORMAL 0
-#define MODE_CONFIGURATION 1
-#define MODE_ACCESS_POINT 2
+#define MODE_NORMAL 0        // Device is in operating mode
+#define MODE_CONFIGURATION 1 // Device is in configuration mode (within LAN)
+#define MODE_ACCESS_POINT                                                      \
+  2 // Device is in configuration mode (access point mode)
 
 class AFEDevice {
 
@@ -31,7 +32,7 @@ public:
 
   AFEDevice();
 
-  /* Method reads configuration data */
+  /* Method reads device configuration data. It used in config panel */
   void begin();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */

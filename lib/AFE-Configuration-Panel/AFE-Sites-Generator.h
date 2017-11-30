@@ -15,7 +15,7 @@
 #include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFESitesGenerator {
 
@@ -25,25 +25,31 @@ private:
   AFEDevice Device;
   uint8_t language;
 
-  const String generateMQTTHelp(const char *label, const char *topic,
-                                const char *command, const char *value);
-
+  /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
-
+  /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateSwitchItem(uint8_t id, boolean checked);
   const String generateRelayItem(uint8_t id, boolean checked);
   const String generateLEDItem(uint8_t id, boolean checked);
 
-public:
-  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
-  AFESitesGenerator();
-
-  String generateHTMLPage(String &page);
+  /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
                                const String body);
+
+public:
+  /* Constructor*/
+  AFESitesGenerator();
+
+  /* Method generates site header with menu. When redirect param is diff than 0
+   * then it will redirect page to main page after redirect param time (in sec)
+   */
   const String generateHeader(uint8_t redirect = 0);
+
+  /* Method generates site footer */
   const char *generateFooter();
+
+  /* All following methods generates configuration sections */
   String addLanguageConfiguration();
   String addDeviceConfiguration();
   String addNetworkConfiguration();
@@ -51,12 +57,21 @@ public:
   String addLEDConfiguration(uint8_t id);
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+
+  /* These methods generates firmware upgrade sections */
   String addUpgradeSection();
   String addPostUpgradeSection(boolean status);
+
+  /* Method generate restore to defaults section. Command = 0 is pre-reset site,
+   * 1 is a post reset site */
   String addResetSection(uint8_t command);
+
+  /* Method addes info that device is being reset */
   String addExitSection();
+
+  /* Method generates section shown when device is in norma mode */
   String addHelpSection();
-  String addHTTPAPIConfiguration();
+
   // @TODO DOMOTICZ String addDomoticzConfiguration();
   // @TODO DS18B20 String addDS18B20Configuration();
 };

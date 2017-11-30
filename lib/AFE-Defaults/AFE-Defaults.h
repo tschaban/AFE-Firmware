@@ -14,7 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEDefaults {
 private:
@@ -22,9 +22,17 @@ private:
 
 public:
   AFEDefaults();
-  void set();
+
+  /* Method returns firmware version number */
   const char *getFirmwareVersion();
+
+  /* Method returns firmware version type */
   uint8_t getFirmwareType();
+
+  /* Method erases EEPROM */
   void eraseConfiguration();
+
+  /* Method set default values */
+  void set();
 };
 #endif

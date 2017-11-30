@@ -30,12 +30,11 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  // Comment below if you needed to debug it through Serial
-  // Serial.swap();
+  /* Turn off publishing information to Serial */
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
-  //  Device.setDevice();
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
@@ -73,7 +72,6 @@ void setup() {
   if (Device.configuration.isSwitch[0]) {
     Switch.begin(0);
   }
-
   if (Device.configuration.isSwitch[1]) {
     ExternalSwitch.begin(1);
   }
@@ -108,8 +106,6 @@ void loop() {
         if (Device.configuration.httpAPI) {
           if (WebServer.httpAPIlistener()) {
             processHTTPAPIRequest(WebServer.getHTTPCommand());
-
-
           }
         }
 
@@ -138,6 +134,7 @@ void loop() {
     WebServer.listener();
   }
 
+  /* Listens for switch events */
   Switch.listener();
   ExternalSwitch.listener();
 

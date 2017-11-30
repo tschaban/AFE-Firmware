@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <PubSubClient.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 #include <WiFiClient.h>
 
 class AFEMQTT {
@@ -30,6 +30,9 @@ private:
   boolean sleepMode = false;
   boolean isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
+
+  /* Method pushes to the MQTT Broker MQTT Message */
+  void publishToMQTTBroker(const char *topic, const char *message);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -53,8 +56,6 @@ public:
   /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
    * publishToMQTTBroker  */
   void publish(const char *topic, const char *type, const char *message);
-
-  void publishToMQTTBroker(const char *topic, const char *message);
 
   /* Returns TRUE if connected to MQTT Broker */
   boolean connected();

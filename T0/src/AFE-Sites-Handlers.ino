@@ -11,10 +11,12 @@
 #include "WProgram.h"
 #endif
 
-#include <Streaming.h>
+//#include <Streaming.h>
 
+/* Method handles favicon.ico request */
 void handleFavicon() {}
 
+/* Method handles all HTTP request */
 void handleHTTPRequests() { WebServer.generate(); }
 
 #endif

@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+ DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h
@@ -13,7 +13,7 @@
 
 #include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
-#include <Streaming.h>
+// include <Streaming.h>
 
 class AFEConfigurationPanel {
 
@@ -24,11 +24,10 @@ private:
   uint8_t language;
 
 public:
-  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
+  /* Constructor */
   AFEConfigurationPanel();
 
   /* It returns configuration site */
-  String getSite(const String option, uint8_t command);
   String getSite(const String option, uint8_t command, boolean data);
   String getDeviceConfigurationSite(const String option, uint8_t command,
                                     DEVICE data);
@@ -38,8 +37,9 @@ public:
                                   MQTT data);
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data);
-  String getRelayConfigurationSite(const String option, uint8_t command,
-                                   RELAY data1, RELAY data2);
+  String getRelayConfigurationSite(
+      const String option, uint8_t command, RELAY data1,
+      RELAY data2); // This method is set for two relays (future use)
   String getSwitchConfigurationSite(const String option, uint8_t command,
                                     SWITCH data1, SWITCH data2);
   String getLanguageConfigurationSite(const String option, uint8_t command,
@@ -48,7 +48,11 @@ public:
   // DOMOTICZ data);
   // @TODO DS18B20 String getSite(const String option, uint8_t command, DS18B20
   // data);
+
+  /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();
+
+  /* It generates sites post firmware upgrade */
   String postFirmwareUpgradeSite(boolean status);
 };
 

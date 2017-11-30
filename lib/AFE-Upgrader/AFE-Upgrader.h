@@ -21,11 +21,14 @@ private:
   FIRMWARE FirmwareConfiguration;
   AFEDataAccess Data;
   AFEDefaults Defaults;
+
+  /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
 
 public:
   /* Constructor */
   AFEUpgrader();
+
   /* Checks if firmware has been upgraded */
   boolean upgraded();
 

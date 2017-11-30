@@ -35,12 +35,13 @@ struct DEVICE {
   char name[32];
   boolean mqttAPI;
   boolean httpAPI;
-  //  boolean domoticzAPI;
+  boolean domoticzAPI;
   boolean isLED[1];
   boolean isRelay[1];
   boolean isSwitch[2];
-  //  boolean isDS18B20;
-  //  boolean isDHT;
+  boolean isDS18B20;
+  boolean isDHT;
+  boolean isPIR;
 };
 
 struct NETWORK {
@@ -95,17 +96,13 @@ struct HTTPCOMMAND {
   char command[32];
 };
 
-/* @TODO DS18B20
-
 struct DS18B20 {
   uint8_t gpio;
   float correction;
   uint16_t interval;
   uint16_t unit;
 };
-*/
 
-/* @TODO DOMOTICZ
 struct DOMOTICZ {
   char host[32];
   IPAddress ip;
@@ -113,6 +110,5 @@ struct DOMOTICZ {
   char user[32];
   char password[32];
 };
-*/
 
 #endif

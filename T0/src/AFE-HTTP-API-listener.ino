@@ -8,6 +8,8 @@
 #include "WProgram.h"
 #endif
 
+/* Method creates JSON respons after processing HTTP API request, and pushes it
+ */
 void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
                               byte state = 9) {
   String respond;
@@ -34,6 +36,7 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
   WebServer.sendJSON(respond);
 }
 
+/* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
   /* Checking of request is about a relay */
