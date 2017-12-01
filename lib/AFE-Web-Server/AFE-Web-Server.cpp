@@ -120,10 +120,10 @@ String AFEWebServer::getOptionName() {
 
   if (Device.getMode() == MODE_NORMAL) {
     /* Recived HTTP API Command */
-    if (server.hasArg("cmd")) {
+    if (server.hasArg("command")) {
       /* Constructing command */
-      server.arg("cmd").toCharArray(httpCommand.command,
-                                    sizeof(httpCommand.command));
+      server.arg("command").toCharArray(httpCommand.command,
+                                        sizeof(httpCommand.command));
       if (server.arg("device")) {
         server.arg("device").toCharArray(httpCommand.device,
                                          sizeof(httpCommand.device));
@@ -138,7 +138,7 @@ String AFEWebServer::getOptionName() {
       }
 
       receivedHTTPCommand = true;
-      return server.arg("cmd");
+      return server.arg("command");
 
     } else {
       return "help";
