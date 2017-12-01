@@ -153,8 +153,8 @@ String AFEWebServer::getOptionName() {
 }
 
 uint8_t AFEWebServer::getCommand() {
-  if (server.hasArg("command")) {
-    return server.arg("command").toInt();
+  if (server.hasArg("cmd")) {
+    return server.arg("cmd").toInt();
   }
 }
 
