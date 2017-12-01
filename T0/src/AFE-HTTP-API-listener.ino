@@ -25,13 +25,13 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
   }
 
   if (state != 9) {
-    respond += "\"state\":\"";
+    respond += "\"value\":\"";
     respond += state == RELAY_ON ? "on" : "off";
     respond += "\",";
   }
 
   respond += "\"status\":\"";
-  respond += status ? "success" : "failure";
+  respond += status ? "success" : "error";
   respond += "\"}";
   WebServer.sendJSON(respond);
 }
