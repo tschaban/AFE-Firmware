@@ -41,7 +41,7 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
     page += Site.addExitSection();
   } else {
     page += Site.generateHeader();
-    page += "<form action=\"/?option=language&command=1\"  method=\"post\">";
+    page += "<form action=\"/?option=language&cmd=1\"  method=\"post\">";
     page += Site.addLanguageConfiguration();
     page += "<input type=\"submit\" class=\"b bs\" value=\"";
     page += language == 0 ? "Zapisz" : "Save";
@@ -60,7 +60,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=device&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=device&cmd=1\"  method=\"post\">";
   page += Site.addDeviceConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -77,7 +77,7 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
     Data.saveConfiguration(data);
   }
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=network&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=network&cmd=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -94,7 +94,7 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=mqtt&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=mqtt&cmd=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -112,7 +112,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=led&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
   page += Site.addLEDConfiguration(0);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -131,7 +131,7 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=relay&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=relay&cmd=1\"  method=\"post\">";
   page += Site.addRelayConfiguration(0);
   //  page += Site.addRelayConfiguration(1);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -158,7 +158,7 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=switch&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=switch&cmd=1\"  method=\"post\">";
 
   if (Device.configuration.isSwitch[0]) {
     page += Site.addSwitchConfiguration(0);
@@ -201,7 +201,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=domoticz&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=domoticz&cmd=1\"  method=\"post\">";
   page += Site.addDomoticzConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -221,7 +221,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=ds18b20&command=1\"  method=\"post\">";
+  page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
   page += Site.addDS18B20Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";

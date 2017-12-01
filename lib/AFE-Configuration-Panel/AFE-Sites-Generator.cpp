@@ -102,9 +102,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=exit\">";
     page += language == 0 ? "Zakończ konfigurację" : "Finish configuration";
   } else {
-    page += "<li class=\"itm\"><a href=\"\\?option=help&command=1\">";
+    page += "<li class=\"itm\"><a href=\"\\?option=help&cmd=1\">";
     page += language == 0 ? "Ustawienia" : "Settings";
-    page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&command=2\">";
+    page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&cmd=2\">";
     page += language == 0 ? "Ustawienia (tryb:" : "Settings (mode:";
     page += " Access Point)";
   }
@@ -844,7 +844,7 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
   String body = "<fieldset>";
   String subtitle;
   if (command == 0) {
-    body += "<a href=\"\\?option=reset&command=1\" class=\"b be\">";
+    body += "<a href=\"\\?option=reset&cmd=1\" class=\"b be\">";
     body += language == 0 ? "Przywróć ustawienia początkowe"
                           : "Restore default settings";
     body += "</a>";
