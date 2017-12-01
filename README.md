@@ -1,10 +1,10 @@
-# AFE-Firmware
+## AFE-Firmware
 - Firmware for ESP based devices for home automation
-- Very well fits to devices like sonoff or custom builds
+- Very well fits to devices like [sonoff](http://smart-house.adrian.czabanowski.com/przelacznik-sonoff/) or custom builds
 
-# Documentaion
+## Documentation
 - [PL] [tutaj](http://smart-house.adrian.czabanowski.com/afe-firmware-pl/)
 - [EN] [here](http://smart-house.adrian.czabanowski.com/afe-firmware-en/) *Not written yet*
 
-# Download firmware
+## Download firmware
 - [PL] [here](http://smart-house.adrian.czabanowski.com/afe-firmware-pl/wersje/)
