@@ -1,4 +1,10 @@
 # AFE-Firmware
 - Firmware for ESP based devices for home automation
-- It will replace Sonoff Basic Firmware https://github.com/tschaban/SONOFF-BASIC-firmware
-- All variations of firmware will be uploaded to firmwares folder
+- Very well fits to devices like sonoff or custom builds
+
+# Documentaion
+- [PL] [tutaj](http://smart-house.adrian.czabanowski.com/afe-firmware-pl/)
+- [EN] [here](http://smart-house.adrian.czabanowski.com/afe-firmware-en/) *Not written yet*
+
+# Download firmware
+- [PL] [here](http://smart-house.adrian.czabanowski.com/afe-firmware-pl/wersje/)
