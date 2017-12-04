@@ -1,9 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
 #include <AFE-Data-Access.h>
@@ -16,6 +13,7 @@
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
+#include <AFE-Sensor-DS18B20.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -25,9 +23,8 @@ AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch;
 AFESwitch ExternalSwitch;
-
 AFERelay Relay;
-
+AFESensorDS18B20 SensorDS18B20;
 MQTT MQTTConfiguration;
 
 void setup() {
@@ -35,7 +32,7 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  // Comment below if you needed to debug it through Serial
+  /* Turn off publishing information to Serial */
   Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
@@ -57,37 +54,44 @@ void setup() {
   }
 
   /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL) {
-    RELAY RelayConfiguration;
-    RelayConfiguration = Data.getRelayConfiguration(0);
-    if (RelayConfiguration.present) {
-      Relay.begin(0);
-      Relay.setRelayAfterRestoringPower();
-    }
+  if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
+    Relay.begin(0);
+    Relay.setRelayAfterRestoringPower();
   }
 
   /* Initialzing network */
   Network.begin(Device.getMode());
 
-  /* Initializing LED */
+  /* Initializing LED, checking if LED exists is made on Class level  */
   Led.begin(0);
+
   /* If device in configuration mode then start LED blinking */
   if (Device.getMode() != MODE_NORMAL) {
     Led.blinkingOn(100);
   }
 
   /* Initializing Switches */
-  Switch.begin(0);
-  ExternalSwitch.begin(1);
-
-  /* Initializing MQTT */
-  if (Device.getMode() != MODE_ACCESS_POINT) {
-    MQTTConfiguration = Data.getMQTTConfiguration();
-    Mqtt.begin();
-    Network.connect();
+  if (Device.configuration.isSwitch[0]) {
+    Switch.begin(0);
+  }
+  if (Device.configuration.isSwitch[1]) {
+    ExternalSwitch.begin(1);
   }
 
-  /* Initializing HTTP API */
+  /* Initializing sensor: DS18B20 */
+  if (Device.configuration.isDS18B20) {
+    SensorDS18B20.begin();
+  }
+
+  /* Initializing MQTT */
+  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
+    MQTTConfiguration = Data.getMQTTConfiguration();
+    Mqtt.begin();
+  }
+
+  Network.connect();
+
+  /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
@@ -97,28 +101,44 @@ void loop() {
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
     if (Network.connected()) {
-
       if (Device.getMode() == MODE_NORMAL) {
-
         /* Connect to MQTT if not connected */
-        Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+        if (Device.configuration.mqttAPI) {
+          Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+        }
 
         WebServer.listener();
 
-        /* Relay turn off event launched */
-        if (Relay.autoTurnOff()) {
-          Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-        }
-
-        /* One of the switches has been shortly pressed */
-        if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-          Relay.toggle();
-          if (Relay.get() == RELAY_ON) {
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-          } else {
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
+        /* Checking if there was received HTTP API Command */
+        if (Device.configuration.httpAPI) {
+          if (WebServer.httpAPIlistener()) {
+            processHTTPAPIRequest(WebServer.getHTTPCommand());
           }
         }
+
+        /* Relay related code */
+        if (Device.configuration.isRelay[0]) {
+
+          /* Relay turn off event launched */
+          if (Relay.autoTurnOff()) {
+            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+          }
+
+          /* One of the switches has been shortly pressed */
+          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
+            Relay.toggle();
+            MQTTPublishRelayState(); // MQTT Listener library
+          }
+        }
+
+        /* Sensor: DS18B20 relate code */
+        if (Device.configuration.isDS18B20) {
+          if (SensorDS18B20.isReady()) {
+            Mqtt.publish("temperature",(char)SensorDS18B20.get());
+          }
+        }
+
+
       } else { // Configuration Mode
         WebServer.listener();
       }
@@ -130,6 +150,7 @@ void loop() {
     WebServer.listener();
   }
 
+  /* Listens for switch events */
   Switch.listener();
   ExternalSwitch.listener();
 
@@ -149,5 +170,12 @@ void loop() {
                                     : Device.reboot(MODE_NORMAL);
   }
 
+  /* Led listener */
   Led.loop();
+
+  /* Sesnor: DS18B20 listener */
+  SensorDS18B20.listener();
+
+
+
 }

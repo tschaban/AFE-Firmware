@@ -1,9 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
 
@@ -12,7 +9,7 @@ AFEMQTT::AFEMQTT() {}
 void AFEMQTT::begin() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
-  sprintf(deviceName, "%s", NetworkConfiguration.host);
+  sprintf(deviceName, "%s", Device.configuration.name);
 
   /* Defaults are taken from WiFi config. They can be set using
    * setReconnectionParams() */
@@ -78,7 +75,7 @@ void AFEMQTT::connect() {
             // Updating relay state after setting default value after MQTT
             // connected
             publish(Relay.getMQTTTopic(), "state",
-                    Relay.get() == RELAY_ON ? "ON" : "OFF");
+                    Relay.get() == RELAY_ON ? "on" : "off");
           }
         } else {
           connections++;
@@ -101,7 +98,10 @@ void AFEMQTT::connect() {
             */
             break;
           }
-          delay(durationBetweenConnectionAttempts * 1000);
+          Led.on();
+          delay(durationBetweenConnectionAttempts * 500);
+          Led.off();
+          delay(durationBetweenConnectionAttempts * 500);
           /* Serial << "."; */
         }
       }

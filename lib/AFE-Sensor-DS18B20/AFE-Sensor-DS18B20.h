@@ -22,6 +22,11 @@ class AFESensorDS18B20 {
 private:
   uint8_t gpio;
   float correction = 0;
+  float previousTemperature = -127;
+  boolean ready = false;
+  uint8_t unit= 0;
+
+  unsigned long startTime = 0;
 
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
@@ -29,14 +34,25 @@ public:
   AFESensorDS18B20(uint8_t sensor_gpio);
 
   void begin(uint8_t sensor_gpio);
+
   /* Get current temp in Celsius (default) possible options:
      - UNIT_CELCIUS
-                 - UNIT_FAHRENHEIT
-        */
-  float get(uint8_t unit = 0);
+    - UNIT_FAHRENHEIT
+  */
+
+
+  // @TODO I think reading temp should be made in the listener, issue to solve how to get temperature but publish only changes
+  float get();
+  float getPrevious();
 
   /* If needed set temperature correction value */
   void setCorrection(float sensor_correction);
+
+  boolean isReady();
+
+  /* Method has to be added to the loop in order to listen for sensor value changes */
+  void listener();
+
 };
 
 #endif
