@@ -2,38 +2,36 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
+
 #include "AFE-Sensor-DS18B20.h"
 
 AFESensorDS18B20::AFESensorDS18B20(){};
 
-AFESensorDS18B20::AFESensorDS18B20(uint8_t sensor_gpio) { begin(sensor_gpio); }
-
-void AFESensorDS18B20::begin(uint8_t sensor_gpio) { gpio = sensor_gpio; }
-
-float AFESensorDS18B20::getPrevious() {
-  return previousTemperature;
+void AFESensorDS18B20::begin() {
+  AFEDataAccess Data;
+  configuration = Data.getDS18B20Configuration();
+  _initialized = true;
 }
 
 float AFESensorDS18B20::get() {
-
-  OneWire wireProtocol(gpio);
+  float temperature = -127;
+ if (_initialized) {
+  OneWire wireProtocol(configuration.gpio);
   DallasTemperature sensor(&wireProtocol);
   sensor.begin();
 
-  float temperature;
   do {
     sensor.requestTemperatures();
-    temperature = unit == UNIT_CELCIUS ? sensor.getTempCByIndex(0)
+    temperature = configuration.unit==UNIT_CELCIUS ? sensor.getTempCByIndex(0)
                                        : sensor.getTempFByIndex(0);
   } while (temperature == 85.0 || temperature == (-127.0));
-
-  startTime=0; // Reset timer
-
-  return temperature + correction;
+}
+  return temperature + configuration.correction;
 }
 
-void AFESensorDS18B20::setCorrection(float sensor_correction) {
-  correction = sensor_correction;
+float  AFESensorDS18B20::getLatest() {
+  ready = false;
+  return currentTemperature;
 }
 
 boolean AFESensorDS18B20::isReady() {
@@ -46,13 +44,20 @@ boolean AFESensorDS18B20::isReady() {
 }
 
 void AFESensorDS18B20::listener() {
+  if (_initialized) {
   unsigned long time = millis();
 
   if (startTime == 0) { // starting timer. used for switch sensitiveness
     startTime = time;
   }
 
-  if (time - startTime >= 5000) {
-    ready = true;
+  if (time - startTime >= configuration.interval * 1000) {
+    float newTemperature = get();
+    if (newTemperature!=currentTemperature) {
+      currentTemperature = newTemperature;
+      ready = true;
+      startTime = 0;
+    }
   }
+}
 }
