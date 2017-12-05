@@ -100,7 +100,7 @@ struct DS18B20 {
   uint8_t gpio;
   float correction;
   uint16_t interval;
-  uint16_t unit;
+  uint8_t unit;
 };
 
 struct DOMOTICZ {
