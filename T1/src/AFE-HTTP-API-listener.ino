@@ -10,8 +10,7 @@
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it
  */
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
-                              byte state = 9) {
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,const char *value) {
   String respond;
   respond = "{";
   if (strlen(request.device) > 0) {
@@ -24,9 +23,9 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
     respond += "\"command\":\"" + String(request.command) + "\",";
   }
 
-  if (state != 9) {
+  if (!strlen(value) == 0) {
     respond += "\"value\":\"";
-    respond += state == RELAY_ON ? "on" : "off";
+    respond += value;
     respond += "\",";
   }
 
@@ -46,49 +45,52 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       if (strcmp(request.command, "on") == 0) {
         Relay.on();
         if (Relay.get() == RELAY_ON) {
-          sendHTTPAPIRequestStatus(request, true);
+          sendHTTPAPIRequestStatus(request, true , "a");
           MQTTPublishRelayState(); // MQTT Listener library
         } else {
-          sendHTTPAPIRequestStatus(request, false);
+          sendHTTPAPIRequestStatus(request, false, "a");
         }
       } else if (strcmp(request.command, "off") == 0) { // Off
         Relay.off();
         if (Relay.get() == RELAY_OFF) {
-          sendHTTPAPIRequestStatus(request, true);
+          sendHTTPAPIRequestStatus(request, true, "a");
           MQTTPublishRelayState(); // MQTT Listener library
         } else {
-          sendHTTPAPIRequestStatus(request, false);
+          sendHTTPAPIRequestStatus(request, false, "a");
         }
 
       } else if (strcmp(request.command, "toggle") == 0) { // toggle
         uint8_t state = Relay.get();
         Relay.toggle();
         if (state != Relay.get()) {
-          sendHTTPAPIRequestStatus(request, true);
+          sendHTTPAPIRequestStatus(request, true, "a");
           MQTTPublishRelayState(); // MQTT Listener library
         } else {
-          sendHTTPAPIRequestStatus(request, false);
+          sendHTTPAPIRequestStatus(request, false, "a");
         }
 
       } else if (strcmp(request.command, "reportStatus") == 0) { // reportStatus
-        sendHTTPAPIRequestStatus(request, true, Relay.get());
+        sendHTTPAPIRequestStatus(request, true, "a");//Relay.get()==RELAY_ON?"on":"off");
         /* Commend not implemented */
       } else {
-        sendHTTPAPIRequestStatus(request, false);
+        sendHTTPAPIRequestStatus(request, false, "a");
       }
       /* No such relay */
     } else {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(request, false, "a");
     }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
-    sendHTTPAPIRequestStatus(request, true);
+    sendHTTPAPIRequestStatus(request, true,"a");
+    Device.reboot(Device.getMode());
+  } else if (strcmp(request.command, "getTemperature") == 0) { // getTemperature
+    sendHTTPAPIRequestStatus(request, true, (char)SensorDS18B20.get());
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==
              0) { // configurationMode
-    sendHTTPAPIRequestStatus(request, true);
+    sendHTTPAPIRequestStatus(request, true, "a");
     Device.reboot(MODE_CONFIGURATION);
     /* No such device or commend not implemented */
   } else {
-    sendHTTPAPIRequestStatus(request, false);
+    sendHTTPAPIRequestStatus(request, false, "a");
   }
 }
