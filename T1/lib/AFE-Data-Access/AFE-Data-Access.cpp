@@ -15,6 +15,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   configuration.isRelay[0] = Eeprom.read(369);
   configuration.isSwitch[0] = Eeprom.read(395);
   configuration.isSwitch[1] = Eeprom.read(402);
+  // @TODO DS18B20
+  configuration.isDS18B20 = Eeprom.read(999);
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
 
@@ -80,7 +82,10 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
+
+  // @TODO DS18B20
   uint8_t nextRelay = 26;
+
   char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(370 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(372 + id * nextRelay, 5).toFloat();
@@ -97,9 +102,11 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  /* @TODO DOMOTICZ
-    configuration.idx = Eeprom.read(376 + id * next, 5).toInt();
-    configuration.publishToDomoticz = Eeprom.readUInt8(382 + id * next); */
+  // @TODO DS18B20
+  configuration.thermostat.temperatureTurnOn = Eeprom.read(999 + id * nextRelay, 6).toFloat();
+  configuration.thermostat.temperatureTurnOff = Eeprom.read(999 + id * nextRelay, 6).toFloat();
+  configuration.thermostat.temperatureTurnOnAbove = Eeprom.read(999 + id * nextRelay);
+  configuration.thermostat.temperatureTurnOffAbove = Eeprom.read(99 + id * nextRelay);
 
   return configuration;
 }
@@ -116,11 +123,12 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 }
 
 DS18B20 AFEDataAccess::getDS18B20Configuration() {
+    // @TODO DS18B20
   DS18B20 configuration;
-  configuration.gpio = Eeprom.readUInt8(401);
-  configuration.correction = Eeprom.read(402, 5).toFloat();
-  configuration.interval = Eeprom.read(407, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(412);
+  configuration.gpio = Eeprom.readUInt8(999);
+  configuration.correction = Eeprom.read(999, 5).toFloat();
+  configuration.interval = Eeprom.read(999, 5).toInt();
+  configuration.unit = Eeprom.readUInt8(999);
   return configuration;
 }
 
@@ -130,9 +138,10 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(395, configuration.isSwitch[0]);
   Eeprom.write(402, configuration.isSwitch[1]);
   Eeprom.write(366, configuration.isLED[0]);
+  // @TODO DS18B20
+  Eeprom.write(413, configuration.isDS18B20);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
-  // Eeprom.write(413, configuration.isDS18B20);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -164,6 +173,7 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
+  // @TODO DS18B20
   uint8_t nextRelay = 26;
 
   Eeprom.writeUInt8(370 + id * nextRelay, configuration.gpio);
@@ -172,10 +182,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   /* @TODO For MQTT only */
   Eeprom.write(378 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
-  /* @TODO DOMOTICZ
-    Eeprom.write(376 + id * nextRelay, 5, (long)configuration.idx);
-    Eeprom.writeUInt8(382 + id * nextRelay, configuration.publishToDomoticz);
-    */
+
+  // @TODO DS18B20
+  Eeprom.write(999 + id * nextRelay, 6, configuration.thermostat.temperatureTurnOn);
+  Eeprom.write(999 + id * nextRelay, 6, configuration.thermostat.temperatureTurnOff);
+  Eeprom.write(999, configuration.thermostat.temperatureTurnOnAbove);
+  Eeprom.write(999, configuration.thermostat.temperatureTurnOffAbove);
+
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -228,37 +241,3 @@ uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
 void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
-
-/* @TODO DOMOTICZ
-DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
-  DOMOTICZ configuration;
-
-  Eeprom.read(228, 32).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(260);
-  configuration.port = Eeprom.read(264, 5).toInt();
-  Eeprom.read(269, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
-  Eeprom.read(301, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
-
-  Serial << endl << "INFO: Requested : Domoticz";
-  Serial << endl << "    - Host : " << configuration.host;
-  Serial << endl << "    - IP : " << configuration.ip;
-  Serial << endl << "    - Port : " << configuration.port;
-  Serial << endl << "    - User : " << configuration.user;
-  Serial << endl << "    - Password : " << configuration.password;
-
-  return configuration;
-}
-*/
-
-/* @TODO DOMOTICZ
-void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
-  Eeprom.write(228, 32, configuration.host);
-  Eeprom.writeIP(260, configuration.ip);
-  Eeprom.write(264, 5, (long)configuration.port);
-  Eeprom.write(269, 32, configuration.user);
-  Eeprom.write(301, 32, configuration.password);
-}
-*/
