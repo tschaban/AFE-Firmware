@@ -131,8 +131,14 @@ void AFEMQTT::publish(const char *type, const char *message) {
   publishToMQTTBroker(_mqttTopic, message);
 }
 
-void AFEMQTT::publish(const char *topic, const char *type,
-                      const char *message) {
+void AFEMQTT::publish(const char *type, float value, uint8_t width, uint8_t precision) {
+  char message[10];
+  dtostrf(value, width, precision, message);
+  publish(type, message);
+
+}
+
+void AFEMQTT::publish(const char *topic, const char *type,const char *message) {
   char _mqttTopic[50];
   sprintf(_mqttTopic, "%s%s", topic, type);
   publishToMQTTBroker(_mqttTopic, message);

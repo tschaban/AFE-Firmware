@@ -50,8 +50,9 @@ public:
   /* Connecting to MQTT Broker */
   void connect();
 
-  /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
+  /* Publishing MQTT Message. It calls private method publishToMQTTBroker. First one publishes char string, second one float with optional specyfication float format to convert string */
   void publish(const char *type, const char *message);
+  void publish(const char *type, float value, uint8_t width=2, uint8_t precision=2);
 
   /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
    * publishToMQTTBroker  */
