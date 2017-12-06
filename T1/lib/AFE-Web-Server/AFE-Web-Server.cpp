@@ -183,6 +183,9 @@ DEVICE AFEWebServer::getDeviceData() {
   server.arg("led0").length() > 0 ? data.isLED[0] = true
                                   : data.isLED[0] = false;
 
+  server.arg("ds18b20").length() > 0 ? data.isDS18B20 = true
+                                     : data.isDS18B20 = false;
+
   return data;
 }
 
@@ -293,8 +296,6 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
         server.arg("relay" + String(id) + "_power_restored").toInt();
   }
 
-  // @TODO For MQTT only
-
   if (server.arg("relay" + String(id) + "_name").length() > 0) {
     server.arg("relay" + String(id) + "_name")
         .toCharArray(data.name, sizeof(data.name));
@@ -304,16 +305,6 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.stateMQTTConnected =
         server.arg("relay" + String(id) + "_mqtt_connected").toInt();
   }
-
-  /* @TODO DOMOTICZ
-  if (server.arg("relay" + String(id) + "_idx").length() > 0) {
-    data.idx = server.arg("relay" + String(id) + "_idx").toInt();
-  }
-  if (server.arg("relay" + String(id) + "_publish_to_domoticz").length() > 0) {
-    data.publishToDomoticz =
-        server.arg("relay" + String(id) + "_publish_to_domoticz").toInt();
-  }
-  */
 
   return data;
 }
@@ -360,15 +351,8 @@ uint8_t AFEWebServer::getLanguageData() {
                                              : 1;
 }
 
-/* @TODO DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
   DS18B20 data;
-
-  if (server.arg("ds18b20_present").length() > 0) {
-    data.present = true;
-  } else {
-    data.present = false;
-  }
 
   if (server.arg("ds18b20_gpio").length() > 0) {
     data.gpio = server.arg("ds18b20_gpio").toInt();
@@ -387,37 +371,3 @@ DS18B20 AFEWebServer::getDS18B20Data() {
   }
   return data;
 }
-*/
-/* @TODO DOMOTICZ
-DOMOTICZ AFEWebServer::getDomoticzData() {
-  DOMOTICZ data;
-
-  if (server.arg("domoticz_host").length() > 0) {
-    server.arg("domoticz_host").toCharArray(data.host, sizeof(data.host));
-  }
-
-  if (server.arg("domoticz_ip1").length() > 0 &&
-      server.arg("domoticz_ip2").length() > 0 &&
-      server.arg("domoticz_ip3").length() > 0 &&
-      server.arg("domoticz_ip4").length() > 0) {
-
-    data.ip = IPAddress(
-        server.arg("domoticz_ip1").toInt(), server.arg("domoticz_ip2").toInt(),
-        server.arg("domoticz_ip3").toInt(), server.arg("domoticz_ip4").toInt());
-  }
-
-  if (server.arg("domoticz_port").length() > 0) {
-    data.port = server.arg("domoticz_port").toInt();
-  }
-
-  if (server.arg("domoticz_user").length() > 0) {
-    server.arg("domoticz_user").toCharArray(data.user, sizeof(data.user));
-  }
-
-  if (server.arg("domoticz_password").length() > 0) {
-    server.arg("domoticz_password")
-        .toCharArray(data.password, sizeof(data.password));
-  }
-  return data;
-}
-*/

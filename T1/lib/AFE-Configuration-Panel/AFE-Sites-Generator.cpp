@@ -81,6 +81,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     if (Device.configuration.isLED[0]) {
       page += "<li class=\"itm\"><a href=\"\\?option=led\">LED</a></li>";
     }
+
+    if (Device.configuration.isDS18B20) {
+      page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
+      page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+      page += "</a></li>";
+    }
+
     if (Device.configuration.isRelay[0]) {
       page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
       page += language == 0 ? "Przekaźnik" : "Relay";
@@ -788,6 +795,57 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   return addConfigurationBlock(title, "", body);
 }
 
+String AFESitesGenerator::addDS18B20Configuration() {
+
+  DS18B20 configuration;
+  configuration = Data.getDS18B20Configuration();
+
+  String body = "<fieldset>";
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"ds18b20_present\" type=\"checkbox\" value=\"1\"";
+  body += (configuration.present ? " checked=\"checked\"" : "");
+  body += "> Włączony?";
+  body += "</label>";
+  body += "</div>";
+  body += generateConfigParameter_GPIO("ds18b20_gpio", configuration.gpio);
+  body += "<div class=\"cf\">";
+  body += "<label>Odczyty co</label>";
+  body += "<input name=\"ds18b20_interval\" type=\"number\" maxlength=\"5\" "
+          "value=\"";
+  body += configuration.interval;
+  body += "\">";
+  body += "<span class=\"hint\">sekund. Zakres 10sek do 99999sek</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>Korekta wartości o</label>";
+  body += "<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"6\" "
+          "value=\"";
+  body += configuration.correction;
+  body += "\">";
+  body += "<span class=\"hint\">stopni. Zakres -9.99 do 9.99, </span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>Jednostka</label>";
+  body += "<select  name=\"ds18b20_unit\">";
+  body += "<option value=\"0\"";
+  body += (configuration.unit == 0 ? " selected=\"selected\"" : "");
+  body += ">celsjusz</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
+  body += ">fahrenheit</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock("Czujnik temperatury DS18B20",
+                               "DS18B20 jest obsługiwanym czujnikiem "
+                               "temperatury. Możliwe jest podłaczenie tylko "
+                               "jednego czujnika temperatury",
+                               body);
+}
+
 String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
@@ -1020,140 +1078,3 @@ const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
 
   return body;
 }
-
-/* @TODO DOMOTICZ
-body += "<div class=\"cf\">";
-body += "<label>IDX urządzenia</label>";
-body += "<input name=\"relay" + String(id) +
-        "_idx\" type=\"number\" maxlength=\"3\" value=\"";
-body += configuration.idx;
-body += "\">";
-body += "<span class=\"hint\">Informacja wymagana. Do odczytania z "
-        "konfiguracji Domoticz</span>";
-body += "</div>";
-
-body += "<div class=\"cc\">";
-body += "<label>";
-body += "<input name=\"relay" + String(id) +
-        "_publish_to_domoticz\" type=\"checkbox\" value=\"1\"";
-body += (configuration.publishToDomoticz ? " checked=\"checked\"" : "");
-body += "> Publikowac stan przekaźnika do Domoticz?";
-body += "</label>";
-body += "</div>";
-
-*/
-
-/* @TODO DOMOTICZ
-String AFESitesGenerator::addDomoticzConfiguration() {
-
-  DOMOTICZ configuration;
-  configuration = Data.getDomoticzConfiguration();
-
-  String body = "<fieldset>";
-  body += "<div class=\"cf\">";
-  body += "<label>IP serwera</label>";
-  body += "<input name=\"domoticz_ip1\" type=\"number\" maxlength=\"3\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[0];
-  body += "\">.";
-  body += "<input name=\"domoticz_ip2\" type=\"number\" maxlength=\"3\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[1];
-  body += "\">.";
-  body += "<input name=\"domoticz_ip3\" type=\"number\" maxlength=\"3\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[2];
-  body += "\">.";
-  body += "<input name=\"domoticz_ip4\" type=\"number\" maxlength=\"3\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[3];
-  body += "\">";
-  body += "<span class=\"hint\">Informacja wymagana</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>Port</label>";
-  body += "<input name=\"domoticz_port\" type=\"number\" "
-          "maxlength=\"5\" value=\"";
-  body += configuration.port;
-  body += "\">";
-  body += "<span class=\"hint\">Informacja wymagana</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>Użytkownik</label>";
-  body +=
-      "<input name=\"domoticz_user\" type=\"text\"  maxlength=\"32\" value=\"";
-  body += configuration.user;
-  body += "\">";
-  body += "<span class=\"hint\">Max 32 znaki</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>Hasło</label>";
-  body += "<input name=\"domoticz_password\" type=\"password\"  "
-          "maxlength=\"32\" value=\"";
-  body += configuration.password;
-  body += "\">";
-  body += "<span class=\"hint\">Max 32 znaki</span>";
-  body += "</div>";
-
-  body += "</fieldset>";
-
-  return addConfigurationBlock("Serwer Domoticz",
-                               "Konfiguracja wymagana jest jedynie kiedy jest "
-                               "potrzeba wysyłania stanu przekaźnika do "
-                               "serwera Domoticz",
-                               body);
-}
-*/
-
-/* @TODO DS18B20
-String AFESitesGenerator::addDS18B20Configuration() {
-
-  DS18B20 configuration;
-  configuration = Data.getDS18B20Configuration();
-
-  String body = "<fieldset>";
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"ds18b20_present\" type=\"checkbox\" value=\"1\"";
-  body += (configuration.present ? " checked=\"checked\"" : "");
-  body += "> Włączony?";
-  body += "</label>";
-  body += "</div>";
-  body += generateConfigParameter_GPIO("ds18b20_gpio", configuration.gpio);
-  body += "<div class=\"cf\">";
-  body += "<label>Odczyty co</label>";
-  body += "<input name=\"ds18b20_interval\" type=\"number\" maxlength=\"5\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\">";
-  body += "<span class=\"hint\">sekund. Zakres 10sek do 99999sek</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>Korekta wartości o</label>";
-  body += "<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"6\" "
-          "value=\"";
-  body += configuration.correction;
-  body += "\">";
-  body += "<span class=\"hint\">stopni. Zakres -9.99 do 9.99, </span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>Jednostka</label>";
-  body += "<select  name=\"ds18b20_unit\">";
-  body += "<option value=\"0\"";
-  body += (configuration.unit == 0 ? " selected=\"selected\"" : "");
-  body += ">celsjusz</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">fahrenheit</option>";
-  body += "</select>";
-  body += "</div>";
-
-  body += "</fieldset>";
-
-  return addConfigurationBlock("Czujnik temperatury DS18B20",
-                               "DS18B20 jest obsługiwanym czujnikiem "
-                               "temperatury. Możliwe jest podłaczenie tylko "
-                               "jednego czujnika temperatury",
-                               body);
-}
-*/

@@ -44,10 +44,8 @@ public:
                                     SWITCH data1, SWITCH data2);
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
-  // @TODO DOMOTICZ String getSite(const String option, uint8_t command,
-  // DOMOTICZ data);
-  // @TODO DS18B20 String getSite(const String option, uint8_t command, DS18B20
-  // data);
+  String getDS18B20ConfigurationSite(const String option, uint8_t command,
+                                     DS18B20 data);
 
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();

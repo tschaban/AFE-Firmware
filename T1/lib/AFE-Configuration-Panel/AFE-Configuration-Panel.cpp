@@ -173,6 +173,23 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   return page;
 }
 
+String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          DS18B20 data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
+  page += Site.addDS18B20Configuration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page = Site.generateHeader();
   page += "<form method=\"post\" action=\"\" "
@@ -189,44 +206,3 @@ String AFEConfigurationPanel::postFirmwareUpgradeSite(boolean status) {
   page += Site.generateFooter();
   return page;
 }
-
-/* @TODO DOMOTICZ
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      DOMOTICZ data) {
-
-  Serial << endl << "INFO: Generating Domoticz configuration site";
-
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-  }
-
-  String page = Site.generateHeader();
-  page += "<form action=\"/?option=domoticz&cmd=1\"  method=\"post\">";
-  page += Site.addDomoticzConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
-  page += "\"></form>";
-  page += Site.generateFooter();
-  return page;
-}
-*/
-
-/* @TODO DS18B20
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      DS18B20 data) {
-
-  Serial << endl << "INFO: Generating DS18B20 configuration site";
-
-  if (command == SERVER_CMD_SAVE) {    Data.saveConfiguration(data);
-  }
-
-  String page = Site.generateHeader();
-  page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
-  page += Site.addDS18B20Configuration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
-  page += "\"></form>";
-  page += Site.generateFooter();
-  return page;
-}
-*/

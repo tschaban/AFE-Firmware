@@ -73,7 +73,6 @@ public:
   String addHelpSection();
 
   // @TODO DOMOTICZ String addDomoticzConfiguration();
-  // @TODO DS18B20 String addDS18B20Configuration();
 };
 
 #endif

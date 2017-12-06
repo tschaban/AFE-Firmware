@@ -46,6 +46,7 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
   LED getLEDData(uint8_t id);
+  DS18B20 getDS18B20Data();
   uint8_t getLanguageData();
 
   // @TODO DOMOTICZ getDomoticzData();
