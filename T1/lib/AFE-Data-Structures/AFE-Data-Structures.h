@@ -81,13 +81,10 @@ struct RELAY {
   uint8_t gpio;
   float timeToOff;
   uint8_t statePowerOn;
-  /* @TODO Only for MQTT */
   char name[16];
   uint8_t stateMQTTConnected;
   char mqttTopic[49];
-  /* @TODO Only for Domoticz */
-  uint16_t idx;
-  boolean publishToDomoticz;
+  boolean showStatusUsingLED;
   THERMOSTAT thermostat;
 };
 
