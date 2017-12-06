@@ -58,7 +58,9 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         //    Serial << endl << "INFO: Process: configuration Mode";
         Device.reboot(MODE_CONFIGURATION);
       } else if ((char)payload[2] == 't') { // getTemperature
-           Mqtt.publish("temperature",(char)SensorDS18B20.get());
+        char  temperatureString[6];
+        dtostrf(SensorDS18B20.get(), 2, 2, temperatureString);
+           Mqtt.publish("temperature",temperatureString);
       }
     }
   }

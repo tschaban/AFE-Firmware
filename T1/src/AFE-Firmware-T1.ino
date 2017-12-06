@@ -134,8 +134,7 @@ void loop() {
         /* Sensor: DS18B20 relate code */
         if (Device.configuration.isDS18B20) {
           if (SensorDS18B20.isReady()) {
-            //(char)SensorDS18B20.getLatest()
-            Mqtt.publish("temperature","a");
+          Mqtt.publish("temperature",SensorDS18B20.getLatest());
           }
         }
 
