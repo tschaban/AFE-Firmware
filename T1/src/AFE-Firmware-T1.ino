@@ -8,12 +8,12 @@
 #include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
+#include <AFE-Sensor-DS18B20.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 #include <Streaming.h>
-#include <AFE-Sensor-DS18B20.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -134,10 +134,9 @@ void loop() {
         /* Sensor: DS18B20 relate code */
         if (Device.configuration.isDS18B20) {
           if (SensorDS18B20.isReady()) {
-          Mqtt.publish("temperature",SensorDS18B20.getLatest());
+            Mqtt.publish("temperature", SensorDS18B20.getLatest());
           }
         }
-
 
       } else { // Configuration Mode
         WebServer.listener();
@@ -175,7 +174,4 @@ void loop() {
 
   /* Sesnor: DS18B20 listener */
   SensorDS18B20.listener();
-
-
-
 }
