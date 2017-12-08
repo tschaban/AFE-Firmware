@@ -39,6 +39,7 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
+  Led.on();
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
     /* Checking Relay #0 */
@@ -91,4 +92,5 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   } else {
     sendHTTPAPIRequestStatus(request, false);
   }
+  Led.off();
 }
