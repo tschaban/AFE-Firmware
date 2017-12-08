@@ -214,6 +214,17 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += generateSwitchItem(0, configuration.isSwitch[0]);
   body += generateSwitchItem(1, configuration.isSwitch[1]);
 
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"ds18b20\" type=\"checkbox\" value=\"1\"";
+  body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " DS18B20 ";
+  body += language == 0 ? " jest podłączony" : " present";
+  body += "?";
+  body += "</label>";
+  body += "</div>";
+
   body += "</fieldset>";
 
   page += addConfigurationBlock(
@@ -803,39 +814,49 @@ String AFESitesGenerator::addDS18B20Configuration() {
   String body = "<fieldset>";
   body += generateConfigParameter_GPIO("ds18b20_gpio", configuration.gpio);
   body += "<div class=\"cf\">";
-  body += "<label>Odczyty co</label>";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
   body += "<input name=\"ds18b20_interval\" type=\"number\" maxlength=\"5\" "
           "value=\"";
   body += configuration.interval;
   body += "\">";
-  body += "<span class=\"hint\">sekund. Zakres 10sek do 99999sek</span>";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10sek do 99999sek" : "seconds. Range: 10 to 99999 seconds";
+  body += "</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
-  body += "<label>Korekta wartości o</label>";
-  body += "<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"6\" "
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o":"Temperature correction";
+  body += "</label>";
+  body += "<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"5\" "
           "value=\"";
   body += configuration.correction;
   body += "\">";
-  body += "<span class=\"hint\">stopni. Zakres -9.99 do 9.99, </span>";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "stopni. Zakres: -9.99 do 9.99":"degrees. Range: -9.99 to 9.99";
+  body += "</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
-  body += "<label>Jednostka</label>";
+  body += "<label>";
+  body += language == 0 ? "Jednostka":"Unit";
+  body += "</label>";
   body += "<select  name=\"ds18b20_unit\">";
   body += "<option value=\"0\"";
-  body += (configuration.unit == 0 ? " selected=\"selected\"" : "");
-  body += ">celsjusz</option>";
+  body += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
+  body += language == 0 ?"Celsjusz":"Celsius";
+  body += "</option>";
   body += "<option value=\"1\"";
   body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">fahrenheit</option>";
+  body += ">Fahrenheit</option>";
   body += "</select>";
   body += "</div>";
 
   body += "</fieldset>";
 
-  return addConfigurationBlock("Czujnik temperatury DS18B20",
-                               "DS18B20 jest obsługiwanym czujnikiem "
-                               "temperatury. Możliwe jest podłaczenie tylko "
-                               "jednego czujnika temperatury",
+  return addConfigurationBlock(language == 0
+              ? "Czujnik temperatury DS18B20" : "DS18B20 temperature sensor",
+                               "",
                                body);
 }
 
