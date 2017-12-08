@@ -94,6 +94,13 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
         getOptionName(), getCommand(), data1, data2));
+  } else if (getOptionName() == "ds18b20") {
+        DS18B20 data1 = {};
+        if (getCommand() == SERVER_CMD_SAVE) {
+          data1 = getDS18B20Data();
+        }
+        publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(
+            getOptionName(), getCommand(), data1));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
