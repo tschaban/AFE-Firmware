@@ -28,19 +28,19 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(firmwareConfiguration);
 
-  sprintf(deviceConfiguration.name, "ESP");
+  sprintf(deviceConfiguration.name, "AFE-Device");
   deviceConfiguration.isLED[0] = true;
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
-  deviceConfiguration.isDS18B20 = true;
-  deviceConfiguration.mqttAPI = true;
+  deviceConfiguration.isDS18B20 = false;
+  deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
   Data->saveConfiguration(deviceConfiguration);
 
-  sprintf(networkConfiguration.ssid, "POLICJA: Posterunek");
-  sprintf(networkConfiguration.password, "1231231234");
+  sprintf(networkConfiguration.ssid, "");
+  sprintf(networkConfiguration.password, "");
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
   networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
@@ -52,12 +52,12 @@ void AFEDefaults::set() {
   Data->saveConfiguration(networkConfiguration);
 
   sprintf(MQTTConfiguration.host, "");
-  MQTTConfiguration.ip = IPAddress(192, 168, 2, 231);
-  sprintf(MQTTConfiguration.user, "sonoff");
-  sprintf(MQTTConfiguration.password, "Sonoff#221!2016");
+  MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
+  sprintf(MQTTConfiguration.user, "");
+  sprintf(MQTTConfiguration.password, "");
   MQTTConfiguration.port = 1883;
   // sprintf(MQTTConfiguration.topic, "/device/");
-  sprintf(MQTTConfiguration.topic, "/esp/");
+  sprintf(MQTTConfiguration.topic, "/device/");
 
   Data->saveConfiguration(MQTTConfiguration);
 
@@ -91,7 +91,7 @@ void AFEDefaults::set() {
 
   DS18B20Configuration.gpio = 14;
   DS18B20Configuration.correction = 0;
-  DS18B20Configuration.interval = 10;
+  DS18B20Configuration.interval = 60;
   DS18B20Configuration.unit = 0;
 
   Data->saveConfiguration(DS18B20Configuration);
@@ -107,7 +107,7 @@ void AFEDefaults::set() {
 Data->saveConfiguration(DomoticzConfiguration);
   
   */
-  Data->saveDeviceMode(0);
+  Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
 }
