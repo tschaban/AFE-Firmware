@@ -15,7 +15,6 @@
 #include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
 
 class AFESitesGenerator {
 
@@ -42,7 +41,7 @@ public:
   AFESitesGenerator();
 
   /* Method generates site header with menu. When redirect param is diff than 0
-   * then it will redirect page to main page after redirect param time (in sec)
+    then it will redirect page to main page after redirect param time (in sec)
    */
   const String generateHeader(uint8_t redirect = 0);
 
@@ -57,6 +56,7 @@ public:
   String addLEDConfiguration(uint8_t id);
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+  String addDS18B20Configuration();
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();
