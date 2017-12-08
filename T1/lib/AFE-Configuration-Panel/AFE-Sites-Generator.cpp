@@ -801,13 +801,6 @@ String AFESitesGenerator::addDS18B20Configuration() {
   configuration = Data.getDS18B20Configuration();
 
   String body = "<fieldset>";
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"ds18b20_present\" type=\"checkbox\" value=\"1\"";
-  body += (configuration.present ? " checked=\"checked\"" : "");
-  body += "> Włączony?";
-  body += "</label>";
-  body += "</div>";
   body += generateConfigParameter_GPIO("ds18b20_gpio", configuration.gpio);
   body += "<div class=\"cf\">";
   body += "<label>Odczyty co</label>";
