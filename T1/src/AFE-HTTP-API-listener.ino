@@ -48,7 +48,6 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,byte valu
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
   Led.on();
-
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
     /* Checking Relay #0 */
@@ -74,11 +73,11 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else { /* No such relay */
       sendHTTPAPIRequestStatus(request, false);
     }
+  } else if (strcmp(request.device, "ds18b20") == 0 && strcmp(request.command, "getTemperature") == 0) {
+    sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
-  } else if (strcmp(request.command, "getTemperature") == 0) { // getTemperature
-    sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
   } else if (strcmp(request.command, "configurationMode") == 0) { // configurationMode
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(MODE_CONFIGURATION);
