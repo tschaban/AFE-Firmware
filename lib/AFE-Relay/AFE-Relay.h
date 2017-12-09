@@ -63,12 +63,17 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
+  /* Methods returns relay name */
+  const char *getName();
+
   /* Methods while added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
   boolean autoTurnOff();
 
-  /* Methods returns relay name */
-  const char *getName();
+  /* Methods related to thermostat functionality */
+  /* Method returns relay thermostat configuration. If such exist for particular firmware version */
+  THERMOSTAT getConfiguration();
+  boolean thermostatEnabled();
 };
 
 #endif

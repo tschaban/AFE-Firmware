@@ -90,3 +90,11 @@ boolean AFERelay::autoTurnOff() {
 }
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
+
+THERMOSTAT AFERelay::getConfiguration() {
+  return RelayConfiguration.thermostat;
+}
+
+boolean AFERelay::thermostatEnabled() {
+  return RelayConfiguration.thermostat.enabled;
+}
