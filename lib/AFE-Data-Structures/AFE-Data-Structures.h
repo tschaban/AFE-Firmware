@@ -70,17 +70,23 @@ struct LED {
   boolean changeToOppositeValue;
 };
 
+struct THERMOSTAT {
+  boolean enabled;
+  float temperatureTurnOn;
+  boolean temperatureTurnOnAbove;
+  float temperatureTurnOff;
+  boolean temperatureTurnOffAbove;
+};
+
 struct RELAY {
   uint8_t gpio;
   float timeToOff;
   uint8_t statePowerOn;
-  /* @TODO Only for MQTT */
   char name[16];
   uint8_t stateMQTTConnected;
   char mqttTopic[49];
-  /* @TODO Only for Domoticz */
-  uint16_t idx;
-  boolean publishToDomoticz;
+  boolean showStatusUsingLED;
+  THERMOSTAT thermostat;
 };
 
 struct SWITCH {
@@ -100,7 +106,7 @@ struct DS18B20 {
   uint8_t gpio;
   float correction;
   uint16_t interval;
-  uint16_t unit;
+  uint8_t unit;
 };
 
 struct DOMOTICZ {
