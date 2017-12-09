@@ -70,10 +70,12 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState() {
   if (Device.configuration.mqttAPI) {
+    Led.on();
     if (Relay.get() == RELAY_ON) {
       Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
     } else {
       Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
     }
+    Led.off();
   }
 }
