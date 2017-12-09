@@ -8,6 +8,7 @@
 #include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
+#include <AFE-Thermostat.h>
 #include <AFE-Sensor-DS18B20.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -24,8 +25,11 @@ AFELED Led;
 AFESwitch Switch;
 AFESwitch ExternalSwitch;
 AFERelay Relay;
+AFEThermostat Thermostat;
 AFESensorDS18B20 SensorDS18B20;
 MQTT MQTTConfiguration;
+
+float temperature;
 
 void setup() {
 
@@ -57,6 +61,7 @@ void setup() {
   if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
     Relay.begin(0);
     Relay.setRelayAfterRestoringPower();
+    Thermostat.begin(Relay.getConfiguration());
   }
 
   /* Initialzing network */
@@ -131,12 +136,34 @@ void loop() {
           }
         }
 
-        /* Sensor: DS18B20 relate code */
+        /* Sensor: DS18B20 related code */
         if (Device.configuration.isDS18B20) {
+
+          /* Sensor: DS18B20 listener */
+          SensorDS18B20.listener();
+
           if (SensorDS18B20.isReady()) {
-            Mqtt.publish("temperature", SensorDS18B20.getLatest());
+            temperature = SensorDS18B20.getLatest();
+
+            /* Thermostat listener */
+            Thermostat.listener(temperature);
+
+            /* If event triggered by thermostat */
+            if (Thermostat.isReady()) {
+              if (Thermostat.getRelayState()==RELAY_ON) {
+                Relay.on();
+              } else {
+                Relay.off();
+              }
+              MQTTPublishRelayState();
+            }
+
+            /* Publishing temperature to MQTT Broker if enabled */
+            Mqtt.publish("temperature", temperature);
+
           }
         }
+
 
       } else { // Configuration Mode
         WebServer.listener();
@@ -172,6 +199,4 @@ void loop() {
   /* Led listener */
   Led.loop();
 
-  /* Sesnor: DS18B20 listener */
-  SensorDS18B20.listener();
 }

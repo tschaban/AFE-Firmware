@@ -67,6 +67,13 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
 
+  RelayConfiguration.thermostat.enabled = false;
+  RelayConfiguration.thermostat.temperatureTurnOn = 0;
+  RelayConfiguration.thermostat.temperatureTurnOnAbove = false;
+  RelayConfiguration.thermostat.temperatureTurnOff = 0;
+  RelayConfiguration.thermostat.temperatureTurnOffAbove = true;
+
+
   Data->saveConfiguration(0, RelayConfiguration);
 
   /* @TODO DOMOTICZ

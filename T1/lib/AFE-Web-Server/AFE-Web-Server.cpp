@@ -295,9 +295,11 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   if (server.arg("relay" + String(id) + "_gpio").length() > 0) {
     data.gpio = server.arg("relay" + String(id) + "_gpio").toInt();
   }
+
   if (server.arg("relay" + String(id) + "_off_time").length() > 0) {
     data.timeToOff = server.arg("relay" + String(id) + "_off_time").toFloat();
   }
+
   if (server.arg("relay" + String(id) + "_power_restored").length() > 0) {
     data.statePowerOn =
         server.arg("relay" + String(id) + "_power_restored").toInt();
@@ -312,6 +314,28 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.stateMQTTConnected =
         server.arg("relay" + String(id) + "_mqtt_connected").toInt();
   }
+
+  server.arg("relay" + String(id) + "thermostat_enabled").length() > 0 ? data.thermostat.enabled = true
+                                     : data.thermostat.enabled = false;
+
+
+  if (server.arg("relay" + String(id) + "temp_on").length() > 0) {
+    data.thermostat.temperatureTurnOn = server.arg("relay" + String(id) + "temp_on").toFloat();
+  }
+
+  if (server.arg("relay" + String(id) + "temp_off").length() > 0) {
+    data.thermostat.temperatureTurnOff = server.arg("relay" + String(id) + "temp_off").toFloat();
+  }
+
+
+  if (server.arg("relay" + String(id) + "temp_on_sign").length() > 0) {
+    data.thermostat.temperatureTurnOnAbove = server.arg("relay" + String(id) + "temp_on_sign").toInt() == 0 ? false : true;
+  }
+
+  if (server.arg("relay" + String(id) + "temp_off_sign").length() > 0) {
+    data.thermostat.temperatureTurnOffAbove = server.arg("relay" + String(id) + "temp_off_sign").toInt()  == 0 ? false : true;
+  }
+
 
   return data;
 }

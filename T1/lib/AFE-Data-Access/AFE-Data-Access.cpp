@@ -81,7 +81,7 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
-  uint8_t nextRelay = 39;
+  uint8_t nextRelay = 40;
 
   char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(397 + id * nextRelay);
@@ -109,6 +109,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
       Eeprom.read(433 + id * nextRelay);
   configuration.thermostat.temperatureTurnOffAbove =
       Eeprom.read(434 + id * nextRelay);
+  configuration.thermostat.enabled =
+          Eeprom.read(435 + id * nextRelay);
 
   return configuration;
 }
@@ -173,7 +175,7 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
-  uint8_t nextRelay = 39;
+  uint8_t nextRelay = 40;
 
   Eeprom.writeUInt8(397 + id * nextRelay, configuration.gpio);
   Eeprom.write(399 + id * nextRelay, 5, configuration.timeToOff);
@@ -186,8 +188,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
                configuration.thermostat.temperatureTurnOn);
   Eeprom.write(428 + id * nextRelay, 6,
                configuration.thermostat.temperatureTurnOff);
-  Eeprom.write(433, configuration.thermostat.temperatureTurnOnAbove);
-  Eeprom.write(434, configuration.thermostat.temperatureTurnOffAbove);
+  Eeprom.write(433 + id * nextRelay, configuration.thermostat.temperatureTurnOnAbove);
+  Eeprom.write(434 + id * nextRelay, configuration.thermostat.temperatureTurnOffAbove);
+  Eeprom.write(435 + id * nextRelay, configuration.thermostat.enabled);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
