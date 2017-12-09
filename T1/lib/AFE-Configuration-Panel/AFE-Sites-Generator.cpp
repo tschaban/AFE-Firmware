@@ -318,19 +318,19 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "<label>";
   body += language == 0 ? "Adres IP" : "IP Addess";
   body += "</label>";
-  body += "<input name=\"device_ip1\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"device_ip1\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[0];
   body += "\">.";
-  body += "<input name=\"device_ip2\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"device_ip2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[1];
   body += "\">.";
-  body += "<input name=\"device_ip3\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"device_ip3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[2];
   body += "\">.";
-  body += "<input name=\"device_ip4\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"device_ip4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[3];
   body += "\">";
@@ -340,19 +340,19 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "<label>";
   body += language == 0 ? "Bramka" : "Gateway";
   body += "</label>";
-  body += "<input name=\"gateway_ip1\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"gateway_ip1\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.gateway[0];
   body += "\">.";
-  body += "<input name=\"gateway_ip2\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"gateway_ip2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.gateway[1];
   body += "\">.";
-  body += "<input name=\"gateway_ip3\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"gateway_ip3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.gateway[2];
   body += "\">.";
-  body += "<input name=\"gateway_ip4\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"gateway_ip4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.gateway[3];
   body += "\">";
@@ -362,19 +362,19 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "<label>";
   body += language == 0 ? "Maska sieci" : "Subnet";
   body += "</label>";
-  body += "<input name=\"subnet_ip1\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"subnet_ip1\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.subnet[0];
   body += "\">.";
-  body += "<input name=\"subnet_ip2\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"subnet_ip2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.subnet[1];
   body += "\">.";
-  body += "<input name=\"subnet_ip3\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"subnet_ip3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.subnet[2];
   body += "\">.";
-  body += "<input name=\"subnet_ip4\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"subnet_ip4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.subnet[3];
   body += "\">";
@@ -461,19 +461,19 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += "<label>";
   body += language == 0 ? "Adres IP" : "IP address";
   body += "</label>";
-  body += "<input name=\"mqtt_ip1\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"mqtt_ip1\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[0];
   body += "\">.";
-  body += "<input name=\"mqtt_ip2\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"mqtt_ip2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[1];
   body += "\">.";
-  body += "<input name=\"mqtt_ip3\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"mqtt_ip3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[2];
   body += "\">.";
-  body += "<input name=\"mqtt_ip4\" type=\"number\" maxlength=\"3\" "
+  body += "<input name=\"mqtt_ip4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" maxlength=\"3\" "
           "style=\"width:70px\" value=\"";
   body += configuration.ip[3];
   body += "\">";
@@ -571,6 +571,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   RELAY configuration;
   configuration = Data.getRelayConfiguration(id);
 
+  DEVICE device;
+  device = Data.getDeviceConfiguration();
+
   String body = "<fieldset>";
 
   char filed[13];
@@ -594,7 +597,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<p class=\"cm\">";
   body +=
       language == 0
-          ? "Konfiguracja zachowania się przekaźnika po przywróceniu zasilania "
+          ? "Konfiguracja przekaźnika po przywróceniu zasilania "
             "lub nawiązaniu połączenia do brokera MQTT"
           : "Setting relay state after power is restored "
             "or the device connected to MQTT Broker";
@@ -628,7 +631,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<option value=\"4\"";
   body += (configuration.statePowerOn == 4 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej wartości"
+  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
                         : "Oposite to the last known state";
   body += "</option>";
   body += "</select>";
@@ -669,7 +672,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body +=
       (configuration.stateMQTTConnected == 4 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej wartości"
+  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
                         : "Oposite to the last known state";
   body += "</option>";
   body += "<option value=\"5\"";
@@ -684,8 +687,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Funkcjonalność automaycznego wyłączenie przekaźnika "
-                        : "Automatic relay switching off functionality";
+  body += language == 0 ? "Funkcjonalność automatycznego wyłączenie przekaźnika "
+                        : "Turning relay off automatically after defined time";
   body += "</p>";
 
   body += "<div class=\"cf\">";
@@ -697,26 +700,104 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += configuration.timeToOff;
   body += "\">";
   body += "<span class=\"hint\">0.01 - 99999 (";
-  body += language == 0 ? "sekund). Brak akcji jeśli jest ustawione na 0"
+  body += language == 0 ? "sekund). Brak akcji jeśli jest 0"
                         : "seconds). No action if it's set to 0";
   body += "</span>";
   body += "</div>";
 
-  body += "</fieldset>";
+  if (device.isDS18B20) {
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Funkcjonalność termostatu" : "Thermostat functionality";
+  body += "</p>";
+
+
+      body += "<div class=\"cc\">";
+      body += "<label>";
+      body += "<input name=\"relay" + String(id) + "thermostat_enabled\" type=\"checkbox\" value=\"1\"";
+      body += configuration.thermostat.enabled ? " checked=\"checked\">" : ">";
+      body += language == 0 ? " termostat jest włączony" : "is thermostat enabled";
+      body += "?</label>";
+      body += "</div>";
+
+      body += "<div class=\"cf\">";
+      body += "<label>";
+      body += language == 0 ? "Włącz jeśli temp. jest" : "Switch on if temp. is";
+      body += "</label>";
+
+      body += "<select name=\"relay" + String(id) + "temp_on_sign\">";
+      body += "<option value=\"0\"";
+      body += (configuration.thermostat.temperatureTurnOnAbove == 0 ? " selected=\"selected\"" : "");
+      body += ">";
+      body += language == 0 ? "mniejsza" : "below";
+      body += "</option>";
+      body += "<option value=\"1\"";
+      body += (configuration.thermostat.temperatureTurnOnAbove == 1 ? " selected=\"selected\"" : "");
+      body += ">";
+      body += language == 0 ? "większa" : "above";
+      body += "</option>";
+      body += "</select>";
+      body += "<span> ";
+      body += language == 0 ? "od" : "from";
+      body += " </span>";
+      body += "<input name=\"relay" + String(id) +
+              "temp_on\" type=\"number\" min=\"-55\" max=\"125\" step=\"any\" maxlength=\"5\" value=\"";
+      body += configuration.thermostat.temperatureTurnOn;
+      body += "\">";
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres"
+                            : "Range";
+      body += ": -55 - +125</span>";
+        body += "</div>";
+
+
+
+      body += "<div class=\"cf\">";
+      body += "<label>";
+      body += language == 0 ? "Wyłącz jeśli temp. jest" : "Switch off if temp. is";
+      body += "</label>";
+
+      body += "<select name=\"relay" + String(id) + "temp_off_sign\">";
+      body += "<option value=\"0\"";
+      body += (configuration.thermostat.temperatureTurnOffAbove == 0 ? " selected=\"selected\"" : "");
+      body += ">";
+      body += language == 0 ? "mniejsza" : "below";
+      body += "</option>";
+      body += "<option value=\"1\"";
+      body += (configuration.thermostat.temperatureTurnOffAbove == 1 ? " selected=\"selected\"" : "");
+      body += ">";
+      body += language == 0 ? "większa" : "above";
+      body += "</option>";
+      body += "</select>";
+      body += "<span> ";
+      body += language == 0 ? "od" : "from";
+      body += " </span>";
+
+      body += "<input name=\"relay" + String(id) +
+              "temp_off\" type=\"number\" min=\"-55\" max=\"125\" step=\"any\" maxlength=\"5\" value=\"";
+      body += configuration.thermostat.temperatureTurnOff;
+      body += "\">";
+
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres"
+                            : "Range";
+      body += ": -55 - +125</span>";
+      body += "</div>";
+}
+
+      body += "</fieldset>";
+
+
 
   char title[23];
   language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
-                : sprintf(title, "Relay #%d", id + 1);
+                        : sprintf(title, "Relay #%d", id + 1);
 
-  return addConfigurationBlock(
-      title,
-      language == 0
-          ? "Przekaźnik musi posiadać unikalną nazwę np. "
-            "<strong>lampa</strong>. "
-            "Nazwa przekaźnika jest używana przez MQTT API"
-          : "Relay must have unique name, for example: <strong>lamp</strong>. "
-            "Relay name is used by MQTT API",
-      body);
+
+    return addConfigurationBlock(
+        title,"",
+        body);
+
 }
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
@@ -817,25 +898,25 @@ String AFESitesGenerator::addDS18B20Configuration() {
   body += "<label>";
   body += language == 0 ? "Odczyty co" : "Read every";
   body += "</label>";
-  body += "<input name=\"ds18b20_interval\" type=\"number\" maxlength=\"5\" "
+  body += "<input name=\"ds18b20_interval\" min=\"5\" max=\"86400\" step=\"1\" type=\"number\" maxlength=\"5\" "
           "value=\"";
   body += configuration.interval;
   body += "\">";
   body += "<span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 10sek do 99999sek" : "seconds. Range: 10 to 99999 seconds";
+  body += language == 0 ? "sekund. Zakres: 5sek do 86400sek (48h)" : "seconds. Range: 5 to 86400sec (48h)";
   body += "</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Korekta wartości o":"Temperature correction";
   body += "</label>";
-  body += "<input name=\"ds18b20_correction\" type=\"number\" maxlength=\"5\" "
+  body += "<input name=\"ds18b20_correction\" type=\"number\" min=\"-9.99\" max=\"9.99\" step=\"0.01\"  maxlength=\"5\" "
           "value=\"";
   body += configuration.correction;
   body += "\">";
   body += "<span class=\"hint\">";
-  body += language == 0 ? "stopni. Zakres: -9.99 do 9.99":"degrees. Range: -9.99 to 9.99";
-  body += "</span>";
+  body += language == 0 ? "stopni. Zakres":"degrees. Range";
+  body += ": -9.99 - +9.99</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
