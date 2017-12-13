@@ -119,8 +119,10 @@ void loop() {
 
           /* One of the switches has been shortly pressed */
           if (Switch.isPressed() || ExternalSwitch.isPressed()) {
+            Led.on();
             Relay.toggle();
             MQTTPublishRelayState(); // MQTT Listener library
+            Led.off();
           }
         }
       } else { // Configuration Mode
