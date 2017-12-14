@@ -15,6 +15,8 @@ void AFERelay::begin(uint8_t id) {
   RelayConfiguration = Data.getRelayConfiguration(_id);
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
+
+  Thermostat.begin(RelayConfiguration.thermostat);
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
@@ -91,6 +93,7 @@ boolean AFERelay::autoTurnOff() {
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
 
+/*
 THERMOSTAT AFERelay::getConfiguration() {
   return RelayConfiguration.thermostat;
 }
@@ -98,3 +101,4 @@ THERMOSTAT AFERelay::getConfiguration() {
 boolean AFERelay::thermostatEnabled() {
   return RelayConfiguration.thermostat.enabled;
 }
+*/

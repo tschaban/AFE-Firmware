@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0rc1"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0rc2"; }
 uint8_t AFEDefaults::getFirmwareType() { return 1; }
 void AFEDefaults::set() {
 
@@ -73,7 +73,6 @@ void AFEDefaults::set() {
   RelayConfiguration.thermostat.temperatureTurnOff = 0;
   RelayConfiguration.thermostat.temperatureTurnOffAbove = true;
 
-
   Data->saveConfiguration(0, RelayConfiguration);
 
   /* @TODO DOMOTICZ
@@ -112,7 +111,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
