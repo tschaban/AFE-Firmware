@@ -12,6 +12,8 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Thermostat.h>
+
 //#include <Streaming.h>
 
 /* Relay states */
@@ -35,6 +37,8 @@ public:
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
+
+  AFEThermostat Thermostat;
 
   /* Method: initiates relay */
   void begin(uint8_t id);
@@ -71,9 +75,9 @@ public:
   boolean autoTurnOff();
 
   /* Methods related to thermostat functionality */
-  /* Method returns relay thermostat configuration. If such exist for particular firmware version */
-  THERMOSTAT getConfiguration();
-  boolean thermostatEnabled();
+  /* Method returns relay thermostat configuration. If such exist for particular
+   * firmware version */
+  //  boolean thermostatEnabled();
 };
 
 #endif

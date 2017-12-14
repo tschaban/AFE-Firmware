@@ -67,15 +67,18 @@ void AFEMQTT::connect() {
           /*
                       Serial << endl << "INFO: Subsribed";
           */
+
           // Setting Relay state after connection to MQTT
-          if (!Relay.setRelayAfterRestoringMQTTConnection()) {
-            // Requesting state from MQTT Broker / service
-            publish(Relay.getMQTTTopic(), "get", "defaultState");
-          } else {
-            // Updating relay state after setting default value after MQTT
-            // connected
-            publish(Relay.getMQTTTopic(), "state",
-                    Relay.get() == RELAY_ON ? "on" : "off");
+          if (Device.configuration.isRelay[0]) {
+            if (!Relay.setRelayAfterRestoringMQTTConnection()) {
+              // Requesting state from MQTT Broker / service
+              publish(Relay.getMQTTTopic(), "get", "defaultState");
+            } else {
+              // Updating relay state after setting default value after MQTT
+              // connected
+              publish(Relay.getMQTTTopic(), "state",
+                      Relay.get() == RELAY_ON ? "on" : "off");
+            }
           }
         } else {
           connections++;
@@ -131,14 +134,15 @@ void AFEMQTT::publish(const char *type, const char *message) {
   publishToMQTTBroker(_mqttTopic, message);
 }
 
-void AFEMQTT::publish(const char *type, float value, uint8_t width, uint8_t precision) {
+void AFEMQTT::publish(const char *type, float value, uint8_t width,
+                      uint8_t precision) {
   char message[10];
   dtostrf(value, width, precision, message);
   publish(type, message);
-
 }
 
-void AFEMQTT::publish(const char *topic, const char *type,const char *message) {
+void AFEMQTT::publish(const char *topic, const char *type,
+                      const char *message) {
   char _mqttTopic[50];
   sprintf(_mqttTopic, "%s%s", topic, type);
   publishToMQTTBroker(_mqttTopic, message);
@@ -146,8 +150,8 @@ void AFEMQTT::publish(const char *topic, const char *type,const char *message) {
 
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-    //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
-    //  message;
+    /* Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
+     * message; */
     Broker.publish(topic, message);
   }
 }

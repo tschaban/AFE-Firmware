@@ -4,11 +4,9 @@
 
 #include "AFE-Thermostat.h"
 
-AFEThermostat::AFEThermostat() {};
+AFEThermostat::AFEThermostat(){};
 
-void AFEThermostat::begin(THERMOSTAT config) {
-  configuration = config;
-}
+void AFEThermostat::begin(THERMOSTAT config) { configuration = config; }
 
 boolean AFEThermostat::isReady() {
   if (ready) {
@@ -19,24 +17,34 @@ boolean AFEThermostat::isReady() {
   }
 }
 
-byte AFEThermostat::getRelayState() {
-  return relayState;
-}
+byte AFEThermostat::getRelayState() { return relayState; }
 
 void AFEThermostat::listener(float currentTemperature) {
-   if (configuration.enabled) {
-     if (configuration.temperatureTurnOnAbove && currentTemperature > configuration.temperatureTurnOn) {
-       relayState = RELAY_ON;
-       ready = true;
-     } else if (!configuration.temperatureTurnOnAbove && currentTemperature < configuration.temperatureTurnOn) {
-       relayState = RELAY_ON;
-       ready = true;
-     } else if (configuration.temperatureTurnOffAbove && currentTemperature > configuration.temperatureTurnOff) {
-       relayState = RELAY_OFF;
-       ready = true;
-     } else if (!configuration.temperatureTurnOffAbove && currentTemperature < configuration.temperatureTurnOff) {
-       relayState = RELAY_OFF;
-       ready = true;
-     }
-   }
+  if (configuration.enabled) {
+    if (configuration.temperatureTurnOnAbove &&
+        currentTemperature > configuration.temperatureTurnOn) {
+      relayState = RELAY_ON;
+      ready = true;
+    } else if (!configuration.temperatureTurnOnAbove &&
+               currentTemperature < configuration.temperatureTurnOn) {
+      relayState = RELAY_ON;
+      ready = true;
+    } else if (configuration.temperatureTurnOffAbove &&
+               currentTemperature > configuration.temperatureTurnOff) {
+      relayState = RELAY_OFF;
+      ready = true;
+    } else if (!configuration.temperatureTurnOffAbove &&
+               currentTemperature < configuration.temperatureTurnOff) {
+      relayState = RELAY_OFF;
+      ready = true;
+    }
+  }
 }
+
+void AFEThermostat::on() { configuration.enabled = true; }
+void AFEThermostat::off() { configuration.enabled = false; }
+void AFEThermostat::toggle() {
+  configuration.enabled ? configuration.enabled = false
+                        : configuration.enabled = true;
+}
+boolean AFEThermostat::enabled() { return configuration.enabled; }

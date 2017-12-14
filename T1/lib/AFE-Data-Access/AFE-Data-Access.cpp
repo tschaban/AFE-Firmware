@@ -109,8 +109,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
       Eeprom.read(433 + id * nextRelay);
   configuration.thermostat.temperatureTurnOffAbove =
       Eeprom.read(434 + id * nextRelay);
-  configuration.thermostat.enabled =
-          Eeprom.read(435 + id * nextRelay);
+  configuration.thermostat.enabled = isThermostatEnabled(id);
 
   return configuration;
 }
@@ -188,9 +187,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
                configuration.thermostat.temperatureTurnOn);
   Eeprom.write(428 + id * nextRelay, 6,
                configuration.thermostat.temperatureTurnOff);
-  Eeprom.write(433 + id * nextRelay, configuration.thermostat.temperatureTurnOnAbove);
-  Eeprom.write(434 + id * nextRelay, configuration.thermostat.temperatureTurnOffAbove);
-  Eeprom.write(435 + id * nextRelay, configuration.thermostat.enabled);
+  Eeprom.write(433 + id * nextRelay,
+               configuration.thermostat.temperatureTurnOnAbove);
+  Eeprom.write(434 + id * nextRelay,
+               configuration.thermostat.temperatureTurnOffAbove);
+  saveThermostatState(id, configuration.thermostat.enabled);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -242,4 +243,14 @@ uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
 
 void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
+}
+
+boolean AFEDataAccess::isThermostatEnabled(uint8_t id) {
+  uint8_t nextRelay = 40;
+  return Eeprom.read(435 + id * nextRelay);
+}
+
+void AFEDataAccess::saveThermostatState(uint8_t id, boolean state) {
+  uint8_t nextRelay = 40;
+  Eeprom.write(435 + id * nextRelay, state);
 }
