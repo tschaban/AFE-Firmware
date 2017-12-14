@@ -24,6 +24,10 @@
 // Not used yet #define SWITCH_RELAY_3 13
 // Not used yet #define SWITCH_RELAY_4 14
 
+/* Relay states */
+#define RELAY_ON 1
+#define RELAY_OFF 0
+
 struct FIRMWARE {
   char version[7];
   uint8_t type;
