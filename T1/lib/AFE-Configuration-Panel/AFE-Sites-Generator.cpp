@@ -597,10 +597,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<p class=\"cm\">";
   body +=
       language == 0
-          ? "Konfiguracja przekaźnika po przywróceniu zasilania "
-            "lub nawiązaniu połączenia do brokera MQTT"
-          : "Setting relay state after power is restored "
-            "or the device connected to MQTT Broker";
+          ? "Wartości domyślne"
+          : "Default values";
   body += "</p>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -687,28 +685,48 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Funkcjonalność automatycznego wyłączenie przekaźnika "
-                        : "Turning relay off automatically after defined time";
+  body += language == 0 ? "Automatycznego wyłączenie przekaźnika"
+                        : "Relay automatic switch off";
   body += "</p>";
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Wyłącz po" : "Turn relay OFF after";
+  body += language == 0 ? "Wyłącz po" : "Switch off after";
   body += "*</label>";
   body += "<input name=\"relay" + String(id) +
-          "_off_time\" type=\"number\" step=\"0.01\" maxlength=\"5\" value=\"";
+          "_off_time\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
   body += configuration.timeToOff;
   body += "\">";
-  body += "<span class=\"hint\">0.01 - 99999 (";
-  body += language == 0 ? "sekund). Brak akcji jeśli jest 0"
-                        : "seconds). No action if it's set to 0";
+  body += "<span class=\"hint\">0.01 - 86400";
+  body += language == 0 ? "sek (24h). Brak akcji jeśli jest 0"
+                        : "sec (24h). No action if it's set to 0";
   body += "</span>";
   body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Zabezpieczenie termiczne"
+                        : "Thermal protection";
+  body += "</p>";
+/*
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
+  body += "*</label>";
+  body += "<input name=\"relay" + String(id) +
+          "_off_temp\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
+  body += configuration.timeToOff;
+  body += "\">";
+  body += "<span class=\"hint\">0.01 - 86400";
+  body += language == 0 ? "sek (24h). Brak akcji jeśli jest 0"
+                        : "sec (24h). No action if it's set to 0";
+  body += "</span>";
+  body += "</div>";
+*/
 
   if (device.isDS18B20) {
 
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Funkcjonalność termostatu" : "Thermostat functionality";
+  body += language == 0 ? "Termostat" : "Thermostat";
   body += "</p>";
 
 
@@ -741,22 +759,20 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += language == 0 ? "od" : "from";
       body += " </span>";
       body += "<input name=\"relay" + String(id) +
-              "temp_on\" type=\"number\" min=\"-55\" max=\"125\" step=\"any\" maxlength=\"5\" value=\"";
+              "temp_on\" type=\"number\" min=\"-67\" max=\"260\" step=\"any\" value=\"";
       body += configuration.thermostat.temperatureTurnOn;
       body += "\">";
       body += "<span class=\"hint\">";
       body += language == 0 ? "Zakres"
                             : "Range";
-      body += ": -55 - +125</span>";
-        body += "</div>";
-
+      body += ": -55C : +125C (-67F : +260F)</span>";
+      body += "</div>";
 
 
       body += "<div class=\"cf\">";
       body += "<label>";
       body += language == 0 ? "Wyłącz jeśli temp. jest" : "Switch off if temp. is";
       body += "</label>";
-
       body += "<select name=\"relay" + String(id) + "temp_off_sign\">";
       body += "<option value=\"0\"";
       body += (configuration.thermostat.temperatureTurnOffAbove == 0 ? " selected=\"selected\"" : "");
@@ -772,16 +788,15 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += "<span> ";
       body += language == 0 ? "od" : "from";
       body += " </span>";
-
       body += "<input name=\"relay" + String(id) +
-              "temp_off\" type=\"number\" min=\"-55\" max=\"125\" step=\"any\" maxlength=\"5\" value=\"";
+              "temp_off\" type=\"number\" min=\"-67\" max=\"260\" step=\"any\" value=\"";
       body += configuration.thermostat.temperatureTurnOff;
       body += "\">";
 
       body += "<span class=\"hint\">";
       body += language == 0 ? "Zakres"
                             : "Range";
-      body += ": -55 - +125</span>";
+      body += ": -55C : +125C (-67F : +260F)</span>";
       body += "</div>";
 }
 
