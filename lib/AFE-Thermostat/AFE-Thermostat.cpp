@@ -4,9 +4,12 @@
 
 #include "AFE-Thermostat.h"
 
-AFEThermostat::AFEThermostat(){};
+AFEThermostat::AFEThermostat() {};
 
-void AFEThermostat::begin(THERMOSTAT config) { configuration = config; }
+void AFEThermostat::begin(uint8_t relayID, THERMOSTAT config) {
+  configuration = config;
+  _relayID = relayID;
+}
 
 boolean AFEThermostat::isReady() {
   if (ready) {
@@ -41,10 +44,22 @@ void AFEThermostat::listener(float currentTemperature) {
   }
 }
 
-void AFEThermostat::on() { configuration.enabled = true; }
-void AFEThermostat::off() { configuration.enabled = false; }
+void AFEThermostat::on() {
+  configuration.enabled = true;
+  enable(configuration.enabled);
+}
+void AFEThermostat::off() {
+  configuration.enabled = false;
+  enable(configuration.enabled);
+}
 void AFEThermostat::toggle() {
   configuration.enabled ? configuration.enabled = false
                         : configuration.enabled = true;
+  enable(configuration.enabled);
 }
 boolean AFEThermostat::enabled() { return configuration.enabled; }
+
+void AFEThermostat::enable(boolean state) {
+  AFEDataAccess Data;
+  Data.saveThermostatState(_relayID,state);
+}

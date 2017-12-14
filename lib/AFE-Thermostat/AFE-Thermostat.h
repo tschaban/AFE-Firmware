@@ -13,26 +13,47 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
-#include <AFE-Relay.h>
+
 class AFEThermostat {
 
 private:
   THERMOSTAT configuration;
   boolean ready = false;
   byte relayState;
+  uint8_t _relayID;
+
+  /* Method enables / disables thermostat */
+  void enable(boolean state);
 
 public:
   /* Constructors */
   AFEThermostat();
 
-  void begin(THERMOSTAT config);
-  boolean isReady();
-  byte getRelayState();
-  void listener(float currentTemperature);
-  void on();
-  void off();
-  void toggle();
+  /* Method initialize thermostat */
+  void begin(uint8_t relayID, THERMOSTAT config);
+
+  /* Method returns true if thermostat is enabled */
   boolean enabled();
+
+  /* Method returns true if event related to thermostat has been captured */
+  boolean isReady();
+
+  /* It returns what should be the relay state after thermostat event captured */
+  byte getRelayState();
+
+  /* Method rises event if thermostat themperatures have been exceeded */
+  void listener(float currentTemperature);
+
+  /* Method turns on thermostat */
+  void on();
+
+  /* Method turns off thermostat */
+  void off();
+
+  /* Method turns thermostat to opposite to current state */
+  void toggle();
+
+
 };
 
 #endif
