@@ -16,10 +16,6 @@
 
 //#include <Streaming.h>
 
-/* Relay states */
-#define RELAY_ON 1
-#define RELAY_OFF 0
-
 class AFERelay {
 
 private:
@@ -34,11 +30,14 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
+
+  AFEThermostat Thermostat;
+
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
 
-  AFEThermostat Thermostat;
+
 
   /* Method: initiates relay */
   void begin(uint8_t id);

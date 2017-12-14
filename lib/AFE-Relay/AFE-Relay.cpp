@@ -16,7 +16,7 @@ void AFERelay::begin(uint8_t id) {
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
 
-  Thermostat.begin(RelayConfiguration.thermostat);
+  Thermostat.begin(_id,RelayConfiguration.thermostat);
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
