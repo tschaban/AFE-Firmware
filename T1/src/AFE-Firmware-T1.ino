@@ -114,7 +114,9 @@ void loop() {
         /* Checking if there was received HTTP API Command */
         if (Device.configuration.httpAPI) {
           if (WebServer.httpAPIlistener()) {
+            Led.on();
             processHTTPAPIRequest(WebServer.getHTTPCommand());
+            Led.off();
           }
         }
 
@@ -123,13 +125,17 @@ void loop() {
 
           /* Relay turn off event launched */
           if (Relay.autoTurnOff()) {
+            Led.on();
             Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+            Led.off();
           }
 
           /* One of the switches has been shortly pressed */
           if (Switch.isPressed() || ExternalSwitch.isPressed()) {
+            Led.on();
             Relay.toggle();
             MQTTPublishRelayState(); // MQTT Listener library
+            Led.off();
           }
         }
 
@@ -140,6 +146,7 @@ void loop() {
           SensorDS18B20.listener();
 
           if (SensorDS18B20.isReady()) {
+            Led.on();
             temperature = SensorDS18B20.getLatest();
             /* Thermostat listener */
             Relay.Thermostat.listener(temperature);
@@ -155,6 +162,7 @@ void loop() {
             }
             /* Publishing temperature to MQTT Broker if enabled */
             Mqtt.publish("temperature", temperature);
+            Led.off();
           }
         }
 
