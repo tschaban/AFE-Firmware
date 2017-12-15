@@ -52,10 +52,6 @@ public:
 
   /* Method turns thermostat to opposite to current state */
   void toggle();
-
-
 };
 
 #endif
-/* DODAC ZAPISYWANIE INFORMACJI O TERMOSTACIE DO EEPROM, NIE JESTEM PEWIEN CZY
- * TO NIE POWINO ZOSTAC PRZENIESIONE NA POZIOM RELAY */
