@@ -13,7 +13,8 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[70];
   Led.on();
-   Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
+
+  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
 
