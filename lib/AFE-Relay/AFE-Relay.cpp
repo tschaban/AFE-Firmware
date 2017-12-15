@@ -15,7 +15,7 @@ void AFERelay::begin(uint8_t id) {
   RelayConfiguration = Data.getRelayConfiguration(_id);
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
-
+  /* Initialzing Thermostat functionality for a relay */
   Thermostat.begin(_id,RelayConfiguration.thermostat);
 }
 

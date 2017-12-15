@@ -72,11 +72,6 @@ public:
   /* Methods while added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
   boolean autoTurnOff();
-
-  /* Methods related to thermostat functionality */
-  /* Method returns relay thermostat configuration. If such exist for particular
-   * firmware version */
-  //  boolean thermostatEnabled();
 };
 
 #endif
