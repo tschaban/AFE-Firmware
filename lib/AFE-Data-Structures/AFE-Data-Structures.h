@@ -24,6 +24,10 @@
 // Not used yet #define SWITCH_RELAY_3 13
 // Not used yet #define SWITCH_RELAY_4 14
 
+/* Relay states */
+#define RELAY_ON 1
+#define RELAY_OFF 0
+
 struct FIRMWARE {
   char version[7];
   uint8_t type;
@@ -70,17 +74,24 @@ struct LED {
   boolean changeToOppositeValue;
 };
 
+struct THERMOSTAT {
+  boolean enabled;
+  float temperatureTurnOn;
+  boolean temperatureTurnOnAbove;
+  float temperatureTurnOff;
+  boolean temperatureTurnOffAbove;
+};
+
 struct RELAY {
   uint8_t gpio;
   float timeToOff;
   uint8_t statePowerOn;
-  /* @TODO Only for MQTT */
   char name[16];
   uint8_t stateMQTTConnected;
   char mqttTopic[49];
-  /* @TODO Only for Domoticz */
-  uint16_t idx;
-  boolean publishToDomoticz;
+  boolean showStatusUsingLED;
+  THERMOSTAT thermostat;
+  float thermalProtection;
 };
 
 struct SWITCH {
@@ -100,7 +111,7 @@ struct DS18B20 {
   uint8_t gpio;
   float correction;
   uint16_t interval;
-  uint16_t unit;
+  uint8_t unit;
 };
 
 struct DOMOTICZ {

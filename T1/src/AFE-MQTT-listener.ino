@@ -1,10 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  MQTT Messages listener
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -12,52 +8,104 @@
 #include "WProgram.h"
 #endif
 
+/* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
-  char _mqttTopic[50];
+  char _mqttTopic[70];
   Led.on();
-  // Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
+
+//  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
-
-    for (uint8_t i = 0; i < length; i++) {
-      Serial << (char)payload[i];
-    }
-
+/*
+                         for (uint8_t i = 0; i < length; i++) {
+                           Serial << (char)payload[i];
+                         }
+*/
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
-    /*
+/*
         Serial << endl
                << "DEBUG: "
                << "checking relay messages: " << _mqttTopic;
-    */
-    if (String(topic) == String(_mqttTopic)) {
-      if ((char)payload[1] == 'N') {
+*/
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[0] == 'o' && length==2) { // on
         Relay.on();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "ON");
-      } else if ((char)payload[1] == 'F') {
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+      } else if ((char)payload[0] == 'o' && length==3) { // off
         Relay.off();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "OFF");
-      } else if ((char)payload[2] == 'p') { // reportState
+        Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+      } else if (((char)payload[0] == 'r' && length==12) || ((char)payload[0] == 'g' && length==3)) { // reportState or get @TODO remove onve rc1 is no longer used
         Mqtt.publish(Relay.getMQTTTopic(), "state",
-                     Relay.get() == RELAY_ON ? "ON" : "OFF");
+                     Relay.get() == RELAY_ON ? "on" : "off");
+      } else if ((char)payload[0] == 't' && length==6) { // toggle
+        Relay.get() == RELAY_ON ? Relay.off() : Relay.on();
+        Mqtt.publish(Relay.getMQTTTopic(), "state",
+                     Relay.get() == RELAY_ON ? "on" : "off");
       }
+    } else {
+
+
+    sprintf(_mqttTopic, "%sthermostat/cmd", Relay.getMQTTTopic());
+/*
+    Serial << endl
+           << "DEBUG: "
+           << "checking thermostat messages: " << _mqttTopic;
+*/
+    if (strcmp(topic, _mqttTopic) == 0) {
+    if ((char)payload[0] == 'o' && length==2) { // on
+      Relay.Thermostat.on();
+      Mqtt.publish(Relay.getMQTTTopic(), "thermostat/state",
+                    Relay.Thermostat.enabled() ? "on" : "off");
+    } else if ((char)payload[0] == 'o' && length==3) { // off
+      Relay.Thermostat.off();
+      Mqtt.publish(Relay.getMQTTTopic(), "thermostat/state",
+                    Relay.Thermostat.enabled() ? "on" : "off");
+    } else if ((char)payload[0] == 't' && length==6) { // toggle
+      Relay.Thermostat.enabled() ? Relay.Thermostat.off()
+                                  : Relay.Thermostat.on();
+      Mqtt.publish(Relay.getMQTTTopic(), "thermostat/state",
+                    Relay.Thermostat.enabled() ? "on" : "off");
+    } else if ((char)payload[0] == 'g' && length==3) { // get
+      Mqtt.publish(Relay.getMQTTTopic(), "thermostat/state",
+                    Relay.Thermostat.enabled() ? "on" : "off");
     }
+  } else {
 
     sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
-    /*
+/*
         Serial << endl
                << "DEBUG: "
                << "checking device level messages: " << _mqttTopic;
-    */
-    if (String(topic) == String(_mqttTopic)) {
+*/
+    if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[2] == 'b') { // reboot
         //      Serial << endl << "INFO: Process: reboot";
         Device.reboot(MODE_NORMAL);
       } else if ((char)payload[2] == 'n') { // configurationMode
         //    Serial << endl << "INFO: Process: configuration Mode";
         Device.reboot(MODE_CONFIGURATION);
+      } else if ((char)payload[2] == 't') { // getTemperature
+        char  temperatureString[6];
+        dtostrf(SensorDS18B20.get(), 2, 2, temperatureString);
+           Mqtt.publish("temperature",temperatureString);
       }
     }
   }
+}
+}
   Led.off();
+}
+
+/* Metod publishes Relay state (used eg by HTTP API) */
+void MQTTPublishRelayState() {
+  if (Device.configuration.mqttAPI) {
+    Led.on();
+    if (Relay.get() == RELAY_ON) {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
+    } else {
+      Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+    }
+    Led.off();
+  }
 }

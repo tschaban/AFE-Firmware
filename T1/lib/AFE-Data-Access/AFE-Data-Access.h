@@ -33,7 +33,6 @@ public:
   DS18B20 getDS18B20Configuration();
   // @TODO DOMOTICZ getDomoticzConfiguration();
 
-
   /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
   void saveConfiguration(FIRMWARE configuration);
@@ -44,7 +43,6 @@ public:
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(DS18B20 configuration);
   // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
-
 
   /* Methods read and save firmware version from/to EEPROM */
   const char getVersion();
@@ -61,5 +59,9 @@ public:
   /* Methods read and save firmware Language from/to EEPROM */
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
+
+  /* Methods read and save thermostate state */
+  boolean isThermostatEnabled(uint8_t id);
+  void saveThermostatState(uint8_t id, boolean state);
 };
 #endif
