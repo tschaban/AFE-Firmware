@@ -12,8 +12,10 @@
 #endif
 
 #include <AFE-Data-Access.h>
-//#include <Streaming.h>
+#include <AFE-Thermostat.h>
+#include <AFE-Thermal-Protection.h>
 
+//#include <Streaming.h>
 
 class AFERelay {
 
@@ -29,9 +31,15 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
+
+  AFEThermostat Thermostat;
+  AFEThermalProtection ThermalProtection;
+
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
+
+
 
   /* Method: initiates relay */
   void begin(uint8_t id);
@@ -60,12 +68,12 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
+  /* Methods returns relay name */
+  const char *getName();
+
   /* Methods while added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
   boolean autoTurnOff();
-
-  /* Methods returns relay name */
-  const char *getName();
 };
 
 #endif
