@@ -22,7 +22,6 @@ boolean AFESwitch::getState() { return state; }
 
 boolean AFESwitch::isPressed() {
   if (pressed) {
-    Led.blink(50);
     pressed = false;
     return true;
   } else {
@@ -42,7 +41,6 @@ boolean AFESwitch::is5s() {
 boolean AFESwitch::is10s() {
   if (pressed4tenSeconds) {
     pressed4tenSeconds = false;
-    Led.blink(50);
     return true;
   } else {
     return false;

@@ -13,6 +13,8 @@
 
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include <AFE-Data-Structures.h>
+#include <AFE-Data-Access.h>
 
 #define UNIT_CELCIUS 0
 #define UNIT_FAHRENHEIT 1
@@ -20,23 +22,34 @@
 class AFESensorDS18B20 {
 
 private:
-  uint8_t gpio;
-  float correction = 0;
+  DS18B20 configuration;
+  float currentTemperature = -127;
+  boolean ready = false;
+  unsigned long startTime = 0;
+  boolean _initialized = false;
 
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorDS18B20();
-  AFESensorDS18B20(uint8_t sensor_gpio);
 
-  void begin(uint8_t sensor_gpio);
+  void begin();
+
   /* Get current temp in Celsius (default) possible options:
      - UNIT_CELCIUS
-                 - UNIT_FAHRENHEIT
-        */
-  float get(uint8_t unit = 0);
+    - UNIT_FAHRENHEIT
+  */
 
-  /* If needed set temperature correction value */
-  void setCorrection(float sensor_correction);
+
+  // @TODO I think reading temp should be made in the listener, issue to solve how to get temperature but publish only changes
+  float get();
+
+  float getLatest();
+
+  boolean isReady();
+
+  /* Method has to be added to the loop in order to listen for sensor value changes */
+  void listener();
+
 };
 
 #endif

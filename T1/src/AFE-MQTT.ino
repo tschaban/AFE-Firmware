@@ -1,9 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
 
@@ -12,7 +9,7 @@ AFEMQTT::AFEMQTT() {}
 void AFEMQTT::begin() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
-  sprintf(deviceName, "%s", NetworkConfiguration.host);
+  sprintf(deviceName, "%s", Device.configuration.name);
 
   /* Defaults are taken from WiFi config. They can be set using
    * setReconnectionParams() */
@@ -70,15 +67,18 @@ void AFEMQTT::connect() {
           /*
                       Serial << endl << "INFO: Subsribed";
           */
+
           // Setting Relay state after connection to MQTT
-          if (!Relay.setRelayAfterRestoringMQTTConnection()) {
-            // Requesting state from MQTT Broker / service
-            publish(Relay.getMQTTTopic(), "get", "defaultState");
-          } else {
-            // Updating relay state after setting default value after MQTT
-            // connected
-            publish(Relay.getMQTTTopic(), "state",
-                    Relay.get() == RELAY_ON ? "ON" : "OFF");
+          if (Device.configuration.isRelay[0]) {
+            if (!Relay.setRelayAfterRestoringMQTTConnection()) {
+              // Requesting state from MQTT Broker / service
+              publish(Relay.getMQTTTopic(), "get", "defaultState");
+            } else {
+              // Updating relay state after setting default value after MQTT
+              // connected
+              publish(Relay.getMQTTTopic(), "state",
+                      Relay.get() == RELAY_ON ? "on" : "off");
+            }
           }
         } else {
           connections++;
@@ -101,7 +101,10 @@ void AFEMQTT::connect() {
             */
             break;
           }
-          delay(durationBetweenConnectionAttempts * 1000);
+          Led.on();
+          delay(durationBetweenConnectionAttempts * 500);
+          Led.off();
+          delay(durationBetweenConnectionAttempts * 500);
           /* Serial << "."; */
         }
       }
@@ -131,6 +134,13 @@ void AFEMQTT::publish(const char *type, const char *message) {
   publishToMQTTBroker(_mqttTopic, message);
 }
 
+void AFEMQTT::publish(const char *type, float value, uint8_t width,
+                      uint8_t precision) {
+  char message[10];
+  dtostrf(value, width, precision, message);
+  publish(type, message);
+}
+
 void AFEMQTT::publish(const char *topic, const char *type,
                       const char *message) {
   char _mqttTopic[50];
@@ -140,8 +150,8 @@ void AFEMQTT::publish(const char *topic, const char *type,
 
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-    //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
-    //  message;
+    /* Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
+     * message; */
     Broker.publish(topic, message);
   }
 }

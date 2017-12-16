@@ -1,10 +1,6 @@
-/*
-  AFE Firmware for smart home devices build on ESP8266
-  Version: T0
-  MQTT class
-  More info: https://github.com/tschaban/AFE-Firmware
-  LICENCE: http://opensource.org/licenses/MIT
-*/
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #ifndef _AFE_MQTT_h
 #define _AFE_MQTT_h
@@ -17,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <PubSubClient.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 #include <WiFiClient.h>
 
 class AFEMQTT {
@@ -35,6 +31,9 @@ private:
   boolean isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
 
+  /* Method pushes to the MQTT Broker MQTT Message */
+  void publishToMQTTBroker(const char *topic, const char *message);
+
 public:
   /* Constructor: it sets all necessary parameters */
   AFEMQTT();
@@ -51,14 +50,13 @@ public:
   /* Connecting to MQTT Broker */
   void connect();
 
-  /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
+  /* Publishing MQTT Message. It calls private method publishToMQTTBroker. First one publishes char string, second one float with optional specyfication float format to convert string */
   void publish(const char *type, const char *message);
+  void publish(const char *type, float value, uint8_t width=2, uint8_t precision=2);
 
   /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
    * publishToMQTTBroker  */
   void publish(const char *topic, const char *type, const char *message);
-
-  void publishToMQTTBroker(const char *topic, const char *message);
 
   /* Returns TRUE if connected to MQTT Broker */
   boolean connected();
