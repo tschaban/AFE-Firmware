@@ -10,69 +10,60 @@
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it
  */
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
-                              byte state = 9) {
-  String respond;
-  respond = "{";
-  if (strlen(request.device) > 0) {
-    respond += "\"device\":\"" + String(request.device) + "\",";
-  }
-  if (strlen(request.name) > 0) {
-    respond += "\"name\":\"" + String(request.name) + "\",";
-  }
-  if (strlen(request.command) > 0) {
-    respond += "\"command\":\"" + String(request.command) + "\",";
-  }
+ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,const char *value = "") {
+   String respond;
+   respond = "{";
+   if (strlen(request.device) > 0) {
+     respond += "\"device\":\"" + String(request.device) + "\",";
+   }
+   if (strlen(request.name) > 0) {
+     respond += "\"name\":\"" + String(request.name) + "\",";
+   }
+   if (strlen(request.command) > 0) {
+     respond += "\"command\":\"" + String(request.command) + "\",";
+   }
 
-  if (state != 9) {
-    respond += "\"value\":\"";
-    respond += state == RELAY_ON ? "on" : "off";
-    respond += "\",";
-  }
+   if (!strlen(value) == 0) {
+     respond += "\"value\":\"";
+     respond += value;
+     respond += "\",";
+   }
 
-  respond += "\"status\":\"";
-  respond += status ? "success" : "error";
-  respond += "\"}";
-  WebServer.sendJSON(respond);
-}
+   respond += "\"status\":\"";
+   respond += status ? "success" : "error";
+   respond += "\"}";
+   WebServer.sendJSON(respond);
+ }
+
+ /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus method which creates JSON respons and pushes it */
+ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,byte value) {
+   sendHTTPAPIRequestStatus(request,status,value==RELAY_ON?"on":"off");
+ }
+
 
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
-
+  Led.on();
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
     /* Checking Relay #0 */
     if (strcmp(request.name, Relay.getName()) == 0) {
       if (strcmp(request.command, "on") == 0) {
         Relay.on();
-        if (Relay.get() == RELAY_ON) {
-          sendHTTPAPIRequestStatus(request, true);
-          MQTTPublishRelayState(); // MQTT Listener library
-        } else {
-          sendHTTPAPIRequestStatus(request, false);
-        }
+        sendHTTPAPIRelayRequestStatus(request,Relay.get()==RELAY_ON, Relay.get());
+        MQTTPublishRelayState(); // MQTT Listener library
       } else if (strcmp(request.command, "off") == 0) { // Off
         Relay.off();
-        if (Relay.get() == RELAY_OFF) {
-          sendHTTPAPIRequestStatus(request, true);
-          MQTTPublishRelayState(); // MQTT Listener library
-        } else {
-          sendHTTPAPIRequestStatus(request, false);
-        }
-
+        sendHTTPAPIRelayRequestStatus(request,Relay.get()==RELAY_OFF, Relay.get());
+        MQTTPublishRelayState(); // MQTT Listener library
       } else if (strcmp(request.command, "toggle") == 0) { // toggle
         uint8_t state = Relay.get();
         Relay.toggle();
-        if (state != Relay.get()) {
-          sendHTTPAPIRequestStatus(request, true);
-          MQTTPublishRelayState(); // MQTT Listener library
-        } else {
-          sendHTTPAPIRequestStatus(request, false);
-        }
-
+        sendHTTPAPIRelayRequestStatus(request,state!=Relay.get(), Relay.get());
+        MQTTPublishRelayState(); // MQTT Listener library
       } else if (strcmp(request.command, "reportStatus") == 0) { // reportStatus
-        sendHTTPAPIRequestStatus(request, true, Relay.get());
-        /* Commend not implemented */
+        sendHTTPAPIRelayRequestStatus(request,true, Relay.get());
+        /* Command not implemented.Info */
       } else {
         sendHTTPAPIRequestStatus(request, false);
       }
@@ -91,4 +82,5 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   } else {
     sendHTTPAPIRequestStatus(request, false);
   }
+  Led.off();
 }

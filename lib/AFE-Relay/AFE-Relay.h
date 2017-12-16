@@ -14,6 +14,9 @@
 #include <AFE-Data-Access.h>
 //#include <Streaming.h>
 
+/* Relay states */
+#define RELAY_ON 1
+#define RELAY_OFF 0
 
 class AFERelay {
 
