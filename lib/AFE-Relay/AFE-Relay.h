@@ -13,6 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Thermostat.h>
+#include <AFE-Thermal-Protection.h>
 
 //#include <Streaming.h>
 
@@ -32,6 +33,7 @@ private:
 public:
 
   AFEThermostat Thermostat;
+  AFEThermalProtection ThermalProtection;
 
   /* Constructors */
   AFERelay();

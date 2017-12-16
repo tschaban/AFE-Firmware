@@ -35,7 +35,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  //Serial.swap();
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -148,18 +148,29 @@ void loop() {
           if (SensorDS18B20.isReady()) {
             Led.on();
             temperature = SensorDS18B20.getLatest();
+
             /* Thermostat listener */
             Relay.Thermostat.listener(temperature);
 
-            /* If event triggered by thermostat */
+            /* Thermal Protection listener */
+            Relay.ThermalProtection.listener(temperature);
+
+            /* Relay control by thermostat code */
             if (Relay.Thermostat.isReady()) {
-              if (Relay.Thermostat.getRelayState() == RELAY_ON) {
+              if (Relay.Thermostat.getRelayState() == RELAY_ON && !Relay.ThermalProtection.protectionOn()) {
                 Relay.on();
               } else {
                 Relay.off();
               }
               MQTTPublishRelayState();
             }
+
+            /* Checking if relay should be switched off based on device thermal protection */
+            if (Relay.get()==RELAY_ON && Relay.ThermalProtection.protectionOn()) {
+               Relay.off();
+               MQTTPublishRelayState();
+            }
+
             /* Publishing temperature to MQTT Broker if enabled */
             Mqtt.publish("temperature", temperature);
             Led.off();

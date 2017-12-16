@@ -17,6 +17,8 @@ void AFERelay::begin(uint8_t id) {
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
   /* Initialzing Thermostat functionality for a relay */
   Thermostat.begin(_id,RelayConfiguration.thermostat);
+  /* Initialzing thermal protection functionality for a relay */
+  ThermalProtection.begin(RelayConfiguration.thermalProtection);
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }

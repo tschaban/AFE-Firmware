@@ -336,7 +336,9 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.thermostat.temperatureTurnOffAbove = server.arg("sf" + String(id)).toInt()  == 0 ? false : true;
   }
 
-
+  if (server.arg("tp" + String(id) ).length() > 0) {
+    data.thermalProtection = server.arg("tp" + String(id)).toInt();
+  }
   return data;
 }
 

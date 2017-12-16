@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0rc2"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0.0"; }
 uint8_t AFEDefaults::getFirmwareType() { return 1; }
 void AFEDefaults::set() {
 
@@ -72,6 +72,7 @@ void AFEDefaults::set() {
   RelayConfiguration.thermostat.temperatureTurnOnAbove = false;
   RelayConfiguration.thermostat.temperatureTurnOff = 0;
   RelayConfiguration.thermostat.temperatureTurnOffAbove = true;
+  RelayConfiguration.thermalProtection = 0;
 
   Data->saveConfiguration(0, RelayConfiguration);
 

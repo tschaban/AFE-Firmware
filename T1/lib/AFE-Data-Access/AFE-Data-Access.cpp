@@ -111,6 +111,9 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
       Eeprom.read(434 + id * nextRelay);
   configuration.thermostat.enabled = isThermostatEnabled(id);
 
+  configuration.thermalProtection =
+      Eeprom.read(436 + id * nextRelay, 3).toInt();
+
   return configuration;
 }
 
@@ -192,6 +195,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(434 + id * nextRelay,
                configuration.thermostat.temperatureTurnOffAbove);
   saveThermostatState(id, configuration.thermostat.enabled);
+  Eeprom.write(436 + id * nextRelay,3,
+               configuration.thermalProtection);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {

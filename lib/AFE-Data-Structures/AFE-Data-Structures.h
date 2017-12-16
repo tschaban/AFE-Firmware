@@ -91,6 +91,7 @@ struct RELAY {
   char mqttTopic[49];
   boolean showStatusUsingLED;
   THERMOSTAT thermostat;
+  float thermalProtection;
 };
 
 struct SWITCH {

@@ -219,17 +219,15 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "<input name=\"ds\" type=\"checkbox\" value=\"1\"";
   body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
-  body += " DS18B20 ";
-  body += language == 0 ? " jest podłączony" : " present";
-  body += "?";
+  body += " DS18B20";
   body += "</label>";
   body += "</div>";
 
   body += "</fieldset>";
 
   page += addConfigurationBlock(
-      language == 0 ? "Sprzęt" : "Hardware",
-      language == 0 ? "Konfiguracja urządzenia" : "Device configuration", body);
+      language == 0 ? "Konfiguracja urządzenia" : "Hardware configuration",
+      language == 0 ? "Wybierz podłączone elementy do urządzenia" : "Select connected items to your device", body);
 
   body = "<fieldset>";
   body += "<div class=\"cc\">";
@@ -700,7 +698,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
                         : "sec (24h). No action if it's set to 0";
   body += "</span>";
   body += "</div>";
-/*
+
+if (device.isDS18B20) {
+
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Zabezpieczenie termiczne"
                         : "Thermal protection";
@@ -710,18 +710,20 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<label>";
   body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
   body += "*</label>";
-  body += "<input name=\"relay" + String(id) +
-          "_off_temp\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
-  body += configuration.timeToOff;
+  body += "<input name=\"tp" + String(id) +
+          "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
+  body += configuration.thermalProtection;
   body += "\">";
-  body += "<span class=\"hint\">0.01 - 86400";
-  body += language == 0 ? "sek (24h). Brak akcji jeśli jest 0"
-                        : "sec (24h). No action if it's set to 0";
-  body += "</span>";
-  body += "</div>";
-*/
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "Zakres"
+                        : "Range";
+  body += ": -55C : +125C (-67F : +259F). ";
+  body += language == 0 ? "Brak akcji jeśli jest 0"
+                        : "No action if it's set to 0";
+  body += "</span></div>";
 
-  if (device.isDS18B20) {
+
+
 
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Termostat" : "Thermostat";
@@ -1145,10 +1147,8 @@ const String AFESitesGenerator::generateSwitchItem(uint8_t id,
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
   body += ">";
-  body += language == 0 ? "Przycisk / włącznik #" : "Is button / switch #";
+  body += language == 0 ? "Przycisk / włącznik #" : "Button / switch #";
   body += id + 1;
-  body += language == 0 ? " podłączony" : " present";
-  body += "?";
   body += "</label>";
   body += "</div>";
 
@@ -1163,8 +1163,7 @@ const String AFESitesGenerator::generateRelayItem(uint8_t id, boolean checked) {
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
   body += ">";
-  body += language == 0 ? "Przekaźnik podłączony" : "Is Relay present";
-  body += "?";
+  body += language == 0 ? "Przekaźnik" : "Relay";
   body += "</label>";
   body += "</div>";
 
@@ -1178,10 +1177,7 @@ const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
   body += id;
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
-  body += ">";
-  body += language == 0 ? "LED podłączony" : "Is LED present";
-  body += "?";
-  body += "</label>";
+  body += ">LED</label>";
   body += "</div>";
 
   return body;
