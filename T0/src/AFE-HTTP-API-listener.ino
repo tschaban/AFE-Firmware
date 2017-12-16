@@ -40,10 +40,8 @@
    sendHTTPAPIRequestStatus(request,status,value==RELAY_ON?"on":"off");
  }
 
-
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
-  Led.on();
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
     /* Checking Relay #0 */
@@ -61,7 +59,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         Relay.toggle();
         sendHTTPAPIRelayRequestStatus(request,state!=Relay.get(), Relay.get());
         MQTTPublishRelayState(); // MQTT Listener library
-      } else if (strcmp(request.command, "reportStatus") == 0) { // reportStatus
+      } else if (strcmp(request.command, "reportStatus") == 0 || strcmp(request.command, "get") == 0) { // reportStatus or get
         sendHTTPAPIRelayRequestStatus(request,true, Relay.get());
         /* Command not implemented.Info */
       } else {
@@ -82,5 +80,4 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   } else {
     sendHTTPAPIRequestStatus(request, false);
   }
-  Led.off();
 }

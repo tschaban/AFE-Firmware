@@ -105,7 +105,9 @@ void loop() {
         /* Checking if there was received HTTP API Command */
         if (Device.configuration.httpAPI) {
           if (WebServer.httpAPIlistener()) {
+            Led.on();
             processHTTPAPIRequest(WebServer.getHTTPCommand());
+            Led.off();
           }
         }
 
@@ -114,7 +116,9 @@ void loop() {
 
           /* Relay turn off event launched */
           if (Relay.autoTurnOff()) {
+            Led.on();
             Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
+            Led.off();
           }
 
           /* One of the switches has been shortly pressed */
