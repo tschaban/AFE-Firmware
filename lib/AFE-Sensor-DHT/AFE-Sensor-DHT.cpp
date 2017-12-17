@@ -14,13 +14,11 @@ void AFESensorDHT::begin() {
 }
 
 float AFESensorDHT::get() {
-
   DHT dht(configuration.gpio, configuration.type == 1
                    ? DHT11
                    : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  float temperature;
-  temperature = dht.readTemperature();
+  float temperature = dht.readTemperature();
 
   return temperature + configuration.temperature.correction;
 }

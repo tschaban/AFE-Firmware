@@ -44,7 +44,6 @@ public:
 
   boolean isReady();
 
-  /* Method has to be added to the loop in order to listen for sensor value changes */
   void listener();
 
 };
