@@ -114,6 +114,24 @@ struct DS18B20 {
   uint8_t unit;
 };
 
+struct TEMPERATURE {
+  float correction;
+  unsigned int interval;
+  uint8_t unit;
+};
+
+struct HUMIDITY {
+  float correction;
+  unsigned int interval;
+};
+
+struct DH {
+  uint8_t gpio;
+  uint8_t type;
+  TEMPERATURE temperature;
+  HUMIDITY humidity;
+};
+
 struct DOMOTICZ {
   char host[32];
   IPAddress ip;
