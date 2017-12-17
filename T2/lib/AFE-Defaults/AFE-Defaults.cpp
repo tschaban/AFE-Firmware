@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0.1"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0rc1"; }
 uint8_t AFEDefaults::getFirmwareType() { return 1; }
 void AFEDefaults::set() {
 
@@ -33,7 +33,7 @@ void AFEDefaults::set() {
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
-  deviceConfiguration.isDHT = false;
+  deviceConfiguration.isDHT = true;
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
