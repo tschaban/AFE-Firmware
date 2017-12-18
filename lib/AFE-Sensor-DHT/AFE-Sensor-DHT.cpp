@@ -44,7 +44,7 @@ float AFESensorDHT::getHeatIndex() {
                    ? DHT11
                    : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  return dht.computeHeatIndex(currentTemperature,currentHumidity, configuration.temperature.unit==0?false:true));  
+  return dht.computeHeatIndex(currentTemperature,currentHumidity, configuration.temperature.unit==0?false:true);
 }
 
 boolean AFESensorDHT::temperatureSensorReady() {
