@@ -28,6 +28,7 @@ AFESensorDHT SensorDHT;
 MQTT MQTTConfiguration;
 
 float temperature;
+float humidity;
 
 void setup() {
 
@@ -145,9 +146,9 @@ void loop() {
           /* Sensor: DS18B20 listener */
           SensorDHT.listener();
 
-          if (SensorDHT.isReady()) {
+          if (SensorDHT.temperatureSensorReady()) {
             Led.on();
-            temperature = SensorDHT.getLatest();
+            temperature = SensorDHT.getLatestTemperature();
 
             /* Thermostat listener */
             Relay.Thermostat.listener(temperature);
@@ -175,6 +176,18 @@ void loop() {
             Mqtt.publish("temperature", temperature);
             Led.off();
           }
+
+          /* Humidity sensor related code */
+          if (SensorDHT.humiditySensorReady()) {
+            Led.on();
+            humidity = SensorDHT.getLatestHumidity();
+
+            /* Publishing humidity to MQTT Broker if enabled */
+            Mqtt.publish("humidity", humidity);
+            Led.off();
+          }
+
+
         }
 
       } else { // Configuration Mode

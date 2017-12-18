@@ -53,8 +53,7 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
   Led.on();
-  /* Checking of request is about a relay */
-  if (strcmp(request.device, "relay") == 0) {
+  if /* Relay level commands */ (strcmp(request.device, "relay") == 0) {
     /* Checking Relay #0 */
     if (strcmp(request.name, Relay.getName()) == 0) {
       if (strcmp(request.command, "on") == 0) {
@@ -97,11 +96,23 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else { /* No such relay */
       sendHTTPAPIRequestStatus(request, false);
     }
-  } else if (strcmp(request.device, "DHT") == 0) {
-    if (strcmp(request.command, "getTemperature") == 0 || strcmp(request.command, "get") == 0) { // @TODO remove once verson rc1 is not used
-      sendHTTPAPIRequestStatus(request, true, SensorDHT.get());
-    }
-  } else if (strcmp(request.command, "reboot") == 0) { // reboot
+  }  /* DHT Sensor */ else if (strcmp(request.device, "dht") == 0) {
+      if (strcmp(request.name, "temperature") == 0) {
+        strcmp(request.command, "get") == 0 ?
+        sendHTTPAPIRequestStatus(request, true, SensorDHT.getTemperature()) :
+        sendHTTPAPIRequestStatus(request, false);
+      } else if (strcmp(request.name, "humidity") == 0) {
+        strcmp(request.command, "get") == 0 ?
+           sendHTTPAPIRequestStatus(request, true, SensorDHT.getHumidity()) :
+           sendHTTPAPIRequestStatus(request, false);
+      } else if (strcmp(request.name, "heatIndex") == 0) {
+        strcmp(request.command, "get") == 0 ?
+             sendHTTPAPIRequestStatus(request, true, SensorDHT.getHeatIndex()) :
+             sendHTTPAPIRequestStatus(request, false);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
+      }
+  } /* Device level commands */ else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==

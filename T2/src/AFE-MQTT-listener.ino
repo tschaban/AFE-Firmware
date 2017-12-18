@@ -79,16 +79,24 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                << "checking device level messages: " << _mqttTopic;
 */
     if (strcmp(topic, _mqttTopic) == 0) {
-      if ((char)payload[2] == 'b') { // reboot
+      if ((char)payload[2] == 'b' && length==6 ) { // reboot
         //      Serial << endl << "INFO: Process: reboot";
         Device.reboot(MODE_NORMAL);
-      } else if ((char)payload[2] == 'n') { // configurationMode
+      } else if ((char)payload[2] == 'n' && length==17) { // configurationMode
         //    Serial << endl << "INFO: Process: configuration Mode";
         Device.reboot(MODE_CONFIGURATION);
-      } else if ((char)payload[2] == 't') { // getTemperature
+      } else if ((char)payload[2] == 't' && length==14) { // getTemperature
         char  temperatureString[6];
-        dtostrf(SensorDHT.get(), 2, 2, temperatureString);
-           Mqtt.publish("temperature",temperatureString);
+        dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
+        Mqtt.publish("temperature",temperatureString);
+      } else if ((char)payload[2] == 't' && length==11) { // getHumidity
+        char  humidityString[6];
+        dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
+        Mqtt.publish("humidity",humidityString);
+      } else if ((char)payload[2] == 't' && length==12) { // getHeatIndex
+        char heatIndex[6];
+        dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
+        Mqtt.publish("heatIndex",heatIndex);
       }
     }
   }

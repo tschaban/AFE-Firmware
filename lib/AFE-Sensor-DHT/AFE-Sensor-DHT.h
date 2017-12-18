@@ -23,8 +23,11 @@ class AFESensorDHT {
 private:
   DH configuration;
   float currentTemperature = -127;
-  boolean ready = false;
-  unsigned long startTime = 0;
+  float currentHumidity = -1;
+  boolean temperatureInBuffer = false;
+  boolean humidityInBuffer = false;
+  unsigned long temperatureCounterStartTime = 0;
+  unsigned long humidityCounterStartTime = 0;
   boolean _initialized = false;
 
 public:
@@ -33,16 +36,14 @@ public:
 
   void begin();
 
-  /* Get current temp in Celsius (default) possible options:
-     - UNIT_CELCIUS
-     - UNIT_FAHRENHEIT
-  */
+  float getTemperature();
+  float getHumidity();
+  float getLatestTemperature();
+  float getLatestHumidity();
+  float getHeatIndex();
 
-  float get();
-
-  float getLatest();
-
-  boolean isReady();
+  boolean temperatureSensorReady();
+  boolean humiditySensorReady();
 
   void listener();
 

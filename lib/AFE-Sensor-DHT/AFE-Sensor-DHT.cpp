@@ -13,24 +13,52 @@ void AFESensorDHT::begin() {
   _initialized = true;
 }
 
-float AFESensorDHT::get() {
+float AFESensorDHT::getTemperature() {
   DHT dht(configuration.gpio, configuration.type == 1
                    ? DHT11
                    : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  float temperature = dht.readTemperature();
-
-  return temperature + configuration.temperature.correction;
+  return dht.readTemperature(configuration.temperature.unit==0?false:true) + configuration.temperature.correction;
 }
 
-float  AFESensorDHT::getLatest() {
-  ready = false;
+float AFESensorDHT::getHumidity() {
+  DHT dht(configuration.gpio, configuration.type == 1
+                   ? DHT11
+                   : configuration.type == 2 ? DHT21 : DHT22);
+ dht.begin();
+ return dht.readHumidity() + configuration.temperature.correction;
+}
+
+float AFESensorDHT::getLatestTemperature() {
+  temperatureInBuffer = false;
   return currentTemperature;
 }
 
-boolean AFESensorDHT::isReady() {
-  if (ready) {
-    ready = false;
+float AFESensorDHT::getLatestHumidity() {
+  humidityInBuffer = false;
+  return currentHumidity;
+}
+
+float AFESensorDHT::getHeatIndex() {
+  DHT dht(configuration.gpio, configuration.type == 1
+                   ? DHT11
+                   : configuration.type == 2 ? DHT21 : DHT22);
+  dht.begin();
+  return dht.computeHeatIndex(currentTemperature,currentHumidity, configuration.temperature.unit==0?false:true));  
+}
+
+boolean AFESensorDHT::temperatureSensorReady() {
+  if (temperatureInBuffer) {
+    temperatureInBuffer = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+boolean AFESensorDHT::humiditySensorReady() {
+  if (humidityInBuffer) {
+    humidityInBuffer = false;
     return true;
   } else {
     return false;
@@ -39,19 +67,35 @@ boolean AFESensorDHT::isReady() {
 
 void AFESensorDHT::listener() {
   if (_initialized) {
-  unsigned long time = millis();
+  unsigned long temperatureTime = millis();
+  unsigned long humidityTime = temperatureTime;
 
-  if (startTime == 0) { // starting timer. used for switch sensitiveness
-    startTime = time;
+  if (temperatureCounterStartTime == 0) {
+    temperatureCounterStartTime = temperatureTime;
   }
 
-  if (time - startTime >= configuration.temperature.interval * 1000) {
-    float newTemperature = get();
+  if (humidityCounterStartTime == 0) {
+    humidityCounterStartTime = humidityTime;
+  }
+
+  if (temperatureTime - temperatureCounterStartTime >= configuration.temperature.interval * 1000) {
+    float newTemperature = getTemperature();
     if (newTemperature!=currentTemperature) {
       currentTemperature = newTemperature;
-      ready = true;
-      startTime = 0;
+      temperatureInBuffer = true;
+      temperatureCounterStartTime = 0;
     }
   }
+
+  if (humidityTime - humidityCounterStartTime >= configuration.humidity.interval * 1000) {
+    float newHumidity = getHumidity();
+    if (newHumidity!=currentHumidity) {
+      currentHumidity = newHumidity;
+      humidityInBuffer = true;
+      humidityCounterStartTime = 0;
+    }
+  }
+
+
 }
 }
