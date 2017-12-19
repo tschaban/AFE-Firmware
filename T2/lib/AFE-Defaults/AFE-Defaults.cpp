@@ -68,10 +68,17 @@ void AFEDefaults::set() {
   sprintf(RelayConfiguration.name, "switch");
 
   RelayConfiguration.thermostat.enabled = false;
-  RelayConfiguration.thermostat.temperatureTurnOn = 0;
-  RelayConfiguration.thermostat.temperatureTurnOnAbove = false;
-  RelayConfiguration.thermostat.temperatureTurnOff = 0;
-  RelayConfiguration.thermostat.temperatureTurnOffAbove = true;
+  RelayConfiguration.thermostat.turnOn = 0;
+  RelayConfiguration.thermostat.turnOnAbove = false;
+  RelayConfiguration.thermostat.turnOff = 0;
+  RelayConfiguration.thermostat.turnOffAbove = true;
+
+  RelayConfiguration.humidistat.enabled = false;
+  RelayConfiguration.humidistat.turnOn = 0;
+  RelayConfiguration.humidistat.turnOnAbove = false;
+  RelayConfiguration.humidistat.turnOff = 0;
+  RelayConfiguration.humidistat.turnOffAbove = true;
+
   RelayConfiguration.thermalProtection = 0;
 
   Data->saveConfiguration(0, RelayConfiguration);
@@ -114,7 +121,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);

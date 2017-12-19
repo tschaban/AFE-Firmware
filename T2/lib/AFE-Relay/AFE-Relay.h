@@ -12,8 +12,9 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Thermostat.h>
+#include <AFE-Humidistat.h>
 #include <AFE-Thermal-Protection.h>
+#include <AFE-Thermostat.h>
 
 //#include <Streaming.h>
 
@@ -31,15 +32,13 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
-
   AFEThermostat Thermostat;
+  AFEHumidistat Humidistat;
   AFEThermalProtection ThermalProtection;
 
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
-
-
 
   /* Method: initiates relay */
   void begin(uint8_t id);

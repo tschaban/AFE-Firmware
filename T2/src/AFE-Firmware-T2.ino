@@ -158,7 +158,8 @@ void loop() {
 
             /* Relay control by thermostat code */
             if (Relay.Thermostat.isReady()) {
-              if (Relay.Thermostat.getRelayState() == RELAY_ON && !Relay.ThermalProtection.protectionOn()) {
+              if (Relay.Thermostat.getRelayState() == RELAY_ON &&
+                  !Relay.ThermalProtection.protectionOn()) {
                 Relay.on();
               } else {
                 Relay.off();
@@ -166,10 +167,12 @@ void loop() {
               MQTTPublishRelayState();
             }
 
-            /* Checking if relay should be switched off based on device thermal protection */
-            if (Relay.get()==RELAY_ON && Relay.ThermalProtection.protectionOn()) {
-               Relay.off();
-               MQTTPublishRelayState();
+            /* Checking if relay should be switched off based on device thermal
+             * protection */
+            if (Relay.get() == RELAY_ON &&
+                Relay.ThermalProtection.protectionOn()) {
+              Relay.off();
+              MQTTPublishRelayState();
             }
 
             /* Publishing temperature to MQTT Broker if enabled */
@@ -182,12 +185,23 @@ void loop() {
             Led.on();
             humidity = SensorDHT.getLatestHumidity();
 
+            /* Humiditstat listener */
+            Relay.Humidistat.listener(temperature);
+
+            /* Relay control by Humiditstat code */
+            if (Relay.Humidistat.isReady()) {
+              if (Relay.Humidistat.getRelayState() == RELAY_ON) {
+                Relay.on();
+              } else {
+                Relay.off();
+              }
+              MQTTPublishRelayState();
+            }
+
             /* Publishing humidity to MQTT Broker if enabled */
             Mqtt.publish("humidity", humidity);
             Led.off();
           }
-
-
         }
 
       } else { // Configuration Mode

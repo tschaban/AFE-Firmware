@@ -61,5 +61,9 @@ public:
   /* Methods read and save thermostate state */
   boolean isThermostatEnabled(uint8_t id);
   void saveThermostatState(uint8_t id, boolean state);
+
+  /* Methods read and save humidistat state */
+  boolean isHumidistatEnabled(uint8_t id);
+  void saveHumidistatState(uint8_t id, boolean state);
 };
 #endif
