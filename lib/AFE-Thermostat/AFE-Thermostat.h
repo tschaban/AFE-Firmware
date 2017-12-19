@@ -17,20 +17,21 @@
 class AFEThermostat {
 
 private:
-  THERMOSTAT configuration;
   boolean ready = false;
-  byte relayState;
   uint8_t _relayID;
 
   /* Method enables / disables thermostat */
   void enable(boolean state);
 
 public:
+  RELAYSTAT configuration;
+  byte relayState;
+
   /* Constructors */
   AFEThermostat();
 
   /* Method initialize thermostat */
-  void begin(uint8_t relayID, THERMOSTAT config);
+  void begin(uint8_t relayID, RELAYSTAT config);
 
   /* Method returns true if thermostat is enabled */
   boolean enabled();
@@ -38,7 +39,8 @@ public:
   /* Method returns true if event related to thermostat has been captured */
   boolean isReady();
 
-  /* It returns what should be the relay state after thermostat event captured */
+  /* It returns what should be the relay state after thermostat event captured
+   */
   byte getRelayState();
 
   /* Method rises event if thermostat themperatures have been exceeded */

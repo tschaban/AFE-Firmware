@@ -4,9 +4,9 @@
 
 #include "AFE-Thermostat.h"
 
-AFEThermostat::AFEThermostat() {};
+AFEThermostat::AFEThermostat(){};
 
-void AFEThermostat::begin(uint8_t relayID, THERMOSTAT config) {
+void AFEThermostat::begin(uint8_t relayID, RELAYSTAT config) {
   configuration = config;
   _relayID = relayID;
 }
@@ -24,20 +24,20 @@ byte AFEThermostat::getRelayState() { return relayState; }
 
 void AFEThermostat::listener(float currentTemperature) {
   if (configuration.enabled) {
-    if (configuration.temperatureTurnOnAbove &&
-        currentTemperature > configuration.temperatureTurnOn) {
+    if (configuration.turnOnAbove &&
+        currentTemperature > configuration.turnOn) {
       relayState = RELAY_ON;
       ready = true;
-    } else if (!configuration.temperatureTurnOnAbove &&
-               currentTemperature < configuration.temperatureTurnOn) {
+    } else if (!configuration.turnOnAbove &&
+               currentTemperature < configuration.turnOn) {
       relayState = RELAY_ON;
       ready = true;
-    } else if (configuration.temperatureTurnOffAbove &&
-               currentTemperature > configuration.temperatureTurnOff) {
+    } else if (configuration.turnOffAbove &&
+               currentTemperature > configuration.turnOff) {
       relayState = RELAY_OFF;
       ready = true;
-    } else if (!configuration.temperatureTurnOffAbove &&
-               currentTemperature < configuration.temperatureTurnOff) {
+    } else if (!configuration.turnOffAbove &&
+               currentTemperature < configuration.turnOff) {
       relayState = RELAY_OFF;
       ready = true;
     }
@@ -61,5 +61,5 @@ boolean AFEThermostat::enabled() { return configuration.enabled; }
 
 void AFEThermostat::enable(boolean state) {
   AFEDataAccess Data;
-  Data.saveThermostatState(_relayID,state);
+  Data.saveThermostatState(_relayID, state);
 }
