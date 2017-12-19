@@ -74,12 +74,12 @@ struct LED {
   boolean changeToOppositeValue;
 };
 
-struct THERMOSTAT {
+struct RELAYSTAT {
   boolean enabled;
-  float temperatureTurnOn;
-  boolean temperatureTurnOnAbove;
-  float temperatureTurnOff;
-  boolean temperatureTurnOffAbove;
+  float turnOn;
+  boolean turnOnAbove;
+  float turnOff;
+  boolean turnOffAbove;
 };
 
 struct RELAY {
@@ -90,7 +90,8 @@ struct RELAY {
   uint8_t stateMQTTConnected;
   char mqttTopic[49];
   boolean showStatusUsingLED;
-  THERMOSTAT thermostat;
+  RELAYSTAT thermostat;
+  RELAYSTAT humidistat;
   float thermalProtection;
 };
 
