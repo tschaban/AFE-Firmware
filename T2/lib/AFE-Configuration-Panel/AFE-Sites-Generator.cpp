@@ -802,7 +802,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body +=
         "<input name=\"he" + String(id) + "\" type=\"checkbox\" value=\"1\"";
     body += configuration.humidistat.enabled ? " checked=\"checked\">" : ">";
-    body += language == 0 ? "włączona" : "enabled";
+    body +=
+        language == 0 ? "Regulacja wilgotności włączona" : "Humidistat enabled";
     body += "?</label>";
     body += "</div>";
 
@@ -832,7 +833,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += language == 0 ? "od" : "from";
     body += " </span>";
     body += "<input name=\"hn" + String(id) +
-            "\" type=\"number\" min=\"1\" max=\"99\" step=\"1\" value=\"";
+            "\" type=\"number\" min=\"0\" max=\"99\" step=\"1\" value=\"";
     body += configuration.humidistat.turnOn;
     body += "\">";
     body += "<span class=\"hint\">% ";
@@ -865,7 +866,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += language == 0 ? "od" : "from";
     body += " </span>";
     body += "<input name=\"hf" + String(id) +
-            "\" type=\"number\" min=\"1\" max=\"99\" step=\"1\" value=\"";
+            "\" type=\"number\" min=\"0\" max=\"99\" step=\"1\" value=\"";
     body += configuration.humidistat.turnOff;
     body += "\">";
 
@@ -1037,7 +1038,7 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 0 ? "Odczyty co" : "Read every";
   body += "</label>";
   body +=
-      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "<input name=\"j\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
       "value=\"";
   body += configuration.humidity.interval;
   body += "\">";
@@ -1050,7 +1051,7 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Humidity value correction";
   body += "</label>";
-  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+  body += "<input name=\"d\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
           "step=\"0.01\" "
           "value=\"";
   body += configuration.humidity.correction;

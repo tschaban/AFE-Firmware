@@ -333,7 +333,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   if (server.arg("hsn" + String(id)).length() > 0) {
     data.humidistat.turnOnAbove =
-        server.arg("hso" + String(id)).toInt() == 0 ? false : true;
+        server.arg("hsn" + String(id)).toInt() == 0 ? false : true;
   }
 
   if (server.arg("hsf" + String(id)).length() > 0) {
@@ -390,6 +390,10 @@ DH AFEWebServer::getDHTData() {
     data.gpio = server.arg("g").toInt();
   }
 
+  if (server.arg("t").length() > 0) {
+    data.type = server.arg("t").toInt();
+  }
+
   if (server.arg("c").length() > 0) {
     data.temperature.correction = server.arg("c").toFloat();
   }
@@ -401,5 +405,14 @@ DH AFEWebServer::getDHTData() {
   if (server.arg("u").length() > 0) {
     data.temperature.unit = server.arg("u").toInt();
   }
+
+  if (server.arg("d").length() > 0) {
+    data.humidity.correction = server.arg("d").toFloat();
+  }
+
+  if (server.arg("j").length() > 0) {
+    data.humidity.interval = server.arg("j").toInt();
+  }
+
   return data;
 }

@@ -7,7 +7,7 @@
 AFEDefaults::AFEDefaults() {}
 
 const char *AFEDefaults::getFirmwareVersion() { return "1.0rc1"; }
-uint8_t AFEDefaults::getFirmwareType() { return 1; }
+uint8_t AFEDefaults::getFirmwareType() { return 2; }
 void AFEDefaults::set() {
 
   AFEDataAccess *Data;
@@ -105,10 +105,10 @@ void AFEDefaults::set() {
 
   DHTConfiguration.gpio = 14;
   DHTConfiguration.temperature.correction = 0;
-  DHTConfiguration.temperature.interval = 60;
+  DHTConfiguration.temperature.interval = 10;
   DHTConfiguration.temperature.unit = 0;
   DHTConfiguration.humidity.correction = 0;
-  DHTConfiguration.humidity.interval = 60;
+  DHTConfiguration.humidity.interval = 10;
 
   Data->saveConfiguration(DHTConfiguration);
 
@@ -121,7 +121,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
