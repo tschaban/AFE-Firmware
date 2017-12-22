@@ -19,14 +19,12 @@ class AFEThermostat {
 private:
   boolean ready = false;
   uint8_t _relayID;
-
+  RELAYSTAT configuration;
+  byte relayState;
   /* Method enables / disables thermostat */
   void enable(boolean state);
 
 public:
-  RELAYSTAT configuration;
-  byte relayState;
-
   /* Constructors */
   AFEThermostat();
 

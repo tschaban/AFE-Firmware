@@ -2,7 +2,6 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-
 #include "AFE-Sensor-DHT.h"
 
 AFESensorDHT::AFESensorDHT(){};
@@ -15,18 +14,20 @@ void AFESensorDHT::begin() {
 
 float AFESensorDHT::getTemperature() {
   DHT dht(configuration.gpio, configuration.type == 1
-                   ? DHT11
-                   : configuration.type == 2 ? DHT21 : DHT22);
+                                  ? DHT11
+                                  : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  return dht.readTemperature(configuration.temperature.unit==0?false:true) + configuration.temperature.correction;
+  return dht.readTemperature(configuration.temperature.unit == 0 ? false
+                                                                 : true) +
+         configuration.temperature.correction;
 }
 
 float AFESensorDHT::getHumidity() {
   DHT dht(configuration.gpio, configuration.type == 1
-                   ? DHT11
-                   : configuration.type == 2 ? DHT21 : DHT22);
- dht.begin();
- return dht.readHumidity() + configuration.temperature.correction;
+                                  ? DHT11
+                                  : configuration.type == 2 ? DHT21 : DHT22);
+  dht.begin();
+  return dht.readHumidity() + configuration.humidity.correction;
 }
 
 float AFESensorDHT::getLatestTemperature() {
@@ -41,10 +42,12 @@ float AFESensorDHT::getLatestHumidity() {
 
 float AFESensorDHT::getHeatIndex() {
   DHT dht(configuration.gpio, configuration.type == 1
-                   ? DHT11
-                   : configuration.type == 2 ? DHT21 : DHT22);
+                                  ? DHT11
+                                  : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  return dht.computeHeatIndex(currentTemperature,currentHumidity, configuration.temperature.unit==0?false:true);
+  return dht.computeHeatIndex(currentTemperature, currentHumidity,
+                              configuration.temperature.unit == 0 ? false
+                                                                  : true);
 }
 
 boolean AFESensorDHT::temperatureSensorReady() {
@@ -67,35 +70,35 @@ boolean AFESensorDHT::humiditySensorReady() {
 
 void AFESensorDHT::listener() {
   if (_initialized) {
-  unsigned long temperatureTime = millis();
-  unsigned long humidityTime = temperatureTime;
+    unsigned long temperatureTime = millis();
+    unsigned long humidityTime = temperatureTime;
 
-  if (temperatureCounterStartTime == 0) {
-    temperatureCounterStartTime = temperatureTime;
-  }
+    if (temperatureCounterStartTime == 0) {
+      temperatureCounterStartTime = temperatureTime;
+    }
 
-  if (humidityCounterStartTime == 0) {
-    humidityCounterStartTime = humidityTime;
-  }
+    if (humidityCounterStartTime == 0) {
+      humidityCounterStartTime = humidityTime;
+    }
 
-  if (temperatureTime - temperatureCounterStartTime >= configuration.temperature.interval * 1000) {
-    float newTemperature = getTemperature();
-    if (newTemperature!=currentTemperature) {
-      currentTemperature = newTemperature;
-      temperatureInBuffer = true;
+    if (temperatureTime - temperatureCounterStartTime >=
+        configuration.temperature.interval * 1000) {
+      float newTemperature = getTemperature();
+      if (newTemperature != currentTemperature) {
+        currentTemperature = newTemperature;
+        temperatureInBuffer = true;
+      }
       temperatureCounterStartTime = 0;
     }
-  }
 
-  if (humidityTime - humidityCounterStartTime >= configuration.humidity.interval * 1000) {
-    float newHumidity = getHumidity();
-    if (newHumidity!=currentHumidity) {
-      currentHumidity = newHumidity;
-      humidityInBuffer = true;
+    if (humidityTime - humidityCounterStartTime >=
+        configuration.humidity.interval * 1000) {
+      float newHumidity = getHumidity();
+      if (newHumidity != currentHumidity) {
+        currentHumidity = newHumidity;
+        humidityInBuffer = true;
+      }
       humidityCounterStartTime = 0;
     }
   }
-
-
-}
 }

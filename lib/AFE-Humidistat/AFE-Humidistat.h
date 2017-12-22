@@ -21,10 +21,11 @@ class AFEHumidistat {
    * functionality */
 
 private:
-  AFEThermostat Humidistat;
+  boolean ready = false;
   uint8_t _relayID;
-
-  /* Method enables / disables humidistat */
+  RELAYSTAT configuration;
+  byte relayState;
+  /* Method enables / disables thermostat */
   void enable(boolean state);
 
 public:
@@ -45,7 +46,7 @@ public:
   byte getRelayState();
 
   /* Method rises event if thermostat humidistat have been exceeded */
-  void listener(float currentTemperature);
+  void listener(float currentHumidity);
 
   /* Method turns on humidistat */
   void on();

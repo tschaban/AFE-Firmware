@@ -6,18 +6,15 @@
 
 AFERelay::AFERelay(){};
 
-AFERelay::AFERelay(uint8_t id) { begin(id); }
-
-void AFERelay::begin(uint8_t id) {
+void AFERelay::begin() {
   MQTT MQTTConfiguration;
   MQTTConfiguration = Data.getMQTTConfiguration();
-  _id = id;
-  RelayConfiguration = Data.getRelayConfiguration(_id);
+  RelayConfiguration = Data.getRelayConfiguration();
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
   /* Initialzing Thermostat and Humiditstat functionality for a relay control */
-  Thermostat.begin(_id, RelayConfiguration.thermostat);
-  Humidistat.begin(_id, RelayConfiguration.humidistat);
+  Thermostat.begin(0, RelayConfiguration.thermostat);
+  Humidistat.begin(0, RelayConfiguration.humidistat);
   /* Initialzing thermal protection functionality for a relay */
   ThermalProtection.begin(RelayConfiguration.thermalProtection);
 }
@@ -37,7 +34,7 @@ void AFERelay::on() {
       turnOffCounter = millis();
     }
   }
-  Data.saveRelayState(_id, RELAY_ON);
+  Data.saveRelayState(RELAY_ON);
 }
 
 /* Set relay to OFF */
@@ -45,7 +42,7 @@ void AFERelay::off() {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
   }
-  Data.saveRelayState(_id, RELAY_OFF);
+  Data.saveRelayState(RELAY_OFF);
 }
 
 /* Toggle relay */
@@ -78,9 +75,9 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 2) {
     on();
   } else if (option == 3) {
-    Data.getRelayState(_id) == RELAY_ON ? on() : off();
+    Data.getRelayState() == RELAY_ON ? on() : off();
   } else if (option == 4) {
-    Data.getRelayState(_id) == RELAY_ON ? off() : on();
+    Data.getRelayState() == RELAY_ON ? off() : on();
   }
 }
 

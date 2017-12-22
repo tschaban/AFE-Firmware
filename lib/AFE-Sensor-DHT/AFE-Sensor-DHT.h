@@ -11,9 +11,10 @@
 #include "WProgram.h"
 #endif
 
-#include <DHT.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
+#include <DHT.h>
+#include <Streaming.h>
 
 #define UNIT_CELCIUS 0
 #define UNIT_FAHRENHEIT 1
@@ -46,7 +47,6 @@ public:
   boolean humiditySensorReady();
 
   void listener();
-
 };
 
 #endif

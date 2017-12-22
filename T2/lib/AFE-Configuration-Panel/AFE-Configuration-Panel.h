@@ -37,15 +37,17 @@ public:
                                   MQTT data);
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data);
-  String getRelayConfigurationSite(
-      const String option, uint8_t command, RELAY data1,
-      RELAY data2); // This method is set for two relays (future use)
+  String getRelayConfigurationSite(const String option, uint8_t command,
+                                   RELAY data);
+
+  String getRelayStatConfigurationSite(const String option, uint8_t command,
+                                       RELAYSTAT data, boolean thermostat);
+
   String getSwitchConfigurationSite(const String option, uint8_t command,
                                     SWITCH data1, SWITCH data2);
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
-  String getDHTConfigurationSite(const String option, uint8_t command,
-                                     DH data);
+  String getDHTConfigurationSite(const String option, uint8_t command, DH data);
 
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();

@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 class AFEDataAccess {
 private:
@@ -27,8 +27,9 @@ public:
   FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
-  LED getLEDConfiguration(uint8_t id);
-  RELAY getRelayConfiguration(uint8_t id);
+  LED getLEDConfiguration();
+  LED getLEDConfiguration(uint8_t); // Used only to be compatible with AFE-LED.h
+  RELAY getRelayConfiguration();
   SWITCH getSwitchConfiguration(uint8_t id);
   DH getDHTConfiguration();
 
@@ -37,8 +38,9 @@ public:
   void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
-  void saveConfiguration(uint8_t id, LED configuration);
-  void saveConfiguration(uint8_t id, RELAY configuration);
+  void saveConfiguration(LED configuration);
+  void saveConfiguration(RELAY configuration);
+  void saveConfiguration(RELAYSTAT configuration, boolean thermostat);
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(DH configuration);
 
@@ -47,8 +49,8 @@ public:
   void saveVersion(String version);
 
   /* Methods read and save relay state from/to EEPROM */
-  boolean getRelayState(uint8_t id);
-  void saveRelayState(uint8_t id, boolean state);
+  boolean getRelayState();
+  void saveRelayState(boolean state);
 
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
@@ -59,11 +61,17 @@ public:
   void saveLanguage(uint8_t language);
 
   /* Methods read and save thermostate state */
-  boolean isThermostatEnabled(uint8_t id);
-  void saveThermostatState(uint8_t id, boolean state);
+  boolean isThermostatEnabled();
+  void saveThermostatState(boolean state);
+  void saveThermostatState(
+      uint8_t id,
+      boolean state); // This is only for compatibility with AFE-Thermostat.h
 
   /* Methods read and save humidistat state */
-  boolean isHumidistatEnabled(uint8_t id);
-  void saveHumidistatState(uint8_t id, boolean state);
+  boolean isHumidistatEnabled();
+  void saveHumidistatState(boolean state);
+  void saveHumidistatState(
+      uint8_t id,
+      boolean state); // This is only for compatibility with AFE-Humidistat.h
 };
 #endif

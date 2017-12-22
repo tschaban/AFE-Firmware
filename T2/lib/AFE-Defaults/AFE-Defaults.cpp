@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0rc1"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0.0"; }
 uint8_t AFEDefaults::getFirmwareType() { return 2; }
 void AFEDefaults::set() {
 
@@ -33,7 +33,7 @@ void AFEDefaults::set() {
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
-  deviceConfiguration.isDHT = true;
+  deviceConfiguration.isDHT = false;
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
@@ -56,7 +56,6 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.user, "");
   sprintf(MQTTConfiguration.password, "");
   MQTTConfiguration.port = 1883;
-  // sprintf(MQTTConfiguration.topic, "/device/");
   sprintf(MQTTConfiguration.topic, "/device/");
 
   Data->saveConfiguration(MQTTConfiguration);
@@ -81,12 +80,7 @@ void AFEDefaults::set() {
 
   RelayConfiguration.thermalProtection = 0;
 
-  Data->saveConfiguration(0, RelayConfiguration);
-
-  /* @TODO DOMOTICZ
-  RelayConfiguration.idx = 0;
-  RelayConfiguration.publishToDomoticz = false;
-  */
+  Data->saveConfiguration(RelayConfiguration);
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
@@ -101,30 +95,20 @@ void AFEDefaults::set() {
 
   LEDConfiguration.gpio = 13;
   LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(0, LEDConfiguration);
+  Data->saveConfiguration(LEDConfiguration);
 
   DHTConfiguration.gpio = 14;
+  DHTConfiguration.type = 1;
   DHTConfiguration.temperature.correction = 0;
-  DHTConfiguration.temperature.interval = 10;
+  DHTConfiguration.temperature.interval = 60;
   DHTConfiguration.temperature.unit = 0;
   DHTConfiguration.humidity.correction = 0;
-  DHTConfiguration.humidity.interval = 10;
+  DHTConfiguration.humidity.interval = 60;
 
   Data->saveConfiguration(DHTConfiguration);
 
-  /* @TODO DOMOTICZ
-  Serial << endl << "INFO: Setting defaults: domoticz";
-  sprintf(DomoticzConfiguration.host, "");
-  DomoticzConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(DomoticzConfiguration.user, "");
-  sprintf(DomoticzConfiguration.password, "");
-  DomoticzConfiguration.port = 8080;
-
-Data->saveConfiguration(DomoticzConfiguration);
-  
-  */
   Data->saveDeviceMode(2);
-  Data->saveRelayState(0, false);
+  Data->saveRelayState(false);
   Data->saveLanguage(1);
 }
 

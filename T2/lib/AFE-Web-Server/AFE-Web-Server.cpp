@@ -70,21 +70,19 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
-    LED data1 = {};
+    LED data = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getLEDData(0);
+      data = getLEDData();
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(
-        getOptionName(), getCommand(), data1));
+    publishHTML(ConfigurationPanel.getLEDConfigurationSite(getOptionName(),
+                                                           getCommand(), data));
   } else if (getOptionName() == "relay") {
-    RELAY data1 = {};
-    RELAY data2 = {};
+    RELAY data = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getRelayData(0);
-      //  data2 = getRelayData(1);
+      data = getRelayData();
     }
     publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-        getOptionName(), getCommand(), data1, data2));
+        getOptionName(), getCommand(), data));
   } else if (getOptionName() == "switch") {
     SWITCH data1 = {};
     SWITCH data2 = {};
@@ -95,12 +93,22 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
         getOptionName(), getCommand(), data1, data2));
   } else if (getOptionName() == "DHT") {
-    DH data1 = {};
+    DH data = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getDHTData();
+      data = getDHTData();
     }
-    publishHTML(ConfigurationPanel.getDHTConfigurationSite(
-        getOptionName(), getCommand(), data1));
+    publishHTML(ConfigurationPanel.getDHTConfigurationSite(getOptionName(),
+                                                           getCommand(), data));
+  } else if (getOptionName() == "thermostat" ||
+             getOptionName() == "humidistat") {
+    RELAYSTAT data = {};
+    if (getCommand() == SERVER_CMD_SAVE) {
+      getOptionName() == "thermostat" ? data = getThermostateData()
+                                      : data = getHumidistatData();
+    }
+    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
+        getOptionName(), getCommand(), data,
+        getOptionName() == "thermostat" ? true : false));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -176,8 +184,8 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
-  server.arg("r0").length() > 0 ? data.isRelay[0] = true
-                                : data.isRelay[0] = false;
+  server.arg("r").length() > 0 ? data.isRelay[0] = true
+                               : data.isRelay[0] = false;
 
   server.arg("s0").length() > 0 ? data.isSwitch[0] = true
                                 : data.isSwitch[0] = false;
@@ -185,7 +193,7 @@ DEVICE AFEWebServer::getDeviceData() {
   server.arg("s1").length() > 0 ? data.isSwitch[1] = true
                                 : data.isSwitch[1] = false;
 
-  server.arg("l0").length() > 0 ? data.isLED[0] = true : data.isLED[0] = false;
+  server.arg("l").length() > 0 ? data.isLED[0] = true : data.isLED[0] = false;
 
   server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
 
@@ -272,73 +280,79 @@ MQTT AFEWebServer::getMQTTData() {
   return data;
 }
 
-RELAY AFEWebServer::getRelayData(uint8_t id) {
+RELAY AFEWebServer::getRelayData() {
   RELAY data;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
+  if (server.arg("g").length() > 0) {
+    data.gpio = server.arg("g").toInt();
   }
 
-  if (server.arg("ot" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("ot" + String(id)).toFloat();
+  if (server.arg("ot").length() > 0) {
+    data.timeToOff = server.arg("ot").toFloat();
   }
 
-  if (server.arg("pr" + String(id)).length() > 0) {
-    data.statePowerOn = server.arg("pr" + String(id)).toInt();
+  if (server.arg("pr").length() > 0) {
+    data.statePowerOn = server.arg("pr").toInt();
   }
 
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   }
 
-  if (server.arg("mc" + String(id)).length() > 0) {
-    data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
+  if (server.arg("mc").length() > 0) {
+    data.stateMQTTConnected = server.arg("mc").toInt();
   }
 
-  server.arg("te" + String(id)).length() > 0 ? data.thermostat.enabled = true
-                                             : data.thermostat.enabled = false;
-
-  if (server.arg("to" + String(id)).length() > 0) {
-    data.thermostat.turnOn = server.arg("to" + String(id)).toFloat();
+  if (server.arg("tp").length() > 0) {
+    data.thermalProtection = server.arg("tp").toInt();
   }
 
-  if (server.arg("tf" + String(id)).length() > 0) {
-    data.thermostat.turnOff = server.arg("tf" + String(id)).toFloat();
+  return data;
+}
+
+RELAYSTAT AFEWebServer::getThermostateData() {
+  RELAYSTAT data;
+  server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
+
+  if (server.arg("tn").length() > 0) {
+    data.turnOn = server.arg("tn").toFloat();
   }
 
-  if (server.arg("so" + String(id)).length() > 0) {
-    data.thermostat.turnOnAbove =
-        server.arg("so" + String(id)).toInt() == 0 ? false : true;
+  if (server.arg("tf").length() > 0) {
+    data.turnOff = server.arg("tf").toFloat();
   }
 
-  if (server.arg("sf" + String(id)).length() > 0) {
-    data.thermostat.turnOffAbove =
-        server.arg("sf" + String(id)).toInt() == 0 ? false : true;
+  if (server.arg("ta").length() > 0) {
+    data.turnOnAbove = server.arg("ta").toInt() == 0 ? false : true;
   }
 
-  if (server.arg("tp" + String(id)).length() > 0) {
-    data.thermalProtection = server.arg("tp" + String(id)).toInt();
+  if (server.arg("tb").length() > 0) {
+    data.turnOffAbove = server.arg("tb").toInt() == 0 ? false : true;
   }
 
-  server.arg("he" + String(id)).length() > 0 ? data.humidistat.enabled = true
-                                             : data.humidistat.enabled = false;
+  return data;
+}
 
-  if (server.arg("hn" + String(id)).length() > 0) {
-    data.humidistat.turnOn = server.arg("hn" + String(id)).toFloat();
+RELAYSTAT AFEWebServer::getHumidistatData() {
+
+  RELAYSTAT data;
+
+  server.arg("he").length() > 0 ? data.enabled = true : data.enabled = false;
+
+  if (server.arg("hn").length() > 0) {
+    data.turnOn = server.arg("hn").toFloat();
   }
 
-  if (server.arg("hf" + String(id)).length() > 0) {
-    data.humidistat.turnOff = server.arg("hf" + String(id)).toFloat();
+  if (server.arg("hf").length() > 0) {
+    data.turnOff = server.arg("hf").toFloat();
   }
 
-  if (server.arg("hsn" + String(id)).length() > 0) {
-    data.humidistat.turnOnAbove =
-        server.arg("hsn" + String(id)).toInt() == 0 ? false : true;
+  if (server.arg("ha").length() > 0) {
+    data.turnOnAbove = server.arg("ha").toInt() == 0 ? false : true;
   }
 
-  if (server.arg("hsf" + String(id)).length() > 0) {
-    data.humidistat.turnOffAbove =
-        server.arg("hsf" + String(id)).toInt() == 0 ? false : true;
+  if (server.arg("hb").length() > 0) {
+    data.turnOffAbove = server.arg("hb").toInt() == 0 ? false : true;
   }
 
   return data;
@@ -366,15 +380,14 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   return data;
 }
 
-LED AFEWebServer::getLEDData(uint8_t id) {
+LED AFEWebServer::getLEDData() {
   LED data;
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.gpio = server.arg("l" + String(id)).toInt();
+  if (server.arg("l").length() > 0) {
+    data.gpio = server.arg("l").toInt();
   }
 
-  server.arg("o" + String(id)).length() > 0
-      ? data.changeToOppositeValue = true
-      : data.changeToOppositeValue = false;
+  server.arg("o").length() > 0 ? data.changeToOppositeValue = true
+                               : data.changeToOppositeValue = false;
 
   return data;
 }

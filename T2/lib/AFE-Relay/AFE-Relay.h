@@ -21,7 +21,6 @@
 class AFERelay {
 
 private:
-  uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
   char mqttTopic[50];
@@ -38,10 +37,8 @@ public:
 
   /* Constructors */
   AFERelay();
-  AFERelay(uint8_t id);
-
   /* Method: initiates relay */
-  void begin(uint8_t id);
+  void begin();
 
   /* Method returns MQTT topic for this relay */
   const char *getMQTTTopic();

@@ -36,7 +36,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  Serial.swap();
+  // Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -58,7 +58,7 @@ void setup() {
 
   /* Initializing relay and setting it's default state at power on*/
   if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
-    Relay.begin(0);
+    Relay.begin();
     Relay.setRelayAfterRestoringPower();
   }
 
@@ -146,6 +146,7 @@ void loop() {
           /* Sensor: DS18B20 listener */
           SensorDHT.listener();
 
+          /* Temperature sensor related code */
           if (SensorDHT.temperatureSensorReady()) {
             Led.on();
             temperature = SensorDHT.getLatestTemperature();
@@ -186,7 +187,7 @@ void loop() {
             humidity = SensorDHT.getLatestHumidity();
 
             /* Humiditstat listener */
-            Relay.Humidistat.listener(temperature);
+            Relay.Humidistat.listener(humidity);
 
             /* Relay control by Humiditstat code */
             if (Relay.Humidistat.isReady()) {

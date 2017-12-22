@@ -108,12 +108,12 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
                                                       LED data) {
 
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(0, data);
+    Data.saveConfiguration(data);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
-  page += Site.addLEDConfiguration(0);
+  page += Site.addLEDConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -123,17 +123,35 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
 
 String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
                                                         uint8_t command,
-                                                        RELAY data1,
-                                                        RELAY data2) {
+                                                        RELAY data) {
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(0, data1);
-    //    Data.saveConfiguration(1, data2);
+    Data.saveConfiguration(data);
   }
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=relay&cmd=1\"  method=\"post\">";
-  page += Site.addRelayConfiguration(0);
-  //  page += Site.addRelayConfiguration(1);
+  page += Site.addRelayConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getRelayStatConfigurationSite(
+    const String option, uint8_t command, RELAYSTAT data, boolean thermostat) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data, thermostat);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=";
+  page += thermostat ? "thermostat" : "humidistat";
+  page += "&cmd=1\"  method=\"post\">";
+
+  thermostat ? page += Site.addThermostatConfiguration()
+             : page += Site.addHumidistatConfiguration();
+
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -174,8 +192,8 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
 }
 
 String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
-                                                          uint8_t command,
-                                                          DH data) {
+                                                      uint8_t command,
+                                                      DH data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }

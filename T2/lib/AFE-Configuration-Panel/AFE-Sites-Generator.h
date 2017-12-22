@@ -29,8 +29,10 @@ private:
                                             uint8_t selected);
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateSwitchItem(uint8_t id, boolean checked);
-  const String generateRelayItem(uint8_t id, boolean checked);
-  const String generateLEDItem(uint8_t id, boolean checked);
+  const String generateRelayItem(boolean checked);
+  const String generateLEDItem(boolean checked);
+  const String generateTwoValueController(RELAYSTAT configuration,
+                                          boolean thermostat);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
@@ -53,8 +55,10 @@ public:
   String addDeviceConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
-  String addLEDConfiguration(uint8_t id);
-  String addRelayConfiguration(uint8_t id);
+  String addLEDConfiguration();
+  String addRelayConfiguration();
+  String addThermostatConfiguration();
+  String addHumidistatConfiguration();
   String addSwitchConfiguration(uint8_t id);
   String addDHTConfiguration();
 
@@ -71,8 +75,6 @@ public:
 
   /* Method generates section shown when device is in norma mode */
   String addHelpSection();
-
-  // @TODO DOMOTICZ String addDomoticzConfiguration();
 };
 
 #endif

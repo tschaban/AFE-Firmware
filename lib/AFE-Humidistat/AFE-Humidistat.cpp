@@ -7,25 +7,57 @@
 AFEHumidistat::AFEHumidistat(){};
 
 void AFEHumidistat::begin(uint8_t relayID, RELAYSTAT config) {
-  Humidistat.begin(relayID, config);
+  configuration = config;
   _relayID = relayID;
 }
 
-boolean AFEHumidistat::isReady() { Humidistat.isReady(); }
-
-byte AFEHumidistat::getRelayState() { return Humidistat.relayState; }
-
-void AFEHumidistat::listener(float currentTemperature) {
-  Humidistat.listener(currentTemperature);
+boolean AFEHumidistat::isReady() {
+  if (ready) {
+    ready = false;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-void AFEHumidistat::on() { Humidistat.on(); }
+byte AFEHumidistat::getRelayState() { return relayState; }
 
-void AFEHumidistat::off() { Humidistat.off(); }
+void AFEHumidistat::listener(float currentTemperature) {
+  if (configuration.enabled) {
+    if (configuration.turnOnAbove &&
+        currentTemperature > configuration.turnOn) {
+      relayState = RELAY_ON;
+      ready = true;
+    } else if (!configuration.turnOnAbove &&
+               currentTemperature < configuration.turnOn) {
+      relayState = RELAY_ON;
+      ready = true;
+    } else if (configuration.turnOffAbove &&
+               currentTemperature > configuration.turnOff) {
+      relayState = RELAY_OFF;
+      ready = true;
+    } else if (!configuration.turnOffAbove &&
+               currentTemperature < configuration.turnOff) {
+      relayState = RELAY_OFF;
+      ready = true;
+    }
+  }
+}
 
-void AFEHumidistat::toggle() { Humidistat.toggle(); }
-
-boolean AFEHumidistat::enabled() { return Humidistat.configuration.enabled; }
+void AFEHumidistat::on() {
+  configuration.enabled = true;
+  enable(configuration.enabled);
+}
+void AFEHumidistat::off() {
+  configuration.enabled = false;
+  enable(configuration.enabled);
+}
+void AFEHumidistat::toggle() {
+  configuration.enabled ? configuration.enabled = false
+                        : configuration.enabled = true;
+  enable(configuration.enabled);
+}
+boolean AFEHumidistat::enabled() { return configuration.enabled; }
 
 void AFEHumidistat::enable(boolean state) {
   AFEDataAccess Data;

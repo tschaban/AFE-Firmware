@@ -93,6 +93,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
       page += language == 0 ? "Przekaźnik" : "Relay";
       page += "</a></li>";
+      if (Device.configuration.isDHT) {
+        page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
+        page += language == 0 ? "Termostat" : "Thermostat";
+        page += "</a></li>";
+        page += "<li class=\"itm\"><a href=\"\\?option=humidistat\"> - ";
+        page += language == 0 ? "Regulator wilgotności" : "Humidistat";
+        page += "</a></li>";
+      }
     }
     if (Device.configuration.isSwitch[0] || Device.configuration.isSwitch[1]) {
       page += "<li class=\"itm\"><a href=\"\\?option=switch\">";
@@ -207,8 +215,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body = "<fieldset>";
 
-  body += generateLEDItem(0, configuration.isLED[0]);
-  body += generateRelayItem(0, configuration.isRelay[0]);
+  body += generateLEDItem(configuration.isLED[0]);
+  body += generateRelayItem(configuration.isRelay[0]);
   body += generateSwitchItem(0, configuration.isSwitch[0]);
   body += generateSwitchItem(1, configuration.isSwitch[1]);
 
@@ -523,22 +531,17 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
       body);
 }
 
-String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
+String AFESitesGenerator::addLEDConfiguration() {
   LED configuration;
-  configuration = Data.getLEDConfiguration(id);
+  configuration = Data.getLEDConfiguration();
 
   String body = "<fieldset>";
 
-  char filed[13];
-  sprintf(filed, "l%d", id);
-
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO("l", configuration.gpio);
 
   body += "<div class=\"cc\">";
   body += "<label>";
-  body += "<input name=\"o";
-  body += id;
-  body += "\" type=\"checkbox\" value=\"1\"";
+  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
   body += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
   body += ">";
   body += language == 0 ? "Zmień świecenie diody LED na odwrotne"
@@ -556,27 +559,23 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
       body);
 }
 
-String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
+String AFESitesGenerator::addRelayConfiguration() {
 
   RELAY configuration;
-  configuration = Data.getRelayConfiguration(id);
+  configuration = Data.getRelayConfiguration();
 
   DEVICE device;
   device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
 
-  char filed[13];
-  sprintf(filed, "g%d", id);
-
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
 
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Nazwa" : "Name";
   body += "*</label>";
-  body += "<input name=\"n" + String(id) +
-          "\" type=\"text\" maxlength=\"16\" value=\"";
+  body += "<input name=\"n\" type=\"text\" maxlength=\"16\" value=\"";
   body += configuration.name;
   body += "\">";
   body += "<span class=\"hint\">Max 16 ";
@@ -592,7 +591,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += language == 0 ? "Po przywróceniu zasilania"
                         : "When power is restored set it to";
   body += "</label>";
-  body += "<select name=\"pr" + String(id) + "\">";
+  body += "<select name=\"pr\">";
   body += "<option value=\"0\"";
   body += (configuration.statePowerOn == 0 ? " selected=\"selected\"" : "");
   body += ">";
@@ -628,7 +627,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += language == 0 ? "Po podłączeniu do brokera MQTT"
                         : "After establishing connection to MQTT Broker";
   body += "</label>";
-  body += "<select  name=\"mc" + String(id) + "\">";
+  body += "<select  name=\"mc\">";
   body += "<option value=\"0\"";
   body +=
       (configuration.stateMQTTConnected == 0 ? " selected=\"selected\"" : "");
@@ -680,8 +679,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<label>";
   body += language == 0 ? "Wyłącz po" : "Switch off after";
   body += "*</label>";
-  body += "<input name=\"ot" + String(id) +
-          "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
+  body += "<input name=\"ot\" type=\"number\" step=\"0.01\" min=\"0\" "
+          "max=\"86400\"  value=\"";
   body += configuration.timeToOff;
   body += "\">";
   body += "<span class=\"hint\">0.01 - 86400";
@@ -700,189 +699,48 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += "<label>";
     body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
     body += "*</label>";
-    body += "<input name=\"tp" + String(id) +
-            "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
+    body += "<input name=\"tp\" type=\"number\" step=\"1\" min=\"-67\" "
+            "max=\"259\"  value=\"";
     body += configuration.thermalProtection;
     body += "\">";
     body += "<span class=\"hint\">";
     body += language == 0 ? "Zakres" : "Range";
-    body += ": -55C : +125C (-67F : +259F). ";
+    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +259&deg;F). ";
     body += language == 0 ? "Brak akcji jeśli jest 0"
                           : "No action if it's set to 0";
     body += "</span></div>";
-
-    body += "<br><p class=\"cm\">";
-    body += language == 0 ? "Termostat" : "Thermostat";
-    body += "</p>";
-
-    body += "<div class=\"cc\">";
-    body += "<label>";
-    body +=
-        "<input name=\"te" + String(id) + "\" type=\"checkbox\" value=\"1\"";
-    body += configuration.thermostat.enabled ? " checked=\"checked\">" : ">";
-    body += language == 0 ? " termostat włączony" : "thermostat enabled";
-    body += "?</label>";
-    body += "</div>";
-
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += language == 0 ? "Włącz jeśli temp. jest" : "Switch on if temp. is";
-    body += "</label>";
-
-    body += "<select name=\"so" + String(id) + "\">";
-    body += "<option value=\"0\"";
-    body +=
-        (configuration.thermostat.turnOnAbove == 0 ? " selected=\"selected\""
-                                                   : "");
-    body += ">";
-    body += language == 0 ? "mniejsza" : "below";
-    body += "</option>";
-    body += "<option value=\"1\"";
-    body +=
-        (configuration.thermostat.turnOnAbove == 1 ? " selected=\"selected\""
-                                                   : "");
-    body += ">";
-    body += language == 0 ? "większa" : "above";
-    body += "</option>";
-    body += "</select>";
-    body += "<span> ";
-    body += language == 0 ? "od" : "from";
-    body += " </span>";
-    body += "<input name=\"to" + String(id) +
-            "\" type=\"number\" min=\"-67\" max=\"260\" step=\"any\" value=\"";
-    body += configuration.thermostat.turnOn;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres" : "Range";
-    body += ": -55C : +125C (-67F : +260F)</span>";
-    body += "</div>";
-
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body +=
-        language == 0 ? "Wyłącz jeśli temp. jest" : "Switch off if temp. is";
-    body += "</label>";
-    body += "<select name=\"sf" + String(id) + "\">";
-    body += "<option value=\"0\"";
-    body +=
-        (configuration.thermostat.turnOffAbove == 0 ? " selected=\"selected\""
-                                                    : "");
-    body += ">";
-    body += language == 0 ? "mniejsza" : "below";
-    body += "</option>";
-    body += "<option value=\"1\"";
-    body +=
-        (configuration.thermostat.turnOffAbove == 1 ? " selected=\"selected\""
-                                                    : "");
-    body += ">";
-    body += language == 0 ? "większa" : "above";
-    body += "</option>";
-    body += "</select>";
-    body += "<span> ";
-    body += language == 0 ? "od" : "from";
-    body += " </span>";
-    body += "<input name=\"tf" + String(id) +
-            "\" type=\"number\" min=\"-67\" max=\"260\" step=\"any\" value=\"";
-    body += configuration.thermostat.turnOff;
-    body += "\">";
-
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres" : "Range";
-    body += ": -55C : +125C (-67F : +260F)</span>";
-    body += "</div>";
-
-    /* humiditistat */
-
-    body += "<br><p class=\"cm\">";
-    body += language == 0 ? "Regulacja wilgotności" : "Humidistat";
-    body += "</p>";
-
-    body += "<div class=\"cc\">";
-    body += "<label>";
-    body +=
-        "<input name=\"he" + String(id) + "\" type=\"checkbox\" value=\"1\"";
-    body += configuration.humidistat.enabled ? " checked=\"checked\">" : ">";
-    body +=
-        language == 0 ? "Regulacja wilgotności włączona" : "Humidistat enabled";
-    body += "?</label>";
-    body += "</div>";
-
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += language == 0 ? "Włącz jeśli wilgotność jest"
-                          : "Switch on if humidity is";
-    body += "</label>";
-
-    body += "<select name=\"hsn" + String(id) + "\">";
-    body += "<option value=\"0\"";
-    body +=
-        (configuration.humidistat.turnOnAbove == 0 ? " selected=\"selected\""
-                                                   : "");
-    body += ">";
-    body += language == 0 ? "mniejsza" : "below";
-    body += "</option>";
-    body += "<option value=\"1\"";
-    body +=
-        (configuration.humidistat.turnOnAbove == 1 ? " selected=\"selected\""
-                                                   : "");
-    body += ">";
-    body += language == 0 ? "większa" : "above";
-    body += "</option>";
-    body += "</select>";
-    body += "<span> ";
-    body += language == 0 ? "od" : "from";
-    body += " </span>";
-    body += "<input name=\"hn" + String(id) +
-            "\" type=\"number\" min=\"0\" max=\"99\" step=\"1\" value=\"";
-    body += configuration.humidistat.turnOn;
-    body += "\">";
-    body += "<span class=\"hint\">% ";
-    body += language == 0 ? "Zakres" : "Range";
-    body += ": 1-99</span>";
-    body += "</div>";
-
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += language == 0 ? "Wyłącz jeśli wilgotność jest"
-                          : "Switch off if humidity is";
-    body += "</label>";
-    body += "<select name=\"hsf" + String(id) + "\">";
-    body += "<option value=\"0\"";
-    body +=
-        (configuration.humidistat.turnOffAbove == 0 ? " selected=\"selected\""
-                                                    : "");
-    body += ">";
-    body += language == 0 ? "mniejsza" : "below";
-    body += "</option>";
-    body += "<option value=\"1\"";
-    body +=
-        (configuration.humidistat.turnOffAbove == 1 ? " selected=\"selected\""
-                                                    : "");
-    body += ">";
-    body += language == 0 ? "większa" : "above";
-    body += "</option>";
-    body += "</select>";
-    body += "<span> ";
-    body += language == 0 ? "od" : "from";
-    body += " </span>";
-    body += "<input name=\"hf" + String(id) +
-            "\" type=\"number\" min=\"0\" max=\"99\" step=\"1\" value=\"";
-    body += configuration.humidistat.turnOff;
-    body += "\">";
-
-    body += "<span class=\"hint\">% ";
-    body += language == 0 ? "Zakres" : "Range";
-    body += ": 1-99</span>";
-    body += "</div>";
   }
 
   body += "</fieldset>";
 
-  char title[23];
-  language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
-                : sprintf(title, "Relay #%d", id + 1);
+  return addConfigurationBlock(language == 0 ? "Przekaźnik" : "Relay", "",
+                               body);
+}
 
-  return addConfigurationBlock(title, "", body);
+String AFESitesGenerator::addThermostatConfiguration() {
+  RELAY configuration;
+  configuration = Data.getRelayConfiguration();
+  String body = generateTwoValueController(configuration.thermostat, true);
+  return addConfigurationBlock(
+      language == 0 ? "Termostat" : "Thermostat",
+      language == 0
+          ? "Termostat kontroluje przekaźnik w "
+            "zależności od wartości temperatury"
+          : "Thermostat controlls the relay depending on temperature value",
+      body);
+}
+
+String AFESitesGenerator::addHumidistatConfiguration() {
+  RELAY configuration;
+  configuration = Data.getRelayConfiguration();
+  String body = generateTwoValueController(configuration.humidistat, false);
+  return addConfigurationBlock(
+      language == 0 ? "Regulator wilgotności" : "Humidistat",
+      language == 0
+          ? "Regulator wilgotności kontroluje przekaźnik w "
+            "zależności od wartości wilgotności"
+          : "Humidistat controlls the relay depending on humidity value",
+      body);
 }
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
@@ -970,14 +828,14 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 1 ? "e" : "";
   body += "</label>";
   body += "<select name=\"t\">";
-  body += "<option value=\"0\"";
-  body += (configuration.type == 0 ? " selected=\"selected\"" : "");
-  body += ">DH11</option>";
   body += "<option value=\"1\"";
   body += (configuration.type == 1 ? " selected=\"selected\"" : "");
-  body += ">DH21</option>";
+  body += ">DH11</option>";
   body += "<option value=\"2\"";
   body += (configuration.type == 2 ? " selected=\"selected\"" : "");
+  body += ">DH21</option>";
+  body += "<option value=\"3\"";
+  body += (configuration.type == 3 ? " selected=\"selected\"" : "");
   body += ">DH22</option>";
   body += "</select>";
   body += "</div>";
@@ -1011,7 +869,7 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99 - +9.99</span>";
+  body += ": -9.99&deg; - +9.99&deg;</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -1137,9 +995,10 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
               "information, incl. WiFi configuration";
   } else {
     subtitle += "";
+    body += "<p class=\"cm\">";
     body += language == 0 ? "Trwa przywracanie ustawień początkowych"
                           : "Restoring configuration is in progress";
-    body += "</strong>";
+    body += "</p>";
     body += "<p class=\"cm\">";
     body += language == 0 ? "Po 20 sekundach połącz się z siecią WiFi o "
                             "nazwie: <strong>AFE-Device</strong>, a następnie "
@@ -1264,12 +1123,10 @@ const String AFESitesGenerator::generateSwitchItem(uint8_t id,
   return body;
 }
 
-const String AFESitesGenerator::generateRelayItem(uint8_t id, boolean checked) {
+const String AFESitesGenerator::generateRelayItem(boolean checked) {
   String body = "<div class=\"cc\">";
   body += "<label>";
-  body += "<input name=\"r";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
+  body += "<input name=\"r\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
   body += ">";
   body += language == 0 ? "Przekaźnik" : "Relay";
@@ -1279,15 +1136,106 @@ const String AFESitesGenerator::generateRelayItem(uint8_t id, boolean checked) {
   return body;
 }
 
-const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
+const String AFESitesGenerator::generateLEDItem(boolean checked) {
   String body = "<div class=\"cc\">";
   body += "<label>";
-  body += "<input name=\"l";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
+  body += "<input name=\"l\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
   body += ">LED</label>";
   body += "</div>";
+
+  return body;
+}
+
+const String
+AFESitesGenerator::generateTwoValueController(RELAYSTAT configuration,
+                                              boolean thermostat) {
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"";
+  body += thermostat ? "te" : "he";
+  body += "\" type=\"checkbox\" value=\"1\"";
+  body += configuration.enabled ? " checked=\"checked\">" : ">";
+
+  body += language == 0 ? " włączony" : "enabled";
+
+  body += "?</label>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Włącz jeśli " : "Switch on if ";
+  body += thermostat ? "temp." : language == 0 ? "wilgotność" : "humidity";
+  body += language == 0 ? " jest" : " is";
+  body += "</label>";
+
+  body += "<select name=\"";
+  body += thermostat ? "ta" : "ha";
+  body += "\"><option value=\"0\"";
+  body += (configuration.turnOnAbove == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "mniejsza" : "below";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.turnOnAbove == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "większa" : "above";
+  body += "</option>";
+  body += "</select>";
+  body += "<span> ";
+  body += language == 0 ? "od" : "from";
+  body += " </span>";
+  body += "<input name=\"";
+  body += thermostat ? "tn" : "hn";
+  body += "\" type=\"number\" value=\"";
+  body += configuration.turnOn;
+  body += "\" min=\"";
+  thermostat ? body += "-67\" max=\"260\" step=\"any"
+             : body += "0\" max=\"99\" step=\"any";
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  thermostat ? body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)"
+             : body += ": 1 - 99%";
+
+  body += "</span></div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wyłącz jeśli " : "Switch off if ";
+  body += thermostat ? "temp." : language == 0 ? "wilgotność" : "humidity";
+  body += language == 0 ? " jest" : " is";
+  body += "</label>";
+  body += "<select name=\"";
+  body += thermostat ? "tb" : "hb";
+  body += "\"><option value=\"0\"";
+  body += (configuration.turnOffAbove == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "mniejsza" : "below";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.turnOffAbove == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "większa" : "above";
+  body += "</option>";
+  body += "</select>";
+  body += "<span> ";
+  body += language == 0 ? "od" : "from";
+  body += " </span>";
+  body += "<input name=\"";
+  body += thermostat ? "tf" : "hf";
+  body += "\" type=\"number\" value=\"";
+  body += configuration.turnOff;
+  body += "\" min=\"";
+  thermostat ? body += "-67\" max=\"260\" step=\"any"
+             : body += "0\" max=\"99\" step=\"any";
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  thermostat ? body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)"
+             : body += ": 1 - 99%";
+  body += "</div></fieldset>";
 
   return body;
 }

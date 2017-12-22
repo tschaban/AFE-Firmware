@@ -43,9 +43,11 @@ private:
   DEVICE getDeviceData();
   NETWORK getNetworkData();
   MQTT getMQTTData();
-  RELAY getRelayData(uint8_t id);
+  RELAY getRelayData();
+  RELAYSTAT getThermostateData();
+  RELAYSTAT getHumidistatData();
   SWITCH getSwitchData(uint8_t id);
-  LED getLEDData(uint8_t id);
+  LED getLEDData();
   DH getDHTData();
   uint8_t getLanguageData();
 

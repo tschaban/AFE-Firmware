@@ -17,17 +17,14 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   //  Serial << endl << "INFO: MQTT message recieved: " << topic << " \\ ";
 
   if (length >= 1) { // command arrived
-                     /*
-                                              for (uint8_t i = 0; i < length; i++) {
-                                                Serial << (char)payload[i];
-                                              }
-                     */
+
+    /*  for (uint8_t i = 0; i < length; i++) {
+        Serial << (char)payload[i];
+      } */
+
+    /* Checking if Relay related message has been received  */
     sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
-    /*
-            Serial << endl
-                   << "DEBUG: "
-                   << "checking relay messages: " << _mqttTopic;
-    */
+
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[0] == 'o' && length == 2) { // on
         Relay.on();
@@ -48,12 +45,9 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     } else {
 
+      /* Checking if Thermostat related message has been received  */
       sprintf(_mqttTopic, "%sthermostat/cmd", Relay.getMQTTTopic());
-      /*
-          Serial << endl
-                 << "DEBUG: "
-                 << "checking thermostat messages: " << _mqttTopic;
-      */
+
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[0] == 'o' && length == 2) { // on
           Relay.Thermostat.on();
@@ -74,33 +68,51 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
       } else {
 
-        sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
-        /*
-                Serial << endl
-                       << "DEBUG: "
-                       << "checking device level messages: " << _mqttTopic;
-        */
+        /* Checking if Hunidistat related message has been received  */
+        sprintf(_mqttTopic, "%shumidistat/cmd", Relay.getMQTTTopic());
+
         if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[2] == 'b' && length == 6) { // reboot
-            //      Serial << endl << "INFO: Process: reboot";
-            Device.reboot(MODE_NORMAL);
-          } else if ((char)payload[2] == 'n' &&
-                     length == 17) { // configurationMode
-            //    Serial << endl << "INFO: Process: configuration Mode";
-            Device.reboot(MODE_CONFIGURATION);
-          } else if ((char)payload[2] == 't' &&
-                     length == 14) { // getTemperature
-            char temperatureString[6];
-            dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
-            Mqtt.publish("temperature", temperatureString);
-          } else if ((char)payload[2] == 't' && length == 11) { // getHumidity
-            char humidityString[6];
-            dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
-            Mqtt.publish("humidity", humidityString);
-          } else if ((char)payload[2] == 't' && length == 12) { // getHeatIndex
-            char heatIndex[6];
-            dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
-            Mqtt.publish("heatIndex", heatIndex);
+          if ((char)payload[0] == 'o' && length == 2) { // on
+            Relay.Humidistat.on();
+            Mqtt.publish(Relay.getMQTTTopic(), "humidistat/state",
+                         Relay.Humidistat.enabled() ? "on" : "off");
+          } else if ((char)payload[0] == 'o' && length == 3) { // off
+            Relay.Humidistat.off();
+            Mqtt.publish(Relay.getMQTTTopic(), "humidistat/state",
+                         Relay.Humidistat.enabled() ? "on" : "off");
+          } else if ((char)payload[0] == 't' && length == 6) { // toggle
+            Relay.Humidistat.enabled() ? Relay.Humidistat.off()
+                                       : Relay.Humidistat.on();
+            Mqtt.publish(Relay.getMQTTTopic(), "humidistat/state",
+                         Relay.Humidistat.enabled() ? "on" : "off");
+          } else if ((char)payload[0] == 'g' && length == 3) { // get
+            Mqtt.publish(Relay.getMQTTTopic(), "humidistat/state",
+                         Relay.Humidistat.enabled() ? "on" : "off");
+          }
+        } else {
+
+          sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
+          if (strcmp(topic, _mqttTopic) == 0) {
+            if ((char)payload[2] == 'b' && length == 6) { // reboot
+              Device.reboot(MODE_NORMAL);
+            } else if ((char)payload[2] == 'n' &&
+                       length == 17) { // configurationMode
+              Device.reboot(MODE_CONFIGURATION);
+            } else if ((char)payload[2] == 't' &&
+                       length == 14) { // getTemperature
+              char temperatureString[6];
+              dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
+              Mqtt.publish("temperature", temperatureString);
+            } else if ((char)payload[2] == 't' && length == 11) { // getHumidity
+              char humidityString[6];
+              dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
+              Mqtt.publish("humidity", humidityString);
+            } else if ((char)payload[2] == 't' &&
+                       length == 12) { // getHeatIndex
+              char heatIndex[6];
+              dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
+              Mqtt.publish("heatIndex", heatIndex);
+            }
           }
         }
       }
