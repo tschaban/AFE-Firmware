@@ -2,16 +2,16 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-Thermostat.h"
+#include "AFE-Humidistat.h"
 
-AFEThermostat::AFEThermostat(){};
+AFEHumidistat::AFEHumidistat(){};
 
-void AFEThermostat::begin(uint8_t relayID, RELAYSTAT config) {
+void AFEHumidistat::begin(uint8_t relayID, RELAYSTAT config) {
   configuration = config;
   _relayID = relayID;
 }
 
-boolean AFEThermostat::isReady() {
+boolean AFEHumidistat::isReady() {
   if (ready) {
     ready = false;
     return true;
@@ -20,9 +20,9 @@ boolean AFEThermostat::isReady() {
   }
 }
 
-byte AFEThermostat::getRelayState() { return relayState; }
+byte AFEHumidistat::getRelayState() { return relayState; }
 
-void AFEThermostat::listener(float currentTemperature) {
+void AFEHumidistat::listener(float currentTemperature) {
   if (configuration.enabled) {
     if (configuration.turnOnAbove &&
         currentTemperature > configuration.turnOn) {
@@ -44,22 +44,22 @@ void AFEThermostat::listener(float currentTemperature) {
   }
 }
 
-void AFEThermostat::on() {
+void AFEHumidistat::on() {
   configuration.enabled = true;
   enable(configuration.enabled);
 }
-void AFEThermostat::off() {
+void AFEHumidistat::off() {
   configuration.enabled = false;
   enable(configuration.enabled);
 }
-void AFEThermostat::toggle() {
+void AFEHumidistat::toggle() {
   configuration.enabled ? configuration.enabled = false
                         : configuration.enabled = true;
   enable(configuration.enabled);
 }
-boolean AFEThermostat::enabled() { return configuration.enabled; }
+boolean AFEHumidistat::enabled() { return configuration.enabled; }
 
-void AFEThermostat::enable(boolean state) {
+void AFEHumidistat::enable(boolean state) {
   AFEDataAccess Data;
-  Data.saveThermostatState(_relayID, state);
+  Data.saveHumidistatState(_relayID, state);
 }

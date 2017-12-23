@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_Thermostat_h
-#define _AFE_Thermostat_h
+#ifndef _AFE_Humidistat_h
+#define _AFE_Humidistat_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -13,8 +13,12 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Thermostat.h>
 
-class AFEThermostat {
+class AFEHumidistat {
+
+  /* Class is just an interface to the AFE-thermostat which has the same
+   * functionality */
 
 private:
   boolean ready = false;
@@ -26,31 +30,31 @@ private:
 
 public:
   /* Constructors */
-  AFEThermostat();
+  AFEHumidistat();
 
-  /* Method initialize thermostat */
+  /* Method initialize humidistat */
   void begin(uint8_t relayID, RELAYSTAT config);
 
-  /* Method returns true if thermostat is enabled */
+  /* Method returns true if humidistat is enabled */
   boolean enabled();
 
-  /* Method returns true if event related to thermostat has been captured */
+  /* Method returns true if event related to humidistat has been captured */
   boolean isReady();
 
-  /* It returns what should be the relay state after thermostat event captured
+  /* It returns what should be the relay state after humidistat event captured
    */
   byte getRelayState();
 
-  /* Method rises event if thermostat themperatures have been exceeded */
-  void listener(float currentTemperature);
+  /* Method rises event if thermostat humidistat have been exceeded */
+  void listener(float currentHumidity);
 
-  /* Method turns on thermostat */
+  /* Method turns on humidistat */
   void on();
 
-  /* Method turns off thermostat */
+  /* Method turns off humidistat */
   void off();
 
-  /* Method turns thermostat to opposite to current state */
+  /* Method turns humidistat to opposite to current state */
   void toggle();
 };
 
