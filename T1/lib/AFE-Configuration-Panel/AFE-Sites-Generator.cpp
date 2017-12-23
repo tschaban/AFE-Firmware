@@ -672,7 +672,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Automatycznego wyłączenie przekaźnika"
+  body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
                         : "Automatic switching off of the relay";
   body += "</p>";
 
