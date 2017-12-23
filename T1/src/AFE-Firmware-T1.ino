@@ -157,7 +157,8 @@ void loop() {
 
             /* Relay control by thermostat code */
             if (Relay.Thermostat.isReady()) {
-              if (Relay.Thermostat.getRelayState() == RELAY_ON && !Relay.ThermalProtection.protectionOn()) {
+              if (Relay.Thermostat.getRelayState() == RELAY_ON &&
+                  !Relay.ThermalProtection.protectionOn()) {
                 Relay.on();
               } else {
                 Relay.off();
@@ -165,10 +166,12 @@ void loop() {
               MQTTPublishRelayState();
             }
 
-            /* Checking if relay should be switched off based on device thermal protection */
-            if (Relay.get()==RELAY_ON && Relay.ThermalProtection.protectionOn()) {
-               Relay.off();
-               MQTTPublishRelayState();
+            /* Checking if relay should be switched off based on device thermal
+             * protection */
+            if (Relay.get() == RELAY_ON &&
+                Relay.ThermalProtection.protectionOn()) {
+              Relay.off();
+              MQTTPublishRelayState();
             }
 
             /* Publishing temperature to MQTT Broker if enabled */
