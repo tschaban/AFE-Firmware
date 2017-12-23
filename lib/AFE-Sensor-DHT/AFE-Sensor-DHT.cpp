@@ -74,7 +74,14 @@ void AFESensorDHT::listener() {
     unsigned long humidityTime = temperatureTime;
 
     if (temperatureCounterStartTime == 0) {
-      temperatureCounterStartTime = temperatureTime;
+
+      if (configuration.temperature.interval ==
+              configuration.humidity.interval &&
+          humidityCounterStartTime == 0) {
+        temperatureCounterStartTime = temperatureTime - 4000;
+      } else {
+        temperatureCounterStartTime = temperatureTime;
+      }
     }
 
     if (humidityCounterStartTime == 0) {
