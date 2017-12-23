@@ -101,14 +101,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   configuration.showStatusUsingLED = Eeprom.read(422 + id * nextRelay);
 
-  configuration.thermostat.temperatureTurnOn =
-      Eeprom.read(423 + id * nextRelay, 6).toFloat();
-  configuration.thermostat.temperatureTurnOff =
-      Eeprom.read(428 + id * nextRelay, 6).toFloat();
-  configuration.thermostat.temperatureTurnOnAbove =
-      Eeprom.read(433 + id * nextRelay);
-  configuration.thermostat.temperatureTurnOffAbove =
-      Eeprom.read(434 + id * nextRelay);
+  configuration.thermostat.turnOn =
+      Eeprom.read(423 + id * nextRelay, 5).toFloat();
+  configuration.thermostat.turnOff =
+      Eeprom.read(428 + id * nextRelay, 5).toFloat();
+  configuration.thermostat.turnOnAbove = Eeprom.read(433 + id * nextRelay);
+  configuration.thermostat.turnOffAbove = Eeprom.read(434 + id * nextRelay);
   configuration.thermostat.enabled = isThermostatEnabled(id);
 
   configuration.thermalProtection =
@@ -186,17 +184,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(421 + id * nextRelay, configuration.stateMQTTConnected);
 
   Eeprom.write(422 + id * nextRelay, configuration.showStatusUsingLED);
-  Eeprom.write(423 + id * nextRelay, 6,
-               configuration.thermostat.temperatureTurnOn);
-  Eeprom.write(428 + id * nextRelay, 6,
-               configuration.thermostat.temperatureTurnOff);
-  Eeprom.write(433 + id * nextRelay,
-               configuration.thermostat.temperatureTurnOnAbove);
-  Eeprom.write(434 + id * nextRelay,
-               configuration.thermostat.temperatureTurnOffAbove);
+  Eeprom.write(423 + id * nextRelay, 5, configuration.thermostat.turnOn);
+  Eeprom.write(428 + id * nextRelay, 5, configuration.thermostat.turnOff);
+  Eeprom.write(433 + id * nextRelay, configuration.thermostat.turnOnAbove);
+  Eeprom.write(434 + id * nextRelay, configuration.thermostat.turnOffAbove);
   saveThermostatState(id, configuration.thermostat.enabled);
-  Eeprom.write(436 + id * nextRelay,3,
-               configuration.thermalProtection);
+  Eeprom.write(436 + id * nextRelay, 3, configuration.thermalProtection);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -229,12 +222,12 @@ const char AFEDataAccess::getVersion() {
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
 
 boolean AFEDataAccess::getRelayState(uint8_t id) {
-  uint8_t nextRelay = 39;
+  uint8_t nextRelay = 40;
   return Eeprom.read(398 + id * nextRelay);
 }
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-  uint8_t nextRelay = 39;
+  uint8_t nextRelay = 40;
   Eeprom.write(398 + id * nextRelay, state);
 }
 
