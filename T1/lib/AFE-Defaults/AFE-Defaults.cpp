@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0.1"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0.2"; }
 uint8_t AFEDefaults::getFirmwareType() { return 1; }
 void AFEDefaults::set() {
 
@@ -68,10 +68,11 @@ void AFEDefaults::set() {
   sprintf(RelayConfiguration.name, "switch");
 
   RelayConfiguration.thermostat.enabled = false;
-  RelayConfiguration.thermostat.temperatureTurnOn = 0;
-  RelayConfiguration.thermostat.temperatureTurnOnAbove = false;
-  RelayConfiguration.thermostat.temperatureTurnOff = 0;
-  RelayConfiguration.thermostat.temperatureTurnOffAbove = true;
+  RelayConfiguration.thermostat.turnOn = 0;
+  RelayConfiguration.thermostat.turnOnAbove = false;
+  RelayConfiguration.thermostat.turnOff = 0;
+  RelayConfiguration.thermostat.turnOffAbove = true;
+
   RelayConfiguration.thermalProtection = 0;
 
   Data->saveConfiguration(0, RelayConfiguration);
@@ -112,7 +113,7 @@ void AFEDefaults::set() {
   DomoticzConfiguration.port = 8080;
 
 Data->saveConfiguration(DomoticzConfiguration);
-  
+  
   */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
