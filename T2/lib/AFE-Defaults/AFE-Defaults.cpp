@@ -6,7 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0.0"; }
+const char *AFEDefaults::getFirmwareVersion() { return "1.0.1"; }
 uint8_t AFEDefaults::getFirmwareType() { return 2; }
 void AFEDefaults::set() {
 

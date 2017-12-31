@@ -19,8 +19,7 @@ void AFEDefaults::set() {
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
   LED LEDConfiguration;
-  // @TODO DOMOTICZ DomoticzConfiguration;
-  // @TODO DS18B20 DS18B20Configuration;
+  PIR PIRConfiguration;
 
   sprintf(firmwareConfiguration.version, getFirmwareVersion());
   firmwareConfiguration.type = getFirmwareType();
@@ -30,10 +29,29 @@ void AFEDefaults::set() {
   Data->saveConfiguration(firmwareConfiguration);
 
   sprintf(deviceConfiguration.name, "AFE-Device");
+
   deviceConfiguration.isLED[0] = true;
-  deviceConfiguration.isRelay[0] = true;
+  deviceConfiguration.isLED[1] = false;
+  deviceConfiguration.isLED[2] = false;
+  deviceConfiguration.isLED[3] = false;
+  deviceConfiguration.isLED[4] = false;
+
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
+  deviceConfiguration.isSwitch[2] = false;
+  deviceConfiguration.isSwitch[3] = false;
+  deviceConfiguration.isSwitch[4] = false;
+
+  deviceConfiguration.isRelay[0] = true;
+  deviceConfiguration.isRelay[1] = false;
+  deviceConfiguration.isRelay[2] = false;
+  deviceConfiguration.isRelay[3] = false;
+
+  deviceConfiguration.isPIR[0] = true;
+  deviceConfiguration.isPIR[1] = false;
+  deviceConfiguration.isPIR[2] = false;
+  deviceConfiguration.isPIR[3] = false;
+
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
@@ -65,51 +83,38 @@ void AFEDefaults::set() {
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
-
   Data->saveConfiguration(0, RelayConfiguration);
 
-  /* @TODO DOMOTICZ
-  RelayConfiguration.idx = 0;
-  RelayConfiguration.publishToDomoticz = false;
-  */
+  sprintf(RelayConfiguration.name, "");
+  Data->saveConfiguration(1, RelayConfiguration);
+  Data->saveConfiguration(2, RelayConfiguration);
+  Data->saveConfiguration(3, RelayConfiguration);
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
   Data->saveConfiguration(0, SwitchConfiguration);
-
-  SwitchConfiguration.gpio = 14;
-  SwitchConfiguration.type = 1;
-  SwitchConfiguration.functionality = 11;
   Data->saveConfiguration(1, SwitchConfiguration);
+  Data->saveConfiguration(2, SwitchConfiguration);
+  Data->saveConfiguration(3, SwitchConfiguration);
+  Data->saveConfiguration(4, SwitchConfiguration);
 
   LEDConfiguration.gpio = 13;
   LEDConfiguration.changeToOppositeValue = false;
   Data->saveConfiguration(0, LEDConfiguration);
 
-  /* @TODO DS18B20
-    Serial << endl << "INFO: Setting defaults: ds18b20";
-    DS18B20Configuration.present = false;
-    DS18B20Configuration.gpio = 0;
-    DS18B20Configuration.correction = 0;
-    DS18B20Configuration.interval = 60;
-    DS18B20Confi/guration.unit = 0;
+  PIRConfiguration.gpio = 6;
+  sprintf(PIRConfiguration.name, "pir");
+  PIRConfiguration.Led.gpio = 14;
+  PIRConfiguration.relay.id = 0;
+  PIRConfiguration.relay.howLongKeepItOpen = 10;
+  PIRConfiguration.relay.invertedState = false;
+  Data->saveConfiguration(0, PIRConfiguration);
+  Data->saveConfiguration(1, PIRConfiguration);
+  Data->saveConfiguration(2, PIRConfiguration);
+  Data->saveConfiguration(3, PIRConfiguration);
 
-    DS18B20 Data->saveConfiguration(DS18B20Configuration);
-  */
-
-  /* @TODO DOMOTICZ
-  Serial << endl << "INFO: Setting defaults: domoticz";
-  sprintf(DomoticzConfiguration.host, "");
-  DomoticzConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(DomoticzConfiguration.user, "");
-  sprintf(DomoticzConfiguration.password, "");
-  DomoticzConfiguration.port = 8080;
-
-Data->saveConfiguration(DomoticzConfiguration);
-  
-  */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
