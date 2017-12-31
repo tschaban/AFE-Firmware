@@ -20,13 +20,16 @@
 // Not used yet #define SWITCH_CONFIG 1
 // Not used yet #define SWITCH_REBOOT 2
 #define SWITCH_RELAY_1 11
-// Not used yet #define SWITCH_RELAY_2 12
-// Not used yet #define SWITCH_RELAY_3 13
-// Not used yet #define SWITCH_RELAY_4 14
-
+#define SWITCH_RELAY_2 12
+#define SWITCH_RELAY_3 13
+#define SWITCH_RELAY_4 14
 /* Relay states */
 #define RELAY_ON 1
 #define RELAY_OFF 0
+
+/* Relay states */
+#define PIR_OPEN 1
+#define PIR_CLOSE 0
 
 struct FIRMWARE {
   char version[7];
@@ -40,12 +43,12 @@ struct DEVICE {
   boolean mqttAPI;
   boolean httpAPI;
   boolean domoticzAPI;
-  boolean isLED[1];
-  boolean isRelay[1];
-  boolean isSwitch[2];
+  boolean isLED[5];
+  boolean isRelay[4];
+  boolean isSwitch[5];
+  boolean isPIR[4];
   boolean isDS18B20;
   boolean isDHT;
-  boolean isPIR;
 };
 
 struct NETWORK {
@@ -123,7 +126,7 @@ struct TEMPERATURE {
 
 struct HUMIDITY {
   float correction;
-  unsigned int interval;
+  uint16_t interval;
 };
 
 struct DH {
@@ -131,6 +134,20 @@ struct DH {
   uint8_t type;
   TEMPERATURE temperature;
   HUMIDITY humidity;
+};
+
+struct PIRRELAY {
+  uint8_t id;
+  uint16_t howLongKeepItOpen;
+  boolean invertedState;
+};
+
+struct PIR {
+  uint8_t gpio;
+  char name[16];
+  boolean state;
+  LED Led;
+  PIRRELAY relay;
 };
 
 struct DOMOTICZ {
