@@ -68,11 +68,10 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   return configuration;
 }
 
-LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
+LED AFEDataAccess::getLEDConfiguration() {
   LED configuration;
-  uint8_t nextLED = 0;
-  configuration.gpio = Eeprom.readUInt8(367 + id * nextLED);
-  configuration.changeToOppositeValue = Eeprom.read(368 + id * nextLED);
+  configuration.gpio = Eeprom.readUInt8(367);
+  configuration.changeToOppositeValue = Eeprom.read(368);
 
   return configuration;
 }
@@ -80,16 +79,16 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
-  uint8_t nextRelay = 26;
+  uint8_t nextRelay = 21;
   char mqttTopic[49];
-  configuration.gpio = Eeprom.readUInt8(370 + id * nextRelay);
-  configuration.timeToOff = Eeprom.read(372 + id * nextRelay, 5).toFloat();
-  configuration.statePowerOn = Eeprom.readUInt8(377 + id * nextRelay);
+  configuration.gpio = Eeprom.readUInt8(371 + id * nextRelay);
 
-  Eeprom.read(378 + id * nextRelay, 16)
+  configuration.statePowerOn = Eeprom.readUInt8(373 + id * nextRelay);
+
+  Eeprom.read(374 + id * nextRelay, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 
-  configuration.stateMQTTConnected = Eeprom.readUInt8(394 + id * nextRelay);
+  configuration.stateMQTTConnected = Eeprom.readUInt8(390 + id * nextRelay);
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
                                    sizeof(configurationMQTT.topic));
@@ -97,20 +96,33 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  /* @TODO DOMOTICZ
-    configuration.idx = Eeprom.read(376 + id * next, 5).toInt();
-    configuration.publishToDomoticz = Eeprom.readUInt8(382 + id * next); */
-
   return configuration;
 }
 
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
   uint8_t nextSwitch = 7;
-  configuration.gpio = Eeprom.readUInt8(396 + id * nextSwitch);
-  configuration.type = Eeprom.readUInt8(397 + id * nextSwitch);
-  configuration.sensitiveness = Eeprom.read(398 + id * nextSwitch, 3).toInt();
-  configuration.functionality = Eeprom.readUInt8(401 + id * nextSwitch);
+  configuration.gpio = Eeprom.readUInt8(552 + id * nextSwitch);
+  configuration.type = Eeprom.readUInt8(553 + id * nextSwitch);
+  configuration.sensitiveness = Eeprom.read(554 + id * nextSwitch, 3).toInt();
+  configuration.functionality = Eeprom.readUInt8(557 + id * nextSwitch);
+
+  return configuration;
+}
+
+PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
+  PIR configuration;
+  uint8_t nextPIR = 27;
+  configuration.gpio = Eeprom.readUInt8(525 + id * nextPIR);
+
+  Eeprom.read(526 + id * nextPIR, 16)
+      .toCharArray(configuration.name, sizeof(configuration.name));
+
+  configuration.Led.gpio = Eeprom.readUInt8(543 + id * nextPIR);
+  configuration.relay.id = Eeprom.readUInt8(544 + id * nextPIR);
+  configuration.relay.howLongKeepItOpen =
+      Eeprom.read(545 + id * nextPIR, 5).toInt();
+  configuration.relay.invertedState = Eeprom.read(550 + id * nextPIR);
 
   return configuration;
 }
@@ -155,32 +167,35 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
-  uint8_t nextRelay = 26;
-
-  Eeprom.writeUInt8(370 + id * nextRelay, configuration.gpio);
-  Eeprom.write(372 + id * nextRelay, 5, configuration.timeToOff);
-  Eeprom.writeUInt8(377 + id * nextRelay, configuration.statePowerOn);
-  /* @TODO For MQTT only */
-  Eeprom.write(378 + id * nextRelay, 16, configuration.name);
-  Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
-  /* @TODO DOMOTICZ
-    Eeprom.write(376 + id * nextRelay, 5, (long)configuration.idx);
-    Eeprom.writeUInt8(382 + id * nextRelay, configuration.publishToDomoticz);
-    */
+  uint8_t nextRelay = 21;
+  Eeprom.writeUInt8(371 + id * nextRelay, configuration.gpio);
+  Eeprom.writeUInt8(373 + id * nextRelay, configuration.statePowerOn);
+  Eeprom.write(374 + id * nextRelay, 16, configuration.name);
+  Eeprom.writeUInt8(390 + id * nextRelay, configuration.stateMQTTConnected);
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
-  uint8_t nextLED = 2;
-  Eeprom.writeUInt8(367 + id * nextLED, configuration.gpio);
-  Eeprom.write(368 + id * nextLED, configuration.changeToOppositeValue);
+void AFEDataAccess::saveConfiguration(LED configuration) {
+  Eeprom.writeUInt8(367, configuration.gpio);
+  Eeprom.write(368, configuration.changeToOppositeValue);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   uint8_t nextSwitch = 7;
-  Eeprom.writeUInt8(396 + id * nextSwitch, configuration.gpio);
-  Eeprom.writeUInt8(397 + id * nextSwitch, configuration.type);
-  Eeprom.write(398 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-  Eeprom.writeUInt8(401 + id * nextSwitch, configuration.functionality);
+  Eeprom.writeUInt8(552 + id * nextSwitch, configuration.gpio);
+  Eeprom.writeUInt8(553 + id * nextSwitch, configuration.type);
+  Eeprom.write(554 + id * nextSwitch, 3, (long)configuration.sensitiveness);
+  Eeprom.writeUInt8(557 + id * nextSwitch, configuration.functionality);
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
+  uint8_t nextPIR = 27;
+  Eeprom.writeUInt8(525 + id * nextPIR, configuration.gpio);
+  Eeprom.write(526 + id * nextPIR, 16, configuration.name);
+  Eeprom.writeUInt8(543 + id * nextPIR, configuration.Led.gpio);
+  Eeprom.writeUInt8(544 + id * nextPIR, configuration.relay.id);
+  Eeprom.write(545 + id * nextPIR, 5,
+               (long)configuration.relay.howLongKeepItOpen);
+  Eeprom.write(550 + id * nextPIR, configuration.relay.invertedState);
 }
 
 const char AFEDataAccess::getVersion() {
@@ -192,13 +207,13 @@ const char AFEDataAccess::getVersion() {
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
 
 boolean AFEDataAccess::getRelayState(uint8_t id) {
-  uint8_t nextRelay = 26;
-  return Eeprom.read(371 + id * nextRelay);
+  uint8_t nextRelay = 21;
+  return Eeprom.read(372 + id * nextRelay);
 }
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-  uint8_t nextRelay = 26;
-  Eeprom.write(371 + id * nextRelay, state);
+  uint8_t nextRelay = 21;
+  Eeprom.write(372 + id * nextRelay, state);
 }
 
 uint8_t AFEDataAccess::getDeviceMode() { return Eeprom.readUInt8(26); }
@@ -212,62 +227,3 @@ uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
 void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
-
-/* @TODO DOMOTICZ
-DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
-  DOMOTICZ configuration;
-
-  Eeprom.read(228, 32).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(260);
-  configuration.port = Eeprom.read(264, 5).toInt();
-  Eeprom.read(269, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
-  Eeprom.read(301, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
-
-  Serial << endl << "INFO: Requested : Domoticz";
-  Serial << endl << "    - Host : " << configuration.host;
-  Serial << endl << "    - IP : " << configuration.ip;
-  Serial << endl << "    - Port : " << configuration.port;
-  Serial << endl << "    - User : " << configuration.user;
-  Serial << endl << "    - Password : " << configuration.password;
-
-  return configuration;
-}
-*/
-/* @TODO DS18B20
-DS18B20 AFEDataAccess::getDS18B20Configuration() {
-  DS18B20 configuration;
-
-  configuration.present = Eeprom.read(400);
-  configuration.gpio = Eeprom.readUInt8(401);
-  configuration.correction = Eeprom.read(402, 5).toFloat();
-  configuration.interval = Eeprom.read(407, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(412);
-  Serial << endl << "INFO: Requested : DS18B20 : ";
-  Serial << endl << "    - Present : " << configuration.present;
-  Serial << endl << "    - GPIO : " << configuration.gpio;
-  Serial << endl << "    - Correction by : " << configuration.correction;
-  Serial << endl << "    - Read interval : " << configuration.interval;
-  Serial << endl << "    - Unit : " << configuration.unit;
-  return configuration;
-}
-
-*/
-/* @TODO DOMOTICZ
-void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
-  Eeprom.write(228, 32, configuration.host);
-  Eeprom.writeIP(260, configuration.ip);
-  Eeprom.write(264, 5, (long)configuration.port);
-  Eeprom.write(269, 32, configuration.user);
-  Eeprom.write(301, 32, configuration.password);
-}
-*/
-/* @TODO DS18B20
-void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
-  Eeprom.writeUInt8(401, configuration.gpio);
-  Eeprom.write(402, 5, (float)configuration.correction);
-  Eeprom.write(407, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(412, configuration.unit);
-} */

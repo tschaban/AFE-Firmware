@@ -165,23 +165,42 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
   }
 
-  server.arg("h").length() > 0 ? data.httpAPI = true
-                                     : data.httpAPI = false;
+  server.arg("h").length() > 0 ? data.httpAPI = true : data.httpAPI = false;
 
-  server.arg("m").length() > 0 ? data.mqttAPI = true
-                                     : data.mqttAPI = false;
+  server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
   server.arg("r0").length() > 0 ? data.isRelay[0] = true
-                                    : data.isRelay[0] = false;
+                                : data.isRelay[0] = false;
+
+  server.arg("r1").length() > 0 ? data.isRelay[1] = true
+                                : data.isRelay[1] = false;
+
+  server.arg("r2").length() > 0 ? data.isRelay[2] = true
+                                : data.isRelay[2] = false;
+
+  server.arg("r3").length() > 0 ? data.isRelay[3] = true
+                                : data.isRelay[3] = false;
 
   server.arg("s0").length() > 0 ? data.isSwitch[0] = true
-                                     : data.isSwitch[0] = false;
-
+                                : data.isSwitch[0] = false;
   server.arg("s1").length() > 0 ? data.isSwitch[1] = true
-                                     : data.isSwitch[1] = false;
+                                : data.isSwitch[1] = false;
+  server.arg("s2").length() > 0 ? data.isSwitch[2] = true
+                                : data.isSwitch[2] = false;
+  server.arg("s3").length() > 0 ? data.isSwitch[3] = true
+                                : data.isSwitch[3] = false;
+  server.arg("s4").length() > 0 ? data.isSwitch[4] = true
+                                : data.isSwitch[4] = false;
 
-  server.arg("l0").length() > 0 ? data.isLED[0] = true
-                                  : data.isLED[0] = false;
+  server.arg("p0").length() > 0 ? data.isPIR[0] = true : data.isPIR[0] = false;
+
+  server.arg("p1").length() > 0 ? data.isPIR[1] = true : data.isPIR[1] = false;
+
+  server.arg("p2").length() > 0 ? data.isPIR[2] = true : data.isPIR[2] = false;
+
+  server.arg("p3").length() > 0 ? data.isPIR[3] = true : data.isPIR[3] = false;
+
+  server.arg("l0").length() > 0 ? data.isLED[0] = true : data.isLED[0] = false;
 
   return data;
 }
@@ -193,8 +212,7 @@ NETWORK AFEWebServer::getNetworkData() {
   }
 
   if (server.arg("p").length() > 0) {
-    server.arg("p")
-        .toCharArray(data.password, sizeof(data.password));
+    server.arg("p").toCharArray(data.password, sizeof(data.password));
   }
 
   if (server.arg("d").length() > 0) {
@@ -203,32 +221,24 @@ NETWORK AFEWebServer::getNetworkData() {
     data.isDHCP = false;
   }
 
-  if (server.arg("i1").length() > 0 &&
-      server.arg("i2").length() > 0 &&
-      server.arg("i3").length() > 0 &&
-      server.arg("i4").length() > 0) {
+  if (server.arg("i1").length() > 0 && server.arg("i2").length() > 0 &&
+      server.arg("i3").length() > 0 && server.arg("i4").length() > 0) {
 
-    data.ip = IPAddress(
-        server.arg("i1").toInt(), server.arg("i2").toInt(),
-        server.arg("i3").toInt(), server.arg("i4").toInt());
+    data.ip = IPAddress(server.arg("i1").toInt(), server.arg("i2").toInt(),
+                        server.arg("i3").toInt(), server.arg("i4").toInt());
   }
-  if (server.arg("g1").length() > 0 &&
-      server.arg("g2").length() > 0 &&
-      server.arg("g3").length() > 0 &&
-      server.arg("g4").length() > 0) {
+  if (server.arg("g1").length() > 0 && server.arg("g2").length() > 0 &&
+      server.arg("g3").length() > 0 && server.arg("g4").length() > 0) {
 
-    data.gateway = IPAddress(
-        server.arg("g1").toInt(), server.arg("g2").toInt(),
-        server.arg("g3").toInt(), server.arg("g4").toInt());
+    data.gateway =
+        IPAddress(server.arg("g1").toInt(), server.arg("g2").toInt(),
+                  server.arg("g3").toInt(), server.arg("g4").toInt());
   }
-  if (server.arg("s1").length() > 0 &&
-      server.arg("s2").length() > 0 &&
-      server.arg("s3").length() > 0 &&
-      server.arg("s4").length() > 0) {
+  if (server.arg("s1").length() > 0 && server.arg("s2").length() > 0 &&
+      server.arg("s3").length() > 0 && server.arg("s4").length() > 0) {
 
-    data.subnet = IPAddress(
-        server.arg("s1").toInt(), server.arg("s2").toInt(),
-        server.arg("s3").toInt(), server.arg("s4").toInt());
+    data.subnet = IPAddress(server.arg("s1").toInt(), server.arg("s2").toInt(),
+                            server.arg("s3").toInt(), server.arg("s4").toInt());
   }
   if (server.arg("na").length() > 0) {
     data.noConnectionAttempts = server.arg("na").toInt();
@@ -249,14 +259,11 @@ MQTT AFEWebServer::getMQTTData() {
     server.arg("h").toCharArray(data.host, sizeof(data.host));
   }
 
-  if (server.arg("m1").length() > 0 &&
-      server.arg("m2").length() > 0 &&
-      server.arg("m3").length() > 0 &&
-      server.arg("m4").length() > 0) {
+  if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
+      server.arg("m3").length() > 0 && server.arg("m4").length() > 0) {
 
-    data.ip = IPAddress(
-        server.arg("m1").toInt(), server.arg("m2").toInt(),
-        server.arg("m3").toInt(), server.arg("m4").toInt());
+    data.ip = IPAddress(server.arg("m1").toInt(), server.arg("m2").toInt(),
+                        server.arg("m3").toInt(), server.arg("m4").toInt());
   }
 
   if (server.arg("p").length() > 0) {
@@ -268,8 +275,7 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("s").length() > 0) {
-    server.arg("s")
-        .toCharArray(data.password, sizeof(data.password));
+    server.arg("s").toCharArray(data.password, sizeof(data.password));
   }
 
   if (server.arg("t").length() > 0) {
@@ -298,22 +304,17 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   if (server.arg("g" + String(id)).length() > 0) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
-  if (server.arg("t" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("t" + String(id)).toFloat();
-  }
+
   if (server.arg("r" + String(id)).length() > 0) {
-    data.statePowerOn =
-        server.arg("r" + String(id)).toInt();
+    data.statePowerOn = server.arg("r" + String(id)).toInt();
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id))
-        .toCharArray(data.name, sizeof(data.name));
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
   }
 
   if (server.arg("c" + String(id)).length() > 0) {
-    data.stateMQTTConnected =
-        server.arg("c" + String(id)).toInt();
+    data.stateMQTTConnected = server.arg("c" + String(id)).toInt();
   }
 
   return data;
@@ -327,13 +328,11 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   }
 
   if (server.arg("s" + String(id)).length() > 0) {
-    data.sensitiveness =
-        server.arg("s" + String(id)).toInt();
+    data.sensitiveness = server.arg("s" + String(id)).toInt();
   }
 
   if (server.arg("f" + String(id)).length() > 0) {
-    data.functionality =
-        server.arg("f" + String(id)).toInt();
+    data.functionality = server.arg("f" + String(id)).toInt();
   }
 
   if (server.arg("g" + String(id)).length() > 0) {
@@ -343,7 +342,28 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   return data;
 }
 
+PIR AFEWebServer::getPIRData(uint8_t id) {
+  PIR data;
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("n" + String(id)).length() > 0) {
+    data.name = server.arg("n" + String(id));
+  }
+
+  if (server.arg("s" + String(id)).length() > 0) {
+    data.sensitiveness = server.arg("s" + String(id)).toInt();
+  }
+
+  if (server.arg("f" + String(id)).length() > 0) {
+    data.functionality = server.arg("f" + String(id)).toInt();
+  }
+
+  return data;
+}
+
 uint8_t AFEWebServer::getLanguageData() {
-  return server.arg("l").length() > 0 ? server.arg("l").toInt()
-                                             : 1;
+  return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
 }
