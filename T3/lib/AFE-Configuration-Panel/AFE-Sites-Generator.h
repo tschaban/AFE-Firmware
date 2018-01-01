@@ -57,6 +57,7 @@ public:
   String addLEDConfiguration(uint8_t id);
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+  String addPIRConfiguration(uint8_t id);
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();
@@ -71,9 +72,6 @@ public:
 
   /* Method generates section shown when device is in norma mode */
   String addHelpSection();
-
-  // @TODO DOMOTICZ String addDomoticzConfiguration();
-  // @TODO DS18B20 String addDS18B20Configuration();
 };
 
 #endif

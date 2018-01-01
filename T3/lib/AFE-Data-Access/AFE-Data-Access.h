@@ -27,7 +27,7 @@ public:
   FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
-  LED getLEDConfiguration();
+  LED getLEDConfiguration(uint8_t id);
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
   PIR getPIRConfiguration(uint8_t id);
@@ -37,7 +37,7 @@ public:
   void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
-  void saveConfiguration(LED configuration);
+  void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(uint8_t id, PIR configuration);

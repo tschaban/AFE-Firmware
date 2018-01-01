@@ -136,18 +136,14 @@ struct DH {
   HUMIDITY humidity;
 };
 
-struct PIRRELAY {
-  uint8_t id;
-  uint16_t howLongKeepItOpen;
-  boolean invertedState;
-};
-
 struct PIR {
   uint8_t gpio;
   char name[16];
   boolean state;
-  LED Led;
-  PIRRELAY relay;
+  uint8_t ledId;
+  uint8_t relayId;
+  uint16_t howLongKeepRelayOn;
+  boolean invertRelayState;
 };
 
 struct DOMOTICZ {

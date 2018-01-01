@@ -70,30 +70,32 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
-    LED data1 = {};
+    LED data[5] = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getLEDData(0);
+      for (uint8_t i = 0; i < 5; i++) {
+        data[i] = getLEDData(i);
+      }
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(
-        getOptionName(), getCommand(), data1));
+    publishHTML(ConfigurationPanel.getLEDConfigurationSite(getOptionName(),
+                                                           getCommand(), data));
   } else if (getOptionName() == "relay") {
-    RELAY data1 = {};
-    RELAY data2 = {};
+    RELAY data[4] = {};
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getRelayData(0);
-      //  data2 = getRelayData(1);
+      for (uint8_t i = 0; i < 4; i++) {
+        data[i] = getRelayData(i);
+      }
     }
     publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-        getOptionName(), getCommand(), data1, data2));
+        getOptionName(), getCommand(), data));
   } else if (getOptionName() == "switch") {
-    SWITCH data1 = {};
-    SWITCH data2 = {};
+    SWITCH data[5];
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getSwitchData(0);
-      data2 = getSwitchData(1);
+      for (uint8_t i = 0; i < 5; i++) {
+        data[i] = getSwitchData(i);
+      }
     }
     publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-        getOptionName(), getCommand(), data1, data2));
+        getOptionName(), getCommand(), data));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -193,14 +195,15 @@ DEVICE AFEWebServer::getDeviceData() {
                                 : data.isSwitch[4] = false;
 
   server.arg("p0").length() > 0 ? data.isPIR[0] = true : data.isPIR[0] = false;
-
   server.arg("p1").length() > 0 ? data.isPIR[1] = true : data.isPIR[1] = false;
-
   server.arg("p2").length() > 0 ? data.isPIR[2] = true : data.isPIR[2] = false;
-
   server.arg("p3").length() > 0 ? data.isPIR[3] = true : data.isPIR[3] = false;
 
   server.arg("l0").length() > 0 ? data.isLED[0] = true : data.isLED[0] = false;
+  server.arg("l1").length() > 0 ? data.isLED[1] = true : data.isLED[1] = false;
+  server.arg("l2").length() > 0 ? data.isLED[2] = true : data.isLED[2] = false;
+  server.arg("l3").length() > 0 ? data.isLED[3] = true : data.isLED[3] = false;
+  server.arg("l4").length() > 0 ? data.isLED[4] = true : data.isLED[4] = false;
 
   return data;
 }
@@ -350,16 +353,23 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
-    data.name = server.arg("n" + String(id));
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
   }
 
-  if (server.arg("s" + String(id)).length() > 0) {
-    data.sensitiveness = server.arg("s" + String(id)).toInt();
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledId = server.arg("l" + String(id)).toInt();
   }
 
-  if (server.arg("f" + String(id)).length() > 0) {
-    data.functionality = server.arg("f" + String(id)).toInt();
+  if (server.arg("r" + String(id)).length() > 0) {
+    data.relayId = server.arg("r" + String(id)).toInt();
   }
+
+  if (server.arg("d" + String(id)).length() > 0) {
+    data.howLongKeepRelayOn = server.arg("d" + String(id)).toInt();
+  }
+
+  server.arg("i" + String(id)).length() > 0 ? data.invertRelayState = true
+                                            : data.invertRelayState = false;
 
   return data;
 }

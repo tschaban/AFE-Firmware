@@ -16,10 +16,9 @@
 #include <AFE-Defaults.h>
 //#include <Streaming.h>
 
-#define MODE_NORMAL 0        // Device is in operating mode
-#define MODE_CONFIGURATION 1 // Device is in configuration mode (within LAN)
-#define MODE_ACCESS_POINT                                                      \
-  2 // Device is in configuration mode (access point mode)
+#define MODE_NORMAL 0
+#define MODE_CONFIGURATION 1
+#define MODE_ACCESS_POINT 2
 
 class AFEDevice {
 

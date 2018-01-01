@@ -61,7 +61,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-  page += language == 0 ? "Włącznik WiFi" : "WiFi Switch";
+  page += language == 0 ? "4 włączniki i czujniki ruchu WiFi"
+                        : "4 WiFi switches and PIR sensors";
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -77,19 +78,72 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
               "href=\"\\?option=mqtt\">MQTT "
               "Broker</a></li>";
     }
-    if (Device.configuration.isLED[0]) {
-      page += "<li class=\"itm\"><a href=\"\\?option=led\">LED</a></li>";
+    if (Device.configuration.isLED[0] || Device.configuration.isLED[1] ||
+        Device.configuration.isLED[2] || Device.configuration.isLED[3] ||
+        Device.configuration.isLED[4]) {
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
+              "LEDów</a></li>";
+
+      for (uint8_t i = 0; i < 5; i++) {
+        if (Device.configuration.isLED[i]) {
+          page += "<li class=\"itm\"><a href=\"\\?option=led";
+          page += i;
+          page += "\">  - LED #";
+          page += i + 1;
+          page += "</a></li>";
+        }
+      }
     }
-    if (Device.configuration.isRelay[0]) {
-      page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
-      page += language == 0 ? "Przekaźnik" : "Relay";
-      page += "</a></li>";
+
+    if (Device.configuration.isRelay[0] || Device.configuration.isRelay[1] ||
+        Device.configuration.isRelay[2] || Device.configuration.isRelay[3]) {
+
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
+              "przekaźników</a></li>";
+      for (uint8_t i = 0; i < 4; i++) {
+        if (Device.configuration.isRelay[i]) {
+          page += "<li class=\"itm\"><a href=\"\\?option=relay";
+          page += i;
+          page += "\">  - Przekaźnik #";
+          page += i + 1;
+          page += "</a></li>";
+        }
+      }
     }
-    if (Device.configuration.isSwitch[0] || Device.configuration.isSwitch[1]) {
-      page += "<li class=\"itm\"><a href=\"\\?option=switch\">";
-      page += language == 0 ? "Przycisk / Włącznik" : "Switch / Button";
-      page += "</a></li>";
+
+    if (Device.configuration.isSwitch[0] || Device.configuration.isSwitch[1] ||
+        Device.configuration.isSwitch[2] || Device.configuration.isSwitch[3] ||
+        Device.configuration.isSwitch[4]) {
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
+              "przycisków / włączników</a></li>";
+
+      for (uint8_t i = 0; i < 5; i++) {
+        if (Device.configuration.isSwitch[i]) {
+          page += "<li class=\"itm\"><a href=\"\\?option=switch";
+          page += i;
+          page += "\">  - Przycisk #";
+          page += i + 1;
+          page += "</a></li>";
+        }
+      }
     }
+
+    if (Device.configuration.isPIR[0] || Device.configuration.isPIR[1] ||
+        Device.configuration.isPIR[2] || Device.configuration.isPIR[3]) {
+
+      page += "<li class=\"itm\"><a  style=\"color:#aaaaaa;\">Konfiguracja "
+              "czujników ruch</a></li>";
+      for (uint8_t i = 0; i < 4; i++) {
+        if (Device.configuration.isPIR[i]) {
+          page += "<li class=\"itm\"><a href=\"\\?option=pir";
+          page += i;
+          page += "\">  - Czujnik #";
+          page += i + 1;
+          page += "</a></li>";
+        }
+      }
+    }
+
     page +=
         "<br><br><li class=\"itm\"><a "
         "href=\"\\?option=language\">[PL] Język / "
@@ -198,11 +252,32 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body = "<fieldset>";
 
-  body += generateLEDItem(0, configuration.isLED[0]);
-  body += generateRelayItem(0, configuration.isRelay[0]);
-  body += generateSwitchItem(0, configuration.isSwitch[0]);
-  body += generateSwitchItem(1, configuration.isSwitch[1]);
-
+  body += "<div class=\"cf\"><label>LEDy</label>";
+  for (uint8_t i = 0; i < 5; i++) {
+    body += generateLEDItem(i, configuration.isLED[i]);
+  }
+  body += "</div>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Przekaźniki" : "Relays";
+  body += "</label>";
+  for (uint8_t i = 0; i < 4; i++) {
+    body += generateRelayItem(i, configuration.isRelay[i]);
+  }
+  body += "</div>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Przyciski / włączniki" : "Switches / Buttons";
+  body += "</label>";
+  for (uint8_t i = 0; i < 5; i++) {
+    body += generateSwitchItem(i, configuration.isSwitch[i]);
+  }
+  body += "</div>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Czujniki ruchu" : "PIRs";
+  body += "</label>";
+  for (uint8_t i = 0; i < 4; i++) {
+    body += generateSwitchItem(i, configuration.isSwitch[i]);
+  }
+  body += "</div>";
   body += "</fieldset>";
 
   page += addConfigurationBlock(
@@ -691,7 +766,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 }
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
-
   SWITCH configuration;
   configuration = Data.getSwitchConfiguration(id);
 
@@ -749,6 +823,77 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
           "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
           "value=\"";
   body += configuration.sensitiveness;
+  body += "\">";
+  body += "<span class=\"hint\">0 - 999 (milise";
+  body += language == 0 ? "kund" : "conds";
+  body += ")</span>";
+  body += "</div>";
+  body += "</fieldset>";
+
+  char title[23];
+  language == 0 ? sprintf(title, "Przycisk / Włącznik #%d", id + 1)
+                : sprintf(title, "Switch / Button #%d", id + 1);
+
+  return addConfigurationBlock(title, "", body);
+}
+
+String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
+  PIR configuration;
+  configuration = Data.getPIRConfiguration(id);
+  /*
+  uint8_t gpio;
+  char name[16];
+  boolean state;
+  uint8_t ledId;
+  uint8_t relayId;
+  uint16_t howLongKeepRelayOn;
+  boolean invertRelayState;
+  */
+  String body = "<fieldset>";
+  char filed[13];
+  sprintf(filed, "g%d", id);
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Steruje" : "Controls";
+  body += "</label>";
+  body += "<select name=\"r" + String(id) + "\">";
+  body += "<option value=\"11\"";
+  body += (configuration.relayId == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Przekaźnik #1" : "Relay #1";
+  body += "</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "LED" : "LED";
+  body += "*</label>";
+  body += "<select name=\"l" + String(id) + "\">";
+  body += "<option value=\"0\"";
+  body += (configuration.ledId == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "LED #1" : "LED #1";
+  body += "</option>";
+  body += "</select>";
+  body += "</div>";
+  body += "<br><p class=\"cm\">";
+  body += language == 0
+              ? "Czułość należy ustawić metodą prób, aż uzyska się "
+                "porządane działanie przycisku podczas jego wciskania"
+              : "Sensitiveness should be adjusted if switch didn't behave "
+                "as expected while pressing it";
+
+  body += "</p><div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Jak długo przekaźnik ma byc właczony"
+                        : "How log relay should be on";
+  body += "*</label>";
+  body += "<input name=\"d" + String(id) +
+          "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
+          "value=\"";
+  body += configuration.howLongKeepRelayOn;
   body += "\">";
   body += "<span class=\"hint\">0 - 999 (milise";
   body += language == 0 ? "kund" : "conds";
@@ -944,45 +1089,35 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
 
 const String AFESitesGenerator::generateSwitchItem(uint8_t id,
                                                    boolean checked) {
-  String body = "<div class=\"cc\">";
-  body += "<label>";
+
+  String body = "<label style=\"width:40px\">#";
+  body += id + 1;
   body += "<input name=\"s";
   body += id;
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
-  body += ">";
-  body += language == 0 ? "Przycisk / włącznik #" : "Button / switch #";
-  body += id + 1;
-  body += "</label>";
-  body += "</div>";
-
+  body += "></label>";
   return body;
 }
 
 const String AFESitesGenerator::generateRelayItem(uint8_t id, boolean checked) {
-  String body = "<div class=\"cc\">";
-  body += "<label>";
+  String body = "<label style=\"width:40px\">#";
+  body += id + 1;
   body += "<input name=\"r";
   body += id;
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
-  body += ">";
-  body += language == 0 ? "Przekaźnik" : "Relay";
-  body += "</label>";
-  body += "</div>";
-
+  body += "></label>";
   return body;
 }
 
 const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
-  String body = "<div class=\"cc\">";
-  body += "<label>";
+  String body = "<label style=\"width:40px\">#";
+  body += id + 1;
   body += "<input name=\"l";
   body += id;
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";
-  body += ">LED</label>";
-  body += "</div>";
-
+  body += "></label>";
   return body;
 }
