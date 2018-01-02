@@ -78,22 +78,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
               "href=\"\\?option=mqtt\">MQTT "
               "Broker</a></li>";
     }
-    if (Device.configuration.isLED[0] || Device.configuration.isLED[1] ||
-        Device.configuration.isLED[2] || Device.configuration.isLED[3] ||
-        Device.configuration.isLED[4]) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "LEDów</a></li>";
-
-      for (uint8_t i = 0; i < 5; i++) {
-        if (Device.configuration.isLED[i]) {
-          page += "<li class=\"itm\"><a href=\"\\?option=led";
-          page += i;
-          page += "\">  - LED #";
-          page += i + 1;
-          page += "</a></li>";
-        }
-      }
-    }
+    page += "LED";
+    page += language == 0 ? "y" : "s";
+    page += "</a></li><li class=\"itm\"><a href=\"\\?option=led\">";
 
     if (Device.configuration.isRelay[0] || Device.configuration.isRelay[1] ||
         Device.configuration.isRelay[2] || Device.configuration.isRelay[3]) {
@@ -594,15 +581,11 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
-
   String body = "<fieldset>";
-
   char filed[13];
   sprintf(filed, "g%d", id);
-
+  body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
-
-  body += "<div class=\"cc\">";
   body += "<label>";
   body += "<input name=\"o";
   body += id;
@@ -619,8 +602,8 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   return addConfigurationBlock(
       "LED",
       language == 0 ? "LED wykorzystywany jest do informowania o zdarzeniach "
-                      "oraz stanie urządzenia"
-                    : "LED is used to inform about events and device status",
+                      "lub stanie urządzenia"
+                    : "LED is used to inform about events or device status",
       body);
 }
 
@@ -633,9 +616,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   char filed[13];
   sprintf(filed, "g%d", id);
-
+  body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
-
+  body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Nazwa" : "Name";
@@ -772,7 +755,9 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   String body = "<fieldset>";
   char filed[13];
   sprintf(filed, "g%d", id);
+  body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Funkcja" : "Functionality";
@@ -840,70 +825,96 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   PIR configuration;
   configuration = Data.getPIRConfiguration(id);
-  /*
-  uint8_t gpio;
-  char name[16];
-  boolean state;
-  uint8_t ledId;
-  uint8_t relayId;
-  uint16_t howLongKeepRelayOn;
-  boolean invertRelayState;
-  */
   String body = "<fieldset>";
   char filed[13];
   sprintf(filed, "g%d", id);
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Steruje" : "Controls";
-  body += "</label>";
-  body += "<select name=\"r" + String(id) + "\">";
-  body += "<option value=\"11\"";
-  body += (configuration.relayId == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Przekaźnik #1" : "Relay #1";
-  body += "</option>";
-  body += "</select>";
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "</div>";
+  body += "<br><p class=\"cm\">";
+  body += language == 0
+              ? "Dioda LED może sygnalizować wykryty ruch przez czujnik"
+              : "LED can indicate motion detection by the sensor";
+  body += "</p>";
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "LED" : "LED";
+  body += language == 0 ? "Wybierze LED" : "Select LED";
   body += "*</label>";
   body += "<select name=\"l" + String(id) + "\">";
-  body += "<option value=\"0\"";
-  body += (configuration.ledId == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "LED #1" : "LED #1";
-  body += "</option>";
+  for (uint8_t i = 0; i < 5; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\" ";
+    body += (configuration.ledId == i ? "selected=\"selected\"" : "");
+    body += ">";
+    body += i + 1;
+    body += "</option>";
+  }
   body += "</select>";
   body += "</div>";
   body += "<br><p class=\"cm\">";
   body += language == 0
-              ? "Czułość należy ustawić metodą prób, aż uzyska się "
-                "porządane działanie przycisku podczas jego wciskania"
-              : "Sensitiveness should be adjusted if switch didn't behave "
-                "as expected while pressing it";
+              ? "Czujnik PIR może bezpośrednio sterować jednym przekaźnikiem. "
+                "Poniżej możesz wybrać, którym oraz ustawić dodatkowe "
+                "parametry sterowania"
+              : "Motion detector can control a relay assigned to the sesnor. "
+                "Below you can choose a one and set additional parameters";
+  body += "</p>";
 
-  body += "</p><div class=\"cf\">";
+  body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Jak długo przekaźnik ma byc właczony"
-                        : "How log relay should be on";
+  body += language == 0 ? "Wybierz przekaźnik" : "Select relay";
+  body += "*</label>";
+  body += "<select name=\"r" + String(id) + "\">";
+  for (uint8_t i = 0; i < 4; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\" ";
+    body += (configuration.relayId == i ? "selected=\"selected\"" : "");
+    body += ">";
+    body += i + 1;
+    body += "</option>";
+  }
+  body += "</select>";
+  body += "</div>";
+  body += "<br><p class=\"cm\">";
+  body +=
+      language == 0
+          ? "Na jak długo przekaźnik ma zostać uaktywniony przez czujnik PIR"
+          : "For how long relay should be active after motion has been "
+            "detedcted by the PIR sensor";
+  body += "</p>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Czas" : "Time";
   body += "*</label>";
   body += "<input name=\"d" + String(id) +
-          "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
+          "\" type=\"number\" max=\"86400\" min=\"0.01\" step=\"0.01\" "
           "value=\"";
   body += configuration.howLongKeepRelayOn;
   body += "\">";
-  body += "<span class=\"hint\">0 - 999 (milise";
+  body += "<span class=\"hint\">0.01 - 86400 (24h) se";
   body += language == 0 ? "kund" : "conds";
-  body += ")</span>";
+  body += "</span>";
   body += "</div>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"i";
+  body += id;
+  body += "\" type=\"checkbox\" value=\"1\"";
+  body += configuration.invertRelayState ? " checked=\"checked\"" : "";
+  body += ">";
+  body += language == 0 ? "Wyłącz przekaźnik, gdy PIR wykruyje ruch"
+                        : "Switch off relay if PIR detected move";
+  body += "</label>";
+  body += "</div>";
+
   body += "</fieldset>";
 
-  char title[23];
-  language == 0 ? sprintf(title, "Przycisk / Włącznik #%d", id + 1)
-                : sprintf(title, "Switch / Button #%d", id + 1);
+  char title[25];
+  language == 0 ? sprintf(title, "Czujnik ruchu (PIR) #%d", id + 1)
+                : sprintf(title, "Motion detector (PIR) #%d", id + 1);
 
   return addConfigurationBlock(title, "", body);
 }
@@ -1075,7 +1086,7 @@ String AFESitesGenerator::addConfigurationBlock(const String title,
 
 const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
                                                              uint8_t selected) {
-  String page = "<div class=\"cf\"><label>GPIO</label><select name=\"";
+  String page = "<label>GPIO</label><select name=\"";
   page += field;
   page += "\">";
   for (uint8_t i = 0; i <= 16; i++) {
@@ -1083,7 +1094,7 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
             (selected == i ? "selected=\"selected\"" : "") + ">" + String(i) +
             "</option>";
   }
-  page += "</select></div>";
+  page += "</select>";
   return page;
 }
 

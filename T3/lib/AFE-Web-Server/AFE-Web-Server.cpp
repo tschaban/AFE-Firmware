@@ -78,24 +78,6 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getLEDConfigurationSite(getOptionName(),
                                                            getCommand(), data));
-  } else if (getOptionName() == "relay") {
-    RELAY data[4] = {};
-    if (getCommand() == SERVER_CMD_SAVE) {
-      for (uint8_t i = 0; i < 4; i++) {
-        data[i] = getRelayData(i);
-      }
-    }
-    publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-        getOptionName(), getCommand(), data));
-  } else if (getOptionName() == "switch") {
-    SWITCH data[5];
-    if (getCommand() == SERVER_CMD_SAVE) {
-      for (uint8_t i = 0; i < 5; i++) {
-        data[i] = getSwitchData(i);
-      }
-    }
-    publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-        getOptionName(), getCommand(), data));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -114,6 +96,46 @@ void AFEWebServer::generate() {
       Device.reboot(MODE_CONFIGURATION);
     } else if (getCommand() == 2) {
       Device.reboot(MODE_ACCESS_POINT);
+    }
+  } else {
+
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isRelay[i]) {
+        if (getOptionName() == "relay" + String(i)) {
+          RELAY data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getRelayData(i);
+          }
+          publishHTML(ConfigurationPanel.getRelayConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      }
+    }
+
+    for (uint8_t i = 0; i < 5; i++) {
+      if (Device.configuration.isSwitch[i]) {
+        if (getOptionName() == "switch" + String(i)) {
+          SWITCH data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getSwitchData(i);
+          }
+          publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      }
+    }
+
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isPIR[i]) {
+        if (getOptionName() == "pir" + String(i)) {
+          PIR data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getPIRData(i);
+          }
+          publishHTML(ConfigurationPanel.getPIRConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      }
     }
   }
 }
@@ -171,39 +193,25 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
-  server.arg("r0").length() > 0 ? data.isRelay[0] = true
-                                : data.isRelay[0] = false;
+  for (uint8_t i = 0; i < 5; i++) {
+    server.arg("l" + String(i)).length() > 0 ? data.isLED[i] = true
+                                             : data.isLED[i] = false;
+  }
 
-  server.arg("r1").length() > 0 ? data.isRelay[1] = true
-                                : data.isRelay[1] = false;
+  for (uint8_t i = 0; i < 4; i++) {
+    server.arg("p" + String(i)).length() > 0 ? data.isPIR[i] = true
+                                             : data.isPIR[i] = false;
+  }
 
-  server.arg("r2").length() > 0 ? data.isRelay[2] = true
-                                : data.isRelay[2] = false;
+  for (uint8_t i = 0; i < 5; i++) {
+    server.arg("s" + String(i)).length() > 0 ? data.isSwitch[i] = true
+                                             : data.isSwitch[i] = false;
+  }
 
-  server.arg("r3").length() > 0 ? data.isRelay[3] = true
-                                : data.isRelay[3] = false;
-
-  server.arg("s0").length() > 0 ? data.isSwitch[0] = true
-                                : data.isSwitch[0] = false;
-  server.arg("s1").length() > 0 ? data.isSwitch[1] = true
-                                : data.isSwitch[1] = false;
-  server.arg("s2").length() > 0 ? data.isSwitch[2] = true
-                                : data.isSwitch[2] = false;
-  server.arg("s3").length() > 0 ? data.isSwitch[3] = true
-                                : data.isSwitch[3] = false;
-  server.arg("s4").length() > 0 ? data.isSwitch[4] = true
-                                : data.isSwitch[4] = false;
-
-  server.arg("p0").length() > 0 ? data.isPIR[0] = true : data.isPIR[0] = false;
-  server.arg("p1").length() > 0 ? data.isPIR[1] = true : data.isPIR[1] = false;
-  server.arg("p2").length() > 0 ? data.isPIR[2] = true : data.isPIR[2] = false;
-  server.arg("p3").length() > 0 ? data.isPIR[3] = true : data.isPIR[3] = false;
-
-  server.arg("l0").length() > 0 ? data.isLED[0] = true : data.isLED[0] = false;
-  server.arg("l1").length() > 0 ? data.isLED[1] = true : data.isLED[1] = false;
-  server.arg("l2").length() > 0 ? data.isLED[2] = true : data.isLED[2] = false;
-  server.arg("l3").length() > 0 ? data.isLED[3] = true : data.isLED[3] = false;
-  server.arg("l4").length() > 0 ? data.isLED[4] = true : data.isLED[4] = false;
+  for (uint8_t i = 0; i < 4; i++) {
+    server.arg("r" + String(i)).length() > 0 ? data.isRelay[i] = true
+                                             : data.isRelay[i] = false;
+  }
 
   return data;
 }

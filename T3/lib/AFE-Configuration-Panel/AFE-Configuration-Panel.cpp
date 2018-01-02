@@ -131,22 +131,17 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
 
 String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
                                                         uint8_t command,
-                                                        RELAY data[4]) {
+                                                        RELAY data,
+                                                        uint8_t relayIndex) {
   if (command == SERVER_CMD_SAVE) {
-    for (uint8_t i = 0; i < 4; i++) {
-      if (Device.configuration.isRelay[i]) {
-        Data.saveConfiguration(i, data[i]);
-      }
-    }
+    Data.saveConfiguration(relayIndex, data);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=relay&cmd=1\"  method=\"post\">";
-  for (uint8_t i = 0; i < 4; i++) {
-    if (Device.configuration.isRelay[i]) {
-      page += Site.addRelayConfiguration(i);
-    }
-  }
+  page += "<form action=\"/?option=relay";
+  page += relayIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addRelayConfiguration(relayIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -156,27 +151,41 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
 
 String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          uint8_t command,
-                                                         SWITCH data[5]) {
+                                                         SWITCH data,
+                                                         uint8_t switchIndex) {
 
   Device.begin(); // Reading configuration data
 
   if (command == SERVER_CMD_SAVE) {
-    for (uint8_t i = 0; i < 5; i++) {
-      if (Device.configuration.isSwitch[i]) {
-        Data.saveConfiguration(i, data[i]);
-      }
-    }
+    Data.saveConfiguration(switchIndex, data);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=switch&cmd=1\"  method=\"post\">";
+  page += "<form action=\"/?option=switch";
+  page += switchIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addSwitchConfiguration(switchIndex);
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
 
-  for (uint8_t i = 0; i == 4; i++) {
-    if (Device.configuration.isSwitch[i]) {
-      page += Site.addSwitchConfiguration(i);
-    }
+String AFEConfigurationPanel::getPIRConfigurationSite(const String option,
+                                                      uint8_t command, PIR data,
+                                                      uint8_t PIRIndex) {
+  Device.begin(); // Reading configuration data
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(PIRIndex, data);
   }
 
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=pir";
+  page += PIRIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addPIRConfiguration(PIRIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

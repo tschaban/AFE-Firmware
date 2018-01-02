@@ -38,9 +38,12 @@ public:
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data[5]);
   String getRelayConfigurationSite(const String option, uint8_t command,
-                                   RELAY data[4]);
+                                   RELAY data, uint8_t relayIndex);
   String getSwitchConfigurationSite(const String option, uint8_t command,
-                                    SWITCH data[5]);
+                                    SWITCH data, uint8_t relayIndex);
+  String getPIRConfigurationSite(const String option, uint8_t command, PIR data,
+                                 uint8_t PIRIndex);
+
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
   /* It generates site for firmware upgrade */
