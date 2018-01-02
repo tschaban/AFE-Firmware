@@ -57,6 +57,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
+    Device.begin();
   }
 
   String page = Site.generateHeader();
@@ -154,8 +155,6 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          SWITCH data,
                                                          uint8_t switchIndex) {
 
-  Device.begin(); // Reading configuration data
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(switchIndex, data);
   }
@@ -175,8 +174,6 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
 String AFEConfigurationPanel::getPIRConfigurationSite(const String option,
                                                       uint8_t command, PIR data,
                                                       uint8_t PIRIndex) {
-  Device.begin(); // Reading configuration data
-
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(PIRIndex, data);
   }

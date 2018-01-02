@@ -32,6 +32,7 @@ private:
   const String generateSwitchItem(uint8_t id, boolean checked);
   const String generateRelayItem(uint8_t id, boolean checked);
   const String generateLEDItem(uint8_t id, boolean checked);
+  const String generatePIRItem(uint8_t id, boolean checked);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,

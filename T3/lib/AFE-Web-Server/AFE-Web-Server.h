@@ -30,6 +30,11 @@ private:
   boolean receivedHTTPCommand =
       false; // Once HTTP API requet is recieved it's set to true
 
+  boolean _refreshConfiguration =
+      false; // when it's set to true device configuration is refreshed. It's
+             // set by getPIR. It means device configuration data where update
+             // Required by generate() method
+
   /* Method pushes HTML site from WebServer */
   void publishHTML(String page);
 

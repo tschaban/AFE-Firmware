@@ -35,6 +35,12 @@ HTTPCOMMAND AFEWebServer::getHTTPCommand() {
 }
 
 void AFEWebServer::generate() {
+
+  if (_refreshConfiguration) {
+    _refreshConfiguration = false;
+    Device.begin();
+  }
+
   /* @TODO this method is not writen well */
   if (getOptionName() == "language") {
     uint8_t data;
@@ -184,6 +190,9 @@ uint8_t AFEWebServer::getCommand() {
 
 DEVICE AFEWebServer::getDeviceData() {
   DEVICE data;
+
+  _refreshConfiguration =
+      true; // it will cause that device configuration will be refeshed
 
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));

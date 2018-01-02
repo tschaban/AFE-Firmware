@@ -78,9 +78,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
               "href=\"\\?option=mqtt\">MQTT "
               "Broker</a></li>";
     }
-    page += "LED";
-    page += language == 0 ? "y" : "s";
-    page += "</a></li><li class=\"itm\"><a href=\"\\?option=led\">";
+
+    if (Device.configuration.isLED[0] || Device.configuration.isLED[1] ||
+        Device.configuration.isLED[2] || Device.configuration.isLED[3] ||
+        Device.configuration.isLED[4]) {
+      page += "<li class=\"itm\"><a href=\"\\?option=led\">LED";
+      page += language == 0 ? "y" : "s";
+      page += "</a></li>";
+    }
 
     if (Device.configuration.isRelay[0] || Device.configuration.isRelay[1] ||
         Device.configuration.isRelay[2] || Device.configuration.isRelay[3]) {
@@ -91,7 +96,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         if (Device.configuration.isRelay[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=relay";
           page += i;
-          page += "\">  - Przekaźnik #";
+          page += "\">&#8227; Przekaźnik: ";
           page += i + 1;
           page += "</a></li>";
         }
@@ -108,7 +113,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         if (Device.configuration.isSwitch[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=switch";
           page += i;
-          page += "\">  - Przycisk #";
+          page += "\">&#8227; Przycisk: ";
           page += i + 1;
           page += "</a></li>";
         }
@@ -124,7 +129,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         if (Device.configuration.isPIR[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=pir";
           page += i;
-          page += "\">  - Czujnik #";
+          page += "\">&#8227; Czujnik: ";
           page += i + 1;
           page += "</a></li>";
         }
@@ -216,8 +221,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 }
 
 String AFESitesGenerator::addDeviceConfiguration() {
-  DEVICE configuration;
-  configuration = Data.getDeviceConfiguration();
+  DEVICE configuration = Device.configuration;
 
   String body = "<fieldset><div class=\"cf\"><label>";
   body += language == 0 ? "Nazwa urządzenia" : "Device name";
@@ -262,7 +266,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += language == 0 ? "Czujniki ruchu" : "PIRs";
   body += "</label>";
   for (uint8_t i = 0; i < 4; i++) {
-    body += generateSwitchItem(i, configuration.isSwitch[i]);
+    body += generatePIRItem(i, configuration.isPIR[i]);
   }
   body += "</div>";
   body += "</fieldset>";
@@ -586,7 +590,7 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   sprintf(filed, "g%d", id);
   body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
-  body += "<label>";
+  body += "<label style=\"width: 300px;\">";
   body += "<input name=\"o";
   body += id;
   body += "\" type=\"checkbox\" value=\"1\"";
@@ -599,12 +603,7 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
 
   body += "</fieldset>";
 
-  return addConfigurationBlock(
-      "LED",
-      language == 0 ? "LED wykorzystywany jest do informowania o zdarzeniach "
-                      "lub stanie urządzenia"
-                    : "LED is used to inform about events or device status",
-      body);
+  return addConfigurationBlock("LED #" + String(id + 1), "", body);
 }
 
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
@@ -831,27 +830,44 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "</div>";
-  body += "<br><p class=\"cm\">";
-  body += language == 0
-              ? "Dioda LED może sygnalizować wykryty ruch przez czujnik"
-              : "LED can indicate motion detection by the sensor";
-  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Nazwa" : "Name";
+  body += "*</label>";
+  body += "<input name=\"n" + String(id) +
+          "\" type=\"text\" maxlength=\"16\" value=\"";
+  body += configuration.name;
+  body += "\">";
+  body += "<span class=\"hint\">Max 16 ";
+  body += language == 0 ? "znaków" : "chars";
+  body += "</span>";
+  body += "</div>";
 
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Wybierze LED" : "Select LED";
   body += "*</label>";
   body += "<select name=\"l" + String(id) + "\">";
+  body += "<option value=\"9\" ";
+  body += (configuration.ledId == 9 ? "selected=\"selected\"" : "");
+  body += ">Brak</option>";
   for (uint8_t i = 0; i < 5; i++) {
-    body += "<option value=\"";
-    body += i;
-    body += "\" ";
-    body += (configuration.ledId == i ? "selected=\"selected\"" : "");
-    body += ">";
-    body += i + 1;
-    body += "</option>";
+    if (Device.configuration.isLED[i]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\" ";
+      body += (configuration.ledId == i ? "selected=\"selected\"" : "");
+      body += ">";
+      body += i + 1;
+      body += "</option>";
+    }
   }
   body += "</select>";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "Dioda LED sygnalizuje wykryty ruch przez czujnik"
+                        : "LED indicates motion detection by the sensor";
+  body += "</span>";
   body += "</div>";
   body += "<br><p class=\"cm\">";
   body += language == 0
@@ -867,26 +883,25 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += language == 0 ? "Wybierz przekaźnik" : "Select relay";
   body += "*</label>";
   body += "<select name=\"r" + String(id) + "\">";
+  body += "<option value=\"9\" ";
+  body += (configuration.relayId == 9 ? "selected=\"selected\"" : "");
+  body += ">Brak</option>";
   for (uint8_t i = 0; i < 4; i++) {
-    body += "<option value=\"";
-    body += i;
-    body += "\" ";
-    body += (configuration.relayId == i ? "selected=\"selected\"" : "");
-    body += ">";
-    body += i + 1;
-    body += "</option>";
+    if (Device.configuration.isRelay[i]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\" ";
+      body += (configuration.relayId == i ? "selected=\"selected\"" : "");
+      body += ">";
+      body += i + 1;
+      body += "</option>";
+    }
   }
   body += "</select>";
   body += "</div>";
-  body += "<br><p class=\"cm\">";
-  body +=
-      language == 0
-          ? "Na jak długo przekaźnik ma zostać uaktywniony przez czujnik PIR"
-          : "For how long relay should be active after motion has been "
-            "detedcted by the PIR sensor";
-  body += "</p>";
+
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Czas" : "Time";
+  body += language == 0 ? "Czas uruchomienia" : "How long active";
   body += "*</label>";
   body += "<input name=\"d" + String(id) +
           "\" type=\"number\" max=\"86400\" min=\"0.01\" step=\"0.01\" "
@@ -905,8 +920,9 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "\" type=\"checkbox\" value=\"1\"";
   body += configuration.invertRelayState ? " checked=\"checked\"" : "";
   body += ">";
-  body += language == 0 ? "Wyłącz przekaźnik, gdy PIR wykruyje ruch"
-                        : "Switch off relay if PIR detected move";
+  body += language == 0 ? "Wyłącz przekaźnik, gdy PIR wykryje ruch"
+                        : "Switch off relay if PIR detects move";
+
   body += "</label>";
   body += "</div>";
 
@@ -1126,6 +1142,17 @@ const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
   String body = "<label style=\"width:40px\">#";
   body += id + 1;
   body += "<input name=\"l";
+  body += id;
+  body += "\" type =\"checkbox\" value=\"1\"";
+  body += checked ? " checked=\"checked\"" : "";
+  body += "></label>";
+  return body;
+}
+
+const String AFESitesGenerator::generatePIRItem(uint8_t id, boolean checked) {
+  String body = "<label style=\"width:40px\">#";
+  body += id + 1;
+  body += "<input name=\"p";
   body += id;
   body += "\" type =\"checkbox\" value=\"1\"";
   body += checked ? " checked=\"checked\"" : "";

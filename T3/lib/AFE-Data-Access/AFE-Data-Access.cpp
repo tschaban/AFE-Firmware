@@ -136,7 +136,7 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   Eeprom.read(507 + id * nextPIR, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 
-  configuration.ledId = Eeprom.readUInt8(52 + id * nextPIR);
+  configuration.ledId = Eeprom.readUInt8(524 + id * nextPIR);
   configuration.relayId = Eeprom.readUInt8(525 + id * nextPIR);
   configuration.howLongKeepRelayOn = Eeprom.read(526 + id * nextPIR, 5).toInt();
   configuration.invertRelayState = Eeprom.read(531 + id * nextPIR);
