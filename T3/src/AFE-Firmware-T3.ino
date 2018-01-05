@@ -7,6 +7,7 @@
 #include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
+#include <AFE-PIR.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -24,6 +25,7 @@ AFESwitch Switch;
 AFESwitch ExternalSwitch;
 AFERelay Relay;
 MQTT MQTTConfiguration;
+AFEPIR Pir;
 
 void setup() {
 
@@ -76,6 +78,8 @@ void setup() {
     ExternalSwitch.begin(1);
   }
 
+  Pir.begin(0);
+
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
     MQTTConfiguration = Data.getMQTTConfiguration();
@@ -114,13 +118,6 @@ void loop() {
         /* Relay related code */
         if (Device.configuration.isRelay[0]) {
 
-          /* Relay turn off event launched */
-          if (Relay.autoTurnOff()) {
-            Led.on();
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-            Led.off();
-          }
-
           /* One of the switches has been shortly pressed */
           if (Switch.isPressed() || ExternalSwitch.isPressed()) {
             Led.on();
@@ -129,6 +126,17 @@ void loop() {
             Led.off();
           }
         }
+
+        if (Device.configuration.isPIR[0]) {
+          if (Pir.stateChanged()) {
+            if (Pir.getState()) {
+              Relay.on();
+            } else {
+              Relay.off();
+            }
+          }
+        }
+
       } else { // Configuration Mode
         WebServer.listener();
       }
@@ -159,6 +167,8 @@ void loop() {
     Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                     : Device.reboot(MODE_NORMAL);
   }
+
+  Pir.listener();
 
   Led.loop();
 }

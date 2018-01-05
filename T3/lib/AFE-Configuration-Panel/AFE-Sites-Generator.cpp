@@ -124,7 +124,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         Device.configuration.isPIR[2] || Device.configuration.isPIR[3]) {
 
       page += "<li class=\"itm\"><a  style=\"color:#aaaaaa;\">Konfiguracja "
-              "czujników ruch</a></li>";
+              "czujników ruchu (PIR)</a></li>";
       for (uint8_t i = 0; i < 4; i++) {
         if (Device.configuration.isPIR[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=pir";
