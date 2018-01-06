@@ -69,6 +69,10 @@ public:
 
   /* Methods returns relay name */
   const char *getName();
+
+  void setTimer(float timer);
+
+  void clearTimer();
 };
 
 #endif

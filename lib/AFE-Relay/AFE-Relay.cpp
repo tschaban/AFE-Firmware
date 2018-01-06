@@ -90,3 +90,7 @@ boolean AFERelay::autoTurnOff() {
 }
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
+
+void AFERelay::setTimer(float timer) { RelayConfiguration.timeToOff += timer; }
+
+void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
