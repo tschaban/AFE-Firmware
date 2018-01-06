@@ -130,7 +130,9 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   PIR configuration;
+  MQTT configurationMQTT;
   uint8_t nextPIR = 27;
+  char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(506 + id * nextPIR);
 
   Eeprom.read(507 + id * nextPIR, 16)
@@ -140,6 +142,12 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   configuration.relayId = Eeprom.readUInt8(525 + id * nextPIR);
   configuration.howLongKeepRelayOn = Eeprom.read(526 + id * nextPIR, 5).toInt();
   configuration.invertRelayState = Eeprom.read(531 + id * nextPIR);
+
+  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
+                                   sizeof(configurationMQTT.topic));
+
+  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
+          configuration.name);
 
   return configuration;
 }

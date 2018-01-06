@@ -23,6 +23,7 @@
 #define SWITCH_RELAY_2 12
 #define SWITCH_RELAY_3 13
 #define SWITCH_RELAY_4 14
+
 /* Relay states */
 #define RELAY_ON 1
 #define RELAY_OFF 0
@@ -140,6 +141,7 @@ struct PIR {
   uint8_t gpio;
   char name[16];
   boolean state;
+  char mqttTopic[49];
   uint8_t ledId;
   uint8_t relayId;
   uint16_t howLongKeepRelayOn;
