@@ -19,7 +19,6 @@
 class AFEPIR {
 
 private:
-  PIR PIRConfiguration;
   boolean _initialized = false;
   boolean _stateChanged = false;
   boolean state;
@@ -27,6 +26,8 @@ private:
   AFELED Led;
 
 public:
+  PIR Configuration;
+
   /* Constructors */
   AFEPIR();
   AFEPIR(uint8_t id);
@@ -34,8 +35,8 @@ public:
   /* Init PIR */
   void begin(uint8_t id);
 
-  boolean getState();
-
+  byte get();
+  const char *getMQTTTopic();
   boolean stateChanged();
 
   void listener();

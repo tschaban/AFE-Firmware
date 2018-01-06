@@ -10,20 +10,24 @@ AFEPIR::AFEPIR(uint8_t id) { begin(id); }
 
 void AFEPIR::begin(uint8_t id) {
   AFEDataAccess Data;
-  PIRConfiguration = Data.getPIRConfiguration(id);
-  pinMode(PIRConfiguration.gpio, INPUT_PULLUP);
-  state = digitalRead(PIRConfiguration.gpio);
+  Configuration = Data.getPIRConfiguration(id);
+  pinMode(Configuration.gpio, INPUT_PULLUP);
+  state = digitalRead(Configuration.gpio);
   Led.begin(1);
   _initialized = true;
 }
 
 boolean AFEPIR::stateChanged() { _stateChanged = false; }
 
-boolean AFEPIR::getState() { return state; }
+byte AFEPIR::get() {
+  return digitalRead(Configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
+}
+
+const char *AFEPIR::getMQTTTopic() { return Configuration.mqttTopic; }
 
 void AFEPIR::listener() {
   if (_initialized) {
-    boolean currentState = digitalRead(PIRConfiguration.gpio);
+    boolean currentState = digitalRead(Configuration.gpio);
     if (currentState != state) {
       state = currentState;
       _stateChanged = true;
