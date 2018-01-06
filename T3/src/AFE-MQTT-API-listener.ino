@@ -21,26 +21,27 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                            Serial << (char)payload[i];
                          }
                      */
-    sprintf(_mqttTopic, "%scmd", Relay.getMQTTTopic());
-    /*
-        Serial << endl
-               << "DEBUG: "
-               << "checking relay messages: " << _mqttTopic;
-    */
-    if (strcmp(topic, _mqttTopic) == 0) {
-      if ((char)payload[1] == 'n') {
-        Relay.on();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
-      } else if ((char)payload[1] == 'f') {
-        Relay.off();
-        Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-      } else if ((char)payload[1] == 'e') { // reportState
-        Mqtt.publish(Relay.getMQTTTopic(), "state",
-                     Relay.get() == RELAY_ON ? "on" : "off");
-      } else if ((char)payload[1] == 'o') { // toggle
-        Relay.get() == RELAY_ON ? Relay.off() : Relay.on();
-        Mqtt.publish(Relay.getMQTTTopic(), "state",
-                     Relay.get() == RELAY_ON ? "on" : "off");
+
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isRelay[i]) {
+        sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
+
+        if (strcmp(topic, _mqttTopic) == 0) {
+          if ((char)payload[1] == 'n') {
+            Relay[i].on();
+            Mqtt.publish(Relay[i].getMQTTTopic(), "state", "on");
+          } else if ((char)payload[1] == 'f') {
+            Relay[i].off();
+            Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
+          } else if ((char)payload[1] == 'e') { // reportState
+            Mqtt.publish(Relay[i].getMQTTTopic(), "state",
+                         Relay[i].get() == RELAY_ON ? "on" : "off");
+          } else if ((char)payload[1] == 'o') { // toggle
+            Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
+            Mqtt.publish(Relay[i].getMQTTTopic(), "state",
+                         Relay[i].get() == RELAY_ON ? "on" : "off");
+          }
+        }
       }
     }
 
@@ -64,12 +65,19 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */
-void MQTTPublishRelayState() {
+void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    if (Relay.get() == RELAY_ON) {
-      Mqtt.publish(Relay.getMQTTTopic(), "state", "on");
-    } else {
-      Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-    }
+    Relay[id].get() == RELAY_ON
+        ? Mqtt.publish(Relay[id].getMQTTTopic(), "state", "on")
+        : Mqtt.publish(Relay[id].getMQTTTopic(), "state", "off");
+  }
+}
+
+/* Metod publishes Relay state (used eg by HTTP API) */
+void MQTTPublishPIRState(uint8_t id) {
+  if (Device.configuration.mqttAPI) {
+    Pir[id].get() == PIR_OPEN
+        ? Mqtt.publish(Pir[id].getMQTTTopic(), "state", "open")
+        : Mqtt.publish(Pir[id].getMQTTTopic(), "state", "close");
   }
 }
