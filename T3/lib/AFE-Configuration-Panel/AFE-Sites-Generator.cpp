@@ -762,16 +762,26 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += language == 0 ? "Funkcja" : "Functionality";
   body += "</label>";
   body += "<select name=\"f" + String(id) + "\">";
-  body += "<option value=\"11\"";
-  body += (configuration.functionality == 11 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Sterowanie przekaźnikiem" : "Relay control";
-  body += "</option>";
   body += "<option value=\"0\"";
   body += (configuration.functionality == 0 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Multifunkcyjny" : "Multifunction";
+  body += language == 0 ? "Kontrola urządzenia" : "Device controll";
   body += "</option>";
+
+  for (uint8_t i = 0; i < 4; i++) {
+    if (Device.configuration.isRelay[i]) {
+      body += "<option value=\"";
+      body += 11 + i;
+      body += "\"";
+      body +=
+          configuration.functionality == 11 + i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += language == 0 ? "Sterowanie przekaźnikiem #" : "Relay #";
+      body += i + 1;
+      body += language == 1 ? "control" : "";
+      body += "</option>";
+    }
+  }
   body += "</select>";
   body += "</div>";
 
