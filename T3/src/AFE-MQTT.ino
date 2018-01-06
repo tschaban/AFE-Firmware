@@ -68,14 +68,19 @@ void AFEMQTT::connect() {
                       Serial << endl << "INFO: Subsribed";
           */
           // Setting Relay state after connection to MQTT
-          if (!Relay.setRelayAfterRestoringMQTTConnection()) {
-            // Requesting state from MQTT Broker / service
-            publish(Relay.getMQTTTopic(), "get", "defaultState");
-          } else {
-            // Updating relay state after setting default value after MQTT
-            // connected
-            publish(Relay.getMQTTTopic(), "state",
-                    Relay.get() == RELAY_ON ? "on" : "off");
+
+          for (uint8_t i = 0; i < 4; i++) {
+            if (Device.configuration.isRelay[i]) {
+              if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
+                // Requesting state from MQTT Broker / service
+                publish(Relay[i].getMQTTTopic(), "get", "defaultState");
+              } else {
+                // Updating relay state after setting default value after MQTT
+                // connected
+                publish(Relay[i].getMQTTTopic(), "state",
+                        Relay[i].get() == RELAY_ON ? "on" : "off");
+              }
+            }
           }
         } else {
           connections++;
