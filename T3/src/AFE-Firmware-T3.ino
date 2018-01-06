@@ -21,11 +21,11 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEWebServer WebServer;
 AFELED Led;
-AFESwitch Switch;
+AFESwitch Switch[5];
 AFESwitch ExternalSwitch;
-AFERelay Relay;
+AFERelay Relay[4];
 MQTT MQTTConfiguration;
-AFEPIR Pir;
+AFEPIR Pir[4];
 
 void setup() {
 
@@ -54,9 +54,13 @@ void setup() {
   }
 
   /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
-    Relay.begin(0);
-    Relay.setRelayAfterRestoringPower();
+  if (Device.getMode() == MODE_NORMAL) {
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isRelay[i]) {
+        Relay[i].begin(i);
+        Relay[i].setRelayAfterRestoringPower();
+      }
+    }
   }
 
   /* Initialzing network */
@@ -71,14 +75,18 @@ void setup() {
   }
 
   /* Initializing Switches */
-  if (Device.configuration.isSwitch[0]) {
-    Switch.begin(0);
-  }
-  if (Device.configuration.isSwitch[1]) {
-    ExternalSwitch.begin(1);
+  for (uint8_t i = 0; i < 5; i++) {
+    if (Device.configuration.isSwitch[i]) {
+      Switch[i].begin(i);
+    }
   }
 
-  Pir.begin(0);
+  /* Initializing PIRs */
+  for (uint8_t i = 0; i < 4; i++) {
+    if (Device.configuration.isPIR[i]) {
+      Pir[i].begin(i);
+    }
+  }
 
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
@@ -115,24 +123,42 @@ void loop() {
           }
         }
 
-        /* Relay related code */
-        if (Device.configuration.isRelay[0]) {
-
-          /* One of the switches has been shortly pressed */
-          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-            Led.on();
-            Relay.toggle();
-            MQTTPublishRelayState(); // MQTT Listener library
-            Led.off();
+        /* Switch related code */
+        for (uint8_t i = 0; i < 5; i++) {
+          if (Device.configuration.isSwitch[i]) {
+            /* One of the switches has been shortly pressed */
+            if (Switch[i].isPressed() && Switch[i].getFunctionality() != 0) {
+              Led.on();
+              Relay[Switch[i].getFunctionality() - 11 + i].toggle();
+              MQTTPublishRelayState(Switch[i].getFunctionality() - 11 +
+                                    i); // MQTT Listener library
+              Led.off();
+            }
           }
         }
 
-        if (Device.configuration.isPIR[0]) {
-          if (Pir.stateChanged()) {
-            if (Pir.getState()) {
-              Relay.on();
-            } else {
-              Relay.off();
+        for (uint8_t i = 0; i < 4; i++) {
+          if (Device.configuration.isPIR[i]) {
+            if (Pir[i].stateChanged()) {
+              Led.on();
+              MQTTPublishPIRState(i);
+              if (Pir[i].Configuration.relayId != 9 &&
+                  Pir[i].get() == PIR_OPEN) { // 9 is none
+                Relay[i].setTimer(Pir[i].Configuration.howLongKeepRelayOn);
+                Relay[Pir[i].Configuration.relayId].on();
+              }
+              Led.off();
+            }
+          }
+        }
+
+        for (uint8_t i = 0; i < 4; i++) {
+          if (Device.configuration.isRelay[i]) {
+            if (Relay[i].autoTurnOff()) {
+              Led.on();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
+              Relay[i].clearTimer();
+              Led.off();
             }
           }
         }
@@ -149,26 +175,32 @@ void loop() {
   }
 
   /* Listens for switch events */
-  Switch.listener();
-  ExternalSwitch.listener();
-
-  /* One of the Multifunction switches pressed for 10 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is10s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is10s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
-                                    : Device.reboot(MODE_NORMAL);
+  for (uint8_t i = 0; i < 5; i++) {
+    if (Device.configuration.isSwitch[i]) {
+      Switch[i].listener();
+    }
   }
 
-  /* One of the Multifunction switches pressed for 5 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is5s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is5s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
-                                    : Device.reboot(MODE_NORMAL);
+  for (uint8_t i = 0; i < 5; i++) {
+    if (Device.configuration.isSwitch[i]) {
+      /* One of the Multifunction switches pressed for 10 seconds */
+      if (Switch[i].getFunctionality() == SWITCH_MULTI) {
+        if (Switch[i].is10s()) {
+          Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
+                                          : Device.reboot(MODE_NORMAL);
+        } else if (Switch[i].is5s()) {
+          Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
+                                          : Device.reboot(MODE_NORMAL);
+        }
+      }
+    }
   }
 
-  Pir.listener();
+  for (uint8_t i = 0; i < 4; i++) {
+    if (Device.configuration.isPIR[i]) {
+      Pir[i].listener();
+    }
+  }
 
   Led.loop();
 }
