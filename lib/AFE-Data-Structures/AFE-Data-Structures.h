@@ -19,10 +19,10 @@
 #define SWITCH_MULTI 0
 // Not used yet #define SWITCH_CONFIG 1
 // Not used yet #define SWITCH_REBOOT 2
-#define SWITCH_RELAY_1 11
-#define SWITCH_RELAY_2 12
-#define SWITCH_RELAY_3 13
-#define SWITCH_RELAY_4 14
+//#define SWITCH_RELAY_1 11
+//#define SWITCH_RELAY_2 12
+//#define SWITCH_RELAY_3 13
+//#define SWITCH_RELAY_4 14
 
 /* Relay states */
 #define RELAY_ON 1

@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <PubSubClient.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 #include <WiFiClient.h>
 
 class AFEMQTT {

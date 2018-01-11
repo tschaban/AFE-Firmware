@@ -17,7 +17,14 @@ void AFEPIR::begin(uint8_t id) {
   _initialized = true;
 }
 
-boolean AFEPIR::stateChanged() { _stateChanged = false; }
+boolean AFEPIR::stateChanged() {
+  if (_stateChanged) {
+    _stateChanged = false;
+    return true;
+  } else {
+    return false;
+  }
+}
 
 byte AFEPIR::get() {
   return digitalRead(Configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
@@ -29,6 +36,7 @@ void AFEPIR::listener() {
   if (_initialized) {
     boolean currentState = digitalRead(Configuration.gpio);
     if (currentState != state) {
+      Serial << endl << currentState << "=" << state;
       state = currentState;
       _stateChanged = true;
       state ? Led.on() : Led.off();

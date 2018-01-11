@@ -33,7 +33,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  // Serial.swap();
+  //  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -111,7 +111,6 @@ void loop() {
         if (Device.configuration.mqttAPI) {
           Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
         }
-
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
@@ -141,9 +140,10 @@ void loop() {
           if (Device.configuration.isPIR[i]) {
             if (Pir[i].stateChanged()) {
               Led.on();
-              MQTTPublishPIRState(i);
+              //    MQTTPublishPIRState(i);
               if (Pir[i].Configuration.relayId != 9 &&
                   Pir[i].get() == PIR_OPEN) { // 9 is none
+                Serial << endl << "seting time and turning it on";
                 Relay[i].setTimer(Pir[i].Configuration.howLongKeepRelayOn);
                 Relay[Pir[i].Configuration.relayId].on();
               }
