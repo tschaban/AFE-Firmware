@@ -38,6 +38,8 @@ public:
   byte get();
   const char *getMQTTTopic();
   boolean stateChanged();
+  /* Methods returns pir name */
+  const char *getName();
 
   void listener();
 };

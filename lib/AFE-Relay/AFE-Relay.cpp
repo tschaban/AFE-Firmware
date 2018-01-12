@@ -83,6 +83,8 @@ boolean AFERelay::autoTurnOff() {
   if (RelayConfiguration.timeToOff > 0 && get() == RELAY_ON &&
       millis() - turnOffCounter >= RelayConfiguration.timeToOff * 1000) {
     off();
+    Serial << endl
+           << "Turned off after: " << RelayConfiguration.timeToOff << "s.";
     return true;
   } else {
     return false;
@@ -91,6 +93,9 @@ boolean AFERelay::autoTurnOff() {
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
 
-void AFERelay::setTimer(float timer) { RelayConfiguration.timeToOff += timer; }
+void AFERelay::setTimer(float timer) {
+  RelayConfiguration.timeToOff += timer;
+  Serial << endl << "Timer set to: " << RelayConfiguration.timeToOff;
+}
 
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }

@@ -36,10 +36,11 @@ void AFEPIR::listener() {
   if (_initialized) {
     boolean currentState = digitalRead(Configuration.gpio);
     if (currentState != state) {
-      Serial << endl << currentState << "=" << state;
       state = currentState;
       _stateChanged = true;
       state ? Led.on() : Led.off();
     }
   }
 }
+
+const char *AFEPIR::getName() { return Configuration.name; }

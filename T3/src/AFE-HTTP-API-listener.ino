@@ -43,6 +43,12 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
+void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
+                                 byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == PIR_OPEN ? "open" : "close");
+}
+
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
@@ -82,6 +88,26 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       /* No such relay */
     }
     if (noRelay) {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  } else if (strcmp(request.device, "pir") == 0) {
+    byte state;
+    boolean noPir = true;
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isPIR[i]) {
+        if (strcmp(request.name, Pir[i].getName()) == 0) {
+          noPir = false;
+          if (strcmp(request.command, "get") == 0) { // get
+            sendHTTPAPIPirRequestStatus(request, true, Pir[i].get());
+            /* Command not implemented.Info */
+          } else {
+            sendHTTPAPIRequestStatus(request, false);
+          }
+        }
+      }
+      /* No such Pir */
+    }
+    if (noPir) {
       sendHTTPAPIRequestStatus(request, false);
     }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot

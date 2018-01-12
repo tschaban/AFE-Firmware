@@ -122,6 +122,13 @@ void loop() {
           }
         }
 
+        /* PIR Senosr listener */
+        for (uint8_t i = 0; i < 4; i++) {
+          if (Device.configuration.isPIR[i]) {
+            Pir[i].listener();
+          }
+        }
+
         /* Switch related code */
         for (uint8_t i = 0; i < 5; i++) {
           if (Device.configuration.isSwitch[i]) {
@@ -140,12 +147,13 @@ void loop() {
           if (Device.configuration.isPIR[i]) {
             if (Pir[i].stateChanged()) {
               Led.on();
-              //    MQTTPublishPIRState(i);
+              MQTTPublishPIRState(i);
               if (Pir[i].Configuration.relayId != 9 &&
                   Pir[i].get() == PIR_OPEN) { // 9 is none
                 Serial << endl << "seting time and turning it on";
                 Relay[i].setTimer(Pir[i].Configuration.howLongKeepRelayOn);
                 Relay[Pir[i].Configuration.relayId].on();
+                MQTTPublishRelayState(Pir[i].Configuration.relayId);
               }
               Led.off();
             }
@@ -193,12 +201,6 @@ void loop() {
                                           : Device.reboot(MODE_NORMAL);
         }
       }
-    }
-  }
-
-  for (uint8_t i = 0; i < 4; i++) {
-    if (Device.configuration.isPIR[i]) {
-      Pir[i].listener();
     }
   }
 

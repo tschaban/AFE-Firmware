@@ -33,13 +33,23 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           } else if ((char)payload[1] == 'f') {
             Relay[i].off();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
-          } else if ((char)payload[1] == 'e') { // reportState
-            Mqtt.publish(Relay[i].getMQTTTopic(), "state",
-                         Relay[i].get() == RELAY_ON ? "on" : "off");
+          } else if ((char)payload[1] == 'e') {
+            MQTTPublishRelayState(i);
           } else if ((char)payload[1] == 'o') { // toggle
             Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "state",
-                         Relay[i].get() == RELAY_ON ? "on" : "off");
+            MQTTPublishRelayState(i);
+          }
+        }
+      }
+    }
+
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isPIR[i]) {
+        sprintf(_mqttTopic, "%scmd", Pir[i].getMQTTTopic());
+
+        if (strcmp(topic, _mqttTopic) == 0) {
+          if ((char)payload[1] == 'e') { // get
+            MQTTPublishPIRState(i);
           }
         }
       }
@@ -67,17 +77,15 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    Relay[id].get() == RELAY_ON
-        ? Mqtt.publish(Relay[id].getMQTTTopic(), "state", "on")
-        : Mqtt.publish(Relay[id].getMQTTTopic(), "state", "off");
+    Mqtt.publish(Relay[id].getMQTTTopic(), "state",
+                 Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishPIRState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    Pir[id].get() == PIR_OPEN
-        ? Mqtt.publish(Pir[id].getMQTTTopic(), "state", "open")
-        : Mqtt.publish(Pir[id].getMQTTTopic(), "state", "close");
+    Mqtt.publish(Pir[id].getMQTTTopic(), "state",
+                 Pir[id].get() == PIR_OPEN ? "open" : "close");
   }
 }

@@ -61,8 +61,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-  page += language == 0 ? "4 włączniki i czujniki ruchu WiFi"
-                        : "4 WiFi switches and PIR sensors";
+  page += language == 0 ? "dla 4 włączników i czujników ruchu"
+                        : "for 4 WiFi switches and PIR sensors";
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -718,26 +718,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</select>";
   body += "</div>";
 
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
-                        : "Automatic switching off of the relay";
-  body += "</p>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Wyłącz po" : "Switch off after";
-  body += "*</label>";
-  body +=
-      "<input name=\"t" + String(id) +
-      "\" type=\"number\" step=\"0.01\" max=\"86400\" min=\"0.00\" value=\"";
-  body += configuration.timeToOff;
-  body += "\">";
-  body += "<span class=\"hint\">0.01 - 86400";
-  body += language == 0 ? "sekund (24h). Brak akcji jeśli jest 0"
-                        : "seconds (24h). No action if it's set to 0";
-  body += "</span>";
-  body += "</div>";
-
   body += "</fieldset>";
 
   char title[23];
@@ -856,7 +836,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Wybierze LED" : "Select LED";
+  body += language == 0 ? "LED" : "LED";
   body += "*</label>";
   body += "<select name=\"l" + String(id) + "\">";
   body += "<option value=\"9\" ";
@@ -882,7 +862,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "<br><p class=\"cm\">";
   body += language == 0
               ? "Czujnik PIR może bezpośrednio sterować jednym przekaźnikiem. "
-                "Poniżej możesz wybrać, którym oraz ustawić dodatkowe "
+                "Poniżej możesz wybrać którym oraz ustawić dodatkowe "
                 "parametry sterowania"
               : "Motion detector can control a relay assigned to the sesnor. "
                 "Below you can choose a one and set additional parameters";
