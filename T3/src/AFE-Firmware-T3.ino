@@ -22,10 +22,9 @@ AFEMQTT Mqtt;
 AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[5];
-AFESwitch ExternalSwitch;
 AFERelay Relay[4];
-MQTT MQTTConfiguration;
 AFEPIR Pir[4];
+MQTT MQTTConfiguration;
 
 void setup() {
 
@@ -74,19 +73,11 @@ void setup() {
     Led.blinkingOn(100);
   }
 
-  /* Initializing Switches */
-  for (uint8_t i = 0; i < 5; i++) {
-    if (Device.configuration.isSwitch[i]) {
-      Switch[i].begin(i);
-    }
-  }
+  /* Initializing switches */
+  initSwitch();
 
   /* Initializing PIRs */
-  for (uint8_t i = 0; i < 4; i++) {
-    if (Device.configuration.isPIR[i]) {
-      Pir[i].begin(i);
-    }
-  }
+  initPIR();
 
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
@@ -113,63 +104,9 @@ void loop() {
         }
         WebServer.listener();
 
-        /* Checking if there was received HTTP API Command */
-        if (Device.configuration.httpAPI) {
-          if (WebServer.httpAPIlistener()) {
-            Led.on();
-            processHTTPAPIRequest(WebServer.getHTTPCommand());
-            Led.off();
-          }
-        }
-
-        /* PIR Senosr listener */
-        for (uint8_t i = 0; i < 4; i++) {
-          if (Device.configuration.isPIR[i]) {
-            Pir[i].listener();
-          }
-        }
-
-        /* Switch related code */
-        for (uint8_t i = 0; i < 5; i++) {
-          if (Device.configuration.isSwitch[i]) {
-            /* One of the switches has been shortly pressed */
-            if (Switch[i].isPressed() && Switch[i].getFunctionality() != 0) {
-              Led.on();
-              Relay[Switch[i].getFunctionality() - 11 + i].toggle();
-              MQTTPublishRelayState(Switch[i].getFunctionality() - 11 +
-                                    i); // MQTT Listener library
-              Led.off();
-            }
-          }
-        }
-
-        for (uint8_t i = 0; i < 4; i++) {
-          if (Device.configuration.isPIR[i]) {
-            if (Pir[i].stateChanged()) {
-              Led.on();
-              MQTTPublishPIRState(i);
-              if (Pir[i].Configuration.relayId != 9 &&
-                  Pir[i].get() == PIR_OPEN) { // 9 is none
-                Serial << endl << "seting time and turning it on";
-                Relay[i].setTimer(Pir[i].Configuration.howLongKeepRelayOn);
-                Relay[Pir[i].Configuration.relayId].on();
-                MQTTPublishRelayState(Pir[i].Configuration.relayId);
-              }
-              Led.off();
-            }
-          }
-        }
-
-        for (uint8_t i = 0; i < 4; i++) {
-          if (Device.configuration.isRelay[i]) {
-            if (Relay[i].autoTurnOff()) {
-              Led.on();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
-              Relay[i].clearTimer();
-              Led.off();
-            }
-          }
-        }
+        mainHTTPRequestsHandler();
+        mainSwitch();
+        mainPIR();
 
       } else { // Configuration Mode
         WebServer.listener();
@@ -182,27 +119,7 @@ void loop() {
     WebServer.listener();
   }
 
-  /* Listens for switch events */
-  for (uint8_t i = 0; i < 5; i++) {
-    if (Device.configuration.isSwitch[i]) {
-      Switch[i].listener();
-    }
-  }
-
-  for (uint8_t i = 0; i < 5; i++) {
-    if (Device.configuration.isSwitch[i]) {
-      /* One of the Multifunction switches pressed for 10 seconds */
-      if (Switch[i].getFunctionality() == SWITCH_MULTI) {
-        if (Switch[i].is10s()) {
-          Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
-                                          : Device.reboot(MODE_NORMAL);
-        } else if (Switch[i].is5s()) {
-          Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
-                                          : Device.reboot(MODE_NORMAL);
-        }
-      }
-    }
-  }
+  mainSwitchListener();
 
   Led.loop();
 }
