@@ -26,7 +26,7 @@ private:
   AFELED Led;
 
 public:
-  PIR Configuration;
+  PIR configuration;
 
   /* Constructors */
   AFEPIR();

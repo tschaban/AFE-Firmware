@@ -10,10 +10,10 @@ AFEPIR::AFEPIR(uint8_t id) { begin(id); }
 
 void AFEPIR::begin(uint8_t id) {
   AFEDataAccess Data;
-  Configuration = Data.getPIRConfiguration(id);
-  pinMode(Configuration.gpio, INPUT_PULLUP);
-  state = digitalRead(Configuration.gpio);
-  Led.begin(1);
+  configuration = Data.getPIRConfiguration(id);
+  pinMode(configuration.gpio, INPUT_PULLUP);
+  state = digitalRead(configuration.gpio);
+  Led.begin(configuration.ledId);
   _initialized = true;
 }
 
@@ -27,14 +27,14 @@ boolean AFEPIR::stateChanged() {
 }
 
 byte AFEPIR::get() {
-  return digitalRead(Configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
+  return digitalRead(configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
 }
 
-const char *AFEPIR::getMQTTTopic() { return Configuration.mqttTopic; }
+const char *AFEPIR::getMQTTTopic() { return configuration.mqttTopic; }
 
 void AFEPIR::listener() {
   if (_initialized) {
-    boolean currentState = digitalRead(Configuration.gpio);
+    boolean currentState = digitalRead(configuration.gpio);
     if (currentState != state) {
       state = currentState;
       _stateChanged = true;
@@ -43,4 +43,4 @@ void AFEPIR::listener() {
   }
 }
 
-const char *AFEPIR::getName() { return Configuration.name; }
+const char *AFEPIR::getName() { return configuration.name; }
