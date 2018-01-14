@@ -22,7 +22,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                          }
                      */
 
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
         sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
 
@@ -43,7 +43,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
 
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
       if (Device.configuration.isPIR[i]) {
         sprintf(_mqttTopic, "%scmd", Pir[i].getMQTTTopic());
 
