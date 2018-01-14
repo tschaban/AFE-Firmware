@@ -6,8 +6,6 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0rc1"; }
-uint8_t AFEDefaults::getFirmwareType() { return 3; }
 void AFEDefaults::set() {
 
   AFEDataAccess *Data;
@@ -21,8 +19,8 @@ void AFEDefaults::set() {
   LED LEDConfiguration;
   PIR PIRConfiguration;
 
-  sprintf(firmwareConfiguration.version, getFirmwareVersion());
-  firmwareConfiguration.type = getFirmwareType();
+  sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
+  firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
 
@@ -32,19 +30,19 @@ void AFEDefaults::set() {
   sprintf(deviceConfiguration.name, "AFE-Device");
 
   deviceConfiguration.isLED[0] = true;
-  for (uint8_t i = 1; i < 5; i++) {
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
   }
 
-  for (uint8_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
     deviceConfiguration.isSwitch[i] = false;
   }
 
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
     deviceConfiguration.isRelay[i] = false;
   }
 
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
     deviceConfiguration.isPIR[0] = false;
   }
 

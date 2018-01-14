@@ -11,8 +11,8 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
 //#include <Streaming.h>
 
@@ -22,12 +22,6 @@ private:
 
 public:
   AFEDefaults();
-
-  /* Method returns firmware version number */
-  const char *getFirmwareVersion();
-
-  /* Method returns firmware version type */
-  uint8_t getFirmwareType();
 
   /* Method erases EEPROM */
   void eraseConfiguration();
