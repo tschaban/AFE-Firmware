@@ -3,8 +3,8 @@
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
+#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <AFE-PIR.h>
@@ -21,9 +21,9 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEWebServer WebServer;
 AFELED Led;
-AFESwitch Switch[5];
-AFERelay Relay[4];
-AFEPIR Pir[4];
+AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
+AFERelay Relay[sizeof(Device.configuration.isRelay)];
+AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 MQTT MQTTConfiguration;
 
 void setup() {
@@ -54,7 +54,7 @@ void setup() {
 
   /* Initializing relay and setting it's default state at power on*/
   if (Device.getMode() == MODE_NORMAL) {
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
         Relay[i].begin(i);
         Relay[i].setRelayAfterRestoringPower();
