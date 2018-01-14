@@ -16,11 +16,6 @@
 #include <AFE-LED.h>
 //#include <Streaming.h>
 
-/* Types of switch */
-
-#define SWITCH_TYPE_MONO 0 // Mono stable switch
-#define SWITCH_TYPE_BI 1   // Bistable switch
-
 class AFESwitch {
 
 private:

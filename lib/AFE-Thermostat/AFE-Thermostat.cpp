@@ -6,7 +6,7 @@
 
 AFEThermostat::AFEThermostat(){};
 
-void AFEThermostat::begin(uint8_t relayID, RELAYSTAT config) {
+void AFEThermostat::begin(uint8_t relayID, REGUALTOR config) {
   configuration = config;
   _relayID = relayID;
 }

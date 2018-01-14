@@ -19,7 +19,7 @@ class AFEThermostat {
 private:
   boolean ready = false;
   uint8_t _relayID;
-  RELAYSTAT configuration;
+  REGUALTOR configuration;
   byte relayState;
   /* Method enables / disables thermostat */
   void enable(boolean state);
@@ -29,7 +29,7 @@ public:
   AFEThermostat();
 
   /* Method initialize thermostat */
-  void begin(uint8_t relayID, RELAYSTAT config);
+  void begin(uint8_t relayID, REGUALTOR config);
 
   /* Method returns true if thermostat is enabled */
   boolean enabled();

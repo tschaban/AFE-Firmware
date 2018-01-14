@@ -11,13 +11,10 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Data-Access.h>
+#include <AFE-Data-Structures.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
-#include <AFE-Data-Structures.h>
-#include <AFE-Data-Access.h>
-
-#define UNIT_CELCIUS 0
-#define UNIT_FAHRENHEIT 1
 
 class AFESensorDS18B20 {
 
@@ -39,17 +36,17 @@ public:
     - UNIT_FAHRENHEIT
   */
 
-
-  // @TODO I think reading temp should be made in the listener, issue to solve how to get temperature but publish only changes
+  // @TODO I think reading temp should be made in the listener, issue to solve
+  // how to get temperature but publish only changes
   float get();
 
   float getLatest();
 
   boolean isReady();
 
-  /* Method has to be added to the loop in order to listen for sensor value changes */
+  /* Method has to be added to the loop in order to listen for sensor value
+   * changes */
   void listener();
-
 };
 
 #endif

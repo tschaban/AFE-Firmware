@@ -35,12 +35,19 @@ public:
   /* Init PIR */
   void begin(uint8_t id);
 
+  /* Returns PIR State */
   byte get();
+
+  /* Returns PIR MQTT Topic */
   const char *getMQTTTopic();
+
+  /* Returns true is PIR state changed */
   boolean stateChanged();
-  /* Methods returns pir name */
+
+  /* Methods returns PIR name */
   const char *getName();
 
+  /* Method should be added to main loop to listen for PIR events */
   void listener();
 };
 

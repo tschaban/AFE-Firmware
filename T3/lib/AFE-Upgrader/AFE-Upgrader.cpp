@@ -10,9 +10,8 @@ AFEUpgrader::AFEUpgrader() {
 
 boolean AFEUpgrader::upgraded() {
 
-  if (strcmp(FirmwareConfiguration.version, Defaults.getFirmwareVersion()) ==
-          0 &&
-      FirmwareConfiguration.type == Defaults.getFirmwareType()) {
+  if (strcmp(FirmwareConfiguration.version, FIRMWARE_VERSION) == 0 &&
+      FirmwareConfiguration.type == FIRMWARE_TYPE) {
     return false;
   } else {
     return true;
@@ -20,16 +19,10 @@ boolean AFEUpgrader::upgraded() {
 }
 
 void AFEUpgrader::upgrade() {
-  if (FirmwareConfiguration.type != Defaults.getFirmwareType()) {
+  if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
-    if (strcmp(FirmwareConfiguration.version, "1.0rc1") == 0 &&
-        strcmp(FirmwareConfiguration.version, "1.0rc2") == 0) {
-      Defaults.eraseConfiguration();
-      Defaults.set();
-    } else {
-      Data.saveVersion(String(Defaults.getFirmwareVersion()));
-    }
+    Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
 
