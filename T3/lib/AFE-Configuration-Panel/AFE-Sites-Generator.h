@@ -15,7 +15,7 @@
 #include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 class AFESitesGenerator {
 
@@ -28,15 +28,14 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
-  /* These three methods generates checkboxes for Switch, Relay and LED */
-  const String generateSwitchItem(uint8_t id, boolean checked);
-  const String generateRelayItem(uint8_t id, boolean checked);
-  const String generateLEDItem(uint8_t id, boolean checked);
-  const String generatePIRItem(uint8_t id, boolean checked);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
                                const String body);
+
+  const String generateHardwareItemsList(uint8_t noOfItems,
+                                         uint8_t noOffConnected,
+                                         const char *field, const char *label);
 
 public:
   /* Constructor*/

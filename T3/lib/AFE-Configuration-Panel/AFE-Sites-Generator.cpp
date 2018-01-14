@@ -222,6 +222,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
 String AFESitesGenerator::addDeviceConfiguration() {
   DEVICE configuration = Device.configuration;
+  uint8_t itemsNumber = 0;
 
   String body = "<fieldset><div class=\"cf\"><label>";
   body += language == 0 ? "Nazwa urządzenia" : "Device name";
@@ -243,32 +244,49 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body = "<fieldset>";
 
-  body += "<div class=\"cf\"><label>LEDy</label>";
-  for (uint8_t i = 0; i < 5; i++) {
-    body += generateLEDItem(i, configuration.isLED[i]);
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i]) {
+      itemsNumber++;
+    }
   }
-  body += "</div>";
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Przekaźniki" : "Relays";
-  body += "</label>";
-  for (uint8_t i = 0; i < 4; i++) {
-    body += generateRelayItem(i, configuration.isRelay[i]);
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isLED), itemsNumber, "hl",
+      language == 0 ? "Ilość Led'ów" : "Number of LEDs");
+
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+    if (Device.configuration.isRelay[i]) {
+      itemsNumber++;
+    }
   }
-  body += "</div>";
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Przyciski / włączniki" : "Switches / Buttons";
-  body += "</label>";
-  for (uint8_t i = 0; i < 5; i++) {
-    body += generateSwitchItem(i, configuration.isSwitch[i]);
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isRelay), itemsNumber, "hr",
+      language == 0 ? "Ilość przekaźników" : "Number of relay");
+
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+    if (Device.configuration.isSwitch[i]) {
+      itemsNumber++;
+    }
   }
-  body += "</div>";
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Czujniki ruchu" : "PIRs";
-  body += "</label>";
-  for (uint8_t i = 0; i < 4; i++) {
-    body += generatePIRItem(i, configuration.isPIR[i]);
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
+      language == 0 ? "Ilość przycisków" : "Number of switches");
+
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+    if (Device.configuration.isPIR[i]) {
+      itemsNumber++;
+    }
   }
-  body += "</div>";
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isPIR), itemsNumber, "hp",
+      language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
+
   body += "</fieldset>";
 
   page += addConfigurationBlock(
@@ -1104,48 +1122,34 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
   return page;
 }
 
-const String AFESitesGenerator::generateSwitchItem(uint8_t id,
-                                                   boolean checked) {
+const String AFESitesGenerator::generateHardwareItemsList(
+    uint8_t noOfItems, uint8_t noOffConnected, const char *field,
+    const char *label) {
 
-  String body = "<label style=\"width:40px\">#";
-  body += id + 1;
-  body += "<input name=\"s";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
-  body += checked ? " checked=\"checked\"" : "";
-  body += "></label>";
-  return body;
-}
+  String body = "<div class=\"cf\"><label>";
+  body += label;
+  body += "</label>";
+  body += "<select name=\"";
+  body += field;
+  body += "\">";
+  body += "<option value=\"0\"";
+  body += (noOffConnected == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Brak" : "None";
+  body += "</option>";
 
-const String AFESitesGenerator::generateRelayItem(uint8_t id, boolean checked) {
-  String body = "<label style=\"width:40px\">#";
-  body += id + 1;
-  body += "<input name=\"r";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
-  body += checked ? " checked=\"checked\"" : "";
-  body += "></label>";
-  return body;
-}
+  for (uint8_t i = 1; i <= noOfItems; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\"";
+    body += noOffConnected == i ? " selected=\"selected\"" : "";
+    body += ">";
+    body += i;
+    body += "</option>";
+  }
 
-const String AFESitesGenerator::generateLEDItem(uint8_t id, boolean checked) {
-  String body = "<label style=\"width:40px\">#";
-  body += id + 1;
-  body += "<input name=\"l";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
-  body += checked ? " checked=\"checked\"" : "";
-  body += "></label>";
-  return body;
-}
+  body += "</select>";
+  body += "</div>";
 
-const String AFESitesGenerator::generatePIRItem(uint8_t id, boolean checked) {
-  String body = "<label style=\"width:40px\">#";
-  body += id + 1;
-  body += "<input name=\"p";
-  body += id;
-  body += "\" type =\"checkbox\" value=\"1\"";
-  body += checked ? " checked=\"checked\"" : "";
-  body += "></label>";
   return body;
 }

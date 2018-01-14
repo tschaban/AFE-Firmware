@@ -109,7 +109,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
                                                       LED data[5]) {
 
   if (command == SERVER_CMD_SAVE) {
-    for (uint8_t i = 0; i < 5; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
       if (Device.configuration.isLED[i]) {
         Data.saveConfiguration(i, data[i]);
       }
@@ -118,7 +118,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
 
   String page = Site.generateHeader();
   page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
-  for (uint8_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
       page += Site.addLEDConfiguration(i);
     }
