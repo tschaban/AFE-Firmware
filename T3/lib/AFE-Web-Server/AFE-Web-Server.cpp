@@ -202,24 +202,22 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
-  for (uint8_t i = 0; i < 5; i++) {
-    server.arg("l" + String(i)).length() > 0 ? data.isLED[i] = true
-                                             : data.isLED[i] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+    server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
 
-  for (uint8_t i = 0; i < 4; i++) {
-    server.arg("p" + String(i)).length() > 0 ? data.isPIR[i] = true
-                                             : data.isPIR[i] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+    server.arg("hr").toInt() > i ? data.isRelay[i] = true
+                                 : data.isRelay[i] = false;
   }
 
-  for (uint8_t i = 0; i < 5; i++) {
-    server.arg("s" + String(i)).length() > 0 ? data.isSwitch[i] = true
-                                             : data.isSwitch[i] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+    server.arg("hs").toInt() > i ? data.isSwitch[i] = true
+                                 : data.isSwitch[i] = false;
   }
 
-  for (uint8_t i = 0; i < 4; i++) {
-    server.arg("r" + String(i)).length() > 0 ? data.isRelay[i] = true
-                                             : data.isRelay[i] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+    server.arg("hp").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
   }
 
   return data;
