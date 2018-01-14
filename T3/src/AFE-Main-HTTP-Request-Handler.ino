@@ -1,4 +1,4 @@
-/* Checking if there was received HTTP API Command */
+/* Method listens for HTTP Requests */
 
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {

@@ -1,14 +1,16 @@
+/* Method initialize PIR Sensor */
 void initPIR() {
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
     if (Device.configuration.isPIR[i]) {
       Pir[i].begin(i);
     }
   }
 }
 
+/* Code related to processing PIR events and Relay auto turn off */
 void mainPIR() {
 
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
     if (Device.configuration.isPIR[i]) {
 
       /* Listener */

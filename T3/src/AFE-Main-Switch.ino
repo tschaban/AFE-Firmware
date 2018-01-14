@@ -1,16 +1,16 @@
 /* Initializing Switches */
 void initSwitch() {
-  for (uint8_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
       Switch[i].begin(i);
     }
   }
 }
 
-/* Switch related code */
+/* Method processes Switch related events */
 void mainSwitch() {
 
-  for (uint8_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getFunctionality() != 0) {
@@ -24,10 +24,11 @@ void mainSwitch() {
   }
 }
 
+/* Methods listens for switch related events */
 void mainSwitchListener() {
 
   /* Listens for switch events */
-  for (uint8_t i = 0; i < 5; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
       Switch[i].listener();
 
