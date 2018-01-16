@@ -763,7 +763,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "<option value=\"0\"";
   body += (configuration.functionality == 0 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Kontrola urządzenia" : "Device controll";
+  body += language == 0 ? "Przycisk systemowy" : "System button";
   body += "</option>";
 
   for (uint8_t i = 0; i < 4; i++) {

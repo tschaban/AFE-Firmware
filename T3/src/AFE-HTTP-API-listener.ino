@@ -8,6 +8,47 @@
 #include "WProgram.h"
 #endif
 
+/* Method creates JSON respons after processing HTTP API request, and pushes it
+ */
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
+                              const char *value = "") {
+  String respond;
+  respond = "{";
+  if (strlen(request.device) > 0) {
+    respond += "\"device\":\"" + String(request.device) + "\",";
+  }
+  if (strlen(request.name) > 0) {
+    respond += "\"name\":\"" + String(request.name) + "\",";
+  }
+  if (strlen(request.command) > 0) {
+    respond += "\"command\":\"" + String(request.command) + "\",";
+  }
+
+  if (!strlen(value) == 0) {
+    respond += "\"value\":\"";
+    respond += value;
+    respond += "\",";
+  }
+
+  respond += "\"status\":\"";
+  respond += status ? "success" : "error";
+  respond += "\"}";
+  WebServer.sendJSON(respond);
+}
+
+/* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
+ * method which creates JSON respons and pushes it */
+void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
+                                   byte value) {
+  sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
+}
+
+void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
+                                 byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == PIR_OPEN ? "open" : "close");
+}
+
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
@@ -80,45 +121,4 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   } else {
     sendHTTPAPIRequestStatus(request, false);
   }
-}
-
-/* Method creates JSON respons after processing HTTP API request, and pushes it
- */
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
-                              const char *value = "") {
-  String respond;
-  respond = "{";
-  if (strlen(request.device) > 0) {
-    respond += "\"device\":\"" + String(request.device) + "\",";
-  }
-  if (strlen(request.name) > 0) {
-    respond += "\"name\":\"" + String(request.name) + "\",";
-  }
-  if (strlen(request.command) > 0) {
-    respond += "\"command\":\"" + String(request.command) + "\",";
-  }
-
-  if (!strlen(value) == 0) {
-    respond += "\"value\":\"";
-    respond += value;
-    respond += "\",";
-  }
-
-  respond += "\"status\":\"";
-  respond += status ? "success" : "error";
-  respond += "\"}";
-  WebServer.sendJSON(respond);
-}
-
-/* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
- * method which creates JSON respons and pushes it */
-void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
-                                   byte value) {
-  sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
-}
-
-void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
-                                 byte value) {
-  sendHTTPAPIRequestStatus(request, status,
-                           value == PIR_OPEN ? "open" : "close");
 }

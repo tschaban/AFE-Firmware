@@ -14,6 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
+#include <Streaming.h>
 
 class AFEUpgrader {
 

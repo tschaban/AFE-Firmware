@@ -9,7 +9,6 @@ AFEUpgrader::AFEUpgrader() {
 }
 
 boolean AFEUpgrader::upgraded() {
-
   if (strcmp(FirmwareConfiguration.version, FIRMWARE_VERSION) == 0 &&
       FirmwareConfiguration.type == FIRMWARE_TYPE) {
     return false;

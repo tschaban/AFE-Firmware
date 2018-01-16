@@ -13,7 +13,7 @@
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -32,7 +32,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  //  Serial.swap();
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -61,7 +61,6 @@ void setup() {
       }
     }
   }
-
   /* Initialzing network */
   Network.begin(Device.getMode());
 
@@ -72,21 +71,16 @@ void setup() {
   if (Device.getMode() != MODE_NORMAL) {
     Led.blinkingOn(100);
   }
-
   /* Initializing switches */
   initSwitch();
-
   /* Initializing PIRs */
   initPIR();
-
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
   }
-
   Network.connect();
-
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);

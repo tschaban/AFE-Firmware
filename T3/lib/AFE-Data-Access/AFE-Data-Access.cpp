@@ -121,7 +121,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
   uint8_t nextSwitch = 7;
   configuration.gpio = Eeprom.readUInt8(471 + id * nextSwitch);
-  configuration.type = Eeprom.readUInt8(72 + id * nextSwitch);
+  configuration.type = Eeprom.readUInt8(472 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(473 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(476 + id * nextSwitch);
 

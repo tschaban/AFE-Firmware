@@ -43,14 +43,13 @@ void AFEDefaults::set() {
   }
 
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
-    deviceConfiguration.isPIR[0] = false;
+    deviceConfiguration.isPIR[i] = false;
   }
 
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
   Data->saveConfiguration(deviceConfiguration);
-  //  Serial << endl << "deviceConfiguration";
 
   sprintf(networkConfiguration.ssid, "");
   sprintf(networkConfiguration.password, "");
@@ -73,36 +72,29 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.topic, "/device/");
 
   Data->saveConfiguration(MQTTConfiguration);
-  //  Serial << endl << "MQTTConfiguration";
 
   RelayConfiguration.gpio = 12;
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
-  for (uint8_t i = 0; i < 4; i++) {
-    //  Serial << endl << "RelayConfiguration #";
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
     Data->saveConfiguration(i, RelayConfiguration);
     Data->saveRelayState(i, false);
-    //  Serial << i;
   }
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
-  for (uint8_t i = 0; i < 5; i++) {
-    //  Serial << endl << "SwitchConfiguration #";
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
     Data->saveConfiguration(i, SwitchConfiguration);
-    //  Serial << i;
   }
 
   LEDConfiguration.gpio = 13;
   LEDConfiguration.changeToOppositeValue = false;
-  for (uint8_t i = 0; i < 5; i++) {
-    //  Serial << endl << "LEDConfiguration #";
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isLED); i++) {
     Data->saveConfiguration(i, LEDConfiguration);
-    //  Serial << i;
   }
 
   PIRConfiguration.gpio = 6;
@@ -111,16 +103,12 @@ void AFEDefaults::set() {
   PIRConfiguration.relayId = 0;
   PIRConfiguration.howLongKeepRelayOn = 10;
   PIRConfiguration.invertRelayState = false;
-  for (uint8_t i = 0; i < 4; i++) {
-    //  Serial << endl << "PIRConfiguration #";
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
     Data->saveConfiguration(i, PIRConfiguration);
-    //  Serial << i;
   }
 
   Data->saveDeviceMode(2);
-  //  Serial << endl << "saveDeviceMode";
   Data->saveLanguage(1);
-  //  Serial << endl << "saveLanguage";
 }
 
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

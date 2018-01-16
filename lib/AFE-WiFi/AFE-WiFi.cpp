@@ -10,15 +10,12 @@ void AFEWiFi::begin(uint8_t mode) {
 
   AFEDataAccess Data;
   AFEDevice Device;
-
   networkConfiguration = Data.getNetworkConfiguration();
-
   // Init LED
   Led.begin(0);
 
   // Cleaning @TODO is it neded?
   Data = {};
-
   WiFi.hostname(Device.configuration.name);
   if (mode == MODE_ACCESS_POINT) {
     IPAddress apIP(192, 168, 5, 1);
