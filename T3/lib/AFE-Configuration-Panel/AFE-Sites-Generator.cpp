@@ -803,7 +803,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "<br><p class=\"cm\">";
   body += language == 0
               ? "Czułość należy ustawić metodą prób, aż uzyska się "
-                "porządane działanie przycisku podczas jego wciskania"
+                "pożądane działanie przycisku podczas jego wciskania"
               : "Sensitiveness should be adjusted if switch didn't behave "
                 "as expected while pressing it";
 
@@ -874,7 +874,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "</select>";
   body += "<span class=\"hint\">";
   body += language == 0 ? "Dioda LED sygnalizuje wykryty ruch przez czujnik"
-                        : "LED indicates motion detection by the sensor";
+                        : "LED indicates motion detected by the sensor";
   body += "</span>";
   body += "</div>";
   body += "<br><p class=\"cm\">";
@@ -882,7 +882,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
               ? "Czujnik PIR może bezpośrednio sterować jednym przekaźnikiem. "
                 "Poniżej możesz wybrać którym oraz ustawić dodatkowe "
                 "parametry sterowania"
-              : "Motion detector can control a relay assigned to the sesnor. "
+              : "Motion detection sensor can control a relay assigned to it. "
                 "Below you can choose a one and set additional parameters";
   body += "</p>";
 
@@ -938,7 +938,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 
   char title[25];
   language == 0 ? sprintf(title, "Czujnik ruchu (PIR) #%d", id + 1)
-                : sprintf(title, "Motion detector (PIR) #%d", id + 1);
+                : sprintf(title, "Motion detection sesnor (PIR) #%d", id + 1);
 
   return addConfigurationBlock(title, "", body);
 }
