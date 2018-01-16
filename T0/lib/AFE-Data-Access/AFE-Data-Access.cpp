@@ -97,10 +97,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  /* @TODO DOMOTICZ
-    configuration.idx = Eeprom.read(376 + id * next, 5).toInt();
-    configuration.publishToDomoticz = Eeprom.readUInt8(382 + id * next); */
-
   return configuration;
 }
 
@@ -163,10 +159,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   /* @TODO For MQTT only */
   Eeprom.write(378 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
-  /* @TODO DOMOTICZ
-    Eeprom.write(376 + id * nextRelay, 5, (long)configuration.idx);
-    Eeprom.writeUInt8(382 + id * nextRelay, configuration.publishToDomoticz);
-    */
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -212,62 +204,3 @@ uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
 void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
-
-/* @TODO DOMOTICZ
-DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
-  DOMOTICZ configuration;
-
-  Eeprom.read(228, 32).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(260);
-  configuration.port = Eeprom.read(264, 5).toInt();
-  Eeprom.read(269, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
-  Eeprom.read(301, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
-
-  Serial << endl << "INFO: Requested : Domoticz";
-  Serial << endl << "    - Host : " << configuration.host;
-  Serial << endl << "    - IP : " << configuration.ip;
-  Serial << endl << "    - Port : " << configuration.port;
-  Serial << endl << "    - User : " << configuration.user;
-  Serial << endl << "    - Password : " << configuration.password;
-
-  return configuration;
-}
-*/
-/* @TODO DS18B20
-DS18B20 AFEDataAccess::getDS18B20Configuration() {
-  DS18B20 configuration;
-
-  configuration.present = Eeprom.read(400);
-  configuration.gpio = Eeprom.readUInt8(401);
-  configuration.correction = Eeprom.read(402, 5).toFloat();
-  configuration.interval = Eeprom.read(407, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(412);
-  Serial << endl << "INFO: Requested : DS18B20 : ";
-  Serial << endl << "    - Present : " << configuration.present;
-  Serial << endl << "    - GPIO : " << configuration.gpio;
-  Serial << endl << "    - Correction by : " << configuration.correction;
-  Serial << endl << "    - Read interval : " << configuration.interval;
-  Serial << endl << "    - Unit : " << configuration.unit;
-  return configuration;
-}
-
-*/
-/* @TODO DOMOTICZ
-void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
-  Eeprom.write(228, 32, configuration.host);
-  Eeprom.writeIP(260, configuration.ip);
-  Eeprom.write(264, 5, (long)configuration.port);
-  Eeprom.write(269, 32, configuration.user);
-  Eeprom.write(301, 32, configuration.password);
-}
-*/
-/* @TODO DS18B20
-void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
-  Eeprom.writeUInt8(401, configuration.gpio);
-  Eeprom.write(402, 5, (float)configuration.correction);
-  Eeprom.write(407, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(412, configuration.unit);
-} */

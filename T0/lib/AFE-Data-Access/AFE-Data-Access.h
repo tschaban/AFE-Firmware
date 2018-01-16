@@ -30,9 +30,6 @@ public:
   LED getLEDConfiguration(uint8_t id);
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
-  DS18B20 getDS18B20Configuration();
-  // @TODO DOMOTICZ getDomoticzConfiguration();
-
 
   /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
@@ -42,9 +39,6 @@ public:
   void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
-  void saveConfiguration(DS18B20 configuration);
-  // @TODO DOMOTICZ void saveConfiguration(DOMOTICZ configuration);
-
 
   /* Methods read and save firmware version from/to EEPROM */
   const char getVersion();
