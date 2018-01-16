@@ -16,9 +16,6 @@
 #include <DHT.h>
 #include <Streaming.h>
 
-#define UNIT_CELCIUS 0
-#define UNIT_FAHRENHEIT 1
-
 class AFESensorDHT {
 
 private:

@@ -6,7 +6,7 @@
 
 AFEHumidistat::AFEHumidistat(){};
 
-void AFEHumidistat::begin(uint8_t relayID, RELAYSTAT config) {
+void AFEHumidistat::begin(uint8_t relayID, REGULATOR config) {
   configuration = config;
   _relayID = relayID;
 }

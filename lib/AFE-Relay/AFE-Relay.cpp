@@ -24,11 +24,12 @@ byte AFERelay::get() {
 }
 
 /* Set relay to ON */
-void AFERelay::on() {
+void AFERelay::on(boolean invert) {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
-    if (RelayConfiguration.timeToOff >
-        0) { // Start counter if relay should be automatically turned off
+    if (!invert &&
+        RelayConfiguration.timeToOff >
+            0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
   }
@@ -36,9 +37,14 @@ void AFERelay::on() {
 }
 
 /* Set relay to OFF */
-void AFERelay::off() {
+void AFERelay::off(boolean invert) {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
+    if (invert &&
+        RelayConfiguration.timeToOff >
+            0) { // Start counter if relay should be automatically turned off
+      turnOffCounter = millis();
+    }
   }
   Data.saveRelayState(_id, RELAY_OFF);
 }
@@ -79,10 +85,13 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   }
 }
 
-boolean AFERelay::autoTurnOff() {
-  if (RelayConfiguration.timeToOff > 0 && get() == RELAY_ON &&
+boolean AFERelay::autoTurnOff(boolean invert) {
+
+  if (RelayConfiguration.timeToOff > 0 &&
+      ((invert && get() == RELAY_OFF) || (!invert && get() == RELAY_ON)) &&
       millis() - turnOffCounter >= RelayConfiguration.timeToOff * 1000) {
-    off();
+
+    invert ? on(invert) : off(invert);
     return true;
   } else {
     return false;
@@ -90,3 +99,13 @@ boolean AFERelay::autoTurnOff() {
 }
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
+
+void AFERelay::setTimer(float timer) {
+  if (RelayConfiguration.timeToOff > 0) {
+    turnOffCounter = millis();
+  } else {
+    RelayConfiguration.timeToOff = timer;
+  }
+}
+
+void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }

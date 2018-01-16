@@ -12,11 +12,8 @@
 #endif
 
 #include <AFE-Data-Access.h>
-//#include <Streaming.h>
-
-/* Relay states */
-#define RELAY_ON 1
-#define RELAY_OFF 0
+#include <AFE-Data-Structures.h>
+#include <Streaming.h>
 
 class AFERelay {
 
@@ -55,20 +52,24 @@ public:
   byte get();
 
   /* Turns on relay */
-  void on();
+  void on(boolean invert = false);
 
   /* Turns off relay */
-  void off();
+  void off(boolean invert = false);
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
   /* Methods while added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
-  boolean autoTurnOff();
+  boolean autoTurnOff(boolean invert = false);
 
   /* Methods returns relay name */
   const char *getName();
+
+  void setTimer(float timer);
+
+  void clearTimer();
 };
 
 #endif

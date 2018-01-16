@@ -12,7 +12,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
+#include <AFE-REGULATOR-Structure.h>
 #include <AFE-Thermostat.h>
 
 class AFEHumidistat {
@@ -23,7 +23,7 @@ class AFEHumidistat {
 private:
   boolean ready = false;
   uint8_t _relayID;
-  RELAYSTAT configuration;
+  REGULATOR configuration;
   byte relayState;
   /* Method enables / disables thermostat */
   void enable(boolean state);
@@ -33,7 +33,7 @@ public:
   AFEHumidistat();
 
   /* Method initialize humidistat */
-  void begin(uint8_t relayID, RELAYSTAT config);
+  void begin(uint8_t relayID, REGULATOR config);
 
   /* Method returns true if humidistat is enabled */
   boolean enabled();
