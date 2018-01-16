@@ -847,7 +847,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "<br><p class=\"cm\">";
   body += language == 0
               ? "Czułość należy ustawić metodą prób, aż uzyska się "
-                "porządane działanie przycisku podczas jego wciskania"
+                "pożądane działanie przycisku podczas jego wciskania"
               : "Sensitiveness should be adjusted if switch didn't behave "
                 "as expected while pressing it";
 
