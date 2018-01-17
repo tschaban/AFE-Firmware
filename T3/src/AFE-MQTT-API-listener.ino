@@ -86,6 +86,6 @@ void MQTTPublishRelayState(uint8_t id) {
 void MQTTPublishPIRState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Pir[id].getMQTTTopic(), "state",
-                 Pir[id].get() == PIR_OPEN ? "open" : "close");
+                 Pir[id].get() == PIR_OPEN ? "open" : "closed");
   }
 }
