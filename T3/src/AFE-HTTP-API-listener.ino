@@ -46,7 +46,7 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
                                  byte value) {
   sendHTTPAPIRequestStatus(request, status,
-                           value == PIR_OPEN ? "open" : "close");
+                           value == PIR_OPEN ? "open" : "closed");
 }
 
 /* Method processes HTTP API request */
