@@ -774,9 +774,9 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
       body +=
           configuration.functionality == 11 + i ? " selected=\"selected\"" : "";
       body += ">";
-      body += language == 0 ? "Sterowanie przekaźnikiem #" : "Relay #";
+      body +=
+          language == 0 ? "Sterowanie przekaźnikiem #" : "Controlling relay #";
       body += i + 1;
-      body += language == 1 ? "control" : "";
       body += "</option>";
     }
   }

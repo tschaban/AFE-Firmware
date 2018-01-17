@@ -15,9 +15,9 @@ void mainSwitch() {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getFunctionality() != 0) {
         Led.on();
-        Relay[Switch[i].getFunctionality() - 11 + i].toggle();
-        MQTTPublishRelayState(Switch[i].getFunctionality() - 11 +
-                              i); // MQTT Listener library
+        Relay[Switch[i].getFunctionality() - 11].toggle();
+        MQTTPublishRelayState(Switch[i].getFunctionality() -
+                              11); // MQTT Listener library
         Led.off();
       }
     }
