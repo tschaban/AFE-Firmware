@@ -65,6 +65,8 @@ public:
   /* Methods returns type of switch functionality. See Data-Structure for
    * SWITCH_.... constants */
   uint8_t getFunctionality();
+
+  uint8_t getControlledRelayID();
 };
 
 #endif

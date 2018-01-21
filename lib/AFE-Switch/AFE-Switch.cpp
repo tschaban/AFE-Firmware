@@ -107,3 +107,7 @@ void AFESwitch::listener() {
 uint8_t AFESwitch::getFunctionality() {
   return SwitchConfiguration.functionality;
 }
+
+uint8_t AFESwitch::getControlledRelayID() {
+  return SwitchConfiguration.relayID;
+}
