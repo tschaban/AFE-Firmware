@@ -13,6 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Data-Structures.h>
+#include <AFE-Led.h>
 #include <Streaming.h>
 
 class AFERelay {
@@ -21,6 +22,7 @@ private:
   uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
+  AFELED Led;
   char mqttTopic[50];
   unsigned long turnOffCounter = 0;
 
@@ -70,6 +72,8 @@ public:
   void setTimer(float timer);
 
   void clearTimer();
+
+  uint8_t getControlledLedID();
 };
 
 #endif
