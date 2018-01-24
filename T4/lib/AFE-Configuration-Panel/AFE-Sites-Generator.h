@@ -55,6 +55,7 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addLEDConfiguration(uint8_t id);
+  String addSystemLEDConfiguration();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
 

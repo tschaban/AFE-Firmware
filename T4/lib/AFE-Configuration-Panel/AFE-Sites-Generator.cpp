@@ -596,10 +596,50 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   return addConfigurationBlock("LED #" + String(id + 1), "", body);
 }
 
+String AFESitesGenerator::addSystemLEDConfiguration() {
+  uint8_t configuration = Data.getSystemLedID();
+  AFEDevice Device;
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wybierz LED sygnalizujący stan urządzenia"
+                        : "Select device level LED";
+  body += "</label>";
+
+  body += "<select  name=\"i\">";
+
+  body += "<option value=\"0\"";
+  body += configuration == 0 ? " selected=\"selected\"" : "";
+  body += language == 0 ? ">Brak" : ">None";
+  body += "</option>";
+
+  for (uint8_t i = 1; i <= sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i - 1]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
+    }
+  }
+
+  body += "</select>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock("System LED", "", body);
+}
+
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration;
   configuration = Data.getRelayConfiguration(id);
+  AFEDevice Device;
 
   String body = "<fieldset>";
 
@@ -705,6 +745,54 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
               ? "Pobierz stan przekaźnika z systemu kontrolującego (przez MQTT)"
               : "Get relay's state from a home automation system (over MQTT)";
   body += "</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
+                        : "Automatic switching off of the relay";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wyłącz po" : "Switch off after";
+  body += "*</label>";
+  body +=
+      "<input name=\"t" + String(id) +
+      "\" type=\"number\" step=\"0.01\" max=\"86400\" min=\"0.00\" value=\"";
+  body += configuration.timeToOff;
+  body += "\">";
+  body += "<span class=\"hint\">0.01 - 86400";
+  body += language == 0 ? "sekund (24h). Brak akcji jeśli jest 0"
+                        : "seconds (24h). No action if it's set to 0";
+  body += "</span>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
+                        : "Select relay status LED";
+  body += "</label>";
+
+  body += "<select  name=\"l\">";
+
+  body += "<option value=\"0\"";
+  body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+  body += language == 0 ? ">Brak" : ">None";
+  body += "</option>";
+
+  for (uint8_t i = 1; i <= sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i - 1]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration.ledID == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
+    }
+  }
+
   body += "</select>";
   body += "</div>";
 

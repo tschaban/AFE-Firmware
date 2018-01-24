@@ -106,7 +106,8 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
 
 String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
                                                       uint8_t command,
-                                                      LED data[5]) {
+                                                      LED data[5],
+                                                      uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
@@ -114,6 +115,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
         Data.saveConfiguration(i, data[i]);
       }
     }
+    Data.saveSystemLedID(dataLedID);
   }
 
   String page = Site.generateHeader();
@@ -123,6 +125,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
       page += Site.addLEDConfiguration(i);
     }
   }
+
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

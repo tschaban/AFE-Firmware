@@ -77,13 +77,15 @@ void AFEWebServer::generate() {
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
     LED data[5] = {};
+    uint8_t dataLedID;
     if (getCommand() == SERVER_CMD_SAVE) {
       for (uint8_t i = 0; i < 5; i++) {
         data[i] = getLEDData(i);
       }
+      dataLedID = getSystemLEDData();
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(getOptionName(),
-                                                           getCommand(), data));
+    publishHTML(ConfigurationPanel.getLEDConfigurationSite(
+        getOptionName(), getCommand(), data, dataLedID));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -299,6 +301,16 @@ LED AFEWebServer::getLEDData(uint8_t id) {
   return data;
 }
 
+uint8_t AFEWebServer::getSystemLEDData() {
+  uint8_t data;
+
+  if (server.arg("i").length() > 0) {
+    data = server.arg("i").toInt();
+  }
+
+  return data;
+}
+
 RELAY AFEWebServer::getRelayData(uint8_t id) {
   RELAY data;
 
@@ -316,6 +328,14 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   if (server.arg("c" + String(id)).length() > 0) {
     data.stateMQTTConnected = server.arg("c" + String(id)).toInt();
+  }
+
+  if (server.arg("t" + String(id)).length() > 0) {
+    data.timeToOff = server.arg("t" + String(id)).toFloat();
+  }
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledID = server.arg("l" + String(id)).toInt();
   }
 
   return data;
