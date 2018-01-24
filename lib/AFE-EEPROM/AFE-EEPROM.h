@@ -12,7 +12,7 @@
 #endif
 
 #include <EEPROM.h>
-#include <ESP8266WiFi.h>
+#include <IPAddress.h>
 //#include <Streaming.h>
 
 #define EEPROM_SIZE 1024

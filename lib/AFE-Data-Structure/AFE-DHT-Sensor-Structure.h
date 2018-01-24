@@ -13,7 +13,6 @@
 
 #include <AFE-HUMIDITY-Structure.h>
 #include <AFE-TEMPERATURE-Structure.h>
-#include <ESP8266WiFi.h>
 
 struct DH {
   uint8_t gpio;

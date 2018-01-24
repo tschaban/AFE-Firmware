@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 /* Relay states */
 #define PIR_OPEN 1
 #define PIR_CLOSE 0
