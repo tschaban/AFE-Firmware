@@ -360,6 +360,10 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
 
+  if (server.arg("r" + String(id)).length() > 0) {
+    data.relayID = server.arg("r" + String(id)).toInt();
+  }
+
   return data;
 }
 
