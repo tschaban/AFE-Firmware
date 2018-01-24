@@ -78,63 +78,62 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
               "Broker</a></li>";
     }
 
-    uint8_t itemPresent = false;
+    uint8_t itemPresent = 0;
 
     for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
       if (Device.configuration.isLED[i]) {
-        itemPresent = true;
+        itemPresent++;
+      } else {
         break;
       }
     }
 
-    if (itemPresent) {
+    if (itemPresent > 0) {
       page += "<li class=\"itm\"><a href=\"\\?option=led\">LED";
       page += language == 0 ? "y" : "s";
       page += "</a></li>";
     }
 
-    itemPresent = false;
+    itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
-        itemPresent = true;
+        itemPresent++;
+      } else {
         break;
       }
     }
 
-    if (itemPresent) {
+    if (itemPresent > 0) {
       page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
               "przekaźników</a></li>";
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-        if (Device.configuration.isRelay[i]) {
-          page += "<li class=\"itm\"><a href=\"\\?option=relay";
-          page += i;
-          page += "\">&#8227; Przekaźnik: ";
-          page += i + 1;
-          page += "</a></li>";
-        }
+      for (uint8_t i = 0; i < itemPresent; i++) {
+        page += "<li class=\"itm\"><a href=\"\\?option=relay";
+        page += i;
+        page += "\">&#8227; Przekaźnik: ";
+        page += i + 1;
+        page += "</a></li>";
       }
     }
 
-    itemPresent = false;
+    itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
       if (Device.configuration.isSwitch[i]) {
-        itemPresent = true;
+        itemPresent++;
+      } else {
         break;
       }
     }
 
-    if (itemPresent) {
+    if (itemPresent > 0) {
       page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
               "przycisków / włączników</a></li>";
 
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
-        if (Device.configuration.isSwitch[i]) {
-          page += "<li class=\"itm\"><a href=\"\\?option=switch";
-          page += i;
-          page += "\">&#8227; Przycisk: ";
-          page += i + 1;
-          page += "</a></li>";
-        }
+      for (uint8_t i = 0; i < itemPresent; i++) {
+        page += "<li class=\"itm\"><a href=\"\\?option=switch";
+        page += i;
+        page += "\">&#8227; Przycisk: ";
+        page += i + 1;
+        page += "</a></li>";
       }
     }
 
@@ -249,6 +248,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
       itemsNumber++;
+    } else {
+      break;
     }
   }
 
@@ -260,6 +261,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
       itemsNumber++;
+    } else {
+      break;
     }
   }
 
@@ -271,6 +274,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
       itemsNumber++;
+    } else {
+      break;
     }
   }
 
@@ -643,6 +648,8 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
       body += ">";
       body += i;
       body += "</option>";
+    } else {
+      break;
     }
   }
 
@@ -809,6 +816,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += ">";
       body += i;
       body += "</option>";
+    } else {
+      break;
     }
   }
 
@@ -845,7 +854,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += language == 0 ? "Przycisk systemowy" : "System button";
   body += "</option>";
 
-  for (uint8_t i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
       body += "<option value=\"";
       body += 11 + i;
@@ -857,6 +866,8 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
                             : "Controlling only the relay #";
       body += i + 1;
       body += "</option>";
+    } else {
+      break;
     }
   }
   body += "</select>";
@@ -884,6 +895,8 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
       body += ">";
       body += i;
       body += "</option>";
+    } else {
+      break;
     }
   }
 

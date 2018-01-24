@@ -79,8 +79,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             sendHTTPAPIRequestStatus(request, false);
           }
         }
+      } else {
+        break;
       }
-      /* No such relay */
     }
     if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);

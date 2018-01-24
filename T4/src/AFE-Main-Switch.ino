@@ -3,6 +3,8 @@ void initSwitch() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
       Switch[i].begin(i);
+    } else {
+      break;
     }
   }
 }
@@ -19,6 +21,8 @@ void mainSwitch() {
                               1); // MQTT Listener library
         Led.off();
       }
+    } else {
+      break;
     }
   }
 }
@@ -41,6 +45,8 @@ void mainSwitchListener() {
                                           : Device.reboot(MODE_NORMAL);
         }
       }
+    } else {
+      break;
     }
   }
 }

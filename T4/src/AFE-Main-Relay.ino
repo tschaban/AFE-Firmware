@@ -6,6 +6,8 @@ void mainRelay() {
         Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
         Led.off();
       }
+    } else {
+      break;
     }
   }
 }

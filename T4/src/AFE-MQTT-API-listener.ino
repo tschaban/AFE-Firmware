@@ -40,6 +40,8 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             MQTTPublishRelayState(i);
           }
         }
+      } else {
+        break;
       }
     }
 

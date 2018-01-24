@@ -79,7 +79,7 @@ void AFEWebServer::generate() {
     LED data[5] = {};
     uint8_t dataLedID;
     if (getCommand() == SERVER_CMD_SAVE) {
-      for (uint8_t i = 0; i < 5; i++) {
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
         data[i] = getLEDData(i);
       }
       dataLedID = getSystemLEDData();
@@ -107,7 +107,7 @@ void AFEWebServer::generate() {
     }
   } else {
 
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
         if (getOptionName() == "relay" + String(i)) {
           RELAY data = {};
@@ -117,10 +117,12 @@ void AFEWebServer::generate() {
           publishHTML(ConfigurationPanel.getRelayConfigurationSite(
               getOptionName(), getCommand(), data, i));
         }
+      } else {
+        break;
       }
     }
 
-    for (uint8_t i = 0; i < 5; i++) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
       if (Device.configuration.isSwitch[i]) {
         if (getOptionName() == "switch" + String(i)) {
           SWITCH data = {};
@@ -130,6 +132,8 @@ void AFEWebServer::generate() {
           publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
               getOptionName(), getCommand(), data, i));
         }
+      } else {
+        break;
       }
     }
   }

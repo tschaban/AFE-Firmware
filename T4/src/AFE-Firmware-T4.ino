@@ -56,6 +56,8 @@ void setup() {
       if (Device.configuration.isRelay[i]) {
         Relay[i].begin(i);
         Relay[i].setRelayAfterRestoringPower();
+      } else {
+        break;
       }
     }
   }
