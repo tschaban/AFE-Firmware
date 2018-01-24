@@ -61,7 +61,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-  page += language == 0 ? "dla 4 włączników" : "for 4 WiFi switches";
+  page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -78,20 +78,33 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
               "Broker</a></li>";
     }
 
-    if (Device.configuration.isLED[0] || Device.configuration.isLED[1] ||
-        Device.configuration.isLED[2] || Device.configuration.isLED[3] ||
-        Device.configuration.isLED[4]) {
+    uint8_t itemPresent = false;
+
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+      if (Device.configuration.isLED[i]) {
+        itemPresent = true;
+        break;
+      }
+    }
+
+    if (itemPresent) {
       page += "<li class=\"itm\"><a href=\"\\?option=led\">LED";
       page += language == 0 ? "y" : "s";
       page += "</a></li>";
     }
 
-    if (Device.configuration.isRelay[0] || Device.configuration.isRelay[1] ||
-        Device.configuration.isRelay[2] || Device.configuration.isRelay[3]) {
+    itemPresent = false;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      if (Device.configuration.isRelay[i]) {
+        itemPresent = true;
+        break;
+      }
+    }
 
+    if (itemPresent) {
       page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
               "przekaźników</a></li>";
-      for (uint8_t i = 0; i < 4; i++) {
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=relay";
           page += i;
@@ -102,13 +115,19 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
     }
 
-    if (Device.configuration.isSwitch[0] || Device.configuration.isSwitch[1] ||
-        Device.configuration.isSwitch[2] || Device.configuration.isSwitch[3] ||
-        Device.configuration.isSwitch[4]) {
+    itemPresent = false;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+      if (Device.configuration.isSwitch[i]) {
+        itemPresent = true;
+        break;
+      }
+    }
+
+    if (itemPresent) {
       page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
               "przycisków / włączników</a></li>";
 
-      for (uint8_t i = 0; i < 5; i++) {
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
         if (Device.configuration.isSwitch[i]) {
           page += "<li class=\"itm\"><a href=\"\\?option=switch";
           page += i;
@@ -834,12 +853,40 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
       body +=
           configuration.functionality == 11 + i ? " selected=\"selected\"" : "";
       body += ">";
-      body +=
-          language == 0 ? "Sterowanie przekaźnikiem #" : "Controlling relay #";
+      body += language == 0 ? "Tylko sterowanie przekaźnikiem #"
+                            : "Controlling only the relay #";
       body += i + 1;
       body += "</option>";
     }
   }
+  body += "</select>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wybierz przekaźnik sterowany przez przycisk"
+                        : "Select relay controlled by the switch";
+  body += "</label>";
+
+  body += "<select  name=\"r\">";
+
+  body += "<option value=\"0\"";
+  body += configuration.relayID == 0 ? " selected=\"selected\"" : "";
+  body += language == 0 ? ">Brak" : ">None";
+  body += "</option>";
+
+  for (uint8_t i = 1; i <= sizeof(Device.configuration.isRelay); i++) {
+    if (Device.configuration.isRelay[i - 1]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration.relayID == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
+    }
+  }
+
   body += "</select>";
   body += "</div>";
 
