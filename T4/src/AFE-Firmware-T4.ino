@@ -63,7 +63,10 @@ void setup() {
   Network.begin(Device.getMode());
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-  Led.begin(0);
+  uint8_t systeLedID = Data.getSystemLedID();
+  if (systeLedID > 0) {
+    Led.begin(systeLedID - 1);
+  }
 
   /* If device in configuration mode then start LED blinking */
   if (Device.getMode() != MODE_NORMAL) {
