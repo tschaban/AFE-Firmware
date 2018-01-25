@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct NETWORK {
   char ssid[32];
   char password[32];

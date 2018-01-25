@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct FIRMWARE {
   char version[7];
   uint8_t type;

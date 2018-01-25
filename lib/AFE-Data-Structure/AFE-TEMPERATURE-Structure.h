@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 #define UNIT_CELCIUS 0
 #define UNIT_FAHRENHEIT 1
 

@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct DOMOTICZ {
   char host[32];
   IPAddress ip;

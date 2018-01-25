@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct REGULATOR {
   boolean enabled;
   float turnOn;
