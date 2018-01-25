@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 #define SWITCH_TYPE_MONO 0 // Mono stable switch
 #define SWITCH_TYPE_BI 1   // Bistable switch
 

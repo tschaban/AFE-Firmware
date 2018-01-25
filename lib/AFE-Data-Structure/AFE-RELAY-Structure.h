@@ -12,7 +12,6 @@
 #endif
 
 #include <AFE-REGULATOR-Structure.h>
-#include <ESP8266WiFi.h>
 
 /* Relay states */
 #define RELAY_ON 1

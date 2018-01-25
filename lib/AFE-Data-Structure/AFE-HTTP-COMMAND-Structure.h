@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct HTTPCOMMAND {
   char device[16];
   char name[16];

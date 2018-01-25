@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct HUMIDITY {
   float correction;
   uint16_t interval;
