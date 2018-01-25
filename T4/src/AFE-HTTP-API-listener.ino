@@ -43,10 +43,6 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> master
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
