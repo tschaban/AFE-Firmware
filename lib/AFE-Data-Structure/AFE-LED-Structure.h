@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 struct LED {
   uint8_t gpio;
   boolean changeToOppositeValue;

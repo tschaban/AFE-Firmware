@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 #define SERVER_CMD_SAVE 1
 
 #endif

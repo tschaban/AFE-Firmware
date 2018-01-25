@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
 #define MODE_NORMAL 0
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
