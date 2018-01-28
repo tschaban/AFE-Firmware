@@ -14,7 +14,11 @@ void AFESwitch::begin(uint8_t id) {
   pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-  Led.begin(0);
+
+  uint8_t systeLedID = Data.getSystemLedID();
+  if (systeLedID > 0) {
+    Led.begin(systeLedID - 1);
+  }
   _initialized = true;
 }
 
@@ -106,4 +110,8 @@ void AFESwitch::listener() {
 
 uint8_t AFESwitch::getFunctionality() {
   return SwitchConfiguration.functionality;
+}
+
+uint8_t AFESwitch::getControlledRelayID() {
+  return SwitchConfiguration.relayID;
 }

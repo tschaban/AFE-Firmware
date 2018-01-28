@@ -8,8 +8,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       boolean redirect) {
 
   String page;
-  redirect == 0 ? page = Site.generateHeader(0)
-                : page = Site.generateHeader(10);
+  redirect ? page = Site.generateHeader(10) : page = Site.generateHeader(0);
 
   if (option == "upgrade") {
     page += Site.addUpgradeSection();
@@ -129,6 +128,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
       break;
     }
   }
+  page += Site.addSystemLEDConfiguration();
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";

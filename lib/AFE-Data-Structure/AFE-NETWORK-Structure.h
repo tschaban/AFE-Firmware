@@ -11,6 +11,8 @@
 #include "WProgram.h"
 #endif
 
+#include <IPAddress.h>
+
 struct NETWORK {
   char ssid[32];
   char password[32];

@@ -11,6 +11,7 @@
 #include "WProgram.h"
 #endif
 
+/* Parameter indicates that HTTP request requires data save */
 #define SERVER_CMD_SAVE 1
 
 #endif

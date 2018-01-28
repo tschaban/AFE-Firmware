@@ -24,10 +24,11 @@ struct RELAY {
   char name[16];
   uint8_t stateMQTTConnected;
   char mqttTopic[49];
-  boolean showStatusUsingLED;
+  boolean showStatusUsingLED; // is this really used?
   REGULATOR thermostat;
   REGULATOR humidistat;
   float thermalProtection;
+  uint8_t ledID;
 };
 
 #endif

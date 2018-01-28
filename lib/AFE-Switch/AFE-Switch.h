@@ -12,7 +12,6 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-LED.h>
 //#include <Streaming.h>
 
@@ -62,9 +61,12 @@ public:
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 
-  /* Methods returns type of switch functionality. See Data-Structure for
+  /* Method returns type of switch functionality. See Data-Structure for
    * SWITCH_.... constants */
   uint8_t getFunctionality();
+
+  /* Method returns ID of the relay controlled by the switch */
+  uint8_t getControlledRelayID();
 };
 
 #endif
