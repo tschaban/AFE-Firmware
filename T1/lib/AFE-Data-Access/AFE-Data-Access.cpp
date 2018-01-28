@@ -112,6 +112,11 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.thermalProtection =
       Eeprom.read(436 + id * nextRelay, 3).toInt();
 
+  configuration.ledID = 0; // @TODO added for compatibility with the code
+                           // introduced in T4 so the Relay can switch on
+                           // assigned to it LED. To added for this version in
+                           // future
+
   return configuration;
 }
 

@@ -12,9 +12,8 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <DHT.h>
-#include <Streaming.h>
+// #include <Streaming.h>
 
 class AFESensorDHT {
 
@@ -34,15 +33,29 @@ public:
 
   void begin();
 
+  /* Method returns temperature */
   float getTemperature();
+
+  /* Method returns humidity */
   float getHumidity();
+
+  /* Method returns latest stored in memory temperature */
   float getLatestTemperature();
+
+  /* Method returns latest stored in memory humidity */
   float getLatestHumidity();
+
+  /* Method returns heat index */
   float getHeatIndex();
 
+  /* It returns true if temperature has been read from the sensor */
   boolean temperatureSensorReady();
+
+  /* It returns true if humidity has been read from the sensor */
   boolean humiditySensorReady();
 
+  /* Method should be added to the main loop to check temperature / humidity in
+   * defined time frame */
   void listener();
 };
 

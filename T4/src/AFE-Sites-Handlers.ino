@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_MQTT_Structure_h
-#define _AFE_MQTT_Structure_h
+#ifndef _AFE_Web_Handlers_h
+#define _AFE_Web_Handlers_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -11,15 +11,12 @@
 #include "WProgram.h"
 #endif
 
-#include <IPAddress.h>
+//#include <Streaming.h>
 
-struct MQTT {
-  char host[32];
-  IPAddress ip;
-  uint16_t port;
-  char user[32];
-  char password[32];
-  char topic[32];
-};
+/* Method handles favicon.ico request */
+void handleFavicon() {}
+
+/* Method handles all HTTP request */
+void handleHTTPRequests() { WebServer.generate(); }
 
 #endif

@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_MQTT_Structure_h
-#define _AFE_MQTT_Structure_h
+#ifndef _AFE_Configuration_h
+#define _AFE_Configuration_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -11,15 +11,7 @@
 #include "WProgram.h"
 #endif
 
-#include <IPAddress.h>
-
-struct MQTT {
-  char host[32];
-  IPAddress ip;
-  uint16_t port;
-  char user[32];
-  char password[32];
-  char topic[32];
-};
+#define FIRMWARE_TYPE 4
+#define FIRMWARE_VERSION "1.0.0"
 
 #endif

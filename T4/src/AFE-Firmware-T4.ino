@@ -3,7 +3,6 @@
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
-#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
@@ -51,16 +50,8 @@ void setup() {
   }
 
   /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL) {
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
-        Relay[i].begin(i);
-        Relay[i].setRelayAfterRestoringPower();
-      } else {
-        break;
-      }
-    }
-  }
+  initRelay();
+
   /* Initialzing network */
   Network.begin(Device.getMode());
 

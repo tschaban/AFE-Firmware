@@ -21,6 +21,7 @@ struct SWITCH {
   uint8_t type;
   uint16_t sensitiveness;
   uint8_t functionality;
+  uint8_t relayID;
 };
 
 #endif
