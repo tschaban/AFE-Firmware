@@ -12,7 +12,10 @@ void AFEWiFi::begin(uint8_t mode) {
   AFEDevice Device;
   networkConfiguration = Data.getNetworkConfiguration();
   // Init LED
-  Led.begin(0);
+  uint8_t systeLedID = Data.getSystemLedID();
+  if (systeLedID > 0) {
+    Led.begin(systeLedID - 1);
+  }
 
   // Cleaning @TODO is it neded?
   Data = {};

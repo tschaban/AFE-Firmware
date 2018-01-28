@@ -69,7 +69,7 @@ void AFEMQTT::connect() {
           */
           // Setting Relay state after connection to MQTT
 
-          for (uint8_t i = 0; i < 4; i++) {
+          for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
             if (Device.configuration.isRelay[i]) {
               if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
                 // Requesting state from MQTT Broker / service

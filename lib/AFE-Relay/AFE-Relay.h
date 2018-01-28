@@ -61,17 +61,20 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-  /* Methods while added to main loop turns off relay automatically. Duration
+  /* Methodswhile added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
   boolean autoTurnOff(boolean invert = false);
 
   /* Methods returns relay name */
   const char *getName();
 
+  /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
 
+  /* It removed timer for auto-switch of the relay */
   void clearTimer();
 
+  /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 };
 

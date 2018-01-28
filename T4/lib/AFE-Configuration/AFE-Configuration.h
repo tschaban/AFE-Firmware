@@ -11,8 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Common-Configuration.h>
-
 #define FIRMWARE_TYPE 4
 #define FIRMWARE_VERSION "1.0.0"
 
