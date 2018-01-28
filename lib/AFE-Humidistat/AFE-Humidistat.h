@@ -12,8 +12,6 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-REGULATOR-Structure.h>
-#include <AFE-Thermostat.h>
 
 class AFEHumidistat {
 

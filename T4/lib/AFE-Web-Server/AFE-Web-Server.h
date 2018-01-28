@@ -13,7 +13,6 @@
 
 #include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>

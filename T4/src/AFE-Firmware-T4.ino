@@ -3,7 +3,6 @@
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
-#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>

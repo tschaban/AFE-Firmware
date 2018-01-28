@@ -11,9 +11,9 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Data-Structures.h>
+#include <AFE-NETWORK-Structure.h>
 #include <PubSubClient.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 #include <WiFiClient.h>
 
 class AFEMQTT {

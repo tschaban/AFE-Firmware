@@ -11,6 +11,8 @@
 #include "WProgram.h"
 #endif
 
+#include <IPAddress.h>
+
 struct MQTT {
   char host[32];
   IPAddress ip;

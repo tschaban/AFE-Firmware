@@ -6,7 +6,6 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
   FIRMWARE configuration;
   configuration = Data.getFirmwareConfiguration();
-
   String page = "<!doctype html>"
                 "<html lang=\"en\">"
                 "<head>"
@@ -853,23 +852,13 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += ">";
   body += language == 0 ? "Przycisk systemowy" : "System button";
   body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.functionality == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Tylko sterowanie przekaźnikiem"
+                        : "Controlling only the relay";
+  body += "</option>";
 
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-    if (Device.configuration.isRelay[i]) {
-      body += "<option value=\"";
-      body += 11 + i;
-      body += "\"";
-      body +=
-          configuration.functionality == 11 + i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += language == 0 ? "Tylko sterowanie przekaźnikiem #"
-                            : "Controlling only the relay #";
-      body += i + 1;
-      body += "</option>";
-    } else {
-      break;
-    }
-  }
   body += "</select>";
   body += "</div>";
 
@@ -879,7 +868,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
                         : "Select relay controlled by the switch";
   body += "</label>";
 
-  body += "<select  name=\"r\">";
+  body += "<select  name=\"r" + String(id) + "\">";
 
   body += "<option value=\"0\"";
   body += configuration.relayID == 0 ? " selected=\"selected\"" : "";

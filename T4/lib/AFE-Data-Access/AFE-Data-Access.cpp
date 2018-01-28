@@ -24,7 +24,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
   index = 8;
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(475 + i * index);
+    configuration.isSwitch[i] = Eeprom.read(490 + i * index);
   }
 
   configuration.httpAPI = Eeprom.read(25);
@@ -121,7 +121,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(492 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(493 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(496 + id * nextSwitch);
-  configuration.relayID = Eeprom.readUInt8(497);
+  configuration.relayID = Eeprom.readUInt8(497 + id * nextSwitch);
   return configuration;
 }
 

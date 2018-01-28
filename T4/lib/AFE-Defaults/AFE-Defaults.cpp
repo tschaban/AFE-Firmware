@@ -33,12 +33,15 @@ void AFEDefaults::set() {
     deviceConfiguration.isLED[i] = false;
   }
 
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
-    deviceConfiguration.isSwitch[i] = false;
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch) - 1; i++) {
+    deviceConfiguration.isSwitch[i] = true;
   }
 
+  deviceConfiguration.isSwitch[sizeof(deviceConfiguration.isSwitch) - 1] =
+      false;
+
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    deviceConfiguration.isRelay[i] = false;
+    deviceConfiguration.isRelay[i] = true;
   }
 
   deviceConfiguration.mqttAPI = false;
@@ -68,25 +71,51 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(MQTTConfiguration);
 
-  RelayConfiguration.gpio = 12;
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   RelayConfiguration.ledID = 0;
-  sprintf(RelayConfiguration.name, "switch");
+
+  RelayConfiguration.gpio = 12;
+  sprintf(RelayConfiguration.name, "switch1");
+  Data->saveConfiguration(0, RelayConfiguration);
+
+  RelayConfiguration.gpio = 5;
+  sprintf(RelayConfiguration.name, "switch2");
+  Data->saveConfiguration(1, RelayConfiguration);
+
+  RelayConfiguration.gpio = 4;
+  sprintf(RelayConfiguration.name, "switch3");
+  Data->saveConfiguration(2, RelayConfiguration);
+
+  RelayConfiguration.gpio = 15;
+  sprintf(RelayConfiguration.name, "switch4");
+  Data->saveConfiguration(3, RelayConfiguration);
+
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    Data->saveConfiguration(i, RelayConfiguration);
     Data->saveRelayState(i, false);
   }
 
-  SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
+
+  SwitchConfiguration.gpio = 0;
   SwitchConfiguration.functionality = 0;
-  SwitchConfiguration.relayID = 0;
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
-    Data->saveConfiguration(i, SwitchConfiguration);
-  }
+  SwitchConfiguration.relayID = 1;
+  Data->saveConfiguration(0, SwitchConfiguration);
+
+  SwitchConfiguration.gpio = 9;
+  SwitchConfiguration.functionality = 1;
+  SwitchConfiguration.relayID = 2;
+  Data->saveConfiguration(1, SwitchConfiguration);
+
+  SwitchConfiguration.gpio = 10;
+  SwitchConfiguration.relayID = 3;
+  Data->saveConfiguration(2, SwitchConfiguration);
+
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.relayID = 4;
+  Data->saveConfiguration(3, SwitchConfiguration);
 
   LEDConfiguration.gpio = 13;
   LEDConfiguration.changeToOppositeValue = false;
