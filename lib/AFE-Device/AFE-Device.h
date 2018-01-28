@@ -11,8 +11,8 @@
 #include "WProgram.h"
 #endif
 
-//#include <AFE-DEVICE-Structure.h>
-//#include <AFE-Data-Access.h>
+#include <AFE-DEVICE-Structure.h>
+#include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
 //#include <Streaming.h>
 

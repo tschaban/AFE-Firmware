@@ -12,7 +12,7 @@
 #endif
 
 #include <AFE-Common-Configuration.h>
-//#include <AFE-Device.h>
+#include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
 // #include <Streaming.h>
 
