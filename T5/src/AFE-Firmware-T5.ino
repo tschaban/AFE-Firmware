@@ -2,6 +2,7 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
+#include "AFE-Contactron.h"
 #include "AFE-MQTT.h"
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -22,6 +23,7 @@ AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
+AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
 

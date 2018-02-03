@@ -30,6 +30,7 @@ public:
   LED getLEDConfiguration(uint8_t id);
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
+  CONTACTRON getContactronConfiguration(uint8_t id);
   DH getDHTConfiguration();
 
   /* Methods save configuration to EEPROM */
@@ -40,13 +41,14 @@ public:
   void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
+  void saveConfiguration(uint8_t id, CONTACTRON configuration);
   void saveConfiguration(DH configuration);
 
   /* Methods read and save firmware version from/to EEPROM */
   const char getVersion();
   void saveVersion(String version);
 
-  /* Methods read and save relay state from/to EEPROM */
+  /* Methods: exists only for compatibility purpose */
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
 

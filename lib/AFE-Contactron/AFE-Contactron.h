@@ -19,7 +19,7 @@
 class AFEContactron {
 
 private:
-  CONTACTRON ContractonConfiguration;
+  CONTACTRON ContactronConfiguration;
   boolean _initialized = false;
   boolean state;
   boolean previousState; // Actually this stores current cotactron state

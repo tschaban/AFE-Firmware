@@ -12,7 +12,7 @@
 #endif
 
 #include <AFE-CONTACTRON-Structure.h>
-#include <AFE-DEVICE-Structure.h>
+#include <AFE-DEVICE-T5-Structure.h>
 #include <AFE-DHT-Sensor-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>

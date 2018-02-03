@@ -23,7 +23,7 @@ struct DEVICE {
   boolean isLED[3];
   boolean isRelay[1];
   boolean isSwitch[2];
-  boolean isCotactron[2];
+  boolean isContactron[2];
   boolean isDHT;
 };
 

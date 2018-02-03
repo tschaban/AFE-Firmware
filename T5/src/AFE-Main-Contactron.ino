@@ -1,8 +1,8 @@
 /* Initializing Switches */
-void initSwitch() {
+void initContactron() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
     if (Device.configuration.isContactron[i]) {
-      Switch[i].begin(i);
+      Contactron[i].begin(i);
     } else {
       break;
     }

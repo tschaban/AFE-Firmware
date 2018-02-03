@@ -15,9 +15,8 @@ void AFEContactron::begin(uint8_t id) {
   state = digitalRead(ContactronConfiguration.gpio);
   previousState = state;
 
-  uint8_t ledID = getLedID();
-  if (ledID > 0) {
-    ContactronLedID.begin(ledID - 1);
+  if (ContactronConfiguration.ledID > 0) {
+    ContactronLed.begin(ContactronConfiguration.ledID - 1);
   }
   _initialized = true;
 }
@@ -26,18 +25,18 @@ boolean AFEContactron::getState() {
   uint8_t _return;
   if (ContactronConfiguration.outputDefaultState == CONTACTRON_NO) {
     if (state) {
-      ContactronLedID.on();
+      ContactronLed.on();
       _return = CONTACTRON_OPEN;
     } else {
-      ContactronLedID.off();
+      ContactronLed.off();
       _return = CONTACTRON_CLOSED;
     }
   } else {
     if (state) {
-      ContactronLedID.on();
+      ContactronLed.on();
       _return = CONTACTRON_CLOSED;
     } else {
-      ContactronLedID.off();
+      ContactronLed.off();
       _return = CONTACTRON_OPEN;
     }
   }

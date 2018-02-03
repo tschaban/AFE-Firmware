@@ -16,6 +16,7 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
+  CONTACTRON ContactronConfiguration;
   LED LEDConfiguration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -33,15 +34,19 @@ void AFEDefaults::set() {
     deviceConfiguration.isLED[i] = false;
   }
 
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch) - 1; i++) {
-    deviceConfiguration.isSwitch[i] = true;
+  deviceConfiguration.isSwitch[0] = true;
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isSwitch); i++) {
+    deviceConfiguration.isSwitch[i] = false;
   }
 
-  deviceConfiguration.isSwitch[sizeof(deviceConfiguration.isSwitch) - 1] =
-      false;
+  deviceConfiguration.isRelay[0] = true;
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isRelay); i++) {
+    deviceConfiguration.isRelay[i] = false;
+  }
 
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    deviceConfiguration.isRelay[i] = true;
+  deviceConfiguration.isContactron[0] = true;
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isContactron); i++) {
+    deviceConfiguration.isContactron[i] = false;
   }
 
   deviceConfiguration.mqttAPI = false;
@@ -71,26 +76,13 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(MQTTConfiguration);
 
-  RelayConfiguration.timeToOff = 0;
-  RelayConfiguration.statePowerOn = 3;
-  RelayConfiguration.stateMQTTConnected = 0;
-  RelayConfiguration.ledID = 0;
-
+  RelayConfiguration.timeToOff = 200;
   RelayConfiguration.gpio = 12;
-  sprintf(RelayConfiguration.name, "switch1");
+  sprintf(RelayConfiguration.name, "switch");
   Data->saveConfiguration(0, RelayConfiguration);
-
-  RelayConfiguration.gpio = 5;
-  sprintf(RelayConfiguration.name, "switch2");
-  Data->saveConfiguration(1, RelayConfiguration);
-
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    Data->saveRelayState(i, false);
-  }
 
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
-
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.functionality = 0;
   SwitchConfiguration.relayID = 1;
@@ -98,7 +90,7 @@ void AFEDefaults::set() {
 
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.functionality = 1;
-  SwitchConfiguration.relayID = 2;
+  SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 
   LEDConfiguration.gpio = 13;
