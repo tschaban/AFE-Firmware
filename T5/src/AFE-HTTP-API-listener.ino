@@ -46,7 +46,8 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
-  sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
+  sendHTTPAPIRequestStatus(request, status,
+                           value == RELAY_ON ? "open" : "open");
 }
 
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
@@ -58,42 +59,21 @@ void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
-  if (strcmp(request.device, "relay") == 0) {
-    uint8_t state;
-    boolean noRelay = true;
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
-        if (strcmp(request.name, Relay[i].getName()) == 0) {
-          noRelay = false;
-          if (strcmp(request.command, "on") == 0) {
-            Relay[i].on();
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
-                                          Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
-          } else if (strcmp(request.command, "off") == 0) { // Off
-            Relay[i].off();
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
-                                          Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
-          } else if (strcmp(request.command, "toggle") == 0) { // toggle
-            state = Relay[i].get();
-            Relay[i].toggle();
-            sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
-                                          Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
-          } else if (strcmp(request.command, "get") ==
-                     0) { // reportStatus or get
-            sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
-            /* Command not implemented.Info */
-          } else {
-            sendHTTPAPIRequestStatus(request, false);
-          }
-        }
-      } else {
-        break;
-      }
-    }
-    if (noRelay) {
+  if (strcmp(request.device, "gate") == 0) {
+    if (strcmp(request.command, "open") == 0) {
+      Relay[0].on();
+      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
+                                    Relay[0].get());
+      MQTTPublishRelayState(0);                       // MQTT Listener library
+    } else if (strcmp(request.command, "off") == 0) { // Off
+      Relay[0].off();
+      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_OFF,
+                                    Relay[0].get());
+      MQTTPublishRelayState(0);                       // MQTT Listener library
+    } else if (strcmp(request.command, "get") == 0) { // reportStatus or get
+      sendHTTPAPIRelayRequestStatus(request, true, Relay[0].get());
+      /* Command not implemented.Info */
+    } else {
       sendHTTPAPIRequestStatus(request, false);
     }
   } else if (strcmp(request.device, "contactron") == 0) {
@@ -117,7 +97,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (noContactron) {
       sendHTTPAPIRequestStatus(request, false);
     }
-
   } else if (strcmp(request.name, "temperature") == 0) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getTemperature())

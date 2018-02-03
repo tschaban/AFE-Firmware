@@ -22,10 +22,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     configuration.isSwitch[i] = Eeprom.read(395 + i * index);
   }
 
-  index = 23;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    configuration.isRelay[i] = Eeprom.read(459 + i * index);
-  }
+  configuration.isRelay[0] = Eeprom.read(459);
 
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {

@@ -16,34 +16,25 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   if (length >= 1) { // command arrived
 
     /* Checking if Relay related message has been received  */
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
-        sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
 
-        if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[1] == 'n') {
-            Relay[i].on();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "state", "on");
-          } else if ((char)payload[1] == 'f') {
-            Relay[i].off();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
-          } else if ((char)payload[1] == 'e') {
-            MQTTPublishRelayState(i);
-          } else if ((char)payload[1] == 'o') { // toggle
-            Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
-            MQTTPublishRelayState(i);
-          }
-        }
-      } else {
-        break;
+    sprintf(_mqttTopic, "%scmd", Relay[0].getMQTTTopic());
+
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[1] == 'n') {
+        Relay[0].on();
+        Mqtt.publish(Relay[0].getMQTTTopic(), "state", "on");
+      } else if ((char)payload[1] == 'f') {
+        Relay[0].off();
+        Mqtt.publish(Relay[0].getMQTTTopic(), "state", "off");
+      } else if ((char)payload[1] == 'e') {
+        MQTTPublishRelayState(0);
       }
     }
 
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
         sprintf(_mqttTopic, "%scmd", Contactron[i].getMQTTTopic());
-
-        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') {
+        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
           MQTTPublishContactronState(i);
         }
       } else {

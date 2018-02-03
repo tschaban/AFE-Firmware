@@ -260,21 +260,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isLED), itemsNumber, "hl",
       language == 0 ? "Ilość Led'ów" : "Number of LEDs");
 
-  /*
-    itemsNumber = 0;
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
-        itemsNumber++;
-      } else {
-        break;
-      }
-    }
-
-  body += generateHardwareItemsList(
-      sizeof(Device.configuration.isRelay), itemsNumber, "hr",
-      language == 0 ? "Ilość przekaźników" : "Number of relay");
-  */
-
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
     if (Device.configuration.isContactron[i]) {
@@ -758,19 +743,13 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += language == 0 ? ">Brak" : ">None";
   body += "</option>";
 
-  for (uint8_t i = 1; i <= sizeof(Device.configuration.isRelay); i++) {
-    if (Device.configuration.isRelay[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.relayID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
-    }
-  }
+  body += "<option value=\"";
+  body += 1;
+  body += "\"";
+  body += configuration.relayID == 1 ? " selected=\"selected\"" : "";
+  body += ">";
+  body += 1;
+  body += "</option>";
 
   body += "</select>";
   body += "</div>";

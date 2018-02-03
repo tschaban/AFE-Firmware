@@ -40,9 +40,6 @@ void AFEDefaults::set() {
   }
 
   deviceConfiguration.isRelay[0] = true;
-  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isRelay); i++) {
-    deviceConfiguration.isRelay[i] = false;
-  }
 
   deviceConfiguration.isContactron[0] = true;
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isContactron); i++) {
@@ -78,7 +75,7 @@ void AFEDefaults::set() {
 
   RelayConfiguration.timeToOff = 200;
   RelayConfiguration.gpio = 12;
-  sprintf(RelayConfiguration.name, "switch");
+  sprintf(RelayConfiguration.name, "gate");
   Data->saveConfiguration(0, RelayConfiguration);
 
   SwitchConfiguration.type = 0;
