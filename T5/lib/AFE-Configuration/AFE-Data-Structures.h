@@ -11,7 +11,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-CONTACTRON-Structure.h>
 #include <AFE-DEVICE-Structure.h>
+#include <AFE-DHT-Sensor-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
 #include <AFE-LED-Structure.h>
@@ -19,6 +21,5 @@
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
-#include <AFE-DHT-Sensor-Structure.h>
 
 #endif
