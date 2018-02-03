@@ -47,6 +47,8 @@ public:
                                         CONTACTRON data,
                                         uint8_t contactronIndex);
 
+  String getDHTConfigurationSite(const String option, uint8_t command, DH data);
+
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
   /* It generates site for firmware upgrade */

@@ -959,6 +959,118 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
       language == 0 ? "Aktualizacja firmware" : "Firmware upgrade", "", body);
 }
 
+String AFESitesGenerator::addDHTConfiguration() {
+
+  DH configuration;
+  configuration = Data.getDHTConfiguration();
+
+  String body = "<fieldset>";
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
+
+  body += "<div class=\"cf\">";
+  body += "<label>Typ";
+  body += language == 1 ? "e" : "";
+  body += "</label>";
+  body += "<select name=\"t\">";
+  body += "<option value=\"1\"";
+  body += (configuration.type == 1 ? " selected=\"selected\"" : "");
+  body += ">DH11</option>";
+  body += "<option value=\"2\"";
+  body += (configuration.type == 2 ? " selected=\"selected\"" : "");
+  body += ">DH21</option>";
+  body += "<option value=\"3\"";
+  body += (configuration.type == 3 ? " selected=\"selected\"" : "");
+  body += ">DH22</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.temperature.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
+                        : "seconds. Range: 10 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o" : "Temperature value correction";
+  body += "</label>";
+  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+          "step=\"0.01\" "
+          "value=\"";
+  body += configuration.temperature.correction;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "stopni. Zakres" : "degrees. Range";
+  body += ": -9.99&deg; - +9.99&deg;</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Jednostka" : "Unit";
+  body += "</label>";
+  body += "<select  name=\"u\">";
+  body += "<option value=\"0\"";
+  body +=
+      (configuration.temperature.unit == 0 ? " selected=\"selected\">" : ">");
+  body += language == 0 ? "Celsjusz" : "Celsius";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.temperature.unit == 1 ? " selected=\"selected\"" : "");
+  body += ">Fahrenheit</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"j\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.humidity.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
+                        : "seconds. Range: 10 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o" : "Humidity value correction";
+  body += "</label>";
+  body += "<input name=\"d\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+          "step=\"0.01\" "
+          "value=\"";
+  body += configuration.humidity.correction;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  body += ": -99.9 - +99.9</span>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock(language == 0
+                                   ? "Czujnik temperatury i wilgotności DHT"
+                                   : "DHT temperature and humidity sensor",
+                               "", body);
+}
+
 String AFESitesGenerator::addResetSection(uint8_t command) {
   String body = "<fieldset>";
   String subtitle;
