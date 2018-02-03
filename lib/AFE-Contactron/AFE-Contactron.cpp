@@ -11,18 +11,21 @@ AFEContactron::AFEContactron(uint8_t id) { begin(id); }
 void AFEContactron::begin(uint8_t id) {
   AFEDataAccess Data;
   ContactronConfiguration = Data.getContactronConfiguration(id);
+  MQTT MQTTConfiguration;
+  MQTTConfiguration = Data.getMQTTConfiguration();
   pinMode(ContactronConfiguration.gpio, INPUT_PULLUP);
   state = digitalRead(ContactronConfiguration.gpio);
   previousState = state;
-
+  sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic,
+          ContactronConfiguration.name);
   if (ContactronConfiguration.ledID > 0) {
     ContactronLed.begin(ContactronConfiguration.ledID - 1);
   }
   _initialized = true;
 }
 
-boolean AFEContactron::getState() {
-  uint8_t _return;
+byte AFEContactron::get() {
+  byte _return;
   if (ContactronConfiguration.outputDefaultState == CONTACTRON_NO) {
     if (state) {
       ContactronLed.on();
@@ -41,6 +44,12 @@ boolean AFEContactron::getState() {
     }
   }
   return _return;
+}
+
+const char *AFEContactron::getName() { return ContactronConfiguration.name; }
+
+const char *AFEContactron::getMQTTTopic() {
+  return ContactronConfiguration.mqttTopic;
 }
 
 boolean AFEContactron::changed() {

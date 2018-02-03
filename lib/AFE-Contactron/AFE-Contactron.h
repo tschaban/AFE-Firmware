@@ -25,7 +25,7 @@ private:
   boolean previousState; // Actually this stores current cotactron state
 
   unsigned long startTime = 0;
-
+  char mqttTopic[50];
   boolean connected =
       false; // It's set to true once button connected physically
   boolean _connected = false;
@@ -39,7 +39,13 @@ public:
 
   void begin(uint8_t id);
 
-  boolean getState();
+  byte get();
+
+  /* Methods returns contactron name */
+  const char *getName();
+
+  /* Method returns MQTT topic for this contactron */
+  const char *getMQTTTopic();
 
   boolean changed();
 

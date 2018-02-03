@@ -49,6 +49,11 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
+void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
+                                        byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == CONTACTRON_OPEN ? "open" : "closed");
+}
 
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
@@ -76,9 +81,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
                                           Relay[i].get());
             MQTTPublishRelayState(i); // MQTT Listener library
-          } else if (strcmp(request.command, "reportStatus") == 0 ||
-                     strcmp(request.command, "get") ==
-                         0) { // reportStatus or get
+          } else if (strcmp(request.command, "get") ==
+                     0) { // reportStatus or get
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
             /* Command not implemented.Info */
           } else {
@@ -92,19 +96,41 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);
     }
+  } else if (strcmp(request.device, "contactron") == 0) {
+    boolean noContactron = true;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        if (strcmp(request.name, Contactron[i].getName()) == 0) {
+          noContactron = false;
+          if (strcmp(request.command, "get") == 0) {
+            sendHTTPAPIContactronRequestStatus(request, true,
+                                               Contactron[i].get());
+            /* Command not implemented.Info */
+          } else {
+            sendHTTPAPIRequestStatus(request, false);
+          }
+        }
+      } else {
+        break;
+      }
+    }
+    if (noContactron) {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+
   } else if (strcmp(request.name, "temperature") == 0) {
-      strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getTemperature())
-          : sendHTTPAPIRequestStatus(request, false);
+    strcmp(request.command, "get") == 0
+        ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getTemperature())
+        : sendHTTPAPIRequestStatus(request, false);
   } else if (strcmp(request.name, "humidity") == 0) {
-      strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHumidity())
-          : sendHTTPAPIRequestStatus(request, false);
+    strcmp(request.command, "get") == 0
+        ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHumidity())
+        : sendHTTPAPIRequestStatus(request, false);
   } else if (strcmp(request.name, "heatIndex") == 0) {
-      strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHeatIndex())
-          : sendHTTPAPIRequestStatus(request, false);
-  }  else if (strcmp(request.command, "reboot") == 0) { // reboot
+    strcmp(request.command, "get") == 0
+        ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHeatIndex())
+        : sendHTTPAPIRequestStatus(request, false);
+  } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==

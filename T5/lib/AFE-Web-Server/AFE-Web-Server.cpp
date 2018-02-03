@@ -136,6 +136,21 @@ void AFEWebServer::generate() {
         break;
       }
     }
+
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        if (getOptionName() == "contactron" + String(i)) {
+          CONTACTRON data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getContactronData(i);
+          }
+          publishHTML(ConfigurationPanel.getContactronConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      } else {
+        break;
+      }
+    }
   }
 }
 
@@ -366,6 +381,66 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
 
   if (server.arg("r" + String(id)).length() > 0) {
     data.relayID = server.arg("r" + String(id)).toInt();
+  }
+
+  return data;
+}
+
+CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
+  CONTACTRON data;
+
+  if (server.arg("o" + String(id)).length() > 0) {
+    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+  }
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledID = server.arg("l" + String(id)).toInt();
+  }
+
+  if (server.arg("b" + String(id)).length() > 0) {
+    data.bouncing = server.arg("b" + String(id)).toInt();
+  }
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("n" + String(id)).length() > 0) {
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  }
+
+  return data;
+}
+
+DH AFEWebServer::getDHTData() {
+  DH data;
+
+  if (server.arg("g").length() > 0) {
+    data.gpio = server.arg("g").toInt();
+  }
+
+  if (server.arg("t").length() > 0) {
+    data.type = server.arg("t").toInt();
+  }
+
+  if (server.arg("c").length() > 0) {
+    data.temperature.correction = server.arg("c").toFloat();
+  }
+
+  if (server.arg("i").length() > 0) {
+    data.temperature.interval = server.arg("i").toInt();
+  }
+
+  if (server.arg("u").length() > 0) {
+    data.temperature.unit = server.arg("u").toInt();
+  }
+
+  if (server.arg("d").length() > 0) {
+    data.humidity.correction = server.arg("d").toFloat();
+  }
+
+  if (server.arg("j").length() > 0) {
+    data.humidity.interval = server.arg("j").toInt();
   }
 
   return data;

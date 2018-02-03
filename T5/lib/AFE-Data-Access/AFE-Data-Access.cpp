@@ -129,11 +129,24 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
   uint8_t nextContactron = 8;
+  MQTT configurationMQTT;
+  char mqttTopic[49];
+
   configuration.gpio = Eeprom.readUInt8(412 + id * nextContactron);
   configuration.outputDefaultState =
       Eeprom.readUInt8(413 + id * nextContactron);
   configuration.ledID = Eeprom.readUInt8(414 + id * nextContactron);
   configuration.bouncing = Eeprom.read(415 + id * nextContactron, 4).toInt();
+
+  Eeprom.read(443 + id * nextContactron, 16)
+      .toCharArray(configuration.name, sizeof(configuration.name));
+
+  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
+                                   sizeof(configurationMQTT.topic));
+
+  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
+          configuration.name);
+
   return configuration;
 }
 

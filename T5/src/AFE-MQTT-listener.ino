@@ -14,6 +14,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   char _mqttTopic[70];
   Led.on();
   if (length >= 1) { // command arrived
+
     /* Checking if Relay related message has been received  */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -32,6 +33,18 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
             MQTTPublishRelayState(i);
           }
+        }
+      } else {
+        break;
+      }
+    }
+
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        sprintf(_mqttTopic, "%scmd", Contactron[i].getMQTTTopic());
+
+        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') {
+          MQTTPublishContactronState(i);
         }
       } else {
         break;
@@ -59,7 +72,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
   }
-
   Led.off();
 }
 
@@ -68,5 +80,13 @@ void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Relay[id].getMQTTTopic(), "state",
                  Relay[id].get() == RELAY_ON ? "on" : "off");
+  }
+}
+
+/* Metod publishes Relay state (used eg by HTTP API) */
+void MQTTPublishContactronState(uint8_t id) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish(Contactron[id].getMQTTTopic(), "state",
+                 Contactron[id].get() == CONTACTRON_OPEN ? "open" : "closed");
   }
 }

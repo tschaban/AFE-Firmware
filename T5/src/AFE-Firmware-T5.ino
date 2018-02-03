@@ -27,6 +27,9 @@ AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
 
+float temperature;
+float humidity;
+
 void setup() {
 
   Serial.begin(115200);
@@ -53,9 +56,6 @@ void setup() {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
-  /* Initializing relay and setting it's default state at power on*/
-  initRelay();
-
   /* Initialzing network */
   Network.begin(Device.getMode());
 
@@ -69,8 +69,6 @@ void setup() {
   if (Device.getMode() != MODE_NORMAL) {
     Led.blinkingOn(100);
   }
-  /* Initializing switches */
-  initSwitch();
 
   /* Initializing MQTT */
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
@@ -82,6 +80,15 @@ void setup() {
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
+
+  /* Initializing relay */
+  initRelay();
+  /* Initializing switches */
+  initSwitch();
+  /* Initializing contactrons */
+  initContactron();
+  /* Initializing DHT Sensor */
+  initDHTSensor();
 }
 
 void loop() {
@@ -98,6 +105,8 @@ void loop() {
         mainHTTPRequestsHandler();
         mainRelay();
         mainSwitch();
+        mainContactron();
+        mainDHTSensor();
 
       } else { // Configuration Mode
         WebServer.listener();
@@ -111,6 +120,7 @@ void loop() {
   }
 
   mainSwitchListener();
+  mainContactronListener();
 
   Led.loop();
 }

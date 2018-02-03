@@ -49,6 +49,8 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
   LED getLEDData(uint8_t id);
+  CONTACTRON getContactronData(uint8_t id);
+  DH getDHTData();
   uint8_t getSystemLEDData();
   uint8_t getLanguageData();
 

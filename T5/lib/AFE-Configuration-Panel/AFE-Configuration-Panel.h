@@ -42,6 +42,11 @@ public:
                                    RELAY data, uint8_t relayIndex);
   String getSwitchConfigurationSite(const String option, uint8_t command,
                                     SWITCH data, uint8_t relayIndex);
+
+  String getContactronConfigurationSite(const String option, uint8_t command,
+                                        CONTACTRON data,
+                                        uint8_t contactronIndex);
+
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
   /* It generates site for firmware upgrade */

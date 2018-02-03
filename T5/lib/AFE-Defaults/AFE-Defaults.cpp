@@ -86,17 +86,24 @@ void AFEDefaults::set() {
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.functionality = 0;
   SwitchConfiguration.relayID = 1;
-  Data->saveConfiguration(0, SwitchConfiguration);
-
-  SwitchConfiguration.gpio = 9;
-  SwitchConfiguration.functionality = 1;
-  SwitchConfiguration.relayID = 1;
-  Data->saveConfiguration(1, SwitchConfiguration);
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
+    Data->saveConfiguration(i, SwitchConfiguration);
+  }
 
   LEDConfiguration.gpio = 13;
   LEDConfiguration.changeToOppositeValue = false;
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isLED); i++) {
     Data->saveConfiguration(i, LEDConfiguration);
+  }
+
+  ContactronConfiguration.gpio = 14;
+  ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
+  ContactronConfiguration.ledID = 0;
+  ContactronConfiguration.bouncing = 200;
+  sprintf(ContactronConfiguration.name, "contactron");
+
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isContactron); i++) {
+    Data->saveConfiguration(i, ContactronConfiguration);
   }
 
   Data->saveSystemLedID(1);

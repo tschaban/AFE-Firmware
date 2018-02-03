@@ -143,6 +143,13 @@ void AFEMQTT::publish(const char *topic, const char *type,
   publishToMQTTBroker(_mqttTopic, message);
 }
 
+void AFEMQTT::publish(const char *type, float value, uint8_t width,
+                      uint8_t precision) {
+  char message[10];
+  dtostrf(value, width, precision, message);
+  publish(type, message);
+}
+
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
     //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<

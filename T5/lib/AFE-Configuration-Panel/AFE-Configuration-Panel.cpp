@@ -178,6 +178,26 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   return page;
 }
 
+String AFEConfigurationPanel::getContactronConfigurationSite(
+    const String option, uint8_t command, CONTACTRON data,
+    uint8_t contactronIndex) {
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(contactronIndex, data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=switch";
+  page += contactronIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addContactronConfiguration(contactronIndex);
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page = Site.generateHeader();
   page += "<form method=\"post\" action=\"\" "

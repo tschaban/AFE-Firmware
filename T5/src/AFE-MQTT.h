@@ -52,6 +52,8 @@ public:
 
   /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
   void publish(const char *type, const char *message);
+  void publish(const char *type, float value, uint8_t width = 2,
+               uint8_t precision = 2);
 
   /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
    * publishToMQTTBroker  */

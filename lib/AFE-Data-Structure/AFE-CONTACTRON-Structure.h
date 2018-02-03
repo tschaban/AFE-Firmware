@@ -19,10 +19,11 @@
 
 struct CONTACTRON {
   uint8_t gpio;
-  uint8_t outputDefaultState;
+  byte outputDefaultState;
   uint8_t ledID;
   uint16_t bouncing;
   char name[16];
+  char mqttTopic[49];
 };
 
 #endif

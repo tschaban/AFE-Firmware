@@ -60,7 +60,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-  page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
+  page += language == 0 ? "do sterownika bramy" : "for gate controller";
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -93,9 +93,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
+    page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
+    page += language == 0 ? "Konfiguracja przekaźnia" : "Relay configuration";
+    page += "</a></li>";
+
     itemPresent = 0;
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
         itemPresent++;
       } else {
         break;
@@ -104,11 +108,11 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
     if (itemPresent > 0) {
       page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "przekaźników</a></li>";
+              "kontaktronów</a></li>";
       for (uint8_t i = 0; i < itemPresent; i++) {
-        page += "<li class=\"itm\"><a href=\"\\?option=relay";
+        page += "<li class=\"itm\"><a href=\"\\?option=contactron";
         page += i;
-        page += "\">&#8227; Przekaźnik: ";
+        page += "\">&#8227; Kontaktron: ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -256,9 +260,24 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isLED), itemsNumber, "hl",
       language == 0 ? "Ilość Led'ów" : "Number of LEDs");
 
+  /*
+    itemsNumber = 0;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      if (Device.configuration.isRelay[i]) {
+        itemsNumber++;
+      } else {
+        break;
+      }
+    }
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isRelay), itemsNumber, "hr",
+      language == 0 ? "Ilość przekaźników" : "Number of relay");
+  */
+
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-    if (Device.configuration.isRelay[i]) {
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+    if (Device.configuration.isContactron[i]) {
       itemsNumber++;
     } else {
       break;
@@ -266,8 +285,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(
-      sizeof(Device.configuration.isRelay), itemsNumber, "hr",
-      language == 0 ? "Ilość przekaźników" : "Number of relay");
+      sizeof(Device.configuration.isContactron), itemsNumber, "hc",
+      language == 0 ? "Ilość kontaktronów" : "Number of contactrons");
 
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
@@ -676,165 +695,24 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "</div>";
+
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Nazwa" : "Name";
+  body += language == 0 ? "Długośc impulsu*" : "Impulse duration*";
   body += "*</label>";
-  body += "<input name=\"n" + String(id) +
-          "\" type=\"text\" maxlength=\"16\" value=\"";
-  body += configuration.name;
-  body += "\">";
-  body += "<span class=\"hint\">Max 16 ";
-  body += language == 0 ? "znaków" : "chars";
-  body += "</span>";
-  body += "</div>";
-
-  body += "<p class=\"cm\">";
-  body += language == 0 ? "Wartości domyślne" : "Default values";
-  body += "</p>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body +=
-      language == 0 ? "Po przywróceniu zasilania" : "When power is restored";
-  body += "</label>";
-  body += "<select name=\"r" + String(id) + "\">";
-  body += "<option value=\"0\"";
-  body += (configuration.statePowerOn == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Brak akcji" : "No action";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.statePowerOn == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Wyłączony" : "Off";
-  body += "</option>";
-  body += "<option value=\"2\"";
-  body += (configuration.statePowerOn == 2 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Włączony" : "On";
-  body += "</option>";
-  body += "<option value=\"3\"";
-  body += (configuration.statePowerOn == 3 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
-  body += "</option>";
-  body += "<option value=\"4\"";
-  body += (configuration.statePowerOn == 4 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
-                        : "Opposite to the last known state";
-  body += "</option>";
-  body += "</select>";
-  body += "</div>";
-
-  /* @TODO MQTT */
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Po podłączeniu do brokera MQTT"
-                        : "After establishing connection to MQTT Broker";
-  body += "</label>";
-  body += "<select  name=\"c" + String(id) + "\">";
-  body += "<option value=\"0\"";
-  body +=
-      (configuration.stateMQTTConnected == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Brak akcji" : "No action";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body +=
-      (configuration.stateMQTTConnected == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Wyłączony" : "Off";
-  body += "</option>";
-  body += "<option value=\"2\"";
-  body +=
-      (configuration.stateMQTTConnected == 2 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Włączony" : "On";
-  body += "</option>";
-  body += "<option value=\"3\"";
-  body +=
-      (configuration.stateMQTTConnected == 3 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
-  body += "</option>";
-  body += "<option value=\"4\"";
-  body +=
-      (configuration.stateMQTTConnected == 4 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej wartości"
-                        : "Opposite to the last known state";
-  body += "</option>";
-  body += "<option value=\"5\"";
-  body +=
-      (configuration.stateMQTTConnected == 5 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0
-              ? "Pobierz stan przekaźnika z systemu kontrolującego (przez MQTT)"
-              : "Get relay's state from a home automation system (over MQTT)";
-  body += "</option>";
-  body += "</select>";
-  body += "</div>";
-
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
-                        : "Automatic switching off of the relay";
-  body += "</p>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Wyłącz po" : "Switch off after";
-  body += "*</label>";
-  body +=
-      "<input name=\"t" + String(id) +
-      "\" type=\"number\" step=\"0.01\" max=\"86400\" min=\"0.00\" value=\"";
+  body += "<input name=\"t" + String(id) +
+          "\" type=\"number\" step=\"1\" max=\"2000\" min=\"1\" value=\"";
   body += configuration.timeToOff;
   body += "\">";
-  body += "<span class=\"hint\">0.01 - 86400";
-  body += language == 0 ? "sekund (24h). Brak akcji jeśli jest 0"
-                        : "seconds (24h). No action if it's set to 0";
+  body += "<span class=\"hint\">1 - 2000 milise";
+  body += language == 0 ? "kund" : "cunds";
   body += "</span>";
-  body += "</div>";
-
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
-                        : "Select LED informing about relay state";
-  body += "</p>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>LED</label>";
-
-  body += "<select  name=\"l" + String(id) + "\">";
-
-  body += "<option value=\"0\"";
-  body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
-  body += language == 0 ? ">Brak" : ">None";
-  body += "</option>";
-
-  for (uint8_t i = 1; i <= sizeof(Device.configuration.isLED); i++) {
-    if (Device.configuration.isLED[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.ledID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
-    }
-  }
-
-  body += "</select>";
   body += "</div>";
 
   body += "</fieldset>";
 
-  char title[23];
-  language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
-                : sprintf(title, "Relay #%d", id + 1);
-
-  return addConfigurationBlock(title, "", body);
+  return addConfigurationBlock(language == 0 ? "Przekaźnik" : "Relay", "",
+                               body);
 }
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
@@ -939,6 +817,96 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   char title[23];
   language == 0 ? sprintf(title, "Przycisk / Włącznik #%d", id + 1)
                 : sprintf(title, "Switch / Button #%d", id + 1);
+
+  return addConfigurationBlock(title, "", body);
+}
+
+String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
+  CONTACTRON configuration;
+  configuration = Data.getContactronConfiguration(id);
+
+  String body = "<fieldset>";
+  char filed[13];
+  sprintf(filed, "g%d", id);
+  body += "<div class=\"cf\">";
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Typ" : "Type";
+  body += "</label>";
+  body += "<select name=\"o" + String(id) + "\">";
+  body += "<option value=\"0\"";
+  body +=
+      (configuration.outputDefaultState == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NO" : "NO";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body +=
+      (configuration.outputDefaultState == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NC" : "NC";
+  body += "</option>";
+
+  body += "</select>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>LED ";
+  body +=
+      language == 0 ? "przypisany do kontaktrony" : "assigned to contactron";
+  body += "</label>";
+
+  body += "<select  name=\"l" + String(id) + "\">";
+
+  body += "<option value=\"0\"";
+  body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+  body += language == 0 ? ">Brak" : ">None";
+  body += "</option>";
+
+  for (uint8_t i = 1; i <= sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i - 1]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration.ledID == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
+    } else {
+      break;
+    }
+  }
+
+  body += "</select>";
+  body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0
+              ? "Czułość należy ustawić eksperymentalnie, aż uzyska się "
+                "pożądane działanie kontraktonu"
+              : "Sensitiveness should be adjusted experimentally until "
+                "contracton behave as expected";
+
+  body += "</p><div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Czułość" : "Sensitiveness";
+  body += "*</label>";
+  body += "<input name=\"b" + String(id) +
+          "\" type=\"number\" max=\"2000\" min=\"0\" step=\"1\" "
+          "value=\"";
+  body += configuration.bouncing;
+  body += "\">";
+  body += "<span class=\"hint\">0 - 2000 (milise";
+  body += language == 0 ? "kund" : "conds";
+  body += ")</span>";
+  body += "</div>";
+  body += "</fieldset>";
+
+  char title[23];
+  language == 0 ? sprintf(title, "Kontaktron #%d", id + 1)
+                : sprintf(title, "Contactron #%d", id + 1);
 
   return addConfigurationBlock(title, "", body);
 }
