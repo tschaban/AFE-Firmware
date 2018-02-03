@@ -20,10 +20,10 @@ struct DEVICE {
   boolean mqttAPI;
   boolean httpAPI;
   boolean domoticzAPI;
-  boolean isLED[2];
+  boolean isLED[3];
   boolean isRelay[1];
   boolean isSwitch[2];
-  boolean isContracton[2];
+  boolean isCotactron[2];
   boolean isDHT;
 };
 
