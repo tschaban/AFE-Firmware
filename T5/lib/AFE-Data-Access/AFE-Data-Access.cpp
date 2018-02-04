@@ -22,8 +22,6 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     configuration.isSwitch[i] = Eeprom.read(395 + i * index);
   }
 
-  configuration.isRelay[0] = Eeprom.read(459);
-
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
     configuration.isContactron[i] = Eeprom.read(411 + i * index);
@@ -93,21 +91,10 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
 
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
-  MQTT configurationMQTT;
-  uint8_t nextRelay = 23;
-  char mqttTopic[49];
+  uint8_t nextRelay = 5;
 
   configuration.gpio = Eeprom.readUInt8(459 + id * nextRelay);
-  configuration.timeToOff = Eeprom.read(461 + id * nextRelay, 4).toFloat();
-
-  Eeprom.read(465 + id * nextRelay, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
-
-  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
-                                   sizeof(configurationMQTT.topic));
-
-  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
-          configuration.name);
+  configuration.timeToOff = Eeprom.read(460 + id * nextRelay, 4).toInt();
 
   return configuration;
 }
@@ -125,7 +112,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
-  uint8_t nextContactron = 8;
+  uint8_t nextContactron = 24;
   MQTT configurationMQTT;
   char mqttTopic[49];
 
@@ -135,7 +122,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   configuration.ledID = Eeprom.readUInt8(414 + id * nextContactron);
   configuration.bouncing = Eeprom.read(415 + id * nextContactron, 4).toInt();
 
-  Eeprom.read(443 + id * nextContactron, 16)
+  Eeprom.read(419 + id * nextContactron, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
@@ -162,12 +149,7 @@ DH AFEDataAccess::getDHTConfiguration() {
 void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(9, 16, configuration.name);
 
-  uint8_t index = 23;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    Eeprom.write(459 + i * index, configuration.isRelay[i]);
-  }
-
-  index = 8;
+  uint8_t index = 8;
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
     Eeprom.write(395 + i * index, configuration.isSwitch[i]);
   }
@@ -177,12 +159,12 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
     Eeprom.write(366 + i * index, configuration.isLED[i]);
   }
 
-  index = 8;
+  index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
     Eeprom.write(411 + i * index, configuration.isContactron[i]);
   }
 
-  Eeprom.write(369, configuration.isDHT);
+  Eeprom.write(374, configuration.isDHT);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
 }
@@ -216,10 +198,9 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
-  uint8_t nextRelay = 23;
-  Eeprom.writeUInt8(460 + id * nextRelay, configuration.gpio);
-  Eeprom.write(461 + id * nextRelay, 4, configuration.timeToOff);
-  Eeprom.write(465 + id * nextRelay, 16, configuration.name);
+  uint8_t nextRelay = 5;
+  Eeprom.writeUInt8(459 + id * nextRelay, configuration.gpio);
+  Eeprom.write(460 + id * nextRelay, 4, long(configuration.timeToOff));
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -238,13 +219,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
-  uint8_t nextContactron = 8;
+  uint8_t nextContactron = 24;
   Eeprom.writeUInt8(412 + id * nextContactron, configuration.gpio);
   Eeprom.writeUInt8(413 + id * nextContactron,
                     configuration.outputDefaultState);
   Eeprom.writeUInt8(414 + id * nextContactron, configuration.ledID);
   Eeprom.write(415 + id * nextContactron, 4, (long)configuration.bouncing);
-  Eeprom.write(443 + id * nextContactron, 16, configuration.name);
+  Eeprom.write(419 + id * nextContactron, 16, configuration.name);
 }
 
 void AFEDataAccess::saveConfiguration(DH configuration) {

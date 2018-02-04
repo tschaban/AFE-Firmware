@@ -21,16 +21,16 @@ class AFEContactron {
 private:
   CONTACTRON ContactronConfiguration;
   boolean _initialized = false;
-  boolean state;
-  boolean previousState; // Actually this stores current cotactron state
+  boolean state;            // It stores actual contactron state
+  byte _state;              // This contains contactron state to return
+  boolean _changed = false; // True if contractor changed state
 
   unsigned long startTime = 0;
   char mqttTopic[50];
-  boolean connected =
-      false; // It's set to true once button connected physically
-  boolean _connected = false;
 
   AFELED ContactronLed;
+
+  void convert();
 
 public:
   /* Constructors */

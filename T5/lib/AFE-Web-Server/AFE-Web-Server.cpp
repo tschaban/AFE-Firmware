@@ -76,7 +76,7 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
-    LED data[5] = {};
+    LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
     if (getCommand() == SERVER_CMD_SAVE) {
       for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
@@ -107,19 +107,13 @@ void AFEWebServer::generate() {
     }
   } else {
 
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
-        if (getOptionName() == "relay" + String(i)) {
-          RELAY data = {};
-          if (getCommand() == SERVER_CMD_SAVE) {
-            data = getRelayData(i);
-          }
-          publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-              getOptionName(), getCommand(), data, i));
-        }
-      } else {
-        break;
+    if (getOptionName() == "relay0") {
+      RELAY data = {};
+      if (getCommand() == SERVER_CMD_SAVE) {
+        data = getRelayData(0);
       }
+      publishHTML(ConfigurationPanel.getRelayConfigurationSite(
+          getOptionName(), getCommand(), data, 0));
     }
 
     for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
@@ -214,14 +208,14 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
 
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-    server.arg("hr").toInt() > i ? data.isRelay[i] = true
-                                 : data.isRelay[i] = false;
-  }
-
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
+  }
+
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+    server.arg("hc").toInt() > i ? data.isContactron[i] = true
+                                 : data.isContactron[i] = false;
   }
 
   return data;
@@ -337,20 +331,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
 
-  if (server.arg("r" + String(id)).length() > 0) {
-    data.statePowerOn = server.arg("r" + String(id)).toInt();
-  }
-
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
-  }
-
-  if (server.arg("c" + String(id)).length() > 0) {
-    data.stateMQTTConnected = server.arg("c" + String(id)).toInt();
-  }
-
   if (server.arg("t" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("t" + String(id)).toFloat();
+    data.timeToOff = server.arg("t" + String(id)).toInt();
   }
 
   if (server.arg("l" + String(id)).length() > 0) {

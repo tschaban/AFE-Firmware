@@ -105,7 +105,7 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
 
 String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
                                                       uint8_t command,
-                                                      LED data[5],
+                                                      LED data[3],
                                                       uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
@@ -187,7 +187,7 @@ String AFEConfigurationPanel::getContactronConfigurationSite(
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=switch";
+  page += "<form action=\"/?option=contactron";
   page += contactronIndex;
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addContactronConfiguration(contactronIndex);

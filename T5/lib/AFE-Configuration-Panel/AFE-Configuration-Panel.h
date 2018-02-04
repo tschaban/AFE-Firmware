@@ -37,7 +37,7 @@ public:
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
   String getLEDConfigurationSite(const String option, uint8_t command,
-                                 LED data[5], uint8_t dataLedID);
+                                 LED data[3], uint8_t dataLedID);
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data, uint8_t relayIndex);
   String getSwitchConfigurationSite(const String option, uint8_t command,

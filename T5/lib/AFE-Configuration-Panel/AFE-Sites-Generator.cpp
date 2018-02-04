@@ -93,7 +93,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
-    page += "<li class=\"itm\"><a href=\"\\?option=relay\">";
+    page += "<li class=\"itm\"><a href=\"\\?option=relay0\">";
     page += language == 0 ? "Konfiguracja przekaźnia" : "Relay configuration";
     page += "</a></li>";
 
@@ -107,12 +107,15 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "kontaktronów</a></li>";
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
+      page += language == 0 ? "Konfiguracja kontaktronów"
+                            : "Contactrons' configuration";
+      page += "</a></li>";
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=contactron";
         page += i;
-        page += "\">&#8227; Kontaktron: ";
+        page += "\">&#8227; ";
+        page += language == 0 ? "Kontaktron: " : "Contactron: ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -128,13 +131,16 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "przycisków / włączników</a></li>";
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
+      page += language == 0 ? "Konfiguracja przycisków / włączników"
+                            : "Switches configuration";
+      page += "</a></li>";
 
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=switch";
         page += i;
-        page += "\">&#8227; Przycisk: ";
+        page += "\">&#8227; ";
+        page += language == 0 ? "Przycisk: " : "Switch: ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -247,7 +253,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
       body);
 
   body = "<fieldset>";
-
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
       itemsNumber++;
@@ -268,7 +273,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
       break;
     }
   }
-
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isContactron), itemsNumber, "hc",
       language == 0 ? "Ilość kontaktronów" : "Number of contactrons");
@@ -281,7 +285,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
       break;
     }
   }
-
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
@@ -683,7 +686,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Długośc impulsu*" : "Impulse duration*";
+  body += language == 0 ? "Długośc impulsu" : "Impulse duration";
   body += "*</label>";
   body += "<input name=\"t" + String(id) +
           "\" type=\"number\" step=\"1\" max=\"2000\" min=\"1\" value=\"";
@@ -812,6 +815,18 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
+  body += language == 0 ? "Nazwa" : "Name";
+  body += "*</label>";
+  body += "<input name=\"n" + String(id) +
+          "\" type=\"text\" maxlength=\"16\" value=\"";
+  body += configuration.name;
+  body += "\">";
+  body += "<span class=\"hint\">Max 16 ";
+  body += language == 0 ? "znaków" : "chars";
+  body += "</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
   body += language == 0 ? "Typ" : "Type";
   body += "</label>";
   body += "<select name=\"o" + String(id) + "\">";
@@ -864,9 +879,9 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += "<br><p class=\"cm\">";
   body += language == 0
               ? "Czułość należy ustawić eksperymentalnie, aż uzyska się "
-                "pożądane działanie kontraktonu"
+                "pożądane działanie kontactronu"
               : "Sensitiveness should be adjusted experimentally until "
-                "contracton behave as expected";
+                "contactron behaves as expected";
 
   body += "</p><div class=\"cf\">";
   body += "<label>";

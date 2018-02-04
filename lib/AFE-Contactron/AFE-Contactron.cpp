@@ -15,7 +15,7 @@ void AFEContactron::begin(uint8_t id) {
   MQTTConfiguration = Data.getMQTTConfiguration();
   pinMode(ContactronConfiguration.gpio, INPUT_PULLUP);
   state = digitalRead(ContactronConfiguration.gpio);
-  previousState = state;
+  state = state;
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic,
           ContactronConfiguration.name);
   if (ContactronConfiguration.ledID > 0) {
@@ -24,27 +24,27 @@ void AFEContactron::begin(uint8_t id) {
   _initialized = true;
 }
 
-byte AFEContactron::get() {
-  byte _return;
+void AFEContactron::convert() {
   if (ContactronConfiguration.outputDefaultState == CONTACTRON_NO) {
     if (state) {
       ContactronLed.on();
-      _return = CONTACTRON_OPEN;
+      _state = CONTACTRON_OPEN;
     } else {
       ContactronLed.off();
-      _return = CONTACTRON_CLOSED;
+      _state = CONTACTRON_CLOSED;
     }
   } else {
     if (state) {
       ContactronLed.on();
-      _return = CONTACTRON_CLOSED;
+      _state = CONTACTRON_CLOSED;
     } else {
       ContactronLed.off();
-      _return = CONTACTRON_OPEN;
+      _state = CONTACTRON_OPEN;
     }
   }
-  return _return;
 }
+
+byte AFEContactron::get() { return _state; }
 
 const char *AFEContactron::getName() { return ContactronConfiguration.name; }
 
@@ -53,8 +53,8 @@ const char *AFEContactron::getMQTTTopic() {
 }
 
 boolean AFEContactron::changed() {
-  if (connected) {
-    connected = false;
+  if (_changed) {
+    _changed = false;
     return true;
   } else {
     return false;
@@ -66,22 +66,20 @@ void AFEContactron::listener() {
     boolean currentState = digitalRead(ContactronConfiguration.gpio);
     unsigned long time = millis();
 
-    if (currentState != previousState) { // contactron stage changed
+    if (currentState != state) { // contactron stage changed
 
       if (startTime == 0) { // starting timer. used for contactron bouncing
         startTime = time;
       }
 
       if (time - startTime >= ContactronConfiguration.bouncing) {
-
-        state = !state;
-        previousState = currentState;
-        connected = true;
+        state = currentState;
+        convert();
+        _changed = true;
       }
 
-    } else if (currentState == previousState && startTime > 0) {
+    } else if (currentState == state && startTime > 0) {
       startTime = 0;
-      _connected = false;
     }
   }
 }
