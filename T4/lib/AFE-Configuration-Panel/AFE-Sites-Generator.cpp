@@ -243,7 +243,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
       body);
 
   body = "<fieldset>";
-
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
       itemsNumber++;
