@@ -305,6 +305,7 @@ LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
   if (server.arg("g" + String(id)).length() > 0) {
     data.gpio = server.arg("g" + String(id)).toInt();
+    //    Serial << endl << "Odczyt g" << id << " gpio=" << data.gpio;
   }
 
   server.arg("o" + String(id)).length() > 0

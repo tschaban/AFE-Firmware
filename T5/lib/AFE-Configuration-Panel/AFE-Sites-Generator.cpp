@@ -605,6 +605,9 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
+
+  //  Serial << endl << "LED: " << id << " gpio " << configuration.gpio;
+
   String body = "<fieldset>";
   char filed[13];
   sprintf(filed, "g%d", id);
