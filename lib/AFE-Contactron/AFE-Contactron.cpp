@@ -22,6 +22,7 @@ void AFEContactron::begin(uint8_t id) {
     ContactronLed.begin(ContactronConfiguration.ledID - 1);
   }
   _initialized = true;
+  convert();
 }
 
 void AFEContactron::convert() {
@@ -35,10 +36,10 @@ void AFEContactron::convert() {
     }
   } else {
     if (state) {
-      ContactronLed.on();
+      ContactronLed.off();
       _state = CONTACTRON_CLOSED;
     } else {
-      ContactronLed.off();
+      ContactronLed.on();
       _state = CONTACTRON_OPEN;
     }
   }
