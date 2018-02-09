@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Led.h>
-// #include <Streaming.h>
+//#include <Streaming.h>
 
 class AFERelay {
 
@@ -23,7 +23,9 @@ private:
   RELAY RelayConfiguration;
   AFELED Led;
   char mqttTopic[50];
+
   unsigned long turnOffCounter = 0;
+  boolean timerUnitInSeconds = true;
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
@@ -76,6 +78,10 @@ public:
 
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
+
+  /* It sets unit of relay to auto turn off timer. Possible options: true -
+   * secods, false - miliseconds */
+  void setTimerUnitToSeconds(boolean value);
 };
 
 #endif

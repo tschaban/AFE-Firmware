@@ -94,7 +94,8 @@ boolean AFERelay::autoTurnOff(boolean invert) {
 
   if (RelayConfiguration.timeToOff > 0 &&
       ((invert && get() == RELAY_OFF) || (!invert && get() == RELAY_ON)) &&
-      millis() - turnOffCounter >= RelayConfiguration.timeToOff * 1000) {
+      millis() - turnOffCounter >=
+          RelayConfiguration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
 
     invert ? on(invert) : off(invert);
     return true;
@@ -116,3 +117,7 @@ void AFERelay::setTimer(float timer) {
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
+
+void AFERelay::setTimerUnitToSeconds(boolean value) {
+  timerUnitInSeconds = value;
+}
