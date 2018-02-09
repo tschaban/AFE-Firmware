@@ -36,6 +36,8 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+  const String generateGateStatesList(uint8_t id, byte state);
+
 public:
   /* Constructor*/
   AFESitesGenerator();
@@ -59,6 +61,7 @@ public:
   String addSwitchConfiguration(uint8_t id);
   String addContactronConfiguration(uint8_t id);
   String addDHTConfiguration();
+  String addGateConfiguration();
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();

@@ -51,6 +51,7 @@ private:
   LED getLEDData(uint8_t id);
   CONTACTRON getContactronData(uint8_t id);
   DH getDHTData();
+  GATE getGateData();
   uint8_t getSystemLEDData();
   uint8_t getLanguageData();
 

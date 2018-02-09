@@ -147,6 +147,14 @@ DH AFEDataAccess::getDHTConfiguration() {
   return configuration;
 }
 
+GATE AFEDataAccess::getGateConfiguration() {
+  GATE configuration;
+  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+    configuration.state[i] = Eeprom.readUInt8(466 + i);
+  }
+  return configuration;
+}
+
 void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(9, 16, configuration.name);
 
@@ -238,6 +246,12 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
   Eeprom.write(385, 4, (float)configuration.temperature.correction);
   Eeprom.write(389, 5, (long)configuration.humidity.interval);
   Eeprom.write(394, 3, (float)configuration.humidity.correction);
+}
+
+void AFEDataAccess::saveConfiguration(GATE configuration) {
+  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+    Eeprom.writeUInt8(466 + i, configuration.state[i]);
+  }
 }
 
 const char AFEDataAccess::getVersion() {

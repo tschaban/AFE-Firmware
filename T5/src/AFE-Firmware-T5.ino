@@ -26,6 +26,7 @@ AFERelay Relay[sizeof(Device.configuration.isRelay)];
 AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
+GATE GateState;
 
 float temperature;
 float humidity;
@@ -36,7 +37,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  Serial.swap();
+  // Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -89,6 +90,8 @@ void setup() {
   initContactron();
   /* Initializing DHT Sensor */
   initDHTSensor();
+
+  GateState = Data.getGateConfiguration();
 }
 
 void loop() {

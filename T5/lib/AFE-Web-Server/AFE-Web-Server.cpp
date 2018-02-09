@@ -145,6 +145,15 @@ void AFEWebServer::generate() {
         break;
       }
     }
+
+    if (getOptionName() == "gate") {
+      GATE data = {};
+      if (getCommand() == SERVER_CMD_SAVE) {
+        data = getGateData();
+      }
+      publishHTML(ConfigurationPanel.getGateConfigurationSite(
+          getOptionName(), getCommand(), data));
+    }
   }
 }
 
@@ -431,4 +440,14 @@ DH AFEWebServer::getDHTData() {
 
 uint8_t AFEWebServer::getLanguageData() {
   return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
+}
+
+GATE AFEWebServer::getGateData() {
+  GATE data;
+  for (uint8_t i = 0; i < sizeof(data.state); i++) {
+    if (server.arg("s" + String(i)).length() > 0) {
+      data.state[i] = server.arg("s" + String(i)).toInt();
+    }
+  }
+  return data;
 }

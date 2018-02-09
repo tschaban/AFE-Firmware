@@ -49,6 +49,9 @@ public:
 
   String getDHTConfigurationSite(const String option, uint8_t command, DH data);
 
+  String getGateConfigurationSite(const String option, uint8_t command,
+                                  GATE data);
+
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
   /* It generates site for firmware upgrade */

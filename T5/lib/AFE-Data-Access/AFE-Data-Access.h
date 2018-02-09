@@ -32,6 +32,7 @@ public:
   SWITCH getSwitchConfiguration(uint8_t id);
   CONTACTRON getContactronConfiguration(uint8_t id);
   DH getDHTConfiguration();
+  GATE getGateConfiguration();
 
   /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
@@ -43,6 +44,7 @@ public:
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(uint8_t id, CONTACTRON configuration);
   void saveConfiguration(DH configuration);
+  void saveConfiguration(GATE configuration);
 
   /* Methods read and save firmware version from/to EEPROM */
   const char getVersion();

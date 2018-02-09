@@ -215,6 +215,23 @@ String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
   return page;
 }
 
+String AFEConfigurationPanel::getGateConfigurationSite(const String option,
+                                                       uint8_t command,
+                                                       GATE data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=gate&cmd=1\"  method=\"post\">";
+  page += Site.addGateConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page = Site.generateHeader();
   page += "<form method=\"post\" action=\"\" "

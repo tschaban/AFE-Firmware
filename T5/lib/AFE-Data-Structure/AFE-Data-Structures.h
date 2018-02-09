@@ -15,6 +15,7 @@
 #include <AFE-DEVICE-T5-Structure.h>
 #include <AFE-DHT-Sensor-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
+#include <AFE-GATE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
 #include <AFE-LED-Structure.h>
 #include <AFE-MQTT-Structure.h>

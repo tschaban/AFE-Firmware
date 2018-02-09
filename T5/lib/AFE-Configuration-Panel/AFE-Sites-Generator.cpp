@@ -107,7 +107,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
+      page += "<li  class=\"itm\"><a>";
       page += language == 0 ? "Konfiguracja kontaktronów"
                             : "Contactrons' configuration";
       page += "</a></li>";
@@ -119,6 +119,11 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         page += i + 1;
         page += "</a></li>";
       }
+
+      page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
+      page += language == 0 ? "Konfiguracja stanów bramy"
+                            : "Gate states configuration";
+      page += "</a></li>";
     }
 
     itemPresent = 0;
@@ -216,7 +221,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         "<a "
         "href=\"https://www.paypal.com/cgi-bin/"
         "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-        "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
+        "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT5%"
         "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
         "3aNonHosted\" target=\"_blank\"><img "
         "src=\"http://adrian.czabanowski.com/afe/donation/T";
@@ -908,6 +913,80 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   return addConfigurationBlock(title, "", body);
 }
 
+String AFESitesGenerator::addGateConfiguration() {
+  GATE gateConfiguration = Data.getGateConfiguration();
+  DEVICE deviceConfiguration = Device.configuration;
+  uint8_t noOfContactrons = deviceConfiguration.isContactron[1] ? 2 : 1;
+  CONTACTRON configuration[noOfContactrons];
+
+  for (uint8_t i = 0; i < noOfContactrons; i++) {
+    configuration[i] = Data.getContactronConfiguration(i);
+  }
+
+  String body = "<fieldset>";
+
+  body += "<p class=\"cm\">";
+  if (language == 0) {
+    body += "Jeśli kontaktron: ";
+    body += configuration[0].name;
+    body += " jest otwarty";
+
+    if (noOfContactrons == 2) {
+      body += " i kontaktron: ";
+      body += configuration[1].name;
+      body += " jest otwarty";
+    }
+    body += " to:";
+  }
+  body += "</p>";
+  body += generateGateStatesList(0, gateConfiguration.state[0]);
+  if (noOfContactrons == 2) {
+    body += "<br><br><p class=\"cm\">";
+    if (language == 0) {
+      body += "Jeśli kontaktron: ";
+      body += configuration[0].name;
+      body += " jest otwarty, a kontaktron: ";
+      body += configuration[1].name;
+      body += " jest zamknięty to:";
+    }
+    body += "</p>";
+    body += generateGateStatesList(1, gateConfiguration.state[1]);
+
+    body += "<br><br><p class=\"cm\">";
+    if (language == 0) {
+      body += "Jeśli kontaktron: ";
+      body += configuration[0].name;
+      body += " jest zamknięty, a kontaktron: ";
+      body += configuration[1].name;
+      body += " jest otwarty to:";
+    }
+    body += "</p>";
+    body += generateGateStatesList(2, gateConfiguration.state[2]);
+  }
+
+  body += "<br><br><p class=\"cm\">";
+  if (language == 0) {
+    body += "Jeśli kontaktron: ";
+    body += configuration[0].name;
+    body += " jest zamknięty";
+
+    if (noOfContactrons == 2) {
+      body += " i kontaktron: ";
+      body += configuration[1].name;
+      body += " jest zamknięty";
+    }
+    body += " to:";
+  }
+  body += "</p>";
+  body += generateGateStatesList(3, gateConfiguration.state[3]);
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock(language == 0 ? "Konfiguracja stanów bramy"
+                                             : "Gate states configuration",
+                               "", body);
+}
+
 String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
@@ -1225,6 +1304,39 @@ const String AFESitesGenerator::generateHardwareItemsList(
     body += "</option>";
   }
 
+  body += "</select>";
+  body += "</div>";
+
+  return body;
+}
+
+const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
+  String body = "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Ustaw stan bramy na" : "Set gate's state to";
+  body += "</label>";
+  body += "<select name=\"s" + String(id) + "\">";
+  body += "<option value=\"";
+  body += GATE_OPEN;
+  body += "\"";
+  body += (state == GATE_OPEN ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Otwarta" : "Open";
+  body += "</option>";
+  body += "<option value=\"";
+  body += GATE_PARTIALLY_OPEN;
+  body += "\"";
+  body += (state == GATE_PARTIALLY_OPEN ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Częściowo otwarta" : "Partially open";
+  body += "</option>";
+  body += "<option value=\"";
+  body += GATE_CLOSED;
+  body += "\"";
+  body += (state == GATE_CLOSED ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Zamknięta" : "Closed";
+  body += "</option>";
   body += "</select>";
   body += "</div>";
 
