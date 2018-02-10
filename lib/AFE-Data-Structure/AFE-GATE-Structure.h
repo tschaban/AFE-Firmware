@@ -14,6 +14,7 @@
 #define GATE_OPEN 0           // Open
 #define GATE_CLOSED 1         // Closed
 #define GATE_PARTIALLY_OPEN 2 // Being opened
+#define GATE_UNKNOWN 9        // Unknown state
 
 struct GATE {
   uint8_t state[4];
