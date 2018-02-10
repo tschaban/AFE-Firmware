@@ -15,10 +15,8 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   Led.on();
   if (length >= 1) { // command arrived
 
-    /* Checking if Relay related message has been received  */
-
-    sprintf(_mqttTopic, "%scmd", Relay[0].getMQTTTopic());
-
+    /* RELAY */
+    sprintf(_mqttTopic, "%srelay/cmd", MQTTConfiguration.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[1] == 'n') {
         Relay[0].on();
@@ -30,7 +28,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         MQTTPublishRelayState(0);
       }
     }
-
+    /* CONTACTRON */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
         sprintf(_mqttTopic, "%scmd", Contactron[i].getMQTTTopic());
@@ -39,6 +37,19 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
       } else {
         break;
+      }
+    }
+    /* GATE */
+    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[2] == 'e' && length == 4) { // open
+        Relay[0].on();
+        MQTTPublishRelayState(0);
+      } else if ((char)payload[2] == 'o' && length == 5) { // close
+        Relay[0].on();
+        MQTTPublishRelayState(0);
+      } else if ((char)payload[2] == 't' && length == 3) { // get
+        MQTTPublishGateState();
       }
     }
 
@@ -69,8 +80,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    Mqtt.publish(Relay[id].getMQTTTopic(), "state",
-                 Relay[id].get() == RELAY_ON ? "on" : "off");
+    Mqtt.publish("relay", Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
 
@@ -79,5 +89,18 @@ void MQTTPublishContactronState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Contactron[id].getMQTTTopic(), "state",
                  Contactron[id].get() == CONTACTRON_OPEN ? "open" : "closed");
+  }
+}
+
+void MQTTPublishGateState() {
+  if (Device.configuration.mqttAPI) {
+    uint8_t gateState = Gate.get();
+    Mqtt.publish("gate", gateState == GATE_OPEN
+                             ? "open"
+                             : gateState == GATE_CLOSED
+                                   ? "closed"
+                                   : gateState == GATE_PARTIALLY_OPEN
+                                         ? "partiallyOpen"
+                                         : "unknown");
   }
 }

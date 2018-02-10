@@ -2,10 +2,11 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-Contactron.h"
 #include "AFE-MQTT.h"
+#include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-Gate.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
 #include <AFE-Sensor-DHT.h>
@@ -27,6 +28,7 @@ AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
 GATE GateState;
+AFEGate Gate;
 
 float temperature;
 float humidity;
@@ -82,12 +84,14 @@ void setup() {
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
 
+  /* Initializing gate */
+  Gate.begin();
+
   /* Initializing relay */
   initRelay();
   /* Initializing switches */
   initSwitch();
-  /* Initializing contactrons */
-  initContactron();
+
   /* Initializing DHT Sensor */
   initDHTSensor();
 
@@ -105,10 +109,12 @@ void loop() {
         }
         WebServer.listener();
 
+        Gate.listener();
+
         mainHTTPRequestsHandler();
         mainRelay();
         mainSwitch();
-        mainContactron();
+        mainGate();
         mainDHTSensor();
 
       } else { // Configuration Mode
@@ -123,7 +129,6 @@ void loop() {
   }
 
   mainSwitchListener();
-  mainContactronListener();
 
   Led.loop();
 }

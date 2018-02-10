@@ -60,7 +60,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-  page += language == 0 ? "do sterownika bramy" : "for gate controller";
+  page += language == 0 ? "do kontrolowania sterownika bramy"
+                        : "to control gate controller";
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -94,7 +95,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     page += "<li class=\"itm\"><a href=\"\\?option=relay0\">";
-    page += language == 0 ? "Konfiguracja przekaźnia" : "Relay configuration";
+    page += language == 0 ? "Przekaźnik" : "Relay";
     page += "</a></li>";
 
     itemPresent = 0;
@@ -107,15 +108,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a>";
-      page += language == 0 ? "Konfiguracja kontaktronów"
-                            : "Contactrons' configuration";
-      page += "</a></li>";
+      page += "<li class=\"itm\"><a><i>";
+      page += language == 0 ? "Czujniki magnetyczne" : "Magnetic sensors";
+      page += "</i></a></li>";
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=contactron";
         page += i;
-        page += "\">&#8227; ";
-        page += language == 0 ? "Kontaktron: " : "Contactron: ";
+        page += "\"> - ";
+        page += language == 0 ? "Czujnik: " : "Sensor: ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -136,15 +136,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
-      page += language == 0 ? "Konfiguracja przycisków / włączników"
-                            : "Switches configuration";
-      page += "</a></li>";
+      page += "<li  class=\"itm\"><a><i>";
+      page += language == 0 ? "Przyciski / wyłączniki" : "Buttons / Switches";
+      page += "</i></a></li>";
 
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=switch";
         page += i;
-        page += "\">&#8227; ";
+        page += "\"> - ";
         page += language == 0 ? "Przycisk: " : "Switch: ";
         page += i + 1;
         page += "</a></li>";
@@ -280,7 +279,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isContactron), itemsNumber, "hc",
-      language == 0 ? "Ilość kontaktronów" : "Number of contactrons");
+      language == 0 ? "Ilość czujników magnetycznych "
+                    : "Number of magnetic sensors");
 
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
@@ -856,8 +856,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 
   body += "<div class=\"cf\">";
   body += "<label>LED ";
-  body +=
-      language == 0 ? "przypisany do kontaktrony" : "assigned to contactron";
+  body += language == 0 ? "przypisany do czujnika" : "assigned to the sensor";
   body += "</label>";
 
   body += "<select  name=\"l" + String(id) + "\">";
@@ -887,9 +886,9 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += "<br><p class=\"cm\">";
   body += language == 0
               ? "Czułość należy ustawić eksperymentalnie, aż uzyska się "
-                "pożądane działanie kontactronu"
+                "pożądane działanie czujnika magnetycznego"
               : "Sensitiveness should be adjusted experimentally until "
-                "contactron behaves as expected";
+                "sensor behaves as expected";
 
   body += "</p><div class=\"cf\">";
   body += "<label>";
@@ -907,8 +906,8 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += "</fieldset>";
 
   char title[23];
-  language == 0 ? sprintf(title, "Kontaktron #%d", id + 1)
-                : sprintf(title, "Contactron #%d", id + 1);
+  language == 0 ? sprintf(title, "Czujnik magnetyczny #%d", id + 1)
+                : sprintf(title, "Magnetic sensor #%d", id + 1);
 
   return addConfigurationBlock(title, "", body);
 }
@@ -927,38 +926,63 @@ String AFESitesGenerator::addGateConfiguration() {
 
   body += "<p class=\"cm\">";
   if (language == 0) {
-    body += "Jeśli kontaktron: ";
+    body += "Jeśli czujnik magnetyczny: <strong>";
     body += configuration[0].name;
-    body += " jest otwarty";
 
     if (noOfContactrons == 2) {
-      body += " i kontaktron: ";
+      body += "</strong> oraz czujnik: <strong>";
       body += configuration[1].name;
-      body += " jest otwarty";
+      body += "</strong> są otwarte";
+    } else {
+      body += "</strong> jest otwarty";
     }
     body += " to:";
+  } else {
+    body += "If magnetic sensor: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> and <strong>";
+      body += configuration[1].name;
+      body += "</strong> are open";
+    } else {
+      body += "</strong> is open";
+    }
+    body += " then:";
   }
   body += "</p>";
   body += generateGateStatesList(0, gateConfiguration.state[0]);
   if (noOfContactrons == 2) {
     body += "<br><br><p class=\"cm\">";
     if (language == 0) {
-      body += "Jeśli kontaktron: ";
+      body += "Jeśli czujnik magnetyczny: <strong>";
       body += configuration[0].name;
-      body += " jest otwarty, a kontaktron: ";
+      body += "</strong> jest otwarty, a czujnik: <strong>";
       body += configuration[1].name;
-      body += " jest zamknięty to:";
+      body += "</strong> jest zamknięty to:";
+    } else {
+      body += "If magnetic sensor: <strong>";
+      body += configuration[0].name;
+      body += "</strong> is open and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> is closed then:";
     }
     body += "</p>";
     body += generateGateStatesList(1, gateConfiguration.state[1]);
 
     body += "<br><br><p class=\"cm\">";
     if (language == 0) {
-      body += "Jeśli kontaktron: ";
+      body += "Jeśli czujnik magnetyczny: <strong>";
       body += configuration[0].name;
-      body += " jest zamknięty, a kontaktron: ";
+      body += "</strong> jest zamknięty, a czujnik: <strong>";
       body += configuration[1].name;
-      body += " jest otwarty to:";
+      body += "</strong> jest otwarty to:";
+    } else {
+      body += "If magnetic sensor: <strong>";
+      body += configuration[0].name;
+      body += "</strong> is closed and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> is open then:";
     }
     body += "</p>";
     body += generateGateStatesList(2, gateConfiguration.state[2]);
@@ -966,16 +990,29 @@ String AFESitesGenerator::addGateConfiguration() {
 
   body += "<br><br><p class=\"cm\">";
   if (language == 0) {
-    body += "Jeśli kontaktron: ";
+    body += "Jeśli czujnik magnetyczny: <strong>";
     body += configuration[0].name;
-    body += " jest zamknięty";
 
     if (noOfContactrons == 2) {
-      body += " i kontaktron: ";
+      body += "</strong> oraz czujnik: <strong>";
       body += configuration[1].name;
-      body += " jest zamknięty";
+      body += "</strong> są zamknięte";
+    } else {
+      body += "</strong> jest zamknięty ";
     }
     body += " to:";
+  } else {
+    body += "If magnetic sensor: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> are closed";
+    } else {
+      body += "</strong> is closed ";
+    }
+    body += " then:";
   }
   body += "</p>";
   body += generateGateStatesList(3, gateConfiguration.state[3]);

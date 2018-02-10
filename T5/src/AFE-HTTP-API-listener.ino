@@ -49,6 +49,17 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
+void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
+                                  byte value) {
+  sendHTTPAPIRequestStatus(
+      request, status,
+      value == GATE_OPEN
+          ? "open"
+          : value == GATE_CLOSED
+                ? "closed"
+                : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
+}
+
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                                         byte value) {
   sendHTTPAPIRequestStatus(request, status,
@@ -70,8 +81,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
                                     Relay[0].get());
       MQTTPublishRelayState(0);
     } else if (strcmp(request.command, "get") == 0) { // reportStatus or get
-      sendHTTPAPIRelayRequestStatus(request, true, Relay[0].get());
-      /* Command not implemented.Info */
+      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
@@ -100,11 +110,11 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     boolean noContactron = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
-        if (strcmp(request.name, Contactron[i].getName()) == 0) {
+        if (strcmp(request.name, Gate.Contactron[i].getName()) == 0) {
           noContactron = false;
           if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIContactronRequestStatus(request, true,
-                                               Contactron[i].get());
+                                               Gate.Contactron[i].get());
             /* Command not implemented.Info */
           } else {
             sendHTTPAPIRequestStatus(request, false);
