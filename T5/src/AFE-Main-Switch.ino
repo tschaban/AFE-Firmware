@@ -16,9 +16,8 @@ void mainSwitch() {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getControlledRelayID() > 0) {
         Led.on();
-        Relay[Switch[i].getControlledRelayID() - 1].toggle();
-        MQTTPublishRelayState(Switch[i].getControlledRelayID() -
-                              1); // MQTT Listener library
+        Relay[Switch[i].getControlledRelayID() - 1].on();
+        MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
         Led.off();
       }
     } else {
