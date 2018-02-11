@@ -18,6 +18,8 @@ void AFEDefaults::set() {
   SWITCH SwitchConfiguration;
   CONTACTRON ContactronConfiguration;
   LED LEDConfiguration;
+  GATE GateConfiguration;
+  DH DHTConfiguration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
@@ -46,6 +48,7 @@ void AFEDefaults::set() {
     deviceConfiguration.isContactron[i] = false;
   }
 
+  deviceConfiguration.isDHT = false;
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.httpAPI = true;
 
@@ -75,7 +78,6 @@ void AFEDefaults::set() {
 
   RelayConfiguration.timeToOff = 200;
   RelayConfiguration.gpio = 12;
-  sprintf(RelayConfiguration.name, "gate");
   Data->saveConfiguration(0, RelayConfiguration);
 
   SwitchConfiguration.type = 0;
@@ -97,11 +99,28 @@ void AFEDefaults::set() {
   ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
   ContactronConfiguration.ledID = 0;
   ContactronConfiguration.bouncing = 200;
-  sprintf(ContactronConfiguration.name, "contactron");
-
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isContactron); i++) {
+    sprintf(ContactronConfiguration.name, "C%d", i + 1);
     Data->saveConfiguration(i, ContactronConfiguration);
   }
+
+  DHTConfiguration.gpio = 14;
+  DHTConfiguration.type = 1;
+  DHTConfiguration.sendOnlyChanges = 1;
+  DHTConfiguration.temperature.correction = 0;
+  DHTConfiguration.temperature.interval = 60;
+  DHTConfiguration.temperature.unit = 0;
+  DHTConfiguration.humidity.correction = 0;
+  DHTConfiguration.humidity.interval = 60;
+
+  Data->saveConfiguration(DHTConfiguration);
+
+  GateConfiguration.state[0] = GATE_OPEN;
+  GateConfiguration.state[1] = GATE_PARTIALLY_OPEN;
+  GateConfiguration.state[2] = GATE_PARTIALLY_OPEN;
+  GateConfiguration.state[3] = GATE_CLOSED;
+
+  Data->saveConfiguration(GateConfiguration);
 
   Data->saveSystemLedID(1);
 

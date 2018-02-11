@@ -150,6 +150,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
     }
 
+    if (Device.configuration.isDHT) {
+      page += "<li class=\"itm\"><a "
+              "href=\"\\?option=DHT\">";
+      page += language == 0 ? "Czujnik temperatury i wilgotności "
+                            : "Temperature and humidity sesnor";
+      page += "</a></li>";
+    }
+
     page +=
         "<br><br><li class=\"itm\"><a "
         "href=\"\\?option=language\">[PL] Język / "
@@ -293,6 +301,17 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"hd\" type=\"checkbox\" value=\"1\"";
+  body += configuration.isDHT ? " checked=\"checked\"" : "";
+  body += language == 0
+              ? ">Czujnik temperatury oraz wilgotności (DHxx) podłączony"
+              : ">Temperature and humidity sesnor (DHxx) connected";
+  body += "?";
+  body += "</label>";
+  body += "</div>";
 
   body += "</fieldset>";
 
@@ -1078,8 +1097,9 @@ String AFESitesGenerator::addDHTConfiguration() {
   configuration = Data.getDHTConfiguration();
 
   String body = "<fieldset>";
+  body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
-
+  body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>Typ";
   body += language == 1 ? "e" : "";
@@ -1101,7 +1121,19 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
   body += "</p>";
 
-  body += "<div class=\"cf\">";
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body +=
+      language == 0
+          ? ">Wysyłać dane tylko, gdy wartość temperatury / wilgotności zmieni "
+            "się"
+          : ">Send data only if value of temperature / humidity has changed";
+  body += "</label>";
+  body += "</div>";
+
+  body += "<br><div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Odczyty co" : "Read every";
   body += "</label>";

@@ -19,12 +19,12 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
   index = 8;
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(397 + i * index);
+    configuration.isSwitch[i] = Eeprom.read(398 + i * index);
   }
 
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-    configuration.isContactron[i] = Eeprom.read(413 + i * index);
+    configuration.isContactron[i] = Eeprom.read(414 + i * index);
   }
 
   configuration.isDHT = Eeprom.read(376);
@@ -94,8 +94,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   uint8_t nextRelay = 5;
 
-  configuration.gpio = Eeprom.readUInt8(461 + id * nextRelay);
-  configuration.timeToOff = Eeprom.read(462 + id * nextRelay, 4).toInt();
+  configuration.gpio = Eeprom.readUInt8(462 + id * nextRelay);
+  configuration.timeToOff = Eeprom.read(463 + id * nextRelay, 4).toInt();
 
   return configuration;
 }
@@ -103,11 +103,11 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
   uint8_t nextSwitch = 8;
-  configuration.gpio = Eeprom.readUInt8(398 + id * nextSwitch);
-  configuration.type = Eeprom.readUInt8(399 + id * nextSwitch);
-  configuration.sensitiveness = Eeprom.read(400 + id * nextSwitch, 3).toInt();
-  configuration.functionality = Eeprom.readUInt8(403 + id * nextSwitch);
-  configuration.relayID = Eeprom.readUInt8(404 + id * nextSwitch);
+  configuration.gpio = Eeprom.readUInt8(399 + id * nextSwitch);
+  configuration.type = Eeprom.readUInt8(400 + id * nextSwitch);
+  configuration.sensitiveness = Eeprom.read(401 + id * nextSwitch, 3).toInt();
+  configuration.functionality = Eeprom.readUInt8(404 + id * nextSwitch);
+  configuration.relayID = Eeprom.readUInt8(405 + id * nextSwitch);
   return configuration;
 }
 
@@ -117,13 +117,13 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   MQTT configurationMQTT;
   char mqttTopic[49];
 
-  configuration.gpio = Eeprom.readUInt8(414 + id * nextContactron);
+  configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
   configuration.outputDefaultState =
-      Eeprom.readUInt8(415 + id * nextContactron);
-  configuration.ledID = Eeprom.readUInt8(416 + id * nextContactron);
-  configuration.bouncing = Eeprom.read(417 + id * nextContactron, 4).toInt();
+      Eeprom.readUInt8(416 + id * nextContactron);
+  configuration.ledID = Eeprom.readUInt8(417 + id * nextContactron);
+  configuration.bouncing = Eeprom.read(418 + id * nextContactron, 4).toInt();
 
-  Eeprom.read(421 + id * nextContactron, 16)
+  Eeprom.read(422 + id * nextContactron, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
@@ -144,13 +144,14 @@ DH AFEDataAccess::getDHTConfiguration() {
   configuration.temperature.correction = Eeprom.read(385, 4).toFloat();
   configuration.humidity.interval = Eeprom.read(389, 5).toInt();
   configuration.humidity.correction = Eeprom.read(394, 3).toFloat();
+  configuration.sendOnlyChanges = Eeprom.read(397);
   return configuration;
 }
 
 GATE AFEDataAccess::getGateConfiguration() {
   GATE configuration;
   for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
-    configuration.state[i] = Eeprom.readUInt8(466 + i);
+    configuration.state[i] = Eeprom.readUInt8(467 + i);
   }
   return configuration;
 }
@@ -160,7 +161,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
   uint8_t index = 8;
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    Eeprom.write(397 + i * index, configuration.isSwitch[i]);
+    Eeprom.write(398 + i * index, configuration.isSwitch[i]);
   }
 
   index = 3;
@@ -170,7 +171,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-    Eeprom.write(413 + i * index, configuration.isContactron[i]);
+    Eeprom.write(414 + i * index, configuration.isContactron[i]);
   }
 
   Eeprom.write(376, configuration.isDHT);
@@ -208,8 +209,8 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 5;
-  Eeprom.writeUInt8(461 + id * nextRelay, configuration.gpio);
-  Eeprom.write(462 + id * nextRelay, 4, long(configuration.timeToOff));
+  Eeprom.writeUInt8(462 + id * nextRelay, configuration.gpio);
+  Eeprom.write(463 + id * nextRelay, 4, long(configuration.timeToOff));
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
@@ -221,21 +222,21 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   uint8_t nextSwitch = 8;
-  Eeprom.writeUInt8(398 + id * nextSwitch, configuration.gpio);
-  Eeprom.writeUInt8(399 + id * nextSwitch, configuration.type);
-  Eeprom.write(400 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-  Eeprom.writeUInt8(403 + id * nextSwitch, configuration.functionality);
-  Eeprom.writeUInt8(404 + id * nextSwitch, configuration.relayID);
+  Eeprom.writeUInt8(399 + id * nextSwitch, configuration.gpio);
+  Eeprom.writeUInt8(400 + id * nextSwitch, configuration.type);
+  Eeprom.write(401 + id * nextSwitch, 3, (long)configuration.sensitiveness);
+  Eeprom.writeUInt8(404 + id * nextSwitch, configuration.functionality);
+  Eeprom.writeUInt8(405 + id * nextSwitch, configuration.relayID);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
   uint8_t nextContactron = 24;
-  Eeprom.writeUInt8(414 + id * nextContactron, configuration.gpio);
-  Eeprom.writeUInt8(415 + id * nextContactron,
+  Eeprom.writeUInt8(415 + id * nextContactron, configuration.gpio);
+  Eeprom.writeUInt8(416 + id * nextContactron,
                     configuration.outputDefaultState);
-  Eeprom.writeUInt8(416 + id * nextContactron, configuration.ledID);
-  Eeprom.write(417 + id * nextContactron, 4, (long)configuration.bouncing);
-  Eeprom.write(421 + id * nextContactron, 16, configuration.name);
+  Eeprom.writeUInt8(417 + id * nextContactron, configuration.ledID);
+  Eeprom.write(418 + id * nextContactron, 4, (long)configuration.bouncing);
+  Eeprom.write(422 + id * nextContactron, 16, configuration.name);
 }
 
 void AFEDataAccess::saveConfiguration(DH configuration) {
@@ -246,11 +247,12 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
   Eeprom.write(385, 4, (float)configuration.temperature.correction);
   Eeprom.write(389, 5, (long)configuration.humidity.interval);
   Eeprom.write(394, 3, (float)configuration.humidity.correction);
+  Eeprom.write(397, configuration.sendOnlyChanges);
 }
 
 void AFEDataAccess::saveConfiguration(GATE configuration) {
   for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
-    Eeprom.writeUInt8(466 + i, configuration.state[i]);
+    Eeprom.writeUInt8(467 + i, configuration.state[i]);
   }
 }
 

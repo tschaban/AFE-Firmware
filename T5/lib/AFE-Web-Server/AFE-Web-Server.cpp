@@ -86,6 +86,13 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getLEDConfigurationSite(
         getOptionName(), getCommand(), data, dataLedID));
+  } else if (getOptionName() == "DHT") {
+    DH data = {};
+    if (getCommand() == SERVER_CMD_SAVE) {
+      data = getDHTData();
+    }
+    publishHTML(ConfigurationPanel.getDHTConfigurationSite(getOptionName(),
+                                                           getCommand(), data));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -226,6 +233,8 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("hc").toInt() > i ? data.isContactron[i] = true
                                  : data.isContactron[i] = false;
   }
+
+  server.arg("hd").toInt() > 0 ? data.isDHT = true : data.isDHT = false;
 
   return data;
 }
@@ -414,6 +423,9 @@ DH AFEWebServer::getDHTData() {
   if (server.arg("t").length() > 0) {
     data.type = server.arg("t").toInt();
   }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
 
   if (server.arg("c").length() > 0) {
     data.temperature.correction = server.arg("c").toFloat();
