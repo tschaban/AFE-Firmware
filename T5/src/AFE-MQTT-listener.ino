@@ -10,11 +10,9 @@
 
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
-
   char _mqttTopic[70];
   Led.on();
   if (length >= 1) { // command arrived
-
     /* RELAY */
     sprintf(_mqttTopic, "%srelay/cmd", MQTTConfiguration.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
@@ -31,7 +29,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     /* CONTACTRON */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
-        sprintf(_mqttTopic, "%scmd", Contactron[i].getMQTTTopic());
+        sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
         if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
           MQTTPublishContactronState(i);
         }
@@ -80,27 +78,28 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    Mqtt.publish("relay", Relay[id].get() == RELAY_ON ? "on" : "off");
+    Mqtt.publish("relay/state", Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishContactronState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
-    Mqtt.publish(Contactron[id].getMQTTTopic(), "state",
-                 Contactron[id].get() == CONTACTRON_OPEN ? "open" : "closed");
+    Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
+                 Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
+                                                              : "closed");
   }
 }
 
 void MQTTPublishGateState() {
   if (Device.configuration.mqttAPI) {
     uint8_t gateState = Gate.get();
-    Mqtt.publish("gate", gateState == GATE_OPEN
-                             ? "open"
-                             : gateState == GATE_CLOSED
-                                   ? "closed"
-                                   : gateState == GATE_PARTIALLY_OPEN
-                                         ? "partiallyOpen"
-                                         : "unknown");
+    Mqtt.publish("gate/state", gateState == GATE_OPEN
+                                   ? "open"
+                                   : gateState == GATE_CLOSED
+                                         ? "closed"
+                                         : gateState == GATE_PARTIALLY_OPEN
+                                               ? "partiallyOpen"
+                                               : "unknown");
   }
 }

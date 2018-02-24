@@ -43,30 +43,11 @@ void AFEMQTT::connect() {
       }
     } else {
       uint8_t connections = 0;
-      /*
-            Serial << endl
-                   << "INFO: Connecting to MQTT: " << MQTTConfiguration.host
-                   << MQTTConfiguration.ip[0] << "." << MQTTConfiguration.ip[1]
-         << "."
-                   << MQTTConfiguration.ip[2] << "." << MQTTConfiguration.ip[3]
-         << ":"
-                   << MQTTConfiguration.port << " " << MQTTConfiguration.user <<
-         "@"
-                   << MQTTConfiguration.password;
-      */
       while (!Broker.connected()) {
         if (Broker.connect(deviceName, MQTTConfiguration.user,
                            MQTTConfiguration.password)) {
-          /*
-                    Serial << endl << "INFO: Connected";
-                    Serial << endl
-                           << "INFO: Subscribing to : " <<
-             mqttTopicForSubscription;
-          */
           Broker.subscribe((char *)mqttTopicForSubscription);
-          /*
-                      Serial << endl << "INFO: Subsribed";
-          */
+
           // Setting Relay state after connection to MQTT
 
           for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
@@ -84,34 +65,18 @@ void AFEMQTT::connect() {
           }
         } else {
           connections++;
-          /*
-                    Serial << endl
-                           << "INFO: MQTT Connection attempt: " << connections +
-             1
-                           << " from " << noConnectionAttempts;
-          */
+
           if (connections >= noConnectionAttempts) {
             sleepMode = true;
             sleepStartTime = millis();
-            /*
-                        Serial
-                            << endl
-                            << "WARN: Not able to connect to MQTT.Going to sleep
-               mode for "
-                            << durationBetweenNextConnectionAttemptsSeries <<
-               "sec.";
-            */
             break;
           }
           Led.on();
           delay(durationBetweenConnectionAttempts * 500);
           Led.off();
           delay(durationBetweenConnectionAttempts * 500);
-          /* Serial << "."; */
         }
       }
-      /* Serial << endl << "INFO: MQTT connection status: " << Broker.state();
-       */
     }
   }
 }
@@ -152,8 +117,6 @@ void AFEMQTT::publish(const char *type, float value, uint8_t width,
 
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-    //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
-    //  message;
     Broker.publish(topic, message);
   }
 }

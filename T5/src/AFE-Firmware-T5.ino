@@ -3,7 +3,6 @@
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-MQTT.h"
-#include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Gate.h>
@@ -24,7 +23,6 @@ AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
-AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
 GATE GateState;
@@ -39,7 +37,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  // Serial.swap();
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
