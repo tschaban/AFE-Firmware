@@ -15,6 +15,7 @@
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
 
+/* Custom DEVICE structure definition */
 struct DEVICE {
   char name[32];
   boolean mqttAPI;

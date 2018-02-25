@@ -5,11 +5,12 @@ void initDHTSensor() {
   }
 }
 
+/* Main code for processing DH sesnor */
 void mainDHTSensor() {
-  /* Sensor: DS18B20 related code */
+  /* Sensor: DTxx related code */
   if (Device.configuration.isDHT) {
 
-    /* Sensor: DS18B20 listener */
+    /* Sensor: DTxx listener */
     SensorDHT.listener();
 
     /* Temperature sensor related code */

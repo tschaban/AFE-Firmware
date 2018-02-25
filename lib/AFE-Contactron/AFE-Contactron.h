@@ -39,6 +39,7 @@ public:
 
   void begin(uint8_t id);
 
+  /* Method returns contactorn state */
   byte get();
 
   /* Methods returns contactron name */
@@ -47,6 +48,7 @@ public:
   /* Method returns MQTT topic for this contactron */
   const char *getMQTTTopic();
 
+  /* Method returns true if cotactron state ahs changed */
   boolean changed();
 
   /* Method has to be added to the loop in order to listen for switch changes */

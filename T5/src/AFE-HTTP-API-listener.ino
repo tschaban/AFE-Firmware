@@ -49,6 +49,7 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
+/* It constructs HTTP response related to gate and calls HTTP push */
 void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
   sendHTTPAPIRequestStatus(
@@ -60,6 +61,7 @@ void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                 : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
 }
 
+/* It constructs HTTP response related to contactron and calls HTTP push */
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                                         byte value) {
   sendHTTPAPIRequestStatus(request, status,

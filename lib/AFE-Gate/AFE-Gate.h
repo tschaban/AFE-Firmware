@@ -27,18 +27,23 @@ class AFEGate {
   boolean _event = false;
 
 public:
+  /* Via this class there is access to contactrons */
   AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
 
   /* Constructors */
-
   AFEGate();
 
+  /* Iniializing gate */
   void begin();
 
+  /* Returns gate state based on contactron state */
   uint8_t get();
 
+  /* Returns true if gate state has changed */
   boolean event();
 
+  /* It should be added to main loop to listen for gate state changes and
+   * request to be processed by the class */
   void listener();
 };
 

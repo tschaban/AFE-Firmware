@@ -62,6 +62,7 @@ public:
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 
+  /* Methods reads and saves sysyem LED */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
 };
