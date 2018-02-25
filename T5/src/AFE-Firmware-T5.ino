@@ -4,10 +4,11 @@
 
 #include "AFE-MQTT.h"
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
+#include <AFE-Gate.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
+#include <AFE-Sensor-DHT.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
@@ -20,10 +21,15 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEWebServer WebServer;
 AFELED Led;
-AFESwitch Switch;
-AFESwitch ExternalSwitch;
-AFERelay Relay;
+AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
+AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
+AFESensorDHT SensorDHT;
+GATE GateState;
+AFEGate Gate;
+
+float temperature;
+float humidity;
 
 void setup() {
 
@@ -51,29 +57,18 @@ void setup() {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
-  /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
-    Relay.begin(0);
-    Relay.setRelayAfterRestoringPower();
-  }
-
   /* Initialzing network */
   Network.begin(Device.getMode());
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-  Led.begin(0);
+  uint8_t systeLedID = Data.getSystemLedID();
+  if (systeLedID > 0) {
+    Led.begin(systeLedID - 1);
+  }
 
   /* If device in configuration mode then start LED blinking */
   if (Device.getMode() != MODE_NORMAL) {
     Led.blinkingOn(100);
-  }
-
-  /* Initializing Switches */
-  if (Device.configuration.isSwitch[0]) {
-    Switch.begin(0);
-  }
-  if (Device.configuration.isSwitch[1]) {
-    ExternalSwitch.begin(1);
   }
 
   /* Initializing MQTT */
@@ -81,13 +76,24 @@ void setup() {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
   }
-
   Network.connect();
-
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
+
+  /* Initializing gate */
+  Gate.begin();
+
+  /* Initializing relay */
+  initRelay();
+  /* Initializing switches */
+  initSwitch();
+
+  /* Initializing DHT Sensor */
+  initDHTSensor();
+
+  GateState = Data.getGateConfiguration();
 }
 
 void loop() {
@@ -99,36 +105,16 @@ void loop() {
         if (Device.configuration.mqttAPI) {
           Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
         }
-
         WebServer.listener();
 
-        /* Checking if there was received HTTP API Command */
-        if (Device.configuration.httpAPI) {
-          if (WebServer.httpAPIlistener()) {
-            Led.on();
-            processHTTPAPIRequest(WebServer.getHTTPCommand());
-            Led.off();
-          }
-        }
+        Gate.listener();
 
-        /* Relay related code */
-        if (Device.configuration.isRelay[0]) {
+        mainHTTPRequestsHandler();
+        mainRelay();
+        mainSwitch();
+        mainGate();
+        mainDHTSensor();
 
-          /* Relay turn off event launched */
-          if (Relay.autoTurnOff()) {
-            Led.on();
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-            Led.off();
-          }
-
-          /* One of the switches has been shortly pressed */
-          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-            Led.on();
-            Relay.toggle();
-            MQTTPublishRelayState(); // MQTT Listener library
-            Led.off();
-          }
-        }
       } else { // Configuration Mode
         WebServer.listener();
       }
@@ -140,25 +126,7 @@ void loop() {
     WebServer.listener();
   }
 
-  /* Listens for switch events */
-  Switch.listener();
-  ExternalSwitch.listener();
-
-  /* One of the Multifunction switches pressed for 10 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is10s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is10s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
-                                    : Device.reboot(MODE_NORMAL);
-  }
-
-  /* One of the Multifunction switches pressed for 5 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is5s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is5s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
-                                    : Device.reboot(MODE_NORMAL);
-  }
+  mainSwitchListener();
 
   Led.loop();
 }

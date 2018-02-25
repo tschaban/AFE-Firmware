@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_DHT_Structure_h
-#define _AFE_DHT_Structure_h
+#ifndef _AFE_GATE_Structure_h
+#define _AFE_GATE_Structure_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -11,15 +11,13 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-HUMIDITY-Structure.h>
-#include <AFE-TEMPERATURE-Structure.h>
+#define GATE_OPEN 0           // Open
+#define GATE_CLOSED 1         // Closed
+#define GATE_PARTIALLY_OPEN 2 // Being opened
+#define GATE_UNKNOWN 9        // Unknown state
 
-struct DH {
-  uint8_t gpio;
-  uint8_t type;
-  TEMPERATURE temperature;
-  HUMIDITY humidity;
-  boolean sendOnlyChanges;
+struct GATE {
+  uint8_t state[4];
 };
 
 #endif
