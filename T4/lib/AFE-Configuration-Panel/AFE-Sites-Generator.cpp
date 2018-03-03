@@ -103,12 +103,17 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "przekaźników</a></li>";
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
+      page +=
+          language == 0 ? "Konfiguracja przekaźników" : "Relays configuration";
+      page += "</a></li>";
+
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=relay";
         page += i;
-        page += "\">&#8227; Przekaźnik: ";
+        page += "\">&#8227; ";
+        page += language == 0 ? "Przekaźnik" : "Relay";
+        page += ": ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -124,13 +129,17 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 
     if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">Konfiguracja "
-              "przycisków / włączników</a></li>";
+      page += "<li  class=\"itm\"><a style=\"color:#aaaaaa;\">";
+      page += language == 0 ? "Konfiguracja przycisków / włączników"
+                            : "Switches/Buttons configuration";
+      page += "</a></li>";
 
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=switch";
         page += i;
-        page += "\">&#8227; Przycisk: ";
+        page += "\">&#8227; ";
+        page += language == 0 ? "Przycisk" : "Switch";
+        page += ": ";
         page += i + 1;
         page += "</a></li>";
       }
@@ -202,14 +211,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += "</a>. ";
     page += language == 0 ? "Z góry dziękuję" : "Thank you";
     page += "</p>";
-    page +=
-        "<a "
-        "href=\"https://www.paypal.com/cgi-bin/"
-        "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-        "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%"
-        "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
-        "3aNonHosted\" target=\"_blank\"><img "
-        "src=\"http://adrian.czabanowski.com/afe/donation/T";
+    page += "<a "
+            "href=\"https://www.paypal.com/cgi-bin/"
+            "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
+            "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT";
+    page += configuration.type;
+    page += "%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
+            "3aNonHosted\" target=\"_blank\"><img "
+            "src=\"http://adrian.czabanowski.com/afe/donation/T";
     page += configuration.type;
     page += "/";
     page += configuration.version;
@@ -339,6 +348,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
+
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Hasło" : "Password";
@@ -350,6 +360,23 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "<span class=\"hint\">Max 32 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
+  body += "</div>";
+
+  body += "<p class=\"cm\">";
+  body += language == 0
+              ? "Adres MAC może pomóc Ci odszukać adres IP tego urządzenia w "
+                "routerze WiFi"
+              : "MAC address may help you to find IP address of this device in "
+                "your WiFi router";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "MAC" : "MAC";
+  body += "</label>";
+  body += "<input type=\"text\" readonly=\"readonly\" value=\"";
+  body += WiFi.macAddress();
+  body += "\">";
   body += "</div>";
   body += "</fieldset>";
 

@@ -224,14 +224,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += "</a>. ";
     page += language == 0 ? "Z góry dziękuję" : "Thank you";
     page += "</p>";
-    page +=
-        "<a "
-        "href=\"https://www.paypal.com/cgi-bin/"
-        "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-        "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT5%"
-        "5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
-        "3aNonHosted\" target=\"_blank\"><img "
-        "src=\"http://adrian.czabanowski.com/afe/donation/T";
+    page += "<a "
+            "href=\"https://www.paypal.com/cgi-bin/"
+            "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
+            "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT";
+    page += configuration.type;
+    page += "%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
+            "3aNonHosted\" target=\"_blank\"><img "
+            "src=\"http://adrian.czabanowski.com/afe/donation/T";
     page += configuration.type;
     page += "/";
     page += configuration.version;
