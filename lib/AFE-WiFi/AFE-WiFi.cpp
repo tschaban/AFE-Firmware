@@ -93,6 +93,7 @@ void AFEWiFi::listener() {
       connections = 0;
       delayStartTime = 0;
       ledStartTime = 0;
+      Led.off();
       /*
       Serial << endl
              << "INFO: Connection established"
