@@ -51,6 +51,8 @@ void AFELED::blinkingOn(unsigned long blinking_interval) {
 
 void AFELED::blinkingOff() { blinking = false; }
 
+boolean AFELED::isBlinking() { return blinking; }
+
 void AFELED::loop() {
   if (_initialized && blinking) {
     unsigned long currentMillis = millis();

@@ -23,20 +23,16 @@ private:
   PubSubClient Broker;
   char mqttTopicForSubscription[34];
   char deviceName[32];
-  NETWORK NetworkConfiguration;
+  uint8_t noConnectionAttempts;
+  uint8_t durationBetweenConnectionAttempts;
+  uint8_t durationBetweenNextConnectionAttemptsSeries;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false;
   boolean isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
 
-  uint8_t connections = 0;
-  unsigned long delayStartTime = 0;
-  unsigned long ledStartTime = 0;
-
   /* Method pushes to the MQTT Broker MQTT Message */
   void publishToMQTTBroker(const char *topic, const char *message);
-  /* Connecting to MQTT Broker */
-  void connect();
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -51,16 +47,23 @@ public:
 
   void begin();
 
+  /* Connecting to MQTT Broker */
+  void connect();
+
   /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
   void publish(const char *type, const char *message);
+  void publish(const char *type, float value, uint8_t width = 2,
+               uint8_t precision = 2);
 
-  /* Publishing MQTT Message to a specific MQTT Topic. It calls private method
-   * publish MQTT Broker */
+  /* Publishing MQTT Message to at specyfic MQTT Topic. It calls private method
+   * publishToMQTTBroker  */
   void publish(const char *topic, const char *type, const char *message);
 
-  /* Methods establishes connection from MQTT Broker, subscribed and set relay
-   * default values */
-  void listener();
+  /* Returns TRUE if connected to MQTT Broker */
+  boolean connected();
+
+  /* MQTT Loop / Listner loop */
+  void loop();
 };
 
 #endif

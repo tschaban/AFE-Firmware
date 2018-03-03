@@ -14,7 +14,6 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
-#include <ESP8266WiFi.h>
 //#include <Streaming.h>
 
 class AFESitesGenerator {
@@ -37,6 +36,8 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+  const String generateGateStatesList(uint8_t id, byte state);
+
 public:
   /* Constructor*/
   AFESitesGenerator();
@@ -58,6 +59,9 @@ public:
   String addSystemLEDConfiguration();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+  String addContactronConfiguration(uint8_t id);
+  String addDHTConfiguration();
+  String addGateConfiguration();
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();

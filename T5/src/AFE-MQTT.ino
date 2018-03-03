@@ -7,8 +7,17 @@
 AFEMQTT::AFEMQTT() {}
 
 void AFEMQTT::begin() {
+  NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
   sprintf(deviceName, "%s", Device.configuration.name);
+
+  /* Defaults are taken from WiFi config. They can be set using
+   * setReconnectionParams() */
+  noConnectionAttempts = NetworkConfiguration.noConnectionAttempts;
+  durationBetweenConnectionAttempts = NetworkConfiguration.waitTimeConnections;
+  durationBetweenNextConnectionAttemptsSeries =
+      NetworkConfiguration.waitTimeSeries;
+
   Broker.setClient(esp);
   if (strlen(MQTTConfiguration.host) > 0) {
     Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
@@ -21,14 +30,7 @@ void AFEMQTT::begin() {
   Broker.setCallback(MQTTMessagesListener);
   sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);
   Data = {};
-}
-
-void AFEMQTT::listener() {
-  if (Broker.connected()) {
-    Broker.loop();
-  } else {
-    connect();
-  }
+  NetworkConfiguration = {};
 }
 
 void AFEMQTT::connect() {
@@ -36,32 +38,18 @@ void AFEMQTT::connect() {
   if (isConfigured) {
     if (sleepMode) {
       if (millis() - sleepStartTime >=
-          NetworkConfiguration.waitTimeSeries * 1000) {
+          durationBetweenNextConnectionAttemptsSeries * 1000) {
         sleepMode = false;
       }
     } else {
-
-      if (ledStartTime == 0) {
-        ledStartTime = millis();
-      }
-
-      if (delayStartTime == 0) {
-        delayStartTime = millis();
-
+      uint8_t connections = 0;
+      while (!Broker.connected()) {
         if (Broker.connect(deviceName, MQTTConfiguration.user,
                            MQTTConfiguration.password)) {
-
-          /*
-                    Serial << endl << "INFO: Connected";
-                    Serial << endl
-                           << "INFO: Subscribing to : " <<
-             mqttTopicForSubscription;
-          */
           Broker.subscribe((char *)mqttTopicForSubscription);
 
-          //        Serial << endl << "INFO: Subsribed";
+          // Setting Relay state after connection to MQTT
 
-          /* Setting Relay state after connection to MQTT */
           for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
             if (Device.configuration.isRelay[i]) {
               if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
@@ -75,50 +63,19 @@ void AFEMQTT::connect() {
               }
             }
           }
-          delayStartTime = 0;
-          ledStartTime = 0;
+        } else {
+          connections++;
+
+          if (connections >= noConnectionAttempts) {
+            sleepMode = true;
+            sleepStartTime = millis();
+            break;
+          }
+          Led.on();
+          delay(durationBetweenConnectionAttempts * 500);
           Led.off();
-          connections = 0;
-
-          return;
+          delay(durationBetweenConnectionAttempts * 500);
         }
-      }
-
-      if (millis() > ledStartTime + 500) {
-        Led.toggle();
-        ledStartTime = 0;
-      }
-
-      if (millis() >
-
-          delayStartTime + (NetworkConfiguration.waitTimeConnections * 1000)) {
-        connections++;
-        /*
-                Serial << endl
-                       << "INFO: MQTT Connection attempt: " << connections + 1
-                       << " from " << NetworkConfiguration.noConnectionAttempts
-                       << ", connection status: " << Broker.state()
-                       << ", connection time: " << millis() - delayStartTime <<
-           "ms";
-
-        */
-        delayStartTime = 0;
-      }
-
-      if (connections >= NetworkConfiguration.noConnectionAttempts) {
-        sleepMode = true;
-        sleepStartTime = millis();
-
-        delayStartTime = 0;
-        ledStartTime = 0;
-        Led.off();
-        connections = 0;
-        /*
-                Serial << endl
-                       << "WARN: Not able to connect to MQTT.Going to sleep mode
-           for "
-                       << NetworkConfiguration.waitTimeSeries << "sec.";
-        */
       }
     }
   }
@@ -128,12 +85,15 @@ void AFEMQTT::setReconnectionParams(
     uint8_t no_connection_attempts,
     uint8_t duration_between_connection_attempts,
     uint8_t duration_between_next_connection_attempts_series) {
-  NetworkConfiguration.noConnectionAttempts = no_connection_attempts;
-  NetworkConfiguration.waitTimeConnections =
-      duration_between_connection_attempts;
-  NetworkConfiguration.waitTimeSeries =
+  noConnectionAttempts = no_connection_attempts;
+  durationBetweenConnectionAttempts = duration_between_connection_attempts;
+  durationBetweenNextConnectionAttemptsSeries =
       duration_between_next_connection_attempts_series;
 }
+
+boolean AFEMQTT::connected() { return Broker.connected(); }
+
+void AFEMQTT::loop() { Broker.loop(); }
 
 void AFEMQTT::publish(const char *type, const char *message) {
   char _mqttTopic[50];
@@ -148,10 +108,15 @@ void AFEMQTT::publish(const char *topic, const char *type,
   publishToMQTTBroker(_mqttTopic, message);
 }
 
+void AFEMQTT::publish(const char *type, float value, uint8_t width,
+                      uint8_t precision) {
+  char message[10];
+  dtostrf(value, width, precision, message);
+  publish(type, message);
+}
+
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-    //  Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " <<
-    //  message;
     Broker.publish(topic, message);
   }
 }
