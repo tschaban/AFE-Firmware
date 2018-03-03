@@ -68,7 +68,7 @@ void setup() {
   Led.begin(0);
 
   /* If device in configuration mode then start LED blinking */
-  if (Device.getMode() != MODE_NORMAL) {
+  if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
 
@@ -91,7 +91,7 @@ void setup() {
     Mqtt.begin();
   }
 
-  Network.connect();
+  Network.listener();
 
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
@@ -106,7 +106,7 @@ void loop() {
       if (Device.getMode() == MODE_NORMAL) {
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
-          Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+          Mqtt.listener();
         }
 
         WebServer.listener();
@@ -116,25 +116,6 @@ void loop() {
           if (WebServer.httpAPIlistener()) {
             Led.on();
             processHTTPAPIRequest(WebServer.getHTTPCommand());
-            Led.off();
-          }
-        }
-
-        /* Relay related code */
-        if (Device.configuration.isRelay[0]) {
-
-          /* Relay turn off event launched */
-          if (Relay.autoTurnOff()) {
-            Led.on();
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-            Led.off();
-          }
-
-          /* One of the switches has been shortly pressed */
-          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-            Led.on();
-            Relay.toggle();
-            MQTTPublishRelayState(); // MQTT Listener library
             Led.off();
           }
         }
@@ -184,7 +165,7 @@ void loop() {
         WebServer.listener();
       }
     } else { // Device not connected to WiFi. Reestablish connection
-      Network.connect();
+      Network.listener();
     }
   } else { // Access Point Mode
     Network.APListener();
