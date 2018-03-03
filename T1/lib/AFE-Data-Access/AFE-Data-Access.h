@@ -63,5 +63,9 @@ public:
   /* Methods read and save thermostate state */
   boolean isThermostatEnabled(uint8_t id);
   void saveThermostatState(uint8_t id, boolean state);
+
+  /* Methods read and save ID of system led */
+  uint8_t getSystemLedID();
+  void saveSystemLedID(uint8_t id);
 };
 #endif

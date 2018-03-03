@@ -257,3 +257,7 @@ void AFEDataAccess::saveThermostatState(uint8_t id, boolean state) {
   uint8_t nextRelay = 40;
   Eeprom.write(435 + id * nextRelay, state);
 }
+
+uint8_t AFEDataAccess::getSystemLedID() { return 1; }
+
+void AFEDataAccess::saveSystemLedID(uint8_t id) {}
