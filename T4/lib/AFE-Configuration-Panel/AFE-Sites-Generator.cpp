@@ -137,7 +137,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=switch";
         page += i;
-        page += "\">&#8227;";
+        page += "\">&#8227; ";
         page += language == 0 ? "Przycisk" : "Switch";
         page += ": ";
         page += i + 1;
@@ -348,6 +348,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
+
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Hasło" : "Password";
@@ -359,6 +360,23 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "<span class=\"hint\">Max 32 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
+  body += "</div>";
+
+  body += "<p class=\"cm\">";
+  body += language == 0
+              ? "Adres MAC może pomóc Ci odszukać adres IP tego urządzenia w "
+                "routerze WiFi"
+              : "MAC address may help you to find IP address of this device in "
+                "your WiFi router";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "MAC" : "MAC";
+  body += "</label>";
+  body += "<input type=\"text\" readonly=\"readonly\" value=\"";
+  body += WiFi.macAddress();
+  body += "\">";
   body += "</div>";
   body += "</fieldset>";
 
