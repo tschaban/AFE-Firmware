@@ -62,7 +62,7 @@ void setup() {
   }
 
   /* If device in configuration mode then start LED blinking */
-  if (Device.getMode() != MODE_NORMAL) {
+  if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
   /* Initializing switches */
@@ -73,7 +73,7 @@ void setup() {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
   }
-  Network.connect();
+  Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
@@ -87,26 +87,32 @@ void loop() {
       if (Device.getMode() == MODE_NORMAL) {
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
-          Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+          Mqtt.listener();
         }
+
         WebServer.listener();
 
         mainHTTPRequestsHandler();
         mainRelay();
-        mainSwitch();
 
       } else { // Configuration Mode
+        if (!Led.isBlinking()) {
+          Led.blinkingOn(100);
+        }
         WebServer.listener();
       }
-    } else { // Device not connected to WiFi. Reestablish connection
-      Network.connect();
+    } else {
+      if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
+        Led.blinkingOff();
+      }
     }
+    Network.listener();
   } else { // Access Point Mode
     Network.APListener();
     WebServer.listener();
   }
 
   mainSwitchListener();
-
+  mainSwitch();
   Led.loop();
 }
