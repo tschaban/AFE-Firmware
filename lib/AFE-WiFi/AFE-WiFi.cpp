@@ -37,38 +37,67 @@ void AFEWiFi::begin(uint8_t mode) {
   }
 }
 
-void AFEWiFi::connect() {
+void AFEWiFi::listener() {
+  if (!connected()) {
+    if (sleepMode) {
+      if (millis() - sleepStartTime >=
+          networkConfiguration.waitTimeSeries * 1000) {
+        sleepMode = false;
+      }
+    } else {
+      if (delayStartTime == 0) {
+        delayStartTime = millis();
+        if (connections == 0) {
+          WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
+          //  Serial << endl << "INFO: Starting establishing WiFi connection";
+        }
+      }
 
-  if (sleepMode) {
-    if (millis() - sleepStartTime >=
-        networkConfiguration.waitTimeSeries * 1000) {
-      sleepMode = false;
-    }
-  } else {
-    uint8_t connections = 0;
-    WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
-    while (WiFi.status() != WL_CONNECTED) {
-      Led.on();
+      if (ledStartTime == 0) {
+        ledStartTime = millis();
+      }
 
-      /* Serial << endl
-             << "INFO: WiFi connection attempt: " << connections + 1 << "from "
-             << networkConfiguration.noConnectionAttempts; */
+      if (millis() > ledStartTime + 500) {
+        Led.toggle();
+        ledStartTime = 0;
+      }
 
-      connections++;
-      delay(networkConfiguration.waitTimeConnections * 500);
-      Led.off();
-      delay(networkConfiguration.waitTimeConnections * 500);
+      if (millis() >
+          delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
+        connections++;
+        /*
+        Serial << endl
+               << "INFO: WiFi connection attempt: " << connections + 1
+               << " from " << networkConfiguration.noConnectionAttempts;
+*/
+        delayStartTime = 0;
+      }
+
       if (connections == networkConfiguration.noConnectionAttempts) {
         sleepMode = true;
         WiFi.disconnect();
         sleepStartTime = millis();
+        delayStartTime = 0;
+        ledStartTime = 0;
+        Led.off();
+        connections = 0;
         /*
                 Serial << endl
                        << "WARN: Not able to connect.Going to sleep mode for "
                        << networkConfiguration.waitTimeSeries << "sec.";
         */
-        break;
       }
+    }
+  } else {
+    if (connections > 0) {
+      connections = 0;
+      delayStartTime = 0;
+      ledStartTime = 0;
+      /*
+      Serial << endl
+             << "INFO: Connection established"
+             << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
+             */
     }
   }
 }

@@ -15,12 +15,16 @@
 #include <AFE-LED.h>
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 class AFEWiFi {
 
 private:
   NETWORK networkConfiguration;
+  unsigned long delayStartTime = 0;
+  unsigned long ledStartTime = 0;
+
+  uint8_t connections = 0;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
@@ -35,14 +39,15 @@ public:
    * method */
   void begin(uint8_t mode);
 
-  /* Connecting to WiFi Access point */
-  void connect();
-
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
 
   /* Method listens for HTTP request while device is in Access Point mode */
   void APListener();
+
+  /* Method checks if device is connected to WiFi - if it's not then it connects
+   * to it */
+  void listener();
 };
 
 #endif
