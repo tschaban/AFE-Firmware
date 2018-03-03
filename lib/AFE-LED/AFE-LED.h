@@ -56,6 +56,9 @@ public:
   /* Turns off LED blinking */
   void blinkingOff();
 
+  /* Returns true if LED is blinking, false if not */
+  boolean isBlinking();
+
   /* Method must be added to main loop in order to enable continues LED blinking
    */
   void loop();
