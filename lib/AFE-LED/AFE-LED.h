@@ -26,9 +26,6 @@ private:
   /* Method turns on/off LED */
   void set(uint8_t state);
 
-  /* Method change the LED to opposite state */
-  void toggle();
-
 public:
   /* Constructor */
   AFELED();
@@ -44,6 +41,9 @@ public:
 
   /* Turn off LED */
   void off();
+
+  /* Method change the LED to opposite state */
+  void toggle();
 
   /* Blink LED. Duration how lon LED is ON can be set by input parameter (in
    * milli)*/
