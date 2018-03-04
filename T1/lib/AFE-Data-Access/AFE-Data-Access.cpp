@@ -9,12 +9,24 @@ AFEDataAccess::AFEDataAccess() {}
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 
+  uint8_t index = 77;
+  for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+    configuration.isLED[i] = Eeprom.read(366 + i * index);
+  }
+
+  index = 40;
+  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+    configuration.isRelay[i] = Eeprom.read(396 + i * index);
+  }
+
+  index = 7;
+  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+    configuration.isSwitch[i] = Eeprom.read(382 + i * index);
+  }
+
   Eeprom.read(9, 16).toCharArray(configuration.name,
                                  sizeof(configuration.name));
-  configuration.isLED[0] = Eeprom.read(366);
-  configuration.isRelay[0] = Eeprom.read(396);
-  configuration.isSwitch[0] = Eeprom.read(382);
-  configuration.isSwitch[1] = Eeprom.read(389);
+
   configuration.isDS18B20 = Eeprom.read(369);
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
@@ -71,7 +83,7 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
 
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
-  uint8_t nextLED = 0;
+  uint8_t nextLED = 77;
   configuration.gpio = Eeprom.readUInt8(367 + id * nextLED);
   configuration.changeToOppositeValue = Eeprom.read(368 + id * nextLED);
 
@@ -112,10 +124,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.thermalProtection =
       Eeprom.read(436 + id * nextRelay, 3).toInt();
 
-  configuration.ledID = 0; // @TODO added for compatibility with the code
-                           // introduced in T4 so the Relay can switch on
-                           // assigned to it LED. To added for this version in
-                           // future
+  configuration.ledID = Eeprom.readUInt8(442 + id);
 
   return configuration;
 }
@@ -127,7 +136,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(384 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(385 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(388 + id * nextSwitch);
-
+  configuration.relayID = Eeprom.readUInt8(440 + id);
   return configuration;
 }
 
@@ -137,15 +146,28 @@ DS18B20 AFEDataAccess::getDS18B20Configuration() {
   configuration.correction = Eeprom.read(371, 5).toFloat();
   configuration.interval = Eeprom.read(376, 5).toInt();
   configuration.unit = Eeprom.readUInt8(381);
+  configuration.sendOnlyChanges = Eeprom.read(446);
   return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(9, 16, configuration.name);
-  Eeprom.write(396, configuration.isRelay[0]);
-  Eeprom.write(382, configuration.isSwitch[0]);
-  Eeprom.write(389, configuration.isSwitch[1]);
-  Eeprom.write(366, configuration.isLED[0]);
+
+  uint8_t index = 40;
+  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+    Eeprom.write(396 + i * index, configuration.isRelay[i]);
+  }
+
+  index = 7;
+  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+    Eeprom.write(382 + i * index, configuration.isSwitch[i]);
+  }
+
+  index = 77;
+  for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+    Eeprom.write(366 + i * index, configuration.isLED[i]);
+  }
+
   Eeprom.write(369, configuration.isDS18B20);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
@@ -187,18 +209,23 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(404 + id * nextRelay, configuration.statePowerOn);
   Eeprom.write(405 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(421 + id * nextRelay, configuration.stateMQTTConnected);
+  Eeprom.writeUInt8(442 + id, configuration.ledID);
 
   Eeprom.write(422 + id * nextRelay, configuration.showStatusUsingLED);
-  Eeprom.write(423 + id * nextRelay, 5, configuration.thermostat.turnOn);
-  Eeprom.write(428 + id * nextRelay, 5, configuration.thermostat.turnOff);
-  Eeprom.write(433 + id * nextRelay, configuration.thermostat.turnOnAbove);
-  Eeprom.write(434 + id * nextRelay, configuration.thermostat.turnOffAbove);
-  saveThermostatState(id, configuration.thermostat.enabled);
+
   Eeprom.write(436 + id * nextRelay, 3, configuration.thermalProtection);
 }
 
+void AFEDataAccess::saveConfiguration(REGULATOR configuration) {
+  Eeprom.write(423, 5, configuration.turnOn);
+  Eeprom.write(428, 5, configuration.turnOff);
+  Eeprom.write(433, configuration.turnOnAbove);
+  Eeprom.write(434, configuration.turnOffAbove);
+  saveThermostatState(0, configuration.enabled);
+}
+
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
-  uint8_t nextLED = 2;
+  uint8_t nextLED = 77;
   Eeprom.writeUInt8(367 + id * nextLED, configuration.gpio);
   Eeprom.write(368 + id * nextLED, configuration.changeToOppositeValue);
 }
@@ -209,6 +236,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(384 + id * nextSwitch, configuration.type);
   Eeprom.write(385 + id * nextSwitch, 3, (long)configuration.sensitiveness);
   Eeprom.writeUInt8(388 + id * nextSwitch, configuration.functionality);
+  Eeprom.writeUInt8(440 + id, configuration.relayID);
 }
 
 void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
@@ -216,6 +244,7 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
   Eeprom.write(371, 5, (float)configuration.correction);
   Eeprom.write(376, 5, (long)configuration.interval);
   Eeprom.writeUInt8(381, configuration.unit);
+  Eeprom.write(446, configuration.sendOnlyChanges);
 }
 
 const char AFEDataAccess::getVersion() {
@@ -258,6 +287,6 @@ void AFEDataAccess::saveThermostatState(uint8_t id, boolean state) {
   Eeprom.write(435 + id * nextRelay, state);
 }
 
-uint8_t AFEDataAccess::getSystemLedID() { return 1; }
+uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(439); }
 
-void AFEDataAccess::saveSystemLedID(uint8_t id) {}
+void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }

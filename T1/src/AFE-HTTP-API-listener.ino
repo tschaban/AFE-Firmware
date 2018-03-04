@@ -50,54 +50,63 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 }
 
 /* Method processes HTTP API request */
+/* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
-
-  Led.on();
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
-    /* Checking Relay #0 */
-    if (strcmp(request.name, Relay.getName()) == 0) {
-      if (strcmp(request.command, "on") == 0) {
-        Relay.on();
-        sendHTTPAPIRelayRequestStatus(request, Relay.get() == RELAY_ON,
-                                      Relay.get());
-        MQTTPublishRelayState();                        // MQTT Listener library
-      } else if (strcmp(request.command, "off") == 0) { // Off
-        Relay.off();
-        sendHTTPAPIRelayRequestStatus(request, Relay.get() == RELAY_OFF,
-                                      Relay.get());
-        MQTTPublishRelayState(); // MQTT Listener library
-      } else if (strcmp(request.command, "toggle") == 0) { // toggle
-        uint8_t state = Relay.get();
-        Relay.toggle();
-        sendHTTPAPIRelayRequestStatus(request, state != Relay.get(),
-                                      Relay.get());
-        MQTTPublishRelayState(); // MQTT Listener library
-      } else if (strcmp(request.command, "reportStatus") == 0 ||
-                 strcmp(request.command, "get") ==
-                     0) { // reportStatus or get @TODO Remove after version rc1
-                          // is not used
-        sendHTTPAPIRelayRequestStatus(request, true, Relay.get());
-      } else if (strcmp(request.command, "enableThermostat") == 0) {
-        Relay.Thermostat.on();
-        sendHTTPAPIRequestStatus(request, true,
-                                 Relay.Thermostat.enabled() ? "on" : "off");
-      } else if (strcmp(request.command, "disableThermostat") == 0) {
-        Relay.Thermostat.off();
-        sendHTTPAPIRequestStatus(request, true,
-                                 Relay.Thermostat.enabled() ? "on" : "off");
-      } else if (strcmp(request.command, "toggleThermostat") == 0) {
-        Relay.Thermostat.enabled() ? Relay.Thermostat.off()
-                                   : Relay.Thermostat.on();
-        sendHTTPAPIRequestStatus(request, true,
-                                 Relay.Thermostat.enabled() ? "on" : "off");
-      } else if (strcmp(request.command, "getThermostat") == 0) {
-        sendHTTPAPIRequestStatus(request, true,
-                                 Relay.Thermostat.enabled() ? "on" : "off");
-      } else { /* Commend not implemented */
-        sendHTTPAPIRequestStatus(request, false);
+    uint8_t state;
+    boolean noRelay = true;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      if (Device.configuration.isRelay[i]) {
+        if (strcmp(request.name, Relay[i].getName()) == 0) {
+          noRelay = false;
+          if (strcmp(request.command, "on") == 0) {
+            Relay[i].on();
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
+                                          Relay[i].get());
+            MQTTPublishRelayState(i); // MQTT Listener library
+          } else if (strcmp(request.command, "off") == 0) { // Off
+            Relay[i].off();
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
+                                          Relay[i].get());
+            MQTTPublishRelayState(i); // MQTT Listener library
+          } else if (strcmp(request.command, "toggle") == 0) { // toggle
+            state = Relay[i].get();
+            Relay[i].toggle();
+            sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
+                                          Relay[i].get());
+            MQTTPublishRelayState(i); // MQTT Listener library
+          } else if (strcmp(request.command, "reportStatus") == 0 ||
+                     strcmp(request.command, "get") ==
+                         0) { // reportStatus or get @TODO Remove after version
+                              // rc1 is not used
+            sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
+            /* Command not implemented.Info */
+          } else if (strcmp(request.command, "enableThermostat") == 0) {
+            Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "disableThermostat") == 0) {
+            Relay[i].Thermostat.off();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "toggleThermostat") == 0) {
+            Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
+                                          : Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "getThermostat") == 0) {
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else {
+            sendHTTPAPIRequestStatus(request, false);
+          }
+        }
+      } else {
+        break;
       }
-    } else { /* No such relay */
+    }
+    if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);
     }
   } else if (strcmp(request.device, "ds18b20") == 0) {
@@ -117,5 +126,4 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   } else {
     sendHTTPAPIRequestStatus(request, false);
   }
-  Led.off();
 }
