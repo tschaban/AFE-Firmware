@@ -76,7 +76,7 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
-    LED data[5] = {};
+    LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
     if (getCommand() == SERVER_CMD_SAVE) {
       for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {

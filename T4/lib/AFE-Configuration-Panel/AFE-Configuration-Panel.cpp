@@ -103,10 +103,9 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
-                                                      uint8_t command,
-                                                      LED data[5],
-                                                      uint8_t dataLedID) {
+String AFEConfigurationPanel::getLEDConfigurationSite(
+    const String option, uint8_t command,
+    LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {

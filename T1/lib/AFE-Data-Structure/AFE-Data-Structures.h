@@ -13,7 +13,7 @@
 
 #include <ESP8266WiFi.h>
 
-#include <AFE-DEVICE-Structure.h>
+#include <AFE-DEVICE-T1-Structure.h>
 #include <AFE-DS18B20-Sensor-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>

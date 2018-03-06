@@ -13,7 +13,6 @@
 
 #include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
@@ -47,10 +46,9 @@ private:
   SWITCH getSwitchData(uint8_t id);
   LED getLEDData(uint8_t id);
   DS18B20 getDS18B20Data();
+  REGULATOR getThermostateData();
+  uint8_t getSystemLEDData();
   uint8_t getLanguageData();
-
-  // @TODO DOMOTICZ getDomoticzData();
-  // @TODO DS18B20 getDS18B20Data();
 
 public:
   AFEWebServer();

@@ -12,8 +12,9 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Thermostat.h>
+#include <AFE-Led.h>
 #include <AFE-Thermal-Protection.h>
+#include <AFE-Thermostat.h>
 
 //#include <Streaming.h>
 
@@ -23,6 +24,7 @@ private:
   uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
+  AFELED Led;
   char mqttTopic[50];
   unsigned long turnOffCounter = 0;
 
@@ -31,15 +33,12 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
-
   AFEThermostat Thermostat;
   AFEThermalProtection ThermalProtection;
 
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
-
-
 
   /* Method: initiates relay */
   void begin(uint8_t id);

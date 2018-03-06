@@ -383,6 +383,22 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
+  body += "<p class=\"cm\">";
+  body += language == 0
+              ? "Adres MAC może pomóc Ci odszukać adres IP tego urządzenia w "
+                "routerze WiFi"
+              : "MAC address may help you to find IP address of this device in "
+                "your WiFi router";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "MAC" : "MAC";
+  body += "</label>";
+  body += "<input type=\"text\" readonly=\"readonly\" value=\"";
+  body += WiFi.macAddress();
+  body += "\">";
+  body += "</div>";
   body += "</fieldset>";
 
   String page = addConfigurationBlock(
@@ -629,8 +645,6 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
-
-  //  Serial << endl << "LED: " << id << " gpio " << configuration.gpio;
 
   String body = "<fieldset>";
   char filed[13];

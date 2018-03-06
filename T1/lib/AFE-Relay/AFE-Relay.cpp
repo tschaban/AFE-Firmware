@@ -19,6 +19,9 @@ void AFERelay::begin(uint8_t id) {
   Thermostat.begin(_id, RelayConfiguration.thermostat);
   /* Initialzing thermal protection functionality for a relay */
   ThermalProtection.begin(RelayConfiguration.thermalProtection);
+  if (RelayConfiguration.ledID > 0) {
+    Led.begin(RelayConfiguration.ledID - 1);
+  }
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
@@ -31,6 +34,7 @@ byte AFERelay::get() {
 void AFERelay::on() {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
+    Led.on();
     if (RelayConfiguration.timeToOff >
         0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
@@ -43,6 +47,7 @@ void AFERelay::on() {
 void AFERelay::off() {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
+    Led.off();
   }
   Data.saveRelayState(_id, RELAY_OFF);
 }
