@@ -211,7 +211,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(421 + id * nextRelay, configuration.stateMQTTConnected);
   Eeprom.writeUInt8(442 + id, configuration.ledID);
 
-  Eeprom.write(422 + id * nextRelay, configuration.showStatusUsingLED);
+  Eeprom.write(422 + id * nextRelay,
+               configuration.showStatusUsingLED); // @TODO is this used?
 
   Eeprom.write(436 + id * nextRelay, 3, configuration.thermalProtection);
 }

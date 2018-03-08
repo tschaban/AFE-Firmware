@@ -54,17 +54,17 @@ void AFEUpgrader::upgradeToVersion110() {
   Data.saveSystemLedID(1);
 
   /* Set that both switches controls relay 1 */
-  Eeprom.writeUInt8(440, 1);
-  Eeprom.writeUInt8(441, 1);
+  Eeprom.writeUInt8(416, 1);
+  Eeprom.writeUInt8(417, 1);
 
   /* Set that none of led informs about status of a relay */
-  Eeprom.writeUInt8(442, 0);
+  Eeprom.writeUInt8(421, 0);
 
   /* Upgrade to new switch functionality codes */
-  if (Eeprom.readUInt8(388) == 11) {
-    Eeprom.writeUInt8(388, 1);
+  if (Eeprom.readUInt8(401) == 11) {
+    Eeprom.writeUInt8(401, 1);
   }
-  if (Eeprom.readUInt8(395) == 11) {
-    Eeprom.writeUInt8(395, 1);
+  if (Eeprom.readUInt8(414) == 11) {
+    Eeprom.writeUInt8(414, 1);
   }
 }

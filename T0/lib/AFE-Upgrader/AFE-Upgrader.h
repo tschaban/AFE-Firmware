@@ -13,7 +13,6 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
-#include <AFE-EEPROM.h>
 // #include <Streaming.h>
 class AFEUpgrader {
 

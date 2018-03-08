@@ -12,6 +12,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   Eeprom.read(9, 16).toCharArray(configuration.name,
                                  sizeof(configuration.name));
   configuration.isLED[0] = Eeprom.read(366);
+  configuration.isLED[1] = Eeprom.read(418);
   configuration.isRelay[0] = Eeprom.read(369);
   configuration.isSwitch[0] = Eeprom.read(395);
   configuration.isSwitch[1] = Eeprom.read(402);
@@ -70,7 +71,7 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
 
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
-  uint8_t nextLED = 0;
+  uint8_t nextLED = 52;
   configuration.gpio = Eeprom.readUInt8(367 + id * nextLED);
   configuration.changeToOppositeValue = Eeprom.read(368 + id * nextLED);
 
@@ -97,10 +98,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  configuration.ledID = 0; // @TODO added for compatibility with the code
-                           // introduced in T4 so the Relay can switch on
-                           // assigned to it LED. To added for this version in
-                           // future
+  configuration.ledID = Eeprom.readUInt8(421 + id);
 
   return configuration;
 }
@@ -112,7 +110,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(397 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(398 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(401 + id * nextSwitch);
-
+  configuration.relayID = Eeprom.readUInt8(421 + id);
   return configuration;
 }
 
@@ -122,9 +120,9 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(395, configuration.isSwitch[0]);
   Eeprom.write(402, configuration.isSwitch[1]);
   Eeprom.write(366, configuration.isLED[0]);
+  Eeprom.write(418, configuration.isLED[1]);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
-  // Eeprom.write(413, configuration.isDS18B20);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -164,10 +162,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   /* @TODO For MQTT only */
   Eeprom.write(378 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
+  Eeprom.writeUInt8(421 + id, configuration.ledID);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
-  uint8_t nextLED = 2;
+  uint8_t nextLED = 52;
   Eeprom.writeUInt8(367 + id * nextLED, configuration.gpio);
   Eeprom.write(368 + id * nextLED, configuration.changeToOppositeValue);
 }
@@ -178,6 +177,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(397 + id * nextSwitch, configuration.type);
   Eeprom.write(398 + id * nextSwitch, 3, (long)configuration.sensitiveness);
   Eeprom.writeUInt8(401 + id * nextSwitch, configuration.functionality);
+  Eeprom.writeUInt8(416 + id, configuration.relayID);
 }
 
 const char AFEDataAccess::getVersion() {
@@ -210,6 +210,6 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(439); }
+uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(415); }
 
-void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }
+void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(415, id); }
