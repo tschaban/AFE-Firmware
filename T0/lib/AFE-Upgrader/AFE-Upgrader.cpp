@@ -9,10 +9,8 @@ AFEUpgrader::AFEUpgrader() {
 }
 
 boolean AFEUpgrader::upgraded() {
-
-  if (strcmp(FirmwareConfiguration.version, Defaults.getFirmwareVersion()) ==
-          0 &&
-      FirmwareConfiguration.type == Defaults.getFirmwareType()) {
+  if (strcmp(FirmwareConfiguration.version, FIRMWARE_VERSION) == 0 &&
+      FirmwareConfiguration.type == FIRMWARE_TYPE) {
     return false;
   } else {
     return true;
@@ -20,16 +18,14 @@ boolean AFEUpgrader::upgraded() {
 }
 
 void AFEUpgrader::upgrade() {
-  if (FirmwareConfiguration.type != Defaults.getFirmwareType()) {
+  if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
-    if (strcmp(FirmwareConfiguration.version, "1.0rc1") == 0 &&
-        strcmp(FirmwareConfiguration.version, "1.0rc2") == 0) {
-      Defaults.eraseConfiguration();
-      Defaults.set();
-    } else {
-      Data.saveVersion(String(Defaults.getFirmwareVersion()));
+    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.0.1")) {
+      upgradeToVersion110();
     }
+    Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
 
@@ -42,4 +38,33 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   Data.saveConfiguration(NetworkConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
+}
+
+void AFEUpgrader::upgradeToVersion110() {
+  AFEEEPROM Eeprom;
+
+  /* Add second LED default config */
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = 3;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data.saveConfiguration(1, LEDConfiguration);
+  Eeprom.write(443, false);
+
+  /* Set first led as system one */
+  Data.saveSystemLedID(1);
+
+  /* Set that both switches controls relay 1 */
+  Eeprom.writeUInt8(440, 1);
+  Eeprom.writeUInt8(441, 1);
+
+  /* Set that none of led informs about status of a relay */
+  Eeprom.writeUInt8(442, 0);
+
+  /* Upgrade to new switch functionality codes */
+  if (Eeprom.readUInt8(388) == 11) {
+    Eeprom.writeUInt8(388, 1);
+  }
+  if (Eeprom.readUInt8(395) == 11) {
+    Eeprom.writeUInt8(395, 1);
+  }
 }
