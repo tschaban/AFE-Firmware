@@ -70,30 +70,16 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
-    LED data1 = {};
+    LED data[sizeof(Device.configuration.isLED)] = {};
+    uint8_t dataLedID;
     if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getLEDData(0);
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+        data[i] = getLEDData(i);
+      }
+      dataLedID = getSystemLEDData();
     }
     publishHTML(ConfigurationPanel.getLEDConfigurationSite(
-        getOptionName(), getCommand(), data1));
-  } else if (getOptionName() == "relay") {
-    RELAY data1 = {};
-    RELAY data2 = {};
-    if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getRelayData(0);
-      //  data2 = getRelayData(1);
-    }
-    publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-        getOptionName(), getCommand(), data1, data2));
-  } else if (getOptionName() == "switch") {
-    SWITCH data1 = {};
-    SWITCH data2 = {};
-    if (getCommand() == SERVER_CMD_SAVE) {
-      data1 = getSwitchData(0);
-      data2 = getSwitchData(1);
-    }
-    publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-        getOptionName(), getCommand(), data1, data2));
+        getOptionName(), getCommand(), data, dataLedID));
   } else if (getOptionName() == "exit") {
     publishHTML(
         ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
@@ -112,6 +98,36 @@ void AFEWebServer::generate() {
       Device.reboot(MODE_CONFIGURATION);
     } else if (getCommand() == 2) {
       Device.reboot(MODE_ACCESS_POINT);
+    }
+  } else {
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      if (Device.configuration.isRelay[i]) {
+        if (getOptionName() == "relay" + String(i)) {
+          RELAY data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getRelayData(i);
+          }
+          publishHTML(ConfigurationPanel.getRelayConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      } else {
+        break;
+      }
+    }
+
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+      if (Device.configuration.isSwitch[i]) {
+        if (getOptionName() == "switch" + String(i)) {
+          SWITCH data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getSwitchData(i);
+          }
+          publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      } else {
+        break;
+      }
     }
   }
 }
@@ -161,40 +177,39 @@ uint8_t AFEWebServer::getCommand() {
 DEVICE AFEWebServer::getDeviceData() {
   DEVICE data;
 
-  if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  if (server.arg("dn").length() > 0) {
+    server.arg("dn").toCharArray(data.name, sizeof(data.name));
   }
 
-  server.arg("h").length() > 0 ? data.httpAPI = true
-                                     : data.httpAPI = false;
+  server.arg("h").length() > 0 ? data.httpAPI = true : data.httpAPI = false;
 
-  server.arg("m").length() > 0 ? data.mqttAPI = true
-                                     : data.mqttAPI = false;
+  server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
-  server.arg("r0").length() > 0 ? data.isRelay[0] = true
-                                    : data.isRelay[0] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+    server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
+  }
 
-  server.arg("s0").length() > 0 ? data.isSwitch[0] = true
-                                     : data.isSwitch[0] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+    server.arg("hr").toInt() > i ? data.isRelay[i] = true
+                                 : data.isRelay[i] = false;
+  }
 
-  server.arg("s1").length() > 0 ? data.isSwitch[1] = true
-                                     : data.isSwitch[1] = false;
-
-  server.arg("l0").length() > 0 ? data.isLED[0] = true
-                                  : data.isLED[0] = false;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+    server.arg("hs").toInt() > i ? data.isSwitch[i] = true
+                                 : data.isSwitch[i] = false;
+  }
 
   return data;
 }
 
 NETWORK AFEWebServer::getNetworkData() {
   NETWORK data;
-  if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data.ssid, sizeof(data.ssid));
+  if (server.arg("s").length() > 0) {
+    server.arg("s").toCharArray(data.ssid, sizeof(data.ssid));
   }
 
   if (server.arg("p").length() > 0) {
-    server.arg("p")
-        .toCharArray(data.password, sizeof(data.password));
+    server.arg("p").toCharArray(data.password, sizeof(data.password));
   }
 
   if (server.arg("d").length() > 0) {
@@ -203,32 +218,24 @@ NETWORK AFEWebServer::getNetworkData() {
     data.isDHCP = false;
   }
 
-  if (server.arg("i1").length() > 0 &&
-      server.arg("i2").length() > 0 &&
-      server.arg("i3").length() > 0 &&
-      server.arg("i4").length() > 0) {
+  if (server.arg("d1").length() > 0 && server.arg("d2").length() > 0 &&
+      server.arg("d3").length() > 0 && server.arg("d4").length() > 0) {
 
-    data.ip = IPAddress(
-        server.arg("i1").toInt(), server.arg("i2").toInt(),
-        server.arg("i3").toInt(), server.arg("i4").toInt());
+    data.ip = IPAddress(server.arg("d1").toInt(), server.arg("d2").toInt(),
+                        server.arg("d3").toInt(), server.arg("d4").toInt());
   }
-  if (server.arg("g1").length() > 0 &&
-      server.arg("g2").length() > 0 &&
-      server.arg("g3").length() > 0 &&
-      server.arg("g4").length() > 0) {
+  if (server.arg("g1").length() > 0 && server.arg("g2").length() > 0 &&
+      server.arg("g3").length() > 0 && server.arg("g4").length() > 0) {
 
-    data.gateway = IPAddress(
-        server.arg("g1").toInt(), server.arg("g2").toInt(),
-        server.arg("g3").toInt(), server.arg("g4").toInt());
+    data.gateway =
+        IPAddress(server.arg("g1").toInt(), server.arg("g2").toInt(),
+                  server.arg("g3").toInt(), server.arg("g4").toInt());
   }
-  if (server.arg("s1").length() > 0 &&
-      server.arg("s2").length() > 0 &&
-      server.arg("s3").length() > 0 &&
-      server.arg("s4").length() > 0) {
+  if (server.arg("s1").length() > 0 && server.arg("s2").length() > 0 &&
+      server.arg("s3").length() > 0 && server.arg("s4").length() > 0) {
 
-    data.subnet = IPAddress(
-        server.arg("s1").toInt(), server.arg("s2").toInt(),
-        server.arg("s3").toInt(), server.arg("s4").toInt());
+    data.subnet = IPAddress(server.arg("s1").toInt(), server.arg("s2").toInt(),
+                            server.arg("s3").toInt(), server.arg("s4").toInt());
   }
   if (server.arg("na").length() > 0) {
     data.noConnectionAttempts = server.arg("na").toInt();
@@ -249,14 +256,11 @@ MQTT AFEWebServer::getMQTTData() {
     server.arg("h").toCharArray(data.host, sizeof(data.host));
   }
 
-  if (server.arg("m1").length() > 0 &&
-      server.arg("m2").length() > 0 &&
-      server.arg("m3").length() > 0 &&
-      server.arg("m4").length() > 0) {
+  if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
+      server.arg("m3").length() > 0 && server.arg("m4").length() > 0) {
 
-    data.ip = IPAddress(
-        server.arg("m1").toInt(), server.arg("m2").toInt(),
-        server.arg("m3").toInt(), server.arg("m4").toInt());
+    data.ip = IPAddress(server.arg("m1").toInt(), server.arg("m2").toInt(),
+                        server.arg("m3").toInt(), server.arg("m4").toInt());
   }
 
   if (server.arg("p").length() > 0) {
@@ -268,12 +272,67 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("s").length() > 0) {
-    server.arg("s")
-        .toCharArray(data.password, sizeof(data.password));
+    server.arg("s").toCharArray(data.password, sizeof(data.password));
   }
 
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.topic, sizeof(data.topic));
+  }
+
+  return data;
+}
+
+RELAY AFEWebServer::getRelayData(uint8_t id) {
+  RELAY data;
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("ot" + String(id)).length() > 0) {
+    data.timeToOff = server.arg("ot" + String(id)).toFloat();
+  }
+
+  if (server.arg("pr" + String(id)).length() > 0) {
+    data.statePowerOn = server.arg("pr" + String(id)).toInt();
+  }
+
+  if (server.arg("n" + String(id)).length() > 0) {
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  }
+
+  if (server.arg("mc" + String(id)).length() > 0) {
+    data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
+  }
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledID = server.arg("l" + String(id)).toInt();
+  }
+
+  return data;
+}
+
+SWITCH AFEWebServer::getSwitchData(uint8_t id) {
+  SWITCH data;
+
+  if (server.arg("t" + String(id)).length() > 0) {
+    data.type = server.arg("t" + String(id)).toInt();
+  }
+
+  if (server.arg("s" + String(id)).length() > 0) {
+    data.sensitiveness = server.arg("s" + String(id)).toInt();
+  }
+
+  if (server.arg("f" + String(id)).length() > 0) {
+    data.functionality = server.arg("f" + String(id)).toInt();
+  }
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("r" + String(id)).length() > 0) {
+    data.relayID = server.arg("r" + String(id)).toInt();
   }
 
   return data;
@@ -292,58 +351,16 @@ LED AFEWebServer::getLEDData(uint8_t id) {
   return data;
 }
 
-RELAY AFEWebServer::getRelayData(uint8_t id) {
-  RELAY data;
+uint8_t AFEWebServer::getSystemLEDData() {
+  uint8_t data;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
-  if (server.arg("t" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("t" + String(id)).toFloat();
-  }
-  if (server.arg("r" + String(id)).length() > 0) {
-    data.statePowerOn =
-        server.arg("r" + String(id)).toInt();
-  }
-
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id))
-        .toCharArray(data.name, sizeof(data.name));
-  }
-
-  if (server.arg("c" + String(id)).length() > 0) {
-    data.stateMQTTConnected =
-        server.arg("c" + String(id)).toInt();
-  }
-
-  return data;
-}
-
-SWITCH AFEWebServer::getSwitchData(uint8_t id) {
-  SWITCH data;
-
-  if (server.arg("t" + String(id)).length() > 0) {
-    data.type = server.arg("t" + String(id)).toInt();
-  }
-
-  if (server.arg("s" + String(id)).length() > 0) {
-    data.sensitiveness =
-        server.arg("s" + String(id)).toInt();
-  }
-
-  if (server.arg("f" + String(id)).length() > 0) {
-    data.functionality =
-        server.arg("f" + String(id)).toInt();
-  }
-
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
+  if (server.arg("i").length() > 0) {
+    data = server.arg("i").toInt();
   }
 
   return data;
 }
 
 uint8_t AFEWebServer::getLanguageData() {
-  return server.arg("l").length() > 0 ? server.arg("l").toInt()
-                                             : 1;
+  return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
 }

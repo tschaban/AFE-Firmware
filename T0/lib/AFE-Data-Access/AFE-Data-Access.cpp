@@ -209,3 +209,7 @@ uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
 void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
+
+uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(439); }
+
+void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }
