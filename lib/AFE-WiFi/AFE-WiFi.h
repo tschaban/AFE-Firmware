@@ -15,7 +15,7 @@
 #include <AFE-LED.h>
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 class AFEWiFi {
 

@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_DOMOTICZ_Structure_h
-#define _AFE_DOMOTICZ_Structure_h
+#ifndef _AFE_PROTOCOL_Structure_h
+#define _AFE_PROTOCOL_Structure_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -11,16 +11,7 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-PROTOCOL-Structure.h>
-#include <IPAddress.h>
-
-struct DOMOTICZ {
-  uint8_t protocol;
-  char host[32];
-  IPAddress ip;
-  uint16_t port;
-  char user[32];
-  char password[32];
-};
+#define PROTOCOL_HTTP 0;
+#define PROTOCOL_HTTPS 0;
 
 #endif

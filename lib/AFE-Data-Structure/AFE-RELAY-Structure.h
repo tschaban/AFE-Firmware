@@ -29,6 +29,7 @@ struct RELAY {
   REGULATOR humidistat;
   float thermalProtection;
   uint8_t ledID;
+  uint16_t idx;
 };
 
 #endif

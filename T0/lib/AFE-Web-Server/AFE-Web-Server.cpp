@@ -69,6 +69,13 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
         getOptionName(), getCommand(), data));
+  } else if (getOptionName() == "domoticz") {
+    DOMOTICZ data;
+    if (getCommand() == SERVER_CMD_SAVE) {
+      data = getDomoticzServerData();
+    }
+    publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
+        getOptionName(), getCommand(), data));
   } else if (getOptionName() == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
@@ -185,6 +192,9 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
 
+  server.arg("d").length() > 0 ? data.domoticzAPI = true
+                               : data.domoticzAPI = false;
+
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
@@ -282,6 +292,39 @@ MQTT AFEWebServer::getMQTTData() {
   return data;
 }
 
+DOMOTICZ AFEWebServer::getDomoticzServerData() {
+  DOMOTICZ data;
+
+  if (server.arg("t").length() > 0) {
+    data.protocol = server.arg("t").toInt();
+  }
+
+  if (server.arg("h").length() > 0) {
+    server.arg("h").toCharArray(data.host, sizeof(data.host));
+  }
+
+  if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
+      server.arg("m3").length() > 0 && server.arg("m4").length() > 0) {
+
+    data.ip = IPAddress(server.arg("m1").toInt(), server.arg("m2").toInt(),
+                        server.arg("m3").toInt(), server.arg("m4").toInt());
+  }
+
+  if (server.arg("p").length() > 0) {
+    data.port = server.arg("p").toInt();
+  }
+
+  if (server.arg("u").length() > 0) {
+    server.arg("u").toCharArray(data.user, sizeof(data.user));
+  }
+
+  if (server.arg("s").length() > 0) {
+    server.arg("s").toCharArray(data.password, sizeof(data.password));
+  }
+
+  return data;
+}
+
 RELAY AFEWebServer::getRelayData(uint8_t id) {
   RELAY data;
 
@@ -307,6 +350,10 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   if (server.arg("l" + String(id)).length() > 0) {
     data.ledID = server.arg("l" + String(id)).toInt();
+  }
+
+  if (server.arg("x" + String(id)).length() > 0) {
+    data.idx = server.arg("x" + String(id)).toInt();
   }
 
   return data;

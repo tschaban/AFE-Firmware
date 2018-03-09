@@ -18,6 +18,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   configuration.isSwitch[1] = Eeprom.read(402);
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
+  configuration.domoticzAPI = Eeprom.read(800);
 
   return configuration;
 }
@@ -69,6 +70,21 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   return configuration;
 }
 
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+  DOMOTICZ configuration;
+
+  configuration.protocol = Eeprom.readUInt8(801);
+  Eeprom.read(802, 32).toCharArray(configuration.host,
+                                   sizeof(configuration.host));
+  configuration.ip = Eeprom.readIP(834);
+  configuration.port = Eeprom.read(838, 5).toInt();
+  Eeprom.read(843, 32).toCharArray(configuration.user,
+                                   sizeof(configuration.user));
+  Eeprom.read(875, 32).toCharArray(configuration.password,
+                                   sizeof(configuration.password));
+  return configuration;
+}
+
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
   uint8_t nextLED = 52;
@@ -100,6 +116,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   configuration.ledID = Eeprom.readUInt8(421 + id);
 
+  configuration.idx = Eeprom.read(930 + id, 6).toInt();
+
   return configuration;
 }
 
@@ -110,7 +128,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(397 + id * nextSwitch);
   configuration.sensitiveness = Eeprom.read(398 + id * nextSwitch, 3).toInt();
   configuration.functionality = Eeprom.readUInt8(401 + id * nextSwitch);
-  configuration.relayID = Eeprom.readUInt8(421 + id);
+  configuration.relayID = Eeprom.readUInt8(416 + id);
   return configuration;
 }
 
@@ -123,6 +141,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(418, configuration.isLED[1]);
   Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
+  Eeprom.write(800, configuration.domoticzAPI);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -153,6 +172,15 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Eeprom.write(334, 32, configuration.topic);
 }
 
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+  Eeprom.writeUInt8(801, configuration.protocol);
+  Eeprom.write(802, 32, configuration.host);
+  Eeprom.writeIP(834, configuration.ip);
+  Eeprom.write(838, 5, (long)configuration.port);
+  Eeprom.write(843, 32, configuration.user);
+  Eeprom.write(875, 32, configuration.password);
+}
+
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 26;
 
@@ -163,6 +191,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(378 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
   Eeprom.writeUInt8(421 + id, configuration.ledID);
+  Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
