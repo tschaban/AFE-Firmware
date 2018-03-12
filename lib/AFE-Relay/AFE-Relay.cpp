@@ -121,3 +121,5 @@ uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
+
+unsigned long AFERelay::getDomoticzIDX() { return RelayConfiguration.idx; }

@@ -82,6 +82,9 @@ public:
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
+
+  /* Return relay IDX in Domoticz */
+  unsigned long getDomoticzIDX();
 };
 
 #endif
