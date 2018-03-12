@@ -303,13 +303,6 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
     server.arg("h").toCharArray(data.host, sizeof(data.host));
   }
 
-  if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
-      server.arg("m3").length() > 0 && server.arg("m4").length() > 0) {
-
-    data.ip = IPAddress(server.arg("m1").toInt(), server.arg("m2").toInt(),
-                        server.arg("m3").toInt(), server.arg("m4").toInt());
-  }
-
   if (server.arg("p").length() > 0) {
     data.port = server.arg("p").toInt();
   }

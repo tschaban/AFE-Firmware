@@ -2,11 +2,10 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-Domoticz-API.h"
-#include "AFE-MQTT.h"
+#include <AFE-API-Domoticz.h>
+#include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Domoticz-API.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
@@ -40,16 +39,12 @@ void setup() {
     Device.setDevice();
   }
 
-  Serial << endl << "pre upgrade";
-
   /* Perform post upgrade changes (if any) */
   AFEUpgrader Upgrader;
   if (Upgrader.upgraded()) {
     Upgrader.upgrade();
   }
   Upgrader = {};
-
-  Serial << endl << "post upgrade";
 
   /* Checking if WiFi is onfigured, if not than it runs access point mode */
   if (Device.getMode() != MODE_ACCESS_POINT && !Device.isConfigured()) {
@@ -58,8 +53,6 @@ void setup() {
 
   /* Initializing relay */
   initRelay();
-
-  Serial << endl << "post relay";
   /* Initialzing network */
   Network.begin(Device.getMode());
 
@@ -68,7 +61,6 @@ void setup() {
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
   }
-  Serial << endl << "post led";
   /* If device in configuration mode then start LED blinking */
   if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
@@ -79,9 +71,7 @@ void setup() {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
   }
-  Serial << endl << "post MQTT";
   Network.listener();
-  Serial << endl << "post net";
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
@@ -89,9 +79,6 @@ void setup() {
 
   /* Initializing switches */
   initSwitch();
-  Serial << endl << "end setup";
-
-  Serial << endl << Domoticz.getRelayUpdateUrl(123456, "Off");
 }
 
 void loop() {

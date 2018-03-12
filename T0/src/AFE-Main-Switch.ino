@@ -18,6 +18,7 @@ void mainSwitch() {
         Led.on();
         Relay[Switch[i].getControlledRelayID() - 1].toggle();
         MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
+        DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
         Led.off();
       }
     } else {

@@ -624,34 +624,13 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += "</div>";
 
   body += "<div class=\"cf\">";
-  body += "<label>Hostname</label>";
-  body += "<input name=\"h\" type=\"text\" maxlength=\"32\" value=\"";
+  body += "<label>Hostname/IP</label>";
+  body += "<input name=\"h\" type=\"text\" maxlength=\"42\" value=\"";
   body += configuration.host;
   body += "\">";
-  body += "<span class=\"hint\">Max 32 ";
+  body += "<span class=\"hint\">Max 42 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Adres IP" : "IP address";
-  body += "</label>";
-  body += "<input name=\"m1\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[0];
-  body += "\">.";
-  body += "<input name=\"m2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[1];
-  body += "\">.";
-  body += "<input name=\"m3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[2];
-  body += "\">.";
-  body += "<input name=\"m4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[3];
-  body += "\">";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>Port*</label>";

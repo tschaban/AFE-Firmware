@@ -1,12 +1,14 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
-
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+/* Method listens for HTTP Requests */
+void mainHTTPRequestsHandler() {
+  if (Device.configuration.httpAPI) {
+    if (WebServer.httpAPIlistener()) {
+      Led.on();
+      Serial << endl << "Got: httpAPIlistener";
+      processHTTPAPIRequest(WebServer.getHTTPCommand());
+      Led.off();
+    }
+  }
+}
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it.
  * The second one method converts float to charString before pushing response */

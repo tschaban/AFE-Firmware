@@ -74,13 +74,12 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
 
   configuration.protocol = Eeprom.readUInt8(801);
-  Eeprom.read(802, 32).toCharArray(configuration.host,
+  Eeprom.read(802, 40).toCharArray(configuration.host,
                                    sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(834);
-  configuration.port = Eeprom.read(838, 5).toInt();
-  Eeprom.read(843, 32).toCharArray(configuration.user,
+  configuration.port = Eeprom.read(842, 5).toInt();
+  Eeprom.read(847, 32).toCharArray(configuration.user,
                                    sizeof(configuration.user));
-  Eeprom.read(875, 32).toCharArray(configuration.password,
+  Eeprom.read(879, 32).toCharArray(configuration.password,
                                    sizeof(configuration.password));
   return configuration;
 }
@@ -174,11 +173,10 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 
 void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
   Eeprom.writeUInt8(801, configuration.protocol);
-  Eeprom.write(802, 32, configuration.host);
-  Eeprom.writeIP(834, configuration.ip);
-  Eeprom.write(838, 5, (long)configuration.port);
-  Eeprom.write(843, 32, configuration.user);
-  Eeprom.write(875, 32, configuration.password);
+  Eeprom.write(802, 40, configuration.host);
+  Eeprom.write(842, 5, (long)configuration.port);
+  Eeprom.write(847, 32, configuration.user);
+  Eeprom.write(879, 32, configuration.password);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {

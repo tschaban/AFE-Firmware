@@ -12,7 +12,6 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Defaults.h>
 #include <ESP8266HTTPClient.h>
 #include <Streaming.h>
 
@@ -21,7 +20,7 @@ class AFEDomoticz {
 private:
   AFEDataAccess Data;
   HTTPClient http;
-  char serverURL[65];
+  char serverURL[68];
 
 public:
   DOMOTICZ configuration;
@@ -29,7 +28,7 @@ public:
   AFEDomoticz();
   void begin();
   void callURL(const char *url);
-  const String getRelayUpdateUrl(uint16_t idx, const char *value);
+  void sendSwitchCommand(unsigned long idx, const char *value);
 };
 
 #endif
