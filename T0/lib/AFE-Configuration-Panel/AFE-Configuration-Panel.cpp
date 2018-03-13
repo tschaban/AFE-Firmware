@@ -11,8 +11,6 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   redirect == 0 ? page = Site.generateHeader(0)
                 : page = Site.generateHeader(10);
 
-  Serial << endl << option << endl << command;
-
   if (option == "upgrade") {
     page += Site.addUpgradeSection();
   } else if (option == "reset") {

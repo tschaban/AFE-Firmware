@@ -14,20 +14,23 @@
 #include <AFE-Data-Access.h>
 #include <ESP8266HTTPClient.h>
 #include <Streaming.h>
+#include <rBase64.h>
 
 class AFEDomoticz {
 
 private:
   AFEDataAccess Data;
   HTTPClient http;
-  char serverURL[68];
+  char serverURL[78];
+
+  const String getApiCall(const char *param, unsigned long idx);
 
 public:
   DOMOTICZ configuration;
 
   AFEDomoticz();
   void begin();
-  void callURL(const char *url);
+  void callURL(const String url);
   void sendSwitchCommand(unsigned long idx, const char *value);
 };
 
