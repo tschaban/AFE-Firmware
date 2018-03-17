@@ -16,7 +16,7 @@
 
 struct DOMOTICZ {
   uint8_t protocol;
-  char host[42];
+  char host[40];
   uint16_t port;
   char user[32];
   char password[32];
