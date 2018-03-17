@@ -28,11 +28,15 @@ private:
   boolean pressed = false; // It's set to true once button pressed physically
   boolean _pressed = false;
 
-  boolean pressed4fiveSeconds =
-      false; // It's set to true when switch is pressed for 5s
-  boolean _pressed4fiveSeconds = false; // used to control LED
-  boolean pressed4tenSeconds =
-      false; // It's set to true when switch is pressed for 10s
+  /* Forst one is set to true after X secodns. Second one controls LED */
+  boolean pressed4fiveSeconds = false;
+  boolean _pressed4fiveSeconds = false;
+
+  boolean pressed4tenSeconds = false;
+  boolean _pressed4tenSeconds = false;
+
+  boolean pressed4thirteenSeconds = false;
+  boolean _pressed4thirteenSeconds = false;
   AFELED Led;
 
 public:
@@ -55,8 +59,11 @@ public:
   /* Method returns true after switch is pressed for 5sec. */
   boolean is5s();
 
-  /* Method return trye after switch is pressed for 10sec */
+  /* Method return true after switch is pressed for 10sec */
   boolean is10s();
+
+  /* Method return true after switch is pressed for 30sec */
+  boolean is30s();
 
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
