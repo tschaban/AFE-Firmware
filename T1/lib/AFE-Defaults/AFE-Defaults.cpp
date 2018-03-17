@@ -78,7 +78,7 @@ void AFEDefaults::set() {
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
-  SwitchConfiguration.relayID = 0;
+  SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
   SwitchConfiguration.gpio = 5;
