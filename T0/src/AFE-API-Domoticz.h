@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <ESP8266HTTPClient.h>
-#include <Streaming.h>
+// s#include <Streaming.h>
 #include <rBase64.h>
 
 class AFEDomoticz {
@@ -21,7 +21,7 @@ class AFEDomoticz {
 private:
   AFEDataAccess Data;
   HTTPClient http;
-  char serverURL[78];
+  char serverURL[184];
 
   const String getApiCall(const char *param, unsigned long idx);
 

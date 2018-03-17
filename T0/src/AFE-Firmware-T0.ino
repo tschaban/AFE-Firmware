@@ -12,7 +12,7 @@
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -79,6 +79,8 @@ void setup() {
 
   /* Initializing switches */
   initSwitch();
+
+  Domoticz.begin();
 }
 
 void loop() {

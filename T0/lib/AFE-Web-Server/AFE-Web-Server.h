@@ -16,7 +16,7 @@
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 class AFEWebServer {
 
@@ -28,6 +28,10 @@ private:
   HTTPCOMMAND httpCommand; // It stores last HTTP API request
   boolean receivedHTTPCommand =
       false; // Once HTTP API requet is recieved it's set to true
+
+  boolean _refreshConfiguration = false; // when it's set to true device
+                                         // configuration is refreshed. Required
+                                         // by generate() method
 
   /* Method pushes HTML site from WebServer */
   void publishHTML(String page);

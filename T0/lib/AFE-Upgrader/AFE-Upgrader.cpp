@@ -22,7 +22,7 @@ void AFEUpgrader::upgrade() {
     upgradeTypeOfFirmware();
   } else {
     if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
-        strcmp(FirmwareConfiguration.version, "1.0.1")) {
+        strcmp(FirmwareConfiguration.version, "1.0.1") == 0) {
       upgradeToVersion110();
     }
     Data.saveVersion(String(FIRMWARE_VERSION));
@@ -43,14 +43,13 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
 void AFEUpgrader::upgradeToVersion110() {
   AFEEEPROM Eeprom;
 
-  /* Add second LED default config */
-  LED LEDConfiguration;
-  LEDConfiguration.gpio = 3;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data.saveConfiguration(1, LEDConfiguration);
-  Eeprom.write(443, false);
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
 
-  /* Set first led as system one */
+  /* LEDs */
+  Eeprom.write(418, false);
+  Defaults.addLEDConfiguration(1, 3);
   Data.saveSystemLedID(1);
 
   /* Set that both switches controls relay 1 */

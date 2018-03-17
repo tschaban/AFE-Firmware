@@ -43,6 +43,11 @@ void mainSwitchListener() {
         } else if (Switch[i].is5s()) {
           Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                           : Device.reboot(MODE_NORMAL);
+        } else if (Switch[i].is30s()) {
+          Led.on();
+          Device.setDevice();
+          Led.off();
+          Device.reboot(MODE_ACCESS_POINT);
         }
       }
     } else {

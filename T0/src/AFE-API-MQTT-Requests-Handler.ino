@@ -15,17 +15,20 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
 
         if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[1] == 'n') {
+          if ((char)payload[1] == 'n' && Relay[i].get() != RELAY_ON) {
             Relay[i].on();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "on");
-          } else if ((char)payload[1] == 'f') {
+            DomoticzPublishRelayState(i);
+          } else if ((char)payload[1] == 'f' && Relay[i].get() != RELAY_OFF) {
             Relay[i].off();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
+            DomoticzPublishRelayState(i);
           } else if ((char)payload[1] == 'e') {
             MQTTPublishRelayState(i);
           } else if ((char)payload[1] == 'o') { // toggle
             Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
             MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
           }
         }
       } else {

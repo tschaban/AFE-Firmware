@@ -77,8 +77,7 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   Eeprom.read(802, 40).toCharArray(configuration.host,
                                    sizeof(configuration.host));
   configuration.port = Eeprom.read(842, 5).toInt();
-  Eeprom.read(847, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
+  Eeprom.read(847, 32).toCharArray(configuration.user, 32);
   Eeprom.read(879, 32).toCharArray(configuration.password,
                                    sizeof(configuration.password));
   return configuration;

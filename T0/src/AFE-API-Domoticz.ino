@@ -4,30 +4,31 @@
 
 #include "AFE-API-Domoticz.h"
 
-AFEDomoticz::AFEDomoticz() { begin(); }
+AFEDomoticz::AFEDomoticz() {}
 
 void AFEDomoticz::begin() {
   configuration = Data.getDomoticzConfiguration();
-  char user[100]; //@TODO
-  rbase64.encode(configuration.user).toCharArray(user, 100);
-  char pass[100]; //@TODO
-  rbase64.encode(configuration.password).toCharArray(pass, 100);
+  char _user[45] = {0}; // base64 conversion takes ceil(n/3)*4 size of mem
+  char _pass[45] = {0};
+  char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
-  char authorization[20 + 100];
   if (configuration.user && configuration.password) {
-    Serial << endl << "There is user / password for domoticz";
-    sprintf(authorization, "&username=%s&password=%s", user, pass);
+    rbase64.encode(configuration.user).toCharArray(_user, sizeof(_user));
+    rbase64.encode(configuration.password).toCharArray(_pass, sizeof(_pass));
+    sprintf(authorization, "&username=%s&password=%s", _user, _pass);
   }
 
   sprintf(serverURL, "%s%s:%d/json.htm?type=command%s",
           configuration.protocol == 0 ? "http://" : "https://",
           configuration.host, configuration.port, authorization);
 
-  http.setTimeout(1000); // @TODO is it working?
+  /* Uncommencted can help to determin the size of serverURL
+  Serial << endl << "ServerURL Size=" << String(serverURL).length();
+  */
 }
 
 const String AFEDomoticz::getApiCall(const char *param, unsigned long idx) {
-  char url[sizeof(serverURL) + 39 + sizeof(param)];
+  char url[sizeof(serverURL) + 18 + strlen(param)];
   sprintf(url, "%s&param=%s&idx=%u", serverURL, param, idx);
   return url;
 }
@@ -40,13 +41,14 @@ void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
 }
 
 void AFEDomoticz::callURL(const String url) {
-  Serial << endl << "INFO: calling url: " << url;
 
+  // Serial << endl << "Calling url: " << url;
   http.begin(url);
-
   int httpCode = http.GET();
-  Serial << endl << "Get: " << httpCode;
+  /*
+  Serial << endl << "Response: " << httpCode;
   String payload = http.getString();
   Serial << endl << payload;
+  */
   http.end();
 }

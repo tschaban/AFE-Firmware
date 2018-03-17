@@ -554,7 +554,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += "<div class=\"cf\">";
   body += "<label>Port*</label>";
   body += "<input name=\"p\" type=\"number\""
-          " min=\"0\" max=\"99999\" step=\"1\" value=\"";
+          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
   body += configuration.port;
   body += "\">";
   body += "</div>";
@@ -612,7 +612,7 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Protokół" : "Protocol";
-  body += ": </label>";
+  body += "* </label>";
   body += "<select name=\"t\">";
   body += "<option value=\"0\"";
   body += configuration.protocol == 0 ? " selected=\"selected\"" : "";
@@ -624,18 +624,18 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += "</div>";
 
   body += "<div class=\"cf\">";
-  body += "<label>Hostname/IP</label>";
-  body += "<input name=\"h\" type=\"text\" maxlength=\"42\" value=\"";
+  body += "<label>Hostname/IP*</label>";
+  body += "<input name=\"h\" type=\"text\" maxlength=\"40\" value=\"";
   body += configuration.host;
   body += "\">";
-  body += "<span class=\"hint\">Max 42 ";
+  body += "<span class=\"hint\">Max 40 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>Port*</label>";
   body += "<input name=\"p\" type=\"number\""
-          " min=\"0\" max=\"99999\" step=\"1\" value=\"";
+          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
   body += configuration.port;
   body += "\">";
   body += "</div>";
@@ -818,55 +818,55 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</select>";
   body += "</div>";
 
-  /* @TODO MQTT */
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Po podłączeniu do brokera MQTT"
-                        : "After establishing connection to MQTT Broker";
-  body += "</label>";
-  body += "<select  name=\"mc" + String(id) + "\">";
-  body += "<option value=\"0\"";
-  body +=
-      (configuration.stateMQTTConnected == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Brak akcji" : "No action";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body +=
-      (configuration.stateMQTTConnected == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Wyłączony" : "Off";
-  body += "</option>";
-  body += "<option value=\"2\"";
-  body +=
-      (configuration.stateMQTTConnected == 2 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Włączony" : "On";
-  body += "</option>";
-  body += "<option value=\"3\"";
-  body +=
-      (configuration.stateMQTTConnected == 3 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
-  body += "</option>";
-  body += "<option value=\"4\"";
-  body +=
-      (configuration.stateMQTTConnected == 4 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
-                        : "Opposite to the last known state";
-  body += "</option>";
-  body += "<option value=\"5\"";
-  body +=
-      (configuration.stateMQTTConnected == 5 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0
-              ? "Wartość z systemu sterowania przekaźnikiem (przez MQTT)"
-              : "Get state from a relay's controlling system (over MQTT)";
-  body += "</option>";
-  body += "</select>";
-  body += "</div>";
-
+  if (device.mqttAPI) {
+    body += "<div class=\"cf\">";
+    body += "<label>";
+    body += language == 0 ? "Po podłączeniu do brokera MQTT"
+                          : "After establishing connection to MQTT Broker";
+    body += "</label>";
+    body += "<select  name=\"mc" + String(id) + "\">";
+    body += "<option value=\"0\"";
+    body +=
+        (configuration.stateMQTTConnected == 0 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0 ? "Brak akcji" : "No action";
+    body += "</option>";
+    body += "<option value=\"1\"";
+    body +=
+        (configuration.stateMQTTConnected == 1 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0 ? "Wyłączony" : "Off";
+    body += "</option>";
+    body += "<option value=\"2\"";
+    body +=
+        (configuration.stateMQTTConnected == 2 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0 ? "Włączony" : "On";
+    body += "</option>";
+    body += "<option value=\"3\"";
+    body +=
+        (configuration.stateMQTTConnected == 3 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
+    body += "</option>";
+    body += "<option value=\"4\"";
+    body +=
+        (configuration.stateMQTTConnected == 4 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
+                          : "Opposite to the last known state";
+    body += "</option>";
+    body += "<option value=\"5\"";
+    body +=
+        (configuration.stateMQTTConnected == 5 ? " selected=\"selected\"" : "");
+    body += ">";
+    body += language == 0
+                ? "Wartość z systemu sterowania przekaźnikiem (przez MQTT)"
+                : "Get state from a relay's controlling system (over MQTT)";
+    body += "</option>";
+    body += "</select>";
+    body += "</div>";
+  }
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
                         : "Automatic switching off of the relay";

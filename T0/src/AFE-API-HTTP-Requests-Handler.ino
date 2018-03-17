@@ -3,7 +3,6 @@ void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
     if (WebServer.httpAPIlistener()) {
       Led.on();
-      Serial << endl << "Got: httpAPIlistener";
       processHTTPAPIRequest(WebServer.getHTTPCommand());
       Led.off();
     }
@@ -63,21 +62,29 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         if (strcmp(request.name, Relay[i].getName()) == 0) {
           noRelay = false;
           if (strcmp(request.command, "on") == 0) {
-            Relay[i].on();
+            if (Relay[i].get() != RELAY_ON) {
+              Relay[i].on();
+              MQTTPublishRelayState(i); // MQTT Listener library
+              DomoticzPublishRelayState(i);
+            }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
                                           Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
+
           } else if (strcmp(request.command, "off") == 0) { // Off
-            Relay[i].off();
+            if (Relay[i].get() != RELAY_OFF) {
+              Relay[i].off();
+              MQTTPublishRelayState(i); // MQTT Listener library
+              DomoticzPublishRelayState(i);
+            }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
                                           Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
             state = Relay[i].get();
             Relay[i].toggle();
             sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
                                           Relay[i].get());
             MQTTPublishRelayState(i); // MQTT Listener library
+            DomoticzPublishRelayState(i);
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
             /* Command not implemented.Info */

@@ -8,15 +8,12 @@ AFEDefaults::AFEDefaults() {}
 
 void AFEDefaults::set() {
 
-  AFEDataAccess *Data;
-
   DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
   NETWORK networkConfiguration;
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  LED LEDConfiguration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
@@ -32,6 +29,7 @@ void AFEDefaults::set() {
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
   deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
   Data->saveConfiguration(deviceConfiguration);
 
@@ -60,29 +58,47 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
   RelayConfiguration.ledID = 0;
+  RelayConfiguration.idx = 1;
   Data->saveConfiguration(0, RelayConfiguration);
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
-  SwitchConfiguration.relayID = 0;
+  SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
-  SwitchConfiguration.functionality = 11;
+  SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 
-  LEDConfiguration.gpio = 13;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(0, LEDConfiguration);
+  addDomoticzConfiguration();
+  addLEDConfiguration(0, 13);
+  addLEDConfiguration(1, 3);
 
   Data->saveSystemLedID(1);
 
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
+}
+
+void AFEDefaults::addDomoticzConfiguration() {
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  sprintf(DomoticzConfiguration.host, "");
+  sprintf(DomoticzConfiguration.user, "");
+  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
+}
+
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = gpio;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data->saveConfiguration(id, LEDConfiguration);
 }
 
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

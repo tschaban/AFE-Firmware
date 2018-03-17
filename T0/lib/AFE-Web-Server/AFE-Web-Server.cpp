@@ -36,6 +36,12 @@ HTTPCOMMAND AFEWebServer::getHTTPCommand() {
 
 void AFEWebServer::generate() {
   /* @TODO this method is not writen well */
+
+  if (_refreshConfiguration) {
+    _refreshConfiguration = false;
+    Device.begin();
+  }
+
   if (getOptionName() == "language") {
     uint8_t data;
     if (getCommand() == SERVER_CMD_SAVE) {
@@ -184,6 +190,9 @@ uint8_t AFEWebServer::getCommand() {
 DEVICE AFEWebServer::getDeviceData() {
   DEVICE data;
 
+  _refreshConfiguration =
+      true; // it will cause that device configuration will be refeshed
+
   if (server.arg("dn").length() > 0) {
     server.arg("dn").toCharArray(data.name, sizeof(data.name));
   }
@@ -215,11 +224,11 @@ DEVICE AFEWebServer::getDeviceData() {
 NETWORK AFEWebServer::getNetworkData() {
   NETWORK data;
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.ssid, sizeof(data.ssid));
+    server.arg("s").toCharArray(data.ssid, sizeof(data.ssid) + 1);
   }
 
   if (server.arg("p").length() > 0) {
-    server.arg("p").toCharArray(data.password, sizeof(data.password));
+    server.arg("p").toCharArray(data.password, sizeof(data.password) + 1);
   }
 
   if (server.arg("d").length() > 0) {
@@ -263,7 +272,7 @@ NETWORK AFEWebServer::getNetworkData() {
 MQTT AFEWebServer::getMQTTData() {
   MQTT data;
   if (server.arg("h").length() > 0) {
-    server.arg("h").toCharArray(data.host, sizeof(data.host));
+    server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
   }
 
   if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
@@ -278,15 +287,19 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("u").length() > 0) {
-    server.arg("u").toCharArray(data.user, sizeof(data.user));
+    server.arg("u").toCharArray(data.user, sizeof(data.user) + 1);
+  } else {
+    data.user[0] = '\0';
   }
 
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.password, sizeof(data.password));
+    server.arg("s").toCharArray(data.password, sizeof(data.password) + 1);
+  } else {
+    data.password[0] = '\0';
   }
 
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data.topic, sizeof(data.topic));
+    server.arg("t").toCharArray(data.topic, sizeof(data.topic) + 1);
   }
 
   return data;
@@ -300,7 +313,7 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
   }
 
   if (server.arg("h").length() > 0) {
-    server.arg("h").toCharArray(data.host, sizeof(data.host));
+    server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
   }
 
   if (server.arg("p").length() > 0) {
@@ -308,11 +321,17 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
   }
 
   if (server.arg("u").length() > 0) {
-    server.arg("u").toCharArray(data.user, sizeof(data.user));
+    server.arg("u").toCharArray(data.user, sizeof(data.user) + 1);
+  } else {
+    data.user[0] = '\0';
   }
 
+  Serial << endl << "data.user=" << data.user;
+
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.password, sizeof(data.password));
+    server.arg("s").toCharArray(data.password, sizeof(data.password) + 1);
+  } else {
+    data.password[0] = '\0';
   }
 
   return data;
@@ -334,7 +353,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name) + 1);
   }
 
   if (server.arg("mc" + String(id)).length() > 0) {
