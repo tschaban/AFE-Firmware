@@ -8,7 +8,7 @@ AFEEEPROM::AFEEEPROM() { EEPROM.begin(EEPROM_SIZE); }
 
 String AFEEEPROM::read(uint16_t address, uint16_t size) {
   String _return;
-  for (uint16_t i = address; i < address + size; ++i) {
+  for (uint16_t i = address; i < address + size; i++) {
     if (EEPROM.read(i) != 255) {
       _return += char(EEPROM.read(i));
     }
