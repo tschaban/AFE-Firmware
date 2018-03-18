@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#ifndef _AFE_Configuration_h
-#define _AFE_Configuration_h
+#ifndef _AFE_PROTOCOL_Structure_h
+#define _AFE_PROTOCOL_Structure_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -11,7 +11,7 @@
 #include "WProgram.h"
 #endif
 
-#define FIRMWARE_TYPE 0
-#define FIRMWARE_VERSION "1.2.0"
+#define PROTOCOL_HTTP 0;
+#define PROTOCOL_HTTPS 0;
 
 #endif

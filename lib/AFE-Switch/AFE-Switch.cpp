@@ -51,6 +51,15 @@ boolean AFESwitch::is10s() {
   }
 }
 
+boolean AFESwitch::is30s() {
+  if (pressed4thirteenSeconds) {
+    pressed4thirteenSeconds = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+
 void AFESwitch::listener() {
   if (_initialized) {
     boolean currentState = digitalRead(SwitchConfiguration.gpio);
@@ -77,12 +86,30 @@ void AFESwitch::listener() {
           /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds
            */
           if (SwitchConfiguration.functionality == SWITCH_MULTI) {
-            if (time - startTime >= 10000 && !pressed4tenSeconds) {
-              pressed4tenSeconds = true;
+
+            if (time - startTime >= 35000) {
+              Led.blink(50);
+              delay(50);
+            }
+
+            if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
+              for (uint8_t i = 0; i < 3; i++) {
+                Led.blink(200);
+                delay(200);
+              }
+              _pressed4thirteenSeconds = true;
+            }
+
+            if (time - startTime >= 10000 && !_pressed4tenSeconds) {
+              for (uint8_t i = 0; i < 2; i++) {
+                Led.blink(200);
+                delay(200);
+              }
+              _pressed4tenSeconds = true;
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
-              Led.blink(500);
+              Led.blink(200);
               _pressed4fiveSeconds = true;
             }
           }
@@ -96,12 +123,24 @@ void AFESwitch::listener() {
     } else if (currentState == previousState && startTime > 0) {
       /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds */
       if (SwitchConfiguration.functionality == SWITCH_MULTI) {
-        if ( // SwitchConfiguration.type == SWITCH_TYPE_MONO &&
-            time - startTime >= 5000 && time - startTime < 10000) {
+
+        if (time - startTime >= 5000 && time - startTime < 10000) {
           pressed4fiveSeconds = true;
         }
+
+        if (time - startTime >= 10000 && time - startTime < 30000) {
+          pressed4tenSeconds = true;
+        }
+
+        if (time - startTime >= 30000 && time - startTime < 35000) {
+          pressed4thirteenSeconds = true;
+        }
+
         _pressed4fiveSeconds = false;
+        _pressed4tenSeconds = false;
+        _pressed4thirteenSeconds = false;
       }
+
       startTime = 0;
       _pressed = false;
     }

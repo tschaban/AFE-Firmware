@@ -49,7 +49,12 @@ void AFEWiFi::listener() {
         delayStartTime = millis();
         if (connections == 0) {
           WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
-          //  Serial << endl << "INFO: Starting establishing WiFi connection";
+          /*
+          Serial << endl << "INFO: Starting establishing WiFi connection";
+          Serial << endl
+                 << networkConfiguration.ssid << "@"
+                 << networkConfiguration.password;
+*/
         }
       }
 
@@ -66,10 +71,10 @@ void AFEWiFi::listener() {
           delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
         connections++;
         /*
-        Serial << endl
-               << "INFO: WiFi connection attempt: " << connections + 1
-               << " from " << networkConfiguration.noConnectionAttempts;
-*/
+                Serial << endl
+                       << "INFO: WiFi connection attempt: " << connections + 1
+                       << " from " << networkConfiguration.noConnectionAttempts;
+        */
         delayStartTime = 0;
       }
 
@@ -95,10 +100,11 @@ void AFEWiFi::listener() {
       ledStartTime = 0;
       Led.off();
       /*
-      Serial << endl
-             << "INFO: Connection established"
-             << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
-             */
+            Serial << endl
+                   << "INFO: Connection established"
+                   << ", MAC: " << WiFi.macAddress() << ", IP: " <<
+         WiFi.localIP();
+      */
     }
   }
 }

@@ -11,9 +11,12 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-PROTOCOL-Structure.h>
+#include <IPAddress.h>
+
 struct DOMOTICZ {
-  char host[32];
-  IPAddress ip;
+  uint8_t protocol;
+  char host[40];
   uint16_t port;
   char user[32];
   char password[32];

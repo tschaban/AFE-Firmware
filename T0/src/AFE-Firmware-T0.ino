@@ -2,9 +2,9 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-MQTT.h"
+#include <AFE-API-Domoticz.h>
+#include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <AFE-Relay.h>
@@ -18,11 +18,11 @@ AFEDataAccess Data;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
+AFEDomoticz Domoticz;
 AFEWebServer WebServer;
 AFELED Led;
-AFESwitch Switch;
-AFESwitch ExternalSwitch;
-AFERelay Relay;
+AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
+AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
 
 void setup() {
@@ -51,29 +51,19 @@ void setup() {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
-  /* Initializing relay and setting it's default state at power on*/
-  if (Device.getMode() == MODE_NORMAL && Device.configuration.isRelay[0]) {
-    Relay.begin(0);
-    Relay.setRelayAfterRestoringPower();
-  }
-
+  /* Initializing relay */
+  initRelay();
   /* Initialzing network */
   Network.begin(Device.getMode());
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-  Led.begin(0);
-
+  uint8_t systeLedID = Data.getSystemLedID();
+  if (systeLedID > 0) {
+    Led.begin(systeLedID - 1);
+  }
   /* If device in configuration mode then start LED blinking */
-  if (Device.getMode() != MODE_NORMAL) {
+  if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
-  }
-
-  /* Initializing Switches */
-  if (Device.configuration.isSwitch[0]) {
-    Switch.begin(0);
-  }
-  if (Device.configuration.isSwitch[1]) {
-    ExternalSwitch.begin(1);
   }
 
   /* Initializing MQTT */
@@ -81,13 +71,19 @@ void setup() {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
   }
-
-  Network.connect();
-
+  Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
+
+  /* Initializing switches */
+  initSwitch();
+
+  /* Initializing Domoticz API */
+  if (Device.configuration.domoticzAPI) {
+    Domoticz.begin();
+  }
 }
 
 void loop() {
@@ -95,70 +91,38 @@ void loop() {
   if (Device.getMode() != MODE_ACCESS_POINT) {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
+
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
-          Mqtt.connected() ? Mqtt.loop() : Mqtt.connect();
+          Mqtt.listener();
         }
 
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
-        if (Device.configuration.httpAPI) {
-          if (WebServer.httpAPIlistener()) {
-            Led.on();
-            processHTTPAPIRequest(WebServer.getHTTPCommand());
-            Led.off();
-          }
-        }
+        mainHTTPRequestsHandler();
+        mainRelay();
 
-        /* Relay related code */
-        if (Device.configuration.isRelay[0]) {
-
-          /* Relay turn off event launched */
-          if (Relay.autoTurnOff()) {
-            Led.on();
-            Mqtt.publish(Relay.getMQTTTopic(), "state", "off");
-            Led.off();
-          }
-
-          /* One of the switches has been shortly pressed */
-          if (Switch.isPressed() || ExternalSwitch.isPressed()) {
-            Led.on();
-            Relay.toggle();
-            MQTTPublishRelayState(); // MQTT Listener library
-            Led.off();
-          }
-        }
       } else { // Configuration Mode
+        if (!Led.isBlinking()) {
+          Led.blinkingOn(100);
+        }
         WebServer.listener();
       }
-    } else { // Device not connected to WiFi. Reestablish connection
-      Network.connect();
+    } else {
+      if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
+        Led.blinkingOff();
+      }
     }
+    Network.listener();
   } else { // Access Point Mode
     Network.APListener();
     WebServer.listener();
   }
 
   /* Listens for switch events */
-  Switch.listener();
-  ExternalSwitch.listener();
-
-  /* One of the Multifunction switches pressed for 10 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is10s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is10s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
-                                    : Device.reboot(MODE_NORMAL);
-  }
-
-  /* One of the Multifunction switches pressed for 5 seconds */
-  if ((Switch.getFunctionality() == SWITCH_MULTI && Switch.is5s()) ||
-      (ExternalSwitch.getFunctionality() == SWITCH_MULTI &&
-       ExternalSwitch.is5s())) {
-    Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
-                                    : Device.reboot(MODE_NORMAL);
-  }
+  mainSwitchListener();
+  mainSwitch();
 
   Led.loop();
 }

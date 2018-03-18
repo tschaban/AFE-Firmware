@@ -11,9 +11,8 @@
 #include "WProgram.h"
 #endif
 
-#include <ESP8266WiFi.h>
-
-#include <AFE-DEVICE-Structure.h>
+#include <AFE-DEVICE-T0-Structure.h>
+#include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
 #include <AFE-LED-Structure.h>

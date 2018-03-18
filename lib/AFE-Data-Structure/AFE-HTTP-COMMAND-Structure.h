@@ -15,6 +15,7 @@ struct HTTPCOMMAND {
   char device[16];
   char name[16];
   char command[32];
+  char source[9];
 };
 
 #endif

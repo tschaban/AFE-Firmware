@@ -14,7 +14,7 @@
 #include <AFE-Common-Configuration.h>
 #include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
-// include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEConfigurationPanel {
 
@@ -36,19 +36,17 @@ public:
                                      NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
+  String getDomoticzServerConfigurationSite(const String option,
+                                            uint8_t command, DOMOTICZ data);
   String getLEDConfigurationSite(const String option, uint8_t command,
-                                 LED data);
-  String getRelayConfigurationSite(
-      const String option, uint8_t command, RELAY data1,
-      RELAY data2); // This method is set for two relays (future use)
+                                 LED data[sizeof(Device.configuration.isLED)],
+                                 uint8_t dataLedID);
+  String getRelayConfigurationSite(const String option, uint8_t command,
+                                   RELAY data, uint8_t relayIndex);
   String getSwitchConfigurationSite(const String option, uint8_t command,
-                                    SWITCH data1, SWITCH data2);
+                                    SWITCH data, uint8_t relayIndex);
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
-  // @TODO DOMOTICZ String getSite(const String option, uint8_t command,
-  // DOMOTICZ data);
-  // @TODO DS18B20 String getSite(const String option, uint8_t command, DS18B20
-  // data);
 
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();

@@ -13,7 +13,7 @@
 
 #include <EEPROM.h>
 #include <IPAddress.h>
-//#include <Streaming.h>
+// s#include <Streaming.h>
 
 #define EEPROM_SIZE 1024
 

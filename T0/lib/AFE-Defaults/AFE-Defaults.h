@@ -11,23 +11,22 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
 //#include <Streaming.h>
 
 class AFEDefaults {
 private:
   AFEEEPROM Eeprom;
+  AFEDataAccess *Data;
 
 public:
   AFEDefaults();
 
-  /* Method returns firmware version number */
-  const char *getFirmwareVersion();
-
-  /* Method returns firmware version type */
-  uint8_t getFirmwareType();
+  void addDomoticzConfiguration();
+  void addLEDConfiguration(uint8_t id, uint8_t gpio);
+  void addDeviceID();
 
   /* Method erases EEPROM */
   void eraseConfiguration();

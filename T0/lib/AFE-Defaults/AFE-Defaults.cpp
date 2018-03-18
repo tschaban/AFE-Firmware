@@ -6,11 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0.1"; }
-uint8_t AFEDefaults::getFirmwareType() { return 0; }
 void AFEDefaults::set() {
-
-  AFEDataAccess *Data;
 
   DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
@@ -18,12 +14,9 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  LED LEDConfiguration;
-  // @TODO DOMOTICZ DomoticzConfiguration;
-  // @TODO DS18B20 DS18B20Configuration;
 
-  sprintf(firmwareConfiguration.version, getFirmwareVersion());
-  firmwareConfiguration.type = getFirmwareType();
+  sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
+  firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
 
@@ -31,12 +24,13 @@ void AFEDefaults::set() {
 
   sprintf(deviceConfiguration.name, "AFE-Device");
   deviceConfiguration.isLED[0] = true;
+  deviceConfiguration.isLED[1] = false;
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
   deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
-
   Data->saveConfiguration(deviceConfiguration);
 
   sprintf(networkConfiguration.ssid, "");
@@ -48,7 +42,6 @@ void AFEDefaults::set() {
   networkConfiguration.noConnectionAttempts = 10;
   networkConfiguration.waitTimeConnections = 1;
   networkConfiguration.waitTimeSeries = 60;
-
   Data->saveConfiguration(networkConfiguration);
 
   sprintf(MQTTConfiguration.host, "");
@@ -57,7 +50,6 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.password, "");
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
-
   Data->saveConfiguration(MQTTConfiguration);
 
   RelayConfiguration.gpio = 12;
@@ -65,54 +57,59 @@ void AFEDefaults::set() {
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
-
+  RelayConfiguration.ledID = 0;
+  RelayConfiguration.idx = 1;
   Data->saveConfiguration(0, RelayConfiguration);
-
-  /* @TODO DOMOTICZ
-  RelayConfiguration.idx = 0;
-  RelayConfiguration.publishToDomoticz = false;
-  */
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
+  SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
-  SwitchConfiguration.functionality = 11;
+  SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 
-  LEDConfiguration.gpio = 13;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(0, LEDConfiguration);
+  addDomoticzConfiguration();
+  addLEDConfiguration(0, 13);
+  addLEDConfiguration(1, 3);
+  addDeviceID();
 
-  /* @TODO DS18B20
-    Serial << endl << "INFO: Setting defaults: ds18b20";
-    DS18B20Configuration.present = false;
-    DS18B20Configuration.gpio = 0;
-    DS18B20Configuration.correction = 0;
-    DS18B20Configuration.interval = 60;
-    DS18B20Confi/guration.unit = 0;
+  Data->saveSystemLedID(1);
 
-    DS18B20 Data->saveConfiguration(DS18B20Configuration);
-  */
-
-  /* @TODO DOMOTICZ
-  Serial << endl << "INFO: Setting defaults: domoticz";
-  sprintf(DomoticzConfiguration.host, "");
-  DomoticzConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(DomoticzConfiguration.user, "");
-  sprintf(DomoticzConfiguration.password, "");
-  DomoticzConfiguration.port = 8080;
-
-Data->saveConfiguration(DomoticzConfiguration);
-  
-  */
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
 }
 
+void AFEDefaults::addDomoticzConfiguration() {
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  sprintf(DomoticzConfiguration.host, "");
+  sprintf(DomoticzConfiguration.user, "");
+  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
+}
+
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = gpio;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data->saveConfiguration(id, LEDConfiguration);
+}
+
+void AFEDefaults::addDeviceID() {
+  char id[8];
+  uint8_t range;
+  for (uint8_t i = 0; i < sizeof(id); i++) {
+    range = random(3);
+    id[i] = char(range == 0 ? random(48, 57)
+                            : range == 1 ? random(65, 90) : random(97, 122));
+  }
+  Data->saveDeviceID(String(id));
+}
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }
