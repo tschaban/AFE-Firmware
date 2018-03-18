@@ -22,22 +22,25 @@ void AFEDomoticz::begin() {
           configuration.protocol == 0 ? "http://" : "https://",
           configuration.host, configuration.port, authorization);
 
+  initialized = true;
   /* Uncommencted can help to determin the size of serverURL
   Serial << endl << "ServerURL Size=" << String(serverURL).length();
   */
+}
+
+void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
+  if (initialized) {
+    String call = getApiCall("switchlight", idx);
+    call += "&switchcmd=";
+    call += value;
+    callURL(call);
+  }
 }
 
 const String AFEDomoticz::getApiCall(const char *param, unsigned long idx) {
   char url[sizeof(serverURL) + 18 + strlen(param)];
   sprintf(url, "%s&param=%s&idx=%u", serverURL, param, idx);
   return url;
-}
-
-void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
-  String call = getApiCall("switchlight", idx);
-  call += "&switchcmd=";
-  call += value;
-  callURL(call);
 }
 
 void AFEDomoticz::callURL(const String url) {

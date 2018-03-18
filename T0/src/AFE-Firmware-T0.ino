@@ -31,7 +31,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  // Serial.swap();
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -80,7 +80,10 @@ void setup() {
   /* Initializing switches */
   initSwitch();
 
-  Domoticz.begin();
+  /* Initializing Domoticz API */
+  if (Device.configuration.domoticzAPI) {
+    Domoticz.begin();
+  }
 }
 
 void loop() {

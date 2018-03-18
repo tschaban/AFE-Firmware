@@ -207,6 +207,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += configuration.type;
     page += "/";
     page += configuration.version;
+    page += "/";
+    page += Data.getDeviceID();
     page += "/\" border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
   }
   page += "</div>"

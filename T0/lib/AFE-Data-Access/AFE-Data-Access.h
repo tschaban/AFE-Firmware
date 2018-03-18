@@ -42,8 +42,7 @@ public:
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
 
-  /* Methods read and save firmware version from/to EEPROM */
-  const char getVersion();
+  /* Methods ave firmware version from/to EEPROM */
   void saveVersion(String version);
 
   /* Methods read and save relay state from/to EEPROM */
@@ -61,5 +60,9 @@ public:
   /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
+
+  /* Methods saves and reads device ID */
+  const String getDeviceID();
+  void saveDeviceID(String id);
 };
 #endif

@@ -42,86 +42,87 @@ void AFEWebServer::generate() {
     Device.begin();
   }
 
-  if (getOptionName() == "language") {
+  const String optionName = getOptionName();
+  uint8_t command = getCommand();
+
+  if (optionName == "language") {
     uint8_t data;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       data = getLanguageData();
     }
     publishHTML(ConfigurationPanel.getLanguageConfigurationSite(
-        getOptionName(), getCommand(), data));
+        optionName, getCommand(), data));
 
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       Device.reboot(Device.getMode());
     }
-  } else if (getOptionName() == "device") {
+  } else if (optionName == "device") {
     DEVICE data;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       data = getDeviceData();
     }
     publishHTML(ConfigurationPanel.getDeviceConfigurationSite(
-        getOptionName(), getCommand(), data));
-  } else if (getOptionName() == "network") {
+        optionName, getCommand(), data));
+  } else if (optionName == "network") {
     NETWORK data;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       data = getNetworkData();
     }
     publishHTML(ConfigurationPanel.getNetworkConfigurationSite(
-        getOptionName(), getCommand(), data));
+        optionName, getCommand(), data));
 
-  } else if (getOptionName() == "mqtt") {
+  } else if (optionName == "mqtt") {
     MQTT data;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       data = getMQTTData();
     }
     publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
-        getOptionName(), getCommand(), data));
-  } else if (getOptionName() == "domoticz") {
+        optionName, getCommand(), data));
+  } else if (optionName == "domoticz") {
     DOMOTICZ data;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       data = getDomoticzServerData();
     }
     publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
-        getOptionName(), getCommand(), data));
-  } else if (getOptionName() == "led") {
+        optionName, getCommand(), data));
+  } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
-    if (getCommand() == SERVER_CMD_SAVE) {
+    if (command == SERVER_CMD_SAVE) {
       for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
         data[i] = getLEDData(i);
       }
       dataLedID = getSystemLEDData();
     }
     publishHTML(ConfigurationPanel.getLEDConfigurationSite(
-        getOptionName(), getCommand(), data, dataLedID));
-  } else if (getOptionName() == "exit") {
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), true));
+        optionName, getCommand(), data, dataLedID));
+  } else if (optionName == "exit") {
+    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(), true));
     Device.reboot(MODE_NORMAL);
-  } else if (getOptionName() == "reset") {
-    publishHTML(
-        ConfigurationPanel.getSite(getOptionName(), getCommand(), false));
-    if (getCommand() == 1) {
+  } else if (optionName == "reset") {
+    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(), false));
+    if (command == 1) {
       Device.setDevice();
       Device.reboot(MODE_ACCESS_POINT);
     }
-  } else if (getOptionName() == "help") {
-    publishHTML(ConfigurationPanel.getSite(getOptionName(), getCommand(),
-                                           getCommand() == 0 ? false : true));
-    if (getCommand() == 1) {
+  } else if (optionName == "help") {
+    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(),
+                                           command == 0 ? false : true));
+    if (command == 1) {
       Device.reboot(MODE_CONFIGURATION);
-    } else if (getCommand() == 2) {
+    } else if (command == 2) {
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
-        if (getOptionName() == "relay" + String(i)) {
+        if (optionName == "relay" + String(i)) {
           RELAY data = {};
-          if (getCommand() == SERVER_CMD_SAVE) {
+          if (command == SERVER_CMD_SAVE) {
             data = getRelayData(i);
           }
           publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-              getOptionName(), getCommand(), data, i));
+              optionName, getCommand(), data, i));
         }
       } else {
         break;
@@ -130,13 +131,13 @@ void AFEWebServer::generate() {
 
     for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
       if (Device.configuration.isSwitch[i]) {
-        if (getOptionName() == "switch" + String(i)) {
+        if (optionName == "switch" + String(i)) {
           SWITCH data = {};
-          if (getCommand() == SERVER_CMD_SAVE) {
+          if (command == SERVER_CMD_SAVE) {
             data = getSwitchData(i);
           }
           publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-              getOptionName(), getCommand(), data, i));
+              optionName, getCommand(), data, i));
         }
       } else {
         break;
@@ -166,6 +167,19 @@ String AFEWebServer::getOptionName() {
         memset(httpCommand.name, 0, sizeof httpCommand.name);
       }
 
+      if (server.arg("source")) {
+        server.arg("source").toCharArray(httpCommand.source,
+                                         sizeof(httpCommand.source));
+      } else {
+        memset(httpCommand.source, 0, sizeof httpCommand.source);
+      }
+      /*
+            Serial << endl
+                   << "GET: Device=" << httpCommand.device
+                   << " Name=" << httpCommand.name << " Source=" <<
+         httpCommand.source
+                   << " Command=" << httpCommand.command;
+      */
       receivedHTTPCommand = true;
       return server.arg("command");
 
@@ -195,6 +209,8 @@ DEVICE AFEWebServer::getDeviceData() {
 
   if (server.arg("dn").length() > 0) {
     server.arg("dn").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
   server.arg("h").length() > 0 ? data.httpAPI = true : data.httpAPI = false;
@@ -225,10 +241,14 @@ NETWORK AFEWebServer::getNetworkData() {
   NETWORK data;
   if (server.arg("s").length() > 0) {
     server.arg("s").toCharArray(data.ssid, sizeof(data.ssid) + 1);
+  } else {
+    data.ssid[0] = '\0';
   }
 
   if (server.arg("p").length() > 0) {
     server.arg("p").toCharArray(data.password, sizeof(data.password) + 1);
+  } else {
+    data.password[0] = '\0';
   }
 
   if (server.arg("d").length() > 0) {
@@ -273,6 +293,8 @@ MQTT AFEWebServer::getMQTTData() {
   MQTT data;
   if (server.arg("h").length() > 0) {
     server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
+  } else {
+    data.host[0] = '\0';
   }
 
   if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
@@ -325,9 +347,6 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
   } else {
     data.user[0] = '\0';
   }
-
-  Serial << endl << "data.user=" << data.user;
-
   if (server.arg("s").length() > 0) {
     server.arg("s").toCharArray(data.password, sizeof(data.password) + 1);
   } else {

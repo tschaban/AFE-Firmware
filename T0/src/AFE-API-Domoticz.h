@@ -22,15 +22,16 @@ private:
   AFEDataAccess Data;
   HTTPClient http;
   char serverURL[184];
+  boolean initialized = false;
 
   const String getApiCall(const char *param, unsigned long idx);
+  void callURL(const String url);
 
 public:
   DOMOTICZ configuration;
 
   AFEDomoticz();
   void begin();
-  void callURL(const String url);
   void sendSwitchCommand(unsigned long idx, const char *value);
 };
 

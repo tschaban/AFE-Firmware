@@ -76,6 +76,7 @@ void AFEDefaults::set() {
   addDomoticzConfiguration();
   addLEDConfiguration(0, 13);
   addLEDConfiguration(1, 3);
+  addDeviceID();
 
   Data->saveSystemLedID(1);
 
@@ -101,4 +102,14 @@ void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
   Data->saveConfiguration(id, LEDConfiguration);
 }
 
+void AFEDefaults::addDeviceID() {
+  char id[8];
+  uint8_t range;
+  for (uint8_t i = 0; i < sizeof(id); i++) {
+    range = random(3);
+    id[i] = char(range == 0 ? random(48, 57)
+                            : range == 1 ? random(65, 90) : random(97, 122));
+  }
+  Data->saveDeviceID(String(id));
+}
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

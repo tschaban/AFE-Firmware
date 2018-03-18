@@ -33,11 +33,16 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
   uint8_t language = Data.getLanguage();
+  String deviceID = Data.getDeviceID();
   Defaults.eraseConfiguration();
   Defaults.set();
   Data.saveConfiguration(NetworkConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
+  /* Restores previous device ID */
+  if (deviceID.length() > 0) {
+    Data.saveDeviceID(deviceID);
+  }
 }
 
 void AFEUpgrader::upgradeToVersion110() {
@@ -65,5 +70,10 @@ void AFEUpgrader::upgradeToVersion110() {
   }
   if (Eeprom.readUInt8(414) == 11) {
     Eeprom.writeUInt8(414, 1);
+  }
+
+  /* Device ID */
+  if (Data.getDeviceID().length() == 0) {
+    Defaults.addDeviceID();
   }
 }

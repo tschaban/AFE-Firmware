@@ -62,20 +62,24 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         if (strcmp(request.name, Relay[i].getName()) == 0) {
           noRelay = false;
           if (strcmp(request.command, "on") == 0) {
-            if (Relay[i].get() != RELAY_ON) {
-              Relay[i].on();
-              MQTTPublishRelayState(i); // MQTT Listener library
+            //        if (Relay[i].get() != RELAY_ON) {
+            Relay[i].on();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
+            //          }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
                                           Relay[i].get());
 
           } else if (strcmp(request.command, "off") == 0) { // Off
-            if (Relay[i].get() != RELAY_OFF) {
-              Relay[i].off();
-              MQTTPublishRelayState(i); // MQTT Listener library
+            //          if (Relay[i].get() != RELAY_OFF) {
+            Relay[i].off();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
+            //      }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
                                           Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
@@ -84,7 +88,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
                                           Relay[i].get());
             MQTTPublishRelayState(i); // MQTT Listener library
-            DomoticzPublishRelayState(i);
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            };
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
             /* Command not implemented.Info */
