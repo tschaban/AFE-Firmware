@@ -48,8 +48,13 @@ void AFEMQTT::connect() {
       if (delayStartTime == 0) {
         delayStartTime = millis();
 
+        /* LWT Topic */
+        char mqttLWTMessage[38];
+        sprintf(mqttLWTMessage, "%sstate", MQTTConfiguration.topic);
+
         if (Broker.connect(deviceName, MQTTConfiguration.user,
-                           MQTTConfiguration.password)) {
+                           MQTTConfiguration.password, mqttLWTMessage, 2, false,
+                           "disconnected")) {
 
           /*
                     Serial << endl << "INFO: Connected";
@@ -60,6 +65,9 @@ void AFEMQTT::connect() {
           Broker.subscribe((char *)mqttTopicForSubscription);
 
           //        Serial << endl << "INFO: Subsribed";
+
+          /* Publishing message that device has been connected */
+          publish(MQTTConfiguration.topic, "state", "connected");
 
           /* Setting Relay state after connection to MQTT */
           for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
