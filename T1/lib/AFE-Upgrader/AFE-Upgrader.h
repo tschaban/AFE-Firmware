@@ -13,7 +13,6 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
-#include <AFE-EEPROM.h>
 // #include <Streaming.h>
 class AFEUpgrader {
 
@@ -25,8 +24,10 @@ private:
   /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
 
-  /* Methods upgrades to v1.1.0 */
+  /* Method upgrades to v1.1.0 */
   void upgradeToVersion110();
+  /* Method upgrades to v1.2.0 */
+  void upgradeToVersion120();
 
 public:
   /* Constructor */

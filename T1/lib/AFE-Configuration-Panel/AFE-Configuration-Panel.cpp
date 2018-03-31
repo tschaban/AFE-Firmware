@@ -104,6 +104,22 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
+String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
+    const String option, uint8_t command, DOMOTICZ data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=domoticz&cmd=1\" method=\"post\">";
+  page += Site.addDomoticzServerConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 String AFEConfigurationPanel::getLEDConfigurationSite(
     const String option, uint8_t command,
     LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {

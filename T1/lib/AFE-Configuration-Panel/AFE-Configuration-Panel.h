@@ -36,6 +36,8 @@ public:
                                      NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
+  String getDomoticzServerConfigurationSite(const String option,
+                                            uint8_t command, DOMOTICZ data);
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
