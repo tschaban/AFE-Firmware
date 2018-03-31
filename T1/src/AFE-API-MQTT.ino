@@ -2,7 +2,7 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-MQTT.h"
+#include "AFE-API-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
 
@@ -73,6 +73,8 @@ void AFEMQTT::connect() {
                 publish(Relay[i].getMQTTTopic(), "state",
                         Relay[i].get() == RELAY_ON ? "on" : "off");
               }
+              // Publishing relay state to Domoticz
+              DomoticzPublishRelayState(i);
             }
           }
           delayStartTime = 0;

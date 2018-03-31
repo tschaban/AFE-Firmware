@@ -26,6 +26,11 @@ void AFEUpgrader::upgrade() {
         strcmp(FirmwareConfiguration.version, "1.0.2") == 0) {
       upgradeToVersion110();
     }
+
+    if (strcmp(FirmwareConfiguration.version, "1.1.0") == 0) {
+      upgradeToVersion120();
+    }
+
     Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
@@ -71,4 +76,17 @@ void AFEUpgrader::upgradeToVersion110() {
 
   /* Set sending temperature only if it changes */
   Eeprom.write(446, true);
+}
+
+void AFEUpgrader::upgradeToVersion120() {
+  AFEEEPROM Eeprom;
+
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
+
+  /* Device ID */
+  if (Data.getDeviceID().length() == 0) {
+    Defaults.addDeviceID();
+  }
 }

@@ -30,6 +30,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   configuration.isDS18B20 = Eeprom.read(369);
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
+  configuration.domoticzAPI = Eeprom.read(800);
 
   return configuration;
 }
@@ -81,6 +82,19 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   return configuration;
 }
 
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+  DOMOTICZ configuration;
+
+  configuration.protocol = Eeprom.readUInt8(801);
+  Eeprom.read(802, 40).toCharArray(configuration.host,
+                                   sizeof(configuration.host));
+  configuration.port = Eeprom.read(842, 5).toInt();
+  Eeprom.read(847, 32).toCharArray(configuration.user, 32);
+  Eeprom.read(879, 32).toCharArray(configuration.password,
+                                   sizeof(configuration.password));
+  return configuration;
+}
+
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
   uint8_t nextLED = 77;
@@ -126,6 +140,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   configuration.ledID = Eeprom.readUInt8(442 + id);
 
+  configuration.idx = Eeprom.read(930 + id, 6).toInt();
+
   return configuration;
 }
 
@@ -169,8 +185,12 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   }
 
   Eeprom.write(369, configuration.isDS18B20);
-  Eeprom.write(25, configuration.httpAPI);
   Eeprom.write(228, configuration.mqttAPI);
+  Eeprom.write(800, configuration.domoticzAPI);
+  if (configuration.domoticzAPI) {
+    configuration.httpAPI = true;
+  }
+  Eeprom.write(25, configuration.httpAPI);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -201,6 +221,14 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Eeprom.write(334, 32, configuration.topic);
 }
 
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+  Eeprom.writeUInt8(801, configuration.protocol);
+  Eeprom.write(802, 40, configuration.host);
+  Eeprom.write(842, 5, (long)configuration.port);
+  Eeprom.write(847, 32, configuration.user);
+  Eeprom.write(879, 32, configuration.password);
+}
+
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 40;
 
@@ -210,11 +238,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(405 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(421 + id * nextRelay, configuration.stateMQTTConnected);
   Eeprom.writeUInt8(442 + id, configuration.ledID);
-
-  Eeprom.write(422 + id * nextRelay,
-               configuration.showStatusUsingLED); // @TODO is this used?
-
   Eeprom.write(436 + id * nextRelay, 3, configuration.thermalProtection);
+  Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
 
 void AFEDataAccess::saveConfiguration(REGULATOR configuration) {
@@ -246,12 +271,6 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
   Eeprom.write(376, 5, (long)configuration.interval);
   Eeprom.writeUInt8(381, configuration.unit);
   Eeprom.write(446, configuration.sendOnlyChanges);
-}
-
-const char AFEDataAccess::getVersion() {
-  char version[7];
-  Eeprom.read(0, 7).toCharArray(version, sizeof(version));
-  return *version;
 }
 
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
@@ -291,3 +310,7 @@ void AFEDataAccess::saveThermostatState(uint8_t id, boolean state) {
 uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(439); }
 
 void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }
+
+const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
+
+void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }

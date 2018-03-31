@@ -2,12 +2,6 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
@@ -24,14 +18,17 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           if ((char)payload[1] == 'n') {
             Relay[i].on();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "on");
+            DomoticzPublishRelayState(i);
           } else if ((char)payload[1] == 'f') {
             Relay[i].off();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
+            DomoticzPublishRelayState(i);
           } else if ((char)payload[1] == 'e') {
             MQTTPublishRelayState(i);
           } else if ((char)payload[1] == 'o') { // toggle
             Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
             MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
           }
         } else {
 
@@ -57,7 +54,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             }
           }
         }
-
       } else {
         break;
       }

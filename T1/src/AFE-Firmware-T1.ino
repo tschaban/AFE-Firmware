@@ -2,7 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-MQTT.h"
+#include <AFE-API-Domoticz.h>
+#include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
@@ -18,6 +19,7 @@ AFEDataAccess Data;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
+AFEDomoticz Domoticz;
 AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
@@ -88,6 +90,11 @@ void setup() {
 
   /* Initializing switches */
   initDS18B20Sensor();
+
+  /* Initializing Domoticz API */
+  if (Device.configuration.domoticzAPI) {
+    Domoticz.begin();
+  }
 }
 
 void loop() {

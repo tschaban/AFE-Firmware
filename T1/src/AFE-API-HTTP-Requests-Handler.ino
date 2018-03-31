@@ -2,11 +2,16 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+/* Method listens for HTTP Requests */
+void mainHTTPRequestsHandler() {
+  if (Device.configuration.httpAPI) {
+    if (WebServer.httpAPIlistener()) {
+      Led.on();
+      processHTTPAPIRequest(WebServer.getHTTPCommand());
+      Led.off();
+    }
+  }
+}
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it.
  * The second one method converts float to charString before pushing response */
@@ -62,24 +67,32 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           noRelay = false;
           if (strcmp(request.command, "on") == 0) {
             Relay[i].on();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            }
+            //          }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
                                           Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
           } else if (strcmp(request.command, "off") == 0) { // Off
             Relay[i].off();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            }
+            //      }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
                                           Relay[i].get());
-            MQTTPublishRelayState(i); // MQTT Listener library
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
             state = Relay[i].get();
             Relay[i].toggle();
             sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
                                           Relay[i].get());
             MQTTPublishRelayState(i); // MQTT Listener library
-          } else if (strcmp(request.command, "reportStatus") == 0 ||
-                     strcmp(request.command, "get") ==
-                         0) { // reportStatus or get @TODO Remove after version
-                              // rc1 is not used
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            };
+          } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
             /* Command not implemented.Info */
           } else if (strcmp(request.command, "enableThermostat") == 0) {
