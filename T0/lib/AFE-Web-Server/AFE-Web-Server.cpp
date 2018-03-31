@@ -322,6 +322,8 @@ MQTT AFEWebServer::getMQTTData() {
 
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.topic, sizeof(data.topic) + 1);
+  } else {
+    data.topic[0] = '\0';
   }
 
   return data;
