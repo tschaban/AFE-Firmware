@@ -50,8 +50,8 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getLanguageData();
     }
-    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(
-        optionName, getCommand(), data));
+    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(optionName,
+                                                                command, data));
 
     if (command == SERVER_CMD_SAVE) {
       Device.reboot(Device.getMode());
@@ -61,30 +61,30 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getDeviceData();
     }
-    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(
-        optionName, getCommand(), data));
+    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(optionName,
+                                                              command, data));
   } else if (optionName == "network") {
     NETWORK data;
     if (command == SERVER_CMD_SAVE) {
       data = getNetworkData();
     }
-    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(
-        optionName, getCommand(), data));
+    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(optionName,
+                                                               command, data));
 
   } else if (optionName == "mqtt") {
     MQTT data;
     if (command == SERVER_CMD_SAVE) {
       data = getMQTTData();
     }
-    publishHTML(ConfigurationPanel.getMQTTConfigurationSite(
-        optionName, getCommand(), data));
+    publishHTML(
+        ConfigurationPanel.getMQTTConfigurationSite(optionName, command, data));
   } else if (optionName == "domoticz") {
     DOMOTICZ data;
     if (command == SERVER_CMD_SAVE) {
       data = getDomoticzServerData();
     }
     publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
-        optionName, getCommand(), data));
+        optionName, command, data));
   } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
@@ -94,19 +94,19 @@ void AFEWebServer::generate() {
       }
       dataLedID = getSystemLEDData();
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(
-        optionName, getCommand(), data, dataLedID));
+    publishHTML(ConfigurationPanel.getLEDConfigurationSite(optionName, command,
+                                                           data, dataLedID));
   } else if (optionName == "exit") {
-    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(), true));
+    publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
-    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(), false));
+    publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
       Device.setDevice();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
-    publishHTML(ConfigurationPanel.getSite(optionName, getCommand(),
+    publishHTML(ConfigurationPanel.getSite(optionName, command,
                                            command == 0 ? false : true));
     if (command == 1) {
       Device.reboot(MODE_CONFIGURATION);
@@ -122,7 +122,7 @@ void AFEWebServer::generate() {
             data = getRelayData(i);
           }
           publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-              optionName, getCommand(), data, i));
+              optionName, command, data, i));
         }
       } else {
         break;
@@ -137,7 +137,7 @@ void AFEWebServer::generate() {
             data = getSwitchData(i);
           }
           publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-              optionName, getCommand(), data, i));
+              optionName, command, data, i));
         }
       } else {
         break;
