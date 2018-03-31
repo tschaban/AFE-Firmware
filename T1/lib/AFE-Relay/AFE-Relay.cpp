@@ -99,3 +99,5 @@ boolean AFERelay::autoTurnOff() {
 }
 
 const char *AFERelay::getName() { return RelayConfiguration.name; }
+
+unsigned long AFERelay::getDomoticzIDX() { return RelayConfiguration.idx; }

@@ -19,10 +19,13 @@
 class AFEDefaults {
 private:
   AFEEEPROM Eeprom;
+  AFEDataAccess *Data;
 
 public:
   AFEDefaults();
-
+  void addDomoticzConfiguration();
+  void addLEDConfiguration(uint8_t id, uint8_t gpio);
+  void addDeviceID();
   /* Method erases EEPROM */
   void eraseConfiguration();
 

@@ -24,6 +24,7 @@ void AFEDefaults::set() {
   firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
   sprintf(firmwareConfiguration.upgradeURL, "");
+
   Data->saveConfiguration(firmwareConfiguration);
 
   sprintf(deviceConfiguration.name, "AFE-Device");
@@ -34,6 +35,7 @@ void AFEDefaults::set() {
   deviceConfiguration.isSwitch[1] = false;
   deviceConfiguration.isDS18B20 = false;
   deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
   Data->saveConfiguration(deviceConfiguration);
 
@@ -63,7 +65,7 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
   RelayConfiguration.ledID = 0;
-
+  RelayConfiguration.idx = 1;
   RelayConfiguration.thermalProtection = 0;
   Data->saveConfiguration(0, RelayConfiguration);
 
@@ -86,12 +88,10 @@ void AFEDefaults::set() {
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 
-  LEDConfiguration.gpio = 13;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(0, LEDConfiguration);
-
-  LEDConfiguration.gpio = 3;
-  Data->saveConfiguration(1, LEDConfiguration);
+  addDomoticzConfiguration();
+  addLEDConfiguration(0, 13);
+  addLEDConfiguration(1, 3);
+  addDeviceID();
 
   DS18B20Configuration.gpio = 14;
   DS18B20Configuration.correction = 0;
@@ -102,10 +102,37 @@ void AFEDefaults::set() {
   Data->saveConfiguration(DS18B20Configuration);
 
   Data->saveSystemLedID(1);
-
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
+}
+
+void AFEDefaults::addDomoticzConfiguration() {
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  sprintf(DomoticzConfiguration.host, "");
+  sprintf(DomoticzConfiguration.user, "");
+  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
+}
+
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = gpio;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data->saveConfiguration(id, LEDConfiguration);
+}
+
+void AFEDefaults::addDeviceID() {
+  char id[8];
+  uint8_t range;
+  for (uint8_t i = 0; i < sizeof(id); i++) {
+    range = random(3);
+    id[i] = char(range == 0 ? random(48, 57)
+                            : range == 1 ? random(65, 90) : random(97, 122));
+  }
+  Data->saveDeviceID(String(id));
 }
 
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

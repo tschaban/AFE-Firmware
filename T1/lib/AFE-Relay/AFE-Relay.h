@@ -73,6 +73,9 @@ public:
   /* Methods while added to main loop turns off relay automatically. Duration
    * how long relay should be on must be configured */
   boolean autoTurnOff();
+
+  /* Return relay IDX in Domoticz */
+  unsigned long getDomoticzIDX();
 };
 
 #endif
