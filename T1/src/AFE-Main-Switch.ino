@@ -18,6 +18,7 @@ void mainSwitch() {
         Led.on();
         Relay[Switch[i].getControlledRelayID() - 1].toggle();
         MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
+        DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
         Led.off();
       }
     } else {
@@ -42,6 +43,11 @@ void mainSwitchListener() {
         } else if (Switch[i].is5s()) {
           Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                           : Device.reboot(MODE_NORMAL);
+        } else if (Switch[i].is30s()) {
+          Led.on();
+          Device.setDevice();
+          Led.off();
+          Device.reboot(MODE_ACCESS_POINT);
         }
       }
     } else {

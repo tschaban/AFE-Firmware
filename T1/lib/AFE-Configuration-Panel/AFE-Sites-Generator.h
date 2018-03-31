@@ -56,6 +56,7 @@ public:
   String addDeviceConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
+  String addDomoticzServerConfiguration();
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
   String addRelayConfiguration(uint8_t id);
