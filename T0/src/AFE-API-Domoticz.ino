@@ -13,8 +13,10 @@ void AFEDomoticz::begin() {
   char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
   if (configuration.user && configuration.password) {
-    rbase64.encode(configuration.user).toCharArray(_user, sizeof(_user));
-    rbase64.encode(configuration.password).toCharArray(_pass, sizeof(_pass));
+    rbase64.encode(configuration.user);
+    sprintf(_user, rbase64.result());
+    rbase64.encode(configuration.password);
+    sprintf(_pass, rbase64.result());
     sprintf(authorization, "&username=%s&password=%s", _user, _pass);
   }
 
