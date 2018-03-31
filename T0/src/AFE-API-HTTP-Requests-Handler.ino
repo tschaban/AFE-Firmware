@@ -105,6 +105,21 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);
     }
+    /* Turning ON / OFF APIs */
+  } else if (strcmp(request.device, "api") == 0) {
+    uint8_t _api =
+        strcmp(request.name, "http") == 0
+            ? API_HTTP
+            : strcmp(request.name, "mqtt") == 0
+                  ? API_MQTT
+                  : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
+    if (_api != 9) {
+      if (strcmp(request.command, "on") == 0) {
+        Data.saveAPI(_api, true);
+      } else if (strcmp(request.command, "off") == 0) {
+        Data.saveAPI(_api, false);
+      }
+    }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
