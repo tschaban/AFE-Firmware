@@ -39,11 +39,15 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
   uint8_t language = Data.getLanguage();
+  const String deviceID = Data.getDeviceID();
   Defaults.eraseConfiguration();
   Defaults.set();
   Data.saveConfiguration(NetworkConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
+  if (deviceID.length() == 8) {
+    Data.saveDeviceID(deviceID);
+  }
 }
 
 void AFEUpgrader::upgradeToVersion110() {
