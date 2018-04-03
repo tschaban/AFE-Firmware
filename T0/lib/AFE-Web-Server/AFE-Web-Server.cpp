@@ -70,7 +70,6 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getNetworkConfigurationSite(optionName,
                                                                command, data));
-
   } else if (optionName == "mqtt") {
     MQTT data;
     if (command == SERVER_CMD_SAVE) {

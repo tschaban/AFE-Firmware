@@ -2,6 +2,14 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
+/* Initializing MQTT */
+void MQTTInit() {
+  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
+    MQTTConfiguration = Data.getMQTTConfiguration();
+    Mqtt.begin();
+  }
+}
+
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
@@ -37,34 +45,44 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 
     /* Turning On/Off HTTP APIs */
-    sprintf(_mqttTopic, "%sconfiguration/api/http", MQTTConfiguration.topic);
+    sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
+            MQTTConfiguration.topic);
 
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[1] == 'n' && length == 2) { // on
         Data.saveAPI(API_HTTP, true);
+        Device.begin();
       } else if ((char)payload[1] == 'f' && length == 3) { // off
         Data.saveAPI(API_HTTP, false);
+        Device.begin();
       }
     } else {
 
       /* Turning On/Off Domoticz APIs */
-      sprintf(_mqttTopic, "%sconfiguration/api/domoticz",
+      sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
               MQTTConfiguration.topic);
 
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'n' && length == 2) { // on
           Data.saveAPI(API_DOMOTICZ, true);
+          Device.begin();
+          DomoticzInit();
+
         } else if ((char)payload[1] == 'f' && length == 3) { // off
           Data.saveAPI(API_DOMOTICZ, false);
+          Device.begin();
+          Domoticz.disconnect();
         }
       } else {
         /* Turning Off MQTT APIs */
-        sprintf(_mqttTopic, "%sconfiguration/api/mqtt",
+        sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
                 MQTTConfiguration.topic);
 
         if (strcmp(topic, _mqttTopic) == 0) {
           if ((char)payload[1] == 'f' && length == 3) { // off
             Data.saveAPI(API_MQTT, false);
+            Device.begin();
+            Mqtt.disconnect();
           }
         } else {
 

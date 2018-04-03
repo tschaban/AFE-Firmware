@@ -12,7 +12,7 @@
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-//#include <Streaming.h>
+#include <Streaming.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -31,7 +31,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  Serial.swap();
+  // Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -66,11 +66,6 @@ void setup() {
     Led.blinkingOn(100);
   }
 
-  /* Initializing MQTT */
-  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
-    MQTTConfiguration = Data.getMQTTConfiguration();
-    Mqtt.begin();
-  }
   Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
@@ -80,10 +75,9 @@ void setup() {
   /* Initializing switches */
   initSwitch();
 
-  /* Initializing Domoticz API */
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.begin();
-  }
+  /* Initializing APIs */
+  MQTTInit();
+  DomoticzInit();
 }
 
 void loop() {

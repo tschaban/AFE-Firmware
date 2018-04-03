@@ -30,6 +30,8 @@ void AFEDomoticz::begin() {
   */
 }
 
+void AFEDomoticz::disconnect() { initialized = false; }
+
 void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
   if (initialized) {
     String call = getApiCall("switchlight", idx);

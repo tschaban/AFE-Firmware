@@ -23,6 +23,12 @@ void AFEMQTT::begin() {
   Data = {};
 }
 
+void AFEMQTT::disconnect() {
+  if (Broker.connected()) {
+    Broker.disconnect();
+  }
+}
+
 void AFEMQTT::listener() {
   if (Broker.connected()) {
     Broker.loop();

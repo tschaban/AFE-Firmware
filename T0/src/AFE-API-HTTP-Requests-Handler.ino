@@ -113,12 +113,29 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             : strcmp(request.name, "mqtt") == 0
                   ? API_MQTT
                   : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
-    if (_api != 9) {
-      if (strcmp(request.command, "on") == 0) {
-        Data.saveAPI(_api, true);
-      } else if (strcmp(request.command, "off") == 0) {
-        Data.saveAPI(_api, false);
+    uint8_t _command = strcmp(request.command, "on") == 0
+                           ? 1
+                           : strcmp(request.command, "off") == 0 ? 0 : 9;
+
+    if (_api != 9 && _command != 9) {
+      Data.saveAPI(_api, _command);
+      Device.begin();
+      if (_command) {
+        if (_api == API_MQTT) {
+          MQTTInit();
+        } else if (_api == API_DOMOTICZ) {
+          DomoticzInit();
+        }
+      } else {
+        if (_api == API_MQTT) {
+          Mqtt.disconnect();
+        } else if (_api == API_DOMOTICZ) {
+          Domoticz.disconnect();
+        }
       }
+      sendHTTPAPIRequestStatus(request, true);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
     }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
