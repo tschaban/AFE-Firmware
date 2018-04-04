@@ -136,12 +136,9 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(402, configuration.isSwitch[1]);
   Eeprom.write(366, configuration.isLED[0]);
   Eeprom.write(418, configuration.isLED[1]);
-  Eeprom.write(228, configuration.mqttAPI);
-  Eeprom.write(800, configuration.domoticzAPI);
-  if (configuration.domoticzAPI) {
-    configuration.httpAPI = true;
-  }
-  Eeprom.write(25, configuration.httpAPI);
+  saveAPI(API_MQTT, configuration.mqttAPI);
+  saveAPI(API_HTTP, configuration.httpAPI);
+  saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -239,3 +236,16 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(415, id); }
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 
 void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
+
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+  if (apiID == API_HTTP) {
+    Eeprom.write(25, state);
+  } else if (apiID == API_MQTT) {
+    Eeprom.write(228, state);
+  } else if (apiID == API_DOMOTICZ) {
+    Eeprom.write(800, state);
+    if (state) {
+      Eeprom.write(25, true);
+    }
+  }
+}

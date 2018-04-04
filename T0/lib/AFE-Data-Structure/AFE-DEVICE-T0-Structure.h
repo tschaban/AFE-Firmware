@@ -15,6 +15,10 @@
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
 
+#define API_HTTP 0
+#define API_MQTT 1
+#define API_DOMOTICZ 2
+
 /* Custom DEVICE structure definition */
 struct DEVICE {
   char name[32];
