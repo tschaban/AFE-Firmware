@@ -66,11 +66,6 @@ void setup() {
     Led.blinkingOn(100);
   }
 
-  /* Initializing MQTT */
-  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
-    MQTTConfiguration = Data.getMQTTConfiguration();
-    Mqtt.begin();
-  }
   Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
@@ -80,10 +75,9 @@ void setup() {
   /* Initializing switches */
   initSwitch();
 
-  /* Initializing Domoticz API */
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.begin();
-  }
+  /* Initializing APIs */
+  MQTTInit();
+  DomoticzInit();
 }
 
 void loop() {

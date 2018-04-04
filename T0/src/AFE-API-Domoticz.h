@@ -32,6 +32,7 @@ public:
 
   AFEDomoticz();
   void begin();
+  void disconnect();
   void sendSwitchCommand(unsigned long idx, const char *value);
 };
 
