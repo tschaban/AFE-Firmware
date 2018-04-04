@@ -12,7 +12,7 @@
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 AFEDataAccess Data;
 AFEDevice Device;
@@ -31,7 +31,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-  // Serial.swap();
+  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
