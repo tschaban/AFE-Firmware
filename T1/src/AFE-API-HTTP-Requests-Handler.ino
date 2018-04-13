@@ -128,6 +128,39 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             0) { // @TODO remove once verson rc1 is not used
       sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
     }
+
+    /* Turning ON / OFF APIs */
+  } else if (strcmp(request.device, "api") == 0) {
+    uint8_t _api =
+        strcmp(request.name, "http") == 0
+            ? API_HTTP
+            : strcmp(request.name, "mqtt") == 0
+                  ? API_MQTT
+                  : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
+    uint8_t _command = strcmp(request.command, "on") == 0
+                           ? 1
+                           : strcmp(request.command, "off") == 0 ? 0 : 9;
+
+    if (_api != 9 && _command != 9) {
+      Data.saveAPI(_api, _command);
+      Device.begin();
+      if (_command) {
+        if (_api == API_MQTT) {
+          MQTTInit();
+        } else if (_api == API_DOMOTICZ) {
+          DomoticzInit();
+        }
+      } else {
+        if (_api == API_MQTT) {
+          Mqtt.disconnect();
+        } else if (_api == API_DOMOTICZ) {
+          Domoticz.disconnect();
+        }
+      }
+      sendHTTPAPIRequestStatus(request, true);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());

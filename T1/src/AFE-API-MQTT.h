@@ -63,6 +63,8 @@ public:
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
    * default values */
   void listener();
+
+  void disconnect();
 };
 
 #endif

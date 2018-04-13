@@ -28,9 +28,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
                                  sizeof(configuration.name));
 
   configuration.isDS18B20 = Eeprom.read(369);
-  configuration.httpAPI = Eeprom.read(25);
-  configuration.mqttAPI = Eeprom.read(228);
-  configuration.domoticzAPI = Eeprom.read(800);
+  saveAPI(API_MQTT, configuration.mqttAPI);
+  saveAPI(API_HTTP, configuration.httpAPI);
+  saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
 
   return configuration;
 }
@@ -314,3 +314,16 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 
 void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
+
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+  if (apiID == API_HTTP) {
+    Eeprom.write(25, state);
+  } else if (apiID == API_MQTT) {
+    Eeprom.write(228, state);
+  } else if (apiID == API_DOMOTICZ) {
+    Eeprom.write(800, state);
+    if (state) {
+      Eeprom.write(25, true);
+    }
+  }
+}
