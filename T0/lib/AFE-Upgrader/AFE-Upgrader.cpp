@@ -23,7 +23,7 @@ void AFEUpgrader::upgrade() {
   } else {
     if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0) {
-      upgradeToVersion110();
+      upgradeToVersion120();
     }
     Data.saveVersion(String(FIRMWARE_VERSION));
   }
@@ -45,7 +45,7 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
-void AFEUpgrader::upgradeToVersion110() {
+void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
 
   /* Add Domoticz default config */
