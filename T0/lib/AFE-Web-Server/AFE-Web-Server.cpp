@@ -337,6 +337,8 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
 
   if (server.arg("h").length() > 0) {
     server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
+  } else {
+    data.host[0] = '\0';
   }
 
   if (server.arg("p").length() > 0) {
