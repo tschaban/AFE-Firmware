@@ -25,6 +25,7 @@ void AFEUpgrader::upgrade() {
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.2") == 0) {
       upgradeToVersion110();
+      upgradeToVersion120();
     }
 
     if (strcmp(FirmwareConfiguration.version, "1.1.0") == 0) {

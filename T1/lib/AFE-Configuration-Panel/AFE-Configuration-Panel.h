@@ -14,7 +14,7 @@
 #include <AFE-Common-Configuration.h>
 #include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
-// include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEConfigurationPanel {
 
@@ -23,6 +23,7 @@ private:
   AFEDataAccess Data;
   AFEDevice Device;
   uint8_t language;
+  uint16_t siteBufferSize = 7500;
 
 public:
   /* Constructor */

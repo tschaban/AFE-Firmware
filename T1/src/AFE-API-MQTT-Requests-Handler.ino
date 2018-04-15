@@ -134,3 +134,9 @@ void MQTTPublishRelayState(uint8_t id) {
                  Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
+
+void MQTTPublishTemperature(float temperature) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("temperature", temperature);
+  }
+}

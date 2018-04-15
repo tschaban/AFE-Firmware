@@ -34,7 +34,7 @@ private:
                                          // by generate() method
 
   /* Method pushes HTML site from WebServer */
-  void publishHTML(String page);
+  void publishHTML(const String &page);
 
   /* Method gets url Option parameter value */
   String getOptionName();

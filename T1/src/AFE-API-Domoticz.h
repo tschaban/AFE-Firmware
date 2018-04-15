@@ -33,7 +33,16 @@ public:
   AFEDomoticz();
   void begin();
   void disconnect();
+
+  /* It send to Domoticz switch state using following API call
+    json.htm?type=command&param=switchlight&idx=IDX&switchcmd=STATE
+  */
   void sendSwitchCommand(unsigned long idx, const char *value);
+
+  /* It send to Domoticz temperature using following API call
+     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+  */
+  void sendTemperatureCommand(unsigned long idx, float value);
 };
 
 #endif

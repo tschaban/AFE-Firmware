@@ -46,6 +46,9 @@ public:
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
+
+  /* Return relay IDX in Domoticz */
+  unsigned long getDomoticzIDX();
 };
 
 #endif
