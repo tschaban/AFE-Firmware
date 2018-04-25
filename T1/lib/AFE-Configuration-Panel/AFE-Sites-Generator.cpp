@@ -577,7 +577,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += "<div class=\"cf\">";
   body += "<label>Port*</label>";
   body += "<input name=\"p\" type=\"number\""
-          " min=\"0\" max=\"99999\" step=\"1\" value=\"";
+          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
   body += configuration.port;
   body += "\">";
   body += "</div>";
@@ -1298,7 +1298,7 @@ String AFESitesGenerator::addLanguageConfiguration() {
   body += ">English</option>";
   body += "</select>";
   body += "</div>";
-
+  body += "</fieldset>";
   String page = addConfigurationBlock("Language / Język",
                                       "Choose language / "
                                       "Wybierz język",

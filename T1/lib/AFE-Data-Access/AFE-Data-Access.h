@@ -71,5 +71,8 @@ public:
   /* Methods saves and reads device ID */
   const String getDeviceID();
   void saveDeviceID(String id);
+
+  /* Methods turns on / off APIs */
+  void saveAPI(uint8_t apiID, boolean state);
 };
 #endif
