@@ -125,8 +125,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  configuration.showStatusUsingLED = Eeprom.read(422 + id * nextRelay);
-
   configuration.thermostat.turnOn =
       Eeprom.read(423 + id * nextRelay, 5).toFloat();
   configuration.thermostat.turnOff =
@@ -314,3 +312,16 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(439, id); }
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 
 void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
+
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+  if (apiID == API_HTTP) {
+    Eeprom.write(25, state);
+  } else if (apiID == API_MQTT) {
+    Eeprom.write(228, state);
+  } else if (apiID == API_DOMOTICZ) {
+    Eeprom.write(800, state);
+    if (state) {
+      Eeprom.write(25, true);
+    }
+  }
+}

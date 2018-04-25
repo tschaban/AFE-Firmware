@@ -2,6 +2,12 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
+void DomoticzInit() {
+  if (Device.configuration.domoticzAPI) {
+    Domoticz.begin();
+  }
+}
+
 void DomoticzPublishRelayState(uint8_t id) {
   if (Device.configuration.domoticzAPI) {
     Domoticz.sendSwitchCommand(Relay[id].getDomoticzIDX(),

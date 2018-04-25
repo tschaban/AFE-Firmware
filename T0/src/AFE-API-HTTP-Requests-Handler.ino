@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+
 /* Method listens for HTTP Requests */
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
@@ -51,7 +55,6 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 }
 
 /* Method processes HTTP API request */
-/* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
@@ -62,24 +65,20 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         if (strcmp(request.name, Relay[i].getName()) == 0) {
           noRelay = false;
           if (strcmp(request.command, "on") == 0) {
-            //        if (Relay[i].get() != RELAY_ON) {
             Relay[i].on();
             MQTTPublishRelayState(i); // MQTT Listener library
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            //          }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
                                           Relay[i].get());
 
           } else if (strcmp(request.command, "off") == 0) { // Off
-            //          if (Relay[i].get() != RELAY_OFF) {
             Relay[i].off();
             MQTTPublishRelayState(i); // MQTT Listener library
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            //      }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
                                           Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle

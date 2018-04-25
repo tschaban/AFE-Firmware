@@ -39,24 +39,28 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   NETWORK NetworkConfiguration;
   NetworkConfiguration = Data.getNetworkConfiguration();
   uint8_t language = Data.getLanguage();
+  String deviceID = Data.getDeviceID();
   Defaults.eraseConfiguration();
   Defaults.set();
   Data.saveConfiguration(NetworkConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
+  /* Restores previous device ID */
+  if (deviceID.length() > 0) {
+    Data.saveDeviceID(deviceID);
+  }
 }
 
 void AFEUpgrader::upgradeToVersion110() {
   AFEEEPROM Eeprom;
 
-  /* Add second LED default config */
-  LED LEDConfiguration;
-  LEDConfiguration.gpio = 3;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data.saveConfiguration(1, LEDConfiguration);
-  Eeprom.write(443, false);
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
 
-  /* Set first led as system one */
+  /* LEDs */
+  Eeprom.write(443, false);
+  Defaults.addLEDConfiguration(1, 3);
   Data.saveSystemLedID(1);
 
   /* Set that both switces controls relay 1 */
@@ -80,10 +84,6 @@ void AFEUpgrader::upgradeToVersion110() {
 
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
-
-  /* Add Domoticz default config */
-  Eeprom.write(800, false);
-  Defaults.addDomoticzConfiguration();
 
   /* Device ID */
   if (Data.getDeviceID().length() == 0) {
