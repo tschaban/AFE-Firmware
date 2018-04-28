@@ -225,6 +225,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   }
   page += "</div>"
           "<div id=\"r\">";
+
   return page;
 }
 
@@ -377,18 +378,8 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
-  body += "<p class=\"cm\">";
-  body += language == 0
-              ? "Adres MAC może pomóc Ci odszukać adres IP tego urządzenia w "
-                "routerze WiFi"
-              : "MAC address may help you to find IP address of this device in "
-                "your WiFi router";
-  body += "</p>";
-
   body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "MAC" : "MAC";
-  body += "</label>";
+  body += "<label>MAC</label>";
   body += "<input type=\"text\" readonly=\"readonly\" value=\"";
   body += WiFi.macAddress();
   body += "\">";
@@ -968,7 +959,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   char title[23];
   language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
                 : sprintf(title, "Relay #%d", id + 1);
-
   return addConfigurationBlock(title, "", body);
 }
 
@@ -1095,8 +1085,27 @@ String AFESitesGenerator::addDS18B20Configuration() {
   DS18B20 configuration;
   configuration = Data.getDS18B20Configuration();
 
+  DEVICE device;
+  device = Data.getDeviceConfiguration();
+
   String body = "<fieldset>";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
+
+  if (device.domoticzAPI) {
+    body += "<div class=\"cf\">";
+    body += "<label>IDX ";
+    body += language == 0 ? "w" : "in";
+    body += " Domoticz*</label>";
+    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Odczyty co" : "Read every";

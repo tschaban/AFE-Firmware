@@ -34,6 +34,7 @@ void mainDS18B20Sensor() {
               Relay[i].off();
             }
             MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
           }
 
           /* Checking if relay should be switched off based on device thermal
@@ -42,12 +43,15 @@ void mainDS18B20Sensor() {
               Relay[i].ThermalProtection.protectionOn()) {
             Relay[i].off();
             MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
           }
         }
       }
 
-      /* Publishing temperature to MQTT Broker if enabled */
-      Mqtt.publish("temperature", temperature);
+      /* Publishing temperature to MQTT Broker and Domoticz if enabled */
+      MQTTPublishTemperature(temperature);
+      DomoticzPublishTemperature(temperature);
+
       Led.off();
     }
   }

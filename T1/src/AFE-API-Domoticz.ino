@@ -41,6 +41,17 @@ void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
   }
 }
 
+void AFEDomoticz::sendTemperatureCommand(unsigned long idx, float value) {
+  if (initialized) {
+    char _temperatureChar[7];
+    dtostrf(value, 4, 2, _temperatureChar);
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    call += _temperatureChar;
+    callURL(call);
+  }
+}
+
 const String AFEDomoticz::getApiCall(const char *param, unsigned long idx) {
   char url[sizeof(serverURL) + 18 + strlen(param)];
   sprintf(url, "%s&param=%s&idx=%u", serverURL, param, idx);

@@ -161,6 +161,7 @@ DS18B20 AFEDataAccess::getDS18B20Configuration() {
   configuration.interval = Eeprom.read(376, 5).toInt();
   configuration.unit = Eeprom.readUInt8(381);
   configuration.sendOnlyChanges = Eeprom.read(446);
+  configuration.idx = Eeprom.read(936, 6).toInt();
   return configuration;
 }
 
@@ -183,12 +184,9 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   }
 
   Eeprom.write(369, configuration.isDS18B20);
-  Eeprom.write(228, configuration.mqttAPI);
-  Eeprom.write(800, configuration.domoticzAPI);
-  if (configuration.domoticzAPI) {
-    configuration.httpAPI = true;
-  }
-  Eeprom.write(25, configuration.httpAPI);
+  saveAPI(API_MQTT, configuration.mqttAPI);
+  saveAPI(API_HTTP, configuration.httpAPI);
+  saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -269,6 +267,7 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
   Eeprom.write(376, 5, (long)configuration.interval);
   Eeprom.writeUInt8(381, configuration.unit);
   Eeprom.write(446, configuration.sendOnlyChanges);
+  Eeprom.write(936, 6, (long)configuration.idx);
 }
 
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }

@@ -62,3 +62,5 @@ void AFESensorDS18B20::listener() {
     }
   }
 }
+
+unsigned long AFESensorDS18B20::getDomoticzIDX() { return configuration.idx; }

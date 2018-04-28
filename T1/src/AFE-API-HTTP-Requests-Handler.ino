@@ -127,6 +127,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             0) { // @TODO remove once verson rc1 is not used
       sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
     }
+    /* Turning ON / OFF APIs */
   } else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
         strcmp(request.name, "http") == 0
