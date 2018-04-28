@@ -125,8 +125,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  configuration.showStatusUsingLED = Eeprom.read(422 + id * nextRelay);
-
   configuration.thermostat.turnOn =
       Eeprom.read(423 + id * nextRelay, 5).toFloat();
   configuration.thermostat.turnOff =

@@ -8,16 +8,13 @@ AFEDefaults::AFEDefaults() {}
 
 void AFEDefaults::set() {
 
-  AFEDataAccess *Data;
-
   DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
   NETWORK networkConfiguration;
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
-  REGULATOR RegulatorConfiguration;
   SWITCH SwitchConfiguration;
-  LED LEDConfiguration;
+  REGULATOR RegulatorConfiguration;
   DS18B20 DS18B20Configuration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -55,7 +52,6 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.user, "");
   sprintf(MQTTConfiguration.password, "");
   MQTTConfiguration.port = 1883;
-  // sprintf(MQTTConfiguration.topic, "/device/");
   sprintf(MQTTConfiguration.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
 
@@ -134,5 +130,4 @@ void AFEDefaults::addDeviceID() {
   }
   Data->saveDeviceID(String(id));
 }
-
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

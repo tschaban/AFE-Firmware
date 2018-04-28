@@ -1307,7 +1307,7 @@ String AFESitesGenerator::addLanguageConfiguration() {
   body += ">English</option>";
   body += "</select>";
   body += "</div>";
-
+  body += "</fieldset>";
   String page = addConfigurationBlock("Language / Język",
                                       "Choose language / "
                                       "Wybierz język",

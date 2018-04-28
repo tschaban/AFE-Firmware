@@ -55,7 +55,6 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 }
 
 /* Method processes HTTP API request */
-/* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
   if (strcmp(request.device, "relay") == 0) {
@@ -128,7 +127,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             0) { // @TODO remove once verson rc1 is not used
       sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
     }
-
     /* Turning ON / OFF APIs */
   } else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =

@@ -23,6 +23,12 @@ void AFEMQTT::begin() {
   Data = {};
 }
 
+void AFEMQTT::disconnect() {
+  if (Broker.connected()) {
+    Broker.disconnect();
+  }
+}
+
 void AFEMQTT::listener() {
   if (Broker.connected()) {
     Broker.loop();
@@ -65,6 +71,9 @@ void AFEMQTT::connect() {
           Broker.subscribe((char *)mqttTopicForSubscription);
 
           //        Serial << endl << "INFO: Subsribed";
+          /* Publishing message that device has been connected */
+          publish(MQTTConfiguration.topic, "state", "connected");
+
           /* Publishing message that device has been connected */
           publish(MQTTConfiguration.topic, "state", "connected");
 

@@ -27,6 +27,7 @@ private:
   AFELED Led;
   char mqttTopic[50];
   unsigned long turnOffCounter = 0;
+  boolean timerUnitInSeconds = true;
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
@@ -59,20 +60,33 @@ public:
   byte get();
 
   /* Turns on relay */
-  void on();
+  void on(boolean invert = false);
 
   /* Turns off relay */
-  void off();
+  void off(boolean invert = false);
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
+  /* Methodswhile added to main loop turns off relay automatically. Duration
+   * how long relay should be on must be configured */
+  boolean autoTurnOff(boolean invert = false);
+
   /* Methods returns relay name */
   const char *getName();
 
-  /* Methods while added to main loop turns off relay automatically. Duration
-   * how long relay should be on must be configured */
-  boolean autoTurnOff();
+  /* It sets timer to auto-switch of the relay */
+  void setTimer(float timer);
+
+  /* It removed timer for auto-switch of the relay */
+  void clearTimer();
+
+  /* It returns ID of the LED that shoud indicated Relay status */
+  uint8_t getControlledLedID();
+
+  /* It sets unit of relay to auto turn off timer. Possible options: true -
+   * secods, false - miliseconds */
+  void setTimerUnitToSeconds(boolean value);
 
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
