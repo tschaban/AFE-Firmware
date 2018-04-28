@@ -15,22 +15,8 @@ void AFEWebServer::listener() { server.handleClient(); }
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
-void AFEWebServer::publishHTML(const String &page) {
-  uint16_t pageSize = page.length();
-  uint16_t size = 2048;
-  server.setContentLength(pageSize);
-  if (pageSize > size) {
-    server.send(200, "text/html", page.substring(0, size));
-    uint16_t transfered = size;
-    uint16_t nextChunk;
-    while (transfered < pageSize) {
-      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-      server.sendContent(page.substring(transfered, nextChunk));
-      transfered = nextChunk;
-    }
-  } else {
-    server.send(200, "text/html", page);
-  }
+void AFEWebServer::publishHTML(String page) {
+  server.send(200, "text/html", page);
 }
 
 void AFEWebServer::sendJSON(String json) {
