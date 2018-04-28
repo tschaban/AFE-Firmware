@@ -70,7 +70,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            //          }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
                                           Relay[i].get());
           } else if (strcmp(request.command, "off") == 0) { // Off
@@ -79,7 +78,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            //      }
             sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
                                           Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
@@ -122,9 +120,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       sendHTTPAPIRequestStatus(request, false);
     }
   } else if (strcmp(request.device, "ds18b20") == 0) {
-    if (strcmp(request.command, "getTemperature") == 0 ||
-        strcmp(request.command, "get") ==
-            0) { // @TODO remove once verson rc1 is not used
+    if (strcmp(request.command, "get") ==
+        0) { // @TODO remove once verson rc1 is not used
       sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
     }
     /* Turning ON / OFF APIs */

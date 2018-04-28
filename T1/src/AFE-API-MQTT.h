@@ -64,6 +64,7 @@ public:
    * default values */
   void listener();
 
+  /* Method turns off MQTT API */
   void disconnect();
 };
 
