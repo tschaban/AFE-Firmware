@@ -27,7 +27,6 @@ void AFEWebServer::publishHTML(String page) {
       nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
       server.sendContent(page.substring(transfered, nextChunk));
       transfered = nextChunk;
-      Serial << endl << "chunk=" << transfered;
     }
   } else {
     server.send(200, "text/html", page);
@@ -125,26 +124,26 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
         optionName, command, data));
   } else if (optionName == "exit") {
-    Serial << endl << "optionName=" << optionName << " command=" << command;
 
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
 
-    Serial << endl << "optionName=" << optionName << " command=" << command;
     publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
       Device.setDevice();
+      server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
 
-    Serial << endl << "optionName=" << optionName << " command=" << command;
-    publishHTML(ConfigurationPanel.getSite(optionName, command,
-                                           command == 0 ? false : true));
+    publishHTML(ConfigurationPanel.getSite(
+        optionName, command, command == SERVER_CMD_NONE ? false : true));
     if (command == 1) {
-      // Device.reboot(MODE_CONFIGURATION);
+      server.client().stop();
+      Device.reboot(MODE_CONFIGURATION);
     } else if (command == 2) {
+      server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else {

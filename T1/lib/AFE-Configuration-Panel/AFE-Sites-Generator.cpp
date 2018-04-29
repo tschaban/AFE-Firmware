@@ -15,7 +15,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   if (redirect > 0) {
     page += "<meta http-equiv=\"refresh\" content=\"";
     page += String(redirect);
-    page += "; url=http://192.168.2.120/\">";
+    page += "; url=/\">";
   }
 
   page += "<title>AFE Firmware ";

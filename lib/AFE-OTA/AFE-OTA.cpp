@@ -32,7 +32,6 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
       return _server->requestAuthentication();
 
     _server->send(200, "text/html", ConfigurationPanel.firmwareUpgradeSite());
-
   });
 
   // handler for the /update form POST (once file upload finishes)
@@ -44,10 +43,9 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
         _server->send(
             200, "text/html",
             ConfigurationPanel.postFirmwareUpgradeSite(Update.hasError()));
-        delay(100);
+        delay(1000);
         _server->client().stop();
         ESP.restart();
-
       },
       [&]() {
         // handler for the file upload, get's the sketch bytes, and writes

@@ -20,7 +20,6 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
     if (command == 0) {
       page += Site.addHelpSection();
     } else if (command == 1 || command == 2) {
-      Serial << endl << "adding exit section";
       page += Site.addExitSection();
     }
   } else {

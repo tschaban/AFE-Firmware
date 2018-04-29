@@ -16,7 +16,7 @@
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEWebServer {
 

@@ -49,11 +49,12 @@ void AFEWiFi::listener() {
         delayStartTime = millis();
         if (connections == 0) {
           WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
-
-          Serial << endl << "INFO: Starting establishing WiFi connection";
-          Serial << endl
-                 << networkConfiguration.ssid << "@"
-                 << networkConfiguration.password;
+          /*
+                    Serial << endl << "INFO: Starting establishing WiFi
+             connection"; Serial << endl
+                           << networkConfiguration.ssid << "@"
+                           << networkConfiguration.password;
+          */
         }
       }
 
@@ -69,10 +70,11 @@ void AFEWiFi::listener() {
       if (millis() >
           delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
         connections++;
-
-        Serial << endl
-               << "INFO: WiFi connection attempt: " << connections + 1
-               << " from " << networkConfiguration.noConnectionAttempts;
+        /*
+                Serial << endl
+                       << "INFO: WiFi connection attempt: " << connections + 1
+                       << " from " << networkConfiguration.noConnectionAttempts;
+                       */
         delayStartTime = 0;
       }
 
@@ -84,10 +86,11 @@ void AFEWiFi::listener() {
         ledStartTime = 0;
         Led.off();
         connections = 0;
-
-        Serial << endl
-               << "WARN: Not able to connect.Going to sleep mode for "
-               << networkConfiguration.waitTimeSeries << "sec.";
+        /*
+                Serial << endl
+                       << "WARN: Not able to connect.Going to sleep mode for "
+                       << networkConfiguration.waitTimeSeries << "sec.";
+                       */
       }
     }
   } else {
@@ -96,9 +99,11 @@ void AFEWiFi::listener() {
       delayStartTime = 0;
       ledStartTime = 0;
       Led.off();
+      /*
       Serial << endl
              << "INFO: Connection established"
              << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
+             */
     }
   }
 }
