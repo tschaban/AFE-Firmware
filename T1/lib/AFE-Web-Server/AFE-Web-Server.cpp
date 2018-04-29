@@ -16,7 +16,22 @@ void AFEWebServer::listener() { server.handleClient(); }
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(String page) {
-  server.send(200, "text/html", page);
+  uint16_t pageSize = page.length();
+  uint16_t size = 1024;
+  server.setContentLength(pageSize);
+  if (pageSize > size) {
+    server.send(200, "text/html", page.substring(0, size));
+    uint16_t transfered = size;
+    uint16_t nextChunk;
+    while (transfered < pageSize) {
+      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+      server.sendContent(page.substring(transfered, nextChunk));
+      transfered = nextChunk;
+      Serial << endl << "chunk=" << transfered;
+    }
+  } else {
+    server.send(200, "text/html", page);
+  }
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -110,19 +125,25 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
         optionName, command, data));
   } else if (optionName == "exit") {
+    Serial << endl << "optionName=" << optionName << " command=" << command;
+
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
+
+    Serial << endl << "optionName=" << optionName << " command=" << command;
     publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
       Device.setDevice();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
+
+    Serial << endl << "optionName=" << optionName << " command=" << command;
     publishHTML(ConfigurationPanel.getSite(optionName, command,
                                            command == 0 ? false : true));
     if (command == 1) {
-      Device.reboot(MODE_CONFIGURATION);
+      // Device.reboot(MODE_CONFIGURATION);
     } else if (command == 2) {
       Device.reboot(MODE_ACCESS_POINT);
     }
@@ -204,6 +225,8 @@ String AFEWebServer::getOptionName() {
 uint8_t AFEWebServer::getCommand() {
   if (server.hasArg("cmd")) {
     return server.arg("cmd").toInt();
+  } else {
+    return SERVER_CMD_NONE;
   }
 }
 
