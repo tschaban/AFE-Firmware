@@ -32,7 +32,7 @@ void AFEDomoticz::begin() {
 
 void AFEDomoticz::disconnect() { initialized = false; }
 
-void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
+void AFEDomoticz::sendSwitchCommand(unsigned int idx, const char *value) {
   if (initialized) {
     String call = getApiCall("switchlight", idx);
     call += "&switchcmd=";
@@ -41,7 +41,7 @@ void AFEDomoticz::sendSwitchCommand(unsigned long idx, const char *value) {
   }
 }
 
-void AFEDomoticz::sendTemperatureCommand(unsigned long idx, float value) {
+void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     char _temperatureChar[7];
     dtostrf(value, 4, 2, _temperatureChar);
@@ -52,7 +52,7 @@ void AFEDomoticz::sendTemperatureCommand(unsigned long idx, float value) {
   }
 }
 
-const String AFEDomoticz::getApiCall(const char *param, unsigned long idx) {
+const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
   char url[sizeof(serverURL) + 18 + strlen(param)];
   sprintf(url, "%s&param=%s&idx=%u", serverURL, param, idx);
   return url;
@@ -62,7 +62,7 @@ void AFEDomoticz::callURL(const String url) {
 
   // Serial << endl << "Calling url: " << url;
   http.begin(url);
-  int httpCode = http.GET();
+  http.GET();
   /*
   Serial << endl << "Response: " << httpCode;
   String payload = http.getString();

@@ -50,11 +50,11 @@ void AFEWiFi::listener() {
         if (connections == 0) {
           WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
           /*
-          Serial << endl << "INFO: Starting establishing WiFi connection";
-          Serial << endl
-                 << networkConfiguration.ssid << "@"
-                 << networkConfiguration.password;
-*/
+                    Serial << endl << "INFO: Starting establishing WiFi
+             connection"; Serial << endl
+                           << networkConfiguration.ssid << "@"
+                           << networkConfiguration.password;
+          */
         }
       }
 
@@ -74,7 +74,7 @@ void AFEWiFi::listener() {
                 Serial << endl
                        << "INFO: WiFi connection attempt: " << connections + 1
                        << " from " << networkConfiguration.noConnectionAttempts;
-        */
+                       */
         delayStartTime = 0;
       }
 
@@ -90,7 +90,7 @@ void AFEWiFi::listener() {
                 Serial << endl
                        << "WARN: Not able to connect.Going to sleep mode for "
                        << networkConfiguration.waitTimeSeries << "sec.";
-        */
+                       */
       }
     }
   } else {
@@ -100,11 +100,10 @@ void AFEWiFi::listener() {
       ledStartTime = 0;
       Led.off();
       /*
-            Serial << endl
-                   << "INFO: Connection established"
-                   << ", MAC: " << WiFi.macAddress() << ", IP: " <<
-         WiFi.localIP();
-      */
+      Serial << endl
+             << "INFO: Connection established"
+             << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
+             */
     }
   }
 }

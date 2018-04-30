@@ -8,8 +8,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       boolean redirect) {
 
   String page;
-  redirect == 0 ? page = Site.generateHeader(0)
-                : page = Site.generateHeader(10);
+  redirect ? page = Site.generateHeader(10) : page = Site.generateHeader(0);
 
   if (option == "upgrade") {
     page += Site.addUpgradeSection();
@@ -28,6 +27,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   page += Site.generateFooter();
+  delay(10);
   return page;
 }
 

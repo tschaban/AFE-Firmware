@@ -13,7 +13,7 @@ void AFEDevice::begin() { configuration = Data.getDeviceConfiguration(); }
 
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);
-  delay(10);
+  delay(1000);
   ESP.restart();
 }
 

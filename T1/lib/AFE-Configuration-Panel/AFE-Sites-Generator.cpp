@@ -15,7 +15,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   if (redirect > 0) {
     page += "<meta http-equiv=\"refresh\" content=\"";
     page += String(redirect);
-    page += ";URL=/\">";
+    page += "; url=/\">";
   }
 
   page += "<title>AFE Firmware ";
@@ -1175,9 +1175,20 @@ String AFESitesGenerator::addUpgradeSection() {
   body += "<input class=\"bs\" name=\"update\" type=\"file\" accept=\".bin\">";
   body += "</div>";
   body += "<p class=\"cm\">";
-  body += language == 0 ? "Po zakończeniu aktualizacji urządzenie zostanie "
-                          "automatycznie zresetowane"
-                        : "Device will be automatically rebooted after upgrade";
+  body +=
+      language == 0
+          ? "Po zakończeniu aktualizacji urządzenie zostanie "
+            "automatycznie zresetowane<br><br><strong>Uwaga:</strong> po "
+            "aktualizacji nie odłączaj urządzenia przez conajmniej 1min.<br>"
+            "Urządzenie formatuje pamięc i wgrywa domyślne ustawienia. "
+            "<br><strong>Ten proces nie może zostac przerwany</strong>."
+          : "Device will be automatically rebooted after "
+            "upgrade<br><br><strong>Warning</strong>: after upgrade do not "
+            "plug "
+            "off the device from power source for around a minute.<br>Device's "
+            "memory "
+            "will be formatted and default settings will be "
+            "uploaded.<br><strong>This process cannot be interrupted</strong>";
   body += "</p>";
   body += "<button type=\"submit\" class=\"b be\">";
   body += language == 0 ? "Aktualizuj" : "Upgrade";

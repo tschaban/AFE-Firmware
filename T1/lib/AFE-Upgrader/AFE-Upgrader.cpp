@@ -55,10 +55,6 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
 void AFEUpgrader::upgradeToVersion110() {
   AFEEEPROM Eeprom;
 
-  /* Add Domoticz default config */
-  Eeprom.write(800, false);
-  Defaults.addDomoticzConfiguration();
-
   /* LEDs */
   Eeprom.write(443, false);
   Defaults.addLEDConfiguration(1, 3);
@@ -85,6 +81,10 @@ void AFEUpgrader::upgradeToVersion110() {
 
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
+
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
 
   /* Device ID */
   if (Data.getDeviceID().length() == 0) {
