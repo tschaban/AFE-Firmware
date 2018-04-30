@@ -13,8 +13,8 @@
 
 #include <AFE-Data-Access.h>
 #include <ESP8266HTTPClient.h>
-// s#include <Streaming.h>
 #include <rBase64.h>
+// #include <Streaming.h>
 
 class AFEDomoticz {
 
@@ -24,7 +24,7 @@ private:
   char serverURL[184];
   boolean initialized = false;
 
-  const String getApiCall(const char *param, unsigned long idx);
+  const String getApiCall(const char *param, unsigned int idx);
   void callURL(const String url);
 
 public:
@@ -33,7 +33,11 @@ public:
   AFEDomoticz();
   void begin();
   void disconnect();
-  void sendSwitchCommand(unsigned long idx, const char *value);
+
+  /* It send to Domoticz switch state using following API call
+    json.htm?type=command&param=switchlight&idx=IDX&switchcmd=STATE
+  */
+  void sendSwitchCommand(unsigned int idx, const char *value);
 };
 
 #endif

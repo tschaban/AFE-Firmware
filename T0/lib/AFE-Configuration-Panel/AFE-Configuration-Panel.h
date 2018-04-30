@@ -23,6 +23,7 @@ private:
   AFEDataAccess Data;
   AFEDevice Device;
   uint8_t language;
+  uint16_t siteBufferSize = 7500;
 
 public:
   /* Constructor */

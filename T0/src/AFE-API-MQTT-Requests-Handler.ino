@@ -43,7 +43,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         break;
       }
     }
-
     /* Turning On/Off HTTP APIs */
     sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
             MQTTConfiguration.topic);

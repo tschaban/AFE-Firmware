@@ -95,7 +95,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
   uint8_t nextRelay = 26;
-  char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(370 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(372 + id * nextRelay, 5).toFloat();
   configuration.statePowerOn = Eeprom.readUInt8(377 + id * nextRelay);
@@ -229,7 +228,7 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(415); }
+uint8_t AFEDataAccess::getSystemLedID() { return Eeprom.readUInt8(415); }
 
 void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(415, id); }
 

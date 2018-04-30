@@ -16,7 +16,21 @@ void AFEWebServer::listener() { server.handleClient(); }
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(String page) {
-  server.send(200, "text/html", page);
+  uint16_t pageSize = page.length();
+  uint16_t size = 1024;
+  server.setContentLength(pageSize);
+  if (pageSize > size) {
+    server.send(200, "text/html", page.substring(0, size));
+    uint16_t transfered = size;
+    uint16_t nextChunk;
+    while (transfered < pageSize) {
+      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+      server.sendContent(page.substring(transfered, nextChunk));
+      transfered = nextChunk;
+    }
+  } else {
+    server.send(200, "text/html", page);
+  }
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -102,14 +116,17 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
       Device.setDevice();
+      server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
-    publishHTML(ConfigurationPanel.getSite(optionName, command,
-                                           command == 0 ? false : true));
+    publishHTML(ConfigurationPanel.getSite(
+        optionName, command, command == SERVER_CMD_NONE ? false : true));
     if (command == 1) {
+      server.client().stop();
       Device.reboot(MODE_CONFIGURATION);
     } else if (command == 2) {
+      server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else {
@@ -172,13 +189,6 @@ String AFEWebServer::getOptionName() {
       } else {
         memset(httpCommand.source, 0, sizeof httpCommand.source);
       }
-      /*
-            Serial << endl
-                   << "GET: Device=" << httpCommand.device
-                   << " Name=" << httpCommand.name << " Source=" <<
-         httpCommand.source
-                   << " Command=" << httpCommand.command;
-      */
       receivedHTTPCommand = true;
       return server.arg("command");
 
@@ -197,12 +207,13 @@ String AFEWebServer::getOptionName() {
 uint8_t AFEWebServer::getCommand() {
   if (server.hasArg("cmd")) {
     return server.arg("cmd").toInt();
+  } else {
+    return SERVER_CMD_NONE;
   }
 }
 
 DEVICE AFEWebServer::getDeviceData() {
   DEVICE data;
-
   _refreshConfiguration =
       true; // it will cause that device configuration will be refeshed
 
