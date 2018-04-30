@@ -124,11 +124,9 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
         optionName, command, data));
   } else if (optionName == "exit") {
-
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
-
     publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
       Device.setDevice();
@@ -136,7 +134,6 @@ void AFEWebServer::generate() {
       Device.reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
-
     publishHTML(ConfigurationPanel.getSite(
         optionName, command, command == SERVER_CMD_NONE ? false : true));
     if (command == 1) {

@@ -79,7 +79,6 @@ void AFEDefaults::set() {
   addDeviceID();
 
   Data->saveSystemLedID(1);
-
   Data->saveDeviceMode(2);
   Data->saveRelayState(0, false);
   Data->saveLanguage(1);
