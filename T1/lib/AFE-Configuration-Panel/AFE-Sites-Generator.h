@@ -28,6 +28,12 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
+  /* These three methods generates checkboxes for Switch, Relay and LED */
+  const String generateSwitchItem(uint8_t id, boolean checked);
+  const String generateRelayItem(boolean checked);
+  const String generateLEDItem(boolean checked);
+  const String generateTwoValueController(REGULATOR configuration,
+                                          boolean thermostat);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
