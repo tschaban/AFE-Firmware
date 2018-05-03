@@ -12,9 +12,8 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Defaults.h>
-
+//#include <Streaming.h>
 class AFEUpgrader {
 
 private:
@@ -24,6 +23,9 @@ private:
 
   /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
+
+  /* Method upgrades to v1.2.0 */
+  void upgradeToVersion120();
 
 public:
   /* Constructor */
