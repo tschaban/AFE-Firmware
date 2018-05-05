@@ -20,6 +20,9 @@ struct DH {
   TEMPERATURE temperature;
   HUMIDITY humidity;
   boolean sendOnlyChanges;
+  unsigned long temperatureIdx;
+  unsigned long humidityIdx;
+  unsigned long temperatureAndHumidityIdx;
 };
 
 #endif
