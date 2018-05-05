@@ -1102,21 +1102,6 @@ String AFESitesGenerator::addDHTConfiguration() {
   String body = "<fieldset>";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
 
-  if (device.domoticzAPI) {
-    body += "<div class=\"cf\">";
-    body += "<label>IDX ";
-    body += language == 0 ? "w" : "in";
-    body += " Domoticz*</label>";
-    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-  }
-
   body += "<div class=\"cf\">";
   body += "<label>Typ";
   body += language == 1 ? "e" : "";
@@ -1181,6 +1166,21 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</select>";
   body += "</div>";
 
+  if (device.domoticzAPI) {
+    body += "<div class=\"cf\">";
+    body += "<label>IDX ";
+    body += language == 0 ? "w" : "in";
+    body += " Domoticz*</label>";
+    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
   body += "</p>";
@@ -1212,6 +1212,34 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 0 ? "Zakres" : "Range";
   body += ": -99.9 - +99.9</span>";
   body += "</div>";
+
+  if (device.domoticzAPI) {
+    body += "<div class=\"cf\">";
+    body += "<label>IDX ";
+    body += language == 0 ? "w" : "in";
+    body += " Domoticz*</label>";
+    body += "<input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.humidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\">";
+    body += "<label>IDX ";
+    body += language == 0 ? "w" : "in";
+    body += " Domoticz*</label>";
+    body += "<input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureAndHumidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
 
   body += "<div class=\"cc\">";
   body += "<label>";
