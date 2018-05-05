@@ -41,7 +41,8 @@ public:
   void saveConfiguration(DOMOTICZ configuration);
   void saveConfiguration(uint8_t id, LED configuration);
   void saveConfiguration(uint8_t id, RELAY configuration);
-  void saveConfiguration(REGULATOR configuration, boolean thermostat);
+  void saveConfiguration(uint8_t id, REGULATOR configuration,
+                         boolean thermostat);
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(DH configuration);
 

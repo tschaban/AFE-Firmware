@@ -108,8 +108,8 @@ void loop() {
         mainHTTPRequestsHandler();
         mainRelay();
 
-        /* Sensor: DS18B20 related code */
-        mainDS18B20Sensor();
+        /* Sensor: DHT related code */
+        mainDHTSensor();
 
       } else { // Configuration Mode
         if (!Led.isBlinking()) {

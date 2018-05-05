@@ -109,7 +109,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   MQTT configurationMQTT;
   uint8_t nextRelay = 40;
 
-  char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(405 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(407 + id * nextRelay, 5).toFloat();
   configuration.statePowerOn = Eeprom.readUInt8(412 + id * nextRelay);
@@ -250,23 +249,25 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
 
-void AFEDataAccess::saveConfiguration(REGULATOR configuration,
+void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR configuration,
                                       boolean thermostat) {
 
-  uint8_t id;
+  /* id is actually not used. It' here for code compatibility with other
+   * versions of AFE */
+  uint8_t index;
 
   if (thermostat) {
-    id = 0;
-    saveThermostatState(configuration.enabled);
+    index = 0;
+    saveThermostatState(id, configuration.enabled);
   } else {
-    id = 13;
-    saveHumidistatState(configuration.enabled);
+    index = 13;
+    saveHumidistatState(id, configuration.enabled);
   }
 
-  Eeprom.write(431 + id, 5, configuration.turnOn);
-  Eeprom.write(436 + id, 5, configuration.turnOff);
-  Eeprom.write(441 + id, configuration.turnOnAbove);
-  Eeprom.write(442 + id, configuration.turnOffAbove);
+  Eeprom.write(431 + index, 5, configuration.turnOn);
+  Eeprom.write(436 + index, 5, configuration.turnOff);
+  Eeprom.write(441 + index, configuration.turnOnAbove);
+  Eeprom.write(442 + index, configuration.turnOffAbove);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {

@@ -20,7 +20,7 @@ void AFEDefaults::set() {
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
-  sprintf(firmwareConfiguration.upgradeURL, "");
+  firmwareConfiguration.upgradeURL[0] = '\0';
 
   Data->saveConfiguration(firmwareConfiguration);
 
@@ -36,8 +36,8 @@ void AFEDefaults::set() {
   deviceConfiguration.httpAPI = true;
   Data->saveConfiguration(deviceConfiguration);
 
-  sprintf(networkConfiguration.ssid, "");
-  sprintf(networkConfiguration.password, "");
+  networkConfiguration.ssid[0] = '\0';
+  networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
   networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
@@ -47,10 +47,10 @@ void AFEDefaults::set() {
   networkConfiguration.waitTimeSeries = 60;
   Data->saveConfiguration(networkConfiguration);
 
-  sprintf(MQTTConfiguration.host, "");
+  MQTTConfiguration.host[0] = '\0';
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(MQTTConfiguration.user, "");
-  sprintf(MQTTConfiguration.password, "");
+  MQTTConfiguration.user[0] = '\0';
+  MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
@@ -62,19 +62,6 @@ void AFEDefaults::set() {
   sprintf(RelayConfiguration.name, "switch");
   RelayConfiguration.ledID = 0;
   RelayConfiguration.idx = 1;
-
-  RelayConfiguration.thermostat.enabled = false;
-  RelayConfiguration.thermostat.turnOn = 0;
-  RelayConfiguration.thermostat.turnOnAbove = false;
-  RelayConfiguration.thermostat.turnOff = 0;
-  RelayConfiguration.thermostat.turnOffAbove = true;
-
-  RelayConfiguration.humidistat.enabled = false;
-  RelayConfiguration.humidistat.turnOn = 0;
-  RelayConfiguration.humidistat.turnOnAbove = false;
-  RelayConfiguration.humidistat.turnOff = 0;
-  RelayConfiguration.humidistat.turnOffAbove = true;
-
   RelayConfiguration.thermalProtection = 0;
   Data->saveConfiguration(0, RelayConfiguration);
 
@@ -83,7 +70,8 @@ void AFEDefaults::set() {
   RegulatorConfiguration.turnOnAbove = false;
   RegulatorConfiguration.turnOff = 0;
   RegulatorConfiguration.turnOffAbove = true;
-  Data->saveConfiguration(RegulatorConfiguration);
+  Data->saveConfiguration(0, RegulatorConfiguration, true);
+  Data->saveConfiguration(0, RegulatorConfiguration, false);
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
@@ -121,9 +109,9 @@ void AFEDefaults::set() {
 void AFEDefaults::addDomoticzConfiguration() {
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration.protocol = 0;
-  sprintf(DomoticzConfiguration.host, "");
-  sprintf(DomoticzConfiguration.user, "");
-  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.host[0] = '\0';
+  DomoticzConfiguration.user[0] = '\0';
+  DomoticzConfiguration.password[0] = '\0';
   DomoticzConfiguration.port = 8080;
   Data->saveConfiguration(DomoticzConfiguration);
 }

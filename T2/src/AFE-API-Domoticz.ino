@@ -52,6 +52,12 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   }
 }
 
+void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {}
+
+void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
+                                                    float temperatureValue,
+                                                    float humidityValue) {}
+
 const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
   char url[sizeof(serverURL) + 18 + strlen(param)];
   sprintf(url, "%s&param=%s&idx=%u", serverURL, param, idx);

@@ -60,6 +60,29 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
                            Relay[i].Thermostat.enabled() ? "on" : "off");
             }
+          } else {
+            /* Checking if Hunidistat related message has been received  */
+            sprintf(_mqttTopic, "%shumidistat/cmd", Relay[i].getMQTTTopic());
+
+            if (strcmp(topic, _mqttTopic) == 0) {
+              if ((char)payload[0] == 'o' && length == 2) { // on
+                Relay[i].Humidistat.on();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 'o' && length == 3) { // off
+                Relay[i].Humidistat.off();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 't' && length == 6) { // toggle
+                Relay[i].Humidistat.enabled() ? Relay.Humidistat.off()
+                                              : Relay.Humidistat.on();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 'g' && length == 3) { // get
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              }
+            }
           }
         }
       } else {
@@ -120,8 +143,17 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             } else if ((char)payload[2] == 't' &&
                        length == 14) { // getTemperature
               char temperatureString[6];
-              dtostrf(SensorDS18B20.get(), 2, 2, temperatureString);
+              dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
               Mqtt.publish("temperature", temperatureString);
+            } else if ((char)payload[2] == 't' && length == 11) { // getHumidity
+              char humidityString[6];
+              dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
+              Mqtt.publish("humidity", humidityString);
+            } else if ((char)payload[2] == 't' &&
+                       length == 12) { // getHeatIndex
+              char heatIndex[6];
+              dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
+              Mqtt.publish("heatIndex", heatIndex);
             }
           }
         }
@@ -142,5 +174,11 @@ void MQTTPublishRelayState(uint8_t id) {
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("temperature", temperature);
+  }
+}
+/* Metod publishes humidity */
+void MQTTPublishHumidity(float humidity) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("humidity", humidity);
   }
 }

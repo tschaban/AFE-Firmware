@@ -64,8 +64,7 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getLanguageData();
     }
-    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(optionName,
-                                                                command, data));
+    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(command, data));
 
     if (command == SERVER_CMD_SAVE) {
       Device.reboot(Device.getMode());
@@ -75,29 +74,26 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getDeviceData();
     }
-    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(optionName,
-                                                              command, data));
+    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(command, data));
   } else if (optionName == "network") {
     NETWORK data;
     if (command == SERVER_CMD_SAVE) {
       data = getNetworkData();
     }
-    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(optionName,
-                                                               command, data));
+    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(command, data));
   } else if (optionName == "mqtt") {
     MQTT data;
     if (command == SERVER_CMD_SAVE) {
       data = getMQTTData();
     }
-    publishHTML(
-        ConfigurationPanel.getMQTTConfigurationSite(optionName, command, data));
+    publishHTML(ConfigurationPanel.getMQTTConfigurationSite(command, data));
   } else if (optionName == "domoticz") {
     DOMOTICZ data;
     if (command == SERVER_CMD_SAVE) {
       data = getDomoticzServerData();
     }
-    publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
-        optionName, command, data));
+    publishHTML(
+        ConfigurationPanel.getDomoticzServerConfigurationSite(command, data));
   } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
@@ -107,23 +103,14 @@ void AFEWebServer::generate() {
       }
       dataLedID = getSystemLEDData();
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(optionName, command,
-                                                           data, dataLedID));
+    publishHTML(
+        ConfigurationPanel.getLEDConfigurationSite(command, data, dataLedID));
   } else if (getOptionName() == "DHT") {
     DH data = {};
     if (command == SERVER_CMD_SAVE) {
       data = getDHTData();
     }
-    publishHTML(
-        ConfigurationPanel.getDHTConfigurationSite(optionName, command, data));
-  } else if (optionName == "thermostat" || optionName == "humidistat") {
-    REGULATOR data = {};
-    if (command == SERVER_CMD_SAVE) {
-      optionName == "thermostat" ? data = getThermostateData()
-                                 : data = getHumidistatData();
-    }
-    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
-        optionName, command, data));
+    publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
@@ -152,9 +139,18 @@ void AFEWebServer::generate() {
           if (command == SERVER_CMD_SAVE) {
             data = getRelayData(i);
           }
-          publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-              optionName, command, data, i));
+          publishHTML(
+              ConfigurationPanel.getRelayConfigurationSite(command, data, i));
+        } else if (optionName == "thermostat" || optionName == "humidistat") {
+          REGULATOR data = {};
+          if (command == SERVER_CMD_SAVE) {
+            optionName == "thermostat" ? data = getThermostateData()
+                                       : data = getHumidistatData();
+          }
+          publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
+              command, data, optionName == "thermostat" ? true : false, i));
         }
+
       } else {
         break;
       }
@@ -167,8 +163,8 @@ void AFEWebServer::generate() {
           if (command == SERVER_CMD_SAVE) {
             data = getSwitchData(i);
           }
-          publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-              optionName, command, data, i));
+          publishHTML(
+              ConfigurationPanel.getSwitchConfigurationSite(command, data, i));
         }
       } else {
         break;

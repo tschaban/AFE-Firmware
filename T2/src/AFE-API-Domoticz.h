@@ -43,6 +43,18 @@ public:
      json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
   */
   void sendTemperatureCommand(unsigned int idx, float value);
+
+  /* It send to Domoticz humidity using following API call
+     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+  */
+  void sendHumidityCommand(unsigned int idx, float value);
+
+  /* It send to Domoticz temperature and humidity using following API call
+     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+  */
+  void sendTemperatureAndHumidityCommand(unsigned int idx,
+                                         float temperatureValue,
+                                         float humidityValue);
 };
 
 #endif
