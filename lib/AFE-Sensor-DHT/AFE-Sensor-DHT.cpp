@@ -110,3 +110,15 @@ void AFESensorDHT::listener() {
     }
   }
 }
+
+unsigned long AFESensorDHT::getDomoticzIDX(uint8_t type) {
+  unsigned long idx;
+  if (type == IDX_TYPE_TEMPERATURE) {
+    idx = configuration.temperatureIdx;
+  } else if (type == IDX_TYPE_HUMIDITY) {
+    idx = configuration.humidityIdx;
+  } else {
+    idx = configuration.temperatureAndHumidityIdx;
+  }
+  return idx;
+}
