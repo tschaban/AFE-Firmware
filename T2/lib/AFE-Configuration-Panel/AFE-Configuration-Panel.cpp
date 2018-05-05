@@ -31,8 +31,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
-                                                           uint8_t command,
+String AFEConfigurationPanel::getLanguageConfigurationSite(uint8_t command,
                                                            uint8_t lang) {
   String page;
   if (command == SERVER_CMD_SAVE) {
@@ -51,8 +50,7 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
-                                                         uint8_t command,
+String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
                                                          DEVICE data) {
 
   if (command == SERVER_CMD_SAVE) {
@@ -72,8 +70,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
-                                                          uint8_t command,
+String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
                                                           NETWORK data) {
 
   if (command == SERVER_CMD_SAVE) {
@@ -91,8 +88,7 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
-                                                       uint8_t command,
+String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
                                                        MQTT data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -110,8 +106,9 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
-    const String option, uint8_t command, DOMOTICZ data) {
+String
+AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
+                                                          DOMOTICZ data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -129,8 +126,8 @@ String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
 }
 
 String AFEConfigurationPanel::getLEDConfigurationSite(
-    const String option, uint8_t command,
-    LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {
+    uint8_t command, LED data[sizeof(Device.configuration.isLED)],
+    uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
@@ -163,8 +160,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
   return page;
 }
 
-String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
-                                                        uint8_t command,
+String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
                                                         RELAY data,
                                                         uint8_t relayIndex) {
   if (command == SERVER_CMD_SAVE) {
@@ -186,9 +182,9 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
 }
 
 String AFEConfigurationPanel::getRelayStatConfigurationSite(
-    const String option, uint8_t command, REGULATOR data, boolean thermostat) {
+    uint8_t command, REGULATOR data, boolean thermostat, uint8_t relayIndex) {
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data, thermostat);
+    Data.saveConfiguration(relayIndex, data, thermostat);
   }
 
   String page;
@@ -208,8 +204,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
   return page;
 }
 
-String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
-                                                         uint8_t command,
+String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
                                                          SWITCH data,
                                                          uint8_t switchIndex) {
 
@@ -231,8 +226,7 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
-                                                      uint8_t command,
+String AFEConfigurationPanel::getDHTConfigurationSite(uint8_t command,
                                                       DH data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
