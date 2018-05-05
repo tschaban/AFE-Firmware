@@ -15,6 +15,10 @@
 #include <DHT.h>
 // #include <Streaming.h>
 
+#define IDX_TYPE_TEMPERATURE 0
+#define IDX_TYPE_HUMIDITY 1
+#define IDX_TYPE_TEMPERATURE_AND_HUMIDITY 2
+
 class AFESensorDHT {
 
 private:
@@ -57,6 +61,10 @@ public:
   /* Method should be added to the main loop to check temperature / humidity in
    * defined time frame */
   void listener();
+
+  /* Method returns sensor IDX for temperature, humidity, temperature and
+   * humidity */
+  unsigned long getDomoticzIDX(uint8_t type);
 };
 
 #endif
