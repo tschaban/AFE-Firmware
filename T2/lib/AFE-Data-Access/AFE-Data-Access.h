@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-#include <Streaming.h>
+//#include <Streaming.h>
 
 class AFEDataAccess {
 private:
@@ -27,9 +27,9 @@ public:
   FIRMWARE getFirmwareConfiguration();
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
-  LED getLEDConfiguration();
-  LED getLEDConfiguration(uint8_t); // Used only to be compatible with AFE-LED.h
-  RELAY getRelayConfiguration();
+  DOMOTICZ getDomoticzConfiguration();
+  LED getLEDConfiguration(uint8_t id);
+  RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
   DH getDHTConfiguration();
 
@@ -38,19 +38,20 @@ public:
   void saveConfiguration(FIRMWARE configuration);
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
-  void saveConfiguration(LED configuration);
-  void saveConfiguration(RELAY configuration);
-  void saveConfiguration(RELAYSTAT configuration, boolean thermostat);
+  void saveConfiguration(DOMOTICZ configuration);
+  void saveConfiguration(uint8_t id, LED configuration);
+  void saveConfiguration(uint8_t id, RELAY configuration);
+  void saveConfiguration(uint8_t id, REGULATOR configuration,
+                         boolean thermostat);
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void saveConfiguration(DH configuration);
 
   /* Methods read and save firmware version from/to EEPROM */
-  const char getVersion();
   void saveVersion(String version);
 
-  /* Methods read and save relay state from/to EEPROM */
-  boolean getRelayState();
-  void saveRelayState(boolean state);
+  /* Methods save relay state from/to EEPROM */
+  boolean getRelayState(uint8_t id);
+  void saveRelayState(uint8_t id, boolean state);
 
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
@@ -60,18 +61,21 @@ public:
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 
-  /* Methods read and save thermostate state */
-  boolean isThermostatEnabled();
-  void saveThermostatState(boolean state);
-  void saveThermostatState(
-      uint8_t id,
-      boolean state); // This is only for compatibility with AFE-Thermostat.h
+  /* Methods read and save thermostate/humidistat state */
+  boolean isThermostatEnabled(uint8_t id);
+  void saveThermostatState(uint8_t id, boolean state);
+  boolean isHumidistatEnabled(uint8_t id);
+  void saveHumidistatState(uint8_t id, boolean state);
 
-  /* Methods read and save humidistat state */
-  boolean isHumidistatEnabled();
-  void saveHumidistatState(boolean state);
-  void saveHumidistatState(
-      uint8_t id,
-      boolean state); // This is only for compatibility with AFE-Humidistat.h
+  /* Methods read and save ID of system led */
+  uint8_t getSystemLedID();
+  void saveSystemLedID(uint8_t id);
+
+  /* Methods saves and reads device ID */
+  const String getDeviceID();
+  void saveDeviceID(String id);
+
+  /* Methods turns on / off APIs */
+  void saveAPI(uint8_t apiID, boolean state);
 };
 #endif

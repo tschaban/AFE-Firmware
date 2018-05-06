@@ -130,4 +130,5 @@ void AFEDefaults::addDeviceID() {
   }
   Data->saveDeviceID(String(id));
 }
+
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }

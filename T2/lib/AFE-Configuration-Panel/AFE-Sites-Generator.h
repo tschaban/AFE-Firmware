@@ -12,9 +12,10 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Data-Structures.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
+#include <ESP8266WiFi.h>
+//#include <Streaming.h>
 
 class AFESitesGenerator {
 
@@ -31,12 +32,16 @@ private:
   const String generateSwitchItem(uint8_t id, boolean checked);
   const String generateRelayItem(boolean checked);
   const String generateLEDItem(boolean checked);
-  const String generateTwoValueController(RELAYSTAT configuration,
-                                          boolean thermostat);
+  const String generateRegulatorController(REGULATOR configuration,
+                                           boolean thermostat);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
                                const String body);
+
+  const String generateHardwareItemsList(uint8_t noOfItems,
+                                         uint8_t noOffConnected,
+                                         const char *field, const char *label);
 
 public:
   /* Constructor*/
@@ -55,12 +60,14 @@ public:
   String addDeviceConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
-  String addLEDConfiguration();
-  String addRelayConfiguration();
-  String addThermostatConfiguration();
-  String addHumidistatConfiguration();
+  String addDomoticzServerConfiguration();
+  String addLEDConfiguration(uint8_t id);
+  String addSystemLEDConfiguration();
+  String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
   String addDHTConfiguration();
+  String addThermostatConfiguration();
+  String addHumidistatConfiguration();
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();

@@ -28,7 +28,6 @@ private:
   HTTPCOMMAND httpCommand; // It stores last HTTP API request
   boolean receivedHTTPCommand =
       false; // Once HTTP API requet is recieved it's set to true
-
   boolean _refreshConfiguration = false; // when it's set to true device
                                          // configuration is refreshed. Required
                                          // by generate() method

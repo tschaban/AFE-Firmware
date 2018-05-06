@@ -112,7 +112,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += language == 0 ? "Przekaźnik" : "Relay";
       page += "</a></li>";
       if (Device.configuration.isDS18B20) {
-        page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">";
+        page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
         page += language == 0 ? "Termostat" : "Thermostat";
         page += "</a></li>";
       }
@@ -1082,11 +1082,8 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
 String AFESitesGenerator::addDS18B20Configuration() {
 
-  DS18B20 configuration;
-  configuration = Data.getDS18B20Configuration();
-
-  DEVICE device;
-  device = Data.getDeviceConfiguration();
+  DS18B20 configuration = Data.getDS18B20Configuration();
+  DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
@@ -1249,7 +1246,6 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
     body += language == 0 ? "Trwa przywracanie ustawień początkowych"
                           : "Restoring configuration is in progress";
     body += "</p><p class=\"cm\">";
-
     body += language == 0 ? "Po 20 sekundach połącz się z siecią WiFi o "
                             "nazwie: <strong>AFE-Device</strong>, a następnie "
                             "połącz się z "

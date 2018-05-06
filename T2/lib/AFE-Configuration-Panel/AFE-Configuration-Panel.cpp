@@ -8,8 +8,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
                                       boolean redirect) {
 
   String page;
-  redirect == 0 ? page = Site.generateHeader(0)
-                : page = Site.generateHeader(10);
+  redirect ? page = Site.generateHeader(10) : page = Site.generateHeader(0);
 
   if (option == "upgrade") {
     page += Site.addUpgradeSection();
@@ -28,11 +27,11 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   page += Site.generateFooter();
+  delay(10);
   return page;
 }
 
-String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
-                                                           uint8_t command,
+String AFEConfigurationPanel::getLanguageConfigurationSite(uint8_t command,
                                                            uint8_t lang) {
   String page;
   if (command == SERVER_CMD_SAVE) {
@@ -51,15 +50,17 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
-                                                         uint8_t command,
+String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
                                                          DEVICE data) {
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
+    Device.begin();
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=device&cmd=1\"  method=\"post\">";
   page += Site.addDeviceConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -69,14 +70,15 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
-                                                          uint8_t command,
+String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
                                                           NETWORK data) {
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=network&cmd=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -86,14 +88,15 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
-                                                       uint8_t command,
+String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
                                                        MQTT data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=mqtt&cmd=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -103,17 +106,18 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
-                                                      uint8_t command,
-                                                      LED data) {
-
+String
+AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
+                                                          DOMOTICZ data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
-  page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
-  page += Site.addLEDConfiguration();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=domoticz&cmd=1\" method=\"post\">";
+  page += Site.addDomoticzServerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -121,16 +125,55 @@ String AFEConfigurationPanel::getLEDConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
-                                                        uint8_t command,
-                                                        RELAY data) {
+String AFEConfigurationPanel::getLEDConfigurationSite(
+    uint8_t command, LED data[sizeof(Device.configuration.isLED)],
+    uint8_t dataLedID) {
+
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+      if (Device.configuration.isLED[i]) {
+        Data.saveConfiguration(i, data[i]);
+      } else {
+        break;
+      }
+    }
+    Data.saveSystemLedID(dataLedID);
   }
 
-  String page = Site.generateHeader();
-  page += "<form action=\"/?option=relay&cmd=1\"  method=\"post\">";
-  page += Site.addRelayConfiguration();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i]) {
+      page += Site.addLEDConfiguration(i);
+    } else {
+      break;
+    }
+  }
+  page += Site.addSystemLEDConfiguration();
+
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
+                                                        RELAY data,
+                                                        uint8_t relayIndex) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(relayIndex, data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=relay";
+  page += relayIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addRelayConfiguration(relayIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -139,12 +182,14 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
 }
 
 String AFEConfigurationPanel::getRelayStatConfigurationSite(
-    const String option, uint8_t command, RELAYSTAT data, boolean thermostat) {
+    uint8_t command, REGULATOR data, boolean thermostat, uint8_t relayIndex) {
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data, thermostat);
+    Data.saveConfiguration(relayIndex, data, thermostat);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=";
   page += thermostat ? "thermostat" : "humidistat";
   page += "&cmd=1\"  method=\"post\">";
@@ -159,31 +204,21 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
   return page;
 }
 
-String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
-                                                         uint8_t command,
-                                                         SWITCH data1,
-                                                         SWITCH data2) {
-
-  Device.begin(); // Reading configuration data
+String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
+                                                         SWITCH data,
+                                                         uint8_t switchIndex) {
 
   if (command == SERVER_CMD_SAVE) {
-    if (Device.configuration.isSwitch[0]) {
-      Data.saveConfiguration(0, data1);
-    }
-    if (Device.configuration.isSwitch[1]) {
-      Data.saveConfiguration(1, data2);
-    }
+    Data.saveConfiguration(switchIndex, data);
   }
 
-  String page = Site.generateHeader();
-  page += "<form action=\"/?option=switch&cmd=1\"  method=\"post\">";
-
-  if (Device.configuration.isSwitch[0]) {
-    page += Site.addSwitchConfiguration(0);
-  }
-  if (Device.configuration.isSwitch[1]) {
-    page += Site.addSwitchConfiguration(1);
-  }
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=switch";
+  page += switchIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addSwitchConfiguration(switchIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -191,14 +226,15 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
-                                                      uint8_t command,
+String AFEConfigurationPanel::getDHTConfigurationSite(uint8_t command,
                                                       DH data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=DHT&cmd=1\"  method=\"post\">";
   page += Site.addDHTConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -209,7 +245,9 @@ String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
 }
 
 String AFEConfigurationPanel::firmwareUpgradeSite() {
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form method=\"post\" action=\"\" "
           "enctype=\"multipart/form-data\">";
   page += Site.addUpgradeSection();
@@ -219,7 +257,9 @@ String AFEConfigurationPanel::firmwareUpgradeSite() {
 }
 
 String AFEConfigurationPanel::postFirmwareUpgradeSite(boolean status) {
-  String page = Site.generateHeader(10);
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader(15);
   page += Site.addPostUpgradeSection(status);
   page += Site.generateFooter();
   return page;

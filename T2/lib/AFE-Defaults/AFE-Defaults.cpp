@@ -6,11 +6,7 @@
 
 AFEDefaults::AFEDefaults() {}
 
-const char *AFEDefaults::getFirmwareVersion() { return "1.0.1"; }
-uint8_t AFEDefaults::getFirmwareType() { return 2; }
 void AFEDefaults::set() {
-
-  AFEDataAccess *Data;
 
   DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
@@ -18,29 +14,30 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  LED LEDConfiguration;
+  REGULATOR RegulatorConfiguration;
   DH DHTConfiguration;
 
-  sprintf(firmwareConfiguration.version, getFirmwareVersion());
-  firmwareConfiguration.type = getFirmwareType();
+  sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
+  firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
-  sprintf(firmwareConfiguration.upgradeURL, "");
+  firmwareConfiguration.upgradeURL[0] = '\0';
 
   Data->saveConfiguration(firmwareConfiguration);
 
   sprintf(deviceConfiguration.name, "AFE-Device");
   deviceConfiguration.isLED[0] = true;
+  deviceConfiguration.isLED[1] = false;
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = false;
   deviceConfiguration.isDHT = false;
   deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
-
   Data->saveConfiguration(deviceConfiguration);
 
-  sprintf(networkConfiguration.ssid, "");
-  sprintf(networkConfiguration.password, "");
+  networkConfiguration.ssid[0] = '\0';
+  networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
   networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
@@ -48,16 +45,14 @@ void AFEDefaults::set() {
   networkConfiguration.noConnectionAttempts = 10;
   networkConfiguration.waitTimeConnections = 1;
   networkConfiguration.waitTimeSeries = 60;
-
   Data->saveConfiguration(networkConfiguration);
 
-  sprintf(MQTTConfiguration.host, "");
+  MQTTConfiguration.host[0] = '\0';
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(MQTTConfiguration.user, "");
-  sprintf(MQTTConfiguration.password, "");
+  MQTTConfiguration.user[0] = '\0';
+  MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
-
   Data->saveConfiguration(MQTTConfiguration);
 
   RelayConfiguration.gpio = 12;
@@ -65,37 +60,35 @@ void AFEDefaults::set() {
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
-
-  RelayConfiguration.thermostat.enabled = false;
-  RelayConfiguration.thermostat.turnOn = 0;
-  RelayConfiguration.thermostat.turnOnAbove = false;
-  RelayConfiguration.thermostat.turnOff = 0;
-  RelayConfiguration.thermostat.turnOffAbove = true;
-
-  RelayConfiguration.humidistat.enabled = false;
-  RelayConfiguration.humidistat.turnOn = 0;
-  RelayConfiguration.humidistat.turnOnAbove = false;
-  RelayConfiguration.humidistat.turnOff = 0;
-  RelayConfiguration.humidistat.turnOffAbove = true;
-
+  RelayConfiguration.ledID = 0;
+  RelayConfiguration.idx = 1;
   RelayConfiguration.thermalProtection = 0;
+  Data->saveConfiguration(0, RelayConfiguration);
 
-  Data->saveConfiguration(RelayConfiguration);
+  RegulatorConfiguration.enabled = false;
+  RegulatorConfiguration.turnOn = 0;
+  RegulatorConfiguration.turnOnAbove = false;
+  RegulatorConfiguration.turnOff = 0;
+  RegulatorConfiguration.turnOffAbove = true;
+  Data->saveConfiguration(0, RegulatorConfiguration, true);
+  Data->saveConfiguration(0, RegulatorConfiguration, false);
 
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
+  SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
   SwitchConfiguration.gpio = 5;
   SwitchConfiguration.type = 1;
-  SwitchConfiguration.functionality = 11;
+  SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 
-  LEDConfiguration.gpio = 13;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(LEDConfiguration);
+  addDomoticzConfiguration();
+  addLEDConfiguration(0, 13);
+  addLEDConfiguration(1, 3);
+  addDeviceID();
 
   DHTConfiguration.gpio = 14;
   DHTConfiguration.type = 1;
@@ -107,9 +100,38 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(DHTConfiguration);
 
+  Data->saveSystemLedID(1);
   Data->saveDeviceMode(2);
-  Data->saveRelayState(false);
+  Data->saveRelayState(0, false);
   Data->saveLanguage(1);
+}
+
+void AFEDefaults::addDomoticzConfiguration() {
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  DomoticzConfiguration.host[0] = '\0';
+  DomoticzConfiguration.user[0] = '\0';
+  DomoticzConfiguration.password[0] = '\0';
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
+}
+
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = gpio;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data->saveConfiguration(id, LEDConfiguration);
+}
+
+void AFEDefaults::addDeviceID() {
+  char id[8];
+  uint8_t range;
+  for (uint8_t i = 0; i < sizeof(id); i++) {
+    range = random(3);
+    id[i] = char(range == 0 ? random(48, 57)
+                            : range == 1 ? random(65, 90) : random(97, 122));
+  }
+  Data->saveDeviceID(String(id));
 }
 
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }
