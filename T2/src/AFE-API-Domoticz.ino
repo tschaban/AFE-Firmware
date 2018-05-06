@@ -52,11 +52,37 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   }
 }
 
-void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {}
+void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
+
+  if (initialized) {
+    char _humidityChar[7];
+    dtostrf(value, 5, 2, _humidityChar);
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=";
+    call += _humidityChar;
+    call += "&svalue=";
+    call += getHumidityState(value);
+    callURL(call);
+  }
+}
 
 void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
-                                                    float humidityValue) {}
+                                                    float humidityValue) {
+  if (initialized) {
+    char _floatToChar[7];
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    dtostrf(temperatureValue, 4, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";";
+    dtostrf(humidityValue, 5, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";";
+    call += getHumidityState(humidityValue);
+    callURL(call);
+  }
+}
 
 const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
   char url[sizeof(serverURL) + 18 + strlen(param)];
@@ -75,4 +101,16 @@ void AFEDomoticz::callURL(const String url) {
   Serial << endl << payload;
   */
   http.end();
+}
+
+uint8_t AFEDomoticz::getHumidityState(float value) {
+  if (value < 40) {
+    return HUMIDITY_WET;
+  } else if (value >= 40 && value <= 60) {
+    return HUMIDITY_COMFORTABLE;
+  } else if (value > 60) {
+    return HUMIDITY_DRY;
+  } else {
+    return HUMIDITY_NORMAL;
+  }
 }

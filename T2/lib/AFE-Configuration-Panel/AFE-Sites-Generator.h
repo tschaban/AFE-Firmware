@@ -32,8 +32,8 @@ private:
   const String generateSwitchItem(uint8_t id, boolean checked);
   const String generateRelayItem(boolean checked);
   const String generateLEDItem(boolean checked);
-  const String generateTwoValueController(REGULATOR configuration,
-                                          boolean thermostat);
+  const String generateRegulatorController(REGULATOR configuration,
+                                           boolean thermostat);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
@@ -42,8 +42,6 @@ private:
   const String generateHardwareItemsList(uint8_t noOfItems,
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
-
-  const String generateTwoValueController(REGULATOR configuration);
 
 public:
   /* Constructor*/

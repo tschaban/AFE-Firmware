@@ -144,8 +144,7 @@ void AFEWebServer::generate() {
         } else if (optionName == "thermostat" || optionName == "humidistat") {
           REGULATOR data = {};
           if (command == SERVER_CMD_SAVE) {
-            optionName == "thermostat" ? data = getThermostateData()
-                                       : data = getHumidistatData();
+            data = getRegulatorData();
           }
           publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
               command, data, optionName == "thermostat" ? true : false, i));
@@ -254,7 +253,7 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
   }
-  server.arg("dh").length() > 0 ? data.isDHT = true : data.isDHT = false;
+  server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
 
   return data;
 }
@@ -420,7 +419,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   return data;
 }
 
-REGULATOR AFEWebServer::getThermostateData() {
+REGULATOR AFEWebServer::getRegulatorData() {
   REGULATOR data;
   server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
 
@@ -438,29 +437,6 @@ REGULATOR AFEWebServer::getThermostateData() {
 
   if (server.arg("tb").length() > 0) {
     data.turnOffAbove = server.arg("tb").toInt() == 0 ? false : true;
-  }
-
-  return data;
-}
-
-REGULATOR AFEWebServer::getHumidistatData() {
-  REGULATOR data;
-  server.arg("he").length() > 0 ? data.enabled = true : data.enabled = false;
-
-  if (server.arg("hn").length() > 0) {
-    data.turnOn = server.arg("hn").toFloat();
-  }
-
-  if (server.arg("hf").length() > 0) {
-    data.turnOff = server.arg("hf").toFloat();
-  }
-
-  if (server.arg("ha").length() > 0) {
-    data.turnOnAbove = server.arg("ha").toInt() == 0 ? false : true;
-  }
-
-  if (server.arg("hb").length() > 0) {
-    data.turnOffAbove = server.arg("hb").toInt() == 0 ? false : true;
   }
 
   return data;

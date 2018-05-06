@@ -16,6 +16,11 @@
 #include <rBase64.h>
 // #include <Streaming.h>
 
+#define HUMIDITY_NORMAL 0
+#define HUMIDITY_COMFORTABLE 1
+#define HUMIDITY_DRY 2
+#define HUMIDITY_WET 3
+
 class AFEDomoticz {
 
 private:
@@ -45,16 +50,21 @@ public:
   void sendTemperatureCommand(unsigned int idx, float value);
 
   /* It send to Domoticz humidity using following API call
-     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+     /json.htm?type=command&param=udevice&idx=IDX&nvalue=HUM&svalue=HUM_STAT
   */
   void sendHumidityCommand(unsigned int idx, float value);
 
   /* It send to Domoticz temperature and humidity using following API call
-     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+     /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP;HUM;HUM_STAT
   */
   void sendTemperatureAndHumidityCommand(unsigned int idx,
                                          float temperatureValue,
                                          float humidityValue);
+
+  /* It returns humidity state using humidity ranges. Look for value meaning at
+   * HUMIDITY_ constant
+   */
+  uint8_t getHumidityState(float value);
 };
 
 #endif

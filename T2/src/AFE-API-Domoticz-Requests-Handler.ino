@@ -19,25 +19,25 @@ void DomoticzPublishRelayState(uint8_t id) {
 
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(float temperature) {
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.sendTemperatureCommand(
-        SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE), temperature);
+  unsigned long idx = SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE);
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendTemperatureCommand(idx, temperature);
   }
 }
 
 /* It publishes humidity to Domoticz */
 void DomoticzPublishHumidity(float humidity) {
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.sendHumidityCommand(SensorDHT.getDomoticzIDX(IDX_TYPE_HUMIDITY),
-                                 humidity);
+  unsigned long idx = SensorDHT.getDomoticzIDX(IDX_TYPE_HUMIDITY);
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendHumidityCommand(idx, humidity);
   }
 }
 
 /* It publishes temperature and humidity to Domoticz */
-void DomoticzPublishHumidity(float temperature, float humidity) {
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.sendTemperatureAndHumidityCommand(
-        SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY),
-        temperature, humidity);
+void DomoticzPublishTemperatureAndHumidity(float temperature, float humidity) {
+  unsigned long idx =
+      SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY);
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendTemperatureAndHumidityCommand(idx, temperature, humidity);
   }
 }

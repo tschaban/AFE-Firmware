@@ -109,21 +109,21 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             sendHTTPAPIRequestStatus(
                 request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
           } else if (strcmp(request.command, "enableHumidistat") == 0) {
-            Relay.Humidistat.on();
+            Relay[i].Humidistat.on();
             sendHTTPAPIRequestStatus(request, true,
-                                     Relay.Humidistat.enabled() ? "on" : "off");
+                                     Relay[i].Humidistat.enabled() ? "on" : "off");
           } else if (strcmp(request.command, "disableHumidistat") == 0) {
-            Relay.Humidistat.off();
+            Relay[i].Humidistat.off();
             sendHTTPAPIRequestStatus(request, true,
-                                     Relay.Humidistat.enabled() ? "on" : "off");
+                                     Relay[i].Humidistat.enabled() ? "on" : "off");
           } else if (strcmp(request.command, "toggleHumidistat") == 0) {
-            Relay.Humidistat.enabled() ? Relay.Humidistat.off()
-                                       : Relay.Humidistat.on();
+            Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
+                                       : Relay[i].Humidistat.on();
             sendHTTPAPIRequestStatus(request, true,
-                                     Relay.Humidistat.enabled() ? "on" : "off");
+                                     Relay[i].Humidistat.enabled() ? "on" : "off");
           } else if (strcmp(request.command, "getHumidistat") == 0) {
             sendHTTPAPIRequestStatus(request, true,
-                                     Relay.Humidistat.enabled() ? "on" : "off");
+                                     Relay[i].Humidistat.enabled() ? "on" : "off");
           } else {
             sendHTTPAPIRequestStatus(request, false);
           }

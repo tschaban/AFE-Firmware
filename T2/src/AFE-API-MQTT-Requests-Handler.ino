@@ -74,8 +74,8 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
                 Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
                              Relay[i].Humidistat.enabled() ? "on" : "off");
               } else if ((char)payload[0] == 't' && length == 6) { // toggle
-                Relay[i].Humidistat.enabled() ? Relay.Humidistat.off()
-                                              : Relay.Humidistat.on();
+                Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
+                                              : Relay[i].Humidistat.on();
                 Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
                              Relay[i].Humidistat.enabled() ? "on" : "off");
               } else if ((char)payload[0] == 'g' && length == 3) { // get

@@ -50,8 +50,7 @@ private:
   SWITCH getSwitchData(uint8_t id);
   LED getLEDData(uint8_t id);
   DH getDHTData();
-  REGULATOR getThermostateData();
-  REGULATOR getHumidistatData();
+  REGULATOR getRegulatorData();
   uint8_t getSystemLEDData();
 
   uint8_t getLanguageData();

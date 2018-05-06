@@ -966,7 +966,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 String AFESitesGenerator::addThermostatConfiguration() {
   RELAY configuration = Data.getRelayConfiguration(0);
-  String body = generateTwoValueController(configuration.thermostat, true);
+  String body = generateRegulatorController(configuration.thermostat, true);
   return addConfigurationBlock(
       language == 0 ? "Termostat" : "Thermostat",
       language == 0
@@ -978,7 +978,7 @@ String AFESitesGenerator::addThermostatConfiguration() {
 
 String AFESitesGenerator::addHumidistatConfiguration() {
   RELAY configuration = Data.getRelayConfiguration(0);
-  String body = generateTwoValueController(configuration.humidistat, false);
+  String body = generateRegulatorController(configuration.humidistat, false);
   return addConfigurationBlock(
       language == 0 ? "Regulator wilgotności" : "Humidistat",
       language == 0
@@ -1119,6 +1119,18 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</select>";
   body += "</div>";
 
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body +=
+      language == 0
+          ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
+            "zmieni się"
+          : ">Send data only if value of temperature or humidity has changed";
+  body += "</label>";
+  body += "</div>";
+
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
   body += "</p>";
@@ -1166,21 +1178,6 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</select>";
   body += "</div>";
 
-  if (device.domoticzAPI) {
-    body += "<div class=\"cf\">";
-    body += "<label>IDX ";
-    body += language == 0 ? "w" : "in";
-    body += " Domoticz*</label>";
-    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.temperatureIdx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-  }
-
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
   body += "</p>";
@@ -1203,8 +1200,8 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Humidity correction";
   body += "</label>";
-  body += "<input name=\"d\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
-          "step=\"0.01\" "
+  body += "<input name=\"d\" type=\"number\" min=\"-99.9\" max=\"99.9\" "
+          "step=\"0.1\" "
           "value=\"";
   body += configuration.humidity.correction;
   body += "\">";
@@ -1214,11 +1211,33 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</div>";
 
   if (device.domoticzAPI) {
-    body += "<div class=\"cf\">";
-    body += "<label>IDX ";
-    body += language == 0 ? "w" : "in";
-    body += " Domoticz*</label>";
-    body += "<input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
+
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+
+    body += "<div class=\"cf\"><label> ";
+    body +=
+        language == 0 ? "IDX czujnika temperatury" : "Temperature sensor IDX";
+    body += " </label>";
+    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sesnor IDX";
+    body += "</label><input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
     body += configuration.humidityIdx;
     body += "\">";
@@ -1227,11 +1246,10 @@ String AFESitesGenerator::addDHTConfiguration() {
     body += "0 - 999999</span>";
     body += "</div>";
 
-    body += "<div class=\"cf\">";
-    body += "<label>IDX ";
-    body += language == 0 ? "w" : "in";
-    body += " Domoticz*</label>";
-    body += "<input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika temperatury i wilgotności"
+                          : "Temperature and humidity sensor IDX";
+    body += "</label><input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
     body += configuration.temperatureAndHumidityIdx;
     body += "\">";
@@ -1240,18 +1258,6 @@ String AFESitesGenerator::addDHTConfiguration() {
     body += "0 - 999999</span>";
     body += "</div>";
   }
-
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body +=
-      language == 0
-          ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
-            "zmieni się"
-          : ">Send data only if value of temperature or humidity has changed";
-  body += "</label>";
-  body += "</div>";
 
   body += "</fieldset>";
 
@@ -1483,7 +1489,8 @@ const String AFESitesGenerator::generateHardwareItemsList(
 }
 
 const String
-AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
+AFESitesGenerator::generateRegulatorController(REGULATOR configuration,
+                                               boolean isThermostat) {
 
   String body = "<fieldset>";
 
@@ -1520,12 +1527,19 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
   body += " </span>";
   body += "<input name=\"tn\" type=\"number\" value=\"";
   body += configuration.turnOn;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  if (isThermostat) {
+    body += "\" min=\"-55\" max=\"125\"";
+  } else {
+    body += "\" min=\"0\" max=\"100\"";
+  }
+  body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-
+  if (isThermostat) {
+    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  } else {
+    body += ": 0% : 100%";
+  }
   body += "</span></div>";
-
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Wyłącz jeśli " : "Switch off if ";
@@ -1548,10 +1562,18 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
   body += " </span>";
   body += "<input name=\"tf\" type=\"number\" value=\"";
   body += configuration.turnOff;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  if (isThermostat) {
+    body += "\" min=\"-55\" max=\"125\"";
+  } else {
+    body += "\" min=\"0\" max=\"100\"";
+  }
+  body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-
+  if (isThermostat) {
+    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  } else {
+    body += ": 0% : 100%";
+  }
   body += "</div></fieldset>";
 
   return body;

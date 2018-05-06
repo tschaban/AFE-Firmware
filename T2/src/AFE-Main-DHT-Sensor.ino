@@ -51,6 +51,8 @@ void mainDHTSensor() {
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishTemperature(temperature);
       DomoticzPublishTemperature(temperature);
+      delay(10);
+      DomoticzPublishTemperatureAndHumidity(temperature, humidity);
 
       Led.off();
     }
@@ -82,7 +84,8 @@ void mainDHTSensor() {
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
       DomoticzPublishHumidity(humidity);
-
+      delay(10);
+      DomoticzPublishTemperatureAndHumidity(temperature, humidity);
       Led.off();
     }
   }
