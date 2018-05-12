@@ -21,8 +21,9 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
-    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0) {
-      upgradeToVersion120();
+    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.0") == 0) {
+      upgradeToVersion121();
     }
 
     Data.saveVersion(String(FIRMWARE_VERSION));
@@ -45,31 +46,31 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
-void AFEUpgrader::upgradeToVersion120() {
+void AFEUpgrader::upgradeToVersion121() {
   AFEEEPROM Eeprom;
 
   /* LEDs */
-  Eeprom.write(443, false);
+  Eeprom.write(464, false);
   Defaults.addLEDConfiguration(1, 3);
   Data.saveSystemLedID(1);
 
   /* Set that both switces controls relay 1 */
-  Eeprom.writeUInt8(440, 1);
-  Eeprom.writeUInt8(441, 1);
+  Eeprom.writeUInt8(461, 1);
+  Eeprom.writeUInt8(462, 1);
 
   /* Set that none of led informs about status of a relay */
-  Eeprom.writeUInt8(442, 0);
+  Eeprom.writeUInt8(430, 0);
 
   /* Upgrade to new switch functionality codes */
-  if (Eeprom.readUInt8(388) == 11) {
-    Eeprom.writeUInt8(388, 1);
+  if (Eeprom.readUInt8(396) == 11) {
+    Eeprom.writeUInt8(396, 1);
   }
-  if (Eeprom.readUInt8(395) == 11) {
-    Eeprom.writeUInt8(395, 1);
+  if (Eeprom.readUInt8(403) == 11) {
+    Eeprom.writeUInt8(403, 1);
   }
 
   /* Set sending temperature only if it changes */
-  Eeprom.write(446, true);
+  Eeprom.write(467, true);
 
   /* Add Domoticz default config */
   Eeprom.write(800, false);
