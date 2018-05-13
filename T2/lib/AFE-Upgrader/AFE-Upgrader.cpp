@@ -31,13 +31,14 @@ void AFEUpgrader::upgrade() {
 }
 
 void AFEUpgrader::upgradeTypeOfFirmware() {
-  NETWORK NetworkConfiguration;
-  NetworkConfiguration = Data.getNetworkConfiguration();
+  NETWORK NetworkConfiguration = Data.getNetworkConfiguration();
+  MQTT MQTTConfiguration = Data.getMQTTConfiguration();
   uint8_t language = Data.getLanguage();
   String deviceID = Data.getDeviceID();
   Defaults.eraseConfiguration();
   Defaults.set();
   Data.saveConfiguration(NetworkConfiguration);
+  Data.saveConfiguration(MQTTConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
   /* Restores previous device ID */
@@ -71,10 +72,18 @@ void AFEUpgrader::upgradeToVersion121() {
 
   /* Set sending temperature only if it changes */
   Eeprom.write(467, true);
+  /* Publish HeatIndex - no */
+  Eeprom.write(974, false);
 
   /* Add Domoticz default config */
   Eeprom.write(800, false);
   Defaults.addDomoticzConfiguration();
+
+  /* IDXs */
+  Eeprom.write(930, 6, (long)0);
+  Eeprom.write(936, 6, (long)0);
+  Eeprom.write(942, 6, (long)0);
+  Eeprom.write(948, 6, (long)0);
 
   /* Device ID */
   if (Data.getDeviceID().length() == 0) {

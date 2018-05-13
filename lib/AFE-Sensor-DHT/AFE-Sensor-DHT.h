@@ -65,6 +65,9 @@ public:
   /* Method returns sensor IDX for temperature, humidity, temperature and
    * humidity */
   unsigned long getDomoticzIDX(uint8_t type);
+
+  /* Get HeatIndex publishing configuration item */
+  boolean publishHeatIndex();
 };
 
 #endif

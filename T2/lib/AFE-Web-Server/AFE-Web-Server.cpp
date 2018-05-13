@@ -527,6 +527,9 @@ DH AFEWebServer::getDHTData() {
   server.arg("o").length() > 0 ? data.sendOnlyChanges = true
                                : data.sendOnlyChanges = false;
 
+  server.arg("p").length() > 0 ? data.publishHeatIndex = true
+                               : data.publishHeatIndex = false;
+
   if (server.arg("xt").length() > 0) {
     data.temperatureIdx = server.arg("xt").toInt();
   }

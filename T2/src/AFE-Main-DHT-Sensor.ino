@@ -50,6 +50,9 @@ void mainDHTSensor() {
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishTemperature(temperature);
+      if (SensorDHT.publishHeatIndex()) {
+        MQTTPublishHeatIndex(SensorDHT.getHeatIndex());
+      }
       DomoticzPublishTemperature(temperature);
       delay(10);
       DomoticzPublishTemperatureAndHumidity(temperature, humidity);
@@ -83,6 +86,9 @@ void mainDHTSensor() {
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
+      if (SensorDHT.publishHeatIndex()) {
+        MQTTPublishHeatIndex(SensorDHT.getHeatIndex());
+      }
       DomoticzPublishHumidity(humidity);
       delay(10);
       DomoticzPublishTemperatureAndHumidity(temperature, humidity);

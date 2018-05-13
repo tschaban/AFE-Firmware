@@ -1131,6 +1131,17 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</label>";
   body += "</div>";
 
+  if (device.domoticzAPI) {
+    body += "<div class=\"cc\">";
+    body += "<label>";
+    body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
+    body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
+    body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
+                          : ">Publish felt air temperature";
+    body += "?</label>";
+    body += "</div>";
+  }
+
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
   body += "</p>";
