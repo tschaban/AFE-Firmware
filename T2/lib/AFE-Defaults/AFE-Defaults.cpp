@@ -61,7 +61,7 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
   sprintf(RelayConfiguration.name, "switch");
   RelayConfiguration.ledID = 0;
-  RelayConfiguration.idx = 1;
+  RelayConfiguration.idx = 0;
   RelayConfiguration.thermalProtection = 0;
   Data->saveConfiguration(0, RelayConfiguration);
 
@@ -92,11 +92,17 @@ void AFEDefaults::set() {
 
   DHTConfiguration.gpio = 14;
   DHTConfiguration.type = 1;
+  DHTConfiguration.sendOnlyChanges = true;
   DHTConfiguration.temperature.correction = 0;
   DHTConfiguration.temperature.interval = 60;
   DHTConfiguration.temperature.unit = 0;
+  DHTConfiguration.sendOnlyChanges = true;
+  DHTConfiguration.publishHeatIndex = false;
   DHTConfiguration.humidity.correction = 0;
   DHTConfiguration.humidity.interval = 60;
+  DHTConfiguration.temperatureIdx = 0;
+  DHTConfiguration.humidityIdx = 0;
+  DHTConfiguration.temperatureAndHumidityIdx = 0;
 
   Data->saveConfiguration(DHTConfiguration);
 

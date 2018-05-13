@@ -25,7 +25,7 @@ private:
   void upgradeTypeOfFirmware();
 
   /* Method upgrades to v1.2.0 */
-  void upgradeToVersion120();
+  void upgradeToVersion121();
 
 public:
   /* Constructor */

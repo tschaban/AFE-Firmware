@@ -11,12 +11,11 @@ void DomoticzInit() {
 
 /* It publishes relay state to Domotucz */
 void DomoticzPublishRelayState(uint8_t id) {
-  if (Device.configuration.domoticzAPI) {
-    Domoticz.sendSwitchCommand(Relay[id].getDomoticzIDX(),
-                               Relay[id].get() == RELAY_ON ? "On" : "Off");
+  unsigned long idx = Relay[id].getDomoticzIDX();
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendSwitchCommand(idx, Relay[id].get() == RELAY_ON ? "On" : "Off");
   }
 }
-
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(float temperature) {
   unsigned long idx = SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE);

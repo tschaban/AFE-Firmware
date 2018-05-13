@@ -122,3 +122,7 @@ unsigned long AFESensorDHT::getDomoticzIDX(uint8_t type) {
   }
   return idx;
 }
+
+boolean AFESensorDHT::publishHeatIndex() {
+  return configuration.publishHeatIndex;
+}

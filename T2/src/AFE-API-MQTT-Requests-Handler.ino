@@ -182,3 +182,9 @@ void MQTTPublishHumidity(float humidity) {
     Mqtt.publish("humidity", humidity);
   }
 }
+/* Metod publishes HeatIndex */
+void MQTTPublishHeatIndex(float heatIndex) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("heatIndex", heatIndex);
+  }
+}

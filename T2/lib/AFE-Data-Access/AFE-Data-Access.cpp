@@ -174,6 +174,8 @@ DH AFEDataAccess::getDHTConfiguration() {
   configuration.humidityIdx = Eeprom.read(942, 6).toInt();
   configuration.temperatureAndHumidityIdx = Eeprom.read(948, 6).toInt();
   configuration.sendOnlyChanges = Eeprom.read(467);
+  configuration.publishHeatIndex = Eeprom.read(974);
+
   return configuration;
 }
 
@@ -300,6 +302,7 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
   Eeprom.write(948, 6, (long)configuration.temperatureAndHumidityIdx);
 
   Eeprom.write(467, configuration.sendOnlyChanges);
+  Eeprom.write(974, configuration.publishHeatIndex);
 }
 
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }

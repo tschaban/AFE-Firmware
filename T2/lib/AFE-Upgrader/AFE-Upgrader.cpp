@@ -21,8 +21,9 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
-    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0) {
-      upgradeToVersion120();
+    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.0") == 0) {
+      upgradeToVersion121();
     }
 
     Data.saveVersion(String(FIRMWARE_VERSION));
@@ -30,13 +31,14 @@ void AFEUpgrader::upgrade() {
 }
 
 void AFEUpgrader::upgradeTypeOfFirmware() {
-  NETWORK NetworkConfiguration;
-  NetworkConfiguration = Data.getNetworkConfiguration();
+  NETWORK NetworkConfiguration = Data.getNetworkConfiguration();
+  MQTT MQTTConfiguration = Data.getMQTTConfiguration();
   uint8_t language = Data.getLanguage();
   String deviceID = Data.getDeviceID();
   Defaults.eraseConfiguration();
   Defaults.set();
   Data.saveConfiguration(NetworkConfiguration);
+  Data.saveConfiguration(MQTTConfiguration);
   Data.saveDeviceMode(Data.getDeviceMode());
   Data.saveLanguage(language);
   /* Restores previous device ID */
@@ -45,35 +47,43 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
-void AFEUpgrader::upgradeToVersion120() {
+void AFEUpgrader::upgradeToVersion121() {
   AFEEEPROM Eeprom;
 
   /* LEDs */
-  Eeprom.write(443, false);
+  Eeprom.write(464, false);
   Defaults.addLEDConfiguration(1, 3);
   Data.saveSystemLedID(1);
 
   /* Set that both switces controls relay 1 */
-  Eeprom.writeUInt8(440, 1);
-  Eeprom.writeUInt8(441, 1);
+  Eeprom.writeUInt8(461, 1);
+  Eeprom.writeUInt8(462, 1);
 
   /* Set that none of led informs about status of a relay */
-  Eeprom.writeUInt8(442, 0);
+  Eeprom.writeUInt8(430, 0);
 
   /* Upgrade to new switch functionality codes */
-  if (Eeprom.readUInt8(388) == 11) {
-    Eeprom.writeUInt8(388, 1);
+  if (Eeprom.readUInt8(396) == 11) {
+    Eeprom.writeUInt8(396, 1);
   }
-  if (Eeprom.readUInt8(395) == 11) {
-    Eeprom.writeUInt8(395, 1);
+  if (Eeprom.readUInt8(403) == 11) {
+    Eeprom.writeUInt8(403, 1);
   }
 
   /* Set sending temperature only if it changes */
-  Eeprom.write(446, true);
+  Eeprom.write(467, true);
+  /* Publish HeatIndex - no */
+  Eeprom.write(974, false);
 
   /* Add Domoticz default config */
   Eeprom.write(800, false);
   Defaults.addDomoticzConfiguration();
+
+  /* IDXs */
+  Eeprom.write(930, 6, (long)0);
+  Eeprom.write(936, 6, (long)0);
+  Eeprom.write(942, 6, (long)0);
+  Eeprom.write(948, 6, (long)0);
 
   /* Device ID */
   if (Data.getDeviceID().length() == 0) {
