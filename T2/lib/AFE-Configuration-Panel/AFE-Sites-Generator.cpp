@@ -1131,7 +1131,7 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</label>";
   body += "</div>";
 
-  if (device.domoticzAPI) {
+  if (device.mqttAPI) {
     body += "<div class=\"cc\">";
     body += "<label>";
     body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
