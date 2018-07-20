@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_MQTT_h
 #define _AFE_MQTT_h
@@ -53,6 +53,8 @@ public:
 
   /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
   void publish(const char *type, const char *message);
+  void publish(const char *type, float value, uint8_t width = 2,
+               uint8_t precision = 2);
 
   /* Publishing MQTT Message to a specific MQTT Topic. It calls private method
    * publish MQTT Broker */
@@ -61,6 +63,9 @@ public:
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
    * default values */
   void listener();
+
+  /* Method turns off MQTT API */
+  void disconnect();
 };
 
 #endif
