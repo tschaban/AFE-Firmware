@@ -117,3 +117,9 @@ boolean AFEWiFi::connected() {
 }
 
 void AFEWiFi::APListener() { dnsServer.processNextRequest(); }
+
+boolean AFEWiFi::eventConnected() {
+   boolean returnValue = eventConnectionEstablished;
+   eventConnectionEstablished = false;
+   return returnValue;
+}
