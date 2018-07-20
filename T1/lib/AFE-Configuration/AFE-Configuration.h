@@ -12,6 +12,6 @@
 #endif
 
 #define FIRMWARE_TYPE 1
-#define FIRMWARE_VERSION "1.2.4"
+#define FIRMWARE_VERSION "1.2.5"
 
 #endif

@@ -96,6 +96,9 @@ void loop() {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
 
+        /* It listens to events and process them */
+        eventsListener();
+
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
           Mqtt.listener();

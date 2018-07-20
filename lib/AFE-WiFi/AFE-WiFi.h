@@ -31,6 +31,8 @@ private:
   DNSServer dnsServer;
   AFELED Led;
 
+  boolean eventConnectionEstablished = false;
+
 public:
   /* Constructor: no actions */
   AFEWiFi();
@@ -41,6 +43,9 @@ public:
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
+
+  /* Returns true if device just connected to the network. It's set to true each time it connected. */
+  boolean eventConnected();
 
   /* Method listens for HTTP request while device is in Access Point mode */
   void APListener();

@@ -162,12 +162,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += "</a></li></ul><br><br><h4>INFORMA";
   page += language == 0 ? "CJE" : "TION";
   page += "</h4><ul class=\"lst\"><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-";
+          "href=\"https://www.smartnydom.pl/afe-firmware-";
   page += language == 0 ? "pl" : "en";
   page += "/\" target=\"_blank\">Do";
   page += language == 0 ? "kumentacja" : "cumentation";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/forum/"
+          "href=\"https://www.smartnydom.pl/forum/"
           "firmware-do-przelacznika-sonoff/\" target=\"_blank\">";
   page += language == 0 ? "Pomoc" : "Help";
   page += "</a></li><li class=\"itm\"><a "
@@ -176,7 +176,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
           "target=\"_blank\">Licenc";
   page += language == 0 ? "ja" : "e";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-";
+          "href=\"https://www.smartnydom.pl/afe-firmware-";
   page += language == 0 ? "pl" : "en";
   page += "/log\" target=\"_blank\">";
   page += language == 0 ? "Wersja" : "Version";
