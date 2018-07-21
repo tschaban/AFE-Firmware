@@ -47,23 +47,26 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
 
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
+  DEVICE deviceConfiguration;
 
-  /* Set that none of led informs about status of a relay */
-  Eeprom.writeUInt8(442, 0);
-
-  /* @TODO Upgrade to new switch functionality codes */
-  if (Eeprom.readUInt8(388) == 11) {
-    Eeprom.writeUInt8(388, 1);
+  /* Relay. Setting LED ID and IDX */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    Eeprom.writeUInt8(531 + i, 0);
+    Eeprom.writeUInt8(930 + i, 0);
   }
-  if (Eeprom.readUInt8(395) == 11) {
-    Eeprom.writeUInt8(395, 1);
+
+  /* Switch functionality codes */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
+    if (Eeprom.readUInt8(496 + i * 8) == 11) {
+      Eeprom.writeUInt8(496, 1);
+    }
   }
 
   /* Add Domoticz default config */
   Eeprom.write(800, false);
   Defaults.addDomoticzConfiguration();
 
-  /* Device ID */
+  /* Add device ID */
   if (Data.getDeviceID().length() == 0) {
     Defaults.addDeviceID();
   }

@@ -18,12 +18,13 @@ void AFEDefaults::set() {
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
-  sprintf(firmwareConfiguration.upgradeURL, "");
+  firmwareConfiguration.upgradeURL[0] = '\0';
 
   Data->saveConfiguration(firmwareConfiguration);
 
   sprintf(deviceConfiguration.name, "AFE-Device");
   deviceConfiguration.isLED[0] = true;
+
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
   }
@@ -44,8 +45,8 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(deviceConfiguration);
 
-  sprintf(networkConfiguration.ssid, "");
-  sprintf(networkConfiguration.password, "");
+  networkConfiguration.ssid[0] = '\0';
+  networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
   networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
@@ -56,10 +57,10 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(networkConfiguration);
 
-  sprintf(MQTTConfiguration.host, "");
+  MQTTConfiguration.host[0] = '\0';
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
-  sprintf(MQTTConfiguration.user, "");
-  sprintf(MQTTConfiguration.password, "");
+  MQTTConfiguration.user[0] = '\0';
+  MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
@@ -116,8 +117,6 @@ void AFEDefaults::set() {
   addLEDConfiguration(1, 3);
   addDeviceID();
 
-
-
   Data->saveSystemLedID(1);
 
   Data->saveDeviceMode(2);
@@ -126,9 +125,9 @@ void AFEDefaults::set() {
 void AFEDefaults::addDomoticzConfiguration() {
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration.protocol = 0;
-  sprintf(DomoticzConfiguration.host, "");
-  sprintf(DomoticzConfiguration.user, "");
-  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.host[0] = '\0';
+  DomoticzConfiguration.user[0] = '\0';
+  DomoticzConfiguration.password[0] = '\0';
   DomoticzConfiguration.port = 8080;
   Data->saveConfiguration(DomoticzConfiguration);
 }

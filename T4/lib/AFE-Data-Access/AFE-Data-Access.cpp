@@ -106,7 +106,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
   uint8_t nextRelay = 27;
-  char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(383 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(385 + id * nextRelay, 5).toFloat();
   configuration.statePowerOn = Eeprom.readUInt8(390 + id * nextRelay);
@@ -122,8 +121,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-  configuration.ledID = Eeprom.readUInt8(408 + id * nextRelay);
-
+  configuration.ledID = Eeprom.readUInt8(531 + id);
   configuration.idx = Eeprom.read(930 + id, 6).toInt();
 
   return configuration;
@@ -206,8 +204,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(390 + id * nextRelay, configuration.statePowerOn);
   Eeprom.write(391 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(407 + id * nextRelay, configuration.stateMQTTConnected);
-  Eeprom.writeUInt8(408 + id * nextRelay, configuration.ledID);
-
+  Eeprom.writeUInt8(531 + id, configuration.ledID);
   Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
 
@@ -250,11 +247,13 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(381); }
+uint8_t AFEDataAccess::getSystemLedID() { return Eeprom.readUInt8(530); }
 
-void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(381, id); }
+void AFEDataAccess::saveSystemLedID(uint8_t id) {
+  return Eeprom.writeUInt8(530, id);
+}
 
-onst String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
+const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 
 void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
 

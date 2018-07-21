@@ -27,6 +27,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   }
 
   page += Site.generateFooter();
+  delay(10);
   return page;
 }
 
@@ -59,7 +60,9 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
     Device.begin();
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=device&cmd=1\"  method=\"post\">";
   page += Site.addDeviceConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -76,7 +79,9 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=network&cmd=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
@@ -93,9 +98,29 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=mqtt&cmd=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
+    const String option, uint8_t command, DOMOTICZ data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=domoticz&cmd=1\" method=\"post\">";
+  page += Site.addDomoticzServerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
@@ -118,7 +143,9 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
     Data.saveSystemLedID(dataLedID);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
@@ -144,7 +171,9 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
     Data.saveConfiguration(relayIndex, data);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=relay";
   page += relayIndex;
   page += "&cmd=1\"  method=\"post\">";
@@ -165,7 +194,9 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
     Data.saveConfiguration(switchIndex, data);
   }
 
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form action=\"/?option=switch";
   page += switchIndex;
   page += "&cmd=1\"  method=\"post\">";
@@ -178,7 +209,9 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
 }
 
 String AFEConfigurationPanel::firmwareUpgradeSite() {
-  String page = Site.generateHeader();
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
   page += "<form method=\"post\" action=\"\" "
           "enctype=\"multipart/form-data\">";
   page += Site.addUpgradeSection();
@@ -188,7 +221,9 @@ String AFEConfigurationPanel::firmwareUpgradeSite() {
 }
 
 String AFEConfigurationPanel::postFirmwareUpgradeSite(boolean status) {
-  String page = Site.generateHeader(10);
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader(15);
   page += Site.addPostUpgradeSection(status);
   page += Site.generateFooter();
   return page;
