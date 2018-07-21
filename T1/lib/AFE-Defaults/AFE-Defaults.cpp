@@ -55,13 +55,14 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
 
-  RelayConfiguration.gpio = 12;
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
-  sprintf(RelayConfiguration.name, "switch");
   RelayConfiguration.ledID = 0;
   RelayConfiguration.idx = 1;
+  RelayConfiguration.gpio = 12;
+  sprintf(RelayConfiguration.name, "switch");
+
   RelayConfiguration.thermalProtection = 0;
   Data->saveConfiguration(0, RelayConfiguration);
 
@@ -72,9 +73,10 @@ void AFEDefaults::set() {
   RegulatorConfiguration.turnOffAbove = true;
   Data->saveConfiguration(RegulatorConfiguration);
 
-  SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
   SwitchConfiguration.sensitiveness = 50;
+
+  SwitchConfiguration.gpio = 0;
   SwitchConfiguration.functionality = 0;
   SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);

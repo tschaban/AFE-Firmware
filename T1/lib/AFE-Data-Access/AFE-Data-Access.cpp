@@ -108,7 +108,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
   uint8_t nextRelay = 40;
-
   char mqttTopic[49];
   configuration.gpio = Eeprom.readUInt8(397 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(399 + id * nextRelay, 5).toFloat();
