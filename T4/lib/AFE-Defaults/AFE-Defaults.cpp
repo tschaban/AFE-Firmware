@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #include "AFE-Defaults.h"
 
@@ -8,15 +8,12 @@ AFEDefaults::AFEDefaults() {}
 
 void AFEDefaults::set() {
 
-  AFEDataAccess *Data;
-
   DEVICE deviceConfiguration;
   FIRMWARE firmwareConfiguration;
   NETWORK networkConfiguration;
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  LED LEDConfiguration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
@@ -25,12 +22,13 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(firmwareConfiguration);
 
-  // Serial << endl << "firmwareConfiguration";
   sprintf(deviceConfiguration.name, "AFE-Device");
-
   deviceConfiguration.isLED[0] = true;
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
+  }
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    deviceConfiguration.isRelay[i] = true;
   }
 
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch) - 1; i++) {
@@ -40,11 +38,8 @@ void AFEDefaults::set() {
   deviceConfiguration.isSwitch[sizeof(deviceConfiguration.isSwitch) - 1] =
       false;
 
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    deviceConfiguration.isRelay[i] = true;
-  }
-
   deviceConfiguration.mqttAPI = false;
+  deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
 
   Data->saveConfiguration(deviceConfiguration);
@@ -60,7 +55,6 @@ void AFEDefaults::set() {
   networkConfiguration.waitTimeSeries = 60;
 
   Data->saveConfiguration(networkConfiguration);
-  //  Serial << endl << "networkConfiguration";
 
   sprintf(MQTTConfiguration.host, "");
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
@@ -68,16 +62,16 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.password, "");
   MQTTConfiguration.port = 1883;
   sprintf(MQTTConfiguration.topic, "/device/");
-
   Data->saveConfiguration(MQTTConfiguration);
 
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
   RelayConfiguration.ledID = 0;
-
+  RelayConfiguration.idx = 0;
   RelayConfiguration.gpio = 12;
   sprintf(RelayConfiguration.name, "switch1");
+
   Data->saveConfiguration(0, RelayConfiguration);
 
   RelayConfiguration.gpio = 5;
@@ -117,16 +111,44 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 4;
   Data->saveConfiguration(3, SwitchConfiguration);
 
-  LEDConfiguration.gpio = 13;
-  LEDConfiguration.changeToOppositeValue = false;
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isLED); i++) {
-    Data->saveConfiguration(i, LEDConfiguration);
-  }
+  addDomoticzConfiguration();
+  addLEDConfiguration(0, 13);
+  addLEDConfiguration(1, 3);
+  addDeviceID();
+
+
 
   Data->saveSystemLedID(1);
 
   Data->saveDeviceMode(2);
   Data->saveLanguage(1);
+}
+void AFEDefaults::addDomoticzConfiguration() {
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  sprintf(DomoticzConfiguration.host, "");
+  sprintf(DomoticzConfiguration.user, "");
+  sprintf(DomoticzConfiguration.password, "");
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
+}
+
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+  LED LEDConfiguration;
+  LEDConfiguration.gpio = gpio;
+  LEDConfiguration.changeToOppositeValue = false;
+  Data->saveConfiguration(id, LEDConfiguration);
+}
+
+void AFEDefaults::addDeviceID() {
+  char id[8];
+  uint8_t range;
+  for (uint8_t i = 0; i < sizeof(id); i++) {
+    range = random(3);
+    id[i] = char(range == 0 ? random(48, 57)
+                            : range == 1 ? random(65, 90) : random(97, 122));
+  }
+  Data->saveDeviceID(String(id));
 }
 
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }
