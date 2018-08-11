@@ -122,7 +122,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
           configuration.name);
 
   configuration.ledID = Eeprom.readUInt8(531 + id);
-  configuration.idx = Eeprom.read(930 + id, 6).toInt();
+  configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
 
   return configuration;
 }
@@ -196,6 +196,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
   Eeprom.write(847, 32, configuration.user);
   Eeprom.write(879, 32, configuration.password);
 }
+
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 27;
 
@@ -205,7 +206,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(391 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(407 + id * nextRelay, configuration.stateMQTTConnected);
   Eeprom.writeUInt8(531 + id, configuration.ledID);
-  Eeprom.write(930 + id, 6, (long)configuration.idx);
+  Eeprom.write(930 + 6 * id, 6, (long)configuration.idx);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {

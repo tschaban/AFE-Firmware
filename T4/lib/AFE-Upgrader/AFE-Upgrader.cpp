@@ -52,7 +52,7 @@ void AFEUpgrader::upgradeToVersion120() {
   /* Relay. Setting LED ID and IDX */
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
     Eeprom.writeUInt8(531 + i, 0);
-    Eeprom.writeUInt8(930 + i, 0);
+    Eeprom.write(930 + 6 * i, 6, (long)0);
   }
 
   /* Switch functionality codes */
@@ -70,4 +70,6 @@ void AFEUpgrader::upgradeToVersion120() {
   if (Data.getDeviceID().length() == 0) {
     Defaults.addDeviceID();
   }
+
+  Data.saveSystemLedID(1);
 }
