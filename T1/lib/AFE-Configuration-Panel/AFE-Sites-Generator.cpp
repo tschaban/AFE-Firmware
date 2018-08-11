@@ -303,7 +303,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   page += addConfigurationBlock(
       language == 0 ? "Konfiguracja urządzenia" : "Hardware configuration",
       language == 0 ? "Wybierz podłączone elementy do urządzenia"
-                    : "Select connected items to your device",
+                    : "Select items connected to your device",
       body);
 
   body = "<fieldset>";
@@ -1181,9 +1181,8 @@ String AFESitesGenerator::addUpgradeSection() {
             "<br><strong>Ten proces nie może zostac przerwany</strong>."
           : "Device will be automatically rebooted after "
             "upgrade<br><br><strong>Warning</strong>: after upgrade do not "
-            "plug "
-            "off the device from power source for around a minute.<br>Device's "
-            "memory "
+            "plug off the device from power source for around a "
+            "minute.<br>Device's memory "
             "will be formatted and default settings will be "
             "uploaded.<br><strong>This process cannot be interrupted</strong>";
   body += "</p>";
@@ -1194,8 +1193,10 @@ String AFESitesGenerator::addUpgradeSection() {
   return addConfigurationBlock(
       language == 0 ? "Aktualizacja firmware" : "Firmware upgrade",
       language == 0 ? "<strong>UWAGA</strong>: nie odłączaj "
-                      "urządzenia od źródła zasilania podczas aktualizacji"
-                    : "<strong>Warning</strong>: don't plug off the device "
+                      "urządzenia od źródła zasilania podczas "
+                      "aktualizacji"
+                    : "<strong>Warning</strong>: don't plug off "
+                      "the device "
                       "from a power source while upgrading",
       body);
 }

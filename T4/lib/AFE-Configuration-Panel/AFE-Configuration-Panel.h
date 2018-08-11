@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
- DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+ DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h
@@ -23,6 +23,7 @@ private:
   AFEDataAccess Data;
   AFEDevice Device;
   uint8_t language;
+  uint16_t siteBufferSize = 7500;
 
 public:
   /* Constructor */
@@ -36,6 +37,8 @@ public:
                                      NETWORK data);
   String getMQTTConfigurationSite(const String option, uint8_t command,
                                   MQTT data);
+  String getDomoticzServerConfigurationSite(const String option,
+                                            uint8_t command, DOMOTICZ data);
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);

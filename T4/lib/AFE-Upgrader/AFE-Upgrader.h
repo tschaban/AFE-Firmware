@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
@@ -24,6 +24,8 @@ private:
 
   /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
+  /* Method upgrades to v1.2.0 */
+  void upgradeToVersion120();
 
 public:
   /* Constructor */

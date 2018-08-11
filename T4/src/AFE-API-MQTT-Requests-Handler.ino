@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+  DOC: http://www.smartnydom.pl/afe-firmware-pl/ */
 
 /* Initializing MQTT */
 void MQTTInit() {
@@ -37,29 +37,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
             MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);
-          }
-        } else {
-
-          sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
-
-          if (strcmp(topic, _mqttTopic) == 0) {
-            if ((char)payload[0] == 'o' && length == 2) { // on
-              Relay[i].Thermostat.on();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                           Relay[i].Thermostat.enabled() ? "on" : "off");
-            } else if ((char)payload[0] == 'o' && length == 3) { // off
-              Relay[i].Thermostat.off();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                           Relay[i].Thermostat.enabled() ? "on" : "off");
-            } else if ((char)payload[0] == 't' && length == 6) { // toggle
-              Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
-                                            : Relay[i].Thermostat.on();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                           Relay[i].Thermostat.enabled() ? "on" : "off");
-            } else if ((char)payload[0] == 'g' && length == 3) { // get
-              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                           Relay[i].Thermostat.enabled() ? "on" : "off");
-            }
           }
         }
       } else {
@@ -117,11 +94,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             } else if ((char)payload[2] == 'n' &&
                        length == 17) { // configurationMode
               Device.reboot(MODE_CONFIGURATION);
-            } else if ((char)payload[2] == 't' &&
-                       length == 14) { // getTemperature
-              char temperatureString[6];
-              dtostrf(SensorDS18B20.get(), 2, 2, temperatureString);
-              Mqtt.publish("temperature", temperatureString);
             }
           }
         }
@@ -136,11 +108,5 @@ void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Relay[id].getMQTTTopic(), "state",
                  Relay[id].get() == RELAY_ON ? "on" : "off");
-  }
-}
-/* Metod publishes temperature */
-void MQTTPublishTemperature(float temperature) {
-  if (Device.configuration.mqttAPI) {
-    Mqtt.publish("temperature", temperature);
   }
 }

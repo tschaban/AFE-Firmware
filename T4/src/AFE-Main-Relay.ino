@@ -1,4 +1,3 @@
-/* Initializing Relays */
 void initRelay() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
@@ -16,7 +15,8 @@ void mainRelay() {
     if (Device.configuration.isRelay[i]) {
       if (Relay[i].autoTurnOff()) {
         Led.on();
-        Mqtt.publish(Relay[i].getMQTTTopic(), "state", "off");
+        MQTTPublishRelayState(i);
+        DomoticzPublishRelayState(i);
         Led.off();
       }
     } else {

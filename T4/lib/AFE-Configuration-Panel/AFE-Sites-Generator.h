@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
@@ -28,6 +28,12 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
+  /* These three methods generates checkboxes for Switch, Relay and LED */
+  const String generateSwitchItem(uint8_t id, boolean checked);
+  const String generateRelayItem(boolean checked);
+  const String generateLEDItem(boolean checked);
+  const String generateTwoValueController(REGULATOR configuration,
+                                          boolean thermostat);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
@@ -42,7 +48,7 @@ public:
   AFESitesGenerator();
 
   /* Method generates site header with menu. When redirect param is diff than 0
-   * then it will redirect page to main page after redirect param time (in sec)
+    then it will redirect page to main page after redirect param time (in sec)
    */
   const String generateHeader(uint8_t redirect = 0);
 
@@ -54,6 +60,7 @@ public:
   String addDeviceConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
+  String addDomoticzServerConfiguration();
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
   String addRelayConfiguration(uint8_t id);

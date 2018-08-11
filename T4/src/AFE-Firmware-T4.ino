@@ -2,7 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
-#include "AFE-MQTT.h"
+#include <AFE-API-Domoticz.h>
+#include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
@@ -17,6 +18,7 @@ AFEDataAccess Data;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
+AFEDomoticz Domoticz;
 AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
@@ -49,7 +51,7 @@ void setup() {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
-  /* Initializing relay and setting it's default state at power on*/
+  /* Initializing relay */
   initRelay();
 
   /* Initialzing network */
@@ -65,19 +67,19 @@ void setup() {
   if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
-  /* Initializing switches */
-  initSwitch();
 
-  /* Initializing MQTT */
-  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
-    MQTTConfiguration = Data.getMQTTConfiguration();
-    Mqtt.begin();
-  }
   Network.listener();
+
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
+
+  /* Initializing switches */
+  initSwitch();
+  /* Initializing APIs */
+  MQTTInit();
+  DomoticzInit();
 }
 
 void loop() {
@@ -85,6 +87,10 @@ void loop() {
   if (Device.getMode() != MODE_ACCESS_POINT) {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
+
+        /* It listens to events and process them */
+        eventsListener();
+
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
           Mqtt.listener();
@@ -92,6 +98,7 @@ void loop() {
 
         WebServer.listener();
 
+        /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
         mainRelay();
 
@@ -112,7 +119,10 @@ void loop() {
     WebServer.listener();
   }
 
+  /* Listens for switch events */
   mainSwitchListener();
   mainSwitch();
+
+  /* Led listener */
   Led.loop();
 }
