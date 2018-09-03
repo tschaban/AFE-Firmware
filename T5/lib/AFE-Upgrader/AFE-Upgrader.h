@@ -24,6 +24,8 @@ private:
 
   /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
+  /* Method upgrades to v1.2.0 */
+  void upgradeToVersion120();
 
 public:
   /* Constructor */

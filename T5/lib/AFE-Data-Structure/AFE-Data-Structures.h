@@ -14,6 +14,7 @@
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-DEVICE-T5-Structure.h>
 #include <AFE-DHT-Sensor-Structure.h>
+#include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-GATE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>

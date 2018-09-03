@@ -9,9 +9,6 @@ AFEDataAccess::AFEDataAccess() {}
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 
-  Eeprom.read(9, 16).toCharArray(configuration.name,
-                                 sizeof(configuration.name));
-
   uint8_t index = 3;
   for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
     configuration.isLED[i] = Eeprom.read(366 + i * index);
@@ -21,6 +18,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
     configuration.isSwitch[i] = Eeprom.read(398 + i * index);
   }
+  Eeprom.read(9, 16).toCharArray(configuration.name,
+                                 sizeof(configuration.name));
 
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
@@ -30,6 +29,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   configuration.isDHT = Eeprom.read(376);
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
+  configuration.domoticzAPI = Eeprom.read(800);
 
   return configuration;
 }
@@ -81,10 +81,22 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   return configuration;
 }
 
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+  DOMOTICZ configuration;
+
+  configuration.protocol = Eeprom.readUInt8(801);
+  Eeprom.read(802, 40).toCharArray(configuration.host,
+                                   sizeof(configuration.host));
+  configuration.port = Eeprom.read(842, 5).toInt();
+  Eeprom.read(847, 32).toCharArray(configuration.user, 32);
+  Eeprom.read(879, 32).toCharArray(configuration.password,
+                                   sizeof(configuration.password));
+  return configuration;
+}
+
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
   uint8_t nextLed = 3;
-
   configuration.gpio = Eeprom.readUInt8(367 + id * nextLed);
   configuration.changeToOppositeValue = Eeprom.read(368 + id * nextLed);
   return configuration;
@@ -256,14 +268,6 @@ void AFEDataAccess::saveConfiguration(GATE configuration) {
   }
 }
 
-const char AFEDataAccess::getVersion() {
-  char version[7];
-  Eeprom.read(0, 7).toCharArray(version, sizeof(version));
-  return *version;
-}
-
-void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
-
 uint8_t AFEDataAccess::getDeviceMode() { return Eeprom.readUInt8(26); }
 
 void AFEDataAccess::saveDeviceMode(uint8_t mode) {
@@ -276,10 +280,27 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-uint8_t AFEDataAccess::getSystemLedID() { Eeprom.readUInt8(375); }
+uint8_t AFEDataAccess::getSystemLedID() { return Eeprom.readUInt8(530); }
 
-void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(375, id); }
+void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(530, id); }
 
 boolean AFEDataAccess::getRelayState(uint8_t id) { return false; }
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {}
+
+const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
+
+void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
+
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+  if (apiID == API_HTTP) {
+    Eeprom.write(25, state);
+  } else if (apiID == API_MQTT) {
+    Eeprom.write(228, state);
+  } else if (apiID == API_DOMOTICZ) {
+    Eeprom.write(800, state);
+    if (state) {
+      Eeprom.write(25, true);
+    }
+  }
+}
