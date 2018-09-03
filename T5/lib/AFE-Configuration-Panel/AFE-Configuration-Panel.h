@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
- LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
- DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h

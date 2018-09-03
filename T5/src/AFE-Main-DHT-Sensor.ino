@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+
 /* Initializing sensor: DHT */
 void initDHTSensor() {
   if (Device.configuration.isDHT) {
