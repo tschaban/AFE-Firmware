@@ -255,7 +255,6 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("d").length() > 0 ? data.domoticzAPI = true
                                : data.domoticzAPI = false;
-
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }

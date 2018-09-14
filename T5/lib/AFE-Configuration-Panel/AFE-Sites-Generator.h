@@ -34,6 +34,7 @@ private:
   const String generateLEDItem(boolean checked);
   const String generateTwoValueController(REGULATOR configuration,
                                           boolean thermostat);
+  const String generateGateStatesList(uint8_t id, byte state);
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,

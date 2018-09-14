@@ -1247,7 +1247,7 @@ String AFESitesGenerator::addDHTConfiguration() {
     body += "</div>";
 
     body += "<div class=\"cf\"><label>";
-    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sesnor IDX";
+    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sensor IDX";
     body += "</label><input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
     body += configuration.humidityIdx;

@@ -161,7 +161,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "<li class=\"itm\"><a "
               "href=\"\\?option=DHT\">";
       page += language == 0 ? "Czujnik temperatury i wilgotności "
-                            : "Temperature and humidity sesnor";
+                            : "Temperature and humidity sensor";
       page += "</a></li>";
     }
 
@@ -317,7 +317,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += configuration.isDHT ? " checked=\"checked\"" : "";
   body += language == 0
               ? ">Czujnik temperatury oraz wilgotności (DHxx) podłączony"
-              : ">Temperature and humidity sesnor (DHxx) connected";
+              : ">Temperature and humidity sensor (DHxx) connected";
   body += "?";
   body += "</label>";
   body += "</div>";
@@ -791,7 +791,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   sprintf(filed, "g%d", id);
 
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
-  body += "</div>";
 
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -1244,14 +1243,14 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Temperature value correction";
   body += "</label>";
-  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
-          "step=\"0.01\" "
+  body += "<input name=\"c\" type=\"number\" min=\"-9.9\" max=\"9.9\" "
+          "step=\"0.1\" "
           "value=\"";
   body += configuration.temperature.correction;
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99&deg; - +9.99&deg;</span>";
+  body += ": -9.9&deg; - +9.9&deg;</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -1291,14 +1290,14 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Humidity value correction";
   body += "</label>";
-  body += "<input name=\"d\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
-          "step=\"0.01\" "
+  body += "<input name=\"d\" type=\"number\" min=\"-9.9\" max=\"9.9\" "
+          "step=\"0.1\" "
           "value=\"";
   body += configuration.humidity.correction;
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -99.9 - +99.9</span>";
+  body += ": -9.9 - +9.9</span>";
   body += "</div>";
 
   body += "</fieldset>";

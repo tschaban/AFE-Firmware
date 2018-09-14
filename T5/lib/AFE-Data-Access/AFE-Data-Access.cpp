@@ -127,7 +127,6 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
   uint8_t nextContactron = 24;
   MQTT configurationMQTT;
-  char mqttTopic[49];
 
   configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
   configuration.outputDefaultState =
@@ -187,8 +186,10 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   }
 
   Eeprom.write(376, configuration.isDHT);
-  Eeprom.write(25, configuration.httpAPI);
-  Eeprom.write(228, configuration.mqttAPI);
+
+  saveAPI(API_HTTP, configuration.httpAPI);
+  saveAPI(API_MQTT, configuration.mqttAPI);
+  saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
 }
 
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
@@ -217,6 +218,14 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Eeprom.write(270, 32, configuration.user);
   Eeprom.write(302, 32, configuration.password);
   Eeprom.write(334, 32, configuration.topic);
+}
+
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+  Eeprom.writeUInt8(801, configuration.protocol);
+  Eeprom.write(802, 40, configuration.host);
+  Eeprom.write(842, 5, (long)configuration.port);
+  Eeprom.write(847, 32, configuration.user);
+  Eeprom.write(879, 32, configuration.password);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
@@ -287,6 +296,8 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(530, id); }
 boolean AFEDataAccess::getRelayState(uint8_t id) { return false; }
 
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {}
+
+void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
 
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 

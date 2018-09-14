@@ -17,6 +17,7 @@ void AFEDefaults::set() {
   CONTACTRON ContactronConfiguration;
   GATE GateConfiguration;
   DH DHTConfiguration;
+  LED LEDConfiguration;
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;

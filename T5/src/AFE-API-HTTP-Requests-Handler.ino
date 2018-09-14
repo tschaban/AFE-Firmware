@@ -2,15 +2,20 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+/* Method listens for HTTP Requests */
+void mainHTTPRequestsHandler() {
+    if (Device.configuration.httpAPI) {
+      if (WebServer.httpAPIlistener()) {
+        Led.on();
+        processHTTPAPIRequest(WebServer.getHTTPCommand());
+        Led.off();
+      }
+    }
+}
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it.
  * The second one method converts float to charString before pushing response */
-void sendHTTPAPIRequestStatusX(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
                               const char *value = "") {
   String respond;
   respond = "{";
@@ -35,7 +40,8 @@ void sendHTTPAPIRequestStatusX(HTTPCOMMAND request, boolean status,
   respond += "\"}";
   WebServer.sendJSON(respond);
 }
-void sendHTTPAPIRequestStatusX(HTTPCOMMAND request, boolean status, float value,
+
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
                               uint8_t width = 2, uint8_t precision = 2) {
   char valueString[10];
   dtostrf(value, width, precision, valueString);
@@ -44,13 +50,13 @@ void sendHTTPAPIRequestStatusX(HTTPCOMMAND request, boolean status, float value,
 
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
-void sendHTTPAPIRelayRequestStatusX(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
 
 /* It constructs HTTP response related to gate and calls HTTP push */
-void sendHTTPAPIGateRequestStatusX(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
   sendHTTPAPIRequestStatus(
       request, status,
@@ -62,14 +68,14 @@ void sendHTTPAPIGateRequestStatusX(HTTPCOMMAND request, boolean status,
 }
 
 /* It constructs HTTP response related to contactron and calls HTTP push */
-void sendHTTPAPIContactronRequestStatusX(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                                         byte value) {
   sendHTTPAPIRequestStatus(request, status,
                            value == CONTACTRON_OPEN ? "open" : "closed");
 }
 
 /* Method processes HTTP API request */
-void processHTTPAPIRequestX(HTTPCOMMAND request) {
+void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
   if (strcmp(request.device, "gate") == 0) {
     if (strcmp(request.command, "open") == 0) {
@@ -141,7 +147,38 @@ void processHTTPAPIRequestX(HTTPCOMMAND request) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHeatIndex())
         : sendHTTPAPIRequestStatus(request, false);
-  } else if (strcmp(request.command, "reboot") == 0) { // reboot
+  } else if (strcmp(request.device, "api") == 0) {
+    uint8_t _api =
+        strcmp(request.name, "http") == 0
+            ? API_HTTP
+            : strcmp(request.name, "mqtt") == 0
+                  ? API_MQTT
+                  : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
+    uint8_t _command = strcmp(request.command, "on") == 0
+                           ? 1
+                           : strcmp(request.command, "off") == 0 ? 0 : 9;
+
+    if (_api != 9 && _command != 9) {
+      Data.saveAPI(_api, _command);
+      Device.begin();
+      if (_command) {
+        if (_api == API_MQTT) {
+          MQTTInit();
+        } else if (_api == API_DOMOTICZ) {
+          DomoticzInit();
+        }
+      } else {
+        if (_api == API_MQTT) {
+          Mqtt.disconnect();
+        } else if (_api == API_DOMOTICZ) {
+          Domoticz.disconnect();
+        }
+      }
+      sendHTTPAPIRequestStatus(request, true);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  } selse if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==
