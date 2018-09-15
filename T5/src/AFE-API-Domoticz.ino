@@ -41,6 +41,14 @@ void AFEDomoticz::sendSwitchCommand(unsigned int idx, const char *value) {
   }
 }
 
+void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
+   sendSwitchCommand(idx,value);
+}
+
+void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
+   sendSwitchCommand(idx,value);
+}
+
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     char _temperatureChar[7];

@@ -9,7 +9,7 @@
 #endif
 
 /* Method is launched after MQTT Message is received */
-void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
+void MQTTMessagesListenerX(char *topic, byte *payload, unsigned int length) {
   char _mqttTopic[70];
   Led.on();
   if (length >= 1) { // command arrived
@@ -76,14 +76,14 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */
-void MQTTPublishRelayState(uint8_t id) {
+void MQTTPublishRelayStateX(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("relay/state", Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */
-void MQTTPublishContactronState(uint8_t id) {
+void MQTTPublishContactronStateX(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
                  Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
@@ -91,7 +91,7 @@ void MQTTPublishContactronState(uint8_t id) {
   }
 }
 
-void MQTTPublishGateState() {
+void MQTTPublishGateStateX() {
   if (Device.configuration.mqttAPI) {
     uint8_t gateState = Gate.get();
     Mqtt.publish("gate/state", gateState == GATE_OPEN

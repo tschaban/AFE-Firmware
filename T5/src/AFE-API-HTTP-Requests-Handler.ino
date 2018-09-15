@@ -4,13 +4,13 @@
 
 /* Method listens for HTTP Requests */
 void mainHTTPRequestsHandler() {
-    if (Device.configuration.httpAPI) {
-      if (WebServer.httpAPIlistener()) {
-        Led.on();
-        processHTTPAPIRequest(WebServer.getHTTPCommand());
-        Led.off();
-      }
+  if (Device.configuration.httpAPI) {
+    if (WebServer.httpAPIlistener()) {
+      Led.on();
+      processHTTPAPIRequest(WebServer.getHTTPCommand());
+      Led.off();
     }
+  }
 }
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it.
@@ -99,16 +99,27 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
                                     Relay[0].get());
       MQTTPublishRelayState(0);
+      if (strcmp(request.source, "domoticz") != 0) {
+        DomoticzPublishRelayState(0);
+      }
     } else if (strcmp(request.command, "off") == 0) {
       Relay[0].off();
       sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_OFF,
                                     Relay[0].get());
       MQTTPublishRelayState(0);
+      if (strcmp(request.source, "domoticz") != 0) {
+        DomoticzPublishRelayState(0);
+      }
+
     } else if (strcmp(request.command, "toggle") == 0) {
       uint8_t state = Relay[0].get();
       Relay[0].toggle();
       sendHTTPAPIRelayRequestStatus(request, state != Relay[0].get(),
                                     Relay[0].get());
+      MQTTPublishRelayState(0); // MQTT Listener library
+      if (strcmp(request.source, "domoticz") != 0) {
+        DomoticzPublishRelayState(0);
+      };
     } else if (strcmp(request.command, "get") == 0) { // reportStatus or get
       sendHTTPAPIRelayRequestStatus(request, true, Relay[0].get());
     } else {
@@ -178,7 +189,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
-  } selse if (strcmp(request.command, "reboot") == 0) { // reboot
+  } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==

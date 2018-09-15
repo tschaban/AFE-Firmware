@@ -11,7 +11,7 @@
 #include "WProgram.h"
 #endif
 
-#include "AFE-Contactron.h"
+#include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
@@ -45,6 +45,9 @@ public:
   /* It should be added to main loop to listen for gate state changes and
    * request to be processed by the class */
   void listener();
+
+  /* Return IDX in Domoticz */
+  unsigned long getDomoticzIDX();
 };
 
 #endif

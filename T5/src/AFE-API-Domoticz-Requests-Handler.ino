@@ -16,6 +16,23 @@ void DomoticzPublishRelayState(uint8_t id) {
     Domoticz.sendSwitchCommand(idx, Relay[id].get() == RELAY_ON ? "On" : "Off");
   }
 }
+
+/* It publishes gate state to Domotucz */
+void DomoticzPublishGateState() {
+  unsigned long idx = Gate.getDomoticzIDX();
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendGateCommand(idx, Gate.get() == RELAY_ON ? "On" : "Off");
+  }
+}
+
+/* It publishes contactron state to Domotucz */
+void DomoticzPublishContactronState(uint8_t id) {
+  unsigned long idx = Gate.Contactron[id].getDomoticzIDX();
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendContactronCommand(idx, Gate.Contactron[id].get() == RELAY_ON ? "On" : "Off");
+  }
+}
+
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(float temperature) {
   unsigned long idx = SensorDHT.getDomoticzIDX(IDX_TYPE_TEMPERATURE);

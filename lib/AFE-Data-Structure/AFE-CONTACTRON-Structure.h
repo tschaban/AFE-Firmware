@@ -24,6 +24,7 @@ struct CONTACTRON {
   uint16_t bouncing;
   char name[16];
   char mqttTopic[49];
+  unsigned long idx;
 };
 
 #endif

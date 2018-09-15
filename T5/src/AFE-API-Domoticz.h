@@ -44,6 +44,10 @@ public:
   */
   void sendSwitchCommand(unsigned int idx, const char *value);
 
+  void sendGateCommand(unsigned int idx, const char *value);
+
+  void sendContactronCommand(unsigned int idx, const char *value);
+
   /* It send to Domoticz temperature using following API call
      json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
   */

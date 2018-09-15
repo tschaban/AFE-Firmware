@@ -65,3 +65,5 @@ boolean AFEGate::event() {
     return false;
   }
 }
+
+unsigned long AFEGate::getDomoticzIDX() { return gateConfiguration.idx; }
