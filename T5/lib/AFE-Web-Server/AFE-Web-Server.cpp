@@ -436,6 +436,10 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.ledID = server.arg("l" + String(id)).toInt();
   }
 
+  if (server.arg("x" + String(id)).length() > 0) {
+    data.idx = server.arg("x" + String(id)).toInt();
+  }
+
   return data;
 }
 
@@ -488,6 +492,10 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
     server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
   }
 
+  if (server.arg("x" + String(id)).length() > 0) {
+    data.idx = server.arg("x" + String(id)).toInt();
+  }
+
   return data;
 }
 
@@ -501,9 +509,6 @@ DH AFEWebServer::getDHTData() {
   if (server.arg("t").length() > 0) {
     data.type = server.arg("t").toInt();
   }
-
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
 
   if (server.arg("c").length() > 0) {
     data.temperature.correction = server.arg("c").toFloat();
@@ -525,6 +530,24 @@ DH AFEWebServer::getDHTData() {
     data.humidity.interval = server.arg("j").toInt();
   }
 
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  server.arg("p").length() > 0 ? data.publishHeatIndex = true
+                               : data.publishHeatIndex = false;
+
+  if (server.arg("xt").length() > 0) {
+    data.temperatureIdx = server.arg("xt").toInt();
+  }
+
+  if (server.arg("xh").length() > 0) {
+    data.humidityIdx = server.arg("xh").toInt();
+  }
+
+  if (server.arg("xth").length() > 0) {
+    data.temperatureAndHumidityIdx = server.arg("xth").toInt();
+  }
+
   return data;
 }
 
@@ -539,5 +562,10 @@ GATE AFEWebServer::getGateData() {
       data.state[i] = server.arg("s" + String(i)).toInt();
     }
   }
+
+  if (server.arg("x").length() > 0) {
+    data.idx = server.arg("x").toInt();
+  }
+
   return data;
 }

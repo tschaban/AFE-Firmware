@@ -42,11 +42,11 @@ void AFEDomoticz::sendSwitchCommand(unsigned int idx, const char *value) {
 }
 
 void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
-   sendSwitchCommand(idx,value);
+  sendSwitchCommand(idx, value);
 }
 
 void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
-   sendSwitchCommand(idx,value);
+  sendSwitchCommand(idx, value);
 }
 
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
@@ -100,14 +100,14 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 
 void AFEDomoticz::callURL(const String url) {
 
-  // Serial << endl << "Calling url: " << url;
+  //  Serial << endl << "Calling url: " << url;
   http.begin(url);
   http.GET();
-  /*
-  Serial << endl << "Response: " << httpCode;
+
+  // Serial << endl << "Response: " << httpCode;
   String payload = http.getString();
-  Serial << endl << payload;
-  */
+  //  Serial << endl << payload;
+
   http.end();
 }
 

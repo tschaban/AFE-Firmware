@@ -13,8 +13,8 @@
 
 #include <AFE-Data-Access.h>
 #include <ESP8266HTTPClient.h>
+//#include <Streaming.h>
 #include <rBase64.h>
-// #include <Streaming.h>
 
 #define HUMIDITY_NORMAL 0
 #define HUMIDITY_COMFORTABLE 1

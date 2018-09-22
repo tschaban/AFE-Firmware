@@ -16,7 +16,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   Led.on();
   if (length >= 1) {
     // command arrived
-    /* RELAY */
+    /* RELAY obsolete
     sprintf(_mqttTopic, "%srelay/cmd", MQTTConfiguration.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[1] == 'n' && length == 2) { // on
@@ -31,107 +31,58 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         MQTTPublishRelayState(0);
       }
     } else {
-
-      /* CONTACTRON */
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-        if (Device.configuration.isContactron[i]) {
-          sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
-          if (strcmp(topic, _mqttTopic) == 0 &&
-              (char)payload[1] == 'e') { // get
-            MQTTPublishContactronState(i);
-          }
-        } else {
-          break;
-        }
-      }
-
-      /* GATE */
-      sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
-      if (strcmp(topic, _mqttTopic) == 0) {
-        if ((char)payload[2] == 'e' && length == 4) { // open
-          Relay[0].on();
-          MQTTPublishRelayState(0);
-        } else if ((char)payload[2] == 'o' && length == 5) { // close
-          Relay[0].on();
-          MQTTPublishRelayState(0);
-        } else if ((char)payload[2] == 't' && length == 3) { // get
-          MQTTPublishGateState();
+*/
+    /* CONTACTRON */
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
+        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
+          MQTTPublishContactronState(i);
         }
       } else {
-
-        /* APIs */
-        sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
-                MQTTConfiguration.topic);
-
-        if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[1] == 'n' && length == 2) { // on
-            Data.saveAPI(API_HTTP, true);
-            Device.begin();
-          } else if ((char)payload[1] == 'f' && length == 3) { // off
-            Data.saveAPI(API_HTTP, false);
-            Device.begin();
-          }
-        } else {
-
-          /* Turning On/Off Domoticz APIs */
-          sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
-                  MQTTConfiguration.topic);
-
-          if (strcmp(topic, _mqttTopic) == 0) {
-            if ((char)payload[1] == 'n' && length == 2) { // on
-              Data.saveAPI(API_DOMOTICZ, true);
-              Device.begin();
-              DomoticzInit();
-
-            } else if ((char)payload[1] == 'f' && length == 3) { // off
-              Data.saveAPI(API_DOMOTICZ, false);
-              Device.begin();
-              Domoticz.disconnect();
-            }
-          } else {
-            /* Turning Off MQTT APIs */
-            sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
-                    MQTTConfiguration.topic);
-
-            if (strcmp(topic, _mqttTopic) == 0) {
-              if ((char)payload[1] == 'f' && length == 3) { // off
-                Data.saveAPI(API_MQTT, false);
-                Device.begin();
-                Mqtt.disconnect();
-              }
-            } else {
-
-              /* Remaining MQTT Messages reboot and configuratonMode */
-              sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
-              if (strcmp(topic, _mqttTopic) == 0) {
-                if ((char)payload[2] == 'b' && length == 6) { // reboot
-                  Device.reboot(MODE_NORMAL);
-                } else if ((char)payload[2] == 'n' &&
-                           length == 17) { // configurationMode
-                  Device.reboot(MODE_CONFIGURATION);
-                } else if ((char)payload[2] == 't' &&
-                           length == 14) { // getTemperature
-                  char temperatureString[6];
-                  dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
-                  Mqtt.publish("temperature", temperatureString);
-                } else if ((char)payload[2] == 't' &&
-                           length == 11) { // getHumidity
-                  char humidityString[6];
-                  dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
-                  Mqtt.publish("humidity", humidityString);
-                } else if ((char)payload[2] == 't' &&
-                           length == 12) { // getHeatIndex
-                  char heatIndex[6];
-                  dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
-                  Mqtt.publish("heatIndex", heatIndex);
-                }
-              }
-            }
-          }
-        }
+        break;
       }
     }
+
+    /* GATE */
+    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[2] == 'e' && length == 4) { // open
+        Relay[0].on();
+        Gate.toggle();
+      } else if ((char)payload[2] == 'o' && length == 5) { // close
+        Relay[0].on();
+        Gate.toggle();
+      } else if ((char)payload[2] == 't' && length == 3) { // get
+        MQTTPublishGateState();
+      }
+    } else {
+
+      /* Remaining MQTT Messages reboot and configuratonMode
+      sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
+      if (strcmp(topic, _mqttTopic) == 0) {
+        if ((char)payload[2] == 'b' && length == 6) { // reboot
+          Device.reboot(MODE_NORMAL);
+        } else if ((char)payload[2] == 'n' &&
+                   length == 17) { // configurationMode
+          Device.reboot(MODE_CONFIGURATION);
+        } else if ((char)payload[2] == 't' && length == 14) { // getTemperature
+          char temperatureString[6];
+          dtostrf(SensorDHT.getTemperature(), 2, 2, temperatureString);
+          Mqtt.publish("temperature", temperatureString);
+        } else if ((char)payload[2] == 't' && length == 11) { // getHumidity
+          char humidityString[6];
+          dtostrf(SensorDHT.getHumidity(), 2, 2, humidityString);
+          Mqtt.publish("humidity", humidityString);
+        } else if ((char)payload[2] == 't' && length == 12) { // getHeatIndex
+          char heatIndex[6];
+          dtostrf(SensorDHT.getHeatIndex(), 2, 2, heatIndex);
+          Mqtt.publish("heatIndex", heatIndex);
+        }
+      }*/
+    }
   }
+
   Led.off();
 }
 

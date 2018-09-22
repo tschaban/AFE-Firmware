@@ -21,7 +21,7 @@ void DomoticzPublishRelayState(uint8_t id) {
 void DomoticzPublishGateState() {
   unsigned long idx = Gate.getDomoticzIDX();
   if (Device.configuration.domoticzAPI && idx > 0) {
-    Domoticz.sendGateCommand(idx, Gate.get() == RELAY_ON ? "On" : "Off");
+    Domoticz.sendGateCommand(idx, Gate.get() == GATE_OPEN ? "On" : "Off");
   }
 }
 
@@ -29,7 +29,8 @@ void DomoticzPublishGateState() {
 void DomoticzPublishContactronState(uint8_t id) {
   unsigned long idx = Gate.Contactron[id].getDomoticzIDX();
   if (Device.configuration.domoticzAPI && idx > 0) {
-    Domoticz.sendContactronCommand(idx, Gate.Contactron[id].get() == RELAY_ON ? "On" : "Off");
+    Domoticz.sendContactronCommand(
+        idx, Gate.Contactron[id].get() == CONTACTRON_OPEN ? "On" : "Off");
   }
 }
 

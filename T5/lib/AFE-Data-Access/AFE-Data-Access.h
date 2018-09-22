@@ -55,6 +55,10 @@ public:
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
 
+  /* Methods save gate state from/to EEPROM */
+  uint8_t getGateState();
+  void saveGateState(uint8_t state);
+
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);

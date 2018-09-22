@@ -77,54 +77,59 @@ void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Checking of request is about a relay */
+  //  Serial << endl
+  //     << request.device << "/" << request.command << "/" << request.source;
   if (strcmp(request.device, "gate") == 0) {
-    if (strcmp(request.command, "open") == 0) {
+    if (strcmp(request.command, "toggle") == 0) {
       Relay[0].on();
-      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
-                                    Relay[0].get());
-      MQTTPublishRelayState(0);
-    } else if (strcmp(request.command, "close") == 0) {
-      Relay[0].on();
-      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
-                                    Relay[0].get());
-      MQTTPublishRelayState(0);
-    } else if (strcmp(request.command, "get") == 0) { // reportStatus or get
+      Gate.toggle();
+      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
+      //  Relay[0].get()); MQTTPublishRelayState(0);
+      // if (strcmp(request.source, "domoticz") != 0) {
+      // DomoticzPublishGateState();
+      //}
+      //}
+
+    } else if (strcmp(request.command, "get") == 0) { // get
       sendHTTPAPIGateRequestStatus(request, true, Gate.get());
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
-  } else if (strcmp(request.device, "relay") == 0) {
-    if (strcmp(request.command, "on") == 0) {
-      Relay[0].on();
-      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
-                                    Relay[0].get());
-      MQTTPublishRelayState(0);
-      if (strcmp(request.source, "domoticz") != 0) {
-        DomoticzPublishRelayState(0);
-      }
-    } else if (strcmp(request.command, "off") == 0) {
-      Relay[0].off();
-      sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_OFF,
-                                    Relay[0].get());
-      MQTTPublishRelayState(0);
-      if (strcmp(request.source, "domoticz") != 0) {
-        DomoticzPublishRelayState(0);
-      }
+    /* Relay code obsolte
 
-    } else if (strcmp(request.command, "toggle") == 0) {
-      uint8_t state = Relay[0].get();
-      Relay[0].toggle();
-      sendHTTPAPIRelayRequestStatus(request, state != Relay[0].get(),
-                                    Relay[0].get());
-      MQTTPublishRelayState(0); // MQTT Listener library
-      if (strcmp(request.source, "domoticz") != 0) {
-        DomoticzPublishRelayState(0);
-      };
-    } else if (strcmp(request.command, "get") == 0) { // reportStatus or get
-      sendHTTPAPIRelayRequestStatus(request, true, Relay[0].get());
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
-    }
+  } else if (strcmp(request.device, "relay") == 0) {
+     if (strcmp(request.command, "on") == 0) {
+       Relay[0].on();
+       sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_ON,
+                                     Relay[0].get());
+       MQTTPublishRelayState(0);
+       if (strcmp(request.source, "domoticz") != 0) {
+         DomoticzPublishRelayState(0);
+       }
+     } else if (strcmp(request.command, "off") == 0) {
+       Relay[0].off();
+       sendHTTPAPIRelayRequestStatus(request, Relay[0].get() == RELAY_OFF,
+                                     Relay[0].get());
+       MQTTPublishRelayState(0);
+       if (strcmp(request.source, "domoticz") != 0) {
+         DomoticzPublishRelayState(0);
+       }
+
+     } else if (strcmp(request.command, "toggle") == 0) {
+       uint8_t state = Relay[0].get();
+       Relay[0].toggle();
+       sendHTTPAPIRelayRequestStatus(request, state != Relay[0].get(),
+                                     Relay[0].get());
+       MQTTPublishRelayState(0); // MQTT Listener library
+       if (strcmp(request.source, "domoticz") != 0) {
+         DomoticzPublishRelayState(0);
+       };
+     } else if (strcmp(request.command, "get") == 0) { // get
+       sendHTTPAPIRelayRequestStatus(request, true, Relay[0].get());
+     } else {
+       sendHTTPAPIRequestStatus(request, false);
+     }
+   } */
   } else if (strcmp(request.device, "contactron") == 0) {
     boolean noContactron = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
@@ -158,37 +163,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, SensorDHT.getHeatIndex())
         : sendHTTPAPIRequestStatus(request, false);
-  } else if (strcmp(request.device, "api") == 0) {
-    uint8_t _api =
-        strcmp(request.name, "http") == 0
-            ? API_HTTP
-            : strcmp(request.name, "mqtt") == 0
-                  ? API_MQTT
-                  : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
-    uint8_t _command = strcmp(request.command, "on") == 0
-                           ? 1
-                           : strcmp(request.command, "off") == 0 ? 0 : 9;
-
-    if (_api != 9 && _command != 9) {
-      Data.saveAPI(_api, _command);
-      Device.begin();
-      if (_command) {
-        if (_api == API_MQTT) {
-          MQTTInit();
-        } else if (_api == API_DOMOTICZ) {
-          DomoticzInit();
-        }
-      } else {
-        if (_api == API_MQTT) {
-          Mqtt.disconnect();
-        } else if (_api == API_DOMOTICZ) {
-          Domoticz.disconnect();
-        }
-      }
-      sendHTTPAPIRequestStatus(request, true);
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
-    }
   } else if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());

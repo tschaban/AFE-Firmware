@@ -82,7 +82,7 @@ void MQTTPublishRelayStateX(uint8_t id) {
   }
 }
 
-/* Metod publishes Relay state (used eg by HTTP API) */
+/* Metod publishes Contactoron state (used eg by HTTP API) */
 void MQTTPublishContactronStateX(uint8_t id) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",

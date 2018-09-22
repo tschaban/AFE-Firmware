@@ -128,8 +128,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
 
       page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
-      page += language == 0 ? "Konfiguracja stanów bramy"
-                            : "Gate states configuration";
+      page +=
+          language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
       page += "</a></li>";
     }
 
@@ -781,9 +781,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration = Data.getRelayConfiguration(id);
-
-  DEVICE device;
-  device = Data.getDeviceConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
 
@@ -804,6 +802,30 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += language == 0 ? "kund" : "cunds";
   body += "</span>";
   body += "</div>";
+
+  if (device.domoticzAPI) {
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+
+    body += "<div class=\"cf\">";
+    body += "<label>IDX</label>";
+    body += "<input name=\"x" + String(id) +
+            "\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
 
   body += "</fieldset>";
 
@@ -911,8 +933,8 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 }
 
 String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
-  CONTACTRON configuration;
-  configuration = Data.getContactronConfiguration(id);
+  CONTACTRON configuration = Data.getContactronConfiguration(id);
+  DEVICE deviceConfiguration = Device.configuration;
 
   String body = "<fieldset>";
   char filed[13];
@@ -932,6 +954,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
+
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Typ" : "Type";
@@ -1002,6 +1025,29 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += language == 0 ? "kund" : "conds";
   body += ")</span>";
   body += "</div>";
+
+  if (deviceConfiguration.domoticzAPI) {
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+    body += "<div class=\"cf\">";
+    body += "<label>IDX</label>";
+    body += "<input name=\"x" + String(id) +
+            "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
   body += "</fieldset>";
 
   char title[23];
@@ -1116,6 +1162,28 @@ String AFESitesGenerator::addGateConfiguration() {
   body += "</p>";
   body += generateGateStatesList(3, gateConfiguration.state[3]);
 
+  if (deviceConfiguration.domoticzAPI) {
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+    body += "<div class=\"cf\">";
+    body += "<label>IDX</label>";
+    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += gateConfiguration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
   body += "</fieldset>";
 
   return addConfigurationBlock(language == 0 ? "Konfiguracja stanów bramy"
@@ -1185,13 +1253,12 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
 
 String AFESitesGenerator::addDHTConfiguration() {
 
-  DH configuration;
-  configuration = Data.getDHTConfiguration();
+  DH configuration = Data.getDHTConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
-  body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
-  body += "</div>";
+
   body += "<div class=\"cf\">";
   body += "<label>Typ";
   body += language == 1 ? "e" : "";
@@ -1209,23 +1276,34 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</select>";
   body += "</div>";
 
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
-  body += "</p>";
-
   body += "<div class=\"cc\">";
   body += "<label>";
   body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
   body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
   body +=
       language == 0
-          ? ">Wysyłać dane tylko, gdy wartość temperatury / wilgotności zmieni "
-            "się"
-          : ">Send data only if value of temperature / humidity has changed";
+          ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
+            "zmieni się"
+          : ">Send data only if value of temperature or humidity has changed";
   body += "</label>";
   body += "</div>";
 
-  body += "<br><div class=\"cf\">";
+  if (device.mqttAPI) {
+    body += "<div class=\"cc\">";
+    body += "<label>";
+    body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
+    body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
+    body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
+                          : ">Publish felt air temperature";
+    body += "?</label>";
+    body += "</div>";
+  }
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Odczyty co" : "Read every";
   body += "</label>";
@@ -1241,16 +1319,16 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Korekta wartości o" : "Temperature value correction";
+  body += language == 0 ? "Korekta wartości o" : "Temperature correction";
   body += "</label>";
-  body += "<input name=\"c\" type=\"number\" min=\"-9.9\" max=\"9.9\" "
-          "step=\"0.1\" "
+  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+          "step=\"0.01\" "
           "value=\"";
   body += configuration.temperature.correction;
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.9&deg; - +9.9&deg;</span>";
+  body += ": -9.99 - +9.99</span>";
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -1288,17 +1366,66 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Korekta wartości o" : "Humidity value correction";
+  body += language == 0 ? "Korekta wartości o" : "Humidity correction";
   body += "</label>";
-  body += "<input name=\"d\" type=\"number\" min=\"-9.9\" max=\"9.9\" "
+  body += "<input name=\"d\" type=\"number\" min=\"-99.9\" max=\"99.9\" "
           "step=\"0.1\" "
           "value=\"";
   body += configuration.humidity.correction;
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -9.9 - +9.9</span>";
+  body += ": -99.9 - +99.9</span>";
   body += "</div>";
+
+  if (device.domoticzAPI) {
+
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+
+    body += "<div class=\"cf\"><label> ";
+    body +=
+        language == 0 ? "IDX czujnika temperatury" : "Temperature sensor IDX";
+    body += " </label>";
+    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sensor IDX";
+    body += "</label><input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.humidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika temperatury i wilgotności"
+                          : "Temperature and humidity sensor IDX";
+    body += "</label><input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureAndHumidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
 
   body += "</fieldset>";
 

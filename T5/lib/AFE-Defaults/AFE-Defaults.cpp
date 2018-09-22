@@ -87,29 +87,39 @@ void AFEDefaults::set() {
     Data->saveConfiguration(i, SwitchConfiguration);
   }
 
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.gpio = 16; // System
   LEDConfiguration.changeToOppositeValue = false;
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isLED); i++) {
-    Data->saveConfiguration(i, LEDConfiguration);
-  }
+  Data->saveConfiguration(0, LEDConfiguration);
+  LEDConfiguration.gpio = 14; // S1
+  Data->saveConfiguration(1, LEDConfiguration);
+  LEDConfiguration.gpio = 13; // S1
+  Data->saveConfiguration(2, LEDConfiguration);
 
-  ContactronConfiguration.gpio = 14;
   ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
-  ContactronConfiguration.ledID = 0;
   ContactronConfiguration.bouncing = 200;
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isContactron); i++) {
-    sprintf(ContactronConfiguration.name, "C%d", i + 1);
-    Data->saveConfiguration(i, ContactronConfiguration);
-  }
+  ContactronConfiguration.gpio = 4;
+  ContactronConfiguration.ledID = 2;
+  ContactronConfiguration.idx = 0;
+  sprintf(ContactronConfiguration.name, "C1");
+  Data->saveConfiguration(0, ContactronConfiguration);
+  ContactronConfiguration.gpio = 5;
+  ContactronConfiguration.ledID = 3;
+  sprintf(ContactronConfiguration.name, "C2");
+  Data->saveConfiguration(1, ContactronConfiguration);
 
-  DHTConfiguration.gpio = 14;
+  DHTConfiguration.gpio = 15;
   DHTConfiguration.type = 1;
-  DHTConfiguration.sendOnlyChanges = 1;
+  DHTConfiguration.sendOnlyChanges = true;
   DHTConfiguration.temperature.correction = 0;
   DHTConfiguration.temperature.interval = 60;
   DHTConfiguration.temperature.unit = 0;
+  DHTConfiguration.sendOnlyChanges = true;
+  DHTConfiguration.publishHeatIndex = false;
   DHTConfiguration.humidity.correction = 0;
   DHTConfiguration.humidity.interval = 60;
+  DHTConfiguration.temperatureIdx = 0;
+  DHTConfiguration.humidityIdx = 0;
+  DHTConfiguration.temperatureAndHumidityIdx = 0;
 
   Data->saveConfiguration(DHTConfiguration);
 
@@ -117,12 +127,12 @@ void AFEDefaults::set() {
   GateConfiguration.state[1] = GATE_PARTIALLY_OPEN;
   GateConfiguration.state[2] = GATE_PARTIALLY_OPEN;
   GateConfiguration.state[3] = GATE_CLOSED;
+  GateConfiguration.idx = 0;
 
   Data->saveConfiguration(GateConfiguration);
-
   Data->saveSystemLedID(1);
-
   Data->saveDeviceMode(2);
+  Data->saveGateState(0);
   Data->saveLanguage(1);
 }
 void AFEDefaults::addDomoticzConfiguration() {

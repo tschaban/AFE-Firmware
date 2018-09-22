@@ -13,7 +13,7 @@ void initRelay() {
 void mainRelay() {
   if (Relay[0].autoTurnOff()) {
     Led.on();
-    MQTTPublishRelayState(0);
+    // MQTTPublishRelayState(0);
     Led.off();
   }
 }

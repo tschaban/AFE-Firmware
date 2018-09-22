@@ -4,9 +4,16 @@
 
 /* Method processes gate related events */
 void mainGate() {
+
   if (Gate.event()) {
     Led.on();
     MQTTPublishGateState();
+    DomoticzPublishGateState();
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        DomoticzPublishContactronState(i);
+      }
+    }
     Led.off();
   }
 }
