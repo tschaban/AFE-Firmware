@@ -8,7 +8,7 @@
 #include <AFE-Device.h>
 #include <AFE-Gate.h>
 #include <AFE-LED.h>
-#include <AFE-Relay.h>
+//#include <AFE-Relay.h>
 #include <AFE-Sensor-DHT.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -24,7 +24,7 @@ AFEDomoticz Domoticz;
 AFEWebServer WebServer;
 AFELED Led;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
-AFERelay Relay[sizeof(Device.configuration.isRelay)];
+// AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
 AFESensorDHT SensorDHT;
 GATE GateState;
@@ -39,7 +39,7 @@ void setup() {
   delay(10);
 
   /* Turn off publishing information to Serial */
-//  Serial.swap();
+  //  Serial.swap();
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */
@@ -60,7 +60,7 @@ void setup() {
   }
 
   /* Initializing relay */
-  initRelay();
+  // initRelay();
 
   /* Initialzing network */
   Network.begin(Device.getMode());
@@ -97,7 +97,6 @@ void setup() {
   DomoticzInit();
 }
 
-
 void loop() {
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
@@ -117,7 +116,7 @@ void loop() {
         Gate.listener();
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
-        mainRelay();
+        // mainRelay();
         mainGate();
         mainDHTSensor();
 

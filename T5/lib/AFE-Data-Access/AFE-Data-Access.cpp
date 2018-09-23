@@ -107,8 +107,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   uint8_t nextRelay = 0; // left for version compatibility
   configuration.gpio = Eeprom.readUInt8(462 + id * nextRelay);
   configuration.timeToOff = Eeprom.read(463 + id * nextRelay, 4).toInt();
-  configuration.idx = Eeprom.read(930 + id, 6).toInt();
-
   return configuration;
 }
 
@@ -239,7 +237,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   uint8_t nextRelay = 5;
   Eeprom.writeUInt8(462 + id * nextRelay, configuration.gpio);
   Eeprom.write(463 + id * nextRelay, 4, long(configuration.timeToOff));
-  Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {

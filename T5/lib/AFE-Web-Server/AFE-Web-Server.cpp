@@ -436,10 +436,6 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.ledID = server.arg("l" + String(id)).toInt();
   }
 
-  if (server.arg("x" + String(id)).length() > 0) {
-    data.idx = server.arg("x" + String(id)).toInt();
-  }
-
   return data;
 }
 

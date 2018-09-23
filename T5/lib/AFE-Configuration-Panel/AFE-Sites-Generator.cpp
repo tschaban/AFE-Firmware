@@ -781,7 +781,6 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   RELAY configuration = Data.getRelayConfiguration(id);
-  DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
 
@@ -802,30 +801,6 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += language == 0 ? "kund" : "cunds";
   body += "</span>";
   body += "</div>";
-
-  if (device.domoticzAPI) {
-    body += "<br><p class=\"cm\">";
-    body +=
-        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
-    body += "</p>";
-    body += "<p class=\"cm\">";
-    body += language == 0
-                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
-                : "If IDX is set to 0 then a value won't be sent to ";
-    body += "Domoticz</p>";
-
-    body += "<div class=\"cf\">";
-    body += "<label>IDX</label>";
-    body += "<input name=\"x" + String(id) +
-            "\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-  }
 
   body += "</fieldset>";
 

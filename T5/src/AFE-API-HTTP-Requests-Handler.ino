@@ -81,7 +81,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   //     << request.device << "/" << request.command << "/" << request.source;
   if (strcmp(request.device, "gate") == 0) {
     if (strcmp(request.command, "toggle") == 0) {
-      Relay[0].on();
+      // Relay[0].on();
       Gate.toggle();
       sendHTTPAPIGateRequestStatus(request, true, Gate.get());
       //  Relay[0].get()); MQTTPublishRelayState(0);

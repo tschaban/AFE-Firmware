@@ -48,10 +48,10 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[2] == 'e' && length == 4) { // open
-        Relay[0].on();
+        // Relay[0].on();
         Gate.toggle();
       } else if ((char)payload[2] == 'o' && length == 5) { // close
-        Relay[0].on();
+        // Relay[0].on();
         Gate.toggle();
       } else if ((char)payload[2] == 't' && length == 3) { // get
         MQTTPublishGateState();
@@ -86,12 +86,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   Led.off();
 }
 
-/* Metod publishes Relay state (used eg by HTTP API) */
-void MQTTPublishRelayState(uint8_t id) {
-  if (Device.configuration.mqttAPI) {
-    Mqtt.publish("relay/state", Relay[id].get() == RELAY_ON ? "on" : "off");
-  }
-}
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.mqttAPI) {

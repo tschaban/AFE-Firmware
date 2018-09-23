@@ -9,14 +9,6 @@ void DomoticzInit() {
   }
 }
 
-/* It publishes relay state to Domotucz */
-void DomoticzPublishRelayState(uint8_t id) {
-  unsigned long idx = Relay[id].getDomoticzIDX();
-  if (Device.configuration.domoticzAPI && idx > 0) {
-    Domoticz.sendSwitchCommand(idx, Relay[id].get() == RELAY_ON ? "On" : "Off");
-  }
-}
-
 /* It publishes gate state to Domotucz */
 void DomoticzPublishGateState() {
   unsigned long idx = Gate.getDomoticzIDX();

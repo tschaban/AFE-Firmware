@@ -15,6 +15,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
+#include <AFE-Relay.h>
 //#include <Streaming.h>
 
 class AFEGate {
@@ -23,6 +24,7 @@ class AFEGate {
   GATE gateConfiguration;
   uint8_t numberOfContractors = 0;
   boolean _event = false;
+  AFERelay Relay[sizeof(Device.configuration.isRelay)];
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

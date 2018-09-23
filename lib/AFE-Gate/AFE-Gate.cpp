@@ -9,6 +9,10 @@ AFEGate::AFEGate(){};
 void AFEGate::begin() {
   gateConfiguration = Data.getGateConfiguration();
 
+  Relay[0].begin(0);
+  Relay[0].setRelayAfterRestoringPower();
+  Relay[0].setTimerUnitToSeconds(false);
+
   for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
     if (Device.configuration.isContactron[i]) {
       Contactron[i].begin(i);
@@ -20,6 +24,7 @@ void AFEGate::begin() {
 }
 
 void AFEGate::toggle() {
+  Relay[0].on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractors == 0) {
     Data.saveGateState(get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
@@ -63,6 +68,9 @@ uint8_t AFEGate::get() {
 }
 
 void AFEGate::listener() {
+
+  Relay[0].autoTurnOff();
+
   for (uint8_t i = 0; i < numberOfContractors; i++) {
     Contactron[i].listener();
     if (Contactron[i].changed()) {
