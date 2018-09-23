@@ -355,7 +355,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Nazwa sieci WiFI" : "WiFi name";
+  body += language == 0 ? "Nazwa sieci WiFi" : "WiFi name";
   body += "*</label>";
   body += "<input name=\"s\" type=\"text\" maxlength=\"32\" value=\"";
   body += configuration.ssid;

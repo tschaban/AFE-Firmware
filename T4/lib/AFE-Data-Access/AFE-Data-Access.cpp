@@ -250,9 +250,7 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
 
 uint8_t AFEDataAccess::getSystemLedID() { return Eeprom.readUInt8(530); }
 
-void AFEDataAccess::saveSystemLedID(uint8_t id) {
-  return Eeprom.writeUInt8(530, id);
-}
+void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(530, id); }
 
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
 

@@ -11,20 +11,23 @@
 #include "WProgram.h"
 #endif
 
-#include "AFE-Contactron.h"
+#include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
+#include <AFE-Relay.h>
 //#include <Streaming.h>
 
 class AFEGate {
   AFEDevice Device;
   AFEDataAccess Data;
   GATE gateConfiguration;
-
   uint8_t numberOfContractors = 0;
-
   boolean _event = false;
+  AFERelay Relay[sizeof(Device.configuration.isRelay)];
+
+  /* Returns gate state based on contactron state */
+  uint8_t getGateStateBasedOnContractons();
 
 public:
   /* Via this class there is access to contactrons */
@@ -33,10 +36,14 @@ public:
   /* Constructors */
   AFEGate();
 
-  /* Iniializing gate */
+  /* Initializing gate */
   void begin();
 
-  /* Returns gate state based on contactron state */
+  /* Triggering gate state changed and saving it's new value if there is not
+   * contactrons */
+  void toggle();
+
+  /* Returns gate state*/
   uint8_t get();
 
   /* Returns true if gate state has changed */
@@ -45,6 +52,9 @@ public:
   /* It should be added to main loop to listen for gate state changes and
    * request to be processed by the class */
   void listener();
+
+  /* Return IDX in Domoticz */
+  unsigned long getDomoticzIDX();
 };
 
 #endif

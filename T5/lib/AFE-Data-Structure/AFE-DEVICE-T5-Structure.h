@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
@@ -14,6 +14,10 @@
 #define MODE_NORMAL 0
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
+
+#define API_HTTP 0
+#define API_MQTT 1
+#define API_DOMOTICZ 2
 
 /* Custom DEVICE structure definition */
 struct DEVICE {

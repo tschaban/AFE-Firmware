@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
@@ -14,6 +14,7 @@
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-DEVICE-T5-Structure.h>
 #include <AFE-DHT-Sensor-Structure.h>
+#include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-GATE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>

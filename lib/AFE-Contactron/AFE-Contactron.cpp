@@ -84,3 +84,7 @@ void AFEContactron::listener() {
     }
   }
 }
+
+unsigned long AFEContactron::getDomoticzIDX() {
+  return ContactronConfiguration.idx;
+}

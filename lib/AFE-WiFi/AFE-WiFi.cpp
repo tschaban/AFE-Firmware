@@ -110,6 +110,7 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (WiFi.status() == WL_CONNECTED) {
+    eventConnectionEstablished = true;
     return true;
   } else {
     return false;
@@ -119,7 +120,7 @@ boolean AFEWiFi::connected() {
 void AFEWiFi::APListener() { dnsServer.processNextRequest(); }
 
 boolean AFEWiFi::eventConnected() {
-   boolean returnValue = eventConnectionEstablished;
-   eventConnectionEstablished = false;
-   return returnValue;
+  boolean returnValue = eventConnectionEstablished;
+  eventConnectionEstablished = false;
+  return returnValue;
 }

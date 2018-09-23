@@ -1,3 +1,7 @@
+/* AFE Firmware for smart home devices
+  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+
 /* Initializing Switches */
 void initSwitch() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
@@ -16,8 +20,8 @@ void mainSwitch() {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getControlledRelayID() > 0) {
         Led.on();
-        Relay[Switch[i].getControlledRelayID() - 1].on();
-        MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
+        // Relay[Switch[i].getControlledRelayID() - 1].on();
+        Gate.toggle();
         Led.off();
       }
     } else {

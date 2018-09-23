@@ -18,6 +18,7 @@
 
 struct GATE {
   uint8_t state[4];
+  unsigned long idx;
 };
 
 #endif

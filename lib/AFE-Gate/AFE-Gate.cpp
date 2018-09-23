@@ -9,6 +9,10 @@ AFEGate::AFEGate(){};
 void AFEGate::begin() {
   gateConfiguration = Data.getGateConfiguration();
 
+  Relay[0].begin(0);
+  Relay[0].setRelayAfterRestoringPower();
+  Relay[0].setTimerUnitToSeconds(false);
+
   for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
     if (Device.configuration.isContactron[i]) {
       Contactron[i].begin(i);
@@ -19,7 +23,16 @@ void AFEGate::begin() {
   }
 }
 
-uint8_t AFEGate::get() {
+void AFEGate::toggle() {
+  Relay[0].on();
+  // Setting Gate state manually is possible only if there is no contactrons
+  if (numberOfContractors == 0) {
+    Data.saveGateState(get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
+    _event = true;
+  }
+}
+
+uint8_t AFEGate::getGateStateBasedOnContractons() {
   uint8_t gateState = GATE_UNKNOWN;
   if (numberOfContractors > 0) {
     uint8_t _state[numberOfContractors];
@@ -45,14 +58,23 @@ uint8_t AFEGate::get() {
   return gateState;
 }
 
+uint8_t AFEGate::get() {
+  if (numberOfContractors ==
+      0) { // If there is not contactorns then get gate state from EEPROM
+    return Data.getGateState();
+  } else { // Get gate state based on contactrons
+    return getGateStateBasedOnContractons();
+  }
+}
+
 void AFEGate::listener() {
 
+  Relay[0].autoTurnOff();
+
   for (uint8_t i = 0; i < numberOfContractors; i++) {
-
     Contactron[i].listener();
-
     if (Contactron[i].changed()) {
-      _event = true;
+      _event = true; // Gate changed the state as contractons changed the state
     }
   }
 }
@@ -65,3 +87,5 @@ boolean AFEGate::event() {
     return false;
   }
 }
+
+unsigned long AFEGate::getDomoticzIDX() { return gateConfiguration.idx; }
