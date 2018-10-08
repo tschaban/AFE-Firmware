@@ -17,9 +17,13 @@ float AFESensorDHT::getTemperature() {
                                   ? DHT11
                                   : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  return dht.readTemperature(configuration.temperature.unit == 0 ? false
-                                                                 : true) +
-         configuration.temperature.correction;
+
+  float _temperature =
+      dht.readTemperature(configuration.temperature.unit == 0 ? false : true);
+
+  return isnan(_temperature)
+             ? currentTemperature
+             : _temperature + configuration.temperature.correction;
 }
 
 float AFESensorDHT::getHumidity() {
@@ -27,7 +31,9 @@ float AFESensorDHT::getHumidity() {
                                   ? DHT11
                                   : configuration.type == 2 ? DHT21 : DHT22);
   dht.begin();
-  return dht.readHumidity() + configuration.humidity.correction;
+  float _humidity = dht.readHumidity();
+  return isnan(_humidity) ? currentHumidity
+                          : _humidity + configuration.humidity.correction;
 }
 
 float AFESensorDHT::getLatestTemperature() {
