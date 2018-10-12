@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #include "AFE-API-MQTT.h"
 
@@ -46,11 +46,11 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-
+#ifndef SHELLY_1_DEVICE
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
-
+#endif
       if (delayStartTime == 0) {
         delayStartTime = millis();
 
@@ -92,19 +92,21 @@ void AFEMQTT::connect() {
             }
           }
           delayStartTime = 0;
+#ifndef SHELLY_1_DEVICE
           ledStartTime = 0;
           Led.off();
+#endif
           connections = 0;
 
           return;
         }
       }
-
+#ifndef SHELLY_1_DEVICE
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
       }
-
+#endif
       if (millis() >
 
           delayStartTime + (NetworkConfiguration.waitTimeConnections * 1000)) {
@@ -126,8 +128,10 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
+#ifndef SHELLY_1_DEVICE
         ledStartTime = 0;
         Led.off();
+#endif
         connections = 0;
         /*
                 Serial << endl

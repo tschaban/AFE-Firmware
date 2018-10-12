@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Web_Server_h
 #define _AFE_Web_Server_h
@@ -49,8 +49,10 @@ private:
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
+#ifndef SHELLY_1_DEVICE
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
+#endif
   uint8_t getLanguageData();
 
 public:

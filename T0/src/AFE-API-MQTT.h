@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_MQTT_h
 #define _AFE_MQTT_h
@@ -31,7 +31,9 @@ private:
 
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
+#ifndef SHELLY_1_DEVICE
   unsigned long ledStartTime = 0;
+#endif
 
   /* Method pushes to the MQTT Broker MQTT Message */
   void publishToMQTTBroker(const char *topic, const char *message);

@@ -15,9 +15,12 @@ void AFERelay::begin(uint8_t id) {
   RelayConfiguration = Data.getRelayConfiguration(_id);
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
+
+#ifndef SHELLY_1_DEVICE
   if (RelayConfiguration.ledID > 0) {
     Led.begin(RelayConfiguration.ledID - 1);
   }
+#endif
 }
 
 const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
@@ -30,7 +33,9 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
+#ifndef SHELLY_1_DEVICE
     Led.on();
+#endif
     if (!invert &&
         RelayConfiguration.timeToOff >
             0) { // Start counter if relay should be automatically turned off
@@ -44,7 +49,9 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
+#ifndef SHELLY_1_DEVICE
     Led.off();
+#endif
     if (invert &&
         RelayConfiguration.timeToOff >
             0) { // Start counter if relay should be automatically turned off
@@ -116,7 +123,9 @@ void AFERelay::setTimer(float timer) {
 
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 
+#ifndef SHELLY_1_DEVICE
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
+#endif
 
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;

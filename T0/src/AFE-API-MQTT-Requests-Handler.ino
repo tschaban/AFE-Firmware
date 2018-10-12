@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 /* Initializing MQTT */
 void MQTTInit() {
@@ -14,7 +14,9 @@ void MQTTInit() {
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[65];
+#ifndef SHELLY_1_DEVICE
   Led.on();
+#endif
 
   if (length >= 1) {
 
@@ -100,7 +102,9 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
   }
+#ifndef SHELLY_1_DEVICE
   Led.off();
+#endif
 }
 
 /* Metod publishes Relay state (used eg by HTTP API) */

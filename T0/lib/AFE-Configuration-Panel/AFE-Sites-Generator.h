@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
@@ -37,8 +37,6 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
-  const String generateTwoValueController(REGULATOR configuration);
-
 public:
   /* Constructor*/
   AFESitesGenerator();
@@ -57,8 +55,10 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
+#ifndef SHELLY_1_DEVICE
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
+#endif
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
 

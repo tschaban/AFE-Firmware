@@ -1,14 +1,18 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 /* Method listens for HTTP Requests */
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
     if (WebServer.httpAPIlistener()) {
+#ifndef SHELLY_1_DEVICE
       Led.on();
+#endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
+#ifndef SHELLY_1_DEVICE
       Led.off();
+#endif
     }
   }
 }
