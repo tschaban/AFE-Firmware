@@ -13,6 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-LED-Structure.h>
 
 class AFELED {
 

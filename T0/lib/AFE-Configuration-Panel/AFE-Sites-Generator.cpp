@@ -61,7 +61,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
+#ifndef SHELLY_1_DEVICE
   page += language == 0 ? "Włącznik WiFi" : "WiFi Switch";
+#else
+  page += language == 0 ? "dla Shelly-1" : "for Shelly-1";
+#endif
+
   page += "</h4><h4>MENU</h4>"
           "<ul class=\"lst\">";
   if (Device.getMode() != MODE_NORMAL) {
@@ -150,13 +155,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += "</a></li></ul><br><br><h4>INFORMA";
   page += language == 0 ? "CJE" : "TION";
   page += "</h4><ul class=\"lst\"><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-";
+          "href=\"https://www.smartnydom.pl/afe-firmware-";
   page += language == 0 ? "pl" : "en";
   page += "/\" target=\"_blank\">Do";
   page += language == 0 ? "kumentacja" : "cumentation";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/forum/"
-          "firmware-do-przelacznika-sonoff/\" target=\"_blank\">";
+          "href=\"https:///www.smartnydom.pl/forum/"
+          "afe-firmware/\" target=\"_blank\">";
   page += language == 0 ? "Pomoc" : "Help";
   page += "</a></li><li class=\"itm\"><a "
           "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
@@ -164,7 +169,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
           "target=\"_blank\">Licenc";
   page += language == 0 ? "ja" : "e";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"http://smart-house.adrian.czabanowski.com/afe-firmware-";
+          "href=\"https://www.smartnydom.pl/afe-firmware-";
   page += language == 0 ? "pl" : "en";
   page += "/log\" target=\"_blank\">";
   page += language == 0 ? "Wersja" : "Version";
@@ -248,9 +253,11 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
+#ifndef SHELLY_1_DEVICE
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isLED), itemsNumber, "hl",
       language == 0 ? "Ilość Led'ów" : "Number of LEDs");
+#endif
 
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
@@ -674,6 +681,7 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
       body);
 }
 
+#ifndef SHELLY_1_DEVICE
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -742,6 +750,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
                       "and its events ",
       body);
 }
+#endif
 
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
@@ -889,6 +898,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</span>";
   body += "</div>";
 
+#ifndef SHELLY_1_DEVICE
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
                         : "Select LED informing about relay state";
@@ -896,9 +906,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += "<div class=\"cf\">";
   body += "<label>LED</label>";
-
   body += "<select  name=\"l" + String(id) + "\">";
-
   body += "<option value=\"0\"";
   body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
   body += language == 0 ? ">Brak" : ">None";
@@ -920,6 +928,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += "</select>";
   body += "</div>";
+#endif
 
   body += "</fieldset>";
 
@@ -1253,81 +1262,6 @@ const String AFESitesGenerator::generateHardwareItemsList(
 
   body += "</select>";
   body += "</div>";
-
-  return body;
-}
-
-const String
-AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
-
-  String body = "<fieldset>";
-
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"te\" type=\"checkbox\" value=\"1\"";
-  body += configuration.enabled ? " checked=\"checked\">" : ">";
-
-  body += language == 0 ? " włączony" : "enabled";
-
-  body += "?</label>";
-  body += "</div>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Włącz jeśli " : "Switch on if ";
-  body += "temp.";
-  body += language == 0 ? " jest" : " is";
-  body += "</label>";
-
-  body += "<select name=\"ta\"><option value=\"0\"";
-  body += (configuration.turnOnAbove == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "mniejsza" : "below";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.turnOnAbove == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "większa" : "above";
-  body += "</option>";
-  body += "</select>";
-  body += "<span> ";
-  body += language == 0 ? "od" : "from";
-  body += " </span>";
-  body += "<input name=\"tn\" type=\"number\" value=\"";
-  body += configuration.turnOn;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
-  body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-
-  body += "</span></div>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Wyłącz jeśli " : "Switch off if ";
-  body += "temp.";
-  body += language == 0 ? " jest" : " is";
-  body += "</label>";
-  body += "<select name=\"tb\"><option value=\"0\"";
-  body += (configuration.turnOffAbove == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "mniejsza" : "below";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.turnOffAbove == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "większa" : "above";
-  body += "</option>";
-  body += "</select>";
-  body += "<span> ";
-  body += language == 0 ? "od" : "from";
-  body += " </span>";
-  body += "<input name=\"tf\" type=\"number\" value=\"";
-  body += configuration.turnOff;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
-  body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-
-  body += "</div></fieldset>";
 
   return body;
 }

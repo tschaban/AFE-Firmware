@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Defaults_h
 #define _AFE_Defaults_h
@@ -25,7 +25,9 @@ public:
   AFEDefaults();
 
   void addDomoticzConfiguration();
+#ifndef SHELLY_1_DEVICE
   void addLEDConfiguration(uint8_t id, uint8_t gpio);
+#endif
   void addDeviceID();
 
   /* Method erases EEPROM */

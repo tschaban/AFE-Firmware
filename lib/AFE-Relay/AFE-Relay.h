@@ -12,7 +12,11 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <AFE-Led.h>
+
+#ifndef SHELLY_1_DEVICE
+#include <AFE-LED.h>
+#endif
+
 //#include <Streaming.h>
 
 class AFERelay {
@@ -21,7 +25,11 @@ private:
   uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
+
+#ifndef SHELLY_1_DEVICE
   AFELED Led;
+#endif
+
   char mqttTopic[50];
 
   unsigned long turnOffCounter = 0;
@@ -76,8 +84,10 @@ public:
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
 
+#ifndef SHELLY_1_DEVICE
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
+#endif
 
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */

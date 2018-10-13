@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
- DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Configuration_Panel_h
 #define _AFE_Configuration_Panel_h
@@ -39,9 +39,11 @@ public:
                                   MQTT data);
   String getDomoticzServerConfigurationSite(const String option,
                                             uint8_t command, DOMOTICZ data);
+#ifndef SHELLY_1_DEVICE
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
+#endif
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data, uint8_t relayIndex);
   String getSwitchConfigurationSite(const String option, uint8_t command,

@@ -12,7 +12,10 @@
 #endif
 
 #include <AFE-Data-Access.h>
+
+#ifndef SHELLY_1_DEVICE
 #include <AFE-LED.h>
+#endif
 //#include <Streaming.h>
 
 class AFESwitch {
@@ -37,7 +40,9 @@ private:
 
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
+#ifndef SHELLY_1_DEVICE
   AFELED Led;
+#endif
 
 public:
   /* Constructors */

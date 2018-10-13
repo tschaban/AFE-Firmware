@@ -1,12 +1,14 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #include <AFE-API-Domoticz.h>
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#ifndef SHELLY_1_DEVICE
 #include <AFE-LED.h>
+#endif
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -20,7 +22,9 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
+#ifndef SHELLY_1_DEVICE
 AFELED Led;
+#endif
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
@@ -56,6 +60,7 @@ void setup() {
   /* Initialzing network */
   Network.begin(Device.getMode());
 
+#ifndef SHELLY_1_DEVICE
   /* Initializing LED, checking if LED exists is made on Class level  */
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
@@ -65,6 +70,7 @@ void setup() {
   if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
+#endif
 
   Network.listener();
   /* Initializing HTTP WebServer */
@@ -98,16 +104,21 @@ void loop() {
         mainRelay();
 
       } else { // Configuration Mode
+#ifndef SHELLY_1_DEVICE
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
+#endif
         WebServer.listener();
       }
-    } else {
+    }
+#ifndef SHELLY_1_DEVICE
+    else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
       }
     }
+#endif
     Network.listener();
   } else { // Access Point Mode
     Network.APListener();
@@ -117,6 +128,7 @@ void loop() {
   /* Listens for switch events */
   mainSwitchListener();
   mainSwitch();
-
+#ifndef SHELLY_1_DEVICE
   Led.loop();
+#endif
 }
