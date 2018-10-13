@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
@@ -15,7 +15,9 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
+#ifndef SHELLY_1_DEVICE
 #include <AFE-LED-Structure.h>
+#endif
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-RELAY-Structure.h>

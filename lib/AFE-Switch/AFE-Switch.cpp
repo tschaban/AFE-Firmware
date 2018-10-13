@@ -11,14 +11,19 @@ AFESwitch::AFESwitch(uint8_t id) { begin(id); }
 void AFESwitch::begin(uint8_t id) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
+#ifdef SHELLY_1_DEVICE
+  pinMode(SwitchConfiguration.gpio, INPUT);
+#else
   pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
+#endif
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-
+#ifndef SHELLY_1_DEVICE
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
   }
+#endif
   _initialized = true;
 }
 
@@ -87,29 +92,36 @@ void AFESwitch::listener() {
            */
           if (SwitchConfiguration.functionality == SWITCH_MULTI) {
 
+#ifndef SHELLY_1_DEVICE
             if (time - startTime >= 35000) {
               Led.blink(50);
               delay(50);
             }
-
+#endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
+#ifndef SHELLY_1_DEVICE
               for (uint8_t i = 0; i < 3; i++) {
                 Led.blink(200);
                 delay(200);
               }
+#endif
               _pressed4thirteenSeconds = true;
             }
 
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
+#ifndef SHELLY_1_DEVICE
               for (uint8_t i = 0; i < 2; i++) {
                 Led.blink(200);
                 delay(200);
               }
+#endif
               _pressed4tenSeconds = true;
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
+#ifndef SHELLY_1_DEVICE
               Led.blink(200);
+#endif
               _pressed4fiveSeconds = true;
             }
           }

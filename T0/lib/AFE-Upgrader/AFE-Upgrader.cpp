@@ -21,10 +21,12 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
+#ifndef SHELLY_1_DEVICE
     if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0) {
       upgradeToVersion120();
     }
+#endif
     Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
@@ -45,6 +47,7 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
+#ifndef SHELLY_1_DEVICE
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
 
@@ -77,3 +80,5 @@ void AFEUpgrader::upgradeToVersion120() {
     Defaults.addDeviceID();
   }
 }
+
+#endif

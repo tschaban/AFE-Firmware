@@ -127,6 +127,7 @@ String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
   return page;
 }
 
+#ifndef SHELLY_1_DEVICE
 String AFEConfigurationPanel::getLEDConfigurationSite(
     const String option, uint8_t command,
     LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {
@@ -161,6 +162,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
   page += Site.generateFooter();
   return page;
 }
+#endif
 
 String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
                                                         uint8_t command,

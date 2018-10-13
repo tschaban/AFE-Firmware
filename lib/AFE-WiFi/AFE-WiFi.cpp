@@ -11,11 +11,14 @@ void AFEWiFi::begin(uint8_t mode) {
   AFEDataAccess Data;
   AFEDevice Device;
   networkConfiguration = Data.getNetworkConfiguration();
+
+#ifndef SHELLY_1_DEVICE
   // Init LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
   }
+#endif
 
   // Cleaning @TODO is it neded?
   Data = {};
@@ -58,6 +61,7 @@ void AFEWiFi::listener() {
         }
       }
 
+#ifndef SHELLY_1_DEVICE
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -66,6 +70,7 @@ void AFEWiFi::listener() {
         Led.toggle();
         ledStartTime = 0;
       }
+#endif
 
       if (millis() >
           delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
@@ -83,8 +88,12 @@ void AFEWiFi::listener() {
         WiFi.disconnect();
         sleepStartTime = millis();
         delayStartTime = 0;
+
+#ifndef SHELLY_1_DEVICE
         ledStartTime = 0;
         Led.off();
+#endif
+
         connections = 0;
         /*
                 Serial << endl
@@ -97,8 +106,12 @@ void AFEWiFi::listener() {
     if (connections > 0) {
       connections = 0;
       delayStartTime = 0;
+
+#ifndef SHELLY_1_DEVICE
       ledStartTime = 0;
       Led.off();
+#endif
+
       /*
       Serial << endl
              << "INFO: Connection established"

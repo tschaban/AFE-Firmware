@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
@@ -25,9 +25,15 @@ struct DEVICE {
   boolean mqttAPI;
   boolean httpAPI;
   boolean domoticzAPI;
+#ifndef SHELLY_1_DEVICE
   boolean isLED[2];
-  boolean isRelay[1];
   boolean isSwitch[2];
+#else
+  boolean isLED[0];
+  boolean isSwitch[1];
+#endif
+
+  boolean isRelay[1];
 };
 
 #endif

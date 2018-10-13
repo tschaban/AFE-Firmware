@@ -12,7 +12,12 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Device.h>
+
+#ifndef SHELLY_1_DEVICE
 #include <AFE-LED.h>
+#endif
+
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
 //#include <Streaming.h>
@@ -22,14 +27,20 @@ class AFEWiFi {
 private:
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
+
+#ifndef SHELLY_1_DEVICE
   unsigned long ledStartTime = 0;
+#endif
 
   uint8_t connections = 0;
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
   DNSServer dnsServer;
+
+#ifndef SHELLY_1_DEVICE
   AFELED Led;
+#endif
 
   boolean eventConnectionEstablished = false;
 
@@ -44,7 +55,8 @@ public:
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
 
-  /* Returns true if device just connected to the network. It's set to true each time it connected. */
+  /* Returns true if device just connected to the network. It's set to true each
+   * time it connected. */
   boolean eventConnected();
 
   /* Method listens for HTTP request while device is in Access Point mode */
