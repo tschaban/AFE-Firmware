@@ -39,5 +39,6 @@ struct DEVICE {
   boolean isSwitch[5];
   boolean isRelay[4];
 #endif
+};
 
 #endif

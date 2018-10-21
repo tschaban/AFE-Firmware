@@ -14,7 +14,7 @@
 #if defined(T0_CONFIG)
 #define FIRMWARE_VERSION "1.2.3"
 #define FIRMWARE_TYPE 0
-#elif (defined(T0_CONFIG) && defined(T0_SHELLY_1_CONFIG))
+#elif defined(T0_CONFIG) && defined(T0_SHELLY_1_CONFIG)
 #define FIRMWARE_VERSION "S1.0.0"
 #define FIRMWARE_TYPE 0
 #elif defined(T4_CONFIG)

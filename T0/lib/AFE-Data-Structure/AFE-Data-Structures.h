@@ -11,7 +11,7 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-DEVICE-T0-Structure.h>
+#include <AFE-DEVICE-Structure.h>
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
