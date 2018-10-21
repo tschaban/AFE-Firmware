@@ -6,7 +6,7 @@
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
 #include <AFE-Relay.h>
@@ -22,7 +22,7 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 AFELED Led;
 #endif
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
@@ -60,7 +60,7 @@ void setup() {
   /* Initialzing network */
   Network.begin(Device.getMode());
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   /* Initializing LED, checking if LED exists is made on Class level  */
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
@@ -92,6 +92,9 @@ void loop() {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
 
+        /* It listens to events and process them */
+        eventsListener();
+
         /* Connect to MQTT if not connected */
         if (Device.configuration.mqttAPI) {
           Mqtt.listener();
@@ -104,7 +107,7 @@ void loop() {
         mainRelay();
 
       } else { // Configuration Mode
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -112,7 +115,7 @@ void loop() {
         WebServer.listener();
       }
     }
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -128,7 +131,8 @@ void loop() {
   /* Listens for switch events */
   mainSwitchListener();
   mainSwitch();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
+  /* Led listener */
   Led.loop();
 #endif
 }

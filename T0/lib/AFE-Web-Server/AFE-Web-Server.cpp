@@ -98,7 +98,7 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
         optionName, command, data));
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
@@ -231,7 +231,7 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("d").length() > 0 ? data.domoticzAPI = true
                                : data.domoticzAPI = false;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
@@ -433,7 +433,7 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   return data;
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
   if (server.arg("g" + String(id)).length() > 0) {

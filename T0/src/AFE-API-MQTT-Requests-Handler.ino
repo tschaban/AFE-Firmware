@@ -14,7 +14,7 @@ void MQTTInit() {
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   char _mqttTopic[65];
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   Led.on();
 #endif
 
@@ -102,7 +102,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
   }
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   Led.off();
 #endif
 }

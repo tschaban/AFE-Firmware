@@ -14,7 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
 
@@ -28,7 +28,7 @@ private:
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   unsigned long ledStartTime = 0;
 #endif
 
@@ -38,7 +38,7 @@ private:
                              // X number of connection failures
   DNSServer dnsServer;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   AFELED Led;
 #endif
 

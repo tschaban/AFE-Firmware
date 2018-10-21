@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
 
@@ -26,7 +26,7 @@ private:
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   AFELED Led;
 #endif
 
@@ -84,7 +84,7 @@ public:
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif

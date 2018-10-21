@@ -6,11 +6,11 @@
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
     if (WebServer.httpAPIlistener()) {
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       Led.off();
 #endif
     }

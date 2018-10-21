@@ -15,7 +15,7 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>

@@ -55,7 +55,7 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif

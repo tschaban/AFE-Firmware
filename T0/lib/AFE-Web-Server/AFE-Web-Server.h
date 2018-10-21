@@ -49,7 +49,7 @@ private:
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif

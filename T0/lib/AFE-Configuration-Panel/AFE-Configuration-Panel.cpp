@@ -127,7 +127,7 @@ String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
   return page;
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 String AFEConfigurationPanel::getLEDConfigurationSite(
     const String option, uint8_t command,
     LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {

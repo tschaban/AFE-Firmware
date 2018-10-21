@@ -31,7 +31,7 @@ private:
 
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   unsigned long ledStartTime = 0;
 #endif
 
@@ -66,6 +66,7 @@ public:
    * default values */
   void listener();
 
+  /* Method turns off MQTT API */
   void disconnect();
 };
 

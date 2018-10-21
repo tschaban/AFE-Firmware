@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
 //#include <Streaming.h>
@@ -40,7 +40,7 @@ private:
 
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   AFELED Led;
 #endif
 

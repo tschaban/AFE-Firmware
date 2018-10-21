@@ -10,13 +10,13 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
   Eeprom.read(9, 16).toCharArray(configuration.name,
                                  sizeof(configuration.name));
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   configuration.isLED[0] = Eeprom.read(366);
   configuration.isLED[1] = Eeprom.read(418);
 #endif
   configuration.isRelay[0] = Eeprom.read(369);
   configuration.isSwitch[0] = Eeprom.read(395);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   configuration.isSwitch[1] = Eeprom.read(402);
 #endif
   configuration.httpAPI = Eeprom.read(25);
@@ -85,7 +85,7 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
                                    sizeof(configuration.password));
   return configuration;
 }
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
   uint8_t nextLED = 52;
@@ -114,7 +114,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
           configuration.name);
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   configuration.ledID = Eeprom.readUInt8(421 + id);
 #endif
   configuration.idx = Eeprom.read(930 + id, 6).toInt();
@@ -137,7 +137,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(9, 16, configuration.name);
   Eeprom.write(369, configuration.isRelay[0]);
   Eeprom.write(395, configuration.isSwitch[0]);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   Eeprom.write(402, configuration.isSwitch[1]);
   Eeprom.write(366, configuration.isLED[0]);
   Eeprom.write(418, configuration.isLED[1]);
@@ -192,12 +192,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   /* @TODO For MQTT only */
   Eeprom.write(378 + id * nextRelay, 16, configuration.name);
   Eeprom.writeUInt8(394 + id * nextRelay, configuration.stateMQTTConnected);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   Eeprom.writeUInt8(421 + id, configuration.ledID);
 #endif
   Eeprom.write(930 + id, 6, (long)configuration.idx);
 }
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
   uint8_t nextLED = 52;
   Eeprom.writeUInt8(367 + id * nextLED, configuration.gpio);
@@ -237,7 +237,7 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 uint8_t AFEDataAccess::getSystemLedID() { return Eeprom.readUInt8(415); }
 
 void AFEDataAccess::saveSystemLedID(uint8_t id) { Eeprom.writeUInt8(415, id); }

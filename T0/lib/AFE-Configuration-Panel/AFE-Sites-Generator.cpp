@@ -61,7 +61,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   page += language == 0 ? "Włącznik WiFi" : "WiFi Switch";
 #else
   page += language == 0 ? "dla Shelly-1" : "for Shelly-1";
@@ -253,7 +253,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isLED), itemsNumber, "hl",
       language == 0 ? "Ilość Led'ów" : "Number of LEDs");
@@ -681,7 +681,7 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
       body);
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -898,7 +898,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</span>";
   body += "</div>";
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
                         : "Select LED informing about relay state";

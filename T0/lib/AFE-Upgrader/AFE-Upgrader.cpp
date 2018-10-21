@@ -21,7 +21,7 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
     if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0) {
       upgradeToVersion120();
@@ -47,7 +47,7 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
 

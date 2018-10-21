@@ -46,7 +46,7 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -92,7 +92,7 @@ void AFEMQTT::connect() {
             }
           }
           delayStartTime = 0;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
           ledStartTime = 0;
           Led.off();
 #endif
@@ -101,7 +101,7 @@ void AFEMQTT::connect() {
           return;
         }
       }
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
@@ -128,7 +128,7 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
         ledStartTime = 0;
         Led.off();
 #endif
