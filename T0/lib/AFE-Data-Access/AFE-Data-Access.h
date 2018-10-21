@@ -13,7 +13,10 @@
 
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEDataAccess {
 private:

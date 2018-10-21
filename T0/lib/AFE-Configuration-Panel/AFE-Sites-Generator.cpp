@@ -15,7 +15,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   if (redirect > 0) {
     page += "<meta http-equiv=\"refresh\" content=\"";
     page += String(redirect);
-    page += "; url=/\">";
+    page += ";url=/\">";
   }
 
   page += "<title>AFE Firmware ";
@@ -61,10 +61,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       "<div id=\"l\">"
       "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
       "<h4 class=\"ltag\">";
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef T0_CONFIG
   page += language == 0 ? "Włącznik WiFi" : "WiFi Switch";
-#else
+#elif T0_SHELLY_1_CONFIG
   page += language == 0 ? "dla Shelly-1" : "for Shelly-1";
+#elif T4_CONFIG
+  page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
 #endif
 
   page += "</h4><h4>MENU</h4>"
@@ -105,10 +107,30 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
-    if (Device.configuration.isRelay[0]) {
-      page += "<li class=\"itm\"><a href=\"\\?option=relay0\">";
-      page += language == 0 ? "Przekaźnik" : "Relay";
-      page += "</a></li>";
+    itemPresent = 0;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      if (Device.configuration.isRelay[i]) {
+        itemPresent++;
+      } else {
+        break;
+      }
+    }
+
+    if (itemPresent > 0) {
+      page += "<li  class=\"itm\"><a><i>";
+      page +=
+          language == 0 ? "Konfiguracja przekaźników" : "Relays configuration";
+      page += "</i></a></li>";
+
+      for (uint8_t i = 0; i < itemPresent; i++) {
+        page += "<li class=\"itm\"><a href=\"\\?option=relay";
+        page += i;
+        page += "\">&#8227; ";
+        page += language == 0 ? "Przekaźnik" : "Relay";
+        page += ": ";
+        page += i + 1;
+        page += "</a></li>";
+      }
     }
 
     itemPresent = 0;
@@ -128,7 +150,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       for (uint8_t i = 0; i < itemPresent; i++) {
         page += "<li class=\"itm\"><a href=\"\\?option=switch";
         page += i;
-        page += "\"> - ";
+        page += "\">&#8227; ";
         page += language == 0 ? "Przycisk: " : "Switch: ";
         page += i + 1;
         page += "</a></li>";
@@ -160,7 +182,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += "/\" target=\"_blank\">Do";
   page += language == 0 ? "kumentacja" : "cumentation";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"https:///www.smartnydom.pl/forum/"
+          "href=\"https://www.smartnydom.pl/forum/"
           "afe-firmware/\" target=\"_blank\">";
   page += language == 0 ? "Pomoc" : "Help";
   page += "</a></li><li class=\"itm\"><a "
@@ -245,6 +267,9 @@ String AFESitesGenerator::addDeviceConfiguration() {
       body);
 
   body = "<fieldset>";
+
+/* LED */
+#ifndef T0_SHELLY_1_CONFIG
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     if (Device.configuration.isLED[i]) {
       itemsNumber++;
@@ -253,12 +278,13 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-#ifndef T0_SHELLY_1_CONFIG
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isLED), itemsNumber, "hl",
       language == 0 ? "Ilość Led'ów" : "Number of LEDs");
+
 #endif
 
+  /* Relay */
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
@@ -272,6 +298,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isRelay), itemsNumber, "hr",
       language == 0 ? "Ilość przekaźników" : "Number of relay");
 
+  /* Switch */
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     if (Device.configuration.isSwitch[i]) {
@@ -280,6 +307,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
       break;
     }
   }
+
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
@@ -343,7 +371,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Nazwa sieci WiFI" : "WiFi name";
+  body += language == 0 ? "Nazwa sieci WiFi" : "WiFi name";
   body += "*</label>";
   body += "<input name=\"s\" type=\"text\" maxlength=\"32\" value=\"";
   body += configuration.ssid;
@@ -364,18 +392,8 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
   body += "</div>";
-  body += "<p class=\"cm\">";
-  body += language == 0
-              ? "Adres MAC może pomóc Ci odszukać adres IP tego urządzenia w "
-                "routerze WiFi"
-              : "MAC address may help you to find IP address of this device in "
-                "your WiFi router";
-  body += "</p>";
-
   body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "MAC" : "MAC";
-  body += "</label>";
+  body += "<label>MAC</label>";
   body += "<input type=\"text\" readonly=\"readonly\" value=\"";
   body += WiFi.macAddress();
   body += "\">";
@@ -1062,11 +1080,11 @@ String AFESitesGenerator::addUpgradeSection() {
             "<br><strong>Ten proces nie może zostac przerwany</strong>."
           : "Device will be automatically rebooted after "
             "upgrade<br><br><strong>Warning</strong>: after upgrade do not "
-            "plug "
-            "off the device from power source for around a minute.<br>Device's "
-            "memory "
+            "plug off the device from power source for around a "
+            "minute.<br>Device's memory "
             "will be formatted and default settings will be "
-            "uploaded.<br><strong>This process cannot be interrupted</strong>";
+            "uploaded.<br><strong>This process cannot be "
+            "interrupted</strong>";
   body += "</p>";
   body += "<button type=\"submit\" class=\"b be\">";
   body += language == 0 ? "Aktualizuj" : "Upgrade";

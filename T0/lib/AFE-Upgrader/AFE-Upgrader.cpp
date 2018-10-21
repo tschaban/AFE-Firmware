@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #include "AFE-Upgrader.h"
 
@@ -50,11 +50,9 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
 #ifndef T0_SHELLY_1_CONFIG
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
+  DEVICE deviceConfiguration;
 
-  /* Add Domoticz default config */
-  Eeprom.write(800, false);
-  Defaults.addDomoticzConfiguration();
-
+#ifdef T0_CONFIG
   /* LEDs */
   Eeprom.write(418, false);
   Defaults.addLEDConfiguration(1, 3);
@@ -66,19 +64,43 @@ void AFEUpgrader::upgradeToVersion120() {
 
   /* Set that none of led informs about status of a relay */
   Eeprom.writeUInt8(421, 0);
+#endif
 
   /* Upgrade to new switch functionality codes */
-  if (Eeprom.readUInt8(401) == 11) {
-    Eeprom.writeUInt8(401, 1);
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
+
+#ifdef T0_CONFIG
+    if (Eeprom.readUInt8(401 + i * 13) == 11) {
+      Eeprom.writeUInt8(401 + i * 13, 1);
+    }
+#elif T4_CONFIG
+    if (Eeprom.readUInt8(496 + i * 8) == 11) {
+      Eeprom.writeUInt8(496 + i * 8, 1);
+    }
+#endif
   }
-  if (Eeprom.readUInt8(414) == 11) {
-    Eeprom.writeUInt8(414, 1);
-  }
+
+  /* T0, T4 */
+
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
 
   /* Device ID */
   if (Data.getDeviceID().length() == 0) {
     Defaults.addDeviceID();
   }
+
+#ifdef T4_CONFIG
+
+  /* Relay. Setting LED ID and IDX */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    Eeprom.writeUInt8(531 + i, 0);
+    Eeprom.write(930 + 6 * i, 6, (long)0);
+  }
+
+  Data.saveSystemLedID(1);
+#endif
 }
 
 #endif

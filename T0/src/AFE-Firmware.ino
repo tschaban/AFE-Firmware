@@ -34,8 +34,10 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-  /* Turn off publishing information to Serial */
+/* Turn off publishing information to Serial */
+#ifndef DEBUG
   Serial.swap();
+#endif
 
   /* Checking if the device is launched for a first time. If so it sets up
    * the device (EEPROM) */

@@ -15,7 +15,10 @@
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFESitesGenerator {
 
