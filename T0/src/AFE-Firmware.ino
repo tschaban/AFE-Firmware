@@ -14,7 +14,9 @@
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-//#include <Streaming.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 AFEDataAccess Data;
 AFEDevice Device;
