@@ -70,8 +70,8 @@ void AFEUpgrader::upgradeToVersion120() {
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
 
 #ifdef T0_CONFIG
-    if (Eeprom.readUInt8(401 + i * 13) == 11) {
-      Eeprom.writeUInt8(401 + i * 13, 1);
+    if (Eeprom.readUInt8(401 + i * 7) == 11) {
+      Eeprom.writeUInt8(401 + i * 7, 1);
     }
 #elif T4_CONFIG
     if (Eeprom.readUInt8(496 + i * 8) == 11) {
