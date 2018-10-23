@@ -20,8 +20,9 @@
 
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
-
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 class AFEWiFi {
 
 private:
@@ -43,6 +44,7 @@ private:
 #endif
 
   boolean eventConnectionEstablished = false;
+  boolean disconnected = false;
 
 public:
   /* Constructor: no actions */

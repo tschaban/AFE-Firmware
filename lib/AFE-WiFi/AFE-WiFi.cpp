@@ -123,9 +123,13 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (WiFi.status() == WL_CONNECTED) {
-    eventConnectionEstablished = true;
+    if (disconnected) {
+      eventConnectionEstablished = true;
+      disconnected = false;
+    }
     return true;
   } else {
+    disconnected = true;
     return false;
   }
 }
