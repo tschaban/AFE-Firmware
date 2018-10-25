@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
 #include "AFE-Defaults.h"
 
@@ -24,20 +24,33 @@ void AFEDefaults::set() {
 
   sprintf(deviceConfiguration.name, "AFE-Device");
 
-  deviceConfiguration.isRelay[0] = true;
-  deviceConfiguration.isSwitch[0] = true;
+  /* APIs */
   deviceConfiguration.mqttAPI = false;
   deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
 
-#ifndef SHELLY_1_DEVICE
+  /* Relay presence */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    deviceConfiguration.isRelay[i] = false;
+  }
+
+  /* Switch presence */
+  deviceConfiguration.isSwitch[0] = true;
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isSwitch); i++) {
+    deviceConfiguration.isSwitch[i] = false;
+  }
+
+#ifndef T0_SHELLY_1_CONFIG
+  /* LED */
   deviceConfiguration.isLED[0] = true;
-  deviceConfiguration.isLED[1] = false;
-  deviceConfiguration.isSwitch[1] = false;
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
+    deviceConfiguration.isLED[i] = false;
+  }
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
 
+  /* Network default config */
   networkConfiguration.ssid[0] = '\0';
   networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
@@ -49,6 +62,7 @@ void AFEDefaults::set() {
   networkConfiguration.waitTimeSeries = 60;
   Data->saveConfiguration(networkConfiguration);
 
+  /* MQTT Default config */
   MQTTConfiguration.host[0] = '\0';
   MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
   MQTTConfiguration.user[0] = '\0';
@@ -57,50 +71,99 @@ void AFEDefaults::set() {
   sprintf(MQTTConfiguration.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
 
-#ifdef SHELLY_1_DEVICE
+  /* Domoticz config */
+  addDomoticzConfiguration();
+
+/* Relay config */
+#ifdef T0_SHELLY_1_CONFIG
   RelayConfiguration.gpio = 4;
 #else
   RelayConfiguration.gpio = 12;
 #endif
+
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
+
+#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
+#elif defined(T4_CONFIG)
+  sprintf(RelayConfiguration.name, "switch1");
+#endif
+
   RelayConfiguration.ledID = 0;
-  RelayConfiguration.idx = 1;
+  RelayConfiguration.idx = 0;
   Data->saveConfiguration(0, RelayConfiguration);
 
-#ifdef SHELLY_1_DEVICE
+#if defined(T4_CONFIG)
+  RelayConfiguration.gpio = 5;
+  sprintf(RelayConfiguration.name, "switch2");
+  Data->saveConfiguration(1, RelayConfiguration);
+
+  RelayConfiguration.gpio = 4;
+  sprintf(RelayConfiguration.name, "switch3");
+  Data->saveConfiguration(2, RelayConfiguration);
+
+  RelayConfiguration.gpio = 15;
+  sprintf(RelayConfiguration.name, "switch4");
+  Data->saveConfiguration(3, RelayConfiguration);
+#endif
+
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    Data->saveRelayState(i, false);
+  }
+
+/* Switch config */
+#ifdef T0_SHELLY_1_CONFIG
   SwitchConfiguration.gpio = 5;
+  SwitchConfiguration.type = 1;
 #else
   SwitchConfiguration.gpio = 0;
-#endif
   SwitchConfiguration.type = 0;
+#endif
+
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
   SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
-#ifndef SHELLY_1_DEVICE
+#ifdef T0_CONFIG
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
+#elif T4_CONFIG
+  SwitchConfiguration.gpio = 9;
+  SwitchConfiguration.relayID = 2;
+#endif
+
+#if defined(T0_CONFIG) || defined(T4_CONFIG)
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
 
-  addDomoticzConfiguration();
-#ifndef SHELLY_1_DEVICE
+#if defined(T4_CONFIG)
+  SwitchConfiguration.gpio = 10;
+  SwitchConfiguration.relayID = 3;
+  Data->saveConfiguration(2, SwitchConfiguration);
+#endif
+
+#if defined(T4_CONFIG)
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.relayID = 4;
+  Data->saveConfiguration(3, SwitchConfiguration);
+#endif
+
+#ifndef T0_SHELLY_1_CONFIG
   addLEDConfiguration(0, 13);
   addLEDConfiguration(1, 3);
 #endif
 
   addDeviceID();
-#ifndef SHELLY_1_DEVICE
+
+#ifndef T0_SHELLY_1_CONFIG
   Data->saveSystemLedID(1);
 #endif
 
   Data->saveDeviceMode(2);
-  Data->saveRelayState(0, false);
   Data->saveLanguage(1);
 }
 
@@ -114,7 +177,7 @@ void AFEDefaults::addDomoticzConfiguration() {
   Data->saveConfiguration(DomoticzConfiguration);
 }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
   LED LEDConfiguration;
   LEDConfiguration.gpio = gpio;

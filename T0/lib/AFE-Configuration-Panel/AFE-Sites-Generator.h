@@ -15,7 +15,10 @@
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFESitesGenerator {
 
@@ -55,7 +58,7 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif

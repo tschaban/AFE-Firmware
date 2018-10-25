@@ -15,13 +15,13 @@ void mainSwitch() {
     if (Device.configuration.isSwitch[i]) {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getControlledRelayID() > 0) {
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
         Led.on();
 #endif
         Relay[Switch[i].getControlledRelayID() - 1].toggle();
         MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
         DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
         Led.off();
 #endif
       }
@@ -48,11 +48,11 @@ void mainSwitchListener() {
           Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                           : Device.reboot(MODE_NORMAL);
         } else if (Switch[i].is30s()) {
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
           Led.on();
 #endif
           Device.setDevice();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
           Led.off();
 #endif
           Device.reboot(MODE_ACCESS_POINT);

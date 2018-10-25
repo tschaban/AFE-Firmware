@@ -12,7 +12,7 @@ void AFEWiFi::begin(uint8_t mode) {
   AFEDevice Device;
   networkConfiguration = Data.getNetworkConfiguration();
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   // Init LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
@@ -61,7 +61,7 @@ void AFEWiFi::listener() {
         }
       }
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -89,7 +89,7 @@ void AFEWiFi::listener() {
         sleepStartTime = millis();
         delayStartTime = 0;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
         ledStartTime = 0;
         Led.off();
 #endif
@@ -107,7 +107,7 @@ void AFEWiFi::listener() {
       connections = 0;
       delayStartTime = 0;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
       ledStartTime = 0;
       Led.off();
 #endif
@@ -123,9 +123,13 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (WiFi.status() == WL_CONNECTED) {
-    eventConnectionEstablished = true;
+    if (disconnected) {
+      eventConnectionEstablished = true;
+      disconnected = false;
+    }
     return true;
   } else {
+    disconnected = true;
     return false;
   }
 }

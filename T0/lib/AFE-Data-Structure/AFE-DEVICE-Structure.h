@@ -25,15 +25,20 @@ struct DEVICE {
   boolean mqttAPI;
   boolean httpAPI;
   boolean domoticzAPI;
-#ifndef SHELLY_1_DEVICE
+
+#if defined(T0_CONFIG)
   boolean isLED[2];
   boolean isSwitch[2];
-#else
+  boolean isRelay[1];
+#elif defined(T0_SHELLY_1_CONFIG)
   boolean isLED[0];
   boolean isSwitch[1];
-#endif
-
   boolean isRelay[1];
+#elif defined(T4_CONFIG)
+  boolean isLED[5];
+  boolean isSwitch[5];
+  boolean isRelay[4];
+#endif
 };
 
 #endif

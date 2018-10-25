@@ -25,7 +25,7 @@ public:
   AFEDefaults();
 
   void addDomoticzConfiguration();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   void addLEDConfiguration(uint8_t id, uint8_t gpio);
 #endif
   void addDeviceID();

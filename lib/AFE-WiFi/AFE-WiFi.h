@@ -14,21 +14,22 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
 
 #include <DNSServer.h>
 #include <ESP8266WiFi.h>
-//#include <Streaming.h>
-
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 class AFEWiFi {
 
 private:
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   unsigned long ledStartTime = 0;
 #endif
 
@@ -38,11 +39,12 @@ private:
                              // X number of connection failures
   DNSServer dnsServer;
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   AFELED Led;
 #endif
 
   boolean eventConnectionEstablished = false;
+  boolean disconnected = false;
 
 public:
   /* Constructor: no actions */

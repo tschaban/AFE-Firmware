@@ -11,12 +11,15 @@
 #include "WProgram.h"
 #endif
 
+#if defined(T0_CONFIG)
+#define FIRMWARE_VERSION "1.2.4"
 #define FIRMWARE_TYPE 0
-
-#ifdef SHELLY_1_DEVICE
-#define FIRMWARE_VERSION "S1.0.0"
-#else
-#define FIRMWARE_VERSION "1.2.3"
+#elif defined(T0_SHELLY_1_CONFIG)
+#define FIRMWARE_VERSION "S1.0.1"
+#define FIRMWARE_TYPE 0
+#elif defined(T4_CONFIG)
+#define FIRMWARE_VERSION "1.2.1"
+#define FIRMWARE_TYPE 4
 #endif
 
 #endif

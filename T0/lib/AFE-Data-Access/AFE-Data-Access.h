@@ -13,7 +13,10 @@
 
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEDataAccess {
 private:
@@ -28,7 +31,7 @@ public:
   NETWORK getNetworkConfiguration();
   MQTT getMQTTConfiguration();
   DOMOTICZ getDomoticzConfiguration();
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   LED getLEDConfiguration(uint8_t id);
 #endif
   RELAY getRelayConfiguration(uint8_t id);
@@ -40,7 +43,7 @@ public:
   void saveConfiguration(NETWORK configuration);
   void saveConfiguration(MQTT configuration);
   void saveConfiguration(DOMOTICZ configuration);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   void saveConfiguration(uint8_t id, LED configuration);
 #endif
   void saveConfiguration(uint8_t id, RELAY configuration);
@@ -61,7 +64,7 @@ public:
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);

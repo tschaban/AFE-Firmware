@@ -39,7 +39,7 @@ public:
                                   MQTT data);
   String getDomoticzServerConfigurationSite(const String option,
                                             uint8_t command, DOMOTICZ data);
-#ifndef SHELLY_1_DEVICE
+#ifndef T0_SHELLY_1_CONFIG
   String getLEDConfigurationSite(const String option, uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
