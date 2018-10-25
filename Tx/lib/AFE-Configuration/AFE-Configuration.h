@@ -17,8 +17,11 @@
 #elif defined(T0_SHELLY_1_CONFIG)
 #define FIRMWARE_VERSION "S1.0.1"
 #define FIRMWARE_TYPE 0
+#elif defined(T1_CONFIG)
+#define FIRMWARE_VERSION "1.2.5"
+#define FIRMWARE_TYPE 1
 #elif defined(T4_CONFIG)
-#define FIRMWARE_VERSION "1.2.1"
+#define FIRMWARE_VERSION "1.2.2"
 #define FIRMWARE_TYPE 4
 #endif
 

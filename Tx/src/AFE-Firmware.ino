@@ -2,6 +2,12 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 #include <AFE-API-Domoticz.h>
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
@@ -29,8 +35,14 @@ AFELED Led;
 #endif
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
+#ifdef T1_CONFIG
+AFESensorDS18B20 SensorDS18B20;
+#endif
 MQTT MQTTConfiguration;
 
+#ifdef T1_CONFIG
+float temperature;
+#endif
 void setup() {
 
   Serial.begin(115200);
@@ -85,6 +97,11 @@ void setup() {
   /* Initializing switches */
   initSwitch();
 
+#ifdef T1_CONFIG
+  /* Initializing switches */
+  initDS18B20Sensor();
+#endif
+
   /* Initializing APIs */
   MQTTInit();
   DomoticzInit();
@@ -109,6 +126,11 @@ void loop() {
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
         mainRelay();
+
+#ifdef T1_CONFIG
+        /* Sensor: DS18B20 related code */
+        mainDS18B20Sensor();
+#endif
 
       } else { // Configuration Mode
 #ifndef T0_SHELLY_1_CONFIG

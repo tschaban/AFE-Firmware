@@ -36,6 +36,9 @@ public:
 #endif
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
+#ifdef T1_CONFIG
+  DS18B20 getDS18B20Configuration();
+#endif
 
   /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
@@ -49,10 +52,15 @@ public:
   void saveConfiguration(uint8_t id, RELAY configuration);
   void saveConfiguration(uint8_t id, SWITCH configuration);
 
-  /* Methods ave firmware version from/to EEPROM */
+#ifdef T1_CONFIG
+  void saveConfiguration(DS18B20 configuration);
+  void saveConfiguration(REGULATOR configuration);
+#endif
+
+  /* Methods saves firmware version from/to EEPROM */
   void saveVersion(String version);
 
-  /* Methods read and save relay state from/to EEPROM */
+  /* Methods reads and saves relay state from/to EEPROM */
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
 
@@ -63,6 +71,12 @@ public:
   /* Methods read and save firmware Language from/to EEPROM */
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
+
+#ifdef T1_CONFIG
+  /* Methods read and save thermostate state */
+  boolean isThermostatEnabled(uint8_t id);
+  void saveThermostatState(uint8_t id, boolean state);
+#endif
 
 #ifndef T0_SHELLY_1_CONFIG
   /* Methods read and save ID of system led */

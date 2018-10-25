@@ -15,12 +15,18 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
-#ifndef T0_SHELLY_1_CONFIG
-#include <AFE-LED-Structure.h>
-#endif
+
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
+
+#ifndef T0_SHELLY_1_CONFIG
+#include <AFE-LED-Structure.h>
+#endif
+
+#ifdef T1_CONFIG
+#include <AFE-DS18B20-Sensor-Structure.h>
+#endif
 
 #endif
