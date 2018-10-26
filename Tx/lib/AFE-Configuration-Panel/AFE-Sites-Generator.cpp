@@ -65,6 +65,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += language == 0 ? "Włącznik WiFi" : "WiFi Switch";
 #elif T0_SHELLY_1_CONFIG
   page += language == 0 ? "dla Shelly-1" : "for Shelly-1";
+#elif T1_CONFIG
+  page += language == 0 ? "Włącznik z czujnikiem temperatury"
+                        : "Switch with temperature sensor";
 #elif T4_CONFIG
   page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
 #endif
@@ -107,6 +110,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
+#ifdef T1_CONFIG
+    if (Device.configuration.isDS18B20) {
+      page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
+      page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+      page += "</a></li>";
+    }
+#endif
+
     itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -130,6 +141,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         page += ": ";
         page += i + 1;
         page += "</a></li>";
+#if defined(T1_CONFIG)
+        if (Device.configuration.isDS18B20) {
+          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
+          page += language == 0 ? "Termostat" : "Thermostat";
+          page += "</a></li>";
+        }
+#endif
       }
     }
 
@@ -157,10 +175,10 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
     }
 
-    page +=
-        "<br><br><li class=\"itm\"><a "
-        "href=\"\\?option=language\">[PL] Język / "
-        "[EN] Language</a></li><br><br><li class=\"itm\"><a href=\"\\update\">";
+    page += "<br><br><li class=\"itm\"><a "
+            "href=\"\\?option=language\">[PL] Język / "
+            "[EN] Language</a></li><br><br><li class=\"itm\"><a "
+            "href=\"\\update\">";
     page += language == 0 ? "Aktulizacja firmware" : "Firmware upgrade";
     page += "</a></li><li class=\"itm\"><a href=\"\\?option=reset\">";
     page += language == 0 ? "Przywracanie ustawień początkowych"
@@ -311,6 +329,17 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
+
+#ifdef T1_CONFIG
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"ds\" type=\"checkbox\" value=\"1\"";
+  body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " DS18B20";
+  body += "</label>";
+  body += "</div>";
+#endif
 
   body += "</fieldset>";
 
@@ -916,6 +945,30 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</span>";
   body += "</div>";
 
+#ifdef T1_CONFIG
+  if (device.isDS18B20) {
+
+    body += "<br><p class=\"cm\">";
+    body += language == 0 ? "Zabezpieczenie termiczne" : "Thermal protection";
+    body += "</p>";
+
+    body += "<div class=\"cf\">";
+    body += "<label>";
+    body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
+    body += "*</label>";
+    body += "<input name=\"tp" + String(id) +
+            "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
+    body += configuration.thermalProtection;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres" : "Range";
+    body += ": -55C : +125C (-67F : +259F). ";
+    body += language == 0 ? "Brak akcji jeśli jest 0"
+                          : "No action if it's set to 0";
+    body += "</span></div>";
+  }
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
@@ -955,6 +1008,21 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
                 : sprintf(title, "Relay #%d", id + 1);
   return addConfigurationBlock(title, "", body);
 }
+
+#ifdef T1_CONFIG
+String AFESitesGenerator::addThermostatConfiguration() {
+  RELAY configuration = Data.getRelayConfiguration(0);
+  String body = generateTwoValueController(configuration.thermostat);
+  return addConfigurationBlock(
+      language == 0 ? "Termostat" : "Thermostat",
+      language == 0
+          ? "Termostat kontroluje przekaźnik w "
+            "zależności od wartości temperatury"
+          : "Thermostat controlls the relay depending on temperature value",
+      body);
+}
+
+#endif
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
@@ -1061,6 +1129,91 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   return addConfigurationBlock(title, "", body);
 }
+
+#ifdef T1_CONFIG
+String AFESitesGenerator::addDS18B20Configuration() {
+
+  DS18B20 configuration = Data.getDS18B20Configuration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
+
+  if (device.domoticzAPI) {
+    body += "<div class=\"cf\">";
+    body += "<label>IDX ";
+    body += language == 0 ? "w" : "in";
+    body += " Domoticz*</label>";
+    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
+                        : "seconds. Range: 5 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body += language == 0
+              ? ">Wysyłać dane tylko, gdy wartość temperatury zmieni się"
+              : ">Send data only if value of temperature has changed";
+  body += "</label>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o" : "Temperature correction";
+  body += "</label>";
+  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+          "step=\"0.01\" "
+          "value=\"";
+  body += configuration.correction;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "stopni. Zakres" : "degrees. Range";
+  body += ": -9.99 - +9.99</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Jednostka" : "Unit";
+  body += "</label>";
+  body += "<select  name=\"u\">";
+  body += "<option value=\"0\"";
+  body += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
+  body += language == 0 ? "Celsjusz" : "Celsius";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
+  body += ">Fahrenheit</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock(language == 0 ? "Czujnik temperatury DS18B20"
+                                             : "DS18B20 temperature sensor",
+                               "", body);
+}
+#endif
 
 String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset>";
@@ -1283,3 +1436,74 @@ const String AFESitesGenerator::generateHardwareItemsList(
 
   return body;
 }
+
+#if defined(T1_CONFIG)
+const String
+AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"te\" type=\"checkbox\" value=\"1\"";
+  body += configuration.enabled ? " checked=\"checked\">" : ">";
+
+  body += language == 0 ? " włączony" : "enabled";
+
+  body += "?</label>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Włącz jeśli " : "Switch on if ";
+  body += "temp.";
+  body += language == 0 ? " jest" : " is";
+  body += "</label>";
+
+  body += "<select name=\"ta\"><option value=\"0\"";
+  body += (configuration.turnOnAbove == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "mniejsza" : "below";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.turnOnAbove == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "większa" : "above";
+  body += "</option>";
+  body += "</select>";
+  body += "<input name=\"tn\" type=\"number\" value=\"";
+  body += configuration.turnOn;
+  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+
+  body += "</span></div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wyłącz jeśli " : "Switch off if ";
+  body += "temp.";
+  body += language == 0 ? " jest" : " is";
+  body += "</label>";
+  body += "<select name=\"tb\"><option value=\"0\"";
+  body += (configuration.turnOffAbove == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "mniejsza" : "below";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.turnOffAbove == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "większa" : "above";
+  body += "</option>";
+  body += "</select>";
+  body += "<input name=\"tf\" type=\"number\" value=\"";
+  body += configuration.turnOff;
+  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+
+  body += "</div></fieldset>";
+
+  return body;
+}
+#endif

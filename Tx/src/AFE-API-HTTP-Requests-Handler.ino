@@ -96,7 +96,26 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             };
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
-            /* Command not implemented.Info */
+/* Command not implemented.Info */
+#if defined(T1_CONFIG)
+          } else if (strcmp(request.command, "enableThermostat") == 0) {
+            Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "disableThermostat") == 0) {
+            Relay[i].Thermostat.off();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "toggleThermostat") == 0) {
+            Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
+                                          : Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "getThermostat") == 0) {
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+
+#endif
           } else {
             sendHTTPAPIRequestStatus(request, false);
           }
@@ -108,6 +127,12 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);
     }
+#if defined(T1_CONFIG)
+  } else if (strcmp(request.device, "ds18b20") == 0) {
+    if (strcmp(request.command, "get") == 0) {
+      sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
+    }
+#endif
     /* Turning ON / OFF APIs */
   } else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =

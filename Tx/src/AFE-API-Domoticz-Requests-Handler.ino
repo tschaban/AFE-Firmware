@@ -16,3 +16,12 @@ void DomoticzPublishRelayState(uint8_t id) {
                                Relay[id].get() == RELAY_ON ? "On" : "Off");
   }
 }
+#if defined(T1_CONFIG)
+/* It publishes temperature to Domotucz */
+void DomoticzPublishTemperature(float temperature) {
+  if (Device.configuration.domoticzAPI) {
+    Domoticz.sendTemperatureCommand(SensorDS18B20.getDomoticzIDX(),
+                                    temperature);
+  }
+}
+#endif

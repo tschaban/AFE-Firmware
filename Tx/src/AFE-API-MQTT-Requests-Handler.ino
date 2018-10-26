@@ -41,6 +41,32 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             DomoticzPublishRelayState(i);
           }
         }
+#if defined(T1_CONFIG)
+        else {
+
+          sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
+
+          if (strcmp(topic, _mqttTopic) == 0) {
+            if ((char)payload[0] == 'o' && length == 2) { // on
+              Relay[i].Thermostat.on();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
+            } else if ((char)payload[0] == 'o' && length == 3) { // off
+              Relay[i].Thermostat.off();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
+            } else if ((char)payload[0] == 't' && length == 6) { // toggle
+              Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
+                                            : Relay[i].Thermostat.on();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
+            } else if ((char)payload[0] == 'g' && length == 3) { // get
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
+            }
+          }
+        }
+#endif
       } else {
         break;
       }
@@ -96,6 +122,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             } else if ((char)payload[2] == 'n' &&
                        length == 17) { // configurationMode
               Device.reboot(MODE_CONFIGURATION);
+#if defined(T1_CONFIG)
+            } else if ((char)payload[2] == 't' &&
+                       length == 14) { // getTemperature
+              char temperatureString[6];
+              dtostrf(SensorDS18B20.get(), 2, 2, temperatureString);
+              Mqtt.publish("temperature", temperatureString);
+#endif
             }
           }
         }
@@ -114,3 +147,11 @@ void MQTTPublishRelayState(uint8_t id) {
                  Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
+#if defined(T1_CONFIG)
+/* Metod publishes temperature */
+void MQTTPublishTemperature(float temperature) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("temperature", temperature);
+  }
+}
+#endif

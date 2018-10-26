@@ -14,7 +14,10 @@
 #include <AFE-Common-Configuration.h>
 #include <AFE-Device.h>
 #include <AFE-Sites-Generator.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEConfigurationPanel {
 
@@ -46,10 +49,18 @@ public:
 #endif
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data, uint8_t relayIndex);
+#ifdef T1_CONFIG
+  String getRelayStatConfigurationSite(const String option, uint8_t command,
+                                       REGULATOR data);
+#endif
   String getSwitchConfigurationSite(const String option, uint8_t command,
                                     SWITCH data, uint8_t relayIndex);
   String getLanguageConfigurationSite(const String option, uint8_t command,
                                       uint8_t lang);
+#ifdef T1_CONFIG
+  String getDS18B20ConfigurationSite(const String option, uint8_t command,
+                                     DS18B20 data);
+#endif
 
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();

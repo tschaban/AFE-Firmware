@@ -23,6 +23,12 @@ private:
 
   /* Method erase eeprom but restores WiFi and Language configuration */
   void upgradeTypeOfFirmware();
+
+#ifdef T1_CONFIG
+  /* Method upgrades to v1.1.0 */
+  void upgradeToVersion110();
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
   /* Methods upgrades to v1.2.0 */
   void upgradeToVersion120();

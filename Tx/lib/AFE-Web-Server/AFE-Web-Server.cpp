@@ -111,6 +111,22 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getLEDConfigurationSite(optionName, command,
                                                            data, dataLedID));
 #endif
+#ifdef T1_CONFIG
+  } else if (optionName == "ds18b20") {
+    DS18B20 data1 = {};
+    if (command == SERVER_CMD_SAVE) {
+      data1 = getDS18B20Data();
+    }
+    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(optionName,
+                                                               command, data1));
+  } else if (optionName == "thermostat") {
+    REGULATOR data = {};
+    if (command == SERVER_CMD_SAVE) {
+      data = getThermostateData();
+    }
+    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
+        optionName, command, data));
+#endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
@@ -246,6 +262,10 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
   }
+#ifdef T1_CONFIG
+  server.arg("ds").length() > 0 ? data.isDS18B20 = true
+                                : data.isDS18B20 = false;
+#endif
 
   return data;
 }
@@ -396,6 +416,13 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
   }
 
+#ifdef T1_CONFIG
+  if (server.arg("tp" + String(id)).length() > 0) {
+    data.thermalProtection = server.arg("tp" + String(id)).toInt();
+  }
+
+#endif
+
   if (server.arg("l" + String(id)).length() > 0) {
     data.ledID = server.arg("l" + String(id)).toInt();
   }
@@ -406,6 +433,31 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   return data;
 }
+
+#ifdef T1_CONFIG
+REGULATOR AFEWebServer::getThermostateData() {
+  REGULATOR data;
+  server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
+
+  if (server.arg("tn").length() > 0) {
+    data.turnOn = server.arg("tn").toFloat();
+  }
+
+  if (server.arg("tf").length() > 0) {
+    data.turnOff = server.arg("tf").toFloat();
+  }
+
+  if (server.arg("ta").length() > 0) {
+    data.turnOnAbove = server.arg("ta").toInt() == 0 ? false : true;
+  }
+
+  if (server.arg("tb").length() > 0) {
+    data.turnOffAbove = server.arg("tb").toInt() == 0 ? false : true;
+  }
+
+  return data;
+}
+#endif
 
 SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   SWITCH data;
@@ -461,3 +513,34 @@ uint8_t AFEWebServer::getSystemLEDData() {
 uint8_t AFEWebServer::getLanguageData() {
   return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
 }
+#ifdef T1_CONFIG
+DS18B20 AFEWebServer::getDS18B20Data() {
+  DS18B20 data;
+
+  if (server.arg("g").length() > 0) {
+    data.gpio = server.arg("g").toInt();
+  }
+
+  if (server.arg("c").length() > 0) {
+    data.correction = server.arg("c").toFloat();
+  }
+
+  if (server.arg("i").length() > 0) {
+    data.interval = server.arg("i").toInt();
+  }
+
+  if (server.arg("u").length() > 0) {
+    data.unit = server.arg("u").toInt();
+  }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  if (server.arg("x").length() > 0) {
+    data.idx = server.arg("x").toInt();
+  }
+
+  return data;
+}
+
+#endif

@@ -186,6 +186,29 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
   return page;
 }
 
+#ifdef T1_CONFIG
+String AFEConfigurationPanel::getRelayStatConfigurationSite(const String option,
+                                                            uint8_t command,
+                                                            REGULATOR data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=thermostat&cmd=1\" method=\"post\">";
+
+  page += Site.addThermostatConfiguration();
+
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+#endif
+
 String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
                                                          uint8_t command,
                                                          SWITCH data,
@@ -209,6 +232,27 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
   return page;
 }
 
+#ifdef T1_CONFIG
+String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          DS18B20 data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
+  page += Site.addDS18B20Configuration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+#endif
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);

@@ -59,3 +59,16 @@ void AFEDomoticz::callURL(const String url) {
   */
   http.end();
 }
+
+#if defined(T1_CONFIG)
+void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
+  if (initialized) {
+    char _temperatureChar[7];
+    dtostrf(value, 4, 2, _temperatureChar);
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    call += _temperatureChar;
+    callURL(call);
+  }
+}
+#endif

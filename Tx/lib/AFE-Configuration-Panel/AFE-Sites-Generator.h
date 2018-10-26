@@ -31,6 +31,14 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field,
                                             uint8_t selected);
+#ifdef T1_CONFIG
+  /* These three methods generates checkboxes for Switch, Relay and LED */
+  const String generateSwitchItem(uint8_t id, boolean checked);
+  const String generateRelayItem(boolean checked);
+  const String generateLEDItem(boolean checked);
+  const String generateTwoValueController(REGULATOR configuration,
+                                          boolean thermostat);
+#endif
 
   /* Method addes configuration block to the site */
   String addConfigurationBlock(const String title, const String description,
@@ -39,6 +47,9 @@ private:
   const String generateHardwareItemsList(uint8_t noOfItems,
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
+#ifdef T1_CONFIG
+  const String generateTwoValueController(REGULATOR configuration);
+#endif
 
 public:
   /* Constructor*/
@@ -64,6 +75,10 @@ public:
 #endif
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+#ifdef T1_CONFIG
+  String addDS18B20Configuration();
+  String addThermostatConfiguration();
+#endif
 
   /* These methods generates firmware upgrade sections */
   String addUpgradeSection();

@@ -53,6 +53,12 @@ private:
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
+
+#if T1_CONFIG
+  DS18B20 getDS18B20Data();
+  REGULATOR getThermostateData();
+#endif
+
   uint8_t getLanguageData();
 
 public:

@@ -14,6 +14,10 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
+#ifdef T1_CONFIG
+  REGULATOR RegulatorConfiguration;
+  DS18B20 DS18B20Configuration;
+#endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
@@ -46,6 +50,10 @@ void AFEDefaults::set() {
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
   }
+#endif
+
+#ifdef T1_CONFIG
+  deviceConfiguration.isDS18B20 = false;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -85,7 +93,7 @@ void AFEDefaults::set() {
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
 #elif defined(T4_CONFIG)
   sprintf(RelayConfiguration.name, "switch1");
@@ -93,6 +101,11 @@ void AFEDefaults::set() {
 
   RelayConfiguration.ledID = 0;
   RelayConfiguration.idx = 0;
+
+#ifdef T1_CONFIG
+  RelayConfiguration.thermalProtection = 0;
+#endif
+
   Data->saveConfiguration(0, RelayConfiguration);
 
 #if defined(T4_CONFIG)
@@ -113,6 +126,16 @@ void AFEDefaults::set() {
     Data->saveRelayState(i, false);
   }
 
+#ifdef T1_CONFIG
+  RegulatorConfiguration.enabled = false;
+  RegulatorConfiguration.turnOn = 0;
+  RegulatorConfiguration.turnOnAbove = false;
+  RegulatorConfiguration.turnOff = 0;
+  RegulatorConfiguration.turnOffAbove = true;
+  Data->saveConfiguration(RegulatorConfiguration);
+#endif
+/* Regulator config */
+
 /* Switch config */
 #ifdef T0_SHELLY_1_CONFIG
   SwitchConfiguration.gpio = 5;
@@ -127,10 +150,10 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
-#ifdef T0_CONFIG
+#if defined(T0_CONFIG) || defined(T1_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
-#elif T4_CONFIG
+#elif defined(T4_CONFIG)
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.relayID = 2;
 #endif
@@ -158,6 +181,15 @@ void AFEDefaults::set() {
 #endif
 
   addDeviceID();
+
+#ifdef T1_CONFIG
+  DS18B20Configuration.gpio = 14;
+  DS18B20Configuration.correction = 0;
+  DS18B20Configuration.interval = 60;
+  DS18B20Configuration.unit = 0;
+  DS18B20Configuration.sendOnlyChanges = true;
+  Data->saveConfiguration(DS18B20Configuration);
+#endif
 
 #ifndef T0_SHELLY_1_CONFIG
   Data->saveSystemLedID(1);

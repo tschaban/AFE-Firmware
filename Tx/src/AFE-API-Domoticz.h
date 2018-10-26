@@ -38,6 +38,13 @@ public:
     json.htm?type=command&param=switchlight&idx=IDX&switchcmd=STATE
   */
   void sendSwitchCommand(unsigned int idx, const char *value);
+
+#if defined(T1_CONFIG)
+  /* It send to Domoticz temperature using following API call
+     json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
+  */
+  void sendTemperatureCommand(unsigned int idx, float value);
+#endif
 };
 
 #endif

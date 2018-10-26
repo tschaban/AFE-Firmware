@@ -17,7 +17,14 @@
 #include <AFE-LED.h>
 #endif
 
-//#include <Streaming.h>
+#if defined(T1_CONFIG)
+#include <AFE-Thermal-Protection.h>
+#include <AFE-Thermostat.h>
+#endif
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFERelay {
 
@@ -40,6 +47,11 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
+#if defined(T1_CONFIG)
+  AFEThermostat Thermostat;
+  AFEThermalProtection ThermalProtection;
+#endif
+
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);

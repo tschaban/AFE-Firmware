@@ -21,9 +21,24 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
     upgradeTypeOfFirmware();
   } else {
+
 #ifndef T0_SHELLY_1_CONFIG
     if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
-        strcmp(FirmwareConfiguration.version, "1.0.1") == 0) {
+        strcmp(FirmwareConfiguration.version, "1.0.1") == 0
+#ifdef T1_CONFIG
+        || strcmp(FirmwareConfiguration.version, "1.0.2") == 0
+#endif
+    ) {
+
+#ifdef T1_CONFIG
+      upgradeToVersion110();
+#endif
+      upgradeToVersion120();
+    }
+#endif
+
+#ifdef T1_CONFIG
+    if (strcmp(FirmwareConfiguration.version, "1.1.0") == 0) {
       upgradeToVersion120();
     }
 #endif
@@ -47,10 +62,41 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
+#ifdef T1_CONFIG
+void AFEUpgrader::upgradeToVersion110() {
+  AFEEEPROM Eeprom;
+
+  /* LEDs */
+  Eeprom.write(443, false);
+  Defaults.addLEDConfiguration(1, 3);
+  Data.saveSystemLedID(1);
+
+  /* Set that both switces controls relay 1 */
+  Eeprom.writeUInt8(440, 1);
+  Eeprom.writeUInt8(441, 1);
+
+  /* Set that none of led informs about status of a relay */
+  Eeprom.writeUInt8(442, 0);
+
+  /* Upgrade to new switch functionality codes */
+  if (Eeprom.readUInt8(388) == 11) {
+    Eeprom.writeUInt8(388, 1);
+  }
+  if (Eeprom.readUInt8(395) == 11) {
+    Eeprom.writeUInt8(395, 1);
+  }
+
+  /* Set sending temperature only if it changes */
+  Eeprom.write(446, true);
+}
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
+#ifndef T1_CONFIG
   DEVICE deviceConfiguration;
+#endif
 
 #ifdef T0_CONFIG
   /* LEDs */
@@ -66,6 +112,7 @@ void AFEUpgrader::upgradeToVersion120() {
   Eeprom.writeUInt8(421, 0);
 #endif
 
+#if defined(T0_CONFIG) || defined(T4_CONFIG)
   /* Upgrade to new switch functionality codes */
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
 
@@ -79,8 +126,9 @@ void AFEUpgrader::upgradeToVersion120() {
     }
 #endif
   }
+#endif
 
-  /* T0, T4 */
+  /* T0, T1, T4 */
 
   /* Add Domoticz default config */
   Eeprom.write(800, false);
