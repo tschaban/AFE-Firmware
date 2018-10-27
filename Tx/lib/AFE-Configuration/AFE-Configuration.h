@@ -20,6 +20,9 @@
 #elif defined(T1_CONFIG)
 #define FIRMWARE_VERSION "1.3.0"
 #define FIRMWARE_TYPE 1
+#elif defined(T2_CONFIG)
+#define FIRMWARE_VERSION "1.3.0"
+#define FIRMWARE_TYPE 2
 #elif defined(T4_CONFIG)
 #define FIRMWARE_VERSION "1.3.0"
 #define FIRMWARE_TYPE 4

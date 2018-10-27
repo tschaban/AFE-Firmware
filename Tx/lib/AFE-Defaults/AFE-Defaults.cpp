@@ -14,9 +14,17 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-#ifdef T1_CONFIG
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   REGULATOR RegulatorConfiguration;
-  DS18B20 DS18B20Configuration;
+#endif
+
+#if defined(T1_CONFIG)
+  DS18B20 SensorConfiguration;
+#endif
+
+#if defined(T2_CONFIG)
+  DHT SensorConfiguration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -54,6 +62,10 @@ void AFEDefaults::set() {
 
 #ifdef T1_CONFIG
   deviceConfiguration.isDS18B20 = false;
+#endif
+
+#ifdef T2_CONFIG
+  deviceConfiguration.isDHT = false;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -102,7 +114,7 @@ void AFEDefaults::set() {
   RelayConfiguration.ledID = 0;
   RelayConfiguration.idx = 0;
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
 #endif
 
@@ -126,15 +138,21 @@ void AFEDefaults::set() {
     Data->saveRelayState(i, false);
   }
 
+/* Regulator config */
 #ifdef T1_CONFIG
   RegulatorConfiguration.enabled = false;
   RegulatorConfiguration.turnOn = 0;
   RegulatorConfiguration.turnOnAbove = false;
   RegulatorConfiguration.turnOff = 0;
   RegulatorConfiguration.turnOffAbove = true;
-  Data->saveConfiguration(RegulatorConfiguration);
 #endif
-/* Regulator config */
+
+#ifdef T1_CONFIG
+  Data->saveConfiguration(RegulatorConfiguration);
+#elifdef T2_CONFIG
+  Data->saveConfiguration(0, RegulatorConfiguration, true);
+  Data->saveConfiguration(0, RegulatorConfiguration, false);
+#endif
 
 /* Switch config */
 #ifdef T0_SHELLY_1_CONFIG
@@ -182,14 +200,29 @@ void AFEDefaults::set() {
 
   addDeviceID();
 
+/* DS18B20 or DHTxx Sensor configuration */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  SensorConfiguration.gpio = 14;
+  SensorConfiguration.sendOnlyChanges = true;
 #ifdef T1_CONFIG
-  DS18B20Configuration.gpio = 14;
-  DS18B20Configuration.correction = 0;
-  DS18B20Configuration.interval = 60;
-  DS18B20Configuration.unit = 0;
-  DS18B20Configuration.sendOnlyChanges = true;
-  DS18B20Configuration.idx = 0;
-  Data->saveConfiguration(DS18B20Configuration);
+  SensorConfiguration.correction = 0;
+  SensorConfiguration.interval = 60;
+  SensorConfiguration.unit = 0;
+  SensorConfiguration.idx = 0;
+#elifdef T2_CONFIG
+  SensorConfiguration.type = 1;
+  SensorConfiguration.temperature.correction = 0;
+  SensorConfiguration.temperature.interval = 60;
+  SensorConfiguration.temperature.unit = 0;
+  SensorConfiguration.publishHeatIndex = false;
+  SensorConfiguration.humidity.correction = 0;
+  SensorConfiguration.humidity.interval = 60;
+  SensorConfiguration.temperatureIdx = 0;
+  SensorConfiguration.humidityIdx = 0;
+  SensorConfiguration.temperatureAndHumidityIdx = 0;
+#endif
+
+  Data->saveConfiguration(SensorConfiguration);
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG

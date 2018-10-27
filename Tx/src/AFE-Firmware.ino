@@ -21,6 +21,10 @@
 #include <AFE-Sensor-DS18B20.h>
 #endif
 
+#ifdef T2_CONFIG
+#include <AFE-Sensor-DHT.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -40,13 +44,21 @@ AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
 
 #ifdef T1_CONFIG
-AFESensorDS18B20 SensorDS18B20;
+AFESensorDS18B20 Sensor;
+#endif
+
+#ifdef T2_CONFIG
+AFESensorDHT Sensor;
 #endif
 
 MQTT MQTTConfiguration;
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
 float temperature;
+#endif
+
+#ifdef T2_CONFIG
+float humidity;
 #endif
 
 void setup() {
@@ -103,9 +115,9 @@ void setup() {
   /* Initializing switches */
   initSwitch();
 
-#ifdef T1_CONFIG
-  /* Initializing switches */
-  initDS18B20Sensor();
+  /* Initializing DS18B20 pr DHTxx sensor */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  initSensor();
 #endif
 
   /* Initializing APIs */
@@ -133,9 +145,9 @@ void loop() {
         mainHTTPRequestsHandler();
         mainRelay();
 
-#ifdef T1_CONFIG
-        /* Sensor: DS18B20 related code */
-        mainDS18B20Sensor();
+        /* Sensor: DS18B20 or DHT related code */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+        mainSensor();
 #endif
 
       } else { // Configuration Mode

@@ -14,7 +14,10 @@
 #include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-EEPROM.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEDefaults {
 private:
