@@ -16,6 +16,13 @@ void AFERelay::begin(uint8_t id) {
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
 
+#if defined(T1_CONFIG)
+  /* Initialzing Thermostat functionality for a relay */
+  Thermostat.begin(_id, RelayConfiguration.thermostat);
+  /* Initialzing thermal protection functionality for a relay */
+  ThermalProtection.begin(RelayConfiguration.thermalProtection);
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
   if (RelayConfiguration.ledID > 0) {
     Led.begin(RelayConfiguration.ledID - 1);
