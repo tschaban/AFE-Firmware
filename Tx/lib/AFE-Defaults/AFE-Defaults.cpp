@@ -188,6 +188,7 @@ void AFEDefaults::set() {
   DS18B20Configuration.interval = 60;
   DS18B20Configuration.unit = 0;
   DS18B20Configuration.sendOnlyChanges = true;
+  DS18B20Configuration.idx = 0;
   Data->saveConfiguration(DS18B20Configuration);
 #endif
 

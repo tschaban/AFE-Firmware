@@ -128,6 +128,7 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
                                    sizeof(configuration.password));
   return configuration;
 }
+
 #ifndef T0_SHELLY_1_CONFIG
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
@@ -215,7 +216,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.ledID = Eeprom.readUInt8(531 + id);
 #endif
 
-  configuration.idx = Eeprom.read(930 + id, 6).toInt();
+  configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
 
 #if defined(T1_CONFIG)
   configuration.thermostat.turnOn =
@@ -274,11 +275,13 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(416 + id);
+  configuration.relayID =
+      Eeprom.readUInt8(416 + id); /* It's in EEPROM one after the other one */
 #elif defined(T1_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(440 + id);
+  configuration.relayID =
+      Eeprom.readUInt8(440 + id); /* It's in EEPROM one after the other one */
 #elif defined(T4_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(497 + id);
+  configuration.relayID = Eeprom.readUInt8(497 + id * nextSwitch);
 #endif
 
   return configuration;
@@ -452,7 +455,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(531 + id, configuration.ledID);
 #endif
 
-  Eeprom.write(930 + id, 6, (long)configuration.idx);
+  Eeprom.write(930 + 6 * id, 6, (long)configuration.idx);
 
 #if defined(T1_CONFIG)
   Eeprom.write(436 + id * nextRelay, 3, configuration.thermalProtection);
@@ -525,11 +528,15 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(416 + id, configuration.relayID);
+  Eeprom.writeUInt8(
+      416 + id,
+      configuration.relayID); /* It's in EEPROM one after the other one */
 #elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(440 + id, configuration.relayID);
+  Eeprom.writeUInt8(
+      440 + id,
+      configuration.relayID); /* It's in EEPROM one after the other one */
 #elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(497 + id, configuration.relayID);
+  Eeprom.writeUInt8(497 + id * nextSwitch, configuration.relayID);
 #endif
 }
 
