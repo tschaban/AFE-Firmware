@@ -27,11 +27,13 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   configuration.isSwitch[0] = Eeprom.read(395);
 #endif
 
-#if defined(T1_CONFIG) || defined(T4_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG)
   uint8_t index = 77;
-#else
+#elif defined(T2_CONFIG)
+  uint8_t index = 98;
+#elif defined(T4_CONFIG)
   uint8_t index = 3;
 #endif
 
@@ -52,6 +54,21 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
   configuration.isDS18B20 = Eeprom.read(369);
+#endif
+
+#ifdef T2_CONFIG
+  index = 0;
+  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+    configuration.isRelay[i] = Eeprom.read(404 + i * index);
+  }
+
+  index = 7;
+  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+    configuration.isSwitch[i] = Eeprom.read(390 + i * index);
+  }
+
+  configuration.isDHT = Eeprom.read(369);
+
 #endif
 
 #ifdef T4_CONFIG
@@ -137,6 +154,8 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   uint8_t nextLED = 52;
 #elif defined(T1_CONFIG)
   uint8_t nextLED = 77;
+#elif defined(T1_CONFIG)
+  uint8_t nextLED = 98;
 #elif defined(T4_CONFIG)
   uint8_t nextLED = 3;
 #endif
@@ -151,53 +170,61 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   MQTT configurationMQTT;
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  uint8_t nextRelay = 26;
-#elif defined(T1_CONFIG)
-  uint8_t nextRelay = 40;
-#elif defined(T4_CONFIG)
+
+#if defined(T4_CONFIG)
   uint8_t nextRelay = 27;
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(370 + id * nextRelay);
+  configuration.gpio = Eeprom.readUInt8(370);
 #elif defined(T1_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(397 + id * nextRelay);
+  configuration.gpio = Eeprom.readUInt8(397);
+#elif defined(T2_CONFIG)
+  configuration.gpio = Eeprom.readUInt8(405);
 #elif defined(T4_CONFIG)
   configuration.gpio = Eeprom.readUInt8(383 + id * nextRelay);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.timeToOff = Eeprom.read(372 + id * nextRelay, 5).toFloat();
+  configuration.timeToOff = Eeprom.read(372, 5).toFloat();
 #elif defined(T1_CONFIG)
-  configuration.timeToOff = Eeprom.read(399 + id * nextRelay, 5).toFloat();
+  configuration.timeToOff = Eeprom.read(399, 5).toFloat();
+#elif defined(T2_CONFIG)
+  configuration.timeToOff = Eeprom.read(407, 5).toFloat();
 #elif defined(T4_CONFIG)
   configuration.timeToOff = Eeprom.read(385 + id * nextRelay, 5).toFloat();
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(377 + id * nextRelay);
+  configuration.statePowerOn = Eeprom.readUInt8(377);
 #elif defined(T1_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(404 + id * nextRelay);
+  configuration.statePowerOn = Eeprom.readUInt8(404);
+#elif defined(T2_CONFIG)
+  configuration.statePowerOn = Eeprom.readUInt8(412);
 #elif defined(T4_CONFIG)
   configuration.statePowerOn = Eeprom.readUInt8(390 + id * nextRelay);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.read(378 + id * nextRelay, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
+  Eeprom.read(378, 16).toCharArray(configuration.name,
+                                   sizeof(configuration.name));
 #elif defined(T1_CONFIG)
-  Eeprom.read(405 + id * nextRelay, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
+  Eeprom.read(405, 16).toCharArray(configuration.name,
+                                   sizeof(configuration.name));
+#elif defined(T2_CONFIG)
+  Eeprom.read(413, 16).toCharArray(configuration.name,
+                                   sizeof(configuration.name));
 #elif defined(T4_CONFIG)
   Eeprom.read(391 + id * nextRelay, 16)
       .toCharArray(configuration.name, sizeof(configuration.name));
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(394 + id * nextRelay);
+  configuration.stateMQTTConnected = Eeprom.readUInt8(394);
 #elif defined(T1_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(421 + id * nextRelay);
+  configuration.stateMQTTConnected = Eeprom.readUInt8(421);
+#elif defined(T2_CONFIG)
+  configuration.stateMQTTConnected = Eeprom.readUInt8(429);
 #elif defined(T4_CONFIG)
   configuration.stateMQTTConnected = Eeprom.readUInt8(407 + id * nextRelay);
 #endif
@@ -209,9 +236,11 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
           configuration.name);
 
 #if defined(T0_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(421 + id);
+  configuration.ledID = Eeprom.readUInt8(421);
 #elif defined(T1_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(442 + id);
+  configuration.ledID = Eeprom.readUInt8(442);
+#elif defined(T2_CONFIG)
+  configuration.ledID = Eeprom.readUInt8(463);
 #elif defined(T4_CONFIG)
   configuration.ledID = Eeprom.readUInt8(531 + id);
 #endif
@@ -219,16 +248,29 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
 
 #if defined(T1_CONFIG)
-  configuration.thermostat.turnOn =
-      Eeprom.read(423 + id * nextRelay, 5).toFloat();
-  configuration.thermostat.turnOff =
-      Eeprom.read(428 + id * nextRelay, 5).toFloat();
-  configuration.thermostat.turnOnAbove = Eeprom.read(433 + id * nextRelay);
-  configuration.thermostat.turnOffAbove = Eeprom.read(434 + id * nextRelay);
+  configuration.thermostat.turnOn = Eeprom.read(423, 5).toFloat();
+  configuration.thermostat.turnOff = Eeprom.read(428, 5).toFloat();
+  configuration.thermostat.turnOnAbove = Eeprom.read(433);
+  configuration.thermostat.turnOffAbove = Eeprom.read(434);
   configuration.thermostat.enabled = isThermostatEnabled(id);
-  configuration.thermalProtection =
-      Eeprom.read(436 + id * nextRelay, 3).toInt();
+  configuration.thermalProtection = Eeprom.read(436, 3).toInt();
 #endif
+
+#if defined(T2_CONFIG)
+  configuration.thermostat.turnOn = Eeprom.read(431, 5).toFloat();
+  configuration.thermostat.turnOff = Eeprom.read(436, 5).toFloat();
+  configuration.thermostat.turnOnAbove = Eeprom.read(441);
+  configuration.thermostat.turnOffAbove = Eeprom.read(442);
+  configuration.thermostat.enabled = isThermostatEnabled(id);
+
+  configuration.humidistat.turnOn = Eeprom.read(444, 5).toFloat();
+  configuration.humidistat.turnOff = Eeprom.read(449, 5).toFloat();
+  configuration.humidistat.turnOnAbove = Eeprom.read(454);
+  configuration.humidistat.turnOffAbove = Eeprom.read(455);
+  configuration.humidistat.enabled = isHumidistatEnabled(id);
+  configuration.thermalProtection = Eeprom.read(457, 3).toInt();
+#endif
+
   return configuration;
 }
 
