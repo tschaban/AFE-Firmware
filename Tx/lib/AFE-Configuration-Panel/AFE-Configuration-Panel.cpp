@@ -186,20 +186,22 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
   return page;
 }
 
-#ifdef T1_CONFIG
-String AFEConfigurationPanel::getRelayStatConfigurationSite(const String option,
-                                                            uint8_t command,
-                                                            REGULATOR data) {
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+String AFEConfigurationPanel::getRelayStatConfigurationSite(
+    const String option, uint8_t command, REGULATOR data, boolean thermostat) {
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
+    Data.saveConfiguration(data, thermostat);
   }
 
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
-  page += "<form action=\"/?option=thermostat&cmd=1\" method=\"post\">";
+  page += "<form action=\"/?option=";
+  page += thermostat ? "thermostat" : "humidistat";
+  page += "&cmd=1\"  method=\"post\">";
 
-  page += Site.addThermostatConfiguration();
+  thermostat ? page += Site.addThermostatConfiguration()
+             : page += Site.addHumidistatConfiguration();
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -235,7 +237,18 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
 #ifdef T1_CONFIG
 String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
                                                           uint8_t command,
-                                                          DS18B20 data) {
+                                                          DS18B20 data)
+
+#endif
+
+#ifdef T2_CONFIG
+    String AFEConfigurationPanel::getDHTConfigurationSite(const String option,
+                                                          uint8_t command,
+                                                          DH data)
+#endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+{
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -243,16 +256,22 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
+
+#ifdef T1_CONFIG
   page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
   page += Site.addDS18B20Configuration();
+#else
+  page += "<form action=\"/?option=DHT&cmd=1\"  method=\"post\">";
+  page += Site.addDHTConfiguration();
+#endif
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
 }
-
 #endif
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);

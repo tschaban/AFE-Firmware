@@ -56,7 +56,14 @@ private:
 
 #if T1_CONFIG
   DS18B20 getDS18B20Data();
-  REGULATOR getThermostateData();
+#endif
+
+#if T2_CONFIG
+  DH getDHTData();
+#endif
+
+#if T1_CONFIG || T2_CONFIG
+  REGULATOR getRegulatorData();
 #endif
 
   uint8_t getLanguageData();

@@ -552,8 +552,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 #endif
 }
 
+/* @TODO Unifiy below two */
+
 #if defined(T1_CONFIG)
-void AFEDataAccess::saveConfiguration(REGULATOR configuration) {
+void AFEDataAccess::saveConfiguration(REGULATOR configuration,
+                                      boolean thermostat) {
   Eeprom.write(423, 5, configuration.turnOn);
   Eeprom.write(428, 5, configuration.turnOff);
   Eeprom.write(433, configuration.turnOnAbove);
@@ -565,19 +568,21 @@ void AFEDataAccess::saveConfiguration(REGULATOR configuration) {
 /* @TODO the code below should be changed if ID is not used */
 
 #if defined(T2_CONFIG)
-void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR configuration,
+void AFEDataAccess::saveConfiguration(REGULATOR configuration,
                                       boolean thermostat) {
 
   /* id is actually not used. It' here for code compatibility with other
    * versions of AFE */
   uint8_t index;
 
+  /* @TODO id is not used. 0 hardcoded. refactoring needed */
+
   if (thermostat) {
     index = 0;
-    saveThermostatState(id, configuration.enabled);
+    saveThermostatState(0, configuration.enabled);
   } else {
     index = 13;
-    saveHumidistatState(id, configuration.enabled);
+    saveHumidistatState(0, configuration.enabled);
   }
 
   Eeprom.write(431 + index, 5, configuration.turnOn);

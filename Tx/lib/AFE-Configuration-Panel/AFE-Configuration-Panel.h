@@ -47,12 +47,15 @@ public:
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
 #endif
+
   String getRelayConfigurationSite(const String option, uint8_t command,
                                    RELAY data, uint8_t relayIndex);
-#ifdef T1_CONFIG
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   String getRelayStatConfigurationSite(const String option, uint8_t command,
-                                       REGULATOR data);
+                                       REGULATOR data, boolean thermostat);
 #endif
+
   String getSwitchConfigurationSite(const String option, uint8_t command,
                                     SWITCH data, uint8_t relayIndex);
   String getLanguageConfigurationSite(const String option, uint8_t command,
@@ -60,6 +63,10 @@ public:
 #ifdef T1_CONFIG
   String getDS18B20ConfigurationSite(const String option, uint8_t command,
                                      DS18B20 data);
+#endif
+
+#ifdef T2_CONFIG
+  String getDHTConfigurationSite(const String option, uint8_t command, DH data);
 #endif
 
   /* It generates site for firmware upgrade */

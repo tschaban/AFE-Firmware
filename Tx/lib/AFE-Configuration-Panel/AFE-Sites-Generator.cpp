@@ -68,6 +68,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 #elif T1_CONFIG
   page += language == 0 ? "Włącznik z czujnikiem temperatury"
                         : "Switch with temperature sensor";
+#elif T2_CONFIG
+  page += language == 0 ? "Włącznik z czujnikiem temperatury i wilgotności"
+                        : "Switch with temperature and humidity sensor";
 #elif T4_CONFIG
   page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
 #endif
@@ -118,6 +121,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 #endif
 
+#ifdef T2_CONFIG
+    if (Device.configuration.isDHT) {
+      page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
+      page += language == 0 ? "Czujnik DHT" : "DHT sensor";
+      page += "</a></li>";
+    }
+#endif
+
     itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -145,6 +156,17 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         if (Device.configuration.isDS18B20) {
           page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
           page += language == 0 ? "Termostat" : "Thermostat";
+          page += "</a></li>";
+        }
+#endif
+
+#if defined(T1_CONFIG)
+        if (Device.configuration.isDHT) {
+          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
+          page += language == 0 ? "Termostat" : "Thermostat";
+          page += "</a></li>";
+          page += "<li class=\"itm\"><a href=\"\\?option=humidistat\"> - ";
+          page += language == 0 ? "Regulator wilgotności" : "Humidistat";
           page += "</a></li>";
         }
 #endif
@@ -330,13 +352,21 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   body += "<div class=\"cc\">";
   body += "<label>";
   body += "<input name=\"ds\" type=\"checkbox\" value=\"1\"";
+#if defined(T1_CONFIG)
   body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
+#else
+  body += configuration.isDHT ? " checked=\"checked\">" : ">";
+#endif
   body += language == 0 ? "Czujnik" : " Sensor";
+#if defined(T1_CONFIG)
   body += " DS18B20";
+#else
+  body += " DHT";
+#endif
   body += "</label>";
   body += "</div>";
 #endif
@@ -946,27 +976,35 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</div>";
 
 #ifdef T1_CONFIG
-  if (device.isDS18B20) {
+  if (device.isDS18B20)
+#endif
 
-    body += "<br><p class=\"cm\">";
-    body += language == 0 ? "Zabezpieczenie termiczne" : "Thermal protection";
-    body += "</p>";
+#ifdef T2_CONFIG
+    if (device.isDHT)
+#endif
 
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
-    body += "*</label>";
-    body += "<input name=\"tp" + String(id) +
-            "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
-    body += configuration.thermalProtection;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres" : "Range";
-    body += ": -55C : +125C (-67F : +259F). ";
-    body += language == 0 ? "Brak akcji jeśli jest 0"
-                          : "No action if it's set to 0";
-    body += "</span></div>";
-  }
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+    {
+
+      body += "<br><p class=\"cm\">";
+      body += language == 0 ? "Zabezpieczenie termiczne" : "Thermal protection";
+      body += "</p>";
+
+      body += "<div class=\"cf\">";
+      body += "<label>";
+      body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
+      body += "*</label>";
+      body += "<input name=\"tp" + String(id) +
+              "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
+      body += configuration.thermalProtection;
+      body += "\">";
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres" : "Range";
+      body += ": -55C : +125C (-67F : +259F). ";
+      body += language == 0 ? "Brak akcji jeśli jest 0"
+                            : "No action if it's set to 0";
+      body += "</span></div>";
+    }
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG
@@ -1009,10 +1047,11 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   return addConfigurationBlock(title, "", body);
 }
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+
 String AFESitesGenerator::addThermostatConfiguration() {
   RELAY configuration = Data.getRelayConfiguration(0);
-  String body = generateTwoValueController(configuration.thermostat);
+  String body = generateTwoValueController(configuration.thermostat, true);
   return addConfigurationBlock(
       language == 0 ? "Termostat" : "Thermostat",
       language == 0
@@ -1022,6 +1061,21 @@ String AFESitesGenerator::addThermostatConfiguration() {
       body);
 }
 
+#endif
+
+#if defined(T2_CONFIG)
+
+String AFESitesGenerator::addHumidistatConfiguration() {
+  RELAY configuration = Data.getRelayConfiguration(0);
+  String body = generateTwoValueController(configuration.humidistat, false);
+  return addConfigurationBlock(
+      language == 0 ? "Regulator wilgotności" : "Humidistat",
+      language == 0
+          ? "Regulator wilgotności kontroluje przekaźnik w "
+            "zależności od wartości wilgotności"
+          : "Humidistat controlls the relay depending on humidity value",
+      body);
+}
 #endif
 
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
@@ -1211,6 +1265,192 @@ String AFESitesGenerator::addDS18B20Configuration() {
 
   return addConfigurationBlock(language == 0 ? "Czujnik temperatury DS18B20"
                                              : "DS18B20 temperature sensor",
+                               "", body);
+}
+#endif
+
+#ifdef T2_CONFIG
+String AFESitesGenerator::addDHTConfiguration() {
+
+  DH configuration = Data.getSensorConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
+
+  body += "<div class=\"cf\">";
+  body += "<label>Typ";
+  body += language == 1 ? "e" : "";
+  body += "</label>";
+  body += "<select name=\"t\">";
+  body += "<option value=\"1\"";
+  body += (configuration.type == 1 ? " selected=\"selected\"" : "");
+  body += ">DH11</option>";
+  body += "<option value=\"2\"";
+  body += (configuration.type == 2 ? " selected=\"selected\"" : "");
+  body += ">DH21</option>";
+  body += "<option value=\"3\"";
+  body += (configuration.type == 3 ? " selected=\"selected\"" : "");
+  body += ">DH22</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body +=
+      language == 0
+          ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
+            "zmieni się"
+          : ">Send data only if value of temperature or humidity has changed";
+  body += "</label>";
+  body += "</div>";
+
+  if (device.mqttAPI) {
+    body += "<div class=\"cc\">";
+    body += "<label>";
+    body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
+    body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
+    body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
+                          : ">Publish felt air temperature";
+    body += "?</label>";
+    body += "</div>";
+  }
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.temperature.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
+                        : "seconds. Range: 10 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o" : "Temperature correction";
+  body += "</label>";
+  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+          "step=\"0.01\" "
+          "value=\"";
+  body += configuration.temperature.correction;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "stopni. Zakres" : "degrees. Range";
+  body += ": -9.99 - +9.99</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Jednostka" : "Unit";
+  body += "</label>";
+  body += "<select  name=\"u\">";
+  body += "<option value=\"0\"";
+  body +=
+      (configuration.temperature.unit == 0 ? " selected=\"selected\">" : ">");
+  body += language == 0 ? "Celsjusz" : "Celsius";
+  body += "</option>";
+  body += "<option value=\"1\"";
+  body += (configuration.temperature.unit == 1 ? " selected=\"selected\"" : "");
+  body += ">Fahrenheit</option>";
+  body += "</select>";
+  body += "</div>";
+
+  body += "<br><p class=\"cm\">";
+  body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"j\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.humidity.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
+                        : "seconds. Range: 10 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Korekta wartości o" : "Humidity correction";
+  body += "</label>";
+  body += "<input name=\"d\" type=\"number\" min=\"-99.9\" max=\"99.9\" "
+          "step=\"0.1\" "
+          "value=\"";
+  body += configuration.humidity.correction;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "Zakres" : "Range";
+  body += ": -99.9 - +99.9</span>";
+  body += "</div>";
+
+  if (device.domoticzAPI) {
+
+    body += "<br><p class=\"cm\">";
+    body +=
+        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
+    body += "</p>";
+    body += "<p class=\"cm\">";
+    body += language == 0
+                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
+                : "If IDX is set to 0 then a value won't be sent to ";
+    body += "Domoticz</p>";
+
+    body += "<div class=\"cf\"><label> ";
+    body +=
+        language == 0 ? "IDX czujnika temperatury" : "Temperature sensor IDX";
+    body += " </label>";
+    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sensor IDX";
+    body += "</label><input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.humidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>";
+    body += language == 0 ? "IDX czujnika temperatury i wilgotności"
+                          : "Temperature and humidity sensor IDX";
+    body += "</label><input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.temperatureAndHumidityIdx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+  }
+
+  body += "</fieldset>";
+
+  return addConfigurationBlock(language == 0
+                                   ? "Czujnik temperatury i wilgotności DHT"
+                                   : "DHT temperature and humidity sensor",
                                "", body);
 }
 #endif
@@ -1437,9 +1677,10 @@ const String AFESitesGenerator::generateHardwareItemsList(
   return body;
 }
 
-#if defined(T1_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
 const String
-AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
+AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
+                                              boolean isThermostat) {
 
   String body = "<fieldset>";
 
@@ -1473,9 +1714,18 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
   body += "</select>";
   body += "<input name=\"tn\" type=\"number\" value=\"";
   body += configuration.turnOn;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  if (isThermostat) {
+    body += "\" min=\"-55\" max=\"125\"";
+  } else {
+    body += "\" min=\"0\" max=\"100\"";
+  }
+  body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  if (isThermostat) {
+    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  } else {
+    body += ": 0% : 100%";
+  }
 
   body += "</span></div>";
 
@@ -1498,9 +1748,18 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration) {
   body += "</select>";
   body += "<input name=\"tf\" type=\"number\" value=\"";
   body += configuration.turnOff;
-  body += "\" min=\"-55\" max=\"125\" step=\"any\"><span class=\"hint\">";
+  if (isThermostat) {
+    body += "\" min=\"-55\" max=\"125\"";
+  } else {
+    body += "\" min=\"0\" max=\"100\"";
+  }
+  body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  if (isThermostat) {
+    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
+  } else {
+    body += ": 0% : 100%";
+  }
 
   body += "</div></fieldset>";
 

@@ -65,14 +65,10 @@ public:
   void saveConfiguration(DH configuration);
 #endif
 
-#if defined(T1_CONFIG)
-  void saveConfiguration(REGULATOR configuration);
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  void saveConfiguration(REGULATOR configuration, boolean thermostat);
 #endif
 
-#if defined(T2_CONFIG)
-  void saveConfiguration(uint8_t id, REGULATOR configuration,
-                         boolean thermostat);
-#endif
   /* Methods saves firmware version from/to EEPROM */
   void saveVersion(String version);
 

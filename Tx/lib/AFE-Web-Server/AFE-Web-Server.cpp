@@ -157,6 +157,24 @@ void AFEWebServer::generate() {
           }
           publishHTML(ConfigurationPanel.getRelayConfigurationSite(
               optionName, command, data, i));
+#if defined(T2_CONFIG)
+        } else if (getOptionName() == "DHT") {
+          DH data = {};
+          if (command == SERVER_CMD_SAVE) {
+            data = getDHTData();
+          }
+          publishHTML(ConfigurationPanel.getDHTConfigurationSite(
+              optionName, command, data));
+        } else if (optionName == "thermostat" || optionName == "humidistat") {
+          REGULATOR data = {};
+          if (command == SERVER_CMD_SAVE) {
+            data = getRegulatorData();
+          }
+          publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
+              optionName, command, data,
+              optionName == "thermostat" ? true : false));
+
+#endif
         }
       } else {
         break;
@@ -265,6 +283,10 @@ DEVICE AFEWebServer::getDeviceData() {
 #ifdef T1_CONFIG
   server.arg("ds").length() > 0 ? data.isDS18B20 = true
                                 : data.isDS18B20 = false;
+#endif
+
+#ifdef T2_CONFIG
+  server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
 #endif
 
   return data;
@@ -416,11 +438,10 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
   }
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   if (server.arg("tp" + String(id)).length() > 0) {
     data.thermalProtection = server.arg("tp" + String(id)).toInt();
   }
-
 #endif
 
   if (server.arg("l" + String(id)).length() > 0) {
@@ -434,8 +455,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   return data;
 }
 
-#ifdef T1_CONFIG
-REGULATOR AFEWebServer::getThermostateData() {
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+REGULATOR AFEWebServer::getRegulatorData() {
   REGULATOR data;
   server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
 
@@ -543,4 +564,58 @@ DS18B20 AFEWebServer::getDS18B20Data() {
   return data;
 }
 
+#endif
+
+#if defined(T2_CONFIG)
+DH AFEWebServer::getDHTData() {
+  DH data;
+
+  if (server.arg("g").length() > 0) {
+    data.gpio = server.arg("g").toInt();
+  }
+
+  if (server.arg("t").length() > 0) {
+    data.type = server.arg("t").toInt();
+  }
+
+  if (server.arg("c").length() > 0) {
+    data.temperature.correction = server.arg("c").toFloat();
+  }
+
+  if (server.arg("i").length() > 0) {
+    data.temperature.interval = server.arg("i").toInt();
+  }
+
+  if (server.arg("u").length() > 0) {
+    data.temperature.unit = server.arg("u").toInt();
+  }
+
+  if (server.arg("d").length() > 0) {
+    data.humidity.correction = server.arg("d").toFloat();
+  }
+
+  if (server.arg("j").length() > 0) {
+    data.humidity.interval = server.arg("j").toInt();
+  }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  server.arg("p").length() > 0 ? data.publishHeatIndex = true
+                               : data.publishHeatIndex = false;
+
+  if (server.arg("xt").length() > 0) {
+    data.temperatureIdx = server.arg("xt").toInt();
+  }
+
+  if (server.arg("xh").length() > 0) {
+    data.humidityIdx = server.arg("xh").toInt();
+  }
+
+  if (server.arg("xth").length() > 0) {
+    data.temperatureAndHumidityIdx = server.arg("xth").toInt();
+  }
+
+  return data;
+}
 #endif
