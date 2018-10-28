@@ -39,7 +39,7 @@ public:
   // how to get temperature but publish only changes
   float get();
 
-  float getLatest();
+  float getLatestTemperature();
 
   boolean isReady();
 

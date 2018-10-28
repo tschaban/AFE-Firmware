@@ -8,7 +8,7 @@ AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin() {
   AFEDataAccess Data;
-  configuration = Data.getDS18B20Configuration();
+  configuration = Data.getSesnorConfiguration();
   _initialized = true;
 }
 
@@ -29,7 +29,7 @@ float AFESensorDS18B20::get() {
   return temperature + configuration.correction;
 }
 
-float AFESensorDS18B20::getLatest() {
+float AFESensorDS18B20::getLatestTemperature() {
   ready = false;
   return currentTemperature;
 }

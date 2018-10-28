@@ -24,7 +24,7 @@ void AFEDefaults::set() {
 #endif
 
 #if defined(T2_CONFIG)
-  DHT SensorConfiguration;
+  DH SensorConfiguration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -204,12 +204,12 @@ void AFEDefaults::set() {
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   SensorConfiguration.gpio = 14;
   SensorConfiguration.sendOnlyChanges = true;
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG)
   SensorConfiguration.correction = 0;
   SensorConfiguration.interval = 60;
   SensorConfiguration.unit = 0;
   SensorConfiguration.idx = 0;
-#elifdef T2_CONFIG
+#elif defined(T2_CONFIG)
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
   SensorConfiguration.temperature.interval = 60;

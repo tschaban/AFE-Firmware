@@ -28,8 +28,9 @@ void mainSensor() {
 #endif
     {
       Led.on();
-      temperature = Sensor.getLatest();
-
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+      temperature = Sensor.getLatestTemperature();
+#endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
 

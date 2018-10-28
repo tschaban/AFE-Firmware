@@ -8,7 +8,7 @@ AFESensorDHT::AFESensorDHT(){};
 
 void AFESensorDHT::begin() {
   AFEDataAccess Data;
-  configuration = Data.getDHTConfiguration();
+  configuration = Data.getSensorConfiguration();
   _initialized = true;
 }
 

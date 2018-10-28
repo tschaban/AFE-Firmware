@@ -16,11 +16,15 @@ void AFERelay::begin(uint8_t id) {
   pinMode(RelayConfiguration.gpio, OUTPUT);
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
 
-#if defined(T1_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   /* Initialzing Thermostat functionality for a relay */
   Thermostat.begin(_id, RelayConfiguration.thermostat);
   /* Initialzing thermal protection functionality for a relay */
   ThermalProtection.begin(RelayConfiguration.thermalProtection);
+#endif
+
+#if defined(T2_CONFIG)
+  Humidistat.begin(_id, RelayConfiguration.humidistat);
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG

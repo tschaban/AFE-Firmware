@@ -36,8 +36,13 @@ public:
 #endif
   RELAY getRelayConfiguration(uint8_t id);
   SWITCH getSwitchConfiguration(uint8_t id);
+
 #ifdef T1_CONFIG
-  DS18B20 getDS18B20Configuration();
+  DS18B20 getSensorConfiguration();
+#endif
+
+#ifdef T2_CONFIG
+  DH getSensorConfiguration();
 #endif
 
   /* Methods save configuration to EEPROM */
@@ -54,9 +59,20 @@ public:
 
 #ifdef T1_CONFIG
   void saveConfiguration(DS18B20 configuration);
+#endif
+
+#ifdef T2_CONFIG
+  void saveConfiguration(DH configuration);
+#endif
+
+#if defined(T1_CONFIG)
   void saveConfiguration(REGULATOR configuration);
 #endif
 
+#if defined(T2_CONFIG)
+  void saveConfiguration(uint8_t id, REGULATOR configuration,
+                         boolean thermostat);
+#endif
   /* Methods saves firmware version from/to EEPROM */
   void saveVersion(String version);
 
@@ -72,10 +88,15 @@ public:
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   /* Methods read and save thermostate state */
   boolean isThermostatEnabled(uint8_t id);
   void saveThermostatState(uint8_t id, boolean state);
+#endif
+
+#if defined(T2_CONFIG)
+  boolean isHumidistatEnabled(uint8_t id);
+  void saveHumidistatState(uint8_t id, boolean state);
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG
