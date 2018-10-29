@@ -222,8 +222,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += "/\" target=\"_blank\">Do";
   page += language == 0 ? "kumentacja" : "cumentation";
   page += "</a></li><li class=\"itm\"><a "
-          "href=\"https://www.smartnydom.pl/forum/"
-          "afe-firmware/\" target=\"_blank\">";
+          "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
+          "target=\"_blank\">";
   page += language == 0 ? "Pomoc" : "Help";
   page += "</a></li><li class=\"itm\"><a "
           "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
@@ -1684,7 +1684,7 @@ const String AFESitesGenerator::generateHardwareItemsList(
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
 const String
 AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
-                                              boolean isThermostat) {
+                                              uint8_t type) {
 
   String body = "<fieldset>";
 
@@ -1718,14 +1718,14 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
   body += "</select>";
   body += "<input name=\"tn\" type=\"number\" value=\"";
   body += configuration.turnOn;
-  if (isThermostat) {
+  if (type == THERMOSTAT_REGULATOR) {
     body += "\" min=\"-55\" max=\"125\"";
   } else {
     body += "\" min=\"0\" max=\"100\"";
   }
   body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  if (isThermostat) {
+  if (type == THERMOSTAT_REGULATOR) {
     body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
   } else {
     body += ": 0% : 100%";
@@ -1752,14 +1752,14 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
   body += "</select>";
   body += "<input name=\"tf\" type=\"number\" value=\"";
   body += configuration.turnOff;
-  if (isThermostat) {
+  if (type == THERMOSTAT_REGULATOR) {
     body += "\" min=\"-55\" max=\"125\"";
   } else {
     body += "\" min=\"0\" max=\"100\"";
   }
   body += "step=\"any\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  if (isThermostat) {
+  if (type == THERMOSTAT_REGULATOR) {
     body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
   } else {
     body += ": 0% : 100%";

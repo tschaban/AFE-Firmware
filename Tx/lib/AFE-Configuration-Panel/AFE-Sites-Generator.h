@@ -34,7 +34,7 @@ private:
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
-                                          boolean thermostat);
+                                          uint8_t type);
 #endif
 
   /* Method addes configuration block to the site */
