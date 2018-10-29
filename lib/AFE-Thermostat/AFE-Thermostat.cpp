@@ -6,10 +6,7 @@
 
 AFEThermostat::AFEThermostat(){};
 
-void AFEThermostat::begin(uint8_t relayID, REGULATOR config) {
-  configuration = config;
-  _relayID = relayID;
-}
+void AFEThermostat::begin(REGULATOR config) { configuration = config; }
 
 boolean AFEThermostat::isReady() {
   if (ready) {
@@ -61,5 +58,5 @@ boolean AFEThermostat::enabled() { return configuration.enabled; }
 
 void AFEThermostat::enable(boolean state) {
   AFEDataAccess Data;
-  Data.saveThermostatState(_relayID, state);
+  Data.saveRegulatorState(state, THERMOSTAT_REGULATOR);
 }

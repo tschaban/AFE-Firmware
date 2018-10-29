@@ -34,39 +34,35 @@ public:
 
   /* It returns configuration site */
   String getSite(const String option, uint8_t command, boolean data);
-  String getDeviceConfigurationSite(const String option, uint8_t command,
-                                    DEVICE data);
-  String getNetworkConfigurationSite(const String option, uint8_t command,
-                                     NETWORK data);
-  String getMQTTConfigurationSite(const String option, uint8_t command,
-                                  MQTT data);
-  String getDomoticzServerConfigurationSite(const String option,
-                                            uint8_t command, DOMOTICZ data);
+  String getDeviceConfigurationSite(uint8_t command, DEVICE data);
+  String getNetworkConfigurationSite(uint8_t command, NETWORK data);
+  String getMQTTConfigurationSite(uint8_t command, MQTT data);
+  String getDomoticzServerConfigurationSite(uint8_t command, DOMOTICZ data);
+
 #ifndef T0_SHELLY_1_CONFIG
-  String getLEDConfigurationSite(const String option, uint8_t command,
+  String getLEDConfigurationSite(uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
 #endif
 
-  String getRelayConfigurationSite(const String option, uint8_t command,
-                                   RELAY data, uint8_t relayIndex);
+  String getRelayConfigurationSite(uint8_t command, RELAY data,
+                                   uint8_t relayIndex);
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
-  String getRelayStatConfigurationSite(const String option, uint8_t command,
-                                       REGULATOR data, boolean thermostat);
+  String getRelayStatConfigurationSite(uint8_t command, REGULATOR data,
+                                       uint8_t regulatorType);
 #endif
 
-  String getSwitchConfigurationSite(const String option, uint8_t command,
-                                    SWITCH data, uint8_t relayIndex);
-  String getLanguageConfigurationSite(const String option, uint8_t command,
-                                      uint8_t lang);
+  String getSwitchConfigurationSite(uint8_t command, SWITCH data,
+                                    uint8_t relayIndex);
+  String getLanguageConfigurationSite(uint8_t command, uint8_t lang);
+
 #ifdef T1_CONFIG
-  String getDS18B20ConfigurationSite(const String option, uint8_t command,
-                                     DS18B20 data);
+  String getDS18B20ConfigurationSite(uint8_t command, DS18B20 data);
 #endif
 
 #ifdef T2_CONFIG
-  String getDHTConfigurationSite(const String option, uint8_t command, DH data);
+  String getDHTConfigurationSite(uint8_t command, DH data);
 #endif
 
   /* It generates site for firmware upgrade */
@@ -75,5 +71,4 @@ public:
   /* It generates sites post firmware upgrade */
   String postFirmwareUpgradeSite(boolean status);
 };
-
 #endif

@@ -20,7 +20,6 @@ class AFEHumidistat {
 
 private:
   boolean ready = false;
-  uint8_t _relayID;
   REGULATOR configuration;
   byte relayState;
   /* Method enables / disables thermostat */
@@ -31,7 +30,7 @@ public:
   AFEHumidistat();
 
   /* Method initialize humidistat */
-  void begin(uint8_t relayID, REGULATOR config);
+  void begin(REGULATOR config);
 
   /* Method returns true if humidistat is enabled */
   boolean enabled();

@@ -6,10 +6,7 @@
 
 AFEHumidistat::AFEHumidistat(){};
 
-void AFEHumidistat::begin(uint8_t relayID, REGULATOR config) {
-  configuration = config;
-  _relayID = relayID;
-}
+void AFEHumidistat::begin(REGULATOR config) { configuration = config; }
 
 boolean AFEHumidistat::isReady() {
   if (ready) {
@@ -61,5 +58,5 @@ boolean AFEHumidistat::enabled() { return configuration.enabled; }
 
 void AFEHumidistat::enable(boolean state) {
   AFEDataAccess Data;
-  Data.saveHumidistatState(_relayID, state);
+  Data.saveRegulatorState(state, HUMIDISTAT_REGULATOR);
 }

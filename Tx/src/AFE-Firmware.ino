@@ -1,30 +1,44 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/*
+AFE Firmware for smarthome devices based on ESP8266/ESP8285 chips
+
+This code combains AFE Firmware versions:
+   - T0 and T0 for Shelly-1
+   - T1 (DS18B29)
+   - T2 (DHTxx)
+   - T4 (Up to 4 relays)
+
+More about the versions (PL): https://www.smartnydom.pl/afe-firmware-pl/wersje/
+LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
+*/
 
 #include <AFE-API-Domoticz.h>
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
+/* Shelly-1 device does not have LED. Excluding LED related code */
 #ifndef T0_SHELLY_1_CONFIG
 #include <AFE-LED.h>
 #endif
-#include <AFE-Relay.h>
 
+#include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 
+/* Adding DS18B20 sensor code */
 #ifdef T1_CONFIG
 #include <AFE-Sensor-DS18B20.h>
 #endif
 
+/* Adding DHTxx sensor code */
 #ifdef T2_CONFIG
 #include <AFE-Sensor-DHT.h>
 #endif
 
+/* Includes libraries for debugging in development compilation only */
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -66,41 +80,45 @@ void setup() {
   Serial.begin(115200);
   delay(10);
 
-/* Turn off publishing information to Serial */
+/* Turn off publishing information to Serial for production compilation */
 #ifndef DEBUG
   Serial.swap();
 #endif
 
-  /* Checking if the device is launched for a first time. If so it sets up
-   * the device (EEPROM) */
+  /* Checking if the device is launched for a first time. If so it loades
+   * default configuration to EEPROM */
   if (Device.isFirstTimeLaunch()) {
     Device.setDevice();
   }
 
-  /* Perform post upgrade changes (if any) */
+  /* Checking if the firmware has been upgraded. Potentially runs post upgrade
+   * code */
   AFEUpgrader Upgrader;
   if (Upgrader.upgraded()) {
     Upgrader.upgrade();
   }
   Upgrader = {};
 
-  /* Checking if WiFi is onfigured, if not than it runs access point mode */
+  /* Checking if WiFi is configured, if not then it runs configuration panel in
+   * access point mode */
   if (Device.getMode() != MODE_ACCESS_POINT && !Device.isConfigured()) {
     Device.reboot(MODE_ACCESS_POINT);
   }
 
   /* Initializing relay */
   initRelay();
+
   /* Initialzing network */
   Network.begin(Device.getMode());
 
-#ifndef T0_SHELLY_1_CONFIG
   /* Initializing LED, checking if LED exists is made on Class level  */
+#ifndef T0_SHELLY_1_CONFIG
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
   }
-  /* If device in configuration mode then start LED blinking */
+
+  /* If device in configuration mode then it starts LED blinking */
   if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
@@ -131,18 +149,23 @@ void loop() {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
 
-        /* It listens to events and process them */
+        /* Triggerd when connectes/reconnects to WiFi */
         eventsListener();
 
-        /* Connect to MQTT if not connected */
+        /* If MQTT API is on it listens for MQTT messages. If the device is not
+         * connected to MQTT Broker, it connects the device to it */
         if (Device.configuration.mqttAPI) {
           Mqtt.listener();
         }
 
+        /* Listens for HTTP requsts. Both for configuration panel HTTP requests
+         * or HTTP API requests if it's turned on */
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
+
+        /* Relay related code */
         mainRelay();
 
         /* Sensor: DS18B20 or DHT related code */
@@ -150,7 +173,7 @@ void loop() {
         mainSensor();
 #endif
 
-      } else { // Configuration Mode
+      } else { /* Device runs in configuration mode over WiFi */
 #ifndef T0_SHELLY_1_CONFIG
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
@@ -159,6 +182,7 @@ void loop() {
         WebServer.listener();
       }
     }
+
 #ifndef T0_SHELLY_1_CONFIG
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
@@ -167,7 +191,7 @@ void loop() {
     }
 #endif
     Network.listener();
-  } else { // Access Point Mode
+  } else { /* Deviced runs in Access Point mode */
     Network.APListener();
     WebServer.listener();
   }
@@ -175,8 +199,9 @@ void loop() {
   /* Listens for switch events */
   mainSwitchListener();
   mainSwitch();
-#ifndef T0_SHELLY_1_CONFIG
+
   /* Led listener */
+#ifndef T0_SHELLY_1_CONFIG
   Led.loop();
 #endif
 }

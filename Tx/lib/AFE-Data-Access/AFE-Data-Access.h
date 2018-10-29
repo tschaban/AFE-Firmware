@@ -25,56 +25,33 @@ private:
 public:
   AFEDataAccess();
 
-  /* Methods read configuration from EEPROM */
   DEVICE getDeviceConfiguration();
-  FIRMWARE getFirmwareConfiguration();
-  NETWORK getNetworkConfiguration();
-  MQTT getMQTTConfiguration();
-  DOMOTICZ getDomoticzConfiguration();
-#ifndef T0_SHELLY_1_CONFIG
-  LED getLEDConfiguration(uint8_t id);
-#endif
-  RELAY getRelayConfiguration(uint8_t id);
-  SWITCH getSwitchConfiguration(uint8_t id);
-
-#ifdef T1_CONFIG
-  DS18B20 getSensorConfiguration();
-#endif
-
-#ifdef T2_CONFIG
-  DH getSensorConfiguration();
-#endif
-
-  /* Methods save configuration to EEPROM */
   void saveConfiguration(DEVICE configuration);
+
+  FIRMWARE getFirmwareConfiguration();
   void saveConfiguration(FIRMWARE configuration);
+
+  NETWORK getNetworkConfiguration();
   void saveConfiguration(NETWORK configuration);
+
+  MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
+
+  DOMOTICZ getDomoticzConfiguration();
   void saveConfiguration(DOMOTICZ configuration);
-#ifndef T0_SHELLY_1_CONFIG
-  void saveConfiguration(uint8_t id, LED configuration);
-#endif
+
+  RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
-  void saveConfiguration(uint8_t id, SWITCH configuration);
-
-#ifdef T1_CONFIG
-  void saveConfiguration(DS18B20 configuration);
-#endif
-
-#ifdef T2_CONFIG
-  void saveConfiguration(DH configuration);
-#endif
-
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-  void saveConfiguration(REGULATOR configuration, boolean thermostat);
-#endif
-
-  /* Methods saves firmware version from/to EEPROM */
-  void saveVersion(String version);
 
   /* Methods reads and saves relay state from/to EEPROM */
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
+
+  SWITCH getSwitchConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, SWITCH configuration);
+
+  /* Methods saves firmware version from/to EEPROM */
+  void saveVersion(String version);
 
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
@@ -84,28 +61,39 @@ public:
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-  /* Methods read and save thermostate state */
-  boolean isThermostatEnabled(uint8_t id);
-  void saveThermostatState(uint8_t id, boolean state);
-#endif
-
-#if defined(T2_CONFIG)
-  boolean isHumidistatEnabled(uint8_t id);
-  void saveHumidistatState(uint8_t id, boolean state);
-#endif
-
-#ifndef T0_SHELLY_1_CONFIG
-  /* Methods read and save ID of system led */
-  uint8_t getSystemLedID();
-  void saveSystemLedID(uint8_t id);
-#endif
-
   /* Methods saves and reads device ID */
   const String getDeviceID();
   void saveDeviceID(String id);
 
   /* Methods turns on / off APIs */
   void saveAPI(uint8_t apiID, boolean state);
+
+#if !defined(T0_SHELLY_1_CONFIG)
+  LED getLEDConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, LED configuration);
+  /* Methods read and save ID of system led */
+  uint8_t getSystemLedID();
+  void saveSystemLedID(uint8_t id);
+#endif
+
+#if defined(T1_CONFIG)
+  DS18B20 getSensorConfiguration();
+  void saveConfiguration(DS18B20 configuration);
+#endif
+
+#if defined(T2_CONFIG)
+  DH getSensorConfiguration();
+  void saveConfiguration(DH configuration);
+#endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  /* Method saves regulator configuration */
+  void saveConfiguration(REGULATOR configuration,
+                         uint8_t type = THERMOSTAT_REGULATOR);
+  /* Methods read and save regulator state.
+  Regulator can be Thermostat or humidistat */
+  boolean isRegulatorEnabled(uint8_t type = THERMOSTAT_REGULATOR);
+  void saveRegulatorState(boolean state, uint8_t type = THERMOSTAT_REGULATOR);
+#endif
 };
 #endif

@@ -247,30 +247,38 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
 
+/* Saving thermostat configuration*/
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
 #if defined(T1_CONFIG)
   configuration.thermostat.turnOn = Eeprom.read(423, 5).toFloat();
   configuration.thermostat.turnOff = Eeprom.read(428, 5).toFloat();
   configuration.thermostat.turnOnAbove = Eeprom.read(433);
   configuration.thermostat.turnOffAbove = Eeprom.read(434);
-  configuration.thermostat.enabled = isThermostatEnabled(id);
-  configuration.thermalProtection = Eeprom.read(436, 3).toInt();
-#endif
-
-#if defined(T2_CONFIG)
+  configuration.thermostat.enabled = isRegulatorEnabled(THERMOSTAT_REGULATOR);
+#else
   configuration.thermostat.turnOn = Eeprom.read(431, 5).toFloat();
   configuration.thermostat.turnOff = Eeprom.read(436, 5).toFloat();
   configuration.thermostat.turnOnAbove = Eeprom.read(441);
   configuration.thermostat.turnOffAbove = Eeprom.read(442);
-  configuration.thermostat.enabled = isThermostatEnabled(id);
+  configuration.thermostat.enabled = isRegulatorEnabled(THERMOSTAT_REGULATOR);
+#endif
+#endif
 
+  /* Saving humiditistat configuration*/
+#if defined(T2_CONFIG)
   configuration.humidistat.turnOn = Eeprom.read(444, 5).toFloat();
   configuration.humidistat.turnOff = Eeprom.read(449, 5).toFloat();
   configuration.humidistat.turnOnAbove = Eeprom.read(454);
   configuration.humidistat.turnOffAbove = Eeprom.read(455);
-  configuration.humidistat.enabled = isHumidistatEnabled(id);
-  configuration.thermalProtection = Eeprom.read(457, 3).toInt();
+  configuration.humidistat.enabled = isRegulatorEnabled(HUMIDISTAT_REGULATOR);
 #endif
 
+/* Saving thermal protection configuration */
+#if defined(T1_CONFIG)
+  configuration.thermalProtection = Eeprom.read(436, 3).toInt();
+#elif defined(T2_CONFIG)
+  configuration.thermalProtection = Eeprom.read(457, 3).toInt();
+#endif
   return configuration;
 }
 
@@ -552,44 +560,52 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 #endif
 }
 
-/* @TODO Unifiy below two */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
+
+  if (type == THERMOSTAT_REGULATOR) {
+    saveRegulatorState(configuration.enabled, THERMOSTAT_REGULATOR);
+  } else {
+    saveRegulatorState(configuration.enabled, HUMIDISTAT_REGULATOR);
+  }
 
 #if defined(T1_CONFIG)
-void AFEDataAccess::saveConfiguration(REGULATOR configuration,
-                                      boolean thermostat) {
   Eeprom.write(423, 5, configuration.turnOn);
   Eeprom.write(428, 5, configuration.turnOff);
   Eeprom.write(433, configuration.turnOnAbove);
   Eeprom.write(434, configuration.turnOffAbove);
-  saveThermostatState(0, configuration.enabled);
-}
+#else
+  Eeprom.write(431, 5, configuration.turnOn);
+  Eeprom.write(436, 5, configuration.turnOff);
+  Eeprom.write(441, configuration.turnOnAbove);
+  Eeprom.write(442, configuration.turnOffAbove);
 #endif
-
-/* @TODO the code below should be changed if ID is not used */
-
-#if defined(T2_CONFIG)
-void AFEDataAccess::saveConfiguration(REGULATOR configuration,
-                                      boolean thermostat) {
-
-  /* id is actually not used. It' here for code compatibility with other
-   * versions of AFE */
-  uint8_t index;
-
-  /* @TODO id is not used. 0 hardcoded. refactoring needed */
-
-  if (thermostat) {
-    index = 0;
-    saveThermostatState(0, configuration.enabled);
-  } else {
-    index = 13;
-    saveHumidistatState(0, configuration.enabled);
-  }
-
-  Eeprom.write(431 + index, 5, configuration.turnOn);
-  Eeprom.write(436 + index, 5, configuration.turnOff);
-  Eeprom.write(441 + index, configuration.turnOnAbove);
-  Eeprom.write(442 + index, configuration.turnOffAbove);
 }
+
+boolean AFEDataAccess::isRegulatorEnabled(uint8_t type) {
+  if (type == THERMOSTAT_REGULATOR) {
+#if defined(T1_CONFIG)
+    return Eeprom.read(435);
+#else
+    return Eeprom.read(443);
+#endif
+  } else {
+    return Eeprom.read(456);
+  }
+}
+
+void AFEDataAccess::saveRegulatorState(boolean state, uint8_t type) {
+  if (type == THERMOSTAT_REGULATOR) {
+#if defined(T1_CONFIG)
+    Eeprom.write(435, state);
+#else
+    Eeprom.write(443, state);
+#endif
+  } else {
+    Eeprom.write(456, state);
+  }
+}
+
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG
@@ -776,37 +792,6 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
   Eeprom.writeUInt8(530, id);
 #endif
 }
-#endif
-
-/* @TODO ID is not needed */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-
-boolean AFEDataAccess::isThermostatEnabled(uint8_t id) {
-#if defined(T1_CONFIG)
-  return Eeprom.read(435);
-#else
-  return Eeprom.read(443);
-#endif
-}
-
-void AFEDataAccess::saveThermostatState(uint8_t id, boolean state) {
-#if defined(T1_CONFIG)
-  Eeprom.write(435, state);
-#else
-  Eeprom.write(443, state);
-#endif
-}
-
-#if defined(T2_CONFIG)
-boolean AFEDataAccess::isHumidistatEnabled(uint8_t id) {
-  return Eeprom.read(456);
-}
-
-void AFEDataAccess::saveHumidistatState(uint8_t id, boolean state) {
-  Eeprom.write(456, state);
-}
-#endif
-
 #endif
 
 const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }

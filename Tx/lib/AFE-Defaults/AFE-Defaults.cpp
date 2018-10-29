@@ -147,11 +147,12 @@ void AFEDefaults::set() {
   RegulatorConfiguration.turnOffAbove = true;
 #endif
 
-#ifdef T1_CONFIG
-  Data->saveConfiguration(RegulatorConfiguration);
-#elifdef T2_CONFIG
-  Data->saveConfiguration(0, RegulatorConfiguration, true);
-  Data->saveConfiguration(0, RegulatorConfiguration, false);
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
+#endif
+
+#if defined(T2_CONFIG)
+  Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
 #endif
 
 /* Switch config */

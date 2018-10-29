@@ -160,7 +160,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         }
 #endif
 
-#if defined(T1_CONFIG)
+#if defined(T2_CONFIG)
         if (Device.configuration.isDHT) {
           page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
           page += language == 0 ? "Termostat" : "Thermostat";
@@ -1049,32 +1049,36 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
 
-String AFESitesGenerator::addThermostatConfiguration() {
+String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
   RELAY configuration = Data.getRelayConfiguration(0);
-  String body = generateTwoValueController(configuration.thermostat, true);
-  return addConfigurationBlock(
-      language == 0 ? "Termostat" : "Thermostat",
-      language == 0
-          ? "Termostat kontroluje przekaźnik w "
-            "zależności od wartości temperatury"
-          : "Thermostat controlls the relay depending on temperature value",
-      body);
-}
 
-#endif
+  if (type == THERMOSTAT_REGULATOR) {
+    String body = generateTwoValueController(configuration.thermostat,
+                                             THERMOSTAT_REGULATOR);
 
+    return addConfigurationBlock(
+        language == 0 ? "Termostat" : "Thermostat",
+        language == 0
+            ? "Termostat kontroluje przekaźnik w "
+              "zależności od wartości temperatury"
+            : "Thermostat controlls the relay depending on temperature value",
+        body);
+
+  }
 #if defined(T2_CONFIG)
+  else {
+    String body = generateTwoValueController(configuration.humidistat,
+                                             HUMIDISTAT_REGULATOR);
 
-String AFESitesGenerator::addHumidistatConfiguration() {
-  RELAY configuration = Data.getRelayConfiguration(0);
-  String body = generateTwoValueController(configuration.humidistat, false);
-  return addConfigurationBlock(
-      language == 0 ? "Regulator wilgotności" : "Humidistat",
-      language == 0
-          ? "Regulator wilgotności kontroluje przekaźnik w "
-            "zależności od wartości wilgotności"
-          : "Humidistat controlls the relay depending on humidity value",
-      body);
+    return addConfigurationBlock(
+        language == 0 ? "Regulator wilgotności" : "Humidistat",
+        language == 0
+            ? "Regulator wilgotności kontroluje przekaźnik w "
+              "zależności od wartości wilgotności"
+            : "Humidistat controlls the relay depending on humidity value",
+        body);
+  }
+#endif
 }
 #endif
 
@@ -1187,7 +1191,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 #ifdef T1_CONFIG
 String AFESitesGenerator::addDS18B20Configuration() {
 
-  DS18B20 configuration = Data.getDS18B20Configuration();
+  DS18B20 configuration = Data.getSensorConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";

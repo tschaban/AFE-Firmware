@@ -39,7 +39,6 @@ void AFEWebServer::sendJSON(String json) {
 
 void AFEWebServer::handle(const char *uri,
                           ESP8266WebServer::THandlerFunction handler) {
-  // Serial << endl << "INFO: Added url : " << uri << " for listening";
   server.on(uri, handler);
 }
 
@@ -64,9 +63,7 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getLanguageData();
     }
-    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(optionName,
-                                                                command, data));
-
+    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(command, data));
     if (command == SERVER_CMD_SAVE) {
       Device.reboot(Device.getMode());
     }
@@ -75,29 +72,26 @@ void AFEWebServer::generate() {
     if (command == SERVER_CMD_SAVE) {
       data = getDeviceData();
     }
-    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(optionName,
-                                                              command, data));
+    publishHTML(ConfigurationPanel.getDeviceConfigurationSite(command, data));
   } else if (optionName == "network") {
     NETWORK data;
     if (command == SERVER_CMD_SAVE) {
       data = getNetworkData();
     }
-    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(optionName,
-                                                               command, data));
+    publishHTML(ConfigurationPanel.getNetworkConfigurationSite(command, data));
   } else if (optionName == "mqtt") {
     MQTT data;
     if (command == SERVER_CMD_SAVE) {
       data = getMQTTData();
     }
-    publishHTML(
-        ConfigurationPanel.getMQTTConfigurationSite(optionName, command, data));
+    publishHTML(ConfigurationPanel.getMQTTConfigurationSite(command, data));
   } else if (optionName == "domoticz") {
     DOMOTICZ data;
     if (command == SERVER_CMD_SAVE) {
       data = getDomoticzServerData();
     }
-    publishHTML(ConfigurationPanel.getDomoticzServerConfigurationSite(
-        optionName, command, data));
+    publishHTML(
+        ConfigurationPanel.getDomoticzServerConfigurationSite(command, data));
 #ifndef T0_SHELLY_1_CONFIG
   } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
@@ -108,24 +102,8 @@ void AFEWebServer::generate() {
       }
       dataLedID = getSystemLEDData();
     }
-    publishHTML(ConfigurationPanel.getLEDConfigurationSite(optionName, command,
-                                                           data, dataLedID));
-#endif
-#ifdef T1_CONFIG
-  } else if (optionName == "ds18b20") {
-    DS18B20 data1 = {};
-    if (command == SERVER_CMD_SAVE) {
-      data1 = getDS18B20Data();
-    }
-    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(optionName,
-                                                               command, data1));
-  } else if (optionName == "thermostat") {
-    REGULATOR data = {};
-    if (command == SERVER_CMD_SAVE) {
-      data = getThermostateData();
-    }
-    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
-        optionName, command, data));
+    publishHTML(
+        ConfigurationPanel.getLEDConfigurationSite(command, data, dataLedID));
 #endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
@@ -155,24 +133,35 @@ void AFEWebServer::generate() {
           if (command == SERVER_CMD_SAVE) {
             data = getRelayData(i);
           }
-          publishHTML(ConfigurationPanel.getRelayConfigurationSite(
-              optionName, command, data, i));
-#if defined(T2_CONFIG)
-        } else if (getOptionName() == "DHT") {
+          publishHTML(
+              ConfigurationPanel.getRelayConfigurationSite(command, data, i));
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG)
+        } else if (optionName == "ds18b20") {
+          DS18B20 data = {};
+          if (command == SERVER_CMD_SAVE) {
+            data = getDS18B20Data();
+          }
+          publishHTML(
+              ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
+#else
+        } else if (optionName == "DHT") {
           DH data = {};
           if (command == SERVER_CMD_SAVE) {
             data = getDHTData();
           }
-          publishHTML(ConfigurationPanel.getDHTConfigurationSite(
-              optionName, command, data));
+          publishHTML(
+              ConfigurationPanel.getDHTConfigurationSite(command, data));
+#endif
         } else if (optionName == "thermostat" || optionName == "humidistat") {
           REGULATOR data = {};
           if (command == SERVER_CMD_SAVE) {
             data = getRegulatorData();
           }
           publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
-              optionName, command, data,
-              optionName == "thermostat" ? true : false));
+              command, data,
+              optionName == "thermostat" ? THERMOSTAT_REGULATOR
+                                         : HUMIDISTAT_REGULATOR));
 
 #endif
         }
@@ -188,8 +177,8 @@ void AFEWebServer::generate() {
           if (command == SERVER_CMD_SAVE) {
             data = getSwitchData(i);
           }
-          publishHTML(ConfigurationPanel.getSwitchConfigurationSite(
-              optionName, command, data, i));
+          publishHTML(
+              ConfigurationPanel.getSwitchConfigurationSite(command, data, i));
         }
       } else {
         break;

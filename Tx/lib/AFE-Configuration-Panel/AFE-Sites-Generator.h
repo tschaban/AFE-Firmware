@@ -69,17 +69,17 @@ public:
 #endif
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+
 #ifdef T1_CONFIG
   String addDS18B20Configuration();
 #endif
 
 #ifdef T2_CONFIG
   String addDHTConfiguration();
-  String addHumidistatConfiguration();
 #endif
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
-  String addThermostatConfiguration();
+  String addRegulatorConfiguration(uint8_t type);
 #endif
 
   /* These methods generates firmware upgrade sections */

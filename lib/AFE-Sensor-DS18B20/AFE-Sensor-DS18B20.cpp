@@ -8,7 +8,7 @@ AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin() {
   AFEDataAccess Data;
-  configuration = Data.getSesnorConfiguration();
+  configuration = Data.getSensorConfiguration();
   _initialized = true;
 }
 
