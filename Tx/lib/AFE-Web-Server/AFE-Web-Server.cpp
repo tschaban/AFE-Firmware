@@ -125,6 +125,33 @@ void AFEWebServer::generate() {
       server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG)
+  } else if (optionName == "ds18b20") {
+    DS18B20 data = {};
+    if (command == SERVER_CMD_SAVE) {
+      data = getDS18B20Data();
+    }
+    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
+#else
+  } else if (optionName == "DHT") {
+    DH data = {};
+    if (command == SERVER_CMD_SAVE) {
+      data = getDHTData();
+    }
+    publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
+#endif
+  } else if (optionName == "thermostat" || optionName == "humidistat") {
+    REGULATOR data = {};
+    if (command == SERVER_CMD_SAVE) {
+      data = getRegulatorData();
+    }
+    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
+        command, data,
+        optionName == "thermostat" ? THERMOSTAT_REGULATOR
+                                   : HUMIDISTAT_REGULATOR));
+
+#endif
   } else {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -135,35 +162,6 @@ void AFEWebServer::generate() {
           }
           publishHTML(
               ConfigurationPanel.getRelayConfigurationSite(command, data, i));
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-#if defined(T1_CONFIG)
-        } else if (optionName == "ds18b20") {
-          DS18B20 data = {};
-          if (command == SERVER_CMD_SAVE) {
-            data = getDS18B20Data();
-          }
-          publishHTML(
-              ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
-#else
-        } else if (optionName == "DHT") {
-          DH data = {};
-          if (command == SERVER_CMD_SAVE) {
-            data = getDHTData();
-          }
-          publishHTML(
-              ConfigurationPanel.getDHTConfigurationSite(command, data));
-#endif
-        } else if (optionName == "thermostat" || optionName == "humidistat") {
-          REGULATOR data = {};
-          if (command == SERVER_CMD_SAVE) {
-            data = getRegulatorData();
-          }
-          publishHTML(ConfigurationPanel.getRelayStatConfigurationSite(
-              command, data,
-              optionName == "thermostat" ? THERMOSTAT_REGULATOR
-                                         : HUMIDISTAT_REGULATOR));
-
-#endif
         }
       } else {
         break;

@@ -575,10 +575,12 @@ void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
   Eeprom.write(433, configuration.turnOnAbove);
   Eeprom.write(434, configuration.turnOffAbove);
 #else
-  Eeprom.write(431, 5, configuration.turnOn);
-  Eeprom.write(436, 5, configuration.turnOff);
-  Eeprom.write(441, configuration.turnOnAbove);
-  Eeprom.write(442, configuration.turnOffAbove);
+  uint8_t index = type == THERMOSTAT_REGULATOR ? 0 : 13;
+  Eeprom.write(431 + index, 5, configuration.turnOn);
+  Eeprom.write(436 + index, 5, configuration.turnOff);
+  Eeprom.write(441 + index, configuration.turnOnAbove);
+  Eeprom.write(442 + index, configuration.turnOffAbove);
+
 #endif
 }
 

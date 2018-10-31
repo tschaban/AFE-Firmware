@@ -15,7 +15,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   if (redirect > 0) {
     page += "<meta http-equiv=\"refresh\" content=\"";
     page += String(redirect);
-    page += ";url=/\">";
+    page += "; url=/\">";
   }
 
   page += "<title>AFE Firmware ";
@@ -154,7 +154,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         page += "</a></li>";
 #if defined(T1_CONFIG)
         if (Device.configuration.isDS18B20) {
-          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
+          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
           page += language == 0 ? "Termostat" : "Thermostat";
           page += "</a></li>";
         }
@@ -162,10 +162,10 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
 #if defined(T2_CONFIG)
         if (Device.configuration.isDHT) {
-          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\"> - ";
+          page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
           page += language == 0 ? "Termostat" : "Thermostat";
           page += "</a></li>";
-          page += "<li class=\"itm\"><a href=\"\\?option=humidistat\"> - ";
+          page += "<li class=\"itm\"><a href=\"\\?option=humidistat\">&#8227; ";
           page += language == 0 ? "Regulator wilgotności" : "Humidistat";
           page += "</a></li>";
         }
@@ -1509,9 +1509,9 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
   }
   body += "</li><li class=\"cm\">";
   body += language == 0
-              ? "Po 10 "
+              ? "Po 15 "
                 "sekundach przełącznik zostanie przeładowany. Proszę czekać"
-              : "After 10s device will be rebooted. Please wait";
+              : "After 15s device will be rebooted. Please wait";
   body += "....</li>";
   body += "</fieldset>";
   return addConfigurationBlock(
