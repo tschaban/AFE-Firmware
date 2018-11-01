@@ -241,43 +241,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += configuration.type;
   page += "]</a></li>"
           "</ul>";
-  if (Device.getMode() != MODE_ACCESS_POINT) {
-    page += "<br><br><h4>";
-    page += language == 0 ? "WSPARCIE" : "DONATION";
-    page += "</h4><p class=\"cm\">";
-    page += language == 0
-                ? "Oprogramowanie dostępne jest za darmo w ramach licencji "
-                : "Software is available for free within terms of ";
-    page += " <a "
-            "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
-            "LICENSE\" "
-            "target=\"_blank\"  style=\"color:#fff\">MIT</a>";
-    page += language == 1 ? " licence" : "";
-    page += "</p><p class=\"cm\">";
-    page += language == 0 ? "Jeśli spełnia Twoje oczekiwania to rozważ wsparcie"
-                          : "If the firmware meets your expectations then "
-                            "consider donation to it's";
-    page += " <a href=\"https://adrian.czabanowski.com\" "
-            "target=\"_blank\" style=\"color:#fff\">aut";
-    page += language == 0 ? "ora" : "hor";
-    page += "</a>. ";
-    page += language == 0 ? "Z góry dziękuję" : "Thank you";
-    page += "</p>";
-    page += "<a "
-            "href=\"https://www.paypal.com/cgi-bin/"
-            "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-            "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT";
-    page += configuration.type;
-    page += "%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
-            "3aNonHosted\" target=\"_blank\"><img "
-            "src=\"http://adrian.czabanowski.com/afe/donation/T";
-    page += configuration.type;
-    page += "/";
-    page += configuration.version;
-    page += "/";
-    page += Data.getDeviceID();
-    page += "/\" border=\"0\" alt=\"PayPal\" style=\"width:290px\"></a>";
-  }
+
   page += "</div>"
           "<div id=\"r\">";
 
@@ -1299,6 +1263,21 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</select>";
   body += "</div>";
 
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label>";
+  body +=
+      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
+      "value=\"";
+  body += configuration.interval;
+  body += "\">";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
+                        : "seconds. Range: 10 to 86400sec";
+  body += " (24h)</span>";
+  body += "</div>";
+
   body += "<div class=\"cc\">";
   body += "<label>";
   body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
@@ -1317,7 +1296,15 @@ String AFESitesGenerator::addDHTConfiguration() {
     body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
     body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
     body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
-                          : ">Publish felt air temperature";
+                          : ">Publish Heat Index";
+    body += "?</label>";
+    body += "</div>";
+
+    body += "<div class=\"cc\">";
+    body += "<label>";
+    body += "<input name=\"j\" type=\"checkbox\" value=\"1\"";
+    body += configuration.publishDewPoint ? " checked=\"checked\"" : "";
+    body += language == 0 ? ">Wysyłać punkt rosy" : ">Publish Dew Point";
     body += "?</label>";
     body += "</div>";
   }
@@ -1326,20 +1313,6 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
   body += "</p>";
 
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label>";
-  body +=
-      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
-      "value=\"";
-  body += configuration.temperature.interval;
-  body += "\">";
-  body += "<span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
-                        : "seconds. Range: 10 to 86400sec";
-  body += " (24h)</span>";
-  body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Temperature correction";
@@ -1373,20 +1346,6 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
   body += "</p>";
 
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label>";
-  body +=
-      "<input name=\"j\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
-      "value=\"";
-  body += configuration.humidity.interval;
-  body += "\">";
-  body += "<span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
-                        : "seconds. Range: 10 to 86400sec";
-  body += " (24h)</span>";
-  body += "</div>";
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Humidity correction";
@@ -1580,6 +1539,9 @@ String AFESitesGenerator::addHelpSection() {
   DEVICE configuration;
   configuration = Data.getDeviceConfiguration();
 
+  FIRMWARE firmware;
+  firmware = Data.getFirmwareConfiguration();
+
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += "<label>";
@@ -1590,10 +1552,53 @@ String AFESitesGenerator::addHelpSection() {
   body += "</span>";
   body += "</div>";
   body += "</fieldset>";
-  return addConfigurationBlock(language == 0
-                                   ? "Urządzenie jest w trybie operacyjnym"
-                                   : "Device is in working mode",
-                               "", body);
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Urządzenie jest w trybie operacyjnym"
+                    : "Device is in working mode",
+      "", body);
+
+  if (Device.getMode() != MODE_ACCESS_POINT) {
+
+    body = "<p class=\"cm\">";
+    body += language == 0
+                ? "Oprogramowanie dostępne jest za darmo w ramach licencji "
+                : "Software is available for free within terms of ";
+    body += " <a "
+            "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
+            "LICENSE\" "
+            "target=\"_blank\"  style=\"color:#00e\">MIT</a>";
+    body += language == 1 ? " licence" : "";
+    body += language == 0
+                ? ". Jeśli spełnia Twoje oczekiwania to rozważ wsparcie"
+                : ". If the firmware meets your expectations then "
+                  "consider donation to it's";
+    body += " <a href=\"https://adrian.czabanowski.com\" "
+            "target=\"_blank\" style=\"color:#00e\">aut";
+    body += language == 0 ? "ora" : "hor";
+    body += "</a>. ";
+    body += language == 0 ? "Z góry dziękuję" : "Thank you";
+    body += "</p>";
+    body += "<a "
+            "href=\"https://www.paypal.com/cgi-bin/"
+            "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
+            "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT";
+    body += firmware.type;
+    body += "%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
+            "3aNonHosted\" target=\"_blank\"><img "
+            "src=\"http://adrian.czabanowski.com/afe/donation/T";
+    body += firmware.type;
+    body += "/";
+    body += firmware.version;
+    body += "/";
+    body += Data.getDeviceID();
+    body += "/\" border=\"0\" alt=\"PayPal\" style=\"width:150px;\"></a>";
+    body += "</fieldset>";
+    page += addConfigurationBlock(language == 0 ? "Wsparcie" : "Donation", "",
+                                  body);
+  }
+
+  return page;
 }
 
 String AFESitesGenerator::addLanguageConfiguration() {

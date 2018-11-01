@@ -12,14 +12,20 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 */
 
+/* Includes libraries for debugging in development compilation only */
+#if defined(DEBUG)
+#include <Streaming.h>
+#endif
+
 #include <AFE-API-Domoticz.h>
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
 #include <AFE-LED.h>
+AFELED Led;
 #endif
 
 #include <AFE-Relay.h>
@@ -28,19 +34,25 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 
-/* Adding DS18B20 sensor code */
-#ifdef T1_CONFIG
+/* T1 Set up, DS18B20 sensor */
+#if defined(T1_CONFIG)
 #include <AFE-Sensor-DS18B20.h>
+AFESensorDS18B20 Sensor;
 #endif
 
-/* Adding DHTxx sensor code */
-#ifdef T2_CONFIG
+/* T1 and T2 Set up */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+float temperature;
+#endif
+
+/* T2 Setup, DHxx sensor */
+#if defined(T2_CONFIG)
 #include <AFE-Sensor-DHT.h>
-#endif
-
-/* Includes libraries for debugging in development compilation only */
-#ifdef DEBUG
-#include <Streaming.h>
+#include <PietteTech_DHT.h>
+void dht_wrapper();
+PietteTech_DHT dht;
+AFESensorDHT Sensor;
+float humidity;
 #endif
 
 AFEDataAccess Data;
@@ -49,31 +61,9 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
-
-#ifndef T0_SHELLY_1_CONFIG
-AFELED Led;
-#endif
-
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
-
-#ifdef T1_CONFIG
-AFESensorDS18B20 Sensor;
-#endif
-
-#ifdef T2_CONFIG
-AFESensorDHT Sensor;
-#endif
-
 MQTT MQTTConfiguration;
-
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-float temperature;
-#endif
-
-#ifdef T2_CONFIG
-float humidity;
-#endif
 
 void setup() {
 
@@ -81,7 +71,7 @@ void setup() {
   delay(10);
 
 /* Turn off publishing information to Serial for production compilation */
-#ifndef DEBUG
+#if !defined(DEBUG)
   Serial.swap();
 #endif
 
@@ -112,7 +102,7 @@ void setup() {
   Network.begin(Device.getMode());
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
@@ -174,7 +164,7 @@ void loop() {
 #endif
 
       } else { /* Device runs in configuration mode over WiFi */
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -183,7 +173,7 @@ void loop() {
       }
     }
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -201,7 +191,7 @@ void loop() {
   mainSwitch();
 
   /* Led listener */
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   Led.loop();
 #endif
 }

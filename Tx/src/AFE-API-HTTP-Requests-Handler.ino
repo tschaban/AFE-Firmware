@@ -149,9 +149,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
 #if defined(T1_CONFIG)
   } else if (strcmp(request.device, "ds18b20") == 0) {
-    if (strcmp(request.command, "get") == 0) {
-      sendHTTPAPIRequestStatus(request, true, Sensor.get());
-    }
+    strcmp(request.command, "get") == 0
+        ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
+        : sendHTTPAPIRequestStatus(request, false);
 #endif
 
 #if defined(T2_CONFIG)
@@ -167,6 +167,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else if (strcmp(request.name, "heatIndex") == 0) {
       strcmp(request.command, "get") == 0
           ? sendHTTPAPIRequestStatus(request, true, Sensor.getHeatIndex())
+          : sendHTTPAPIRequestStatus(request, false);
+    } else if (strcmp(request.name, "dewPoint") == 0) {
+      strcmp(request.command, "get") == 0
+          ? sendHTTPAPIRequestStatus(request, true, Sensor.getDewPoint())
           : sendHTTPAPIRequestStatus(request, false);
     } else {
       sendHTTPAPIRequestStatus(request, false);

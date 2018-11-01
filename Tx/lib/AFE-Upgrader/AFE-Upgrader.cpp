@@ -152,3 +152,12 @@ void AFEUpgrader::upgradeToVersion120() {
 }
 
 #endif
+
+#if defined(T2_CONFIG)
+/* Methods upgrades to v1.3.0 */
+void AFEUpgrader::upgradeToVersion130() {
+  AFEEEPROM Eeprom;
+  /* Setting default value for publishing DewPoint */
+  Eeprom.write(382, false);
+}
+#endif

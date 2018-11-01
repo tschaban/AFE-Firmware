@@ -16,7 +16,6 @@
 
 struct TEMPERATURE {
   float correction;
-  unsigned int interval;
   uint8_t unit;
 };
 

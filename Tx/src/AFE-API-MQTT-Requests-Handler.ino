@@ -151,9 +151,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             } else if ((char)payload[2] == 't' &&
                        length == 14) { // getTemperature
               char temperatureString[6];
-#if defined(T1_CONFIG)
-              dtostrf(Sensor.get(), 2, 2, temperatureString);
-#elif defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
               dtostrf(Sensor.getTemperature(), 2, 2, temperatureString);
 #endif
               Mqtt.publish("temperature", temperatureString);
@@ -164,11 +162,15 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               char humidityString[6];
               dtostrf(Sensor.getHumidity(), 2, 2, humidityString);
               Mqtt.publish("humidity", humidityString);
-            } else if ((char)payload[2] == 't' &&
+            } else if ((char)payload[3] == 'H' &&
                        length == 12) { // getHeatIndex
               char heatIndex[6];
               dtostrf(Sensor.getHeatIndex(), 2, 2, heatIndex);
               Mqtt.publish("heatIndex", heatIndex);
+            } else if ((char)payload[3] == 'D' && length == 12) { // getDewPoint
+              char heatIndex[6];
+              dtostrf(Sensor.getDewPoint(), 2, 2, heatIndex);
+              Mqtt.publish("dewPoint", heatIndex);
 #endif
             }
           }
@@ -208,6 +210,13 @@ void MQTTPublishHumidity(float humidity) {
 void MQTTPublishHeatIndex(float heatIndex) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("heatIndex", heatIndex);
+  }
+}
+
+/* Metod publishes Dew point */
+void MQTTPublishDewPoint(float dewPoint) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("dewPoint", dewPoint);
   }
 }
 #endif

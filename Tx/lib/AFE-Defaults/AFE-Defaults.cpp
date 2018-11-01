@@ -214,11 +214,10 @@ void AFEDefaults::set() {
 #elif defined(T2_CONFIG)
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
-  SensorConfiguration.temperature.interval = 60;
+  SensorConfiguration.interval = 60;
   SensorConfiguration.temperature.unit = 0;
   SensorConfiguration.publishHeatIndex = false;
-  SensorConfiguration.humidity.correction = 0;
-  SensorConfiguration.humidity.interval = 60;
+  SensorConfiguration.publishDewPoint = false;
   SensorConfiguration.temperatureIdx = 0;
   SensorConfiguration.humidityIdx = 0;
   SensorConfiguration.temperatureAndHumidityIdx = 0;

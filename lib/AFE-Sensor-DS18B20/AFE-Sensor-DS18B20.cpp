@@ -12,7 +12,7 @@ void AFESensorDS18B20::begin() {
   _initialized = true;
 }
 
-float AFESensorDS18B20::get() {
+float AFESensorDS18B20::getTemperature() {
   float temperature = -127;
   if (_initialized) {
     OneWire wireProtocol(configuration.gpio);
@@ -52,7 +52,7 @@ void AFESensorDS18B20::listener() {
     }
 
     if (time - startTime >= configuration.interval * 1000) {
-      float newTemperature = get();
+      float newTemperature = getTemperature();
       if (!configuration.sendOnlyChanges ||
           newTemperature != currentTemperature) {
         currentTemperature = newTemperature;

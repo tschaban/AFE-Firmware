@@ -570,7 +570,7 @@ DH AFEWebServer::getDHTData() {
   }
 
   if (server.arg("i").length() > 0) {
-    data.temperature.interval = server.arg("i").toInt();
+    data.interval = server.arg("i").toInt();
   }
 
   if (server.arg("u").length() > 0) {
@@ -581,9 +581,8 @@ DH AFEWebServer::getDHTData() {
     data.humidity.correction = server.arg("d").toFloat();
   }
 
-  if (server.arg("j").length() > 0) {
-    data.humidity.interval = server.arg("j").toInt();
-  }
+  server.arg("j").length() > 0 ? data.publishDewPoint = true
+                               : data.publishDewPoint = false;
 
   server.arg("o").length() > 0 ? data.sendOnlyChanges = true
                                : data.sendOnlyChanges = false;

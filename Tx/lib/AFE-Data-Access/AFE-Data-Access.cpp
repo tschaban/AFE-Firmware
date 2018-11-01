@@ -367,16 +367,16 @@ DH AFEDataAccess::getSensorConfiguration() {
   DH configuration;
   configuration.gpio = Eeprom.readUInt8(370);
   configuration.type = Eeprom.readUInt8(371);
-  configuration.temperature.interval = Eeprom.read(372, 5).toInt();
+  configuration.interval = Eeprom.read(372, 5).toInt();
   configuration.temperature.unit = Eeprom.readUInt8(377);
   configuration.temperature.correction = Eeprom.read(378, 4).toFloat();
-  configuration.humidity.interval = Eeprom.read(382, 5).toInt();
   configuration.humidity.correction = Eeprom.read(387, 3).toFloat();
   configuration.temperatureIdx = Eeprom.read(936, 6).toInt();
   configuration.humidityIdx = Eeprom.read(942, 6).toInt();
   configuration.temperatureAndHumidityIdx = Eeprom.read(948, 6).toInt();
   configuration.sendOnlyChanges = Eeprom.read(467);
   configuration.publishHeatIndex = Eeprom.read(974);
+  configuration.publishDewPoint = Eeprom.read(382);
   return configuration;
 }
 #endif
@@ -708,18 +708,17 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
 void AFEDataAccess::saveConfiguration(DH configuration) {
   Eeprom.writeUInt8(370, configuration.gpio);
   Eeprom.writeUInt8(371, configuration.type);
-  Eeprom.write(372, 5, (long)configuration.temperature.interval);
+  Eeprom.write(372, 5, (long)configuration.interval);
   Eeprom.writeUInt8(377, configuration.temperature.unit);
   Eeprom.write(378, 4, (float)configuration.temperature.correction);
 
-  Eeprom.write(382, 5, (long)configuration.humidity.interval);
   Eeprom.write(387, 3, (float)configuration.humidity.correction);
   Eeprom.write(936, 6, (long)configuration.temperatureIdx);
   Eeprom.write(942, 6, (long)configuration.humidityIdx);
   Eeprom.write(948, 6, (long)configuration.temperatureAndHumidityIdx);
-
   Eeprom.write(467, configuration.sendOnlyChanges);
   Eeprom.write(974, configuration.publishHeatIndex);
+  Eeprom.write(382, configuration.publishDewPoint);
 }
 #endif
 
