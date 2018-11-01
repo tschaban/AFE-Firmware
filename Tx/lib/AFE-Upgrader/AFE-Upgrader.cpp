@@ -23,25 +23,48 @@ void AFEUpgrader::upgrade() {
   } else {
 
 #ifndef T0_SHELLY_1_CONFIG
-    if (strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+
+    if (
+#if defined(T0_CONFIG)
+        strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0
-#ifdef T1_CONFIG
-        || strcmp(FirmwareConfiguration.version, "1.0.2") == 0
+#elif defined(T1_CONFIG)
+        strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.0.1") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.0.2") == 0
+#elif defined(T2_CONFIG)
+        strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.0")
+#elif defined(T4_CONFIG)
+        strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.0.1") == 0
 #endif
     ) {
 
-#ifdef T1_CONFIG
+#ifdef T1_CONFIG /* Upgrade T1 1.0.x to version T1.1.0 */
       upgradeToVersion110();
 #endif
       upgradeToVersion120();
     }
 #endif
 
+/* Upgrade from version T1-1.1.0 to 1.2.0 */
 #ifdef T1_CONFIG
     if (strcmp(FirmwareConfiguration.version, "1.1.0") == 0) {
       upgradeToVersion120();
     }
 #endif
+
+/* Upgrade from version T2 - 1.2.x to 1.3.0 */
+#ifdef T2_CONFIG
+    if (strcmp(FirmwareConfiguration.version, "1.2.1") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.2") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.3") == 0 ||
+        strcmp(FirmwareConfiguration.version, "1.2.4")) {
+      upgradeToVersion130();
+    }
+#endif
+
     Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
@@ -62,6 +85,7 @@ void AFEUpgrader::upgradeTypeOfFirmware() {
   }
 }
 
+/* Upgrade from version T1 1.1.x to 1.1.0 */
 #ifdef T1_CONFIG
 void AFEUpgrader::upgradeToVersion110() {
   AFEEEPROM Eeprom;
@@ -91,7 +115,10 @@ void AFEUpgrader::upgradeToVersion110() {
 }
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+/* Upgrade to version 1.2.0 */
+#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
+    defined(T4_CONFIG)
+
 void AFEUpgrader::upgradeToVersion120() {
   AFEEEPROM Eeprom;
 #ifndef T1_CONFIG
@@ -112,13 +139,31 @@ void AFEUpgrader::upgradeToVersion120() {
   Eeprom.writeUInt8(421, 0);
 #endif
 
-#if defined(T0_CONFIG) || defined(T4_CONFIG)
+#ifdef T2_CONFIG
+  /* LEDs */
+  Eeprom.write(464, false);
+  Defaults.addLEDConfiguration(1, 3);
+  Data.saveSystemLedID(1);
+
+  /* Set that both switces controls relay 1 */
+  Eeprom.writeUInt8(461, 1);
+  Eeprom.writeUInt8(462, 1);
+
+  /* Set that none of led informs about status of a relay */
+  Eeprom.writeUInt8(430, 0);
+#endif
+
+#if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
   /* Upgrade to new switch functionality codes */
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
 
 #ifdef T0_CONFIG
     if (Eeprom.readUInt8(401 + i * 7) == 11) {
       Eeprom.writeUInt8(401 + i * 7, 1);
+    }
+#elif T2_CONFIG
+    if (Eeprom.readUInt8(396 + i * 7) == 11) {
+      Eeprom.writeUInt8(396 + i * 7, 1);
     }
 #elif T4_CONFIG
     if (Eeprom.readUInt8(496 + i * 8) == 11) {
@@ -139,7 +184,20 @@ void AFEUpgrader::upgradeToVersion120() {
     Defaults.addDeviceID();
   }
 
-#ifdef T4_CONFIG
+#if defined(T2_CONFIG)
+  /* Set sending temperature only if it changes */
+  Eeprom.write(467, true);
+  /* Publish HeatIndex - no */
+  Eeprom.write(974, false);
+  /* IDXs */
+  Eeprom.write(930, 6, (long)0);
+  Eeprom.write(936, 6, (long)0);
+  Eeprom.write(942, 6, (long)0);
+  Eeprom.write(948, 6, (long)0);
+
+#endif
+
+#if defined(T4_CONFIG)
 
   /* Relay. Setting LED ID and IDX */
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {

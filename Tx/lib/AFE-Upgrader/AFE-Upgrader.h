@@ -35,7 +35,7 @@ private:
 #endif
 
 #if defined(T2_CONFIG)
-  /* Methods upgrades to v1.3.0 */
+  void upgradeToVersion121();
   void upgradeToVersion130();
 #endif
 
