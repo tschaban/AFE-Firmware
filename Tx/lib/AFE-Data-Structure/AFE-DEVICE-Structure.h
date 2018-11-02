@@ -39,6 +39,11 @@ struct DEVICE {
   boolean isRelay[1];
   boolean isSwitch[2];
   boolean isDS18B20;
+#elif defined(T2_CONFIG)
+  boolean isLED[2];
+  boolean isRelay[1];
+  boolean isSwitch[2];
+  boolean isDHT;
 #elif defined(T4_CONFIG)
   boolean isLED[5];
   boolean isSwitch[5];

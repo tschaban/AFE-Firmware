@@ -8,11 +8,11 @@ AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin() {
   AFEDataAccess Data;
-  configuration = Data.getDS18B20Configuration();
+  configuration = Data.getSensorConfiguration();
   _initialized = true;
 }
 
-float AFESensorDS18B20::get() {
+float AFESensorDS18B20::getTemperature() {
   float temperature = -127;
   if (_initialized) {
     OneWire wireProtocol(configuration.gpio);
@@ -29,7 +29,7 @@ float AFESensorDS18B20::get() {
   return temperature + configuration.correction;
 }
 
-float AFESensorDS18B20::getLatest() {
+float AFESensorDS18B20::getLatestTemperature() {
   ready = false;
   return currentTemperature;
 }
@@ -52,7 +52,7 @@ void AFESensorDS18B20::listener() {
     }
 
     if (time - startTime >= configuration.interval * 1000) {
-      float newTemperature = get();
+      float newTemperature = getTemperature();
       if (!configuration.sendOnlyChanges ||
           newTemperature != currentTemperature) {
         currentTemperature = newTemperature;

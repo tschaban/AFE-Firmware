@@ -2,6 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
+#if defined(T2_CONFIG)
+
 #ifndef _AFE_Sensor_DHT_h
 #define _AFE_Sensor_DHT_h
 
@@ -12,8 +14,10 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <DHT.h>
-// #include <Streaming.h>
+
+#if defined(DEBUG)
+#include <Streaming.h>
+#endif
 
 #define IDX_TYPE_TEMPERATURE 0
 #define IDX_TYPE_HUMIDITY 1
@@ -23,19 +27,23 @@ class AFESensorDHT {
 
 private:
   DH configuration;
-  float currentTemperature = -127;
-  float currentHumidity = -1;
-  boolean temperatureInBuffer = false;
-  boolean humidityInBuffer = false;
-  unsigned long temperatureCounterStartTime = 0;
-  unsigned long humidityCounterStartTime = 0;
+
+  float currentTemperature;
+  float currentHumidity;
+  float currentDewPoint;
+  float currentHeatIndex;
+
+  boolean dataInMemory = false;
   boolean _initialized = false;
+
+  int readResult;
+  unsigned long startTime = 0;
 
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorDHT();
 
-  void begin();
+  void dht_wrapper();
 
   /* Method returns temperature */
   float getTemperature();
@@ -43,20 +51,14 @@ public:
   /* Method returns humidity */
   float getHumidity();
 
-  /* Method returns latest stored in memory temperature */
-  float getLatestTemperature();
-
-  /* Method returns latest stored in memory humidity */
-  float getLatestHumidity();
-
   /* Method returns heat index */
   float getHeatIndex();
 
-  /* It returns true if temperature has been read from the sensor */
-  boolean temperatureSensorReady();
+  /* Method returns Dew Point */
+  float getDewPoint();
 
-  /* It returns true if humidity has been read from the sensor */
-  boolean humiditySensorReady();
+  /* It returns true if data has been read from the sensor */
+  boolean isReady();
 
   /* Method should be added to the main loop to check temperature / humidity in
    * defined time frame */
@@ -68,6 +70,10 @@ public:
 
   /* Get HeatIndex publishing configuration item */
   boolean publishHeatIndex();
+
+  /* True if dew point should be published */
+  boolean publishDewPoint();
 };
 
+#endif
 #endif

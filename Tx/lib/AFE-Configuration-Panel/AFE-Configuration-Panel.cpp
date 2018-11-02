@@ -31,8 +31,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
-                                                           uint8_t command,
+String AFEConfigurationPanel::getLanguageConfigurationSite(uint8_t command,
                                                            uint8_t lang) {
   String page;
   if (command == SERVER_CMD_SAVE) {
@@ -51,8 +50,7 @@ String AFEConfigurationPanel::getLanguageConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
-                                                         uint8_t command,
+String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
                                                          DEVICE data) {
 
   if (command == SERVER_CMD_SAVE) {
@@ -71,8 +69,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
-                                                          uint8_t command,
+String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
                                                           NETWORK data) {
 
   if (command == SERVER_CMD_SAVE) {
@@ -90,8 +87,7 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
-                                                       uint8_t command,
+String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
                                                        MQTT data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -109,8 +105,9 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(const String option,
   return page;
 }
 
-String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
-    const String option, uint8_t command, DOMOTICZ data) {
+String
+AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
+                                                          DOMOTICZ data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -129,8 +126,8 @@ String AFEConfigurationPanel::getDomoticzServerConfigurationSite(
 
 #ifndef T0_SHELLY_1_CONFIG
 String AFEConfigurationPanel::getLEDConfigurationSite(
-    const String option, uint8_t command,
-    LED data[sizeof(Device.configuration.isLED)], uint8_t dataLedID) {
+    uint8_t command, LED data[sizeof(Device.configuration.isLED)],
+    uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
@@ -164,8 +161,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
 }
 #endif
 
-String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
-                                                        uint8_t command,
+String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
                                                         RELAY data,
                                                         uint8_t relayIndex) {
   if (command == SERVER_CMD_SAVE) {
@@ -186,20 +182,24 @@ String AFEConfigurationPanel::getRelayConfigurationSite(const String option,
   return page;
 }
 
-#ifdef T1_CONFIG
-String AFEConfigurationPanel::getRelayStatConfigurationSite(const String option,
-                                                            uint8_t command,
-                                                            REGULATOR data) {
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+String AFEConfigurationPanel::getRelayStatConfigurationSite(
+    uint8_t command, REGULATOR data, uint8_t regulatorType) {
+
   if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
+    Data.saveConfiguration(data, regulatorType);
   }
 
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
-  page += "<form action=\"/?option=thermostat&cmd=1\" method=\"post\">";
+  page += "<form action=\"/?option=";
+  page += regulatorType == THERMOSTAT_REGULATOR ? "thermostat" : "humidistat";
+  page += "&cmd=1\"  method=\"post\">";
 
-  page += Site.addThermostatConfiguration();
+  regulatorType == THERMOSTAT_REGULATOR
+      ? page += Site.addRegulatorConfiguration(THERMOSTAT_REGULATOR)
+      : page += Site.addRegulatorConfiguration(HUMIDISTAT_REGULATOR);
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
@@ -209,8 +209,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(const String option,
 }
 #endif
 
-String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
-                                                         uint8_t command,
+String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
                                                          SWITCH data,
                                                          uint8_t switchIndex) {
 
@@ -233,9 +232,18 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(const String option,
 }
 
 #ifdef T1_CONFIG
-String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
-                                                          uint8_t command,
-                                                          DS18B20 data) {
+String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
+                                                          DS18B20 data)
+
+#endif
+
+#ifdef T2_CONFIG
+    String AFEConfigurationPanel::getDHTConfigurationSite(uint8_t command,
+                                                          DH data)
+#endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+{
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
@@ -243,16 +251,22 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(const String option,
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
+
+#ifdef T1_CONFIG
   page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
   page += Site.addDS18B20Configuration();
+#else
+  page += "<form action=\"/?option=DHT&cmd=1\"  method=\"post\">";
+  page += Site.addDHTConfiguration();
+#endif
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
 }
-
 #endif
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);

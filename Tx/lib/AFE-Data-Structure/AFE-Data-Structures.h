@@ -29,4 +29,8 @@
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
 
+#ifdef T2_CONFIG
+#include <AFE-DHT-Sensor-Structure.h>
+#endif
+
 #endif

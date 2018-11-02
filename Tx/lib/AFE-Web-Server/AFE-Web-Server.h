@@ -49,14 +49,22 @@ private:
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
+
 #ifndef T0_SHELLY_1_CONFIG
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
 
-#if T1_CONFIG
+#if defined(T1_CONFIG)
   DS18B20 getDS18B20Data();
-  REGULATOR getThermostateData();
+#endif
+
+#if defined(T2_CONFIG)
+  DH getDHTData();
+#endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  REGULATOR getRegulatorData();
 #endif
 
   uint8_t getLanguageData();

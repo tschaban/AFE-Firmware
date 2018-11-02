@@ -1,21 +1,38 @@
-/* Initializing sensor: DHT */
-void initDHTSensor() {
-  if (Device.configuration.isDHT) {
-    SensorDHT.begin();
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+
+/* Initializing sensor */
+void initSensor() {
+#if defined(T1_CONFIG)
+  if (Device.configuration.isDS18B20) {
+    Sensor.begin();
   }
+#elif defined(T2_CONFIG)
+  if (Device.configuration.isDHT) {
+    AFEDataAccess Data;
+    DH configuration = Data.getSensorConfiguration();
+
+    dht.begin(configuration.gpio,
+              (uint8_t)configuration.type == 1
+                  ? DHT11
+                  : configuration.type == 2 ? DHT21 : DHT22,
+              dht_wrapper);
+  }
+#endif
 }
 
-/* Main code for processing DH sesnor */
-void mainDHTSensor() {
-  if (Device.configuration.isDHT) {
-
-    /* Sensor: DHT listener */
-    SensorDHT.listener();
-
-    if (SensorDHT.temperatureSensorReady()) {
+/* Main code for processing sesnor */
+void mainSensor() {
+#if defined(T1_CONFIG)
+  if (Device.configuration.isDS18B20)
+#elif defined(T2_CONFIG)
+  if (Device.configuration.isDHT)
+#endif
+  {
+    /* Sensor: listener */
+    Sensor.listener();
+    if (Sensor.isReady()) {
       Led.on();
-      temperature = SensorDHT.getLatestTemperature();
-
+      temperature = Sensor.getTemperature();
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
 
@@ -37,8 +54,8 @@ void mainDHTSensor() {
             DomoticzPublishRelayState(i);
           }
 
-          /* Checking if relay should be switched off based on device thermal
-           * protection */
+          /* Checking if relay should be switched off based on device
+           * thermal protection */
           if (Relay[i].get() == RELAY_ON &&
               Relay[i].ThermalProtection.protectionOn()) {
             Relay[i].off();
@@ -50,20 +67,10 @@ void mainDHTSensor() {
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishTemperature(temperature);
-      if (SensorDHT.publishHeatIndex()) {
-        MQTTPublishHeatIndex(SensorDHT.getHeatIndex());
-      }
       DomoticzPublishTemperature(temperature);
-      delay(10);
-      DomoticzPublishTemperatureAndHumidity(temperature, humidity);
 
-      Led.off();
-    }
-
-    /* Humidity sensor related code */
-    if (SensorDHT.humiditySensorReady()) {
-      Led.on();
-      humidity = SensorDHT.getLatestHumidity();
+#ifdef T2_CONFIG
+      humidity = Sensor.getHumidity();
 
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
@@ -86,13 +93,23 @@ void mainDHTSensor() {
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
-      if (SensorDHT.publishHeatIndex()) {
-        MQTTPublishHeatIndex(SensorDHT.getHeatIndex());
-      }
       DomoticzPublishHumidity(humidity);
       delay(10);
       DomoticzPublishTemperatureAndHumidity(temperature, humidity);
+      if (Sensor.publishHeatIndex()) {
+        MQTTPublishHeatIndex(Sensor.getHeatIndex());
+      }
+      if (Sensor.publishDewPoint()) {
+        MQTTPublishDewPoint(Sensor.getDewPoint());
+      }
+#endif
       Led.off();
     }
   }
 }
+
+#if defined(T2_CONFIG)
+void dht_wrapper() { dht.isrCallback(); }
+#endif
+
+#endif

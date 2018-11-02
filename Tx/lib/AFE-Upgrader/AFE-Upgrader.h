@@ -34,6 +34,11 @@ private:
   void upgradeToVersion120();
 #endif
 
+#if defined(T2_CONFIG)
+  void upgradeToVersion121();
+  void upgradeToVersion130();
+#endif
+
 public:
   /* Constructor */
   AFEUpgrader();

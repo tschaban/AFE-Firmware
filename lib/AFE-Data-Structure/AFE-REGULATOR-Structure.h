@@ -11,6 +11,9 @@
 #include "WProgram.h"
 #endif
 
+#define THERMOSTAT_REGULATOR 0
+#define HUMIDISTAT_REGULATOR 1
+
 struct REGULATOR {
   boolean enabled;
   float turnOn;

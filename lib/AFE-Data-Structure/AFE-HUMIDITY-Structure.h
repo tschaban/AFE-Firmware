@@ -13,7 +13,6 @@
 
 struct HUMIDITY {
   float correction;
-  uint16_t interval;
 };
 
 #endif

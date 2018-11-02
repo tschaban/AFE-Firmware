@@ -97,7 +97,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
 /* Command not implemented.Info */
-#if defined(T1_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
           } else if (strcmp(request.command, "enableThermostat") == 0) {
             Relay[i].Thermostat.on();
             sendHTTPAPIRequestStatus(
@@ -116,6 +116,26 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
                 request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
 
 #endif
+
+#if defined(T2_CONFIG)
+          } else if (strcmp(request.command, "enableHumidistat") == 0) {
+            Relay[i].Humidistat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "disableHumidistat") == 0) {
+            Relay[i].Humidistat.off();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "toggleHumidistat") == 0) {
+            Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
+                                          : Relay[i].Humidistat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "getHumidistat") == 0) {
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+
+#endif
           } else {
             sendHTTPAPIRequestStatus(request, false);
           }
@@ -129,10 +149,34 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
 #if defined(T1_CONFIG)
   } else if (strcmp(request.device, "ds18b20") == 0) {
-    if (strcmp(request.command, "get") == 0) {
-      sendHTTPAPIRequestStatus(request, true, SensorDS18B20.get());
+    strcmp(request.command, "get") == 0
+        ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
+        : sendHTTPAPIRequestStatus(request, false);
+#endif
+
+#if defined(T2_CONFIG)
+  } /* DHT Sensor */ else if (strcmp(request.device, "dht") == 0) {
+    if (strcmp(request.name, "temperature") == 0) {
+      strcmp(request.command, "get") == 0
+          ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
+          : sendHTTPAPIRequestStatus(request, false);
+    } else if (strcmp(request.name, "humidity") == 0) {
+      strcmp(request.command, "get") == 0
+          ? sendHTTPAPIRequestStatus(request, true, Sensor.getHumidity())
+          : sendHTTPAPIRequestStatus(request, false);
+    } else if (strcmp(request.name, "heatIndex") == 0) {
+      strcmp(request.command, "get") == 0
+          ? sendHTTPAPIRequestStatus(request, true, Sensor.getHeatIndex())
+          : sendHTTPAPIRequestStatus(request, false);
+    } else if (strcmp(request.name, "dewPoint") == 0) {
+      strcmp(request.command, "get") == 0
+          ? sendHTTPAPIRequestStatus(request, true, Sensor.getDewPoint())
+          : sendHTTPAPIRequestStatus(request, false);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
     }
 #endif
+
     /* Turning ON / OFF APIs */
   } else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =

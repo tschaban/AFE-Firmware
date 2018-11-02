@@ -14,9 +14,17 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-#ifdef T1_CONFIG
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   REGULATOR RegulatorConfiguration;
-  DS18B20 DS18B20Configuration;
+#endif
+
+#if defined(T1_CONFIG)
+  DS18B20 SensorConfiguration;
+#endif
+
+#if defined(T2_CONFIG)
+  DH SensorConfiguration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -56,6 +64,10 @@ void AFEDefaults::set() {
   deviceConfiguration.isDS18B20 = false;
 #endif
 
+#ifdef T2_CONFIG
+  deviceConfiguration.isDHT = false;
+#endif
+
   Data->saveConfiguration(deviceConfiguration);
 
   /* Network default config */
@@ -93,7 +105,8 @@ void AFEDefaults::set() {
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG)
+#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
+    defined(T2_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
 #elif defined(T4_CONFIG)
   sprintf(RelayConfiguration.name, "switch1");
@@ -102,7 +115,7 @@ void AFEDefaults::set() {
   RelayConfiguration.ledID = 0;
   RelayConfiguration.idx = 0;
 
-#ifdef T1_CONFIG
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
 #endif
 
@@ -126,15 +139,22 @@ void AFEDefaults::set() {
     Data->saveRelayState(i, false);
   }
 
-#ifdef T1_CONFIG
+/* Regulator config */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   RegulatorConfiguration.enabled = false;
   RegulatorConfiguration.turnOn = 0;
   RegulatorConfiguration.turnOnAbove = false;
   RegulatorConfiguration.turnOff = 0;
   RegulatorConfiguration.turnOffAbove = true;
-  Data->saveConfiguration(RegulatorConfiguration);
 #endif
-/* Regulator config */
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
+#endif
+
+#if defined(T2_CONFIG)
+  Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
+#endif
 
 /* Switch config */
 #ifdef T0_SHELLY_1_CONFIG
@@ -150,7 +170,7 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
-#if defined(T0_CONFIG) || defined(T1_CONFIG)
+#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
 #elif defined(T4_CONFIG)
@@ -158,7 +178,7 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 2;
 #endif
 
-#if defined(T0_CONFIG) || defined(T4_CONFIG)
+#if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
@@ -182,14 +202,28 @@ void AFEDefaults::set() {
 
   addDeviceID();
 
-#ifdef T1_CONFIG
-  DS18B20Configuration.gpio = 14;
-  DS18B20Configuration.correction = 0;
-  DS18B20Configuration.interval = 60;
-  DS18B20Configuration.unit = 0;
-  DS18B20Configuration.sendOnlyChanges = true;
-  DS18B20Configuration.idx = 0;
-  Data->saveConfiguration(DS18B20Configuration);
+/* DS18B20 or DHTxx Sensor configuration */
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  SensorConfiguration.gpio = 14;
+  SensorConfiguration.sendOnlyChanges = true;
+#if defined(T1_CONFIG)
+  SensorConfiguration.correction = 0;
+  SensorConfiguration.interval = 60;
+  SensorConfiguration.unit = 0;
+  SensorConfiguration.idx = 0;
+#elif defined(T2_CONFIG)
+  SensorConfiguration.type = 1;
+  SensorConfiguration.temperature.correction = 0;
+  SensorConfiguration.interval = 60;
+  SensorConfiguration.temperature.unit = 0;
+  SensorConfiguration.publishHeatIndex = false;
+  SensorConfiguration.publishDewPoint = false;
+  SensorConfiguration.temperatureIdx = 0;
+  SensorConfiguration.humidityIdx = 0;
+  SensorConfiguration.temperatureAndHumidityIdx = 0;
+#endif
+
+  Data->saveConfiguration(SensorConfiguration);
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG

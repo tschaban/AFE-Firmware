@@ -17,9 +17,13 @@
 #include <AFE-LED.h>
 #endif
 
-#if defined(T1_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
 #include <AFE-Thermal-Protection.h>
 #include <AFE-Thermostat.h>
+#endif
+
+#if defined(T2_CONFIG)
+#include <AFE-Humidistat.h>
 #endif
 
 #ifdef DEBUG
@@ -47,9 +51,13 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
-#if defined(T1_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   AFEThermostat Thermostat;
   AFEThermalProtection ThermalProtection;
+#endif
+
+#if defined(T2_CONFIG)
+  AFEHumidistat Humidistat;
 #endif
 
   /* Constructors */

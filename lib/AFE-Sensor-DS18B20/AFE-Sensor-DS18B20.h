@@ -37,9 +37,9 @@ public:
 
   // @TODO I think reading temp should be made in the listener, issue to solve
   // how to get temperature but publish only changes
-  float get();
+  float getTemperature();
 
-  float getLatest();
+  float getLatestTemperature();
 
   boolean isReady();
 
