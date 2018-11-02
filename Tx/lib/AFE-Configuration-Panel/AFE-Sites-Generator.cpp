@@ -1557,9 +1557,13 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Włącz jeśli " : "Switch on if ";
-  body += "temp.";
-  body += language == 0 ? " jest" : " is";
+  body += language == 0 ? "Włącz jeśli" : "On if";
+  if (type == THERMOSTAT_REGULATOR) {
+    body += " temp.";
+  } else {
+    body += language == 0 ? " wilgo." : " Humidity ";
+  }
+  body += language == 0 ? "jest" : "is";
   body += "</label>";
 
   body += "<select name=\"ta\"><option value=\"0\"";
@@ -1592,9 +1596,13 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Wyłącz jeśli " : "Switch off if ";
-  body += "temp.";
-  body += language == 0 ? " jest" : " is";
+  body += language == 0 ? "Wyłącz jeśli" : "Off if";
+  if (type == THERMOSTAT_REGULATOR) {
+    body += " temp.";
+  } else {
+    body += language == 0 ? " wilgo." : " Humidity ";
+  }
+  body += language == 0 ? "jest" : "is";
   body += "</label>";
   body += "<select name=\"tb\"><option value=\"0\"";
   body += (configuration.turnOffAbove == 0 ? " selected=\"selected\"" : "");
