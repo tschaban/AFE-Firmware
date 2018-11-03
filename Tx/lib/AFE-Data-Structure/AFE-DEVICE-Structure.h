@@ -25,7 +25,6 @@ struct DEVICE {
   boolean mqttAPI;
   boolean httpAPI;
   boolean domoticzAPI;
-
 #if defined(T0_CONFIG)
   boolean isLED[2];
   boolean isSwitch[2];
@@ -48,6 +47,12 @@ struct DEVICE {
   boolean isLED[5];
   boolean isSwitch[5];
   boolean isRelay[4];
+#elif defined(T5_CONFIG)
+  boolean isLED[3];
+  boolean isSwitch[2];
+  boolean isRelay[1];
+  boolean isContactron[2];
+  boolean isDHT;
 #endif
 };
 

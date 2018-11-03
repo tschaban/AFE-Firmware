@@ -9,6 +9,8 @@ void eventsListener() {
 #ifndef T0_SHELLY_1_CONFIG
       Led.on();
 #endif
+
+#if !defined(T5_CONFIG) // Not required for T5
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
           DomoticzPublishRelayState(i);
@@ -16,6 +18,8 @@ void eventsListener() {
           break;
         }
       }
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
       Led.off();
 #endif

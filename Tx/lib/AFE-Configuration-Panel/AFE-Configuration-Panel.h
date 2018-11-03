@@ -61,8 +61,16 @@ public:
   String getDS18B20ConfigurationSite(uint8_t command, DS18B20 data);
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   String getDHTConfigurationSite(uint8_t command, DH data);
+#endif
+
+#if defined(T5_CONFIG)
+  String getContactronConfigurationSite(const String option, uint8_t command,
+                                        CONTACTRON data,
+                                        uint8_t contactronIndex);
+  String getGateConfigurationSite(const String option, uint8_t command,
+                                  GATE data);
 #endif
 
   /* It generates site for firmware upgrade */

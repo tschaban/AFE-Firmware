@@ -48,7 +48,9 @@ private:
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
+#if !defined(T5_CONFIG) // Not required for T5
   void setRelayAfterRestore(uint8_t option);
+#endif
 
 public:
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
@@ -70,6 +72,7 @@ public:
   /* Method returns MQTT topic for this relay */
   const char *getMQTTTopic();
 
+#if !defined(T5_CONFIG) // Not required for T5
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
   void setRelayAfterRestoringPower();
@@ -78,6 +81,7 @@ public:
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
+#endif
 
   /* Method: Returns RELAY_OFF if relay is OFF, RELAY_ON if relay is ON */
   byte get();
@@ -95,8 +99,10 @@ public:
    * how long relay should be on must be configured */
   boolean autoTurnOff(boolean invert = false);
 
+#if !defined(T5_CONFIG) // Not required for T5
   /* Methods returns relay name */
   const char *getName();
+#endif
 
   /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
@@ -113,8 +119,10 @@ public:
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
 
+#if !defined(T5_CONFIG) // Not required for T5
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
+#endif
 };
 
 #endif

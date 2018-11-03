@@ -60,7 +60,7 @@ void AFEDomoticz::callURL(const String url) {
   http.end();
 }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     char _temperatureChar[7];
@@ -73,7 +73,7 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
 
   if (initialized) {
@@ -118,4 +118,14 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
   }
 }
 
+#endif
+
+#if defined(T5_CONFIG) /* @TODO it could be removed and replaced by switch */
+void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
+  sendSwitchCommand(idx, value);
+}
+
+void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
+  sendSwitchCommand(idx, value);
+}
 #endif

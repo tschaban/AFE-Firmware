@@ -6,6 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B29)
    - T2 (DHTxx)
    - T4 (Up to 4 relays)
+   - T5 Gate
 
 More about the versions (PL): https://www.smartnydom.pl/afe-firmware-pl/wersje/
 LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
@@ -41,18 +42,24 @@ AFESensorDS18B20 Sensor;
 #endif
 
 /* T1 and T2 Set up */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
 float temperature;
 #endif
 
 /* T2 Setup, DHxx sensor */
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 #include <AFE-Sensor-DHT.h>
 #include <PietteTech_DHT.h>
 void dht_wrapper();
 PietteTech_DHT dht;
 AFESensorDHT Sensor;
 float humidity;
+#endif
+
+#if defined(T5_CONFIG)
+#include <AFE-Gate.h>
+GATE GateState;
+AFEGate Gate;
 #endif
 
 AFEDataAccess Data;
@@ -120,11 +127,17 @@ void setup() {
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.begin();
 
+/* Initializing Gate */
+#if defined(T5_CONFIG)
+  Gate.begin();
+  GateState = Data.getGateConfiguration();
+#endif
+
   /* Initializing switches */
   initSwitch();
 
   /* Initializing DS18B20 pr DHTxx sensor */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   initSensor();
 #endif
 
@@ -152,14 +165,24 @@ void loop() {
          * or HTTP API requests if it's turned on */
         WebServer.listener();
 
+#if defined(T5_CONFIG)
+        /* Listening for gate events */
+        Gate.listener();
+#endif
+
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
 
-        /* Relay related code */
+#if defined(T5_CONFIG)
+        /* Gate related events */
+        mainGate();
+#else
+        /* Relay related events */
         mainRelay();
+#endif
 
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
         /* Sensor: DS18B20 or DHT related code */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
         mainSensor();
 #endif
 

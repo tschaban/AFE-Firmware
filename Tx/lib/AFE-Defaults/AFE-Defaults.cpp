@@ -21,10 +21,12 @@ void AFEDefaults::set() {
 
 #if defined(T1_CONFIG)
   DS18B20 SensorConfiguration;
-#endif
-
-#if defined(T2_CONFIG)
+#elif defined(T2_CONFIG)
   DH SensorConfiguration;
+#elif defined(T5_CONFIG)
+  DH SensorConfiguration;
+  CONTACTRON ContactronConfiguration;
+  GATE GateConfiguration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -41,10 +43,12 @@ void AFEDefaults::set() {
   deviceConfiguration.domoticzAPI = false;
   deviceConfiguration.httpAPI = true;
 
-  /* Relay presence */
+/* Relay presence */
+#if !defined(T5_CONFIG)
   for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
     deviceConfiguration.isRelay[i] = false;
   }
+#endif
 
   /* Switch presence */
   deviceConfiguration.isSwitch[0] = true;
@@ -52,20 +56,29 @@ void AFEDefaults::set() {
     deviceConfiguration.isSwitch[i] = false;
   }
 
+/* LEDs */
 #ifndef T0_SHELLY_1_CONFIG
-  /* LED */
   deviceConfiguration.isLED[0] = true;
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
   }
 #endif
 
-#ifdef T1_CONFIG
+/* DS18B20 */
+#if defined(T1_CONFIG)
   deviceConfiguration.isDS18B20 = false;
 #endif
 
-#ifdef T2_CONFIG
+/* DHxx */
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   deviceConfiguration.isDHT = false;
+#endif
+
+/* Contactron */
+#if defined(T5_CONFIG)
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isContactron); i++) {
+    deviceConfiguration.isContactron[i] = false;
+  }
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -101,6 +114,9 @@ void AFEDefaults::set() {
   RelayConfiguration.gpio = 12;
 #endif
 
+#if defined(T5_CONFIG)
+  RelayConfiguration.timeToOff = 200;
+#else /* Configuration not related to T5 */
   RelayConfiguration.timeToOff = 0;
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
@@ -119,6 +135,13 @@ void AFEDefaults::set() {
   RelayConfiguration.thermalProtection = 0;
 #endif
 
+  /* Saving defulat relay state */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+    Data->saveRelayState(i, false);
+  }
+
+#endif /* End of configuration not related to T5 */
+
   Data->saveConfiguration(0, RelayConfiguration);
 
 #if defined(T4_CONFIG)
@@ -135,10 +158,6 @@ void AFEDefaults::set() {
   Data->saveConfiguration(3, RelayConfiguration);
 #endif
 
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
-    Data->saveRelayState(i, false);
-  }
-
 /* Regulator config */
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   RegulatorConfiguration.enabled = false;
@@ -148,10 +167,12 @@ void AFEDefaults::set() {
   RegulatorConfiguration.turnOffAbove = true;
 #endif
 
+/* Thermostat configuration */
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
 #endif
 
+/* Hunidistat confiuration */
 #if defined(T2_CONFIG)
   Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
 #endif
@@ -170,7 +191,8 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 1;
   Data->saveConfiguration(0, SwitchConfiguration);
 
-#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
+    defined(T5_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
 #elif defined(T4_CONFIG)
@@ -178,7 +200,8 @@ void AFEDefaults::set() {
   SwitchConfiguration.relayID = 2;
 #endif
 
-#if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
+#if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG) ||          \
+    defined(T5_CONFIG)
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
@@ -187,34 +210,38 @@ void AFEDefaults::set() {
   SwitchConfiguration.gpio = 10;
   SwitchConfiguration.relayID = 3;
   Data->saveConfiguration(2, SwitchConfiguration);
-#endif
-
-#if defined(T4_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.relayID = 4;
   Data->saveConfiguration(3, SwitchConfiguration);
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
-  addLEDConfiguration(0, 13);
+/* LEDs configuration */
+#if !defined(T0_SHELLY_1_CONFIG)
+#if !defined(T5_CONFIG)
   addLEDConfiguration(1, 3);
+  addLEDConfiguration(0, 13);
+#else
+  addLEDConfiguration(0, 16);
+  addLEDConfiguration(1, 14);
+  addLEDConfiguration(1, 13);
+#endif
 #endif
 
   addDeviceID();
 
 /* DS18B20 or DHTxx Sensor configuration */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   SensorConfiguration.gpio = 14;
   SensorConfiguration.sendOnlyChanges = true;
+  SensorConfiguration.interval = 60;
 #if defined(T1_CONFIG)
   SensorConfiguration.correction = 0;
-  SensorConfiguration.interval = 60;
   SensorConfiguration.unit = 0;
   SensorConfiguration.idx = 0;
-#elif defined(T2_CONFIG)
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
-  SensorConfiguration.interval = 60;
+  SensorConfiguration.humidity.correction = 0;
   SensorConfiguration.temperature.unit = 0;
   SensorConfiguration.publishHeatIndex = false;
   SensorConfiguration.publishDewPoint = false;
@@ -224,6 +251,31 @@ void AFEDefaults::set() {
 #endif
 
   Data->saveConfiguration(SensorConfiguration);
+#endif
+
+/* T5: Contactron and Gate configuration */
+#if defined(T5_CONFIG)
+  ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
+  ContactronConfiguration.bouncing = 200;
+  ContactronConfiguration.gpio = 4;
+  ContactronConfiguration.ledID = 2;
+  ContactronConfiguration.idx = 0;
+  sprintf(ContactronConfiguration.name, "C1");
+  Data->saveConfiguration(0, ContactronConfiguration);
+  ContactronConfiguration.gpio = 5;
+  ContactronConfiguration.ledID = 3;
+  sprintf(ContactronConfiguration.name, "C2");
+  Data->saveConfiguration(1, ContactronConfiguration);
+
+  GateConfiguration.state[0] = GATE_OPEN;
+  GateConfiguration.state[1] = GATE_PARTIALLY_OPEN;
+  GateConfiguration.state[2] = GATE_PARTIALLY_OPEN;
+  GateConfiguration.state[3] = GATE_CLOSED;
+  GateConfiguration.idx = 0;
+
+  Data->saveConfiguration(GateConfiguration);
+  Data->saveGateState(0);
+
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG

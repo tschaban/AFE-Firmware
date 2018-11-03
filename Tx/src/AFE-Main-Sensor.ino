@@ -1,4 +1,4 @@
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
 
 /* Initializing sensor */
 void initSensor() {
@@ -6,7 +6,7 @@ void initSensor() {
   if (Device.configuration.isDS18B20) {
     Sensor.begin();
   }
-#elif defined(T2_CONFIG)
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   if (Device.configuration.isDHT) {
     AFEDataAccess Data;
     DH configuration = Data.getSensorConfiguration();
@@ -24,7 +24,7 @@ void initSensor() {
 void mainSensor() {
 #if defined(T1_CONFIG)
   if (Device.configuration.isDS18B20)
-#elif defined(T2_CONFIG)
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   if (Device.configuration.isDHT)
 #endif
   {
@@ -33,6 +33,9 @@ void mainSensor() {
     if (Sensor.isReady()) {
       Led.on();
       temperature = Sensor.getTemperature();
+
+/* Thermostat */
+#if !defined(T5_CONFIG)
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
 
@@ -64,14 +67,16 @@ void mainSensor() {
           }
         }
       }
-
+#endif
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishTemperature(temperature);
       DomoticzPublishTemperature(temperature);
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
       humidity = Sensor.getHumidity();
 
+/* Humidistat */
+#if !defined(T5_CONFIG)
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
 
@@ -90,7 +95,7 @@ void mainSensor() {
           }
         }
       }
-
+#endif
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
       DomoticzPublishHumidity(humidity);
@@ -108,7 +113,7 @@ void mainSensor() {
   }
 }
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 void dht_wrapper() { dht.isrCallback(); }
 #endif
 

@@ -19,7 +19,7 @@
 #include <Streaming.h>
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 #define HUMIDITY_NORMAL 0
 #define HUMIDITY_COMFORTABLE 1
 #define HUMIDITY_DRY 2
@@ -49,14 +49,14 @@ public:
   */
   void sendSwitchCommand(unsigned int idx, const char *value);
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   /* It send to Domoticz temperature using following API call
      json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
   */
   void sendTemperatureCommand(unsigned int idx, float value);
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   /* It send to Domoticz humidity using following API call
      /json.htm?type=command&param=udevice&idx=IDX&nvalue=HUM&svalue=HUM_STAT
   */
@@ -73,6 +73,11 @@ public:
    * HUMIDITY_ constant
    */
   uint8_t getHumidityState(float value);
+#endif
+
+#if defined(T5_CONFIG)
+  void sendGateCommand(unsigned int idx, const char *value);
+  void sendContactronCommand(unsigned int idx, const char *value);
 #endif
 };
 

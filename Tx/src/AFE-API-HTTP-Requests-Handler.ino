@@ -44,6 +44,7 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
   respond += "\"}";
   WebServer.sendJSON(respond);
 }
+
 void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
                               uint8_t width = 2, uint8_t precision = 2) {
   char valueString[10];
@@ -51,16 +52,77 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
   sendHTTPAPIRequestStatus(request, status, valueString);
 }
 
+#if !defined(T5_CONFIG) // Not required for T5
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
+#endif
+
+/* Gate and Contactron responses */
+#if defined(T5_CONFIG)
+/* It constructs HTTP response related to gate and calls HTTP push */
+void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
+                                  byte value) {
+  sendHTTPAPIRequestStatus(
+      request, status,
+      value == GATE_OPEN
+          ? "open"
+          : value == GATE_CLOSED
+                ? "closed"
+                : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
+}
+
+/* It constructs HTTP response related to contactron and calls HTTP push */
+void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
+                                        byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == CONTACTRON_OPEN ? "open" : "closed");
+}
+#endif
 
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
-  /* Checking of request is about a relay */
+
+#if defined(T5_CONFIG)
+
+  /* Request related to gate */
+  if (strcmp(request.device, "gate") == 0) {
+    if (strcmp(request.command, "toggle") == 0) {
+      Gate.toggle();
+      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
+    } else if (strcmp(request.command, "get") == 0) { // get
+      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  }
+  /* Request relared to contactron */
+  else if (strcmp(request.device, "contactron") == 0) {
+    boolean noContactron = true;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        if (strcmp(request.name, Gate.Contactron[i].getName()) == 0) {
+          noContactron = false;
+          if (strcmp(request.command, "get") == 0) {
+            sendHTTPAPIContactronRequestStatus(request, true,
+                                               Gate.Contactron[i].get());
+          } else {
+            sendHTTPAPIRequestStatus(request, false);
+          }
+        }
+      } else {
+        break;
+      }
+    }
+    if (noContactron) {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  }
+#else
+  /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
     boolean noRelay = true;
@@ -147,15 +209,21 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     if (noRelay) {
       sendHTTPAPIRequestStatus(request, false);
     }
+  }
+#endif
+
 #if defined(T1_CONFIG)
-  } else if (strcmp(request.device, "ds18b20") == 0) {
+  /* Request related to ds18b20 */
+  else if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
         : sendHTTPAPIRequestStatus(request, false);
+  }
 #endif
 
-#if defined(T2_CONFIG)
-  } /* DHT Sensor */ else if (strcmp(request.device, "dht") == 0) {
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
+  /* Request related to DHT Sensor */
+  else if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
       strcmp(request.command, "get") == 0
           ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
@@ -175,10 +243,12 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
+  }
 #endif
 
-    /* Turning ON / OFF APIs */
-  } else if (strcmp(request.device, "api") == 0) {
+  /* Requests related to APIs */
+
+  else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
         strcmp(request.name, "http") == 0
             ? API_HTTP

@@ -18,9 +18,15 @@ void mainSwitch() {
 #ifndef T0_SHELLY_1_CONFIG
         Led.on();
 #endif
+
+#if defined(T5_CONFIG) /* Control either gate or a relay */
+        Gate.toggle();
+#else
         Relay[Switch[i].getControlledRelayID() - 1].toggle();
         MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
         DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
+#endif
+
 #ifndef T0_SHELLY_1_CONFIG
         Led.off();
 #endif

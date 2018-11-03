@@ -1,14 +1,19 @@
+
+
 void initRelay() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
       Relay[i].begin(i);
+#if !defined(T5_CONFIG)
       Relay[i].setRelayAfterRestoringPower();
+#endif
     } else {
       break;
     }
   }
 }
 
+#if !defined(T5_CONFIG) /* Relay is not controlled in T5 firmware */
 /* Method checks if any relay should be automatically turned off */
 void mainRelay() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
@@ -28,3 +33,4 @@ void mainRelay() {
     }
   }
 }
+#endif

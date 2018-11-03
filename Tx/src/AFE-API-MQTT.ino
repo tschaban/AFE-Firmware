@@ -70,9 +70,10 @@ void AFEMQTT::connect() {
           */
           Broker.subscribe((char *)mqttTopicForSubscription);
 
-          //        Serial << endl << "INFO: Subsribed";
+//        Serial << endl << "INFO: Subsribed";
 
-          /* Publishing message that device has been connected */
+/* Publishing message that device has been connected */
+#if !defined(T5_CONFIG) // Not required for T5
           publish(MQTTConfiguration.topic, "state", "connected");
 
           /* Setting Relay state after connection to MQTT */
@@ -91,6 +92,8 @@ void AFEMQTT::connect() {
               DomoticzPublishRelayState(i);
             }
           }
+#endif
+
           delayStartTime = 0;
 #ifndef T0_SHELLY_1_CONFIG
           ledStartTime = 0;

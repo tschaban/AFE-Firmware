@@ -125,7 +125,7 @@ void AFEWebServer::generate() {
       server.client().stop();
       Device.reboot(MODE_ACCESS_POINT);
     }
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+
 #if defined(T1_CONFIG)
   } else if (optionName == "ds18b20") {
     DS18B20 data = {};
@@ -133,7 +133,7 @@ void AFEWebServer::generate() {
       data = getDS18B20Data();
     }
     publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
-#else
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   } else if (optionName == "DHT") {
     DH data = {};
     if (command == SERVER_CMD_SAVE) {
@@ -141,6 +141,8 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
 #endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
   } else if (optionName == "thermostat" || optionName == "humidistat") {
     REGULATOR data = {};
     if (command == SERVER_CMD_SAVE) {
@@ -150,8 +152,8 @@ void AFEWebServer::generate() {
         command, data,
         optionName == "thermostat" ? THERMOSTAT_REGULATOR
                                    : HUMIDISTAT_REGULATOR));
-
 #endif
+
   } else {
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -182,6 +184,31 @@ void AFEWebServer::generate() {
         break;
       }
     }
+#if defined(T5_CONFIG)
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        if (optionName == "contactron" + String(i)) {
+          CONTACTRON data = {};
+          if (command == SERVER_CMD_SAVE) {
+            data = getContactronData(i);
+          }
+          publishHTML(ConfigurationPanel.getContactronConfigurationSite(
+              optionName, command, data, i));
+        }
+      } else {
+        break;
+      }
+    }
+
+    if (optionName == "gate") {
+      GATE data = {};
+      if (command == SERVER_CMD_SAVE) {
+        data = getGateData();
+      }
+      publishHTML(ConfigurationPanel.getGateConfigurationSite(optionName,
+                                                              command, data));
+    }
+#endif
   }
 }
 
@@ -258,10 +285,17 @@ DEVICE AFEWebServer::getDeviceData() {
   }
 #endif
 
+#if defined(T5_CONFIG)
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+    server.arg("hc").toInt() > i ? data.isContactron[i] = true
+                                 : data.isContactron[i] = false;
+  }
+#else
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     server.arg("hr").toInt() > i ? data.isRelay[i] = true
                                  : data.isRelay[i] = false;
   }
+#endif
 
   for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
@@ -272,7 +306,7 @@ DEVICE AFEWebServer::getDeviceData() {
                                 : data.isDS18B20 = false;
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
 #endif
 
@@ -413,6 +447,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.timeToOff = server.arg("ot" + String(id)).toFloat();
   }
 
+#if !defined(T5_CONFIG)
   if (server.arg("pr" + String(id)).length() > 0) {
     data.statePowerOn = server.arg("pr" + String(id)).toInt();
   }
@@ -431,12 +466,14 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   }
 #endif
 
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.ledID = server.arg("l" + String(id)).toInt();
-  }
-
   if (server.arg("x" + String(id)).length() > 0) {
     data.idx = server.arg("x" + String(id)).toInt();
+  }
+
+#endif
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledID = server.arg("l" + String(id)).toInt();
   }
 
   return data;
@@ -492,6 +529,53 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
 
   return data;
 }
+
+#if defined(T5_CONFIG)
+CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
+  CONTACTRON data;
+
+  if (server.arg("o" + String(id)).length() > 0) {
+    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+  }
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledID = server.arg("l" + String(id)).toInt();
+  }
+
+  if (server.arg("b" + String(id)).length() > 0) {
+    data.bouncing = server.arg("b" + String(id)).toInt();
+  }
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("n" + String(id)).length() > 0) {
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  }
+
+  if (server.arg("x" + String(id)).length() > 0) {
+    data.idx = server.arg("x" + String(id)).toInt();
+  }
+
+  return data;
+}
+
+GATE AFEWebServer::getGateData() {
+  GATE data;
+  for (uint8_t i = 0; i < sizeof(data.state); i++) {
+    if (server.arg("s" + String(i)).length() > 0) {
+      data.state[i] = server.arg("s" + String(i)).toInt();
+    }
+  }
+
+  if (server.arg("x").length() > 0) {
+    data.idx = server.arg("x").toInt();
+  }
+
+  return data;
+}
+#endif
 
 #ifndef T0_SHELLY_1_CONFIG
 LED AFEWebServer::getLEDData(uint8_t id) {
@@ -553,7 +637,7 @@ DS18B20 AFEWebServer::getDS18B20Data() {
 
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 DH AFEWebServer::getDHTData() {
   DH data;
 
