@@ -25,9 +25,10 @@ void AFEDomoticz::begin() {
           configuration.host, configuration.port, authorization);
 
   initialized = true;
-  /* Uncommencted can help to determin the size of serverURL
+
+#ifdef DEBUG
   Serial << endl << "ServerURL Size=" << String(serverURL).length();
-  */
+#endif
 }
 
 void AFEDomoticz::disconnect() { initialized = false; }
@@ -49,14 +50,18 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 
 void AFEDomoticz::callURL(const String url) {
 
-  // Serial << endl << "Calling url: " << url;
+#ifdef DEBUG
+  Serial << endl << "Calling url: " << url;
+#endif
+
   http.begin(url);
   http.GET();
-  /*
-  Serial << endl << "Response: " << httpCode;
-  String payload = http.getString();
-  Serial << endl << payload;
-  */
+
+  //#ifdef DEBUG
+  //  String payload = http.getString();
+  //  Serial << endl << payload;
+  //#endif
+
   http.end();
 }
 
@@ -108,11 +113,11 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
 
 uint8_t AFEDomoticz::getHumidityState(float value) {
   if (value < 40) {
-    return HUMIDITY_WET;
+    return HUMIDITY_DRY;
   } else if (value >= 40 && value <= 60) {
     return HUMIDITY_COMFORTABLE;
   } else if (value > 60) {
-    return HUMIDITY_DRY;
+    return HUMIDITY_WET;
   } else {
     return HUMIDITY_NORMAL;
   }

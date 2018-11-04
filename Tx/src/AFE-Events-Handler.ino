@@ -10,10 +10,18 @@ void eventsListener() {
       Led.on();
 #endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#if defined(T5_CONFIG)
+      DomoticzPublishGateState();
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+        if (Device.configuration.isContactron[i]) {
+          DomoticzPublishContactronState(i);
+        }
+      }
+#else
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
           DomoticzPublishRelayState(i);
+          lastPublishedContactronState[i] = Gate.Contactron[i].get();
         } else {
           break;
         }

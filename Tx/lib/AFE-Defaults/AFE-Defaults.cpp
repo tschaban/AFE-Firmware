@@ -223,7 +223,7 @@ void AFEDefaults::set() {
 #else
   addLEDConfiguration(0, 16);
   addLEDConfiguration(1, 14);
-  addLEDConfiguration(1, 13);
+  addLEDConfiguration(2, 13);
 #endif
 #endif
 
@@ -239,6 +239,7 @@ void AFEDefaults::set() {
   SensorConfiguration.unit = 0;
   SensorConfiguration.idx = 0;
 #elif defined(T2_CONFIG) || defined(T5_CONFIG)
+  SensorConfiguration.gpio = 2;
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
   SensorConfiguration.humidity.correction = 0;

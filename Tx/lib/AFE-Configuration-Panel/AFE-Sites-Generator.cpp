@@ -1555,17 +1555,12 @@ String AFESitesGenerator::addGateConfiguration() {
   body += "</p>";
   body += generateGateStatesList(3, gateConfiguration.state[3]);
 
+  String page = addConfigurationBlock(
+      language == 0 ? "Konfiguracja stanów bramy" : "Gate states configuration",
+      "", body);
+
   if (deviceConfiguration.domoticzAPI) {
-    body += "<br><p class=\"cm\">";
-    body +=
-        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
-    body += "</p>";
-    body += "<p class=\"cm\">";
-    body += language == 0
-                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
-                : "If IDX is set to 0 then a value won't be sent to ";
-    body += "Domoticz</p>";
-    body += "<div class=\"cf\">";
+    body = "<div class=\"cf\">";
     body += "<label>IDX</label>";
     body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
@@ -1575,13 +1570,18 @@ String AFESitesGenerator::addGateConfiguration() {
     body += language == 0 ? "Zakres: " : "Range: ";
     body += "0 - 999999</span>";
     body += "</div>";
+
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
   }
 
   body += "</fieldset>";
 
-  return addConfigurationBlock(language == 0 ? "Konfiguracja stanów bramy"
-                                             : "Gate states configuration",
-                               "", body);
+  return page;
 }
 
 const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {

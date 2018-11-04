@@ -56,12 +56,6 @@ AFESensorDHT Sensor;
 float humidity;
 #endif
 
-#if defined(T5_CONFIG)
-#include <AFE-Gate.h>
-GATE GateState;
-AFEGate Gate;
-#endif
-
 AFEDataAccess Data;
 AFEDevice Device;
 AFEWiFi Network;
@@ -71,6 +65,14 @@ AFEWebServer WebServer;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
+
+#if defined(T5_CONFIG)
+#include <AFE-Gate.h>
+GATE GateState;
+AFEGate Gate;
+uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
+byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
+#endif
 
 void setup() {
 
