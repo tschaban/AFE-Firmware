@@ -73,6 +73,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
                         : "Switch with temperature and humidity sensor";
 #elif T4_CONFIG
   page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
+#elif T5_CONFIG
+  page += language == 0 ? "do kontrolowania sterownika bramy"
+                        : "to control gate controller";
 #endif
 
   page += "</h4><h4>MENU</h4>"
@@ -113,22 +116,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
-#ifdef T1_CONFIG
-    if (Device.configuration.isDS18B20) {
-      page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
-      page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
-      page += "</a></li>";
-    }
-#endif
-
-#ifdef T2_CONFIG
-    if (Device.configuration.isDHT) {
-      page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
-      page += language == 0 ? "Czujnik DHT" : "DHT sensor";
-      page += "</a></li>";
-    }
-#endif
-
+    /* Relay */
     itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
@@ -152,6 +140,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         page += ": ";
         page += i + 1;
         page += "</a></li>";
+
+/* Thermostat */
 #if defined(T1_CONFIG)
         if (Device.configuration.isDS18B20) {
           page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
@@ -160,6 +150,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         }
 #endif
 
+/* Humidistat */
 #if defined(T2_CONFIG)
         if (Device.configuration.isDHT) {
           page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
@@ -173,6 +164,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
     }
 
+    /* Switch */
     itemPresent = 0;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
       if (Device.configuration.isSwitch[i]) {
@@ -197,6 +189,57 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       }
     }
 
+/* Contactrons and Gate */
+#if defined(T5_CONFIG)
+    itemPresent = 0;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        itemPresent++;
+      } else {
+        break;
+      }
+    }
+
+    if (itemPresent > 0) {
+      page += "<li class=\"itm\"><a><i>";
+      page += language == 0 ? "Czujniki magnetyczne" : "Magnetic sensors";
+      page += "</i></a></li>";
+      for (uint8_t i = 0; i < itemPresent; i++) {
+        page += "<li class=\"itm\"><a href=\"\\?option=contactron";
+        page += i;
+        page += "\"> - ";
+        page += language == 0 ? "Czujnik: " : "Sensor: ";
+        page += i + 1;
+        page += "</a></li>";
+      }
+
+      page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
+      page +=
+          language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
+      page += "</a></li>";
+    }
+
+#endif
+
+/* Sensor DS18B20 */
+#ifdef T1_CONFIG
+    if (Device.configuration.isDS18B20) {
+      page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
+      page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+      page += "</a></li>";
+    }
+#endif
+
+/* Sensor DHxx */
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
+    if (Device.configuration.isDHT) {
+      page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
+      page += language == 0 ? "Czujnik DHT" : "DHT sensor";
+      page += "</a></li>";
+    }
+#endif
+
+    /* Language, Upgrade, Exit */
     page += "<br><br><li class=\"itm\"><a "
             "href=\"\\?option=language\">[PL] Język / "
             "[EN] Language</a></li><br><br><li class=\"itm\"><a "
@@ -208,12 +251,14 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=exit\">";
     page += language == 0 ? "Zakończ konfigurację" : "Finish configuration";
   } else {
+    /* Settings, Access Point */
     page += "<li class=\"itm\"><a href=\"\\?option=help&cmd=1\">";
     page += language == 0 ? "Ustawienia" : "Settings";
     page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&cmd=2\">";
     page += language == 0 ? "Ustawienia (tryb:" : "Settings (mode:";
     page += " Access Point)";
   }
+  /* Information section */
   page += "</a></li></ul><br><br><h4>INFORMA";
   page += language == 0 ? "CJE" : "TION";
   page += "</h4><ul class=\"lst\"><li class=\"itm\"><a "
@@ -288,6 +333,30 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
 #endif
 
+/* Contactrons */
+#if defined(T5_CONFIG)
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+    if (Device.configuration.isContactron[i]) {
+      itemsNumber++;
+    } else {
+      break;
+    }
+  }
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isContactron), itemsNumber, "hc",
+      language == 0 ? "Ilość czujników magnetycznych "
+                    : "Number of magnetic sensors");
+
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+    if (Device.configuration.isSwitch[i]) {
+      itemsNumber++;
+    } else {
+      break;
+    }
+  }
+#else
   /* Relay */
   itemsNumber = 0;
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
@@ -301,6 +370,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += generateHardwareItemsList(
       sizeof(Device.configuration.isRelay), itemsNumber, "hr",
       language == 0 ? "Ilość przekaźników" : "Number of relay");
+#endif
 
   /* Switch */
   itemsNumber = 0;
@@ -316,7 +386,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
           "value=\"1\"";
 #if defined(T1_CONFIG)
@@ -691,6 +761,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
+#if !defined(T5_CONFIG) // Not required for T5
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Nazwa" : "Name";
@@ -809,17 +880,34 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
                         : "Automatic switching off of the relay";
   body += "</p>";
 
+#endif
+
   body += "<div class=\"cf\">";
   body += "<label>";
+#if defined(T5_CONFIG)
+  body += language == 0 ? "Długośc impulsu" : "Impulse duration";
+#else
   body += language == 0 ? "Wyłącz po" : "Switch off after";
+#endif
   body += "*</label>";
+
+#if defined(T5_CONFIG)
+  body += "<input name=\"ot" + String(id) +
+          "\" type=\"number\" step=\"1\" max=\"9999\" min=\"1\" value=\"";
+#else
   body += "<input name=\"ot" + String(id) +
           "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
+#endif
   body += configuration.timeToOff;
   body += "\">";
+#if defined(T5_CONFIG)
+  body += "<span class=\"hint\">1 - 9999 milise";
+  body += language == 0 ? "kund" : "cunds";
+#else
   body += "<span class=\"hint\">0.01 - 86400";
   body += language == 0 ? "sek (24h). Brak akcji jeśli jest 0"
                         : "sec (24h). No action if it's set to 0";
+#endif
   body += "</span>";
   body += "</div>";
 
@@ -855,7 +943,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !(defined(T0_SHELLY_1_CONFIG) || defined(T5_CONFIG))
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
                         : "Select LED informing about relay state";
@@ -954,8 +1042,13 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "<option value=\"1\"";
   body += (configuration.functionality == 1 ? " selected=\"selected\"" : "");
   body += ">";
+#if defined(T5_CONFIG)
+  body +=
+      language == 0 ? "Tylko sterowanie bramą" : "Controlling only the gate";
+#else
   body += language == 0 ? "Tylko sterowanie przekaźnikiem"
                         : "Controlling only the relay";
+#endif
   body += "</option>";
 
   body += "</select>";
@@ -1121,7 +1214,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
 }
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 String AFESitesGenerator::addDHTConfiguration() {
 
   DH configuration = Data.getSensorConfiguration();
@@ -1130,133 +1223,88 @@ String AFESitesGenerator::addDHTConfiguration() {
   String body = "<fieldset>";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
 
-  body += "<div class=\"cf\">";
-  body += "<label>Typ";
+  body += "<div class=\"cf\"><label>Typ";
   body += language == 1 ? "e" : "";
-  body += "</label>";
-  body += "<select name=\"t\">";
-  body += "<option value=\"1\"";
+  body += "</label><select name=\"t\"><option value=\"1\"";
   body += (configuration.type == 1 ? " selected=\"selected\"" : "");
-  body += ">DH11</option>";
-  body += "<option value=\"2\"";
+  body += ">DH11</option><option value=\"2\"";
   body += (configuration.type == 2 ? " selected=\"selected\"" : "");
-  body += ">DH21</option>";
-  body += "<option value=\"3\"";
+  body += ">DH21</option><option value=\"3\"";
   body += (configuration.type == 3 ? " selected=\"selected\"" : "");
-  body += ">DH22</option>";
-  body += "</select>";
-  body += "</div>";
+  body += ">DH22</option></select></div>";
 
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label>";
-  body +=
-      "<input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" type=\"number\" "
-      "value=\"";
+  body += "</label><input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
   body += configuration.interval;
-  body += "\">";
-  body += "<span class=\"hint\">";
+  body += "\"><span class=\"hint\">";
   body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
                         : "seconds. Range: 10 to 86400sec";
-  body += " (24h)</span>";
-  body += "</div>";
-
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
+          "type=\"checkbox\" value=\"1\"";
   body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
   body +=
       language == 0
           ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
             "zmieni się"
           : ">Send data only if value of temperature or humidity has changed";
-  body += "</label>";
-  body += "</div>";
+  body += "</label></div>";
 
   if (device.mqttAPI) {
-    body += "<div class=\"cc\">";
-    body += "<label>";
-    body += "<input name=\"p\" type=\"checkbox\" value=\"1\"";
+    body += "<div class=\"cc\"><label><input name=\"p\" type=\"checkbox\" "
+            "value=\"1\"";
     body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
     body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
                           : ">Publish Heat Index";
-    body += "?</label>";
-    body += "</div>";
-
-    body += "<div class=\"cc\">";
-    body += "<label>";
-    body += "<input name=\"j\" type=\"checkbox\" value=\"1\"";
+    body += "?</label></div><div class=\"cc\"><label><input name=\"j\" "
+            "type=\"checkbox\" value=\"1\"";
     body += configuration.publishDewPoint ? " checked=\"checked\"" : "";
     body += language == 0 ? ">Wysyłać punkt rosy" : ">Publish Dew Point";
-    body += "?</label>";
-    body += "</div>";
+    body += "?</label></div>";
   }
 
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+  body += "<br><p class=\"cm\">Temperatur";
+  body += language == 0 ? "y" : "e";
   body += "</p>";
 
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Korekta wartości o" : "Temperature correction";
-  body += "</label>";
-  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
-          "step=\"0.01\" "
-          "value=\"";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Korekta wartości o" : "Value to correct";
+  body +=
+      "</label><input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+      "step=\"0.01\" value=\"";
   body += configuration.temperature.correction;
-  body += "\">";
-  body += "<span class=\"hint\">";
+  body += "\"><span class=\"hint\">";
   body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99 - +9.99</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += ": -9.99 - +9.99</span></div><div class=\"cf\"><label>";
   body += language == 0 ? "Jednostka" : "Unit";
-  body += "</label>";
-  body += "<select  name=\"u\">";
-  body += "<option value=\"0\"";
+  body += "</label><select  name=\"u\"><option value=\"0\"";
   body +=
       (configuration.temperature.unit == 0 ? " selected=\"selected\">" : ">");
   body += language == 0 ? "Celsjusz" : "Celsius";
-  body += "</option>";
-  body += "<option value=\"1\"";
+  body += "</option><option value=\"1\"";
   body += (configuration.temperature.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">Fahrenheit</option>";
-  body += "</select>";
-  body += "</div>";
-
-  body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Czujnik wilgotności" : "Humidity sensor";
-  body += "</p>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Korekta wartości o" : "Humidity correction";
-  body += "</label>";
-  body += "<input name=\"d\" type=\"number\" min=\"-99.9\" max=\"99.9\" "
-          "step=\"0.1\" "
-          "value=\"";
+  body += ">Fahrenheit</option></select></div><br><p class=\"cm\">";
+  body += language == 0 ? "Wilgotnośc" : "Humidity";
+  body += "</p><div class=\"cf\"><label>";
+  body += language == 0 ? "Korekta wartości o" : "Value to correct";
+  body +=
+      "</label><input name=\"d\" type=\"number\" min=\"-99.9\" max=\"99.9\" "
+      "step=\"0.1\" value=\"";
   body += configuration.humidity.correction;
-  body += "\">";
-  body += "<span class=\"hint\">";
+  body += "\"><span class=\"hint\">";
   body += language == 0 ? "Zakres" : "Range";
-  body += ": -99.9 - +99.9</span>";
-  body += "</div>";
+  body += ": -99.9 - +99.9</span></div>";
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Czujnik temperatury i wilgotności DHT"
+                    : "DHT temperature and humidity sensor",
+      "", body);
 
   if (device.domoticzAPI) {
 
-    body += "<br><p class=\"cm\">";
-    body +=
-        language == 0 ? "Konfiguracja dla Domoticz" : "Domoticz configuration";
-    body += "</p>";
-    body += "<p class=\"cm\">";
-    body += language == 0
-                ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do "
-                : "If IDX is set to 0 then a value won't be sent to ";
-    body += "Domoticz</p>";
-
-    body += "<div class=\"cf\"><label> ";
+    body = "<div class=\"cf\"><label> ";
     body +=
         language == 0 ? "IDX czujnika temperatury" : "Temperature sensor IDX";
     body += " </label>";
@@ -1291,14 +1339,282 @@ String AFESitesGenerator::addDHTConfiguration() {
     body += language == 0 ? "Zakres: " : "Range: ";
     body += "0 - 999999</span>";
     body += "</div>";
+
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
   }
 
   body += "</fieldset>";
 
-  return addConfigurationBlock(language == 0
-                                   ? "Czujnik temperatury i wilgotności DHT"
-                                   : "DHT temperature and humidity sensor",
-                               "", body);
+  return page;
+}
+#endif
+
+#if defined(T5_CONFIG)
+String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
+  CONTACTRON configuration = Data.getContactronConfiguration(id);
+  DEVICE deviceConfiguration = Device.configuration;
+
+  String body = "<fieldset>";
+  char filed[13];
+  sprintf(filed, "g%d", id);
+  body += "<div class=\"cf\">";
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += "</div><div class=\"cf\"><label>";
+  body += language == 0 ? "Nazwa" : "Name";
+  body += "*</label><input name=\"n" + String(id) +
+          "\" type=\"text\" maxlength=\"16\" value=\"";
+  body += configuration.name;
+  body += "\"><span class=\"hint\">Max 16 ";
+  body += language == 0 ? "znaków" : "chars";
+  body += "</span></div><div class=\"cf\"><label>";
+  body += language == 0 ? "Typ" : "Type";
+  body += "</label><select name=\"o" + String(id) + "\"><option value=\"0\"";
+  body +=
+      (configuration.outputDefaultState == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NO" : "NO";
+  body += "</option><option value=\"1\"";
+  body +=
+      (configuration.outputDefaultState == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NC" : "NC";
+  body += "</option></select></div><div class=\"cf\"><label>LED ";
+  body += language == 0 ? "przypisany do czujnika" : "assigned to the sensor";
+  body += "</label><select  name=\"l" + String(id) + "\"><option value=\"0\"";
+  body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+  body += language == 0 ? ">Brak" : ">None";
+  body += "</option>";
+
+  for (uint8_t i = 1; i <= sizeof(Device.configuration.isLED); i++) {
+    if (Device.configuration.isLED[i - 1]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration.ledID == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
+    } else {
+      break;
+    }
+  }
+
+  body += "</select></div><br><p class=\"cm\">";
+  body += language == 0
+              ? "Czułość należy ustawić eksperymentalnie, aż uzyska się "
+                "pożądane działanie czujnika magnetycznego"
+              : "Sensitiveness should be adjusted experimentally until "
+                "sensor behaves as expected";
+
+  body += "</p><div class=\"cf\"><label>";
+  body += language == 0 ? "Czułość" : "Sensitiveness";
+  body += "*</label>";
+  body += "<input name=\"b" + String(id) +
+          "\" type=\"number\" max=\"2000\" min=\"0\" step=\"1\" "
+          "value=\"";
+  body += configuration.bouncing;
+  body += "\"><span class=\"hint\">0 - 2000 (milise";
+  body += language == 0 ? "kund" : "conds";
+  body += ")</span></div>";
+
+  char title[23];
+  language == 0 ? sprintf(title, "Czujnik magnetyczny #%d", id + 1)
+                : sprintf(title, "Magnetic sensor #%d", id + 1);
+
+  String page = addConfigurationBlock(title, "", body);
+
+  if (deviceConfiguration.domoticzAPI) {
+    body = "<div class=\"cf\"><label>IDX</label>";
+    body += "<input name=\"x" + String(id) +
+            "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span></div>";
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  body += "</fieldset>";
+
+  return page;
+}
+
+String AFESitesGenerator::addGateConfiguration() {
+  GATE gateConfiguration = Data.getGateConfiguration();
+  DEVICE deviceConfiguration = Device.configuration;
+  uint8_t noOfContactrons = deviceConfiguration.isContactron[1] ? 2 : 1;
+  CONTACTRON configuration[noOfContactrons];
+
+  for (uint8_t i = 0; i < noOfContactrons; i++) {
+    configuration[i] = Data.getContactronConfiguration(i);
+  }
+
+  String body = "<fieldset>";
+
+  body += "<p class=\"cm\">";
+  if (language == 0) {
+    body += "Jeśli czujnik magnetyczny: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> oraz czujnik: <strong>";
+      body += configuration[1].name;
+      body += "</strong> są otwarte";
+    } else {
+      body += "</strong> jest otwarty";
+    }
+    body += " to:";
+  } else {
+    body += "If magnetic sensor: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> and <strong>";
+      body += configuration[1].name;
+      body += "</strong> are open";
+    } else {
+      body += "</strong> is open";
+    }
+    body += " then:";
+  }
+  body += "</p>";
+  body += generateGateStatesList(0, gateConfiguration.state[0]);
+  if (noOfContactrons == 2) {
+    body += "<br><br><p class=\"cm\">";
+    if (language == 0) {
+      body += "Jeśli czujnik magnetyczny: <strong>";
+      body += configuration[0].name;
+      body += "</strong> jest otwarty, a czujnik: <strong>";
+      body += configuration[1].name;
+      body += "</strong> jest zamknięty to:";
+    } else {
+      body += "If magnetic sensor: <strong>";
+      body += configuration[0].name;
+      body += "</strong> is open and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> is closed then:";
+    }
+    body += "</p>";
+    body += generateGateStatesList(1, gateConfiguration.state[1]);
+
+    body += "<br><br><p class=\"cm\">";
+    if (language == 0) {
+      body += "Jeśli czujnik magnetyczny: <strong>";
+      body += configuration[0].name;
+      body += "</strong> jest zamknięty, a czujnik: <strong>";
+      body += configuration[1].name;
+      body += "</strong> jest otwarty to:";
+    } else {
+      body += "If magnetic sensor: <strong>";
+      body += configuration[0].name;
+      body += "</strong> is closed and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> is open then:";
+    }
+    body += "</p>";
+    body += generateGateStatesList(2, gateConfiguration.state[2]);
+  }
+
+  body += "<br><br><p class=\"cm\">";
+  if (language == 0) {
+    body += "Jeśli czujnik magnetyczny: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> oraz czujnik: <strong>";
+      body += configuration[1].name;
+      body += "</strong> są zamknięte";
+    } else {
+      body += "</strong> jest zamknięty ";
+    }
+    body += " to:";
+  } else {
+    body += "If magnetic sensor: <strong>";
+    body += configuration[0].name;
+
+    if (noOfContactrons == 2) {
+      body += "</strong> and sensor: <strong>";
+      body += configuration[1].name;
+      body += "</strong> are closed";
+    } else {
+      body += "</strong> is closed ";
+    }
+    body += " then:";
+  }
+  body += "</p>";
+  body += generateGateStatesList(3, gateConfiguration.state[3]);
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Konfiguracja stanów bramy" : "Gate states configuration",
+      "", body);
+
+  if (deviceConfiguration.domoticzAPI) {
+    body = "<div class=\"cf\">";
+    body += "<label>IDX</label>";
+    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += gateConfiguration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  body += "</fieldset>";
+
+  return page;
+}
+
+const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
+  String body = "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Ustaw stan bramy na" : "Set gate's state to";
+  body += "</label>";
+  body += "<select name=\"s" + String(id) + "\">";
+  body += "<option value=\"";
+  body += GATE_OPEN;
+  body += "\"";
+  body += (state == GATE_OPEN ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Otwarta" : "Open";
+  body += "</option>";
+  body += "<option value=\"";
+  body += GATE_PARTIALLY_OPEN;
+  body += "\"";
+  body += (state == GATE_PARTIALLY_OPEN ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Częściowo otwarta" : "Partially open";
+  body += "</option>";
+  body += "<option value=\"";
+  body += GATE_CLOSED;
+  body += "\"";
+  body += (state == GATE_CLOSED ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Zamknięta" : "Closed";
+  body += "</option>";
+  body += "</select>";
+  body += "</div>";
+
+  return body;
 }
 #endif
 

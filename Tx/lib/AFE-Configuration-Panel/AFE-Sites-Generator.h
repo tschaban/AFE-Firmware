@@ -45,6 +45,10 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+#if defined(T5_CONFIG)
+  const String generateGateStatesList(uint8_t id, byte state);
+#endif
+
 public:
   /* Constructor*/
   AFESitesGenerator();
@@ -74,12 +78,17 @@ public:
   String addDS18B20Configuration();
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   String addDHTConfiguration();
 #endif
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   String addRegulatorConfiguration(uint8_t type);
+#endif
+
+#if defined(T5_CONFIG)
+  String addGateConfiguration();
+  String addContactronConfiguration(uint8_t id);
 #endif
 
   /* These methods generates firmware upgrade sections */

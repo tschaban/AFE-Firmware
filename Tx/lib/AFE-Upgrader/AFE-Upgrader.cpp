@@ -22,7 +22,7 @@ void AFEUpgrader::upgrade() {
     upgradeTypeOfFirmware();
   } else {
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
 
     if (
 #if defined(T0_CONFIG)
@@ -38,15 +38,19 @@ void AFEUpgrader::upgrade() {
 #elif defined(T4_CONFIG)
         strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0
+#elif defined(T5_CONFIG)
+        strcmp(FirmwareConfiguration.version, "1.0.0") == 0
 #endif
     ) {
 
 #ifdef T1_CONFIG /* Upgrade T1 1.0.x to version T1.1.0 */
       upgradeToVersion110();
-#endif
+#elif defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
       upgradeToVersion120();
-    }
+#elif defined(T5_CONFIG)
+      upgradeToVersion130();
 #endif
+    }
 
 /* Upgrade from version T1-1.1.0 to 1.2.0 */
 #ifdef T1_CONFIG
@@ -66,6 +70,8 @@ void AFEUpgrader::upgrade() {
 #endif
 
     Data.saveVersion(String(FIRMWARE_VERSION));
+
+#endif
   }
 }
 
@@ -211,11 +217,45 @@ void AFEUpgrader::upgradeToVersion120() {
 
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 /* Methods upgrades to v1.3.0 */
 void AFEUpgrader::upgradeToVersion130() {
   AFEEEPROM Eeprom;
+
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   /* Setting default value for publishing DewPoint */
   Eeprom.write(382, false);
+#endif
+
+#if defined(T5_CONFIG)
+  DEVICE deviceConfiguration;
+
+  /* Relay. Setting LED ID and IDX */
+  Eeprom.writeUInt8(531, 0);
+
+  /* Switch functionality codes */
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isSwitch); i++) {
+    if (Eeprom.readUInt8(496 + i * 8) == 11) {
+      Eeprom.writeUInt8(496, 1);
+    }
+  }
+
+  /* Add Domoticz default config */
+  Eeprom.write(800, false);
+  Defaults.addDomoticzConfiguration();
+
+  /* Add device ID */
+  if (Data.getDeviceID().length() == 0) {
+    Defaults.addDeviceID();
+  }
+
+  /* Adding domoticz config for devces */
+  Eeprom.write(942, 6, (long)0); // Contactron 1
+  Eeprom.write(948, 6, (long)0); // Contactron 2
+  Eeprom.write(936, 6, (long)0); // Gate
+
+  Data.saveGateState(0);
+  Data.saveSystemLedID(1);
+#endif
 }
 #endif

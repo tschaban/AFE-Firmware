@@ -9,12 +9,16 @@ AFERelay::AFERelay(){};
 AFERelay::AFERelay(uint8_t id) { begin(id); }
 
 void AFERelay::begin(uint8_t id) {
-  MQTT MQTTConfiguration;
-  MQTTConfiguration = Data.getMQTTConfiguration();
   _id = id;
   RelayConfiguration = Data.getRelayConfiguration(_id);
+
   pinMode(RelayConfiguration.gpio, OUTPUT);
+
+#if !defined(T5_CONFIG) // Not required for T5
+  MQTT MQTTConfiguration;
+  MQTTConfiguration = Data.getMQTTConfiguration();
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
+#endif
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   /* Initialzing Thermostat functionality for a relay */
@@ -53,7 +57,9 @@ void AFERelay::on(boolean invert) {
       turnOffCounter = millis();
     }
   }
+#if !defined(T5_CONFIG) // Not required for T5
   Data.saveRelayState(_id, RELAY_ON);
+#endif
 }
 
 /* Set relay to OFF */
@@ -69,7 +75,9 @@ void AFERelay::off(boolean invert) {
       turnOffCounter = millis();
     }
   }
+#if !defined(T5_CONFIG) // Not required for T5
   Data.saveRelayState(_id, RELAY_OFF);
+#endif
 }
 
 /* Toggle relay */
@@ -81,6 +89,7 @@ void AFERelay::toggle() {
   }
 }
 
+#if !defined(T5_CONFIG) // Not required for T5
 void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(RelayConfiguration.statePowerOn);
 }
@@ -107,6 +116,7 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
     Data.getRelayState(_id) == RELAY_ON ? off() : on();
   }
 }
+#endif
 
 boolean AFERelay::autoTurnOff(boolean invert) {
 
@@ -122,7 +132,9 @@ boolean AFERelay::autoTurnOff(boolean invert) {
   }
 }
 
+#if !defined(T5_CONFIG) // Not required for T5
 const char *AFERelay::getName() { return RelayConfiguration.name; }
+#endif
 
 void AFERelay::setTimer(float timer) {
   if (RelayConfiguration.timeToOff > 0) {
@@ -142,4 +154,6 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
 
+#if !defined(T5_CONFIG) // Not required for T5
 unsigned long AFERelay::getDomoticzIDX() { return RelayConfiguration.idx; }
+#endif

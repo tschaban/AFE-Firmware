@@ -62,35 +62,46 @@ void AFEMQTT::connect() {
                            MQTTConfiguration.password, mqttLWTMessage, 2, false,
                            "disconnected")) {
 
-          /*
-                    Serial << endl << "INFO: Connected";
-                    Serial << endl
-                           << "INFO: Subscribing to : " <<
-             mqttTopicForSubscription;
-          */
+#ifdef DEBUG
+          Serial << endl
+                 << "INFO: Connected" << endl
+                 << "INFO: Subscribing to : " << mqttTopicForSubscription;
+#endif
+
           Broker.subscribe((char *)mqttTopicForSubscription);
 
-          //        Serial << endl << "INFO: Subsribed";
+#ifdef DEBUG
+          Serial << endl << "INFO: Subsribed";
+#endif
 
-          /* Publishing message that device has been connected */
+/* Publishing mesages after connection to MQTT Broker has been established */
+#if defined(T5_CONFIG)
+          MQTTPublishGateState();
+          for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron);
+               i++) {
+            if (Device.configuration.isContactron[i]) {
+              MQTTPublishContactronState(i);
+              lastPublishedContactronState[i] = Gate.Contactron[i].get();
+            }
+          }
+#else
           publish(MQTTConfiguration.topic, "state", "connected");
 
           /* Setting Relay state after connection to MQTT */
           for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
             if (Device.configuration.isRelay[i]) {
               if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
-                // Requesting state from MQTT Broker / service
+                /* Requesting state from MQTT Broker / service */
                 publish(Relay[i].getMQTTTopic(), "get", "defaultState");
               } else {
-                // Updating relay state after setting default value after MQTT
-                // connected
-                publish(Relay[i].getMQTTTopic(), "state",
-                        Relay[i].get() == RELAY_ON ? "on" : "off");
+                /* Updating relay state after setting default value after MQTT
+                 * connected */
+                MQTTPublishRelayState(i);
               }
-              // Publishing relay state to Domoticz
-              DomoticzPublishRelayState(i);
             }
           }
+#endif
+
           delayStartTime = 0;
 #ifndef T0_SHELLY_1_CONFIG
           ledStartTime = 0;
@@ -111,15 +122,14 @@ void AFEMQTT::connect() {
 
           delayStartTime + (NetworkConfiguration.waitTimeConnections * 1000)) {
         connections++;
-        /*
-                Serial << endl
-                       << "INFO: MQTT Connection attempt: " << connections + 1
-                       << " from " << NetworkConfiguration.noConnectionAttempts
-                       << ", connection status: " << Broker.state()
-                       << ", connection time: " << millis() - delayStartTime <<
-           "ms";
+#ifdef DEBUG
+        Serial << endl
+               << "INFO: MQTT Connection attempt: " << connections + 1
+               << " from " << NetworkConfiguration.noConnectionAttempts
+               << ", connection status: " << Broker.state()
+               << ", connection time: " << millis() - delayStartTime << "ms";
 
-        */
+#endif
         delayStartTime = 0;
       }
 
@@ -133,12 +143,12 @@ void AFEMQTT::connect() {
         Led.off();
 #endif
         connections = 0;
-        /*
-                Serial << endl
-                       << "WARN: Not able to connect to MQTT.Going to sleep mode
-           for "
-                       << NetworkConfiguration.waitTimeSeries << "sec.";
-        */
+
+#ifdef DEBUG
+        Serial << endl
+               << "WARN: Not able to connect to MQTT.Going to sleep mode for "
+               << NetworkConfiguration.waitTimeSeries << "sec.";
+#endif
       }
     }
   }

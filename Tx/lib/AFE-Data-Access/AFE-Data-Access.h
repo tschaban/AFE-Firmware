@@ -43,9 +43,11 @@ public:
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
 
+#if !defined(T5_CONFIG)
   /* Methods reads and saves relay state from/to EEPROM */
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
+#endif
 
   SWITCH getSwitchConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, SWITCH configuration);
@@ -81,7 +83,7 @@ public:
   void saveConfiguration(DS18B20 configuration);
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   DH getSensorConfiguration();
   void saveConfiguration(DH configuration);
 #endif
@@ -94,6 +96,15 @@ public:
   Regulator can be Thermostat or humidistat */
   boolean isRegulatorEnabled(uint8_t type = THERMOSTAT_REGULATOR);
   void saveRegulatorState(boolean state, uint8_t type = THERMOSTAT_REGULATOR);
+#endif
+
+#if defined(T5_CONFIG)
+  CONTACTRON getContactronConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, CONTACTRON configuration);
+  GATE getGateConfiguration();
+  void saveConfiguration(GATE configuration);
+  uint8_t getGateState();
+  void saveGateState(uint8_t state);
 #endif
 };
 #endif

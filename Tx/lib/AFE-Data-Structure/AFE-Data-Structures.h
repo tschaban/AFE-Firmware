@@ -29,8 +29,13 @@
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 #include <AFE-DHT-Sensor-Structure.h>
+#endif
+
+#ifdef T5_CONFIG
+#include <AFE-CONTACTRON-Structure.h>
+#include <AFE-GATE-Structure.h>
 #endif
 
 #endif

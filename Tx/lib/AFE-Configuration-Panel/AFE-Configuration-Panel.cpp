@@ -231,18 +231,19 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
   return page;
 }
 
+/* DS18B20 and DHxx Sensors */
 #ifdef T1_CONFIG
 String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
                                                           DS18B20 data)
 
 #endif
 
-#ifdef T2_CONFIG
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
     String AFEConfigurationPanel::getDHTConfigurationSite(uint8_t command,
                                                           DH data)
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
 {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -259,6 +260,49 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=DHT&cmd=1\"  method=\"post\">";
   page += Site.addDHTConfiguration();
 #endif
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+#endif
+
+#if defined(T5_CONFIG)
+String AFEConfigurationPanel::getContactronConfigurationSite(
+    const String option, uint8_t command, CONTACTRON data,
+    uint8_t contactronIndex) {
+
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(contactronIndex, data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=contactron";
+  page += contactronIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addContactronConfiguration(contactronIndex);
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getGateConfigurationSite(const String option,
+                                                       uint8_t command,
+                                                       GATE data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=gate&cmd=1\"  method=\"post\">";
+  page += Site.addGateConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

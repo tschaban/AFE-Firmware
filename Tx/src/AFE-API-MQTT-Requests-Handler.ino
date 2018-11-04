@@ -20,6 +20,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   if (length >= 1) {
 
+#if !defined(T5_CONFIG) /* Relay processing */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
         sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
@@ -96,6 +97,34 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         break;
       }
     }
+#else /* Gate */
+
+    /* Contactrons */
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+      if (Device.configuration.isContactron[i]) {
+        sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
+        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
+          MQTTPublishContactronState(i);
+        }
+      } else {
+        break;
+      }
+    }
+
+    /* Gate */
+    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
+    if (strcmp(topic, _mqttTopic) == 0) {
+      if ((char)payload[2] == 'e' && length == 4) { // open
+        Gate.toggle();
+      } else if ((char)payload[2] == 'o' && length == 5) { // close
+        Gate.toggle();
+      } else if ((char)payload[2] == 't' && length == 3) { // get
+        MQTTPublishGateState();
+      }
+    } // @TODO powinno byc else here
+
+#endif /* Relay and Gate processing */
+
     /* Turning On/Off HTTP APIs */
     sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
             MQTTConfiguration.topic);
@@ -110,7 +139,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     } else {
 
-      /* Turning On/Off Domoticz APIs */
+      /* Start: Turning On/Off Domoticz APIs */
       sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
               MQTTConfiguration.topic);
 
@@ -125,8 +154,10 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           Device.begin();
           Domoticz.disconnect();
         }
+        /* Stop: Turning On/Off Domoticz APIs */
       } else {
-        /* Turning Off MQTT APIs */
+
+        /* start: Turning Off MQTT APIs */
         sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
                 MQTTConfiguration.topic);
 
@@ -136,45 +167,58 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             Device.begin();
             Mqtt.disconnect();
           }
+          /* Stop: Turning Off MQTT APIs */
         } else {
-
-          /* Remaining MQTT Messages reboot and configuratonMode */
+          /* Start: other mqtt requests
+              - reboot,
+              - configurationMode
+              - getTemperature
+              - getHumidity
+              - getHeatIndex
+              - getDewPoint
+           * humifity */
           sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
 
           if (strcmp(topic, _mqttTopic) == 0) {
-            if ((char)payload[2] == 'b' && length == 6) { // reboot
+            /* Reboot */
+            if ((char)payload[2] == 'b' && length == 6) {
               Device.reboot(MODE_NORMAL);
-            } else if ((char)payload[2] == 'n' &&
-                       length == 17) { // configurationMode
+            }
+            /* configurationMode */
+            else if ((char)payload[2] == 'n' && length == 17) {
               Device.reboot(MODE_CONFIGURATION);
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-            } else if ((char)payload[2] == 't' &&
-                       length == 14) { // getTemperature
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+            }
+            /* getTemperature */
+            else if ((char)payload[2] == 't' && length == 14) {
               char temperatureString[6];
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
               dtostrf(Sensor.getTemperature(), 2, 2, temperatureString);
-#endif
               Mqtt.publish("temperature", temperatureString);
 #endif
 
-#ifdef T2_CONFIG
-            } else if ((char)payload[2] == 't' && length == 11) { // getHumidity
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
+            }
+            /* getHumidity */
+            else if ((char)payload[2] == 't' && length == 11) {
               char humidityString[6];
               dtostrf(Sensor.getHumidity(), 2, 2, humidityString);
               Mqtt.publish("humidity", humidityString);
-            } else if ((char)payload[3] == 'H' &&
-                       length == 12) { // getHeatIndex
+            }
+            /* getHeatIndex */
+            else if ((char)payload[3] == 'H' && length == 12) {
               char heatIndex[6];
               dtostrf(Sensor.getHeatIndex(), 2, 2, heatIndex);
               Mqtt.publish("heatIndex", heatIndex);
-            } else if ((char)payload[3] == 'D' && length == 12) { // getDewPoint
+            }
+            /* getDewPoint */
+            else if ((char)payload[3] == 'D' && length == 12) {
               char heatIndex[6];
               dtostrf(Sensor.getDewPoint(), 2, 2, heatIndex);
               Mqtt.publish("dewPoint", heatIndex);
 #endif
             }
           }
-        }
+        } /* End of other methods */
       }
     }
   }
@@ -190,7 +234,7 @@ void MQTTPublishRelayState(uint8_t id) {
                  Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.mqttAPI) {
@@ -199,7 +243,8 @@ void MQTTPublishTemperature(float temperature) {
 }
 #endif
 
-#if defined(T2_CONFIG)
+/* Humidity, HeatIndex, DewPoint */
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 /* Metod publishes humidity */
 void MQTTPublishHumidity(float humidity) {
   if (Device.configuration.mqttAPI) {
@@ -217,6 +262,29 @@ void MQTTPublishHeatIndex(float heatIndex) {
 void MQTTPublishDewPoint(float dewPoint) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("dewPoint", dewPoint);
+  }
+}
+#endif
+
+#if defined(T5_CONFIG)
+void MQTTPublishContactronState(uint8_t id) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
+                 Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
+                                                              : "closed");
+  }
+}
+
+void MQTTPublishGateState() {
+  if (Device.configuration.mqttAPI) {
+    uint8_t gateState = Gate.get();
+    Mqtt.publish("gate/state", gateState == GATE_OPEN
+                                   ? "open"
+                                   : gateState == GATE_CLOSED
+                                         ? "closed"
+                                         : gateState == GATE_PARTIALLY_OPEN
+                                               ? "partiallyOpen"
+                                               : "unknown");
   }
 }
 #endif

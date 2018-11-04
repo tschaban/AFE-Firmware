@@ -12,28 +12,33 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   Eeprom.read(9, 16).toCharArray(configuration.name,
                                  sizeof(configuration.name));
 
+  /* APIs for all the version */
   configuration.httpAPI = Eeprom.read(25);
   configuration.mqttAPI = Eeprom.read(228);
   configuration.domoticzAPI = Eeprom.read(800);
 
+/* T0: Leds and 2nd switches */
 #if defined(T0_CONFIG)
   configuration.isLED[0] = Eeprom.read(366);
   configuration.isLED[1] = Eeprom.read(418);
   configuration.isSwitch[1] = Eeprom.read(402);
 #endif
 
+/* T0, Shelly-1, T5: Relay and first switch */
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.isRelay[0] = Eeprom.read(369);
   configuration.isSwitch[0] = Eeprom.read(395);
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
+/* T1,T2,T4,T5: Led */
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG) ||          \
+    defined(T5_CONFIG)
 
 #if defined(T1_CONFIG)
   uint8_t index = 77;
 #elif defined(T2_CONFIG)
   uint8_t index = 98;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t index = 3;
 #endif
 
@@ -42,6 +47,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 #endif
 
+/* T1: Relay, Switch, isDS18b20 */
 #ifdef T1_CONFIG
   index = 40;
   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
@@ -52,10 +58,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
     configuration.isSwitch[i] = Eeprom.read(382 + i * index);
   }
-
-  configuration.isDS18B20 = Eeprom.read(369);
 #endif
 
+/* T2: Relay, Switch */
 #ifdef T2_CONFIG
   index = 0;
   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
@@ -66,11 +71,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
     configuration.isSwitch[i] = Eeprom.read(390 + i * index);
   }
-
-  configuration.isDHT = Eeprom.read(369);
-
 #endif
 
+/* T4: Relay, Switch */
 #ifdef T4_CONFIG
   index = 27;
   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
@@ -81,6 +84,33 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
     configuration.isSwitch[i] = Eeprom.read(490 + i * index);
   }
+#endif
+
+/* T5: Relay, Switch, Contactron */
+#ifdef T5_CONFIG
+  index = 8;
+
+  configuration.isRelay[0] = true; // Relay must be present - hardcoded
+
+  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+    configuration.isSwitch[i] = Eeprom.read(398 + i * index);
+  }
+
+  index = 24;
+  for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+    configuration.isContactron[i] = Eeprom.read(414 + i * index);
+  }
+#endif
+
+/* T1,T2,T3: Sensors */
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T1_CONFIG)
+  configuration.isDS18B20 = Eeprom.read(369);
+#elif defined(T2_CONFIG)
+  configuration.isDHT = Eeprom.read(369);
+#else
+  configuration.isDHT = Eeprom.read(376);
+#endif
 #endif
 
   return configuration;
@@ -156,7 +186,7 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   uint8_t nextLED = 77;
 #elif defined(T2_CONFIG)
   uint8_t nextLED = 98;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextLED = 3;
 #endif
 
@@ -183,6 +213,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.gpio = Eeprom.readUInt8(405);
 #elif defined(T4_CONFIG)
   configuration.gpio = Eeprom.readUInt8(383 + id * nextRelay);
+#elif defined(T5_CONFIG)
+  configuration.gpio = Eeprom.readUInt8(462);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -193,7 +225,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.timeToOff = Eeprom.read(407, 5).toFloat();
 #elif defined(T4_CONFIG)
   configuration.timeToOff = Eeprom.read(385 + id * nextRelay, 5).toFloat();
+#elif defined(T5_CONFIG)
+  configuration.timeToOff = Eeprom.read(463, 4).toInt();
 #endif
+
+/* Below parameters are not related to T5 version */
+#if !defined(T5_CONFIG)
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.statePowerOn = Eeprom.readUInt8(377);
@@ -279,6 +316,9 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 #elif defined(T2_CONFIG)
   configuration.thermalProtection = Eeprom.read(457, 3).toInt();
 #endif
+
+#endif /* End of code not related to T5 */
+
   return configuration;
 }
 
@@ -288,7 +328,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 #if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T0_SHELLY_1_CONFIG) || \
     defined(T2_CONFIG)
   uint8_t nextSwitch = 7;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextSwitch = 8;
 #endif
 
@@ -300,6 +340,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.gpio = Eeprom.readUInt8(391 + id * nextSwitch);
 #elif defined(T4_CONFIG)
   configuration.gpio = Eeprom.readUInt8(491 + id * nextSwitch);
+#elif defined(T5_CONFIG)
+  configuration.gpio = Eeprom.readUInt8(399 + id * nextSwitch);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -310,6 +352,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.type = Eeprom.readUInt8(392 + id * nextSwitch);
 #elif defined(T4_CONFIG)
   configuration.type = Eeprom.readUInt8(492 + id * nextSwitch);
+#elif defined(T5_CONFIG)
+  configuration.type = Eeprom.readUInt8(400 + id * nextSwitch);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -320,6 +364,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.sensitiveness = Eeprom.read(393 + id * nextSwitch, 3).toInt();
 #elif defined(T4_CONFIG)
   configuration.sensitiveness = Eeprom.read(493 + id * nextSwitch, 3).toInt();
+#elif defined(T5_CONFIG)
+  configuration.sensitiveness = Eeprom.read(401 + id * nextSwitch, 3).toInt();
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -330,7 +376,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   configuration.functionality = Eeprom.readUInt8(396 + id * nextSwitch);
 #elif defined(T4_CONFIG)
   configuration.functionality = Eeprom.readUInt8(496 + id * nextSwitch);
-
+#elif defined(T5_CONFIG)
+  configuration.functionality = Eeprom.readUInt8(404 + id * nextSwitch);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -344,6 +391,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
       Eeprom.readUInt8(461 + id); /* It's in EEPROM one after the other one */
 #elif defined(T4_CONFIG)
   configuration.relayID = Eeprom.readUInt8(497 + id * nextSwitch);
+#elif defined(T5_CONFIG)
+  configuration.relayID = Eeprom.readUInt8(405 + id * nextSwitch);
 #endif
 
   return configuration;
@@ -362,9 +411,10 @@ DS18B20 AFEDataAccess::getSensorConfiguration() {
 }
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 DH AFEDataAccess::getSensorConfiguration() {
   DH configuration;
+#if defined(T2_CONFIG)
   configuration.gpio = Eeprom.readUInt8(370);
   configuration.type = Eeprom.readUInt8(371);
   configuration.interval = Eeprom.read(372, 5).toInt();
@@ -377,19 +427,72 @@ DH AFEDataAccess::getSensorConfiguration() {
   configuration.sendOnlyChanges = Eeprom.read(467);
   configuration.publishHeatIndex = Eeprom.read(974);
   configuration.publishDewPoint = Eeprom.read(382);
+#else
+  configuration.gpio = Eeprom.readUInt8(377);
+  configuration.type = Eeprom.readUInt8(378);
+  configuration.interval = Eeprom.read(379, 5).toInt();
+  configuration.temperature.unit = Eeprom.readUInt8(384);
+  configuration.temperature.correction = Eeprom.read(385, 4).toFloat();
+  configuration.humidity.correction = Eeprom.read(394, 3).toFloat();
+  configuration.temperatureIdx = Eeprom.read(954, 6).toInt();
+  configuration.humidityIdx = Eeprom.read(960, 6).toInt();
+  configuration.temperatureAndHumidityIdx = Eeprom.read(966, 6).toInt();
+  configuration.sendOnlyChanges = Eeprom.read(397);
+  configuration.publishHeatIndex = Eeprom.read(990);
+  configuration.publishDewPoint = Eeprom.read(389);
+#endif
+
+  return configuration;
+}
+#endif
+
+#if defined(T5_CONFIG)
+CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
+  CONTACTRON configuration;
+  uint8_t nextContactron = 24;
+  MQTT configurationMQTT;
+
+  configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
+  configuration.outputDefaultState =
+      Eeprom.readUInt8(416 + id * nextContactron);
+  configuration.ledID = Eeprom.readUInt8(417 + id * nextContactron);
+  configuration.bouncing = Eeprom.read(418 + id * nextContactron, 4).toInt();
+
+  Eeprom.read(422 + id * nextContactron, 16)
+      .toCharArray(configuration.name, sizeof(configuration.name));
+
+  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
+                                   sizeof(configurationMQTT.topic));
+
+  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
+          configuration.name);
+
+  configuration.idx = Eeprom.read(942 + id * 6, 6).toInt();
+
+  return configuration;
+}
+
+GATE AFEDataAccess::getGateConfiguration() {
+  GATE configuration;
+  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+    configuration.state[i] = Eeprom.readUInt8(467 + i);
+  }
+  configuration.idx = Eeprom.read(936, 6).toInt();
   return configuration;
 }
 #endif
 
 void AFEDataAccess::saveConfiguration(DEVICE configuration) {
-  Eeprom.write(9, 16, configuration.name);
   uint8_t index;
+  Eeprom.write(9, 16, configuration.name);
+
+  /* Relay */
 #if defined(T4_CONFIG)
   index = 27;
 #endif
 
   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T5_CONFIG)
     Eeprom.write(369, configuration.isRelay[i]);
 #elif defined(T1_CONFIG)
     Eeprom.write(396, configuration.isRelay[i]);
@@ -400,10 +503,11 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 #endif
   }
 
+/* Switches */
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
     defined(T2_CONFIG)
   index = 7;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   index = 8;
 #endif
 
@@ -416,9 +520,12 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
     Eeprom.write(390 + i * index, configuration.isSwitch[i]);
 #elif defined(T4_CONFIG)
     Eeprom.write(490 + i * index, configuration.isSwitch[i]);
+#elif defined(T5_CONFIG)
+    Eeprom.write(398 + i * index, configuration.isSwitch[i]);
 #endif
   }
 
+  /* LEDs */
 #ifndef T0_SHELLY_1_CONFIG
 
 #if defined(T0_CONFIG)
@@ -427,7 +534,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   index = 77;
 #elif defined(T2_CONFIG)
   index = 98;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   index = 3;
 #endif
 
@@ -436,16 +543,25 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   }
 #endif
 
+  /* APIs */
   saveAPI(API_MQTT, configuration.mqttAPI);
   saveAPI(API_HTTP, configuration.httpAPI);
   saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
 
-#ifdef T1_CONFIG
+  /* Sensors */
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T1_CONFIG)
   Eeprom.write(369, configuration.isDS18B20);
-#endif
-
-#ifdef T2_CONFIG
+#elif defined(T2_CONFIG)
   Eeprom.write(369, configuration.isDHT);
+#else
+
+  Eeprom.write(376, configuration.isDHT);
+  index = 24;
+  for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+    Eeprom.write(414 + i * index, configuration.isContactron[i]);
+  }
+#endif
 #endif
 }
 
@@ -499,6 +615,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(405, configuration.gpio);
 #elif defined(T4_CONFIG)
   Eeprom.writeUInt8(383 + id * nextRelay, configuration.gpio);
+#elif defined(T5_CONFIG)
+  Eeprom.writeUInt8(462, configuration.gpio);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -509,7 +627,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.write(407, 5, configuration.timeToOff);
 #elif defined(T4_CONFIG)
   Eeprom.write(385 + id * nextRelay, 5, configuration.timeToOff);
+#elif defined(T5_CONFIG)
+  Eeprom.write(463, 4, configuration.timeToOff);
 #endif
+
+#if !defined(T5_CONFIG) /* Below paramters are not related to T5 */
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(377, configuration.statePowerOn);
@@ -558,6 +680,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 #elif defined(T2_CONFIG)
   Eeprom.write(457, 3, configuration.thermalProtection);
 #endif
+
+#endif /* End of the code related to T5 */
 }
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
@@ -619,7 +743,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
   uint8_t nextLED = 77;
 #elif defined(T2_CONFIG)
   uint8_t nextLED = 98;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextLED = 3;
 #endif
 
@@ -632,7 +756,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
     defined(T2_CONFIG)
   uint8_t nextSwitch = 7;
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextSwitch = 8;
 #endif
 
@@ -644,6 +768,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(391 + id * nextSwitch, configuration.gpio);
 #elif defined(T4_CONFIG)
   Eeprom.writeUInt8(491 + id * nextSwitch, configuration.gpio);
+#elif defined(T5_CONFIG)
+  Eeprom.writeUInt8(399 + id * nextSwitch, configuration.gpio);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -654,6 +780,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(392 + id * nextSwitch, configuration.type);
 #elif defined(T4_CONFIG)
   Eeprom.writeUInt8(492 + id * nextSwitch, configuration.type);
+#elif defined(T5_CONFIG)
+  Eeprom.writeUInt8(400 + id * nextSwitch, configuration.type);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -664,6 +792,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.write(393 + id * nextSwitch, 3, (long)configuration.sensitiveness);
 #elif defined(T4_CONFIG)
   Eeprom.write(493 + id * nextSwitch, 3, (long)configuration.sensitiveness);
+#elif defined(T5_CONFIG)
+  Eeprom.write(401 + id * nextSwitch, 3, (long)configuration.sensitiveness);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -674,6 +804,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(396 + id * nextSwitch, configuration.functionality);
 #elif defined(T4_CONFIG)
   Eeprom.writeUInt8(496 + id * nextSwitch, configuration.functionality);
+#elif defined(T5_CONFIG)
+  Eeprom.writeUInt8(404 + id * nextSwitch, configuration.functionality);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -690,6 +822,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
       configuration.relayID); /* It's in EEPROM one after the other one */
 #elif defined(T4_CONFIG)
   Eeprom.writeUInt8(497 + id * nextSwitch, configuration.relayID);
+#elif defined(T5_CONFIG)
+  Eeprom.writeUInt8(405 + id * nextSwitch, configuration.relayID);
 #endif
 }
 
@@ -704,14 +838,14 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
 }
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDataAccess::saveConfiguration(DH configuration) {
+#if defined(T2_CONFIG)
   Eeprom.writeUInt8(370, configuration.gpio);
   Eeprom.writeUInt8(371, configuration.type);
-  Eeprom.write(372, 5, (long)configuration.interval);
+  Eeprom.write(379, 5, (long)configuration.interval);
   Eeprom.writeUInt8(377, configuration.temperature.unit);
   Eeprom.write(378, 4, (float)configuration.temperature.correction);
-
   Eeprom.write(387, 3, (float)configuration.humidity.correction);
   Eeprom.write(936, 6, (long)configuration.temperatureIdx);
   Eeprom.write(942, 6, (long)configuration.humidityIdx);
@@ -719,11 +853,48 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
   Eeprom.write(467, configuration.sendOnlyChanges);
   Eeprom.write(974, configuration.publishHeatIndex);
   Eeprom.write(382, configuration.publishDewPoint);
+#else
+  Eeprom.writeUInt8(377, configuration.gpio);
+  Eeprom.writeUInt8(378, configuration.type);
+  Eeprom.write(379, 5, (long)configuration.interval);
+  Eeprom.writeUInt8(384, configuration.temperature.unit);
+  Eeprom.write(385, 4, (float)configuration.temperature.correction);
+  Eeprom.write(394, 3, (float)configuration.humidity.correction);
+  Eeprom.write(954, 6, (long)configuration.temperatureIdx);
+  Eeprom.write(960, 6, (long)configuration.humidityIdx);
+  Eeprom.write(966, 6, (long)configuration.temperatureAndHumidityIdx);
+  Eeprom.write(397, configuration.sendOnlyChanges);
+  Eeprom.write(990, configuration.publishHeatIndex);
+  Eeprom.write(389, configuration.publishDewPoint);
+#endif
+}
+#endif
+
+/* Gate and Contractorn*/
+#if defined(T5_CONFIG)
+void AFEDataAccess::saveConfiguration(GATE configuration) {
+  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+    Eeprom.writeUInt8(467 + i, configuration.state[i]);
+  }
+  Eeprom.write(936, 6, (long)configuration.idx);
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
+  uint8_t nextContactron = 24;
+  Eeprom.writeUInt8(415 + id * nextContactron, configuration.gpio);
+  Eeprom.writeUInt8(416 + id * nextContactron,
+                    configuration.outputDefaultState);
+  Eeprom.writeUInt8(417 + id * nextContactron, configuration.ledID);
+  Eeprom.write(418 + id * nextContactron, 4, (long)configuration.bouncing);
+  Eeprom.write(422 + id * nextContactron, 16, configuration.name);
+  Eeprom.write(942 + id * 6, 6, (long)configuration.idx);
 }
 #endif
 
 void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
 
+/* Relay state methods*/
+#if !defined(T5_CONFIG)
 boolean AFEDataAccess::getRelayState(uint8_t id) {
 #if defined(T4_CONFIG)
   uint8_t nextRelay = 27;
@@ -756,6 +927,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   Eeprom.write(384 + id * nextRelay, state);
 #endif
 }
+#endif /* End: Relay */
 
 uint8_t AFEDataAccess::getDeviceMode() { return Eeprom.readUInt8(26); }
 
@@ -777,7 +949,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
   return Eeprom.readUInt8(439);
 #elif defined(T2_CONFIG)
   return Eeprom.readUInt8(460);
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   return Eeprom.readUInt8(530);
 #endif
 }
@@ -789,7 +961,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
   Eeprom.writeUInt8(439, id);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(460, id);
-#elif defined(T4_CONFIG)
+#elif defined(T4_CONFIG) || defined(T5_CONFIG)
   Eeprom.writeUInt8(530, id);
 #endif
 }
@@ -810,3 +982,11 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
     }
   }
 }
+
+#if defined(T5_CONFIG)
+uint8_t AFEDataAccess::getGateState() { return Eeprom.readUInt8(471); }
+
+void AFEDataAccess::saveGateState(uint8_t state) {
+  Eeprom.writeUInt8(471, state);
+}
+#endif

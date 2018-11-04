@@ -59,12 +59,17 @@ private:
   DS18B20 getDS18B20Data();
 #endif
 
-#if defined(T2_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   DH getDHTData();
 #endif
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   REGULATOR getRegulatorData();
+#endif
+
+#if defined(T5_CONFIG)
+  CONTACTRON getContactronData(uint8_t id);
+  GATE getGateData();
 #endif
 
   uint8_t getLanguageData();

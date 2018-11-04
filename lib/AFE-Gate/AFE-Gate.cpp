@@ -10,7 +10,9 @@ void AFEGate::begin() {
   gateConfiguration = Data.getGateConfiguration();
 
   Relay[0].begin(0);
-  Relay[0].setRelayAfterRestoringPower();
+
+  // Relay[0].setRelayAfterRestoringPower(); I think it's not required
+
   Relay[0].setTimerUnitToSeconds(false);
 
   for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
