@@ -42,6 +42,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             DomoticzPublishRelayState(i);
           }
         }
+
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
         else {
 
@@ -97,6 +98,22 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         break;
       }
     }
+
+#if defined(T3_CONFIG)
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+      if (Device.configuration.isPIR[i]) {
+        sprintf(_mqttTopic, "%scmd", Pir[i].getMQTTTopic());
+
+        if (strcmp(topic, _mqttTopic) == 0) {
+          if ((char)payload[1] == 'e' && length == 3) { // get
+            MQTTPublishPIRState(i);
+          }
+        }
+      }
+    }
+
+#endif
+
 #else /* Gate */
 
     /* Contactrons */
@@ -262,6 +279,16 @@ void MQTTPublishHeatIndex(float heatIndex) {
 void MQTTPublishDewPoint(float dewPoint) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("dewPoint", dewPoint);
+  }
+}
+#endif
+
+#if defined(T3_CONFIG)
+/* Metod publishes Relay state (used eg by HTTP API) */
+void MQTTPublishPIRState(uint8_t id) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish(Pir[id].getMQTTTopic(), "state",
+                 Pir[id].get() == PIR_OPEN ? "open" : "closed");
   }
 }
 #endif

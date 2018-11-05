@@ -59,13 +59,11 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
-#endif
-
-/* Gate and Contactron responses */
-#if defined(T5_CONFIG)
-/* It constructs HTTP response related to gate and calls HTTP push */
-void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
-                                  byte value) {
+#else /* Gate and Contactron responses */
+defined(T5_CONFIG)
+    /* It constructs HTTP response related to gate and calls HTTP push */
+    void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
+                                      byte value) {
   sendHTTPAPIRequestStatus(
       request, status,
       value == GATE_OPEN
@@ -74,6 +72,14 @@ void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                 ? "closed"
                 : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
 }
+
+#if defined(T3_CONFIG)
+void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
+                                 byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == PIR_OPEN ? "open" : "closed");
+}
+#endif
 
 /* It constructs HTTP response related to contactron and calls HTTP push */
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
@@ -198,6 +204,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
                 request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
 
 #endif
+
           } else {
             sendHTTPAPIRequestStatus(request, false);
           }
@@ -246,8 +253,26 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-  /* Requests related to APIs */
+#if defined(T3_CONFIG)
+  else if (strcmp(request.device, "pir") == 0) {
+    boolean pirSendFailure = true;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+      if (Device.configuration.isPIR[i]) {
+        if (strcmp(request.name, Pir[i].getName()) == 0) {
+          if (strcmp(request.command, "get") == 0) { // get
+            pirSendFailure = false;
+            sendHTTPAPIPirRequestStatus(request, true, Pir[i].get());
+          }
+        }
+      }
+    }
+    if (pirSendFailure) {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  }
+#endif
 
+  /* Requests related to APIs */
   else if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
         strcmp(request.name, "http") == 0

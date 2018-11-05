@@ -98,6 +98,11 @@ public:
   void saveRegulatorState(boolean state, uint8_t type = THERMOSTAT_REGULATOR);
 #endif
 
+#if defined(T3_CONFIG)
+  PIR getPIRConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, PIR configuration);
+#endif
+
 #if defined(T5_CONFIG)
   CONTACTRON getContactronConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, CONTACTRON configuration);

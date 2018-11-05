@@ -16,7 +16,10 @@
 #include <AFE-Device.h>
 #include <AFE-OTA.h>
 #include <ESP8266WebServer.h>
-//#include <Streaming.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEWebServer {
 
@@ -65,6 +68,10 @@ private:
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   REGULATOR getRegulatorData();
+#endif
+
+#if defined(T5_CONFIG)
+  PIR getPIRData(uint8_t id);
 #endif
 
 #if defined(T5_CONFIG)

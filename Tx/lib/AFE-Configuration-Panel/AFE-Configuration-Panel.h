@@ -65,6 +65,11 @@ public:
   String getDHTConfigurationSite(uint8_t command, DH data);
 #endif
 
+#if defined(T3_CONFIG)
+  String getPIRConfigurationSite(const String option, uint8_t command, PIR data,
+                                 uint8_t PIRIndex);
+#endif
+
 #if defined(T5_CONFIG)
   String getContactronConfigurationSite(const String option, uint8_t command,
                                         CONTACTRON data,

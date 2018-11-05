@@ -86,6 +86,10 @@ public:
   String addRegulatorConfiguration(uint8_t type);
 #endif
 
+#if defined(T3_CONFIG)
+  String addPIRConfiguration(uint8_t id);
+#endif
+
 #if defined(T5_CONFIG)
   String addGateConfiguration();
   String addContactronConfiguration(uint8_t id);

@@ -3,8 +3,9 @@ AFE Firmware for smarthome devices based on ESP8266/ESP8285 chips
 
 This code combains AFE Firmware versions:
    - T0 and T0 for Shelly-1
-   - T1 (DS18B29)
+   - T1 (DS18B20)
    - T2 (DHTxx)
+   - T3 (PIRs)
    - T4 (Up to 4 relays)
    - T5 Gate
 
@@ -54,6 +55,11 @@ void dht_wrapper();
 PietteTech_DHT dht;
 AFESensorDHT Sensor;
 float humidity;
+#endif
+
+#if defined(T3_CONFIG)
+#include <AFE-PIR.h>
+AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 #endif
 
 AFEDataAccess Data;
@@ -143,6 +149,11 @@ void setup() {
   initSensor();
 #endif
 
+#if defined(T3_CONFIG)
+  /* Initializing PIRs */
+  initPIR();
+#endif
+
   /* Initializing APIs */
   MQTTInit();
   DomoticzInit();
@@ -186,6 +197,10 @@ void loop() {
 #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
         /* Sensor: DS18B20 or DHT related code */
         mainSensor();
+#endif
+
+#if defined(T3_CONFIG)
+        mainPIR();
 #endif
 
       } else { /* Device runs in configuration mode over WiFi */
