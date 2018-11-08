@@ -55,6 +55,17 @@ void DomoticzPublishTemperatureAndHumidity(float temperature, float humidity) {
 
 #endif
 
+/* Pir */
+#if defined(T3_CONFIG)
+/* It publishes gate state to Domotucz */
+void DomoticzPublishPirState(uint8_t id) {
+  unsigned long idx = Pir[id].getDomoticzIDX();
+  if (Device.configuration.domoticzAPI && idx > 0) {
+    Domoticz.sendPirCommand(idx, Pir[id].get() == PIR_OPEN ? "On" : "Off");
+  }
+}
+#endif
+
 /* Gate and Contactron */
 #if defined(T5_CONFIG)
 /* It publishes gate state to Domotucz */

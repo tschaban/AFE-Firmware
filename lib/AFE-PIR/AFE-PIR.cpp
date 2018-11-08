@@ -44,3 +44,5 @@ void AFEPIR::listener() {
 }
 
 const char *AFEPIR::getName() { return configuration.name; }
+
+unsigned long AFEPIR::getDomoticzIDX() { return configuration.idx; }

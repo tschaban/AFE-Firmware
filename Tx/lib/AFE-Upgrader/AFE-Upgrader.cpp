@@ -25,19 +25,16 @@ void AFEUpgrader::upgrade() {
 #if !defined(T0_SHELLY_1_CONFIG)
 
     if (
-#if defined(T0_CONFIG)
+#if defined(T0_CONFIG) || defined(T4_CONFIG)
         strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T3_CONFIG)
         strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.1") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.0.2") == 0
 #elif defined(T2_CONFIG)
         strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
         strcmp(FirmwareConfiguration.version, "1.2.0")
-#elif defined(T4_CONFIG)
-        strcmp(FirmwareConfiguration.version, "1.0.0") == 0 ||
-        strcmp(FirmwareConfiguration.version, "1.0.1") == 0
 #elif defined(T5_CONFIG)
         strcmp(FirmwareConfiguration.version, "1.0.0") == 0
 #endif
@@ -47,7 +44,7 @@ void AFEUpgrader::upgrade() {
       upgradeToVersion110();
 #elif defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T4_CONFIG)
       upgradeToVersion120();
-#elif defined(T5_CONFIG)
+#elif defined(T3_CONFIG) || defined(T5_CONFIG)
       upgradeToVersion130();
 #endif
     }
@@ -217,7 +214,7 @@ void AFEUpgrader::upgradeToVersion120() {
 
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG) || defined(T3_CONFIG) || defined(T5_CONFIG)
 /* Methods upgrades to v1.3.0 */
 void AFEUpgrader::upgradeToVersion130() {
   AFEEEPROM Eeprom;

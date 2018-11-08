@@ -6,11 +6,11 @@
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
     if (WebServer.httpAPIlistener()) {
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
       Led.off();
 #endif
     }
@@ -59,11 +59,22 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
   sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
 }
-#else /* Gate and Contactron responses */
-defined(T5_CONFIG)
-    /* It constructs HTTP response related to gate and calls HTTP push */
-    void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
-                                      byte value) {
+#endif
+
+/* PIR responses */
+#if defined(T3_CONFIG)
+void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
+                                 byte value) {
+  sendHTTPAPIRequestStatus(request, status,
+                           value == PIR_OPEN ? "open" : "closed");
+}
+#endif
+
+/* Gate and Contactron responses */
+#if defined(T5_CONFIG)
+/* It constructs HTTP response related to gate and calls HTTP push */
+void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
+                                  byte value) {
   sendHTTPAPIRequestStatus(
       request, status,
       value == GATE_OPEN
@@ -72,14 +83,6 @@ defined(T5_CONFIG)
                 ? "closed"
                 : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
 }
-
-#if defined(T3_CONFIG)
-void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
-                                 byte value) {
-  sendHTTPAPIRequestStatus(request, status,
-                           value == PIR_OPEN ? "open" : "closed");
-}
-#endif
 
 /* It constructs HTTP response related to contactron and calls HTTP push */
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,

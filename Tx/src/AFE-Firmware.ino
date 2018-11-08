@@ -57,11 +57,6 @@ AFESensorDHT Sensor;
 float humidity;
 #endif
 
-#if defined(T3_CONFIG)
-#include <AFE-PIR.h>
-AFEPIR Pir[sizeof(Device.configuration.isPIR)];
-#endif
-
 AFEDataAccess Data;
 AFEDevice Device;
 AFEWiFi Network;
@@ -71,6 +66,11 @@ AFEWebServer WebServer;
 AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
 AFERelay Relay[sizeof(Device.configuration.isRelay)];
 MQTT MQTTConfiguration;
+
+#if defined(T3_CONFIG)
+#include <AFE-PIR.h>
+AFEPIR Pir[sizeof(Device.configuration.isPIR)];
+#endif
 
 #if defined(T5_CONFIG)
 #include <AFE-Gate.h>

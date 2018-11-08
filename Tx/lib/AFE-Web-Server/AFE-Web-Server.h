@@ -70,7 +70,7 @@ private:
   REGULATOR getRegulatorData();
 #endif
 
-#if defined(T5_CONFIG)
+#if defined(T3_CONFIG)
   PIR getPIRData(uint8_t id);
 #endif
 

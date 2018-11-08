@@ -184,6 +184,24 @@ void AFEWebServer::generate() {
         break;
       }
     }
+
+#if defined(T3_CONFIG)
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device.configuration.isPIR[i]) {
+        if (getOptionName() == "pir" + String(i)) {
+          PIR data = {};
+          if (getCommand() == SERVER_CMD_SAVE) {
+            data = getPIRData(i);
+          }
+          publishHTML(ConfigurationPanel.getPIRConfigurationSite(
+              getOptionName(), getCommand(), data, i));
+        }
+      } else {
+        break;
+      }
+    }
+#endif
+
 #if defined(T5_CONFIG)
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
@@ -308,6 +326,12 @@ DEVICE AFEWebServer::getDeviceData() {
 
 #if defined(T2_CONFIG) || defined(T5_CONFIG)
   server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
+#endif
+
+#if defined(T3_CONFIG)
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+    server.arg("hp").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
+  }
 #endif
 
   return data;
@@ -443,9 +467,11 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
 
+#if !defined(T3_CONFIG)
   if (server.arg("ot" + String(id)).length() > 0) {
     data.timeToOff = server.arg("ot" + String(id)).toFloat();
   }
+#endif
 
 #if !defined(T5_CONFIG)
   if (server.arg("pr" + String(id)).length() > 0) {
@@ -571,6 +597,49 @@ GATE AFEWebServer::getGateData() {
 
   if (server.arg("x").length() > 0) {
     data.idx = server.arg("x").toInt();
+  }
+
+  return data;
+}
+#endif
+
+#if defined(T3_CONFIG)
+PIR AFEWebServer::getPIRData(uint8_t id) {
+  PIR data;
+
+  if (server.arg("g" + String(id)).length() > 0) {
+    data.gpio = server.arg("g" + String(id)).toInt();
+  }
+
+  if (server.arg("n" + String(id)).length() > 0) {
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  }
+
+  if (server.arg("l" + String(id)).length() > 0) {
+    data.ledId = server.arg("l" + String(id)).toInt();
+  }
+
+  if (server.arg("r" + String(id)).length() > 0) {
+    data.relayId = server.arg("r" + String(id)).toInt();
+  }
+
+  if (server.arg("d" + String(id)).length() > 0) {
+    data.howLongKeepRelayOn = server.arg("d" + String(id)).toInt();
+  }
+
+  server.arg("i" + String(id)).length() > 0 ? data.invertRelayState = true
+                                            : data.invertRelayState = false;
+
+  if (server.arg("b" + String(id)).length() > 0) {
+    data.bouncing = server.arg("b" + String(id)).toInt();
+  }
+
+  if (server.arg("o" + String(id)).length() > 0) {
+    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+  }
+
+  if (server.arg("x" + String(id)).length() > 0) {
+    data.idx = server.arg("x" + String(id)).toInt();
   }
 
   return data;

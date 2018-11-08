@@ -125,6 +125,12 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
 
 #endif
 
+#if defined(T3_CONFIG)
+void AFEDomoticz::sendPirCommand(unsigned int idx, const char *value) {
+  sendSwitchCommand(idx, value);
+}
+#endif
+
 #if defined(T5_CONFIG) /* @TODO it could be removed and replaced by switch */
 void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);

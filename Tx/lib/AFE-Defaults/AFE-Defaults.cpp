@@ -23,6 +23,8 @@ void AFEDefaults::set() {
   DS18B20 SensorConfiguration;
 #elif defined(T2_CONFIG)
   DH SensorConfiguration;
+#elif defined(T3_CONFIG)
+  PIR PIRConfiguration;
 #elif defined(T5_CONFIG)
   DH SensorConfiguration;
   CONTACTRON ContactronConfiguration;
@@ -81,6 +83,13 @@ void AFEDefaults::set() {
   }
 #endif
 
+/* PIR */
+#if defined(T3_CONFIG)
+  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isPIR); i++) {
+    deviceConfiguration.isPIR[i] = false;
+  }
+#endif
+
   Data->saveConfiguration(deviceConfiguration);
 
   /* Network default config */
@@ -117,14 +126,18 @@ void AFEDefaults::set() {
 #if defined(T5_CONFIG)
   RelayConfiguration.timeToOff = 200;
 #else /* Configuration not related to T5 */
+
+#if !defined(T3_CONFIG) /* Not used in T3 */
   RelayConfiguration.timeToOff = 0;
+#endif
+
   RelayConfiguration.statePowerOn = 3;
   RelayConfiguration.stateMQTTConnected = 0;
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
     defined(T2_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
-#elif defined(T4_CONFIG)
+#elif defined(T3_CONFIG) || defined(T4_CONFIG)
   sprintf(RelayConfiguration.name, "switch1");
 #endif
 
@@ -144,7 +157,7 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(0, RelayConfiguration);
 
-#if defined(T4_CONFIG)
+#if defined(T3_CONFIG) || defined(T4_CONFIG)
   RelayConfiguration.gpio = 5;
   sprintf(RelayConfiguration.name, "switch2");
   Data->saveConfiguration(1, RelayConfiguration);
@@ -195,7 +208,7 @@ void AFEDefaults::set() {
     defined(T5_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
-#elif defined(T4_CONFIG)
+#elif defined(T3_CONFIG) || defined(T4_CONFIG)
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.relayID = 2;
 #endif
@@ -206,7 +219,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
 
-#if defined(T4_CONFIG)
+#if defined(T3_CONFIG) || defined(T4_CONFIG)
   SwitchConfiguration.gpio = 10;
   SwitchConfiguration.relayID = 3;
   Data->saveConfiguration(2, SwitchConfiguration);
@@ -220,6 +233,13 @@ void AFEDefaults::set() {
 #if !defined(T5_CONFIG)
   addLEDConfiguration(1, 3);
   addLEDConfiguration(0, 13);
+
+#if defined(T3_CONFIG) || defined(T4_CONFIG)
+  addLEDConfiguration(2, 13);
+  addLEDConfiguration(3, 13);
+  addLEDConfiguration(4, 13);
+#endif
+
 #else
   addLEDConfiguration(0, 16);
   addLEDConfiguration(1, 14);
@@ -252,6 +272,21 @@ void AFEDefaults::set() {
 #endif
 
   Data->saveConfiguration(SensorConfiguration);
+#endif
+
+#if defined(T3_CONFIG)
+  PIRConfiguration.gpio = 6;
+  sprintf(PIRConfiguration.name, "pir");
+  PIRConfiguration.ledId = 0;
+  PIRConfiguration.relayId = 0;
+  PIRConfiguration.howLongKeepRelayOn = 10;
+  PIRConfiguration.invertRelayState = false;
+  PIRConfiguration.bouncing = 0;
+  PIRConfiguration.idx = 0;
+  PIRConfiguration.outputDefaultState = PIR_NO;
+  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
+    Data->saveConfiguration(i, PIRConfiguration);
+  }
 #endif
 
 /* T5: Contactron and Gate configuration */

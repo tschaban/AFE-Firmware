@@ -71,6 +71,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 #elif T2_CONFIG
   page += language == 0 ? "Włącznik z czujnikiem temperatury i wilgotności"
                         : "Switch with temperature and humidity sensor";
+#elif T3_CONFIG
+  page += language == 0 ? "dla 4 włączników i czujników ruchu"
+                        : "for 4 WiFi switches and PIR sensors";
 #elif T4_CONFIG
   page += language == 0 ? "dla 4 włączników WiFi" : "for 4 WiFi switches";
 #elif T5_CONFIG
@@ -188,6 +191,33 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
         page += "</a></li>";
       }
     }
+
+    /* Pir */
+#if defined(T3_CONFIG)
+    itemPresent = 0;
+    for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+      if (Device.configuration.isPIR[i]) {
+        itemPresent++;
+      } else {
+        break;
+      }
+    }
+
+    if (itemPresent > 0) {
+      page += "<li class=\"itm\"><a  style=\"color:#aaaaaa;\">Konfiguracja "
+              "czujników ruchu (PIR)</a></li>";
+      for (uint8_t i = 0; i < 4; i++) {
+        if (Device.configuration.isPIR[i]) {
+          page += "<li class=\"itm\"><a href=\"\\?option=pir";
+          page += i;
+          page += "\">&#8227; Czujnik: ";
+          page += i + 1;
+          page += "</a></li>";
+        }
+      }
+    }
+
+#endif
 
 /* Contactrons and Gate */
 #if defined(T5_CONFIG)
@@ -401,6 +431,19 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += " DHT";
 #endif
   body += "</label></div>";
+#endif
+
+#if defined(T3_CONFIG)
+  itemsNumber = 0;
+  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+    if (Device.configuration.isPIR[i]) {
+      itemsNumber++;
+    }
+  }
+
+  body += generateHardwareItemsList(
+      sizeof(Device.configuration.isPIR), itemsNumber, "hp",
+      language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
 
   body += "</fieldset>";
@@ -882,6 +925,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #endif
 
+#if !defined(T3_CONFIG) /* Relay Time off / Impuls is not applicable for T3 */
+
   body += "<div class=\"cf\">";
   body += "<label>";
 #if defined(T5_CONFIG)
@@ -910,6 +955,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
   body += "</span>";
   body += "</div>";
+
+#endif /* T3 exclusion end */
 
 #ifdef T1_CONFIG
   if (device.isDS18B20)
@@ -1351,6 +1398,122 @@ String AFESitesGenerator::addDHTConfiguration() {
   body += "</fieldset>";
 
   return page;
+}
+#endif
+
+#if defined(T3_CONFIG)
+String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
+  PIR configuration;
+  configuration = Data.getPIRConfiguration(id);
+  String body = "<fieldset>";
+  char filed[13];
+  sprintf(filed, "g%d", id);
+  body += "<div class=\"cf\">";
+  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Nazwa" : "Name";
+  body += "*</label>";
+  body += "<input name=\"n" + String(id) +
+          "\" type=\"text\" maxlength=\"16\" value=\"";
+  body += configuration.name;
+  body += "\">";
+  body += "<span class=\"hint\">Max 16 ";
+  body += language == 0 ? "znaków" : "chars";
+  body += "</span>";
+  body += "</div>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "LED" : "LED";
+  body += "*</label>";
+  body += "<select name=\"l" + String(id) + "\">";
+  body += "<option value=\"9\" ";
+  body += (configuration.ledId == 9 ? "selected=\"selected\"" : "");
+  body += ">Brak</option>";
+  for (uint8_t i = 0; i < 5; i++) {
+    if (Device.configuration.isLED[i]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\" ";
+      body += (configuration.ledId == i ? "selected=\"selected\"" : "");
+      body += ">";
+      body += i + 1;
+      body += "</option>";
+    }
+  }
+  body += "</select>";
+  body += "<span class=\"hint\">";
+  body += language == 0 ? "Dioda LED sygnalizuje wykryty ruch przez czujnik"
+                        : "LED indicates motion detected by the sensor";
+  body += "</span>";
+  body += "</div>";
+  body += "<br><p class=\"cm\">";
+  body += language == 0
+              ? "Czujnik PIR może bezpośrednio sterować jednym przekaźnikiem. "
+                "Poniżej możesz wybrać którym oraz ustawić dodatkowe "
+                "parametry sterowania"
+              : "Motion detection sensor can control a relay assigned to it. "
+                "Below you can choose a one and set additional parameters";
+  body += "</p>";
+
+  body += "<div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Wybierz przekaźnik" : "Select relay";
+  body += "*</label>";
+  body += "<select name=\"r" + String(id) + "\">";
+  body += "<option value=\"9\" ";
+  body += (configuration.relayId == 9 ? "selected=\"selected\"" : "");
+  body += ">Brak</option>";
+  for (uint8_t i = 0; i < 4; i++) {
+    if (Device.configuration.isRelay[i]) {
+      body += "<option value=\"";
+      body += i;
+      body += "\" ";
+      body += (configuration.relayId == i ? "selected=\"selected\"" : "");
+      body += ">";
+      body += i + 1;
+      body += "</option>";
+    }
+  }
+  body += "</select>";
+  body += "</div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Czas uruchomienia" : "How long active";
+  body += "*</label>";
+  body += "<input name=\"d" + String(id) +
+          "\" type=\"number\" max=\"86400\" min=\"0.01\" step=\"0.01\" "
+          "value=\"";
+  body += configuration.howLongKeepRelayOn;
+  body += "\">";
+  body += "<span class=\"hint\">0.01 - 86400 (24h) se";
+  body += language == 0 ? "kund" : "conds";
+  body += "</span>";
+  body += "</div>";
+
+  body += "<div class=\"cc\">";
+  body += "<label>";
+  body += "<input name=\"i";
+  body += id;
+  body += "\" type=\"checkbox\" value=\"1\"";
+  body += configuration.invertRelayState ? " checked=\"checked\"" : "";
+  body += ">";
+  body += language == 0 ? "Wyłącz przekaźnik, gdy PIR wykryje ruch"
+                        : "Switch off relay if PIR detects move";
+
+  body += "</label>";
+  body += "</div>";
+
+  body += "</fieldset>";
+
+  char title[25];
+  language == 0 ? sprintf(title, "Czujnik ruchu (PIR) #%d", id + 1)
+                : sprintf(title, "Motion detection sesnor (PIR) #%d", id + 1);
+
+  return addConfigurationBlock(title, "", body);
 }
 #endif
 

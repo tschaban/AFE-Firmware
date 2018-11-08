@@ -38,7 +38,7 @@ private:
   void upgradeToVersion121();
 #endif
 
-#if defined(T2_CONFIG) || (T5_CONFIG)
+#if defined(T2_CONFIG) || (T3_CONFIG) || (T5_CONFIG)
   void upgradeToVersion130();
 #endif
 

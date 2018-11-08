@@ -48,6 +48,9 @@ public:
 
   /* Method should be added to main loop to listen for PIR events */
   void listener();
+
+  /* Method returns Domoticz IDX */
+  unsigned long getDomoticzIDX();
 };
 
 #endif

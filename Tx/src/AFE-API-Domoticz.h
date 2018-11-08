@@ -75,6 +75,10 @@ public:
   uint8_t getHumidityState(float value);
 #endif
 
+#if defined(T3_CONFIG)
+  void sendPirCommand(unsigned int idx, const char *value);
+#endif
+
 #if defined(T5_CONFIG)
   void sendGateCommand(unsigned int idx, const char *value);
   void sendContactronCommand(unsigned int idx, const char *value);

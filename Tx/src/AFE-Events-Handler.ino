@@ -15,17 +15,28 @@ void eventsListener() {
       for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
         if (Device.configuration.isContactron[i]) {
           DomoticzPublishContactronState(i);
+          lastPublishedContactronState[i] = Gate.Contactron[i].get();
         }
       }
 #else
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
           DomoticzPublishRelayState(i);
-          lastPublishedContactronState[i] = Gate.Contactron[i].get();
         } else {
           break;
         }
       }
+
+#if defined(T3_CONFIG)
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+        if (Device.configuration.isPIR[i]) {
+          DomoticzPublishPirState(i);
+        } else {
+          break;
+        }
+      }
+#endif
+
 #endif
 
 #ifndef T0_SHELLY_1_CONFIG
