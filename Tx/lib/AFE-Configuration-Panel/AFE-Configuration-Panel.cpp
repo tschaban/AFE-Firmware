@@ -268,6 +268,28 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
 }
 #endif
 
+#if defined(T3_CONFIG)
+String AFEConfigurationPanel::getPIRConfigurationSite(const String option,
+                                                      uint8_t command, PIR data,
+                                                      uint8_t PIRIndex) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(PIRIndex, data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=pir";
+  page += PIRIndex;
+  page += "&cmd=1\"  method=\"post\">";
+  page += Site.addPIRConfiguration(PIRIndex);
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+#endif
+
 #if defined(T5_CONFIG)
 String AFEConfigurationPanel::getContactronConfigurationSite(
     const String option, uint8_t command, CONTACTRON data,

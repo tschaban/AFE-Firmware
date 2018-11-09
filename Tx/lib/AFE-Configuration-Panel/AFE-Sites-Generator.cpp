@@ -1027,6 +1027,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   char title[23];
   language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
                 : sprintf(title, "Relay #%d", id + 1);
+
   return addConfigurationBlock(title, "", body);
 }
 
@@ -1395,7 +1396,7 @@ String AFESitesGenerator::addDHTConfiguration() {
         body);
   }
 
-  body += "</fieldset>";
+  page += "</fieldset>";
 
   return page;
 }
@@ -1403,8 +1404,9 @@ String AFESitesGenerator::addDHTConfiguration() {
 
 #if defined(T3_CONFIG)
 String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
-  PIR configuration;
-  configuration = Data.getPIRConfiguration(id);
+  PIR configuration = Data.getPIRConfiguration(id);
+  DEVICE device = Data.getDeviceConfiguration();
+
   String body = "<fieldset>";
   char filed[13];
   sprintf(filed, "g%d", id);
@@ -1423,6 +1425,40 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "<span class=\"hint\">Max 16 ";
   body += language == 0 ? "znaków" : "chars";
   body += "</span>";
+  body += "</div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Typ" : "Type";
+  body += "</label><select name=\"o" + String(id) + "\"><option value=\"0\"";
+  body +=
+      (configuration.outputDefaultState == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NO" : "NO";
+  body += "</option><option value=\"1\"";
+  body +=
+      (configuration.outputDefaultState == 1 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "NC" : "NC";
+  body += "</option></select></div>";
+
+  body += "<p class=\"cm\">";
+  body += language == 0
+              ? "Ustawienie Buncing może byc przydatne przy czujnikach "
+                "magnetycznych itp"
+              : "Setting bouncing can be useful for magnetic sensors etc.";
+
+  body += "</p><div class=\"cf\">";
+  body += "<label>";
+  body += language == 0 ? "Buncing" : "Buncing";
+  body += "*</label>";
+  body += "<input name=\"s" + String(id) +
+          "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
+          "value=\"";
+  body += configuration.bouncing;
+  body += "\">";
+  body += "<span class=\"hint\">0 - 999 (milise";
+  body += language == 0 ? "kund" : "conds";
+  body += ")</span>";
   body += "</div>";
 
   body += "<div class=\"cf\">";
@@ -1507,13 +1543,38 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   body += "</label>";
   body += "</div>";
 
-  body += "</fieldset>";
-
   char title[25];
   language == 0 ? sprintf(title, "Czujnik ruchu (PIR) #%d", id + 1)
                 : sprintf(title, "Motion detection sesnor (PIR) #%d", id + 1);
 
-  return addConfigurationBlock(title, "", body);
+  String page = addConfigurationBlock(
+      language == 0 ? "Czujnik temperatury i wilgotności DHT"
+                    : "DHT temperature and humidity sensor",
+      "", body);
+
+  if (device.domoticzAPI) {
+
+    body = "<div class=\"i\"><label>IDX</label>";
+    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  page += "</fieldset>";
+
+  return page;
 }
 #endif
 
@@ -1742,7 +1803,7 @@ String AFESitesGenerator::addGateConfiguration() {
         body);
   }
 
-  body += "</fieldset>";
+  page += "</fieldset>";
 
   return page;
 }
