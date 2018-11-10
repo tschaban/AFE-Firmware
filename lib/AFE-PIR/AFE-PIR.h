@@ -13,7 +13,9 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-LED.h>
-// #include <Streaming.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEPIR {
 
@@ -23,6 +25,9 @@ private:
   boolean state;
 
   AFELED Led;
+
+  /* Returns PIR State */
+  byte get();
 
 public:
   PIR configuration;
@@ -34,8 +39,8 @@ public:
   /* Init PIR */
   void begin(uint8_t id);
 
-  /* Returns PIR State */
-  byte get();
+  /* Returns true if motion has been detected */
+  boolean motionDetected();
 
   /* Returns PIR MQTT Topic */
   const char *getMQTTTopic();

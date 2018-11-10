@@ -17,6 +17,10 @@ void AFEPIR::begin(uint8_t id) {
   _initialized = true;
 }
 
+byte AFEPIR::get() {
+  return digitalRead(configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
+}
+
 boolean AFEPIR::stateChanged() {
   if (_stateChanged) {
     _stateChanged = false;
@@ -26,8 +30,10 @@ boolean AFEPIR::stateChanged() {
   }
 }
 
-byte AFEPIR::get() {
-  return digitalRead(configuration.gpio) == HIGH ? PIR_OPEN : PIR_CLOSE;
+boolean AFEPIR::motionDetected() {
+  return configuration.outputDefaultState == PIR_NO
+             ? (get() == PIR_CLOSE ? true : false)
+             : (get() == PIR_OPEN ? true : false);
 }
 
 const char *AFEPIR::getMQTTTopic() { return configuration.mqttTopic; }
@@ -38,7 +44,7 @@ void AFEPIR::listener() {
     if (currentState != state) {
       state = currentState;
       _stateChanged = true;
-      state ? Led.on() : Led.off();
+      motionDetected() ? Led.on() : Led.off();
     }
   }
 }
