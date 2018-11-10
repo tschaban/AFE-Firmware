@@ -15,6 +15,9 @@
 #define PIR_OPEN 1
 #define PIR_CLOSE 0
 
+#define PIR_NO 0
+#define PIR_NC 1
+
 struct PIR {
   uint8_t gpio;
   char name[16];
@@ -24,6 +27,9 @@ struct PIR {
   uint8_t relayId;
   uint16_t howLongKeepRelayOn;
   boolean invertRelayState;
+  byte outputDefaultState;
+  uint16_t bouncing;
+  unsigned long idx;
 };
 
 #endif
