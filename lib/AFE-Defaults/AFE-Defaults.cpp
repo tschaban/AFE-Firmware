@@ -230,6 +230,7 @@ void AFEDefaults::set() {
 
 /* LEDs configuration */
 #if !defined(T0_SHELLY_1_CONFIG)
+
 #if !defined(T5_CONFIG)
   addLEDConfiguration(1, 3);
   addLEDConfiguration(0, 13);
@@ -240,7 +241,7 @@ void AFEDefaults::set() {
   addLEDConfiguration(4, 13);
 #endif
 
-#else
+#else /* T5 */
   addLEDConfiguration(0, 16);
   addLEDConfiguration(1, 14);
   addLEDConfiguration(2, 13);
