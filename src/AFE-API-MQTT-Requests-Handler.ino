@@ -130,11 +130,9 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     /* Gate */
     sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
-      if ((char)payload[2] == 'e' && length == 4) { // open
+      if ((char)payload[0] == 't' && length == 6) { // toggle
         Gate.toggle();
-      } else if ((char)payload[2] == 'o' && length == 5) { // close
-        Gate.toggle();
-      } else if ((char)payload[2] == 't' && length == 3) { // get
+      } else if ((char)payload[0] == 'g' && length == 3) { // get
         MQTTPublishGateState();
       }
     } // @TODO powinno byc else here
