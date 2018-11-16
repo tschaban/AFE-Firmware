@@ -1038,7 +1038,10 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
   RELAY configuration = Data.getRelayConfiguration(0);
 
-  if (type == THERMOSTAT_REGULATOR) {
+#if defined(T2_CONFIG)
+  if (type == THERMOSTAT_REGULATOR)
+#endif
+  {
     String body = generateTwoValueController(configuration.thermostat,
                                              THERMOSTAT_REGULATOR);
 
