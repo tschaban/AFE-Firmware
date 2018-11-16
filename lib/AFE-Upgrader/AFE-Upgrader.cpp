@@ -22,7 +22,7 @@ void AFEUpgrader::upgrade() {
     upgradeTypeOfFirmware();
   } else {
 
-#if !defined(T0_SHELLY_1_CONFIG)
+#if !(defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG))
 
     if (
 #if defined(T0_CONFIG) || defined(T4_CONFIG)

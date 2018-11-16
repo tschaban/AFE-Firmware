@@ -32,13 +32,14 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
 /* T1,T2,T4,T5: Led */
 #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
-    defined(T4_CONFIG) || defined(T5_CONFIG)
+    defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
 
 #if defined(T1_CONFIG)
   uint8_t index = 77;
 #elif defined(T2_CONFIG)
   uint8_t index = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG)
+#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
+    defined(T6_CONFIG)
   uint8_t index = 3;
 #endif
 
@@ -117,6 +118,19 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   index = 24;
   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
     configuration.isContactron[i] = Eeprom.read(414 + i * index);
+  }
+#endif
+
+/* T1: Relay, Switch, isDS18b20 */
+#ifdef T6_CONFIG
+  index = 40;
+  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+    configuration.isRelay[i] = Eeprom.read(396 + i * index);
+  }
+
+  index = 7;
+  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+    configuration.isSwitch[i] = Eeprom.read(382 + i * index);
   }
 #endif
 
@@ -204,7 +218,8 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   uint8_t nextLED = 77;
 #elif defined(T2_CONFIG)
   uint8_t nextLED = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG)
+#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
+    defined(T6_CONFIG)
   uint8_t nextLED = 3;
 #endif
 
@@ -227,7 +242,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.gpio = Eeprom.readUInt8(370);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.gpio = Eeprom.readUInt8(397);
 #elif defined(T2_CONFIG)
   configuration.gpio = Eeprom.readUInt8(405);
@@ -241,7 +256,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.timeToOff = Eeprom.read(372, 5).toFloat();
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.timeToOff = Eeprom.read(399, 5).toFloat();
 #elif defined(T2_CONFIG)
   configuration.timeToOff = Eeprom.read(407, 5).toFloat();
@@ -256,7 +271,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.statePowerOn = Eeprom.readUInt8(377);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.statePowerOn = Eeprom.readUInt8(404);
 #elif defined(T2_CONFIG)
   configuration.statePowerOn = Eeprom.readUInt8(412);
@@ -269,7 +284,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.read(378, 16).toCharArray(configuration.name,
                                    sizeof(configuration.name));
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.read(405, 16).toCharArray(configuration.name,
                                    sizeof(configuration.name));
 #elif defined(T2_CONFIG)
@@ -285,7 +300,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.stateMQTTConnected = Eeprom.readUInt8(394);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.stateMQTTConnected = Eeprom.readUInt8(421);
 #elif defined(T2_CONFIG)
   configuration.stateMQTTConnected = Eeprom.readUInt8(429);
@@ -303,7 +318,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG)
   configuration.ledID = Eeprom.readUInt8(421);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.ledID = Eeprom.readUInt8(442);
 #elif defined(T2_CONFIG)
   configuration.ledID = Eeprom.readUInt8(463);
@@ -357,7 +372,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
 
 #if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T0_SHELLY_1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
+    defined(T2_CONFIG) || defined(T3_CONFIG) || defined(T6_CONFIG)
   uint8_t nextSwitch = 7;
 #elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextSwitch = 8;
@@ -365,7 +380,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.gpio = Eeprom.readUInt8(396 + id * nextSwitch);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.gpio = Eeprom.readUInt8(383 + id * nextSwitch);
 #elif defined(T2_CONFIG)
   configuration.gpio = Eeprom.readUInt8(391 + id * nextSwitch);
@@ -379,7 +394,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.type = Eeprom.readUInt8(397 + id * nextSwitch);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.type = Eeprom.readUInt8(384 + id * nextSwitch);
 #elif defined(T2_CONFIG)
   configuration.type = Eeprom.readUInt8(392 + id * nextSwitch);
@@ -393,7 +408,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.sensitiveness = Eeprom.read(398 + id * nextSwitch, 3).toInt();
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.sensitiveness = Eeprom.read(385 + id * nextSwitch, 3).toInt();
 #elif defined(T2_CONFIG)
   configuration.sensitiveness = Eeprom.read(393 + id * nextSwitch, 3).toInt();
@@ -407,7 +422,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.functionality = Eeprom.readUInt8(401 + id * nextSwitch);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.functionality = Eeprom.readUInt8(388 + id * nextSwitch);
 #elif defined(T2_CONFIG)
   configuration.functionality = Eeprom.readUInt8(396 + id * nextSwitch);
@@ -422,7 +437,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.relayID =
       Eeprom.readUInt8(416 + id); /* It's in EEPROM one after the other one */
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   configuration.relayID =
       Eeprom.readUInt8(440 + id); /* It's in EEPROM one after the other one */
 #elif defined(T2_CONFIG)
@@ -567,7 +582,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T5_CONFIG)
     Eeprom.write(369, configuration.isRelay[i]);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
     Eeprom.write(396, configuration.isRelay[i]);
 #elif defined(T2_CONFIG)
     Eeprom.write(404, configuration.isRelay[i]);
@@ -580,7 +595,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 /* Switches */
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
+    defined(T2_CONFIG) || defined(T3_CONFIG) || defined(T6_CONFIG)
   index = 7;
 #elif defined(T4_CONFIG) || defined(T5_CONFIG)
   index = 8;
@@ -589,7 +604,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
     Eeprom.write(395 + i * index, configuration.isSwitch[i]);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
     Eeprom.write(382 + i * index, configuration.isSwitch[i]);
 #elif defined(T2_CONFIG)
     Eeprom.write(390 + i * index, configuration.isSwitch[i]);
@@ -607,7 +622,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 #if defined(T0_CONFIG)
   index = 52;
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   index = 77;
 #elif defined(T2_CONFIG)
   index = 98;
@@ -695,7 +710,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(370, configuration.gpio);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(397, configuration.gpio);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(405, configuration.gpio);
@@ -709,7 +724,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.write(372, 5, configuration.timeToOff);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.write(399, 5, configuration.timeToOff);
 #elif defined(T2_CONFIG)
   Eeprom.write(407, 5, configuration.timeToOff);
@@ -723,7 +738,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(377, configuration.statePowerOn);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(404, configuration.statePowerOn);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(412, configuration.statePowerOn);
@@ -735,7 +750,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.write(378, 16, configuration.name);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.write(405, 16, configuration.name);
 #elif defined(T2_CONFIG)
   Eeprom.write(413, 16, configuration.name);
@@ -747,7 +762,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(394, configuration.stateMQTTConnected);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(421, configuration.stateMQTTConnected);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(429, configuration.stateMQTTConnected);
@@ -759,7 +774,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 
 #if defined(T0_CONFIG)
   Eeprom.writeUInt8(421 + id, configuration.ledID);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(442 + id, configuration.ledID);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(463 + id, configuration.ledID);
@@ -839,7 +854,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
   uint8_t nextLED = 77;
 #elif defined(T2_CONFIG)
   uint8_t nextLED = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG)
+#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
+    defined(T6_CONFIG)
   uint8_t nextLED = 3;
 #endif
 
@@ -850,7 +866,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
+    defined(T2_CONFIG) || defined(T3_CONFIG) || defined(T6_CONFIG)
   uint8_t nextSwitch = 7;
 #elif defined(T4_CONFIG) || defined(T5_CONFIG)
   uint8_t nextSwitch = 8;
@@ -858,7 +874,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(396 + id * nextSwitch, configuration.gpio);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(383 + id * nextSwitch, configuration.gpio);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(391 + id * nextSwitch, configuration.gpio);
@@ -872,7 +888,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(397 + id * nextSwitch, configuration.type);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(384 + id * nextSwitch, configuration.type);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(392 + id * nextSwitch, configuration.type);
@@ -886,7 +902,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.write(398 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.write(385 + id * nextSwitch, 3, (long)configuration.sensitiveness);
 #elif defined(T2_CONFIG)
   Eeprom.write(393 + id * nextSwitch, 3, (long)configuration.sensitiveness);
@@ -900,7 +916,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(401 + id * nextSwitch, configuration.functionality);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(388 + id * nextSwitch, configuration.functionality);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(396 + id * nextSwitch, configuration.functionality);
@@ -916,7 +932,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Eeprom.writeUInt8(
       416 + id,
       configuration.relayID); /* It's in EEPROM one after the other one */
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(
       440 + id,
       configuration.relayID); /* It's in EEPROM one after the other one */
@@ -1028,7 +1044,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   return Eeprom.read(371);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   return Eeprom.read(398);
 #elif defined(T2_CONFIG)
   return Eeprom.read(406);
@@ -1049,7 +1065,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.write(371, state);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.write(398, state);
 #elif defined(T2_CONFIG)
   Eeprom.write(406, state);
@@ -1077,7 +1093,7 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
 uint8_t AFEDataAccess::getSystemLedID() {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   return Eeprom.readUInt8(415);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   return Eeprom.readUInt8(439);
 #elif defined(T2_CONFIG)
   return Eeprom.readUInt8(460);
@@ -1091,7 +1107,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
 void AFEDataAccess::saveSystemLedID(uint8_t id) {
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   Eeprom.writeUInt8(415, id);
-#elif defined(T1_CONFIG)
+#elif defined(T1_CONFIG) || defined(T6_CONFIG)
   Eeprom.writeUInt8(439, id);
 #elif defined(T2_CONFIG)
   Eeprom.writeUInt8(460, id);

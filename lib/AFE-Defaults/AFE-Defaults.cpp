@@ -135,7 +135,7 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG)
+    defined(T2_CONFIG) || defined(T6_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
 #elif defined(T3_CONFIG) || defined(T4_CONFIG)
   sprintf(RelayConfiguration.name, "switch1");
@@ -205,7 +205,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(0, SwitchConfiguration);
 
 #if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
-    defined(T5_CONFIG)
+    defined(T5_CONFIG) || defined(T6_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
 #elif defined(T3_CONFIG) || defined(T4_CONFIG)
@@ -214,7 +214,7 @@ void AFEDefaults::set() {
 #endif
 
 #if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
-    defined(T4_CONFIG) || defined(T5_CONFIG)
+    defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
