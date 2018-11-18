@@ -129,6 +129,24 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       sendHTTPAPIRequestStatus(request, false);
     }
   }
+
+#elif defined(T6_CONFIG)
+
+  /* Request related to gate */
+  if (strcmp(request.device, "particleSensor") == 0) {
+    uint16_t _pm25, _pm10 = 0;
+    ParticleSensor.get(&_pm25, &_pm10);
+    if (strcmp(request.name, "PM2.5") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, (float)_pm25, 4, 0);
+      }
+    } else if (strcmp(request.name, "PM10") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, (float)_pm10, 4, 0);
+      }
+    }
+  }
+
 #else
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {

@@ -113,6 +113,25 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #endif
 
+#if defined(T6_CONFIG)
+    if (Device.configuration.isHPMA115S0) {
+      uint16_t _pm25, _pm10 = 0;
+      ParticleSensor.get(&_pm25, &_pm10);
+      sprintf(_mqttTopic, "%sPM2.5/cmd", MQTTConfiguration.topic);
+      if (strcmp(topic, _mqttTopic) == 0) {
+        if ((char)payload[1] == 'e' && length == 3) { // get
+          MQTTPublishParticleSensorState(_pm25, HPMA115S0_TYPE_PM25);
+        }
+      } else {
+        sprintf(_mqttTopic, "%sPM10/cmd", MQTTConfiguration.topic);
+        if ((char)payload[1] == 'e' && length == 3) { // get
+          MQTTPublishParticleSensorState(_pm10, HPMA115S0_TYPE_PM10);
+        }
+      }
+    }
+
+#endif
+
 #else /* Gate */
 
     /* Contactrons */
@@ -309,6 +328,16 @@ void MQTTPublishGateState() {
                                          : gateState == GATE_PARTIALLY_OPEN
                                                ? "partiallyOpen"
                                                : "unknown");
+  }
+}
+#endif
+
+#if defined(T6_CONFIG)
+void MQTTPublishParticleSensorState(uint16_t value, byte type) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish(type == HPMA115S0_TYPE_PM25 ? "particle/PM2.5"
+                                             : "particle/PM10",
+                 value);
   }
 }
 #endif

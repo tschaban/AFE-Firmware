@@ -1851,7 +1851,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
   String body = "<fieldset>";
 
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Odczyty co" : "Read every";
+  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
   body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
@@ -1866,7 +1866,29 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
               ? ">Wysyłać dane tylko, gdy wartość PM2.5 lub PM10 "
                 "zmieni się"
               : ">Send data only if value of PM2.5 or PM10 has changed";
-  body += "</label></div>";
+  body += "</label></div><br><br>";
+  body += "<p class=\"cm\">";
+  body +=
+      language == 0
+          ? "Jeśli poniższa wartość jest większa od 0 to czujnik będzie "
+            "usypiany między odczytami. Wartość poniżej definiuje na ile "
+            "sekund przed odczytem czujnik ma zostać uruchomiony. Wartość musi "
+            "być mniejsza niż interwał pomiarów"
+          : "If the parameter below is different than 0, the sensor will go to "
+            "sleep mode between measurements. The setting below defined how "
+            "many seconds before a measurement the sensor should wake up. It "
+            "should be lower than measurement's interval";
+  body += "</p>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Pomiar po czasie" : "Measure after";
+  body += "</label><input name=\"t\" min=\"0\" max=\"999\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.timeToMeasure;
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 1 do 999sek"
+                        : "seconds. Range: 1 to 999sec";
+  body += "</span></div>";
 
   body += "</fieldset>";
 
@@ -1888,7 +1910,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
     body += "0 - 999999</span>";
     body += "</div>";
 
-    body += "<div class=\"cf\"><label>PM10";
+    body += "<div class=\"cf\"><label>IDX PM10";
     body += "</label><input name=\"x1\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
     body += configuration.idxPM10;

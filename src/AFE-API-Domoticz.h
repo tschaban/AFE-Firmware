@@ -83,6 +83,10 @@ public:
   void sendGateCommand(unsigned int idx, const char *value);
   void sendContactronCommand(unsigned int idx, const char *value);
 #endif
+
+#if defined(T6_CONFIG)
+  void sendCustomSensorCommand(unsigned int idx, uint16_t value);
+#endif
 };
 
 #endif

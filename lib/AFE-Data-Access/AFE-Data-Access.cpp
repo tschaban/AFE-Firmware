@@ -1159,8 +1159,8 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   HPMA115S0 configuration;
   configuration.interval = Eeprom.read(414, 5).toInt();
-  ;
   configuration.sendOnlyChanges = Eeprom.read(419);
+  configuration.timeToMeasure = Eeprom.read(420, 3).toInt();
   configuration.idxPM25 = Eeprom.read(936, 6).toInt();
   configuration.idxPM10 = Eeprom.read(942, 6).toInt();
   return configuration;
@@ -1169,6 +1169,7 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
 void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(414, 5, (long)configuration.interval);
   Eeprom.write(419, configuration.sendOnlyChanges);
+  Eeprom.write(420, 3, (long)configuration.timeToMeasure);
   Eeprom.write(936, 6, (long)configuration.idxPM25);
   Eeprom.write(942, 6, (long)configuration.idxPM10);
 }

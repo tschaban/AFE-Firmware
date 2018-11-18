@@ -15,8 +15,15 @@ void AFEUART::begin() {
 }
 
 void AFEUART::send(const uint8_t *cmd) {
+#ifdef DEBUG
+  Serial << endl << "UART: Sending commnad:  ";
+#endif
   for (uint8_t i = 0; i < sizeof(cmd); i++) {
     SerialBus.write(cmd[i]);
+#ifdef DEBUG
+    Serial << " 0x";
+    Serial.print(cmd[i], HEX);
+#endif
   }
   delay(10);
 }

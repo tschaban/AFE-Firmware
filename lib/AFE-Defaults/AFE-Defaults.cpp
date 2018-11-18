@@ -328,6 +328,7 @@ void AFEDefaults::set() {
 #if defined(T6_CONFIG)
   SensorHPMA115S0Configuration.interval = 60;
   SensorHPMA115S0Configuration.sendOnlyChanges = false;
+  SensorHPMA115S0Configuration.timeToMeasure = 0;
   SensorHPMA115S0Configuration.idxPM10 = 0;
   SensorHPMA115S0Configuration.idxPM25 = 0;
   Data->saveConfiguration(SensorHPMA115S0Configuration);

@@ -794,6 +794,10 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
     data.interval = server.arg("i").toInt();
   }
 
+  if (server.arg("t").length() > 0) {
+    data.timeToMeasure = server.arg("t").toInt();
+  }
+
   server.arg("o").length() > 0 ? data.sendOnlyChanges = true
                                : data.sendOnlyChanges = false;
 

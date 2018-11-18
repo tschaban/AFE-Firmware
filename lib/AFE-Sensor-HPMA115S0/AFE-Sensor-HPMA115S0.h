@@ -18,19 +18,17 @@
 #include <Streaming.h>
 #endif
 
-#define HPMA115S0_TYPE_PM25 0
-#define HPMA115S0_TYPE_PM10 1
-
 class AFESensorHPMA115S0 {
 
 private:
   const uint8_t commandRead[4] = {0x68, 0x01, 0x04, 0x93};
   const uint8_t commandAutoOFF[4] = {0x68, 0x01, 0x20, 0x77};
+  const uint8_t commandMeasuringON[4] = {0x68, 0x01, 0x01, 0x96};
+  const uint8_t commandMeasuringOFF[4] = {0x68, 0x01, 0x02, 0x95};
 
   /* HPMA115S00 commands not used
   const uint8_t commandAutoON[4] = {0x68, 0x01, 0x40, 0x57};
-  const uint8_t commandMeasuringON[4] = {0x68, 0x01, 0x01, 0x96};
-  const uint8_t commandMeasuringOFF[4] = {0x68, 0x01, 0x02, 0x95};
+
   */
 
   HPMA115S0 configuration;
@@ -42,6 +40,8 @@ private:
 
   AFEUART UART;
   unsigned long startTime = 0;
+
+  boolean _measuremntsON = false;
 
   /* Method reads the data from the sensor */
   boolean read();

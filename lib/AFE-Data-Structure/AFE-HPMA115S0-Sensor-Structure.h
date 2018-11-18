@@ -11,9 +11,13 @@
 #include "WProgram.h"
 #endif
 
+#define HPMA115S0_TYPE_PM25 0
+#define HPMA115S0_TYPE_PM10 1
+
 struct HPMA115S0 {
   uint16_t interval;
   boolean sendOnlyChanges;
+  uint16_t timeToMeasure;
   unsigned long idxPM25;
   unsigned long idxPM10;
 };
