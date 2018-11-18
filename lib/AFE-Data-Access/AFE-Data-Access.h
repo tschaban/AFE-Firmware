@@ -111,5 +111,12 @@ public:
   uint8_t getGateState();
   void saveGateState(uint8_t state);
 #endif
+
+#if defined(T6_CONFIG)
+  SERIALPORT getSerialPortConfiguration();
+  void saveConfiguration(SERIALPORT configuration);
+  HPMA115S0 getHPMA115S0SensorConfiguration();
+  void saveConfiguration(HPMA115S0 configuration);
+#endif
 };
 #endif

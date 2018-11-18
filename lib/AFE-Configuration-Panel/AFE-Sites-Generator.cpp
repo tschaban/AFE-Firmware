@@ -78,6 +78,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 #elif T5_CONFIG
   page += language == 0 ? "do kontrolowania sterownika bramy"
                         : "to control gate controller";
+#elif T6_CONFIG
+  page += language == 0 ? "Stacja Pogody" : "Wheater Station";
 #endif
 
   page += "</h4><h4>MENU</h4>"
@@ -268,6 +270,17 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 #endif
 
+/* UART */
+#if defined(T6_CONFIG)
+    if (Device.configuration.isHPMA115S0) {
+      page += "<li class=\"itm\"><a href=\"\\?option=UART\">UART</a></li>";
+      page += "<li class=\"itm\"><a href=\"\\?option=HPMA115S0\">";
+      page += language == 0 ? "Czujnik cząstek PM2.5/PM10"
+                            : "PM2.5/PM10 Particle Sensor";
+      page += "</a></li>";
+    }
+#endif
+
     /* Language, Upgrade, Exit */
     page += "<br><br><li class=\"itm\"><a "
             "href=\"\\?option=language\">[PL] Język / "
@@ -415,19 +428,24 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG) ||          \
+    defined(T6_CONFIG)
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
           "value=\"1\"";
 #if defined(T1_CONFIG)
   body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
-#else
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   body += configuration.isDHT ? " checked=\"checked\">" : ">";
+#elif defined(T6_CONFIG)
+  body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
 #endif
   body += language == 0 ? "Czujnik" : " Sensor";
 #if defined(T1_CONFIG)
   body += " DS18B20";
-#else
+#elif defined(T2_CONFIG) || defined(T5_CONFIG)
   body += " DHT";
+#elif defined(T6_CONFIG)
+  body += " HPMA115S0";
 #endif
   body += "</label></div>";
 #endif
@@ -900,7 +918,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   }
 #endif
 
-#if !defined(T3_CONFIG) /* Relay Time off / Impuls is not applicable for T3 */
+/* Relay Time off / Impuls is not applicable for T3 & T6 */
+#if !(defined(T3_CONFIG) || defined(T6_CONFIG))
   body += "<br><p class=\"cm\">";
   body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
                         : "Automatic switching off of the relay";
@@ -934,7 +953,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</span>";
   body += "</div>";
 
-#endif /* T3 exclusion end */
+#endif /* T3/T6 exclusion end */
 
 #ifdef T1_CONFIG
   if (device.isDS18B20)
@@ -1823,6 +1842,88 @@ const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
 }
 #endif
 
+#if defined(T6_CONFIG)
+String AFESitesGenerator::addHPMA115S0Configuration() {
+
+  HPMA115S0 configuration = Data.getHPMA115S0SensorConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Odczyty co" : "Read every";
+  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.interval;
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
+                        : "seconds. Range: 5 to 86400sec";
+  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
+          "type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body += language == 0
+              ? ">Wysyłać dane tylko, gdy wartość PM2.5 lub PM10 "
+                "zmieni się"
+              : ">Send data only if value of PM2.5 or PM10 has changed";
+  body += "</label></div>";
+
+  body += "</fieldset>";
+
+  String page =
+      addConfigurationBlock(language == 0 ? "Czujnik cząstek PM2.5/PM10"
+                                          : "PM2.5/PM10 Particle Sensor",
+                            "", body);
+
+  if (device.domoticzAPI) {
+    body = "<fieldset>";
+    body += "<div class=\"cf\"><label> ";
+    body += "IDX PM2.5 </label>";
+    body += "<input name=\"x2\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idxPM25;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>PM10";
+    body += "</label><input name=\"x1\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idxPM10;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "</fieldset>";
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  return page;
+}
+
+String AFESitesGenerator::addSerialPortConfiguration() {
+  SERIALPORT configuration = Data.getSerialPortConfiguration();
+
+  String body = "<fieldset>";
+
+  body += generateConfigParameter_GPIO("r", configuration.RXD, "GPIO RXD");
+  body += generateConfigParameter_GPIO("t", configuration.TXD, "GPIO TXD");
+
+  body += "</fieldset>";
+  return addConfigurationBlock("UART", "", body);
+  ;
+}
+#endif
+
 String AFESitesGenerator::addUpgradeSection() {
   String body = "<fieldset><div class=\"cf\"><label>";
   body += language == 0 ? "Wybierz" : "Select";
@@ -2015,9 +2116,11 @@ String AFESitesGenerator::addConfigurationBlock(const String title,
   return page;
 }
 
-const String AFESitesGenerator::generateConfigParameter_GPIO(const char *field,
-                                                             uint8_t selected) {
-  String page = "<div class=\"cf\"><label>GPIO</label><select name=\"";
+const String AFESitesGenerator::generateConfigParameter_GPIO(
+    const char *field, uint8_t selected, const String title) {
+  String page = "<div class=\"cf\"><label>";
+  page += title;
+  page += "</label><select name=\"";
   page += field;
   page += "\">";
   for (uint8_t i = 0; i <= 16; i++) {
