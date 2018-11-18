@@ -105,6 +105,22 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getLEDConfigurationSite(command, data, dataLedID));
 #endif
+#if defined(T6_CONFIG)
+  } else if (optionName == "UART") {
+    SERIALPORT data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getSerialPortData();
+    }
+    publishHTML(
+        ConfigurationPanel.getSerialPortConfigurationSite(command, data));
+  } else if (optionName == "HPMA115S0") {
+    HPMA115S0 data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getHPMA115S0SensorData();
+    }
+    publishHTML(
+        ConfigurationPanel.getHPMA115S0SesnorConfigurationSite(command, data));
+#endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
@@ -334,6 +350,11 @@ DEVICE AFEWebServer::getDeviceData() {
   }
 #endif
 
+#if defined(T6_CONFIG)
+  server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
+                                : data.isHPMA115S0 = false;
+#endif
+
   return data;
 }
 
@@ -467,7 +488,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
 
-#if !defined(T3_CONFIG)
+#if !(defined(T3_CONFIG) || defined(T6_CONFIG))
   if (server.arg("ot" + String(id)).length() > 0) {
     data.timeToOff = server.arg("ot" + String(id)).toFloat();
   }
@@ -753,4 +774,40 @@ DH AFEWebServer::getDHTData() {
 
   return data;
 }
+#endif
+
+#if defined(T6_CONFIG)
+SERIALPORT AFEWebServer::getSerialPortData() {
+  SERIALPORT data;
+  if (server.arg("r").length() > 0) {
+    data.RXD = server.arg("r").toInt();
+  }
+  if (server.arg("t").length() > 0) {
+    data.TXD = server.arg("t").toInt();
+  }
+  return data;
+}
+
+HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
+  HPMA115S0 data;
+  if (server.arg("i").length() > 0) {
+    data.interval = server.arg("i").toInt();
+  }
+
+  if (server.arg("t").length() > 0) {
+    data.timeToMeasure = server.arg("t").toInt();
+  }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  if (server.arg("x2").length() > 0) {
+    data.idxPM25 = server.arg("x2").toInt();
+  }
+
+  if (server.arg("x1").length() > 0) {
+    data.idxPM10 = server.arg("x1").toInt();
+  }
+  return data;
+};
 #endif

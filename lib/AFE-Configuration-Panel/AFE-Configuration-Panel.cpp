@@ -333,6 +333,40 @@ String AFEConfigurationPanel::getGateConfigurationSite(const String option,
 }
 #endif
 
+#if defined(T6_CONFIG)
+String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
+                                                             SERIALPORT data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=UART&cmd=1\"  method=\"post\">";
+  page += Site.addSerialPortConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+String
+AFEConfigurationPanel::getHPMA115S0SesnorConfigurationSite(uint8_t command,
+                                                           HPMA115S0 data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=HPMA115S0&cmd=1\"  method=\"post\">";
+  page += Site.addHPMA115S0Configuration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+#endif
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);

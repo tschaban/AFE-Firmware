@@ -29,6 +29,9 @@ void AFEDefaults::set() {
   DH SensorConfiguration;
   CONTACTRON ContactronConfiguration;
   GATE GateConfiguration;
+#elif defined(T6_CONFIG)
+  HPMA115S0 SensorHPMA115S0Configuration;
+  SERIALPORT SerialPortConfiguration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -90,6 +93,11 @@ void AFEDefaults::set() {
   }
 #endif
 
+/* HPMA115S0 Sesnor */
+#if defined(T6_CONFIG)
+  deviceConfiguration.isHPMA115S0 = false;
+#endif
+
   Data->saveConfiguration(deviceConfiguration);
 
   /* Network default config */
@@ -127,7 +135,7 @@ void AFEDefaults::set() {
   RelayConfiguration.timeToOff = 200;
 #else /* Configuration not related to T5 */
 
-#if !defined(T3_CONFIG) /* Not used in T3 */
+#if !(defined(T3_CONFIG) || defined(T6_CONFIG)) /* Not used in T3 & T6*/
   RelayConfiguration.timeToOff = 0;
 #endif
 
@@ -135,7 +143,7 @@ void AFEDefaults::set() {
   RelayConfiguration.stateMQTTConnected = 0;
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG)
+    defined(T2_CONFIG) || defined(T6_CONFIG)
   sprintf(RelayConfiguration.name, "switch");
 #elif defined(T3_CONFIG) || defined(T4_CONFIG)
   sprintf(RelayConfiguration.name, "switch1");
@@ -205,7 +213,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(0, SwitchConfiguration);
 
 #if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
-    defined(T5_CONFIG)
+    defined(T5_CONFIG) || defined(T6_CONFIG)
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.type = 1;
 #elif defined(T3_CONFIG) || defined(T4_CONFIG)
@@ -214,7 +222,7 @@ void AFEDefaults::set() {
 #endif
 
 #if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
-    defined(T4_CONFIG) || defined(T5_CONFIG)
+    defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
   SwitchConfiguration.functionality = 1;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
@@ -313,6 +321,21 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(GateConfiguration);
   Data->saveGateState(0);
+
+#endif
+
+/* T6 HPMA115S0 Sensor */
+#if defined(T6_CONFIG)
+  SensorHPMA115S0Configuration.interval = 60;
+  SensorHPMA115S0Configuration.sendOnlyChanges = false;
+  SensorHPMA115S0Configuration.timeToMeasure = 0;
+  SensorHPMA115S0Configuration.idxPM10 = 0;
+  SensorHPMA115S0Configuration.idxPM25 = 0;
+  Data->saveConfiguration(SensorHPMA115S0Configuration);
+
+  SerialPortConfiguration.RXD = 4;
+  SerialPortConfiguration.TXD = 5;
+  Data->saveConfiguration(SerialPortConfiguration);
 
 #endif
 

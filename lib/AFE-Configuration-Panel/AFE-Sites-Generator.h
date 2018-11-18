@@ -29,8 +29,8 @@ private:
   uint8_t language;
 
   /* Method generates GPIO selecton list */
-  const String generateConfigParameter_GPIO(const char *field,
-                                            uint8_t selected);
+  const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
+                                            const String title = "GPIO");
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
@@ -93,6 +93,11 @@ public:
 #if defined(T5_CONFIG)
   String addGateConfiguration();
   String addContactronConfiguration(uint8_t id);
+#endif
+
+#if defined(T6_CONFIG)
+  String addHPMA115S0Configuration();
+  String addSerialPortConfiguration();
 #endif
 
   /* These methods generates firmware upgrade sections */

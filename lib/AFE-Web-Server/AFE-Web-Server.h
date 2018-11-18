@@ -79,6 +79,11 @@ private:
   GATE getGateData();
 #endif
 
+#if defined(T6_CONFIG)
+  SERIALPORT getSerialPortData();
+  HPMA115S0 getHPMA115S0SensorData();
+#endif
+
   uint8_t getLanguageData();
 
 public:

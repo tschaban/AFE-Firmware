@@ -58,6 +58,11 @@ struct DEVICE {
   boolean isRelay[1];
   boolean isContactron[2];
   boolean isDHT;
+#elif defined(T6_CONFIG)
+  boolean isLED[2];
+  boolean isSwitch[2];
+  boolean isRelay[1];
+  boolean isHPMA115S0;
 #endif
 };
 

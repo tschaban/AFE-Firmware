@@ -78,6 +78,11 @@ public:
                                   GATE data);
 #endif
 
+#if defined(T6_CONFIG)
+  String getSerialPortConfigurationSite(uint8_t command, SERIALPORT data);
+  String getHPMA115S0SesnorConfigurationSite(uint8_t command, HPMA115S0 data);
+#endif
+
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();
 

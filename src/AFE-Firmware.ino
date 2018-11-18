@@ -8,6 +8,7 @@ This code combains AFE Firmware versions:
    - T3 (PIRs)
    - T4 (Up to 4 relays)
    - T5 Gate
+   - T6 Wheater station
 
 More about the versions (PL): https://www.smartnydom.pl/afe-firmware-pl/wersje/
 LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
@@ -78,6 +79,11 @@ GATE GateState;
 AFEGate Gate;
 uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
 byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
+#endif
+
+#if defined(T6_CONFIG)
+#include <AFE-Sensor-HPMA115S0.h>
+AFESensorHPMA115S0 ParticleSensor;
 #endif
 
 void setup() {
@@ -172,11 +178,19 @@ void setup() {
   Serial << endl << "Switch(es) initialized";
 #endif
 
-  /* Initializing DS18B20 pr DHTxx sensor */
+  /* Initializing DS18B20 or DHTxx sensor */
 #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   initSensor();
 #ifdef DEBUG
   Serial << endl << "Sensors initialized";
+#endif
+#endif
+
+/* Initializing HPMA115S0 sesnor */
+#if defined(T6_CONFIG)
+  initHPMA115S0Sensor();
+#ifdef DEBUG
+  Serial << endl << "HPMS Sensors initialized";
 #endif
 #endif
 
@@ -243,6 +257,11 @@ void loop() {
 #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
         /* Sensor: DS18B20 or DHT related code */
         mainSensor();
+#endif
+
+/* Sensor: HPMA115S0 related code */
+#if defined(T6_CONFIG)
+        mainHPMA115S0Sensor();
 #endif
 
 #if defined(T3_CONFIG)

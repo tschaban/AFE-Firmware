@@ -42,4 +42,9 @@
 #include <AFE-GATE-Structure.h>
 #endif
 
+#ifdef T6_CONFIG
+#include <AFE-HPMA115S0-Sensor-Structure.h>
+#include <AFE-SERIALPORT-Structure.h>
+#endif
+
 #endif

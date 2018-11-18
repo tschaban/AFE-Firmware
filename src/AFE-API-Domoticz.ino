@@ -80,7 +80,6 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 
 #if defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
-
   if (initialized) {
     char _humidityChar[7];
     dtostrf(value, 5, 2, _humidityChar);
@@ -138,5 +137,16 @@ void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
 
 void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
+}
+#endif
+
+#if defined(T6_CONFIG)
+void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, uint16_t value) {
+  if (initialized) {
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    call += value;
+    callURL(call);
+  }
 }
 #endif

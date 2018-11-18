@@ -29,7 +29,7 @@ private:
   void upgradeToVersion110();
 #endif
 
-#if !defined(T0_SHELLY_1_CONFIG)
+#if !(defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG))
   /* Methods upgrades to v1.2.0 */
   void upgradeToVersion120();
 #endif
