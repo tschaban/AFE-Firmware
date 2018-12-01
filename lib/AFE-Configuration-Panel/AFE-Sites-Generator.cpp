@@ -1027,6 +1027,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
+#if !defined(T5_CONFIG)
   if (device.domoticzAPI) {
     body = "<fieldset>";
     body += "<div class=\"cf\">";
@@ -1048,6 +1049,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
             : "If IDX is set to 0 then a value won't be sent to Domoticz",
         body);
   }
+#endif
 
   return page;
 }
