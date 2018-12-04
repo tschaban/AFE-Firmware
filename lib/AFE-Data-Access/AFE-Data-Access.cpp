@@ -1185,4 +1185,19 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(411, configuration.RXD);
   Eeprom.writeUInt8(412, configuration.TXD);
 }
+
+BME680 AFEDataAccess::getBME680SensorConfiguration() {
+  BME680 configuration;
+  configuration.type = 0;
+  configuration.interval = 2;
+  configuration.sendOnlyChanges = false;
+  configuration.temperatureIdx = 0;
+  configuration.humidityIdx = 0;
+  configuration.pressureIdx = 0;
+  configuration.gasIdx = 0;
+  configuration.temperatureAndHumidityIdx = 0;
+  return configuration;
+}
+
+void AFEDataAccess::saveConfiguration(BME680 configuration) {}
 #endif

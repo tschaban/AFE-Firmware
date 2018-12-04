@@ -82,13 +82,15 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
 #if defined(T6_CONFIG)
+#include <AFE-Sensor-BME680.h>
 #include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
+AFESensorBME680 BME680Sensor;
 #endif
 
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(10);
 
 /* Turn off publishing information to Serial for production compilation */
@@ -186,12 +188,10 @@ void setup() {
 #endif
 #endif
 
-/* Initializing HPMA115S0 sesnor */
+/* Initializing T6 sesnors */
 #if defined(T6_CONFIG)
   initHPMA115S0Sensor();
-#ifdef DEBUG
-  Serial << endl << "HPMS Sensors initialized";
-#endif
+
 #endif
 
 #if defined(T3_CONFIG)
@@ -262,6 +262,7 @@ void loop() {
 /* Sensor: HPMA115S0 related code */
 #if defined(T6_CONFIG)
         mainHPMA115S0Sensor();
+        mainBME680Sensor();
 #endif
 
 #if defined(T3_CONFIG)

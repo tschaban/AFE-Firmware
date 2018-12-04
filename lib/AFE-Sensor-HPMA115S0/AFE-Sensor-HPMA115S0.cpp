@@ -153,7 +153,7 @@ void AFESensorHPMA115S0::listener() {
              (currentPM25 != _bufferPM25 || currentPM10 != _bufferPM10))) {
           currentPM25 = _bufferPM25;
           currentPM10 = _bufferPM10;
-          if (currentPM25 != 0 || currentPM10 != 0) {
+          if (currentPM25 != 0 && currentPM10 != 0) {
             ready = true;
           }
         }
