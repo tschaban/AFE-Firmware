@@ -25,4 +25,11 @@ struct BME680 {
   unsigned long temperatureAndHumidityIdx;
 };
 
+struct BME680_DATA {
+  float temperature;
+  float humidity;
+  float pressure;
+  float gasResistance;
+};
+
 #endif

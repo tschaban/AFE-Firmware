@@ -88,7 +88,7 @@ void DomoticzPublishContactronState(uint8_t id) {
 
 #if defined(T6_CONFIG)
 /* It publishes gate state to Domotucz */
-void DomoticzPublishParticleSensorState(uint16_t value, byte type) {
+void DomoticzPublishParticleSensorData(uint16_t value, byte type) {
 
   unsigned long idx = ParticleSensor.getDomoticzIDX(type);
   if (Device.configuration.domoticzAPI && idx > 0) {

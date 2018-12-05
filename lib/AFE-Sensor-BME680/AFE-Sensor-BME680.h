@@ -14,19 +14,18 @@
 #include <AFE-Data-Access.h>
 #include <Adafruit_BME680.h>
 
-#define SEALEVELPRESSURE_HPA (1013.25)
-
 class AFESensorBME680 {
 
 private:
   BME680 configuration;
-
-  float currentTemperature = -127;
+  BME680_DATA sensorData;
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
 
   Adafruit_BME680 bme;
+
+  BME680_DATA get();
 
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
@@ -34,16 +33,7 @@ public:
 
   void begin();
 
-  /* Get current temp in Celsius (default) possible options:
-     - UNIT_CELCIUS
-    - UNIT_FAHRENHEIT
-  */
-
-  // @TODO I think reading temp should be made in the listener, issue to solve
-  // how to get temperature but publish only changes
-  float get();
-
-  float getLatestData();
+  BME680_DATA getLatestData();
 
   boolean isReady();
 

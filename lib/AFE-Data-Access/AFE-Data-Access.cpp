@@ -134,6 +134,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
   configuration.isHPMA115S0 = Eeprom.read(413);
 
+  configuration.isBME680 = true;
+
 #endif
 
 /* T1,T2,T3: Sensors */

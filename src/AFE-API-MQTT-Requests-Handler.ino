@@ -120,12 +120,12 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       sprintf(_mqttTopic, "%sPM2.5/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
-          MQTTPublishParticleSensorState(_pm25, HPMA115S0_TYPE_PM25);
+          MQTTPublishParticleSensorData(_pm25, HPMA115S0_TYPE_PM25);
         }
       } else {
         sprintf(_mqttTopic, "%sPM10/cmd", MQTTConfiguration.topic);
         if ((char)payload[1] == 'e' && length == 3) { // get
-          MQTTPublishParticleSensorState(_pm10, HPMA115S0_TYPE_PM10);
+          MQTTPublishParticleSensorData(_pm10, HPMA115S0_TYPE_PM10);
         }
       }
     }
@@ -333,11 +333,28 @@ void MQTTPublishGateState() {
 #endif
 
 #if defined(T6_CONFIG)
-void MQTTPublishParticleSensorState(uint16_t value, byte type) {
+void MQTTPublishParticleSensorData(uint16_t value, byte type) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish(type == HPMA115S0_TYPE_PM25 ? "particle/PM2.5"
                                              : "particle/PM10",
                  value);
   }
 }
+void MQTTPublishBME680SensorData(BME680_DATA data) {
+  if (Device.configuration.mqttAPI) {
+    String messageString = "{'temperature':'";
+    messageString += data.temperature;
+    messageString += "','humidity':'";
+    messageString += data.humidity;
+    messageString += "','pressure':'";
+    messageString += data.pressure;
+    messageString += "','gasResistance':'";
+    messageString += data.gasResistance;
+    messageString += "'}";
+    char message[messageString.length() + 1];
+    messageString.toCharArray(message, messageString.length() + 1);
+    Mqtt.publish("bme680/all", message);
+  }
+}
+
 #endif

@@ -4,7 +4,7 @@
 
 #include "AFE-Sensor-BME680.h"
 
-AFESensorBME680::AFESensorBME680(){};
+AFESensorBME680::AFESensorBME680() { begin(); };
 
 void AFESensorBME680::begin() {
   AFEDataAccess Data;
@@ -31,15 +31,21 @@ void AFESensorBME680::begin() {
   // Set up oversampling and filter initialization
 }
 
-float AFESensorBME680::get() {
-  if (_initialized) {
+BME680_DATA AFESensorBME680::get() {
+  BME680_DATA data;
+  data.temperature = data.pressure = data.humidity = data.gasResistance = 0;
+  if (bme.performReading()) {
+    data.temperature = bme.temperature;
+    data.pressure = bme.pressure / 100.0;
+    data.humidity = bme.humidity;
+    data.gasResistance = bme.gas_resistance / 1000;
   }
-  return 0;
+  return data;
 }
 
-float AFESensorBME680::getLatestData() {
+BME680_DATA AFESensorBME680::getLatestData() {
   ready = false;
-  return currentTemperature;
+  return sensorData;
 }
 
 boolean AFESensorBME680::isReady() {
@@ -60,11 +66,33 @@ void AFESensorBME680::listener() {
     }
 
     if (time - startTime >= configuration.interval * 1000) {
-      float data = get();
-      if (!configuration.sendOnlyChanges) {
-        ready = true;
-        startTime = 0;
+#if DEBUG
+      Serial << endl << "Reading BME680";
+#endif
+      BME680_DATA data = get();
+
+#if DEBUG
+      Serial << endl
+             << "T=" << data.temperature << ", H=" << data.humidity
+             << ", P=" << data.pressure << ", G=" << data.gasResistance;
+#endif
+
+      if (data.temperature != 0 && data.pressure != 0 && data.humidity != 0 &&
+          data.gasResistance != 0) {
+        if (!configuration.sendOnlyChanges ||
+            data.temperature != sensorData.temperature ||
+            data.pressure != sensorData.pressure ||
+            data.humidity != sensorData.humidity ||
+            data.gasResistance != sensorData.gasResistance) {
+
+          sensorData.temperature = data.temperature;
+          sensorData.pressure = data.pressure;
+          sensorData.humidity = data.humidity;
+          sensorData.gasResistance = data.gasResistance;
+          ready = true;
+        }
       }
+      startTime = 0;
     }
   }
 }
