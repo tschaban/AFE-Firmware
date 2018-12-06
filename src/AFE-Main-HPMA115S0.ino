@@ -14,13 +14,10 @@ void mainHPMA115S0Sensor() {
       /* Sensor: listener */
       ParticleSensor.listener();
       if (ParticleSensor.isReady()) {
-        uint16_t pm25, pm10;
-        ParticleSensor.get(&pm25, &pm10);
-        MQTTPublishParticleSensorData(pm25, HPMA115S0_TYPE_PM25);
-        MQTTPublishParticleSensorData(pm10, HPMA115S0_TYPE_PM10);
-        DomoticzPublishParticleSensorData(pm25, HPMA115S0_TYPE_PM25);
-        delay(10);
-        DomoticzPublishParticleSensorData(pm10, HPMA115S0_TYPE_PM10);
+        HPMA115S0_DATA sensorData;
+        sensorData = ParticleSensor.get();
+        MQTTPublishParticleSensorData(sensorData);
+        DomoticzPublishParticleSensorData(sensorData);
       }
     }
   }

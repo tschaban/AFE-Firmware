@@ -32,18 +32,6 @@ void AFESensorBME680::begin() {
 }
 
 BME680_DATA AFESensorBME680::get() {
-  BME680_DATA data;
-  data.temperature = data.pressure = data.humidity = data.gasResistance = 0;
-  if (bme.performReading()) {
-    data.temperature = bme.temperature;
-    data.pressure = bme.pressure / 100.0;
-    data.humidity = bme.humidity;
-    data.gasResistance = bme.gas_resistance / 1000;
-  }
-  return data;
-}
-
-BME680_DATA AFESensorBME680::getLatestData() {
   ready = false;
   return sensorData;
 }
@@ -69,7 +57,15 @@ void AFESensorBME680::listener() {
 #if DEBUG
       Serial << endl << "Reading BME680";
 #endif
-      BME680_DATA data = get();
+      BME680_DATA data;
+      data.temperature = data.pressure = data.humidity = data.gasResistance =
+          -1;
+      if (bme.performReading()) {
+        data.temperature = bme.temperature;
+        data.pressure = bme.pressure / 100.0;
+        data.humidity = bme.humidity;
+        data.gasResistance = bme.gas_resistance / 1000;
+      }
 
 #if DEBUG
       Serial << endl
@@ -77,8 +73,8 @@ void AFESensorBME680::listener() {
              << ", P=" << data.pressure << ", G=" << data.gasResistance;
 #endif
 
-      if (data.temperature != 0 && data.pressure != 0 && data.humidity != 0 &&
-          data.gasResistance != 0) {
+      if (data.temperature != -1 && data.pressure != -1 &&
+          data.humidity != -1 && data.gasResistance != -1) {
         if (!configuration.sendOnlyChanges ||
             data.temperature != sensorData.temperature ||
             data.pressure != sensorData.pressure ||
@@ -97,4 +93,6 @@ void AFESensorBME680::listener() {
   }
 }
 
-unsigned long AFESensorBME680::getDomoticzIDX() { return 0; }
+void AFESensorBME680::getDomoticzIDX(BME680_DOMOTICZ *idx) {
+  *idx = configuration.idx;
+}

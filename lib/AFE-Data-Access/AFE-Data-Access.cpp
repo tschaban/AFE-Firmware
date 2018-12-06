@@ -1193,11 +1193,9 @@ BME680 AFEDataAccess::getBME680SensorConfiguration() {
   configuration.type = 0;
   configuration.interval = 2;
   configuration.sendOnlyChanges = false;
-  configuration.temperatureIdx = 0;
-  configuration.humidityIdx = 0;
-  configuration.pressureIdx = 0;
-  configuration.gasIdx = 0;
-  configuration.temperatureAndHumidityIdx = 0;
+  configuration.idx.temperatureAndHumidity = 35;
+  configuration.idx.pressure = 2;
+  configuration.idx.gasResistance = 34;
   return configuration;
 }
 

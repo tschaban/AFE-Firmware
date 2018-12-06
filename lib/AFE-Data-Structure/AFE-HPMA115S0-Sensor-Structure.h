@@ -22,4 +22,9 @@ struct HPMA115S0 {
   unsigned long idxPM10;
 };
 
+struct HPMA115S0_DATA {
+  uint16_t pm10;
+  uint16_t pm25;
+};
+
 #endif

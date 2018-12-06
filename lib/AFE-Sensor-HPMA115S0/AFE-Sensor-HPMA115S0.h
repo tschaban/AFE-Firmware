@@ -32,8 +32,8 @@ private:
   */
 
   HPMA115S0 configuration;
-  uint16_t currentPM25, _bufferPM25 = 0;
-  uint16_t currentPM10, _bufferPM10 = 0;
+  HPMA115S0_DATA current;
+  HPMA115S0_DATA buffer;
 
   boolean ready = false;
   boolean _initialized = false;
@@ -54,7 +54,7 @@ public:
   void begin();
 
   /* returns PM2.5 and PM10 */
-  void get(uint16_t *pm25, uint16_t *pm10);
+  HPMA115S0_DATA get();
 
   /* Is true when data has been read from the sensor */
   boolean isReady();

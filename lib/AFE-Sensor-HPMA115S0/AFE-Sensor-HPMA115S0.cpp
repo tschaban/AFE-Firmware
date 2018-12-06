@@ -14,6 +14,8 @@ void AFESensorHPMA115S0::begin() {
   UART.begin();
   _initialized = true;
 
+  current.pm10 = current.pm25 = buffer.pm10 = buffer.pm25 = 0;
+
   /* Turning off automatic data sending from the sensor */
 
   UART.send(commandAutoOFF);
@@ -102,11 +104,11 @@ boolean AFESensorHPMA115S0::read() {
     checkSumToCompare = (65536 - checkSumToCompare) % 256;
 
     if (checkSumToCompare == responseBuffer[counter]) {
-      _bufferPM25 = responseBuffer[3] * 256 + responseBuffer[4];
-      _bufferPM10 = responseBuffer[5] * 256 + responseBuffer[6];
+      buffer.pm25 = responseBuffer[3] * 256 + responseBuffer[4];
+      buffer.pm10 = responseBuffer[5] * 256 + responseBuffer[6];
 #ifdef DEBUG
-      Serial << " Success (PM2.5=" << _bufferPM25 << "ug/m3, "
-             << "PM10=" << _bufferPM10 << "ug/m3)";
+      Serial << " Success (PM2.5=" << buffer.pm25 << "ug/m3, "
+             << "PM10=" << buffer.pm10 << "ug/m3)";
 #endif
       return true;
     } else {
@@ -125,10 +127,7 @@ boolean AFESensorHPMA115S0::read() {
   return false;
 }
 
-void AFESensorHPMA115S0::get(uint16_t *pm25, uint16_t *pm10) {
-  *pm25 = currentPM25;
-  *pm10 = currentPM10;
-}
+HPMA115S0_DATA AFESensorHPMA115S0::get() { return current; }
 
 boolean AFESensorHPMA115S0::isReady() {
   if (ready) {
@@ -150,10 +149,10 @@ void AFESensorHPMA115S0::listener() {
       if (read()) {
         if (!configuration.sendOnlyChanges ||
             (configuration.sendOnlyChanges &&
-             (currentPM25 != _bufferPM25 || currentPM10 != _bufferPM10))) {
-          currentPM25 = _bufferPM25;
-          currentPM10 = _bufferPM10;
-          if (currentPM25 != 0 && currentPM10 != 0) {
+             (current.pm25 != buffer.pm25 || current.pm10 != buffer.pm10))) {
+          current.pm25 = buffer.pm25;
+          current.pm10 = buffer.pm10;
+          if (current.pm25 != 0 && current.pm10 != 0) {
             ready = true;
           }
         }

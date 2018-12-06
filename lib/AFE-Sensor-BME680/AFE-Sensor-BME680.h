@@ -25,15 +25,13 @@ private:
 
   Adafruit_BME680 bme;
 
-  BME680_DATA get();
-
 public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
   void begin();
 
-  BME680_DATA getLatestData();
+  BME680_DATA get();
 
   boolean isReady();
 
@@ -42,7 +40,7 @@ public:
   void listener();
 
   /* Return relay IDX in Domoticz */
-  unsigned long getDomoticzIDX();
+  void getDomoticzIDX(BME680_DOMOTICZ *idx);
 };
 
 #endif

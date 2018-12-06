@@ -115,17 +115,23 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #if defined(T6_CONFIG)
     if (Device.configuration.isHPMA115S0) {
-      uint16_t _pm25, _pm10 = 0;
-      ParticleSensor.get(&_pm25, &_pm10);
-      sprintf(_mqttTopic, "%sPM2.5/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%sparticle/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
-          MQTTPublishParticleSensorData(_pm25, HPMA115S0_TYPE_PM25);
+          HPMA115S0_DATA sensorData;
+          sensorData = ParticleSensor.get();
+          MQTTPublishParticleSensorData(sensorData);
         }
-      } else {
-        sprintf(_mqttTopic, "%sPM10/cmd", MQTTConfiguration.topic);
+      }
+    }
+
+    if (Device.configuration.isBME680) {
+      sprintf(_mqttTopic, "%sbme680/cmd", MQTTConfiguration.topic);
+      if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
-          MQTTPublishParticleSensorData(_pm10, HPMA115S0_TYPE_PM10);
+          BME680_DATA sensorData;
+          sensorData = BME680Sensor.get();
+          MQTTPublishBME680SensorData(sensorData);
         }
       }
     }
@@ -333,13 +339,19 @@ void MQTTPublishGateState() {
 #endif
 
 #if defined(T6_CONFIG)
-void MQTTPublishParticleSensorData(uint16_t value, byte type) {
+void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.mqttAPI) {
-    Mqtt.publish(type == HPMA115S0_TYPE_PM25 ? "particle/PM2.5"
-                                             : "particle/PM10",
-                 value);
+    String messageString = "{'PM2.5':'";
+    messageString += data.pm25;
+    messageString += "','PM10':'";
+    messageString += data.pm10;
+    messageString += "'}";
+    char message[messageString.length() + 1];
+    messageString.toCharArray(message, messageString.length() + 1);
+    Mqtt.publish("particle/all", message);
   }
 }
+
 void MQTTPublishBME680SensorData(BME680_DATA data) {
   if (Device.configuration.mqttAPI) {
     String messageString = "{'temperature':'";
