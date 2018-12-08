@@ -66,9 +66,9 @@ void AFEUpgrader::upgrade() {
     }
 #endif
 
-    Data.saveVersion(String(FIRMWARE_VERSION));
-
 #endif
+
+    Data.saveVersion(String(FIRMWARE_VERSION));
   }
 }
 

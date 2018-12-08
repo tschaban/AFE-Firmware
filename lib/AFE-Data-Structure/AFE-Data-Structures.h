@@ -43,6 +43,7 @@
 #endif
 
 #ifdef T6_CONFIG
+#include <AFE-BME680-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
 #include <AFE-SERIALPORT-Structure.h>
 #endif

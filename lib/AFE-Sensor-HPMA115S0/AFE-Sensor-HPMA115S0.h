@@ -18,13 +18,15 @@
 #include <Streaming.h>
 #endif
 
+#define HPMA115S0_RETRY 5
+
 class AFESensorHPMA115S0 {
 
 private:
   const uint8_t commandRead[4] = {0x68, 0x01, 0x04, 0x93};
   const uint8_t commandAutoOFF[4] = {0x68, 0x01, 0x20, 0x77};
-  const uint8_t commandMeasuringON[4] = {0x68, 0x01, 0x01, 0x96};
-  const uint8_t commandMeasuringOFF[4] = {0x68, 0x01, 0x02, 0x95};
+  const uint8_t commandTurnON[4] = {0x68, 0x01, 0x01, 0x96};
+  const uint8_t commandTurnOFF[4] = {0x68, 0x01, 0x02, 0x95};
 
   /* HPMA115S00 commands not used
   const uint8_t commandAutoON[4] = {0x68, 0x01, 0x40, 0x57};
@@ -32,8 +34,8 @@ private:
   */
 
   HPMA115S0 configuration;
-  uint16_t currentPM25, _bufferPM25 = 0;
-  uint16_t currentPM10, _bufferPM10 = 0;
+  HPMA115S0_DATA current;
+  HPMA115S0_DATA buffer;
 
   boolean ready = false;
   boolean _initialized = false;
@@ -42,9 +44,10 @@ private:
   unsigned long startTime = 0;
 
   boolean _measuremntsON = false;
+  boolean _autoReading = true;
 
   /* Method reads the data from the sensor */
-  boolean read();
+  boolean read(boolean expectingACK = false);
 
 public:
   /* Constructor */
@@ -54,7 +57,7 @@ public:
   void begin();
 
   /* returns PM2.5 and PM10 */
-  void get(uint16_t *pm25, uint16_t *pm10);
+  HPMA115S0_DATA get();
 
   /* Is true when data has been read from the sensor */
   boolean isReady();
@@ -63,8 +66,11 @@ public:
    * changes */
   void listener();
 
+  boolean sendCommand(const uint8_t *command,
+                      uint8_t howManyTimesRetry = HPMA115S0_RETRY);
+
   /* Return relay IDX in Domoticz */
-  unsigned long getDomoticzIDX(byte type);
+  void getDomoticzIDX(HPMA115S0_DOMOTICZ *idx);
 };
 
 #endif

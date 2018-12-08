@@ -82,13 +82,15 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
 #if defined(T6_CONFIG)
+#include <AFE-Sensor-BME680.h>
 #include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
+AFESensorBME680 BME680Sensor;
 #endif
 
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(10);
 
 /* Turn off publishing information to Serial for production compilation */
@@ -97,7 +99,12 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "All classes and global variables initialized";
+  Serial << endl
+         << endl
+         << "################################ BOOTING "
+            "################################"
+         << endl
+         << "All classes and global variables initialized";
 #endif
 
   /* Checking if the device is launched for a first time. If so it loades
@@ -163,57 +170,54 @@ void setup() {
   Serial << endl << "WebServer initialized";
 #endif
 
-/* Initializing Gate */
-#if defined(T5_CONFIG)
-  Gate.begin();
-  GateState = Data.getGateConfiguration();
-#ifdef DEBUG
-  Serial << endl << "Gate initialized";
-#endif
-#endif
-
   /* Initializing switches */
   initSwitch();
 #ifdef DEBUG
   Serial << endl << "Switch(es) initialized";
 #endif
 
-  /* Initializing DS18B20 or DHTxx sensor */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
-  initSensor();
+  if (Device.getMode() == MODE_NORMAL) {
+
+/* Initializing Gate */
+#if defined(T5_CONFIG)
+    Gate.begin();
+    GateState = Data.getGateConfiguration();
 #ifdef DEBUG
-  Serial << endl << "Sensors initialized";
+    Serial << endl << "Gate initialized";
 #endif
 #endif
 
-/* Initializing HPMA115S0 sesnor */
-#if defined(T6_CONFIG)
-  initHPMA115S0Sensor();
+    /* Initializing DS18B20 or DHTxx sensor */
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+    initSensor();
 #ifdef DEBUG
-  Serial << endl << "HPMS Sensors initialized";
+    Serial << endl << "Sensors initialized";
 #endif
+#endif
+
+/* Initializing T6 sesnors */
+#if defined(T6_CONFIG)
+    initHPMA115S0Sensor();
 #endif
 
 #if defined(T3_CONFIG)
-  /* Initializing PIRs */
-  initPIR();
+    /* Initializing PIRs */
+    initPIR();
 #ifdef DEBUG
-  Serial << endl << "PIR initialized";
+    Serial << endl << "PIR initialized";
 #endif
 #endif
+  }
 
   /* Initializing APIs */
   MQTTInit();
-#ifdef DEBUG
-  Serial << endl << "API: MQTT initialized";
-#endif
   DomoticzInit();
-#ifdef DEBUG
-  Serial << endl << "API: Domoticz initialized";
-#endif
 
 #ifdef DEBUG
-  Serial << endl << "Setup completed";
+  Serial << endl
+         << "########################### BOOTING COMPLETED "
+            "###########################"
+         << endl;
 #endif
 }
 
@@ -262,6 +266,7 @@ void loop() {
 /* Sensor: HPMA115S0 related code */
 #if defined(T6_CONFIG)
         mainHPMA115S0Sensor();
+        mainBME680Sensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -298,5 +303,12 @@ void loop() {
   /* Led listener */
 #if !defined(T0_SHELLY_1_CONFIG)
   Led.loop();
+#endif
+
+/* Debug information */
+#if defined(DEBUG)
+  if (Device.getMode() == MODE_NORMAL) {
+    debugListener();
+  }
 #endif
 }

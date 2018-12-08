@@ -133,6 +133,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
   configuration.isHPMA115S0 = Eeprom.read(413);
+  configuration.isBME680 = Eeprom.read(423);
 
 #endif
 
@@ -249,6 +250,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 #if defined(T6_CONFIG)
   Eeprom.write(413, configuration.isHPMA115S0);
+  Eeprom.write(423, configuration.isBME680);
 #endif
 }
 
@@ -1161,8 +1163,8 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   configuration.interval = Eeprom.read(414, 5).toInt();
   configuration.sendOnlyChanges = Eeprom.read(419);
   configuration.timeToMeasure = Eeprom.read(420, 3).toInt();
-  configuration.idxPM25 = Eeprom.read(936, 6).toInt();
-  configuration.idxPM10 = Eeprom.read(942, 6).toInt();
+  configuration.idx.pm25 = Eeprom.read(936, 6).toInt();
+  configuration.idx.pm10 = Eeprom.read(942, 6).toInt();
   return configuration;
 }
 
@@ -1170,8 +1172,8 @@ void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(414, 5, (long)configuration.interval);
   Eeprom.write(419, configuration.sendOnlyChanges);
   Eeprom.write(420, 3, (long)configuration.timeToMeasure);
-  Eeprom.write(936, 6, (long)configuration.idxPM25);
-  Eeprom.write(942, 6, (long)configuration.idxPM10);
+  Eeprom.write(936, 6, (long)configuration.idx.pm25);
+  Eeprom.write(942, 6, (long)configuration.idx.pm10);
 }
 
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
@@ -1184,5 +1186,21 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
 void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(411, configuration.RXD);
   Eeprom.writeUInt8(412, configuration.TXD);
+}
+
+BME680 AFEDataAccess::getBME680SensorConfiguration() {
+  BME680 configuration;
+  configuration.interval = Eeprom.read(424, 5).toInt();
+  configuration.sendOnlyChanges = Eeprom.read(429);
+  configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
+  configuration.idx.gasResistance = Eeprom.read(954, 6).toInt();
+  return configuration;
+}
+
+void AFEDataAccess::saveConfiguration(BME680 configuration) {
+  Eeprom.write(424, 5, (long)configuration.interval);
+  Eeprom.write(429, configuration.sendOnlyChanges);
+  Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);
+  Eeprom.write(954, 6, (long)configuration.idx.gasResistance);
 }
 #endif

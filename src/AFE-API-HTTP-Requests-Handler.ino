@@ -133,16 +133,38 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #elif defined(T6_CONFIG)
 
   /* Request related to gate */
-  if (strcmp(request.device, "particleSensor") == 0) {
-    uint16_t _pm25, _pm10 = 0;
-    ParticleSensor.get(&_pm25, &_pm10);
+  if (strcmp(request.device, "hpma115s0") == 0) {
+    HPMA115S0_DATA sensorData;
+    sensorData = ParticleSensor.get();
     if (strcmp(request.name, "PM2.5") == 0) {
       if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)_pm25, 4, 0);
+        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
       }
     } else if (strcmp(request.name, "PM10") == 0) {
       if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)_pm10, 4, 0);
+        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
+      }
+    }
+  }
+  /* BME680 */
+  else if (strcmp(request.device, "bme680") == 0) {
+    BME680_DATA sensorData;
+    sensorData = BME680Sensor.get();
+    if (strcmp(request.name, "temperature") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
+      }
+    } else if (strcmp(request.name, "humidity") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
+      }
+    } else if (strcmp(request.name, "pressure") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
+      }
+    } else if (strcmp(request.name, "gasResistance") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
       }
     }
   }

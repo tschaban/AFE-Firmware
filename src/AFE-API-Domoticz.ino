@@ -25,10 +25,6 @@ void AFEDomoticz::begin() {
           configuration.host, configuration.port, authorization);
 
   initialized = true;
-
-#ifdef DEBUG
-  Serial << endl << "ServerURL Size=" << String(serverURL).length();
-#endif
 }
 
 void AFEDomoticz::disconnect() { initialized = false; }
@@ -51,7 +47,9 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 void AFEDomoticz::callURL(const String url) {
 
 #ifdef DEBUG
-  Serial << endl << "Calling url: " << url;
+  Serial << endl << endl << "--------------- Domoticz ---------------";
+  Serial << endl << url;
+  Serial << endl << "----------------------------------------" << endl;
 #endif
 
   http.begin(url);
@@ -109,7 +107,9 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
     callURL(call);
   }
 }
+#endif
 
+#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
 uint8_t AFEDomoticz::getHumidityState(float value) {
   if (value < 40) {
     return HUMIDITY_DRY;
@@ -121,7 +121,30 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
     return HUMIDITY_NORMAL;
   }
 }
+#endif
 
+#if defined(T6_CONFIG)
+void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
+    unsigned int idx, float temperatureValue, float humidityValue,
+    float pressureValue) {
+  if (initialized) {
+    char _floatToChar[8];
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    dtostrf(temperatureValue, 4, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";";
+    dtostrf(humidityValue, 5, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";";
+    call += getHumidityState(humidityValue);
+    call += ";";
+    dtostrf(pressureValue, 6, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";0"; // Hardcoded 0 means no forecast data
+    callURL(call);
+  }
+}
 #endif
 
 #if defined(T3_CONFIG)

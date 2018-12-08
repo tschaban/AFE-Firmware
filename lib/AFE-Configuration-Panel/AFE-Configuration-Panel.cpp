@@ -365,6 +365,23 @@ AFEConfigurationPanel::getHPMA115S0SesnorConfigurationSite(uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+
+String AFEConfigurationPanel::getBME680SesnorConfigurationSite(uint8_t command,
+                                                               BME680 data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=BME680&cmd=1\"  method=\"post\">";
+  page += Site.addBME680Configuration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 #endif
 
 String AFEConfigurationPanel::firmwareUpgradeSite() {

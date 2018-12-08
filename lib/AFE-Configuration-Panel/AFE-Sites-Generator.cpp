@@ -279,6 +279,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
                             : "PM2.5/PM10 Particle Sensor";
       page += "</a></li>";
     }
+
+    if (Device.configuration.isBME680) {
+      page += "<li class=\"itm\"><a href=\"\\?option=BME680\">";
+      page += language == 0 ? "Czujnik BME680" : "BME680 Sensor";
+      page += "</a></li>";
+    }
 #endif
 
     /* Language, Upgrade, Exit */
@@ -428,26 +434,39 @@ String AFESitesGenerator::addDeviceConfiguration() {
       sizeof(Device.configuration.isSwitch), itemsNumber, "hs",
       language == 0 ? "Ilość przycisków" : "Number of switches");
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG) ||          \
-    defined(T6_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
           "value=\"1\"";
 #if defined(T1_CONFIG)
   body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
 #elif defined(T2_CONFIG) || defined(T5_CONFIG)
   body += configuration.isDHT ? " checked=\"checked\">" : ">";
-#elif defined(T6_CONFIG)
-  body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
-#endif
   body += language == 0 ? "Czujnik" : " Sensor";
+#endif
+
 #if defined(T1_CONFIG)
   body += " DS18B20";
 #elif defined(T2_CONFIG) || defined(T5_CONFIG)
   body += " DHT";
-#elif defined(T6_CONFIG)
-  body += " HPMA115S0";
 #endif
   body += "</label></div>";
+#endif
+
+#if defined(T6_CONFIG)
+  body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
+          "value=\"1\"";
+  body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " HPMA115S0";
+  body += "</label></div>";
+
+  body += "<div class=\"cc\"><label><input name =\"b6\" type=\"checkbox\" "
+          "value=\"1\"";
+  body += configuration.isBME680 ? " checked=\"checked\">" : ">";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " BME680";
+  body += "</label></div>";
+
 #endif
 
 #if defined(T3_CONFIG)
@@ -1905,7 +1924,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
     body += "IDX PM2.5 </label>";
     body += "<input name=\"x2\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
-    body += configuration.idxPM25;
+    body += configuration.idx.pm25;
     body += "\">";
     body += "<span class=\"hint\">";
     body += language == 0 ? "Zakres: " : "Range: ";
@@ -1915,7 +1934,71 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
     body += "<div class=\"cf\"><label>IDX PM10";
     body += "</label><input name=\"x1\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
-    body += configuration.idxPM10;
+    body += configuration.idx.pm10;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "</fieldset>";
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  return page;
+}
+
+String AFESitesGenerator::addBME680Configuration() {
+
+  BME680 configuration = Data.getBME680SensorConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
+  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.interval;
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
+                        : "seconds. Range: 5 to 86400sec";
+  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
+          "type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body += language == 0 ? ">Wysyłać dane tylko, gdy jedna z wartości "
+                          "zmieni się"
+                        : ">Send data only if one the values has changed";
+  body += "</label></div><br><br>";
+  body += "</fieldset>";
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Czujnik BME680" : "BME680 Sensor", "", body);
+
+  if (device.domoticzAPI) {
+    body = "<fieldset>";
+    body += "<div class=\"cf\"><label>IDX Temp/";
+    body += language == 0 ? "Wilg/Bar" : "Humi/Bar";
+    body += "</label><input name=\"t\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.temperatureHumidityPressure;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Czujnik gazu" : "Gas sensor";
+    body += "</label><input name=\"g\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.gasResistance;
     body += "\">";
     body += "<span class=\"hint\">";
     body += language == 0 ? "Zakres: " : "Range: ";

@@ -19,7 +19,7 @@
 #include <Streaming.h>
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
 #define HUMIDITY_NORMAL 0
 #define HUMIDITY_COMFORTABLE 1
 #define HUMIDITY_DRY 2
@@ -68,11 +68,23 @@ public:
   void sendTemperatureAndHumidityCommand(unsigned int idx,
                                          float temperatureValue,
                                          float humidityValue);
+#endif
 
+#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
   /* It returns humidity state using humidity ranges. Look for value meaning at
    * HUMIDITY_ constant
    */
   uint8_t getHumidityState(float value);
+#endif
+
+#if defined(T6_CONFIG)
+  /* Definition:
+   * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
+   */
+  void sendTemperatureAndHumidityAndPressureCommand(unsigned int idx,
+                                                    float temperatureValue,
+                                                    float humidityValue,
+                                                    float pressureValue);
 #endif
 
 #if defined(T3_CONFIG)

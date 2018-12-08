@@ -63,6 +63,7 @@ struct DEVICE {
   boolean isSwitch[2];
   boolean isRelay[1];
   boolean isHPMA115S0;
+  boolean isBME680;
 #endif
 };
 

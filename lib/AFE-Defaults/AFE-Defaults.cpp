@@ -32,6 +32,7 @@ void AFEDefaults::set() {
 #elif defined(T6_CONFIG)
   HPMA115S0 SensorHPMA115S0Configuration;
   SERIALPORT SerialPortConfiguration;
+  BME680 SensorBME680Configuration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -96,6 +97,7 @@ void AFEDefaults::set() {
 /* HPMA115S0 Sesnor */
 #if defined(T6_CONFIG)
   deviceConfiguration.isHPMA115S0 = false;
+  deviceConfiguration.isBME680 = false;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -329,13 +331,21 @@ void AFEDefaults::set() {
   SensorHPMA115S0Configuration.interval = 60;
   SensorHPMA115S0Configuration.sendOnlyChanges = false;
   SensorHPMA115S0Configuration.timeToMeasure = 0;
-  SensorHPMA115S0Configuration.idxPM10 = 0;
-  SensorHPMA115S0Configuration.idxPM25 = 0;
+  SensorHPMA115S0Configuration.idx.pm10 = 0;
+  SensorHPMA115S0Configuration.idx.pm25 = 0;
   Data->saveConfiguration(SensorHPMA115S0Configuration);
 
-  SerialPortConfiguration.RXD = 4;
-  SerialPortConfiguration.TXD = 5;
+  SerialPortConfiguration.RXD = 12;
+  SerialPortConfiguration.TXD = 14;
   Data->saveConfiguration(SerialPortConfiguration);
+
+  SensorBME680Configuration.interval = 60;
+  SensorBME680Configuration.sendOnlyChanges = false;
+  SensorBME680Configuration.idx.temperatureHumidityPressure = 0;
+  SensorBME680Configuration.idx.gasResistance = 0;
+  Data->saveConfiguration(SensorBME680Configuration);
+
+  ;
 
 #endif
 
