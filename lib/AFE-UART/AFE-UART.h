@@ -32,6 +32,9 @@ public:
 
   /* Method sends data to Serial Port */
   void send(const uint8_t *cmd);
+
+  /* Clean Buffer */
+  void clean();
 };
 
 #endif

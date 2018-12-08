@@ -120,6 +120,14 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getHPMA115S0SesnorConfigurationSite(command, data));
+
+  } else if (optionName == "BME680") {
+    BME680 data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getBME680SensorData();
+    }
+    publishHTML(
+        ConfigurationPanel.getBME680SesnorConfigurationSite(command, data));
 #endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
@@ -353,6 +361,8 @@ DEVICE AFEWebServer::getDeviceData() {
 #if defined(T6_CONFIG)
   server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
                                 : data.isHPMA115S0 = false;
+
+  server.arg("b6").length() > 0 ? data.isBME680 = true : data.isBME680 = false;
 #endif
 
   return data;
@@ -802,12 +812,32 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
                                : data.sendOnlyChanges = false;
 
   if (server.arg("x2").length() > 0) {
-    data.idxPM25 = server.arg("x2").toInt();
+    data.idx.pm25 = server.arg("x2").toInt();
   }
 
   if (server.arg("x1").length() > 0) {
-    data.idxPM10 = server.arg("x1").toInt();
+    data.idx.pm10 = server.arg("x1").toInt();
   }
   return data;
 };
+
+BME680 AFEWebServer::getBME680SensorData() {
+  BME680 data;
+  if (server.arg("i").length() > 0) {
+    data.interval = server.arg("i").toInt();
+  }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  if (server.arg("t").length() > 0) {
+    data.idx.temperatureHumidityPressure = server.arg("t").toInt();
+  }
+
+  if (server.arg("g").length() > 0) {
+    data.idx.gasResistance = server.arg("g").toInt();
+  }
+  return data;
+}
+
 #endif

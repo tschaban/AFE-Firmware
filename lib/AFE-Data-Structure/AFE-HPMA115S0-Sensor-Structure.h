@@ -14,12 +14,16 @@
 #define HPMA115S0_TYPE_PM25 0
 #define HPMA115S0_TYPE_PM10 1
 
+struct HPMA115S0_DOMOTICZ {
+  unsigned long pm25;
+  unsigned long pm10;
+};
+
 struct HPMA115S0 {
   uint16_t interval;
   boolean sendOnlyChanges;
   uint16_t timeToMeasure;
-  unsigned long idxPM25;
-  unsigned long idxPM10;
+  HPMA115S0_DOMOTICZ idx;
 };
 
 struct HPMA115S0_DATA {

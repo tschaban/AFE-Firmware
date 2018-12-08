@@ -6,6 +6,9 @@
 void DomoticzInit() {
   if (Device.configuration.domoticzAPI) {
     Domoticz.begin();
+#ifdef DEBUG
+    Serial << endl << "API: Domoticz initialized";
+#endif
   }
 }
 
@@ -107,14 +110,15 @@ void DomoticzPublishContactronState(uint8_t id) {
 /* It publishes gate state to Domoticz */
 void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.domoticzAPI) {
-    unsigned long idx = ParticleSensor.getDomoticzIDX(HPMA115S0_TYPE_PM25);
-    if (idx > 0) {
-      Domoticz.sendCustomSensorCommand(idx, data.pm25);
+    HPMA115S0_DOMOTICZ idx;
+    ParticleSensor.getDomoticzIDX(&idx);
+    if (idx.pm25 > 0) {
+      Domoticz.sendCustomSensorCommand(idx.pm25, data.pm25);
     }
-    idx = ParticleSensor.getDomoticzIDX(HPMA115S0_TYPE_PM10);
-    if (idx > 0) {
+
+    if (idx.pm10 > 0) {
       delay(10);
-      Domoticz.sendCustomSensorCommand(idx, data.pm10);
+      Domoticz.sendCustomSensorCommand(idx.pm10, data.pm10);
     }
   }
 }
@@ -123,9 +127,9 @@ void DomoticzPublishBME680SensorData(BME680_DATA data) {
   if (Device.configuration.domoticzAPI) {
     BME680_DOMOTICZ idx;
     BME680Sensor.getDomoticzIDX(&idx);
-    if (idx.temperatureAndHumidity > 0) {
+    if (idx.temperatureHumidityPressure > 0) {
       Domoticz.sendTemperatureAndHumidityAndPressureCommand(
-          idx.temperatureAndHumidity, data.temperature, data.humidity,
+          idx.temperatureHumidityPressure, data.temperature, data.humidity,
           data.pressure);
     }
     if (idx.gasResistance > 0) {

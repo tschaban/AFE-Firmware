@@ -7,6 +7,9 @@ void MQTTInit() {
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
+#ifdef DEBUG
+    Serial << endl << "API: MQTT initialized";
+#endif
   }
 }
 
@@ -341,14 +344,14 @@ void MQTTPublishGateState() {
 #if defined(T6_CONFIG)
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.mqttAPI) {
-    String messageString = "{'PM2.5':'";
+    String messageString = "{'PM25':'";
     messageString += data.pm25;
     messageString += "','PM10':'";
     messageString += data.pm10;
     messageString += "'}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("particle/all", message);
+    Mqtt.publish("hpma115s0/all", message);
   }
 }
 

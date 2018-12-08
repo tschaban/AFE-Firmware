@@ -15,8 +15,7 @@
 #define UNIT_FAHRENHEIT 1
 
 struct BME680_DOMOTICZ {
-  unsigned long temperatureAndHumidity;
-  unsigned long pressure;
+  unsigned long temperatureHumidityPressure;
   unsigned long gasResistance;
 };
 

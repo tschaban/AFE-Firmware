@@ -10,9 +10,13 @@ void AFESensorBME680::begin() {
   AFEDataAccess Data;
   configuration = Data.getBME680SensorConfiguration();
 
+#if defined(DEBUG)
+  Serial << endl << endl << "-------- BME680: Initializing --------";
+#endif
+
   if (!bme.begin()) {
 #ifdef DEBUG
-    Serial << endl << "BME680 not found";
+    Serial << endl << "BME680: Not found";
 #endif
     while (1)
       ;
@@ -24,11 +28,13 @@ void AFESensorBME680::begin() {
     bme.setGasHeater(320, 150); // 320*C for 150 ms
     _initialized = true;
 #ifdef DEBUG
-    Serial << endl << "BME680 found";
+    Serial << endl << "BME680: Found";
 #endif
   }
 
-  // Set up oversampling and filter initialization
+#if defined(DEBUG)
+  Serial << endl << "--------------------------------------" << endl;
+#endif
 }
 
 BME680_DATA AFESensorBME680::get() {
@@ -54,9 +60,10 @@ void AFESensorBME680::listener() {
     }
 
     if (time - startTime >= configuration.interval * 1000) {
-#if DEBUG
-      Serial << endl << "Reading BME680";
+#if defined(DEBUG)
+      Serial << endl << endl << "-------- BME680: Reading --------";
 #endif
+
       BME680_DATA data;
       data.temperature = data.pressure = data.humidity = data.gasResistance =
           -1;
@@ -65,13 +72,16 @@ void AFESensorBME680::listener() {
         data.pressure = bme.pressure / 100.0;
         data.humidity = bme.humidity;
         data.gasResistance = bme.gas_resistance / 1000;
-      }
-
 #if DEBUG
-      Serial << endl
-             << "T=" << data.temperature << ", H=" << data.humidity
-             << ", P=" << data.pressure << ", G=" << data.gasResistance;
+        Serial << endl
+               << "Temperature = " << data.temperature << endl
+               << "Humidity = " << data.humidity << endl
+               << "Pressure = " << data.pressure << endl
+               << "Gas Sesnor = " << data.gasResistance;
+      } else {
+        Serial << "No data found";
 #endif
+      }
 
       if (data.temperature != -1 && data.pressure != -1 &&
           data.humidity != -1 && data.gasResistance != -1) {
@@ -89,6 +99,9 @@ void AFESensorBME680::listener() {
         }
       }
       startTime = 0;
+#if defined(DEBUG)
+      Serial << endl << "---------------------------------" << endl;
+#endif
     }
   }
 }

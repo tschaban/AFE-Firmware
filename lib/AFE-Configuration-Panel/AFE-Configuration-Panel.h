@@ -81,6 +81,7 @@ public:
 #if defined(T6_CONFIG)
   String getSerialPortConfigurationSite(uint8_t command, SERIALPORT data);
   String getHPMA115S0SesnorConfigurationSite(uint8_t command, HPMA115S0 data);
+  String getBME680SesnorConfigurationSite(uint8_t command, BME680 data);
 #endif
 
   /* It generates site for firmware upgrade */

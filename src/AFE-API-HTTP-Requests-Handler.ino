@@ -133,7 +133,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #elif defined(T6_CONFIG)
 
   /* Request related to gate */
-  if (strcmp(request.device, "particleSensor") == 0) {
+  if (strcmp(request.device, "hpma115s0") == 0) {
     HPMA115S0_DATA sensorData;
     sensorData = ParticleSensor.get();
     if (strcmp(request.name, "PM2.5") == 0) {

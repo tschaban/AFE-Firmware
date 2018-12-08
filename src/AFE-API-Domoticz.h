@@ -78,6 +78,9 @@ public:
 #endif
 
 #if defined(T6_CONFIG)
+  /* Definition:
+   * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
+   */
   void sendTemperatureAndHumidityAndPressureCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue,

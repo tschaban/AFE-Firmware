@@ -64,14 +64,14 @@ void AFEMQTT::connect() {
 
 #ifdef DEBUG
           Serial << endl
-                 << "INFO: Connected" << endl
-                 << "INFO: Subscribing to : " << mqttTopicForSubscription;
+                 << "MQTT: Connected" << endl
+                 << "MQTT: Subscribing to : " << mqttTopicForSubscription;
 #endif
 
           Broker.subscribe((char *)mqttTopicForSubscription);
 
 #ifdef DEBUG
-          Serial << endl << "INFO: Subsribed";
+          Serial << endl << "MQTT: Subsribed";
 #endif
 
           eventConnectionEstablished = true;
@@ -97,8 +97,8 @@ void AFEMQTT::connect() {
         connections++;
 #ifdef DEBUG
         Serial << endl
-               << "INFO: MQTT Connection attempt: " << connections + 1
-               << " from " << NetworkConfiguration.noConnectionAttempts
+               << "MQTT Connection attempt: " << connections + 1 << " from "
+               << NetworkConfiguration.noConnectionAttempts
                << ", connection status: " << Broker.state()
                << ", connection time: " << millis() - delayStartTime << "ms";
 
@@ -119,7 +119,8 @@ void AFEMQTT::connect() {
 
 #ifdef DEBUG
         Serial << endl
-               << "WARN: Not able to connect to MQTT.Going to sleep mode for "
+               << "MQTT: WARN: Not able to connect to MQTT.Going to sleep mode "
+                  "for "
                << NetworkConfiguration.waitTimeSeries << "sec.";
 #endif
       }
@@ -161,7 +162,10 @@ void AFEMQTT::publish(const char *topic, const char *type,
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
 #ifdef DEBUG
-    Serial << endl << "INFO: MQTT publising:  " << topic << "  \\ " << message;
+    Serial << endl << endl << "-------------------- MQTT --------------------";
+    Serial << endl << "Topic: " << topic;
+    Serial << endl << "Message: " << message;
+    Serial << endl << "----------------------------------------------";
 #endif
     Broker.publish(topic, message);
   }

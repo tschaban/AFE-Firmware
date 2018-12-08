@@ -25,10 +25,6 @@ void AFEDomoticz::begin() {
           configuration.host, configuration.port, authorization);
 
   initialized = true;
-
-#ifdef DEBUG
-  Serial << endl << "ServerURL Size=" << String(serverURL).length();
-#endif
 }
 
 void AFEDomoticz::disconnect() { initialized = false; }
@@ -51,7 +47,9 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 void AFEDomoticz::callURL(const String url) {
 
 #ifdef DEBUG
-  Serial << endl << "Calling url: " << url;
+  Serial << endl << endl << "--------------- Domoticz ---------------";
+  Serial << endl << url;
+  Serial << endl << "----------------------------------------" << endl;
 #endif
 
   http.begin(url);
@@ -143,8 +141,7 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     call += ";";
     dtostrf(pressureValue, 6, 2, _floatToChar);
     call += _floatToChar;
-    call += ";0";
-
+    call += ";0"; // Hardcoded 0 means no forecast data
     callURL(call);
   }
 }
