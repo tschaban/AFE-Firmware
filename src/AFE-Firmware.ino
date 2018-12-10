@@ -230,14 +230,14 @@ void loop() {
         /* Triggerd when connectes/reconnects to WiFi */
         eventsListener();
 
-        /* If MQTT API is on it listens for MQTT messages. If the device is not
-         * connected to MQTT Broker, it connects the device to it */
+        /* If MQTT API is on it listens for MQTT messages. If the device is
+         * not connected to MQTT Broker, it connects the device to it */
         if (Device.configuration.mqttAPI) {
           Mqtt.listener();
         }
 
-        /* Listens for HTTP requsts. Both for configuration panel HTTP requests
-         * or HTTP API requests if it's turned on */
+        /* Listens for HTTP requsts. Both for configuration panel HTTP
+         * requests or HTTP API requests if it's turned on */
         WebServer.listener();
 
 #if defined(T5_CONFIG)

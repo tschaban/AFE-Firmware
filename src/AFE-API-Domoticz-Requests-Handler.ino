@@ -107,3 +107,36 @@ void DomoticzPublishContactronState(uint8_t id) {
   }
 }
 #endif
+
+#if defined(T6_CONFIG)
+void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
+  if (Device.configuration.domoticzAPI) {
+    HPMA115S0_DOMOTICZ idx;
+    ParticleSensor.getDomoticzIDX(&idx);
+    if (idx.pm25 > 0) {
+      Domoticz.sendCustomSensorCommand(idx.pm25, data.pm25);
+    }
+
+    if (idx.pm10 > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.pm10, data.pm10);
+    }
+  }
+}
+
+void DomoticzPublishBME680SensorData(BME680_DATA data) {
+  if (Device.configuration.domoticzAPI) {
+    BME680_DOMOTICZ idx;
+    BME680Sensor.getDomoticzIDX(&idx);
+    if (idx.temperatureHumidityPressure > 0) {
+      Domoticz.sendTemperatureAndHumidityAndPressureCommand(
+          idx.temperatureHumidityPressure, data.temperature, data.humidity,
+          data.pressure);
+    }
+    if (idx.gasResistance > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.gasResistance, data.gasResistance);
+    }
+  }
+}
+#endif
