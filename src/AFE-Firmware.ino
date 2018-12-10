@@ -97,16 +97,16 @@ void setup() {
 #if !defined(DEBUG)
   Serial.swap();
 #endif
-
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "################################ BOOTING "
-            "################################"
-         << endl
-         << "All classes and global variables initialized";
-#endif
-
+  /*
+  #ifdef DEBUG
+    Serial << endl
+           << endl
+           << "################################ BOOTING "
+              "################################"
+           << endl
+           << "All classes and global variables initialized";
+  #endif
+  */
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
   if (Device.isFirstTimeLaunch()) {
@@ -212,13 +212,13 @@ void setup() {
   /* Initializing APIs */
   MQTTInit();
   DomoticzInit();
-
-#ifdef DEBUG
-  Serial << endl
-         << "########################### BOOTING COMPLETED "
-            "###########################"
-         << endl;
-#endif
+  /*
+  #ifdef DEBUG
+    Serial << endl
+           << "########################### BOOTING COMPLETED "
+              "###########################"
+           << endl;
+  #endif */
 }
 
 void loop() {
@@ -263,7 +263,7 @@ void loop() {
         mainSensor();
 #endif
 
-/* Sensor: HPMA115S0 related code */
+/* Sensor: HPMA115S0 related code  */
 #if defined(T6_CONFIG)
         mainHPMA115S0Sensor();
         mainBME680Sensor();
@@ -305,10 +305,10 @@ void loop() {
   Led.loop();
 #endif
 
-/* Debug information */
-#if defined(DEBUG)
-  if (Device.getMode() == MODE_NORMAL) {
-    debugListener();
-  }
-#endif
+  /* Debug information
+  #if defined(DEBUG)
+    if (Device.getMode() == MODE_NORMAL) {
+      debugListener();
+    }
+  #endif */
 }

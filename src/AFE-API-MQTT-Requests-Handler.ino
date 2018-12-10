@@ -2,6 +2,10 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
+#if defined(WHATEVER)
+void MQTTPublishParticleSensorData(HPMA115S0_DATA d) {}
+#endif
+
 /* Initializing MQTT */
 void MQTTInit() {
   if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
@@ -15,7 +19,6 @@ void MQTTInit() {
 
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
-
   char _mqttTopic[65];
 #ifndef T0_SHELLY_1_CONFIG
   Led.on();
@@ -339,37 +342,4 @@ void MQTTPublishGateState() {
                                                : "unknown");
   }
 }
-#endif
-
-#if defined(T6_CONFIG)
-void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
-  if (Device.configuration.mqttAPI) {
-    String messageString = "{'PM25':'";
-    messageString += data.pm25;
-    messageString += "','PM10':'";
-    messageString += data.pm10;
-    messageString += "'}";
-    char message[messageString.length() + 1];
-    messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("hpma115s0/all", message);
-  }
-}
-
-void MQTTPublishBME680SensorData(BME680_DATA data) {
-  if (Device.configuration.mqttAPI) {
-    String messageString = "{'temperature':'";
-    messageString += data.temperature;
-    messageString += "','humidity':'";
-    messageString += data.humidity;
-    messageString += "','pressure':'";
-    messageString += data.pressure;
-    messageString += "','gasResistance':'";
-    messageString += data.gasResistance;
-    messageString += "'}";
-    char message[messageString.length() + 1];
-    messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("bme680/all", message);
-  }
-}
-
 #endif

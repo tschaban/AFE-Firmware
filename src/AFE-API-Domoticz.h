@@ -77,16 +77,6 @@ public:
   uint8_t getHumidityState(float value);
 #endif
 
-#if defined(T6_CONFIG)
-  /* Definition:
-   * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
-   */
-  void sendTemperatureAndHumidityAndPressureCommand(unsigned int idx,
-                                                    float temperatureValue,
-                                                    float humidityValue,
-                                                    float pressureValue);
-#endif
-
 #if defined(T3_CONFIG)
   void sendPirCommand(unsigned int idx, const char *value);
 #endif
@@ -98,6 +88,13 @@ public:
 
 #if defined(T6_CONFIG)
   void sendCustomSensorCommand(unsigned int idx, uint16_t value);
+  /* Definition:
+   * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
+   */
+  void sendTemperatureAndHumidityAndPressureCommand(unsigned int idx,
+                                                    float temperatureValue,
+                                                    float humidityValue,
+                                                    float pressureValue);
 #endif
 };
 

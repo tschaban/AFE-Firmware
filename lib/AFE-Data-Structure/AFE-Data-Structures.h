@@ -33,7 +33,7 @@
 #include <AFE-DHT-Sensor-Structure.h>
 #endif
 
-#if defined(T3_CONFIG)
+#ifdef T3_CONFIG
 #include <AFE-PIR-Sensor-Structure.h>
 #endif
 
