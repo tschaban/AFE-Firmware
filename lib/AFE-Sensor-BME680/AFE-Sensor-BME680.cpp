@@ -72,7 +72,7 @@ void AFESensorBME680::listener() {
         data.pressure = bme.pressure / 100.0;
         data.humidity = bme.humidity;
         data.gasResistance = bme.gas_resistance / 1000;
-#if DEBUG
+#if defined(DEBUG)
         Serial << endl
                << "Temperature = " << data.temperature << endl
                << "Humidity = " << data.humidity << endl

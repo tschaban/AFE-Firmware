@@ -6,9 +6,11 @@
 void DomoticzInit() {
   if (Device.configuration.domoticzAPI) {
     Domoticz.begin();
-#ifdef DEBUG
-    Serial << endl << "API: Domoticz initialized";
-#endif
+    /*
+    #ifdef DEBUG
+        Serial << endl << "API: Domoticz initialized";
+    #endif
+    */
   }
 }
 
@@ -107,7 +109,6 @@ void DomoticzPublishContactronState(uint8_t id) {
 #endif
 
 #if defined(T6_CONFIG)
-/* It publishes gate state to Domoticz */
 void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.domoticzAPI) {
     HPMA115S0_DOMOTICZ idx;
@@ -138,5 +139,4 @@ void DomoticzPublishBME680SensorData(BME680_DATA data) {
     }
   }
 }
-
 #endif

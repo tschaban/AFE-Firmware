@@ -15,7 +15,6 @@ void MQTTInit() {
 
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
-
   char _mqttTopic[65];
 #ifndef T0_SHELLY_1_CONFIG
   Led.on();
@@ -342,6 +341,7 @@ void MQTTPublishGateState() {
 #endif
 
 #if defined(T6_CONFIG)
+
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.mqttAPI) {
     String messageString = "{'PM25':'";

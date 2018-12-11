@@ -872,7 +872,7 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
 #if defined(T2_CONFIG)
   Eeprom.writeUInt8(370, configuration.gpio);
   Eeprom.writeUInt8(371, configuration.type);
-  Eeprom.write(379, 5, (long)configuration.interval);
+  Eeprom.write(372, 5, (long)configuration.interval);
   Eeprom.writeUInt8(377, configuration.temperature.unit);
   Eeprom.write(378, 4, (float)configuration.temperature.correction);
   Eeprom.write(387, 3, (float)configuration.humidity.correction);
