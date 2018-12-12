@@ -84,8 +84,11 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #if defined(T6_CONFIG)
 #include <AFE-Sensor-BME680.h>
 #include <AFE-Sensor-HPMA115S0.h>
+//#include <Wire.h>
+#include <AFE-Sensor-BH1750.h>
 AFESensorHPMA115S0 ParticleSensor;
 AFESensorBME680 BME680Sensor;
+AFESensorBH1750 BH1750Sensor;
 #endif
 
 void setup() {
@@ -97,16 +100,16 @@ void setup() {
 #if !defined(DEBUG)
   Serial.swap();
 #endif
-  /*
-  #ifdef DEBUG
-    Serial << endl
-           << endl
-           << "################################ BOOTING "
-              "################################"
-           << endl
-           << "All classes and global variables initialized";
-  #endif
-  */
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "################################ BOOTING "
+            "################################"
+         << endl
+         << "All classes and global variables initialized";
+#endif
+
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
   if (Device.isFirstTimeLaunch()) {
@@ -197,7 +200,10 @@ void setup() {
 
 /* Initializing T6 sesnors */
 #if defined(T6_CONFIG)
+    Wire.begin();
     initHPMA115S0Sensor();
+    BME680Sensor.begin();
+    BH1750Sensor.begin();
 #endif
 
 #if defined(T3_CONFIG)
@@ -212,13 +218,13 @@ void setup() {
   /* Initializing APIs */
   MQTTInit();
   DomoticzInit();
-  /*
-  #ifdef DEBUG
-    Serial << endl
-           << "########################### BOOTING COMPLETED "
-              "###########################"
-           << endl;
-  #endif */
+
+#ifdef DEBUG
+  Serial << endl
+         << "########################### BOOTING COMPLETED "
+            "###########################"
+         << endl;
+#endif
 }
 
 void loop() {
@@ -267,6 +273,7 @@ void loop() {
 #if defined(T6_CONFIG)
         mainHPMA115S0Sensor();
         mainBME680Sensor();
+        mainBH1750Sensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -305,10 +312,10 @@ void loop() {
   Led.loop();
 #endif
 
-  /* Debug information
-  #if defined(DEBUG)
-    if (Device.getMode() == MODE_NORMAL) {
-      debugListener();
-    }
-  #endif */
+/* Debug information */
+#if defined(DEBUG)
+  if (Device.getMode() == MODE_NORMAL) {
+    debugListener();
+  }
+#endif
 }

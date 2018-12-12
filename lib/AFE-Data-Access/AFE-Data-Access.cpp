@@ -134,6 +134,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
   configuration.isHPMA115S0 = Eeprom.read(413);
   configuration.isBME680 = Eeprom.read(423);
+  configuration.isBH1750 = true; // Eeprom.read(423);
 
 #endif
 
@@ -1203,4 +1204,13 @@ void AFEDataAccess::saveConfiguration(BME680 configuration) {
   Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);
   Eeprom.write(954, 6, (long)configuration.idx.gasResistance);
 }
+
+BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
+  BH1750 configuration;
+  configuration.interval = 1;            // Eeprom.read(424, 5).toInt();
+  configuration.sendOnlyChanges = false; // Eeprom.read(429);
+  configuration.mode = 0;
+  configuration.idx = 0;
+}
+void AFEDataAccess::saveConfiguration(BH1750 configuration) {}
 #endif

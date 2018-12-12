@@ -119,6 +119,9 @@ public:
   void saveConfiguration(HPMA115S0 configuration);
   BME680 getBME680SensorConfiguration();
   void saveConfiguration(BME680 configuration);
+  BH1750 getBH1750SensorConfiguration();
+  void saveConfiguration(BH1750 configuration);
+
 #endif
 };
 #endif
