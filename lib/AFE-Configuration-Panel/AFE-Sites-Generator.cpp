@@ -285,6 +285,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += language == 0 ? "Czujnik BME680" : "BME680 Sensor";
       page += "</a></li>";
     }
+
+    if (Device.configuration.isBH1750) {
+      page += "<li class=\"itm\"><a href=\"\\?option=BH1750\">";
+      page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
+      page += "</a></li>";
+    }
 #endif
 
     /* Language, Upgrade, Exit */
@@ -465,6 +471,13 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += configuration.isBME680 ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
   body += " BME680";
+  body += "</label></div>";
+
+  body += "<div class=\"cc\"><label><input name =\"bh\" type=\"checkbox\" "
+          "value=\"1\"";
+  body += configuration.isBH1750 ? " checked=\"checked\">" : ">";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " BH1750";
   body += "</label></div>";
 
 #endif
@@ -2001,6 +2014,66 @@ String AFESitesGenerator::addBME680Configuration() {
     body += configuration.idx.gasResistance;
     body += "\">";
     body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "</fieldset>";
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  return page;
+}
+
+String AFESitesGenerator::addBH1750Configuration() {
+
+  BH1750 configuration = Data.getBH1750SensorConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
+  body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.interval;
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 1 do 86400sek"
+                        : "seconds. Range: 1 to 86400sec";
+  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
+          "type=\"checkbox\" value=\"1\"";
+  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  body += language == 0 ? ">Wysyłać dane tylko, gdy jedna z wartości "
+                          "zmieni się"
+                        : ">Send data only if one the values has changed";
+  body += "</label></div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Czułość" : "Sensitiveness";
+  body += "</label><input name=\"m\" type=\"number\" value=\"";
+  body += configuration.mode;
+  body += "\" disabled><span class=\"hint\">";
+  body += language == 0 ? "(brak możliwości zmiany)" : "(can't be set)";
+  body += " </span></div>";
+
+  body += "</fieldset>";
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Czujnik BH1750" : "BH1750 Sensor", "", body);
+
+  if (device.domoticzAPI) {
+    body = "<fieldset>";
+    body += "<div class=\"cf\"><label>IDX</label><input name=\"d\" "
+            "type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx;
+    body += "\"><span class=\"hint\">";
     body += language == 0 ? "Zakres: " : "Range: ";
     body += "0 - 999999</span>";
     body += "</div>";

@@ -16,9 +16,11 @@ void AFESensorBH1750::begin() {
   Serial << endl << endl << "----- BH1750: Initializing -----";
 #endif
 
-  bh1750.begin();
-
-  Serial << endl << "Sesnor initialized";
+  bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2);
+  Serial << endl << "Sensor initialized";
+  Serial << endl << "Mode: " << configuration.mode;
+  Serial << endl << "Interval: " << configuration.interval;
+  Serial << endl << "IDX: " << configuration.idx;
 
 #if defined(DEBUG)
   Serial << endl << "---------------------------------";
@@ -48,9 +50,14 @@ void AFESensorBH1750::listener() {
 
       float _currentLightLevel = bh1750.readLightLevel();
 
+      if (_currentLightLevel != currentLightLevel) {
+        currentLightLevel = _currentLightLevel;
+        ready = true;
+      }
+
 #if defined(DEBUG)
       Serial << endl << "Lux: " << _currentLightLevel << "lx";
-      Serial << endl << endl << "---------------------------";
+      Serial << endl << "---------------------------";
 #endif
 
       startTime = millis();

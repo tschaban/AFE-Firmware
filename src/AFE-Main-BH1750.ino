@@ -10,8 +10,8 @@ void mainBH1750Sensor() {
     BH1750Sensor.listener();
     if (BH1750Sensor.isReady()) {
       float sensorData = BH1750Sensor.get();
-      //  MQTTPublishParticleSensorData(sensorData);
-      //  DomoticzPublishParticleSensorData(sensorData);
+      MQTTPublishLightLevel(sensorData);
+      DomoticzPublishLightLevel(sensorData);
       //      }
     }
   }

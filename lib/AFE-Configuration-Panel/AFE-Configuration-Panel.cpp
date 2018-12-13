@@ -350,7 +350,7 @@ String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
   return page;
 }
 String
-AFEConfigurationPanel::getHPMA115S0SesnorConfigurationSite(uint8_t command,
+AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
                                                            HPMA115S0 data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -366,7 +366,7 @@ AFEConfigurationPanel::getHPMA115S0SesnorConfigurationSite(uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getBME680SesnorConfigurationSite(uint8_t command,
+String AFEConfigurationPanel::getBME680SensorConfigurationSite(uint8_t command,
                                                                BME680 data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -375,6 +375,22 @@ String AFEConfigurationPanel::getBME680SesnorConfigurationSite(uint8_t command,
   String page = Site.generateHeader();
   page += "<form action=\"/?option=BME680&cmd=1\"  method=\"post\">";
   page += Site.addBME680Configuration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
+                                                               BH1750 data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=BH1750&cmd=1\"  method=\"post\">";
+  page += Site.addBH1750Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

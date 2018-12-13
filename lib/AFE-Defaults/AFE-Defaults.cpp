@@ -33,6 +33,7 @@ void AFEDefaults::set() {
   HPMA115S0 SensorHPMA115S0Configuration;
   SERIALPORT SerialPortConfiguration;
   BME680 SensorBME680Configuration;
+  BH1750 SensorBH1750Configuration;
 #endif
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
@@ -344,6 +345,12 @@ void AFEDefaults::set() {
   SensorBME680Configuration.idx.temperatureHumidityPressure = 0;
   SensorBME680Configuration.idx.gasResistance = 0;
   Data->saveConfiguration(SensorBME680Configuration);
+
+  SensorBH1750Configuration.interval = 60;
+  SensorBH1750Configuration.sendOnlyChanges = false;
+  SensorBH1750Configuration.idx = 0;
+  SensorBH1750Configuration.mode = 0;
+  Data->saveConfiguration(SensorBH1750Configuration);
 
   ;
 

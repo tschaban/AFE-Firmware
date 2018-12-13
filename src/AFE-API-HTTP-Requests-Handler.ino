@@ -169,6 +169,16 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
   }
 
+  /* BH1750 */
+  else if (strcmp(request.device, "bh1750") == 0) {
+    if (strcmp(request.name, "lux") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        float lux = BH1750Sensor.get();
+        sendHTTPAPIRequestStatus(request, true, lux);
+      }
+    }
+  }
+
 #else
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {

@@ -83,6 +83,7 @@ private:
   SERIALPORT getSerialPortData();
   HPMA115S0 getHPMA115S0SensorData();
   BME680 getBME680SensorData();
+  BH1750 getBH1750SensorData();
 #endif
 
   uint8_t getLanguageData();

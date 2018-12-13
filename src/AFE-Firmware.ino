@@ -201,9 +201,15 @@ void setup() {
 /* Initializing T6 sesnors */
 #if defined(T6_CONFIG)
     Wire.begin();
-    initHPMA115S0Sensor();
-    BME680Sensor.begin();
-    BH1750Sensor.begin();
+    if (Device.configuration.isHPMA115S0) {
+      initHPMA115S0Sensor();
+    }
+    if (Device.configuration.isBME680) {
+      BME680Sensor.begin();
+    }
+    if (Device.configuration.isBH1750) {
+      BH1750Sensor.begin();
+    }
 #endif
 
 #if defined(T3_CONFIG)
