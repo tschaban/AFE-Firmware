@@ -139,4 +139,15 @@ void DomoticzPublishBME680SensorData(BME680_DATA data) {
     }
   }
 }
+
+void DomoticzPublishLightLevel(float lux) {
+  if (Device.configuration.domoticzAPI) {
+    unsigned long idx = BH1750Sensor.getDomoticzIDX();
+
+    if (idx > 0) {
+      Domoticz.sendSValueCommand(idx, lux);
+    }
+  }
+}
+
 #endif

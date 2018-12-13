@@ -4,7 +4,7 @@
 
 #include "AFE-Sensor-BME680.h"
 
-AFESensorBME680::AFESensorBME680() { begin(); };
+AFESensorBME680::AFESensorBME680(){};
 
 void AFESensorBME680::begin() {
   AFEDataAccess Data;

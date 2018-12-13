@@ -76,6 +76,19 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 }
 #endif
 
+#if defined(T6_CONFIG)
+void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
+  if (initialized) {
+    char _char[10];
+    dtostrf(value, 7, 3, _char);
+    String call = getApiCall("udevice", idx);
+    call += "&svalue=";
+    call += _char;
+    callURL(call);
+  }
+}
+#endif
+
 #if defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
   if (initialized) {
@@ -145,6 +158,7 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     callURL(call);
   }
 }
+
 #endif
 
 #if defined(T3_CONFIG)

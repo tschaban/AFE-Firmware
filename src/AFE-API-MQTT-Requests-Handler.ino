@@ -372,4 +372,10 @@ void MQTTPublishBME680SensorData(BME680_DATA data) {
   }
 }
 
+void MQTTPublishLightLevel(float lux) {
+  if (Device.configuration.mqttAPI) {
+    Mqtt.publish("bh1750/lux", lux);
+  }
+}
+
 #endif

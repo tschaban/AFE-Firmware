@@ -87,6 +87,7 @@ public:
 #endif
 
 #if defined(T6_CONFIG)
+  void sendSValueCommand(unsigned int idx, float value);
   void sendCustomSensorCommand(unsigned int idx, uint16_t value);
   /* Definition:
    * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer

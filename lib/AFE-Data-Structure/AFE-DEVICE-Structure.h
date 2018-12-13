@@ -64,6 +64,7 @@ struct DEVICE {
   boolean isRelay[1];
   boolean isHPMA115S0;
   boolean isBME680;
+  boolean isBH1750;
 #endif
 };
 

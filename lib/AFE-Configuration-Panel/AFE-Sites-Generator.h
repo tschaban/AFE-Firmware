@@ -98,6 +98,7 @@ public:
 #if defined(T6_CONFIG)
   String addHPMA115S0Configuration();
   String addBME680Configuration();
+  String addBH1750Configuration();
   String addSerialPortConfiguration();
 #endif
 

@@ -119,7 +119,7 @@ void AFEWebServer::generate() {
       data = getHPMA115S0SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getHPMA115S0SesnorConfigurationSite(command, data));
+        ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
 
   } else if (optionName == "BME680") {
     BME680 data;
@@ -127,7 +127,14 @@ void AFEWebServer::generate() {
       data = getBME680SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getBME680SesnorConfigurationSite(command, data));
+        ConfigurationPanel.getBME680SensorConfigurationSite(command, data));
+  } else if (optionName == "BH1750") {
+    BH1750 data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getBH1750SensorData();
+    }
+    publishHTML(
+        ConfigurationPanel.getBH1750SensorConfigurationSite(command, data));
 #endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
@@ -363,6 +370,7 @@ DEVICE AFEWebServer::getDeviceData() {
                                 : data.isHPMA115S0 = false;
 
   server.arg("b6").length() > 0 ? data.isBME680 = true : data.isBME680 = false;
+  server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
 #endif
 
   return data;
@@ -836,6 +844,25 @@ BME680 AFEWebServer::getBME680SensorData() {
 
   if (server.arg("g").length() > 0) {
     data.idx.gasResistance = server.arg("g").toInt();
+  }
+  return data;
+}
+
+BH1750 AFEWebServer::getBH1750SensorData() {
+  BH1750 data;
+  if (server.arg("i").length() > 0) {
+    data.interval = server.arg("i").toInt();
+  }
+
+  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+                               : data.sendOnlyChanges = false;
+
+  if (server.arg("m").length() > 0) {
+    data.mode = server.arg("m").toInt();
+  }
+
+  if (server.arg("d").length() > 0) {
+    data.idx = server.arg("d").toInt();
   }
   return data;
 }
