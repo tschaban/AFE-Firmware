@@ -63,7 +63,9 @@ void AFEDomoticz::callURL(const String url) {
   http.end();
 }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+/* T1,T2,T5,T6 */
+#if !(defined(T0_CONFIG) || defined(T3_CONFIG) || defined(T4_CONFIG))
+
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     char _temperatureChar[7];
@@ -89,7 +91,7 @@ void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
   if (initialized) {
     char _humidityChar[7];
@@ -102,7 +104,9 @@ void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
     callURL(call);
   }
 }
+#endif
 
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
 void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
@@ -155,6 +159,18 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     dtostrf(pressureValue, 6, 2, _floatToChar);
     call += _floatToChar;
     call += ";0"; // Hardcoded 0 means no forecast data
+    callURL(call);
+  }
+}
+
+void AFEDomoticz::sendPressureCommand(unsigned int idx, float pressureValue) {
+  if (initialized) {
+    char _floatToChar[7];
+    String call = getApiCall("udevice", idx);
+    call += "&nvalue=0&svalue=";
+    dtostrf(pressureValue, 4, 2, _floatToChar);
+    call += _floatToChar;
+    call += ";0";
     callURL(call);
   }
 }

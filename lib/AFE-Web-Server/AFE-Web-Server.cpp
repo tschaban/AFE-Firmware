@@ -845,6 +845,19 @@ BME680 AFEWebServer::getBME680SensorData() {
   if (server.arg("g").length() > 0) {
     data.idx.gasResistance = server.arg("g").toInt();
   }
+
+  if (server.arg("e").length() > 0) {
+    data.idx.temperature = server.arg("e").toInt();
+  }
+
+  if (server.arg("h").length() > 0) {
+    data.idx.humidity = server.arg("h").toInt();
+  }
+
+  if (server.arg("p").length() > 0) {
+    data.idx.pressure = server.arg("p").toInt();
+  }
+
   return data;
 }
 

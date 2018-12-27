@@ -2007,6 +2007,39 @@ String AFESitesGenerator::addBME680Configuration() {
     body += "0 - 999999</span>";
     body += "</div>";
 
+    body += "<div class=\"cf\"><label>IDX Temperatur";
+    body += language == 0 ? "a" : "e";
+    body += "</label><input name=\"e\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.temperature;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Wilgotność" : "Humidity";
+    body += "</label><input name=\"h\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.humidity;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Ciśnienie" : "Pressure";
+    body += "</label><input name=\"p\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.pressure;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
     body += "<div class=\"cf\"><label>IDX ";
     body += language == 0 ? "Czujnik gazu" : "Gas sensor";
     body += "</label><input name=\"g\" type=\"number\" step=\"1\" min=\"0\" "
@@ -2022,7 +2055,7 @@ String AFESitesGenerator::addBME680Configuration() {
     page += addConfigurationBlock(
         "Domoticz",
         language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            ? "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
             : "If IDX is set to 0 then a value won't be sent to Domoticz",
         body);
   }
@@ -2114,8 +2147,8 @@ String AFESitesGenerator::addUpgradeSection() {
           ? "Po zakończeniu aktualizacji urządzenie zostanie "
             "automatycznie zresetowane<br><br><strong>Uwaga:</strong> po "
             "aktualizacji nie odłączaj urządzenia przez conajmniej 1min.<br>"
-            "Urządzenie formatuje pamięc i wgrywa domyślne ustawienia. "
-            "<br><strong>Ten proces nie może zostac przerwany</strong>."
+            "Urządzenie formatuje pamięć i wgrywa domyślne ustawienia. "
+            "<br><strong>Ten proces nie może zostać przerwany</strong>."
           : "Device will be automatically rebooted after "
             "upgrade<br><br><strong>Warning</strong>: after upgrade do not "
             "plug off the device from power source for around a "

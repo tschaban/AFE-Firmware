@@ -344,6 +344,9 @@ void AFEDefaults::set() {
   SensorBME680Configuration.sendOnlyChanges = false;
   SensorBME680Configuration.idx.temperatureHumidityPressure = 0;
   SensorBME680Configuration.idx.gasResistance = 0;
+  SensorBME680Configuration.idx.temperature = 0;
+  SensorBME680Configuration.idx.humidity = 0;
+  SensorBME680Configuration.idx.pressure = 0;
   Data->saveConfiguration(SensorBME680Configuration);
 
   SensorBH1750Configuration.interval = 60;

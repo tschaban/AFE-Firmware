@@ -17,6 +17,9 @@
 struct BME680_DOMOTICZ {
   unsigned long temperatureHumidityPressure;
   unsigned long gasResistance;
+  unsigned long temperature;
+  unsigned long pressure;
+  unsigned long humidity;
 };
 
 struct BME680 {

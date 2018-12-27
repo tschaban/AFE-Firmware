@@ -137,6 +137,18 @@ void DomoticzPublishBME680SensorData(BME680_DATA data) {
       delay(10);
       Domoticz.sendCustomSensorCommand(idx.gasResistance, data.gasResistance);
     }
+    if (idx.temperature > 0) {
+      delay(10);
+      Domoticz.sendTemperatureCommand(idx.temperature, data.temperature);
+    }
+    if (idx.humidity > 0) {
+      delay(10);
+      Domoticz.sendHumidityCommand(idx.humidity, data.humidity);
+    }
+    if (idx.pressure > 0) {
+      delay(10);
+      Domoticz.sendPressureCommand(idx.pressure, data.pressure);
+    }
   }
 }
 

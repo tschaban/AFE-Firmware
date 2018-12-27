@@ -1196,6 +1196,9 @@ BME680 AFEDataAccess::getBME680SensorConfiguration() {
   configuration.sendOnlyChanges = Eeprom.read(429);
   configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
   configuration.idx.gasResistance = Eeprom.read(954, 6).toInt();
+  configuration.idx.temperature = Eeprom.read(960, 6).toInt();
+  configuration.idx.humidity = Eeprom.read(966, 6).toInt();
+  configuration.idx.pressure = Eeprom.read(972, 6).toInt();
   return configuration;
 }
 
@@ -1204,6 +1207,9 @@ void AFEDataAccess::saveConfiguration(BME680 configuration) {
   Eeprom.write(429, configuration.sendOnlyChanges);
   Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);
   Eeprom.write(954, 6, (long)configuration.idx.gasResistance);
+  Eeprom.write(960, 6, (long)configuration.idx.temperature);
+  Eeprom.write(966, 6, (long)configuration.idx.humidity);
+  Eeprom.write(972, 6, (long)configuration.idx.pressure);
 }
 
 BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
