@@ -82,12 +82,11 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
 #if defined(T6_CONFIG)
-#include <AFE-Sensor-BME680.h>
-#include <AFE-Sensor-HPMA115S0.h>
-//#include <Wire.h>
 #include <AFE-Sensor-BH1750.h>
+#include <AFE-Sensor-BMEx80.h>
+#include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
-AFESensorBME680 BME680Sensor;
+AFESensorBMEx80 BME680Sensor;
 AFESensorBH1750 BH1750Sensor;
 #endif
 
@@ -205,7 +204,7 @@ void setup() {
       initHPMA115S0Sensor();
     }
     if (Device.configuration.isBME680) {
-      BME680Sensor.begin();
+      BME680Sensor.begin(TYPE_BME680_SENSOR);
     }
     if (Device.configuration.isBH1750) {
       BH1750Sensor.begin();

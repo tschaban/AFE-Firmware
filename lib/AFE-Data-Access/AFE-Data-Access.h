@@ -117,8 +117,8 @@ public:
   void saveConfiguration(SERIALPORT configuration);
   HPMA115S0 getHPMA115S0SensorConfiguration();
   void saveConfiguration(HPMA115S0 configuration);
-  BME680 getBME680SensorConfiguration();
-  void saveConfiguration(BME680 configuration);
+  BMEx80 getBME680SensorConfiguration();
+  void saveConfiguration(BMEx80 configuration);
   BH1750 getBH1750SensorConfiguration();
   void saveConfiguration(BH1750 configuration);
 

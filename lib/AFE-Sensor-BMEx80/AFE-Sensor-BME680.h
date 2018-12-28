@@ -17,30 +17,20 @@
 class AFESensorBME680 {
 
 private:
-  BME680 configuration;
-  BME680_DATA sensorData;
-  boolean ready = false;
-  unsigned long startTime = 0;
-  boolean _initialized = false;
-
   Adafruit_BME680 bme;
 
 public:
+  BMEx80 configuration;
+  BMEx80_DATA data;
+
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
-  void begin();
+  boolean begin();
 
-  BME680_DATA get();
+  boolean read();
 
-  boolean isReady();
-
-  /* Method has to be added to the loop in order to listen for sensor value
-   * changes */
-  void listener();
-
-  /* Return relay IDX in Domoticz */
-  void getDomoticzIDX(BME680_DOMOTICZ *idx);
+  BMEx80_DATA get();
 };
 
 #endif

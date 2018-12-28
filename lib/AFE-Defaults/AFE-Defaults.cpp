@@ -32,7 +32,7 @@ void AFEDefaults::set() {
 #elif defined(T6_CONFIG)
   HPMA115S0 SensorHPMA115S0Configuration;
   SERIALPORT SerialPortConfiguration;
-  BME680 SensorBME680Configuration;
+  BMEx80 SensorBME680Configuration;
   BH1750 SensorBH1750Configuration;
 #endif
 

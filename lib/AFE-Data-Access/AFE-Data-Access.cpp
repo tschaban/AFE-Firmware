@@ -1190,8 +1190,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(412, configuration.TXD);
 }
 
-BME680 AFEDataAccess::getBME680SensorConfiguration() {
-  BME680 configuration;
+BMEx80 AFEDataAccess::getBME680SensorConfiguration() {
+  BMEx80 configuration;
   configuration.interval = Eeprom.read(424, 5).toInt();
   configuration.sendOnlyChanges = Eeprom.read(429);
   configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
@@ -1202,7 +1202,7 @@ BME680 AFEDataAccess::getBME680SensorConfiguration() {
   return configuration;
 }
 
-void AFEDataAccess::saveConfiguration(BME680 configuration) {
+void AFEDataAccess::saveConfiguration(BMEx80 configuration) {
   Eeprom.write(424, 5, (long)configuration.interval);
   Eeprom.write(429, configuration.sendOnlyChanges);
   Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);

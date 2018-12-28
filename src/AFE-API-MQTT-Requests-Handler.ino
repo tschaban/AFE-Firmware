@@ -131,7 +131,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       sprintf(_mqttTopic, "%sbme680/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
-          BME680_DATA sensorData;
+          BMEx80_DATA sensorData;
           sensorData = BME680Sensor.get();
           MQTTPublishBME680SensorData(sensorData);
         }
@@ -355,7 +355,7 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   }
 }
 
-void MQTTPublishBME680SensorData(BME680_DATA data) {
+void MQTTPublishBME680SensorData(BMEx80_DATA data) {
   if (Device.configuration.mqttAPI) {
     String messageString = "{'temperature':'";
     messageString += data.temperature;

@@ -367,7 +367,7 @@ AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
 }
 
 String AFEConfigurationPanel::getBME680SensorConfigurationSite(uint8_t command,
-                                                               BME680 data) {
+                                                               BMEx80 data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }

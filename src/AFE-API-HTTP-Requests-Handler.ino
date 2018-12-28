@@ -148,7 +148,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
   /* BME680 */
   else if (strcmp(request.device, "bme680") == 0) {
-    BME680_DATA sensorData;
+    BMEx80_DATA sensorData;
     sensorData = BME680Sensor.get();
     if (strcmp(request.name, "temperature") == 0) {
       if (strcmp(request.command, "get") == 0) {

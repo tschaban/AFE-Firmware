@@ -2,8 +2,8 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
-#ifndef _AFE_BME680_Structure_h
-#define _AFE_BME680_Structure_h
+#ifndef _AFE_BMEx80_Structure_h
+#define _AFE_BMEx80_Structure_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -14,7 +14,7 @@
 #define UNIT_CELCIUS 0
 #define UNIT_FAHRENHEIT 1
 
-struct BME680_DOMOTICZ {
+struct BMEx80_DOMOTICZ {
   unsigned long temperatureHumidityPressure;
   unsigned long gasResistance;
   unsigned long temperature;
@@ -22,14 +22,14 @@ struct BME680_DOMOTICZ {
   unsigned long humidity;
 };
 
-struct BME680 {
+struct BMEx80 {
   uint8_t type;
   uint16_t interval;
   boolean sendOnlyChanges;
-  BME680_DOMOTICZ idx;
+  BMEx80_DOMOTICZ idx;
 };
 
-struct BME680_DATA {
+struct BMEx80_DATA {
   float temperature;
   float humidity;
   float pressure;

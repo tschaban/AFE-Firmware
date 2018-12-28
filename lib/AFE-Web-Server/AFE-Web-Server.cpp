@@ -122,7 +122,7 @@ void AFEWebServer::generate() {
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
 
   } else if (optionName == "BME680") {
-    BME680 data;
+    BMEx80 data;
     if (command == SERVER_CMD_SAVE) {
       data = getBME680SensorData();
     }
@@ -829,8 +829,8 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   return data;
 };
 
-BME680 AFEWebServer::getBME680SensorData() {
-  BME680 data;
+BMEx80 AFEWebServer::getBME680SensorData() {
+  BMEx80 data;
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }

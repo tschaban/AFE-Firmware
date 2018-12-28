@@ -82,10 +82,9 @@ private:
 #if defined(T6_CONFIG)
   SERIALPORT getSerialPortData();
   HPMA115S0 getHPMA115S0SensorData();
-  BME680 getBME680SensorData();
+  BMEx80 getBME680SensorData();
   BH1750 getBH1750SensorData();
 #endif
-
   uint8_t getLanguageData();
 
 public:

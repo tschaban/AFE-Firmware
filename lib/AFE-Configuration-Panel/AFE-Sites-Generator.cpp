@@ -1968,7 +1968,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
 
 String AFESitesGenerator::addBME680Configuration() {
 
-  BME680 configuration = Data.getBME680SensorConfiguration();
+  BMEx80 configuration = Data.getBME680SensorConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";

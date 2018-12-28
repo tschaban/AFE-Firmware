@@ -124,9 +124,9 @@ void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   }
 }
 
-void DomoticzPublishBME680SensorData(BME680_DATA data) {
+void DomoticzPublishBME680SensorData(BMEx80_DATA data) {
   if (Device.configuration.domoticzAPI) {
-    BME680_DOMOTICZ idx;
+    BMEx80_DOMOTICZ idx;
     BME680Sensor.getDomoticzIDX(&idx);
     if (idx.temperatureHumidityPressure > 0) {
       Domoticz.sendTemperatureAndHumidityAndPressureCommand(
