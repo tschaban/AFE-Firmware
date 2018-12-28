@@ -121,13 +121,13 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
 
-  } else if (optionName == "BME680") {
-    BMEx80 data;
+  } else if (optionName == "BMx80") {
+    BMx80 data;
     if (command == SERVER_CMD_SAVE) {
-      data = getBME680SensorData();
+      data = getBMx80SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getBME680SensorConfigurationSite(command, data));
+        ConfigurationPanel.getBMx80SensorConfigurationSite(command, data));
   } else if (optionName == "BH1750") {
     BH1750 data;
     if (command == SERVER_CMD_SAVE) {
@@ -369,7 +369,10 @@ DEVICE AFEWebServer::getDeviceData() {
   server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
                                 : data.isHPMA115S0 = false;
 
-  server.arg("b6").length() > 0 ? data.isBME680 = true : data.isBME680 = false;
+  if (server.arg("b6").length() > 0) {
+    data.isBMx80 = server.arg("b6").toInt();
+  }
+
   server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
 #endif
 
@@ -829,8 +832,8 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   return data;
 };
 
-BMEx80 AFEWebServer::getBME680SensorData() {
-  BMEx80 data;
+BMx80 AFEWebServer::getBMx80SensorData() {
+  BMx80 data;
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }

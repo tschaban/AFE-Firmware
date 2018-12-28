@@ -2,33 +2,35 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
-#include "AFE-Sensor-BMEx80.h"
+#include "AFE-Sensor-BMx80.h"
 
-AFESensorBMEx80::AFESensorBMEx80(){};
+AFESensorBMx80::AFESensorBMx80(){};
 
-void AFESensorBMEx80::begin(uint8_t type) {
+void AFESensorBMx80::begin(uint8_t type) {
   sensorType = type;
 
 #if defined(DEBUG)
-  Serial << endl << endl << "-------- BMEx80: Initializing --------";
+  Serial << endl << endl << "-------- BMx80: Initializing --------";
 #endif
 
   _initialized =
-      (sensorType == TYPE_BME680_SENSOR
-           ? s6.begin()
-           : (sensorType == TYPE_BME280_SENSOR ? s2.begin() : false));
+      sensorType == TYPE_BME680_SENSOR
+          ? s6.begin()
+          : sensorType == TYPE_BME280_SENSOR ? s2.begin() : s1.begin();
 
 #if defined(DEBUG)
+  Serial << endl
+         << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
   Serial << endl << "--------------------------------------" << endl;
 #endif
 }
 
-BMEx80_DATA AFESensorBMEx80::get() {
+BMx80_DATA AFESensorBMx80::get() {
   ready = false;
   return sensorData;
 }
 
-boolean AFESensorBMEx80::isReady() {
+boolean AFESensorBMx80::isReady() {
   if (ready) {
     ready = false;
     return true;
@@ -37,7 +39,7 @@ boolean AFESensorBMEx80::isReady() {
   }
 }
 
-void AFESensorBMEx80::listener() {
+void AFESensorBMx80::listener() {
   if (_initialized) {
     unsigned long time = millis();
 
@@ -47,7 +49,9 @@ void AFESensorBMEx80::listener() {
 
     if (time - startTime >= (sensorType == TYPE_BME680_SENSOR
                                  ? s6.configuration.interval
-                                 : s2.configuration.interval) *
+                                 : sensorType == TYPE_BME280_SENSOR
+                                       ? s2.configuration.interval
+                                       : s1.configuration.interval) *
                                 1000) {
 
 #if defined(DEBUG)
@@ -59,23 +63,28 @@ void AFESensorBMEx80::listener() {
 #endif
 
       boolean readStatus =
-          (sensorType == TYPE_BME680_SENSOR ? s6.read() : s2.read());
+          sensorType == TYPE_BME680_SENSOR
+              ? s6.read()
+              : sensorType == TYPE_BME280_SENSOR ? s2.read() : s1.read();
 
       if (readStatus) {
-        sensorData = sensorType == TYPE_BME680_SENSOR ? s6.data : s2.data;
+        sensorData = sensorType == TYPE_BME680_SENSOR
+                         ? s6.data
+                         : sensorType == TYPE_BME280_SENSOR ? s2.data : s1.data;
 
 #if defined(DEBUG)
         Serial << endl
                << "Temperature = " << sensorData.temperature << endl
-               << "Humidity = " << sensorData.humidity << endl
                << "Pressure = " << sensorData.pressure;
+        if (sensorType != TYPE_BMP180_SENSOR) {
+          Serial << endl << "Humidity = " << sensorData.humidity;
+        }
         if (sensorType == TYPE_BME680_SENSOR) {
           Serial << endl << "Gas level = " << sensorData.gasResistance;
         }
       } else {
-        Serial << "No data found";
+        Serial << endl << "No data found";
 #endif
-
         ready = true;
       }
       startTime = 0;
@@ -86,7 +95,9 @@ void AFESensorBMEx80::listener() {
   }
 }
 
-void AFESensorBMEx80::getDomoticzIDX(BMEx80_DOMOTICZ *idx) {
-  *idx = sensorType == TYPE_BME680_SENSOR ? s6.configuration.idx
-                                          : s2.configuration.idx;
+void AFESensorBMx80::getDomoticzIDX(BMx80_DOMOTICZ *idx) {
+  *idx = sensorType == TYPE_BME680_SENSOR
+             ? s6.configuration.idx
+             : sensorType == TYPE_BME280_SENSOR ? s2.configuration.idx
+                                                : s1.configuration.idx;
 }

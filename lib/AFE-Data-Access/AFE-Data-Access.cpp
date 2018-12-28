@@ -133,7 +133,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
   configuration.isHPMA115S0 = Eeprom.read(413);
-  configuration.isBME680 = Eeprom.read(423);
+  configuration.isBMx80 = Eeprom.readUInt8(423);
   configuration.isBH1750 = Eeprom.read(430);
 
 #endif
@@ -251,7 +251,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 #if defined(T6_CONFIG)
   Eeprom.write(413, configuration.isHPMA115S0);
-  Eeprom.write(423, configuration.isBME680);
+  Eeprom.writeUInt8(423, configuration.isBMx80);
   Eeprom.write(430, configuration.isBH1750);
 #endif
 }
@@ -1190,8 +1190,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(412, configuration.TXD);
 }
 
-BMEx80 AFEDataAccess::getBME680SensorConfiguration() {
-  BMEx80 configuration;
+BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
+  BMx80 configuration;
   configuration.interval = Eeprom.read(424, 5).toInt();
   configuration.sendOnlyChanges = Eeprom.read(429);
   configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
@@ -1202,7 +1202,7 @@ BMEx80 AFEDataAccess::getBME680SensorConfiguration() {
   return configuration;
 }
 
-void AFEDataAccess::saveConfiguration(BMEx80 configuration) {
+void AFEDataAccess::saveConfiguration(BMx80 configuration) {
   Eeprom.write(424, 5, (long)configuration.interval);
   Eeprom.write(429, configuration.sendOnlyChanges);
   Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);

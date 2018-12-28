@@ -280,9 +280,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
-    if (Device.configuration.isBME680) {
-      page += "<li class=\"itm\"><a href=\"\\?option=BME680\">";
-      page += language == 0 ? "Czujnik BME680" : "BME680 Sensor";
+    if (Device.configuration.isBMx80 != 0) {
+      page += "<li class=\"itm\"><a href=\"\\?option=BMx80\">";
+      page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
       page += "</a></li>";
     }
 
@@ -468,9 +468,9 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body += "<div class=\"cc\"><label><input name =\"b6\" type=\"checkbox\" "
           "value=\"1\"";
-  body += configuration.isBME680 ? " checked=\"checked\">" : ">";
+  body += configuration.isBMx80 ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
-  body += " BME680";
+  body += " BMx80";
   body += "</label></div>";
 
   body += "<div class=\"cc\"><label><input name =\"bh\" type=\"checkbox\" "
@@ -1966,9 +1966,9 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
   return page;
 }
 
-String AFESitesGenerator::addBME680Configuration() {
+String AFESitesGenerator::addBMx80Configuration() {
 
-  BMEx80 configuration = Data.getBME680SensorConfiguration();
+  BMx80 configuration = Data.getBMx80SensorConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
@@ -1992,7 +1992,7 @@ String AFESitesGenerator::addBME680Configuration() {
   body += "</fieldset>";
 
   String page = addConfigurationBlock(
-      language == 0 ? "Czujnik BME680" : "BME680 Sensor", "", body);
+      language == 0 ? "Czujnik BMx80" : "BMx80 Sensor", "", body);
 
   if (device.domoticzAPI) {
     body = "<fieldset>";

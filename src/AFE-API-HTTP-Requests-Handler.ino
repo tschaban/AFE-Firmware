@@ -133,7 +133,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #elif defined(T6_CONFIG)
 
   /* Request related to gate */
-  if (strcmp(request.device, "hpma115s0") == 0) {
+  if (strcmp(request.device, "HPMA115S0") == 0) {
     HPMA115S0_DATA sensorData;
     sensorData = ParticleSensor.get();
     if (strcmp(request.name, "PM2.5") == 0) {
@@ -146,23 +146,25 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       }
     }
   }
-  /* BME680 */
-  else if (strcmp(request.device, "bme680") == 0) {
-    BMEx80_DATA sensorData;
-    sensorData = BME680Sensor.get();
+  /* BMx80 */
+  else if (strcmp(request.device, "BMx80") == 0) {
+    BMx80_DATA sensorData;
+    sensorData = BMx80Sensor.get();
     if (strcmp(request.name, "temperature") == 0) {
       if (strcmp(request.command, "get") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      }
-    } else if (strcmp(request.name, "humidity") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
       }
     } else if (strcmp(request.name, "pressure") == 0) {
       if (strcmp(request.command, "get") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
       }
-    } else if (strcmp(request.name, "gasResistance") == 0) {
+    } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+               strcmp(request.name, "humidity") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
+      }
+    } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
+               strcmp(request.name, "gasResistance") == 0) {
       if (strcmp(request.command, "get") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
       }
@@ -170,7 +172,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 
   /* BH1750 */
-  else if (strcmp(request.device, "bh1750") == 0) {
+  else if (strcmp(request.device, "BH1750") == 0) {
     if (strcmp(request.name, "lux") == 0) {
       if (strcmp(request.command, "get") == 0) {
         float lux = BH1750Sensor.get();

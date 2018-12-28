@@ -81,7 +81,7 @@ public:
 #if defined(T6_CONFIG)
   String getSerialPortConfigurationSite(uint8_t command, SERIALPORT data);
   String getHPMA115S0SensorConfigurationSite(uint8_t command, HPMA115S0 data);
-  String getBME680SensorConfigurationSite(uint8_t command, BMEx80 data);
+  String getBMx80SensorConfigurationSite(uint8_t command, BMx80 data);
   String getBH1750SensorConfigurationSite(uint8_t command, BH1750 data);
 #endif
 

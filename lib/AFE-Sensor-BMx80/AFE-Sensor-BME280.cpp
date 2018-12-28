@@ -8,7 +8,7 @@ AFESensorBME280::AFESensorBME280(){};
 
 boolean AFESensorBME280::begin() {
   AFEDataAccess Data;
-  configuration = Data.getBME680SensorConfiguration();
+  configuration = Data.getBMx80SensorConfiguration();
 
 #if defined(DEBUG)
   Serial << endl << "Sensor type: BME280";
@@ -21,9 +21,6 @@ boolean AFESensorBME280::begin() {
                     Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1,
                     Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
 
-#ifdef DEBUG
-    Serial << endl << "BME280: Found";
-#endif
     return true;
   }
 }

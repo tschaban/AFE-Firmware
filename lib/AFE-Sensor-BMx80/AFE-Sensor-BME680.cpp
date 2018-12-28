@@ -8,7 +8,7 @@ AFESensorBME680::AFESensorBME680(){};
 
 boolean AFESensorBME680::begin() {
   AFEDataAccess Data;
-  configuration = Data.getBME680SensorConfiguration();
+  configuration = Data.getBMx80SensorConfiguration();
 
 #if defined(DEBUG)
   Serial << endl << "Sensor type: BME680";
@@ -22,9 +22,6 @@ boolean AFESensorBME680::begin() {
     bme.setPressureOversampling(BME680_OS_4X);
     bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
     bme.setGasHeater(320, 150); // 320*C for 150 ms
-#ifdef DEBUG
-    Serial << endl << "BME680: Found";
-#endif
     return true;
   }
 }
