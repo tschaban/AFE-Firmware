@@ -22,7 +22,6 @@ struct BMx80_DOMOTICZ {
 struct BMx80 {
   uint8_t type;
   uint16_t interval;
-  boolean sendOnlyChanges;
   BMx80_DOMOTICZ idx;
 };
 

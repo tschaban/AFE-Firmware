@@ -133,8 +133,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
   configuration.isHPMA115S0 = Eeprom.read(413);
-  configuration.isBMx80 = Eeprom.readUInt8(423);
-  configuration.isBH1750 = Eeprom.read(430);
+  configuration.isBMx80 = Eeprom.readUInt8(422);
+  configuration.isBH1750 = Eeprom.read(428);
 
 #endif
 
@@ -251,8 +251,8 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 #if defined(T6_CONFIG)
   Eeprom.write(413, configuration.isHPMA115S0);
-  Eeprom.writeUInt8(423, configuration.isBMx80);
-  Eeprom.write(430, configuration.isBH1750);
+  Eeprom.writeUInt8(422, configuration.isBMx80);
+  Eeprom.write(428, configuration.isBH1750);
 #endif
 }
 
@@ -1163,19 +1163,17 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   HPMA115S0 configuration;
   configuration.interval = Eeprom.read(414, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(419);
-  configuration.timeToMeasure = Eeprom.read(420, 3).toInt();
-  configuration.idx.pm25 = Eeprom.read(936, 6).toInt();
-  configuration.idx.pm10 = Eeprom.read(942, 6).toInt();
+  configuration.timeToMeasure = Eeprom.read(419, 3).toInt();
+  configuration.idx.pm25 = Eeprom.read(926, 6).toInt();
+  configuration.idx.pm10 = Eeprom.read(932, 6).toInt();
   return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(414, 5, (long)configuration.interval);
-  Eeprom.write(419, configuration.sendOnlyChanges);
-  Eeprom.write(420, 3, (long)configuration.timeToMeasure);
-  Eeprom.write(936, 6, (long)configuration.idx.pm25);
-  Eeprom.write(942, 6, (long)configuration.idx.pm10);
+  Eeprom.write(419, 3, (long)configuration.timeToMeasure);
+  Eeprom.write(926, 6, (long)configuration.idx.pm25);
+  Eeprom.write(932, 6, (long)configuration.idx.pm10);
 }
 
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
@@ -1192,38 +1190,34 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
 
 BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
   BMx80 configuration;
-  configuration.interval = Eeprom.read(424, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(429);
-  configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
-  configuration.idx.gasResistance = Eeprom.read(954, 6).toInt();
-  configuration.idx.temperature = Eeprom.read(960, 6).toInt();
-  configuration.idx.humidity = Eeprom.read(966, 6).toInt();
-  configuration.idx.pressure = Eeprom.read(972, 6).toInt();
+  configuration.interval = Eeprom.read(423, 5).toInt();
+  configuration.idx.temperatureHumidityPressure = Eeprom.read(938, 6).toInt();
+  configuration.idx.gasResistance = Eeprom.read(944, 6).toInt();
+  configuration.idx.temperature = Eeprom.read(950, 6).toInt();
+  configuration.idx.humidity = Eeprom.read(956, 6).toInt();
+  configuration.idx.pressure = Eeprom.read(962, 6).toInt();
   return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(BMx80 configuration) {
-  Eeprom.write(424, 5, (long)configuration.interval);
-  Eeprom.write(429, configuration.sendOnlyChanges);
-  Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);
-  Eeprom.write(954, 6, (long)configuration.idx.gasResistance);
-  Eeprom.write(960, 6, (long)configuration.idx.temperature);
-  Eeprom.write(966, 6, (long)configuration.idx.humidity);
-  Eeprom.write(972, 6, (long)configuration.idx.pressure);
+  Eeprom.write(423, 5, (long)configuration.interval);
+  Eeprom.write(938, 6, (long)configuration.idx.temperatureHumidityPressure);
+  Eeprom.write(944, 6, (long)configuration.idx.gasResistance);
+  Eeprom.write(950, 6, (long)configuration.idx.temperature);
+  Eeprom.write(956, 6, (long)configuration.idx.humidity);
+  Eeprom.write(962, 6, (long)configuration.idx.pressure);
 }
 
 BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
   BH1750 configuration;
-  configuration.interval = Eeprom.read(431, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(436);
-  configuration.mode = Eeprom.readUInt8(437);
-  configuration.idx = Eeprom.read(978, 6).toInt();
+  configuration.interval = Eeprom.read(429, 5).toInt();
+  configuration.mode = Eeprom.readUInt8(434);
+  configuration.idx = Eeprom.read(968, 6).toInt();
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(BH1750 configuration) {
-  Eeprom.write(431, 5, (long)configuration.interval);
-  Eeprom.write(436, configuration.sendOnlyChanges);
-  Eeprom.writeUInt8(437, configuration.mode);
-  Eeprom.write(978, 6, (long)configuration.idx);
+  Eeprom.write(429, 5, (long)configuration.interval);
+  Eeprom.writeUInt8(434, configuration.mode);
+  Eeprom.write(968, 6, (long)configuration.idx);
 }
 #endif

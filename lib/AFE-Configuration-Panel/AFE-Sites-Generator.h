@@ -15,6 +15,9 @@
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
+#if defined(T6_CONFIG)
+#include <AFE-Sensor-BMx80.h>
+#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -27,6 +30,7 @@ private:
   AFEDataAccess Data;
   AFEDevice Device;
   uint8_t language;
+  FIRMWARE firmware;
 
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,

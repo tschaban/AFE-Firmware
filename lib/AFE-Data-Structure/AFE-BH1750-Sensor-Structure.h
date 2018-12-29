@@ -14,7 +14,6 @@
 struct BH1750 {
   uint16_t interval;
   uint8_t mode;
-  boolean sendOnlyChanges;
   unsigned long idx;
 };
 

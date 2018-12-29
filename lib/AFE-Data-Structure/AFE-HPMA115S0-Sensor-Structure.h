@@ -21,7 +21,6 @@ struct HPMA115S0_DOMOTICZ {
 
 struct HPMA115S0 {
   uint16_t interval;
-  boolean sendOnlyChanges;
   uint16_t timeToMeasure;
   HPMA115S0_DOMOTICZ idx;
 };

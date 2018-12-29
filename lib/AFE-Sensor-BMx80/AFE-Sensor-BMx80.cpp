@@ -82,10 +82,11 @@ void AFESensorBMx80::listener() {
         if (sensorType == TYPE_BME680_SENSOR) {
           Serial << endl << "Gas level = " << sensorData.gasResistance;
         }
+
+        ready = true;
       } else {
         Serial << endl << "No data found";
 #endif
-        ready = true;
       }
       startTime = 0;
 #if defined(DEBUG)

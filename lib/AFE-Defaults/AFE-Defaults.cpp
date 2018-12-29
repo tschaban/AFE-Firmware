@@ -330,7 +330,6 @@ void AFEDefaults::set() {
 /* T6 HPMA115S0 Sensor */
 #if defined(T6_CONFIG)
   SensorHPMA115S0Configuration.interval = 60;
-  SensorHPMA115S0Configuration.sendOnlyChanges = false;
   SensorHPMA115S0Configuration.timeToMeasure = 0;
   SensorHPMA115S0Configuration.idx.pm10 = 0;
   SensorHPMA115S0Configuration.idx.pm25 = 0;
@@ -341,7 +340,6 @@ void AFEDefaults::set() {
   Data->saveConfiguration(SerialPortConfiguration);
 
   SensorBMx80Configuration.interval = 60;
-  SensorBMx80Configuration.sendOnlyChanges = false;
   SensorBMx80Configuration.idx.temperatureHumidityPressure = 0;
   SensorBMx80Configuration.idx.gasResistance = 0;
   SensorBMx80Configuration.idx.temperature = 0;
@@ -350,12 +348,9 @@ void AFEDefaults::set() {
   Data->saveConfiguration(SensorBMx80Configuration);
 
   SensorBH1750Configuration.interval = 60;
-  SensorBH1750Configuration.sendOnlyChanges = false;
   SensorBH1750Configuration.idx = 0;
   SensorBH1750Configuration.mode = 0;
   Data->saveConfiguration(SensorBH1750Configuration);
-
-  ;
 
 #endif
 

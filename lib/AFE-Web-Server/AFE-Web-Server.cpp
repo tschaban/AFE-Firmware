@@ -819,9 +819,6 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
     data.timeToMeasure = server.arg("t").toInt();
   }
 
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
-
   if (server.arg("x2").length() > 0) {
     data.idx.pm25 = server.arg("x2").toInt();
   }
@@ -837,9 +834,6 @@ BMx80 AFEWebServer::getBMx80SensorData() {
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }
-
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
 
   if (server.arg("t").length() > 0) {
     data.idx.temperatureHumidityPressure = server.arg("t").toInt();
@@ -869,9 +863,6 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }
-
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
 
   if (server.arg("m").length() > 0) {
     data.mode = server.arg("m").toInt();

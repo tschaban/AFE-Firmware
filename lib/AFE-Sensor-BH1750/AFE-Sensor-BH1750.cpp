@@ -48,15 +48,13 @@ void AFESensorBH1750::listener() {
       Serial << endl << "Time: " << (millis() - startTime) / 1000 << "s";
 #endif
 
-      float _currentLightLevel = bh1750.readLightLevel();
-
-      if (_currentLightLevel != currentLightLevel) {
-        currentLightLevel = _currentLightLevel;
+      currentLightLevel = bh1750.readLightLevel();
+      if (currentLightLevel >= 0) {
         ready = true;
       }
 
 #if defined(DEBUG)
-      Serial << endl << "Lux: " << _currentLightLevel << "lx";
+      Serial << endl << "Lux: " << currentLightLevel << "lx";
       Serial << endl << "---------------------------";
 #endif
 

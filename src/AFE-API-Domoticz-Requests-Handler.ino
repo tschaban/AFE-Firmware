@@ -134,7 +134,7 @@ void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
           idx.temperatureHumidityPressure, data.temperature, data.humidity,
           data.pressure);
     }
-    if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
+    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR &&
         idx.gasResistance > 0) {
       delay(10);
       Domoticz.sendCustomSensorCommand(idx.gasResistance, data.gasResistance);

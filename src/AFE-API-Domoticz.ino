@@ -68,11 +68,9 @@ void AFEDomoticz::callURL(const String url) {
 
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
-    char _temperatureChar[7];
-    dtostrf(value, 4, 2, _temperatureChar);
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
-    call += _temperatureChar;
+    call += value;
     callURL(call);
   }
 }
@@ -81,11 +79,9 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 #if defined(T6_CONFIG)
 void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
   if (initialized) {
-    char _char[10];
-    dtostrf(value, 7, 3, _char);
     String call = getApiCall("udevice", idx);
     call += "&svalue=";
-    call += _char;
+    call += value;
     callURL(call);
   }
 }
@@ -94,11 +90,9 @@ void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
 #if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
   if (initialized) {
-    char _humidityChar[7];
-    dtostrf(value, 5, 2, _humidityChar);
     String call = getApiCall("udevice", idx);
     call += "&nvalue=";
-    call += _humidityChar;
+    call += value;
     call += "&svalue=";
     call += getHumidityState(value);
     callURL(call);
@@ -114,11 +108,9 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
     char _floatToChar[7];
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
-    dtostrf(temperatureValue, 4, 2, _floatToChar);
-    call += _floatToChar;
+    call += temperatureValue;
     call += ";";
-    dtostrf(humidityValue, 5, 2, _floatToChar);
-    call += _floatToChar;
+    call += humidityValue;
     call += ";";
     call += getHumidityState(humidityValue);
     callURL(call);
@@ -145,19 +137,15 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     unsigned int idx, float temperatureValue, float humidityValue,
     float pressureValue) {
   if (initialized) {
-    char _floatToChar[8];
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
-    dtostrf(temperatureValue, 4, 2, _floatToChar);
-    call += _floatToChar;
+    call += temperatureValue;
     call += ";";
-    dtostrf(humidityValue, 5, 2, _floatToChar);
-    call += _floatToChar;
+    call += humidityValue;
     call += ";";
     call += getHumidityState(humidityValue);
     call += ";";
-    dtostrf(pressureValue, 6, 2, _floatToChar);
-    call += _floatToChar;
+    call += pressureValue;
     call += ";0"; // Hardcoded 0 means no forecast data
     callURL(call);
   }
@@ -165,11 +153,9 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
 
 void AFEDomoticz::sendPressureCommand(unsigned int idx, float pressureValue) {
   if (initialized) {
-    char _floatToChar[7];
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
-    dtostrf(pressureValue, 4, 2, _floatToChar);
-    call += _floatToChar;
+    call += pressureValue;
     call += ";0";
     callURL(call);
   }
