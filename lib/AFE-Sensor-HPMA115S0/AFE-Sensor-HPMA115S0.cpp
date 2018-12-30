@@ -273,14 +273,10 @@ void AFESensorHPMA115S0::listener() {
 
       UART.send(commandRead);
       if (read()) {
-        if (!configuration.sendOnlyChanges ||
-            (configuration.sendOnlyChanges &&
-             (current.pm25 != buffer.pm25 || current.pm10 != buffer.pm10))) {
-          current.pm25 = buffer.pm25;
-          current.pm10 = buffer.pm10;
-          if (current.pm25 != 0 && current.pm10 != 0) {
-            ready = true;
-          }
+        current.pm25 = buffer.pm25;
+        current.pm10 = buffer.pm10;
+        if (current.pm25 != 0 && current.pm10 != 0) {
+          ready = true;
         }
       }
 

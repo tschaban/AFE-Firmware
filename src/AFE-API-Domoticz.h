@@ -49,19 +49,23 @@ public:
   */
   void sendSwitchCommand(unsigned int idx, const char *value);
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG) ||          \
+    defined(T6_CONFIG)
   /* It send to Domoticz temperature using following API call
      json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
   */
   void sendTemperatureCommand(unsigned int idx, float value);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
   /* It send to Domoticz humidity using following API call
      /json.htm?type=command&param=udevice&idx=IDX&nvalue=HUM&svalue=HUM_STAT
   */
   void sendHumidityCommand(unsigned int idx, float value);
 
+#endif
+
+#if defined(T2_CONFIG) || defined(T5_CONFIG)
   /* It send to Domoticz temperature and humidity using following API call
      /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP;HUM;HUM_STAT
   */
@@ -89,6 +93,7 @@ public:
 #if defined(T6_CONFIG)
   void sendSValueCommand(unsigned int idx, float value);
   void sendCustomSensorCommand(unsigned int idx, uint16_t value);
+  void sendPressureCommand(unsigned int idx, float pressureValue);
   /* Definition:
    * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
    */

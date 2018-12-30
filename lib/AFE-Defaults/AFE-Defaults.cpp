@@ -32,7 +32,7 @@ void AFEDefaults::set() {
 #elif defined(T6_CONFIG)
   HPMA115S0 SensorHPMA115S0Configuration;
   SERIALPORT SerialPortConfiguration;
-  BME680 SensorBME680Configuration;
+  BMx80 SensorBMx80Configuration;
   BH1750 SensorBH1750Configuration;
 #endif
 
@@ -98,7 +98,7 @@ void AFEDefaults::set() {
 /* HPMA115S0 Sesnor */
 #if defined(T6_CONFIG)
   deviceConfiguration.isHPMA115S0 = false;
-  deviceConfiguration.isBME680 = false;
+  deviceConfiguration.isBMx80 = 0;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -330,7 +330,6 @@ void AFEDefaults::set() {
 /* T6 HPMA115S0 Sensor */
 #if defined(T6_CONFIG)
   SensorHPMA115S0Configuration.interval = 60;
-  SensorHPMA115S0Configuration.sendOnlyChanges = false;
   SensorHPMA115S0Configuration.timeToMeasure = 0;
   SensorHPMA115S0Configuration.idx.pm10 = 0;
   SensorHPMA115S0Configuration.idx.pm25 = 0;
@@ -340,19 +339,20 @@ void AFEDefaults::set() {
   SerialPortConfiguration.TXD = 14;
   Data->saveConfiguration(SerialPortConfiguration);
 
-  SensorBME680Configuration.interval = 60;
-  SensorBME680Configuration.sendOnlyChanges = false;
-  SensorBME680Configuration.idx.temperatureHumidityPressure = 0;
-  SensorBME680Configuration.idx.gasResistance = 0;
-  Data->saveConfiguration(SensorBME680Configuration);
+  SensorBMx80Configuration.interval = 60;
+  SensorBMx80Configuration.i2cAddress = 0;
+  SensorBMx80Configuration.idx.temperatureHumidityPressure = 0;
+  SensorBMx80Configuration.idx.gasResistance = 0;
+  SensorBMx80Configuration.idx.temperature = 0;
+  SensorBMx80Configuration.idx.humidity = 0;
+  SensorBMx80Configuration.idx.pressure = 0;
+  Data->saveConfiguration(SensorBMx80Configuration);
 
   SensorBH1750Configuration.interval = 60;
-  SensorBH1750Configuration.sendOnlyChanges = false;
+  SensorBH1750Configuration.i2cAddress = 0;
   SensorBH1750Configuration.idx = 0;
   SensorBH1750Configuration.mode = 0;
   Data->saveConfiguration(SensorBH1750Configuration);
-
-  ;
 
 #endif
 

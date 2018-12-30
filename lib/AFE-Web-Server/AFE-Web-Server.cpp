@@ -121,13 +121,13 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
 
-  } else if (optionName == "BME680") {
-    BME680 data;
+  } else if (optionName == "BMx80") {
+    BMx80 data;
     if (command == SERVER_CMD_SAVE) {
-      data = getBME680SensorData();
+      data = getBMx80SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getBME680SensorConfigurationSite(command, data));
+        ConfigurationPanel.getBMx80SensorConfigurationSite(command, data));
   } else if (optionName == "BH1750") {
     BH1750 data;
     if (command == SERVER_CMD_SAVE) {
@@ -369,7 +369,10 @@ DEVICE AFEWebServer::getDeviceData() {
   server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
                                 : data.isHPMA115S0 = false;
 
-  server.arg("b6").length() > 0 ? data.isBME680 = true : data.isBME680 = false;
+  if (server.arg("b6").length() > 0) {
+    data.isBMx80 = server.arg("b6").toInt();
+  }
+
   server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
 #endif
 
@@ -816,9 +819,6 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
     data.timeToMeasure = server.arg("t").toInt();
   }
 
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
-
   if (server.arg("x2").length() > 0) {
     data.idx.pm25 = server.arg("x2").toInt();
   }
@@ -829,14 +829,16 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   return data;
 };
 
-BME680 AFEWebServer::getBME680SensorData() {
-  BME680 data;
+BMx80 AFEWebServer::getBMx80SensorData() {
+  BMx80 data;
+
+  if (server.arg("a").length() > 0) {
+    data.i2cAddress = server.arg("a").toInt();
+  }
+
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }
-
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
 
   if (server.arg("t").length() > 0) {
     data.idx.temperatureHumidityPressure = server.arg("t").toInt();
@@ -845,17 +847,31 @@ BME680 AFEWebServer::getBME680SensorData() {
   if (server.arg("g").length() > 0) {
     data.idx.gasResistance = server.arg("g").toInt();
   }
+
+  if (server.arg("e").length() > 0) {
+    data.idx.temperature = server.arg("e").toInt();
+  }
+
+  if (server.arg("h").length() > 0) {
+    data.idx.humidity = server.arg("h").toInt();
+  }
+
+  if (server.arg("p").length() > 0) {
+    data.idx.pressure = server.arg("p").toInt();
+  }
+
   return data;
 }
 
 BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
+  if (server.arg("a").length() > 0) {
+    data.i2cAddress = server.arg("a").toInt();
+  }
+
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }
-
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
 
   if (server.arg("m").length() > 0) {
     data.mode = server.arg("m").toInt();

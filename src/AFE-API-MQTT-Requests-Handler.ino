@@ -127,13 +127,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
 
-    if (Device.configuration.isBME680) {
-      sprintf(_mqttTopic, "%sbme680/cmd", MQTTConfiguration.topic);
+    if (Device.configuration.isBMx80) {
+      sprintf(_mqttTopic, "%sbmx80/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
-          BME680_DATA sensorData;
-          sensorData = BME680Sensor.get();
-          MQTTPublishBME680SensorData(sensorData);
+          BMx80_DATA sensorData;
+          sensorData = BMx80Sensor.get();
+          MQTTPublishBMx80SensorData(sensorData);
         }
       }
     }
@@ -351,30 +351,34 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
     messageString += "'}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("hpma115s0/all", message);
+    Mqtt.publish("HPMA115S0/all", message);
   }
 }
 
-void MQTTPublishBME680SensorData(BME680_DATA data) {
+void MQTTPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.mqttAPI) {
     String messageString = "{'temperature':'";
     messageString += data.temperature;
-    messageString += "','humidity':'";
-    messageString += data.humidity;
+    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
+      messageString += "','humidity':'";
+      messageString += data.humidity;
+    }
+    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
+      messageString += "','gasResistance':'";
+      messageString += data.gasResistance;
+    }
     messageString += "','pressure':'";
     messageString += data.pressure;
-    messageString += "','gasResistance':'";
-    messageString += data.gasResistance;
     messageString += "'}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("bme680/all", message);
+    Mqtt.publish("BMx80/all", message);
   }
 }
 
 void MQTTPublishLightLevel(float lux) {
   if (Device.configuration.mqttAPI) {
-    Mqtt.publish("bh1750/lux", lux);
+    Mqtt.publish("BH1750/lux", lux);
   }
 }
 

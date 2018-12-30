@@ -366,15 +366,15 @@ AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getBME680SensorConfigurationSite(uint8_t command,
-                                                               BME680 data) {
+String AFEConfigurationPanel::getBMx80SensorConfigurationSite(uint8_t command,
+                                                              BMx80 data) {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
 
   String page = Site.generateHeader();
-  page += "<form action=\"/?option=BME680&cmd=1\"  method=\"post\">";
-  page += Site.addBME680Configuration();
+  page += "<form action=\"/?option=BMx80&cmd=1\"  method=\"post\">";
+  page += Site.addBMx80Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
   page += language == 0 ? "Zapisz" : "Save";
   page += "\"></form>";

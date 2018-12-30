@@ -82,13 +82,14 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
 #if defined(T6_CONFIG)
-#include <AFE-Sensor-BME680.h>
-#include <AFE-Sensor-HPMA115S0.h>
-//#include <Wire.h>
+#include <AFE-I2C-Scanner.h>
 #include <AFE-Sensor-BH1750.h>
+#include <AFE-Sensor-BMx80.h>
+#include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
-AFESensorBME680 BME680Sensor;
+AFESensorBMx80 BMx80Sensor;
 AFESensorBH1750 BH1750Sensor;
+AFEI2CScanner I2CScanner;
 #endif
 
 void setup() {
@@ -198,15 +199,20 @@ void setup() {
 #endif
 #endif
 
-/* Initializing T6 sesnors */
+/* Initializing T6 sensor */
 #if defined(T6_CONFIG)
     Wire.begin();
     if (Device.configuration.isHPMA115S0) {
       initHPMA115S0Sensor();
     }
-    if (Device.configuration.isBME680) {
-      BME680Sensor.begin();
+    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
+      BMx80Sensor.begin(TYPE_BME680_SENSOR);
+    } else if (Device.configuration.isBMx80 == TYPE_BME280_SENSOR) {
+      BMx80Sensor.begin(TYPE_BME280_SENSOR);
+    } else if (Device.configuration.isBMx80 == TYPE_BMP180_SENSOR) {
+      BMx80Sensor.begin(TYPE_BMP180_SENSOR);
     }
+
     if (Device.configuration.isBH1750) {
       BH1750Sensor.begin();
     }
@@ -224,6 +230,13 @@ void setup() {
   /* Initializing APIs */
   MQTTInit();
   DomoticzInit();
+
+#if defined(DEBUG) && defined(T6_CONFIG)
+  /* Scanning I2C for devices */
+  if (Device.getMode() == MODE_NORMAL) {
+    I2CScanner.scanAll();
+  }
+#endif
 
 #ifdef DEBUG
   Serial << endl
@@ -265,7 +278,7 @@ void loop() {
         mainGate();
 #endif
 
-#if !(defined(T3_CONFIG) || defined(T5_CONFIG))
+#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
         /* Relay related events */
         mainRelay();
 #endif
@@ -278,7 +291,7 @@ void loop() {
 /* Sensor: HPMA115S0 related code  */
 #if defined(T6_CONFIG)
         mainHPMA115S0Sensor();
-        mainBME680Sensor();
+        mainBMx80Sensor();
         mainBH1750Sensor();
 #endif
 

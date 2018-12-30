@@ -1,11 +1,11 @@
 #include "AFE-Sites-Generator.h"
 
-AFESitesGenerator::AFESitesGenerator() { language = Data.getLanguage(); }
+AFESitesGenerator::AFESitesGenerator() {
+  language = Data.getLanguage();
+  firmware = Data.getFirmwareConfiguration();
+}
 
 const String AFESitesGenerator::generateHeader(uint8_t redirect) {
-
-  FIRMWARE configuration;
-  configuration = Data.getFirmwareConfiguration();
 
   String page = "<!doctype html>"
                 "<html lang=\"en\">"
@@ -19,9 +19,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   }
 
   page += "<title>AFE Firmware ";
-  page += configuration.version;
+  page += firmware.version;
   page += " [T";
-  page += configuration.type;
+  page += firmware.type;
   page +=
       "]</title>"
       "<style>#l,#r{padding:20px}.ltag,.ltit,body{margin:0}.b,.itm "
@@ -280,9 +280,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
       page += "</a></li>";
     }
 
-    if (Device.configuration.isBME680) {
-      page += "<li class=\"itm\"><a href=\"\\?option=BME680\">";
-      page += language == 0 ? "Czujnik BME680" : "BME680 Sensor";
+    if (Device.configuration.isBMx80 != 0) {
+      page += "<li class=\"itm\"><a href=\"\\?option=BMx80\">";
+      page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
       page += "</a></li>";
     }
 
@@ -320,29 +320,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += language == 0 ? "pl" : "en";
   page += "/\" target=\"_blank\">Do";
   page += language == 0 ? "kumentacja" : "cumentation";
-  page += "</a></li><li class=\"itm\"><a "
-          "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
-          "target=\"_blank\">";
-  page += language == 0 ? "Pomoc" : "Help";
-  page += "</a></li><li class=\"itm\"><a "
-          "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
-          "LICENSE\" "
-          "target=\"_blank\">Licenc";
-  page += language == 0 ? "ja" : "e";
-  page += "</a></li><li class=\"itm\"><a "
-          "href=\"https://www.smartnydom.pl/afe-firmware-";
-  page += language == 0 ? "pl" : "en";
-  page += "/log\" target=\"_blank\">";
-  page += language == 0 ? "Wersja" : "Version";
-  page += " ";
-  page += configuration.version;
-  page += " [T";
-  page += configuration.type;
-  page += "]</a></li>"
-          "</ul>";
-
-  page += "</div>"
-          "<div id=\"r\">";
+  page += "</a></li></ul></div><div id=\"r\">";
 
   return page;
 }
@@ -459,18 +437,12 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #if defined(T6_CONFIG)
+
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
   body += " HPMA115S0";
-  body += "</label></div>";
-
-  body += "<div class=\"cc\"><label><input name =\"b6\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.isBME680 ? " checked=\"checked\">" : ">";
-  body += language == 0 ? "Czujnik" : " Sensor";
-  body += " BME680";
   body += "</label></div>";
 
   body += "<div class=\"cc\"><label><input name =\"bh\" type=\"checkbox\" "
@@ -479,6 +451,50 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += language == 0 ? "Czujnik" : " Sensor";
   body += " BH1750";
   body += "</label></div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Czujnik" : " Sensor";
+  body += " BMx80";
+  body += "</label>";
+  body += "<select name=\"b6\">";
+  body += "<option value=\"0\"";
+  body += (configuration.isBMx80 == 0 ? " selected=\"selected\"" : "");
+  body += ">";
+  body += language == 0 ? "Brak" : "None";
+  body += "</option>";
+
+  body += "<option value=\"";
+  body += TYPE_BMP180_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.isBMx80 == TYPE_BMP180_SENSOR ? " selected=\"selected\""
+                                                   : "");
+  body += ">";
+  body += "BMP085/BMP180";
+  body += "</option>";
+
+  body += "<option value=\"";
+  body += TYPE_BME280_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.isBMx80 == TYPE_BME280_SENSOR ? " selected=\"selected\""
+                                                   : "");
+  body += ">";
+  body += "BME280";
+  body += "</option>";
+
+  body += "<option value=\"";
+  body += TYPE_BME680_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.isBMx80 == TYPE_BME680_SENSOR ? " selected=\"selected\""
+                                                   : "");
+  body += ">";
+  body += "BME680";
+  body += "</option>";
+
+  body += "</select>";
+  body += "</div>";
 
 #endif
 
@@ -1893,14 +1909,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
   body += "\"><span class=\"hint\">";
   body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
                         : "seconds. Range: 5 to 86400sec";
-  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
-          "type=\"checkbox\" value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body += language == 0
-              ? ">Wysyłać dane tylko, gdy wartość PM2.5 lub PM10 "
-                "zmieni się"
-              : ">Send data only if value of PM2.5 or PM10 has changed";
-  body += "</label></div><br><br>";
+  body += " (24h)</span></div><br><br>";
   body += "<p class=\"cm\">";
   body +=
       language == 0
@@ -1966,12 +1975,14 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
   return page;
 }
 
-String AFESitesGenerator::addBME680Configuration() {
+String AFESitesGenerator::addBMx80Configuration() {
 
-  BME680 configuration = Data.getBME680SensorConfiguration();
+  BMx80 configuration = Data.getBMx80SensorConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
+
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
 
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
@@ -1982,47 +1993,79 @@ String AFESitesGenerator::addBME680Configuration() {
   body += "\"><span class=\"hint\">";
   body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
                         : "seconds. Range: 5 to 86400sec";
-  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
-          "type=\"checkbox\" value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body += language == 0 ? ">Wysyłać dane tylko, gdy jedna z wartości "
-                          "zmieni się"
-                        : ">Send data only if one the values has changed";
-  body += "</label></div><br><br>";
+  body += " (24h)</span></div><br><br>";
   body += "</fieldset>";
 
   String page = addConfigurationBlock(
-      language == 0 ? "Czujnik BME680" : "BME680 Sensor", "", body);
+      language == 0 ? "Czujnik BMx80" : "BMx80 Sensor", "", body);
 
   if (device.domoticzAPI) {
     body = "<fieldset>";
-    body += "<div class=\"cf\"><label>IDX Temp/";
-    body += language == 0 ? "Wilg/Bar" : "Humi/Bar";
-    body += "</label><input name=\"t\" type=\"number\" step=\"1\" min=\"0\" "
+    if (device.isBMx80 != TYPE_BMP180_SENSOR) {
+      body += "<div class=\"cf\"><label>IDX Temp/";
+      body += language == 0 ? "Wilg/Bar" : "Humi/Bar";
+      body += "</label><input name=\"t\" type=\"number\" step=\"1\" min=\"0\" "
+              "max=\"999999\"  value=\"";
+      body += configuration.idx.temperatureHumidityPressure;
+      body += "\">";
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres: " : "Range: ";
+      body += "0 - 999999</span>";
+      body += "</div>";
+    }
+
+    body += "<div class=\"cf\"><label>IDX Temperatur";
+    body += language == 0 ? "a" : "e";
+    body += "</label><input name=\"e\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
-    body += configuration.idx.temperatureHumidityPressure;
+    body += configuration.idx.temperature;
     body += "\">";
     body += "<span class=\"hint\">";
     body += language == 0 ? "Zakres: " : "Range: ";
     body += "0 - 999999</span>";
     body += "</div>";
+
+    if (device.isBMx80 != TYPE_BMP180_SENSOR) {
+      body += "<div class=\"cf\"><label>IDX ";
+      body += language == 0 ? "Wilgotność" : "Humidity";
+      body += "</label><input name=\"h\" type=\"number\" step=\"1\" min=\"0\" "
+              "max=\"999999\"  value=\"";
+      body += configuration.idx.humidity;
+      body += "\">";
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres: " : "Range: ";
+      body += "0 - 999999</span>";
+      body += "</div>";
+    }
 
     body += "<div class=\"cf\"><label>IDX ";
-    body += language == 0 ? "Czujnik gazu" : "Gas sensor";
-    body += "</label><input name=\"g\" type=\"number\" step=\"1\" min=\"0\" "
+    body += language == 0 ? "Ciśnienie" : "Pressure";
+    body += "</label><input name=\"p\" type=\"number\" step=\"1\" min=\"0\" "
             "max=\"999999\"  value=\"";
-    body += configuration.idx.gasResistance;
+    body += configuration.idx.pressure;
     body += "\">";
     body += "<span class=\"hint\">";
     body += language == 0 ? "Zakres: " : "Range: ";
     body += "0 - 999999</span>";
     body += "</div>";
 
+    if (device.isBMx80 == TYPE_BME680_SENSOR) {
+      body += "<div class=\"cf\"><label>IDX ";
+      body += language == 0 ? "Czujnik gazu" : "Gas sensor";
+      body += "</label><input name=\"g\" type=\"number\" step=\"1\" min=\"0\" "
+              "max=\"999999\"  value=\"";
+      body += configuration.idx.gasResistance;
+      body += "\">";
+      body += "<span class=\"hint\">";
+      body += language == 0 ? "Zakres: " : "Range: ";
+      body += "0 - 999999</span>";
+      body += "</div>";
+    }
     body += "</fieldset>";
     page += addConfigurationBlock(
         "Domoticz",
         language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            ? "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
             : "If IDX is set to 0 then a value won't be sent to Domoticz",
         body);
   }
@@ -2037,6 +2080,8 @@ String AFESitesGenerator::addBH1750Configuration() {
 
   String body = "<fieldset>";
 
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
   body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
@@ -2046,15 +2091,7 @@ String AFESitesGenerator::addBH1750Configuration() {
   body += "\"><span class=\"hint\">";
   body += language == 0 ? "sekund. Zakres: 1 do 86400sek"
                         : "seconds. Range: 1 to 86400sec";
-  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
-          "type=\"checkbox\" value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body += language == 0 ? ">Wysyłać dane tylko, gdy jedna z wartości "
-                          "zmieni się"
-                        : ">Send data only if one the values has changed";
-  body += "</label></div>";
-
-  body += "<div class=\"cf\"><label>";
+  body += " (24h)</span></div><div class=\"cf\"><label>";
   body += language == 0 ? "Czułość" : "Sensitiveness";
   body += "</label><input name=\"m\" type=\"number\" value=\"";
   body += configuration.mode;
@@ -2102,6 +2139,35 @@ String AFESitesGenerator::addSerialPortConfiguration() {
   return addConfigurationBlock("UART", "", body);
   ;
 }
+
+String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
+  AFEI2CScanner I2CScanner;
+  String body = "<div class=\"cf\"><label>I2C Ad";
+  body += language == 0 ? "res" : "ddress";
+  body += ": </label><select name=\"a\">";
+  body += "<option value=\"0\"";
+  body += address == 0 ? " selected=\"selected\"" : "";
+  body += ">";
+  body += language == 0 ? "Brak" : "Missing";
+  body += "</option>";
+
+  for (byte addressToScan = 1; addressToScan < 127; addressToScan++) {
+    if (I2CScanner.scan(addressToScan)) {
+      body += "<option value=\"";
+      body += addressToScan;
+      body += "\"";
+      body += addressToScan == address ? " selected=\"selected\"" : "";
+      body += ">[0x";
+      body += String(addressToScan, HEX);
+      body += "] : ";
+      body += I2CScanner.getName(addressToScan);
+      body += "</option>";
+    }
+  }
+  body += "</select></div>";
+  return body;
+}
+
 #endif
 
 String AFESitesGenerator::addUpgradeSection() {
@@ -2114,8 +2180,8 @@ String AFESitesGenerator::addUpgradeSection() {
           ? "Po zakończeniu aktualizacji urządzenie zostanie "
             "automatycznie zresetowane<br><br><strong>Uwaga:</strong> po "
             "aktualizacji nie odłączaj urządzenia przez conajmniej 1min.<br>"
-            "Urządzenie formatuje pamięc i wgrywa domyślne ustawienia. "
-            "<br><strong>Ten proces nie może zostac przerwany</strong>."
+            "Urządzenie formatuje pamięć i wgrywa domyślne ustawienia. "
+            "<br><strong>Ten proces nie może zostać przerwany</strong>."
           : "Device will be automatically rebooted after "
             "upgrade<br><br><strong>Warning</strong>: after upgrade do not "
             "plug off the device from power source for around a "
@@ -2212,9 +2278,6 @@ String AFESitesGenerator::addHelpSection() {
   DEVICE configuration;
   configuration = Data.getDeviceConfiguration();
 
-  FIRMWARE firmware;
-  firmware = Data.getFirmwareConfiguration();
-
   String body = "<fieldset><div class=\"cf\"><label>";
   body += language == 0 ? "Stan: uruchomione " : "Status: running";
   body += "</label><span></div></fieldset>";
@@ -2227,17 +2290,40 @@ String AFESitesGenerator::addHelpSection() {
 
   if (Device.getMode() != MODE_ACCESS_POINT) {
 
-    body = "<p class=\"cm\">";
-    body += language == 0
-                ? "Oprogramowanie dostępne jest za darmo w ramach licencji "
-                : "The software is available for free within terms of ";
-    body += " <a "
+    body = "<a "
+           "href=\"https://www.smartnydom.pl/afe-firmware-";
+    body += language == 0 ? "pl" : "en";
+    body += "/log\" target=\"_blank\"><img "
+            "src=\"https://img.shields.io/badge/"
+            "version%20-%20";
+    body += firmware.version;
+    body += "%20[T";
+    body += firmware.type;
+    body += "]-blue.svg\" /></a> ";
+
+    body += "<a href=\"https://github.com/tschaban/AFE-Firmware/"
+            "issues?q=is:issue+is:open+label:Defect\" target=\"_blank\"><img "
+            "src=\"https://img.shields.io/github/issues/tschaban/AFE-Firmware/"
+            "Defect.svg\" /></a> ";
+
+    body += "<a href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
+            "target=\"_blank\"><img "
+            "src=\"https://img.shields.io/badge/help-forum-red.svg\" /></a> ";
+
+    body += "<a "
             "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
-            "LICENSE\" "
-            "target=\"_blank\"  style=\"color:#00e\">MIT</a>";
+            "LICENSE\" target=\"_blank\"><img "
+            "src=\"https://img.shields.io/github/license/tschaban/"
+            "AFE-Firmware.svg\" /></a>";
+
+    page += addConfigurationBlock("Firmware", "", body);
+
+    body = "<p class=\"cm\">";
+    body += language == 0 ? "Oprogramowanie dostępne jest za darmo"
+                          : "The software is available for free";
     body += language == 0 ? ". Jeśli spełnia Twoje oczekiwania to postaw "
-                          : " licence. If it meets your expectations, then "
-                            "consider buying a beer to the ";
+                          : ". If it meets your expectations, then consider "
+                            "buying a beer to the ";
     body += " <a href=\"https://www.smartnydom.pl/o-stronie/\" "
             "target=\"_blank\" style=\"color:#00e\">aut";
     body += language == 0 ? "orowi" : "hor";
@@ -2259,7 +2345,8 @@ String AFESitesGenerator::addHelpSection() {
     body += "/";
     body += Data.getDeviceID();
     body += "/\" border=\"0\" alt=\"PayPal\"></a>";
-    body += "</fieldset>";
+    body += "</fieldset><br>";
+
     page += addConfigurationBlock(language == 0 ? "Wsparcie" : "Donation", "",
                                   body);
   }

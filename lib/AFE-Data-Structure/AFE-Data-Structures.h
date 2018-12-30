@@ -42,10 +42,13 @@
 #include <AFE-GATE-Structure.h>
 #endif
 
-#ifdef T6_CONFIG
+/* @TODO BUG For unknown reason non T5 version can't be compiled if these are
+ * excluded */
 #include <AFE-BH1750-Sensor-Structure.h>
-#include <AFE-BME680-Sensor-Structure.h>
+#include <AFE-BMx80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
+
+#ifdef T6_CONFIG
 #include <AFE-SERIALPORT-Structure.h>
 #endif
 

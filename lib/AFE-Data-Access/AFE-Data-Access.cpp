@@ -133,8 +133,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
   configuration.isHPMA115S0 = Eeprom.read(413);
-  configuration.isBME680 = Eeprom.read(423);
-  configuration.isBH1750 = Eeprom.read(430);
+  configuration.isBMx80 = Eeprom.readUInt8(422);
+  configuration.isBH1750 = Eeprom.read(429);
 
 #endif
 
@@ -251,8 +251,8 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 
 #if defined(T6_CONFIG)
   Eeprom.write(413, configuration.isHPMA115S0);
-  Eeprom.write(423, configuration.isBME680);
-  Eeprom.write(430, configuration.isBH1750);
+  Eeprom.writeUInt8(422, configuration.isBMx80);
+  Eeprom.write(429, configuration.isBH1750);
 #endif
 }
 
@@ -398,7 +398,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
   configuration.gpio = Eeprom.readUInt8(370);
-#elif defined(T1_CONFIG) || defined(T6_CONFIG)
+#elif defined(T1_CONFIG)
   configuration.gpio = Eeprom.readUInt8(397);
 #elif defined(T2_CONFIG)
   configuration.gpio = Eeprom.readUInt8(405);
@@ -495,7 +495,11 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   configuration.ledID = Eeprom.readUInt8(394);
 #endif
 
+#if !defined(T6_CONFIG)
   configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
+#else
+  configuration.idx = Eeprom.read(920, 6).toInt();
+#endif
 
 /* Saving thermostat configuration*/
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
@@ -555,7 +559,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 #elif defined(T5_CONFIG)
   Eeprom.writeUInt8(462, configuration.gpio);
 #elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(373, configuration.gpio);
+  Eeprom.writeUInt8(374, configuration.gpio);
 #endif
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
@@ -628,7 +632,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Eeprom.writeUInt8(394, configuration.ledID);
 #endif
 
+#if !defined(T6_CONFIG)
   Eeprom.write(930 + 6 * id, 6, (long)configuration.idx);
+#else
+  Eeprom.write(920, 6, (long)configuration.idx);
+#endif
 
 #if defined(T1_CONFIG)
   Eeprom.write(436, 3, configuration.thermalProtection);
@@ -1163,19 +1171,17 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   HPMA115S0 configuration;
   configuration.interval = Eeprom.read(414, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(419);
-  configuration.timeToMeasure = Eeprom.read(420, 3).toInt();
-  configuration.idx.pm25 = Eeprom.read(936, 6).toInt();
-  configuration.idx.pm10 = Eeprom.read(942, 6).toInt();
+  configuration.timeToMeasure = Eeprom.read(419, 3).toInt();
+  configuration.idx.pm25 = Eeprom.read(926, 6).toInt();
+  configuration.idx.pm10 = Eeprom.read(932, 6).toInt();
   return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(414, 5, (long)configuration.interval);
-  Eeprom.write(419, configuration.sendOnlyChanges);
-  Eeprom.write(420, 3, (long)configuration.timeToMeasure);
-  Eeprom.write(936, 6, (long)configuration.idx.pm25);
-  Eeprom.write(942, 6, (long)configuration.idx.pm10);
+  Eeprom.write(419, 3, (long)configuration.timeToMeasure);
+  Eeprom.write(926, 6, (long)configuration.idx.pm25);
+  Eeprom.write(932, 6, (long)configuration.idx.pm10);
 }
 
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
@@ -1190,34 +1196,40 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(412, configuration.TXD);
 }
 
-BME680 AFEDataAccess::getBME680SensorConfiguration() {
-  BME680 configuration;
-  configuration.interval = Eeprom.read(424, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(429);
-  configuration.idx.temperatureHumidityPressure = Eeprom.read(948, 6).toInt();
-  configuration.idx.gasResistance = Eeprom.read(954, 6).toInt();
+BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
+  BMx80 configuration;
+  configuration.interval = Eeprom.read(423, 5).toInt();
+  configuration.i2cAddress = Eeprom.readUInt8(428);
+  configuration.idx.temperatureHumidityPressure = Eeprom.read(938, 6).toInt();
+  configuration.idx.gasResistance = Eeprom.read(944, 6).toInt();
+  configuration.idx.temperature = Eeprom.read(950, 6).toInt();
+  configuration.idx.humidity = Eeprom.read(956, 6).toInt();
+  configuration.idx.pressure = Eeprom.read(962, 6).toInt();
   return configuration;
 }
 
-void AFEDataAccess::saveConfiguration(BME680 configuration) {
-  Eeprom.write(424, 5, (long)configuration.interval);
-  Eeprom.write(429, configuration.sendOnlyChanges);
-  Eeprom.write(948, 6, (long)configuration.idx.temperatureHumidityPressure);
-  Eeprom.write(954, 6, (long)configuration.idx.gasResistance);
+void AFEDataAccess::saveConfiguration(BMx80 configuration) {
+  Eeprom.write(423, 5, (long)configuration.interval);
+  Eeprom.writeUInt8(428, configuration.i2cAddress);
+  Eeprom.write(938, 6, (long)configuration.idx.temperatureHumidityPressure);
+  Eeprom.write(944, 6, (long)configuration.idx.gasResistance);
+  Eeprom.write(950, 6, (long)configuration.idx.temperature);
+  Eeprom.write(956, 6, (long)configuration.idx.humidity);
+  Eeprom.write(962, 6, (long)configuration.idx.pressure);
 }
 
 BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
   BH1750 configuration;
-  configuration.interval = Eeprom.read(431, 5).toInt();
-  configuration.sendOnlyChanges = Eeprom.read(436);
-  configuration.mode = Eeprom.readUInt8(437);
-  configuration.idx = Eeprom.read(978, 6).toInt();
+  configuration.interval = Eeprom.read(430, 5).toInt();
+  configuration.i2cAddress = Eeprom.readUInt8(435);
+  configuration.mode = Eeprom.readUInt8(436);
+  configuration.idx = Eeprom.read(968, 6).toInt();
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(BH1750 configuration) {
-  Eeprom.write(431, 5, (long)configuration.interval);
-  Eeprom.write(436, configuration.sendOnlyChanges);
-  Eeprom.writeUInt8(437, configuration.mode);
-  Eeprom.write(978, 6, (long)configuration.idx);
+  Eeprom.write(430, 5, (long)configuration.interval);
+  Eeprom.writeUInt8(435, configuration.i2cAddress);
+  Eeprom.writeUInt8(436, configuration.mode);
+  Eeprom.write(968, 6, (long)configuration.idx);
 }
 #endif

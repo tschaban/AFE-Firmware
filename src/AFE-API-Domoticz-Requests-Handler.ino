@@ -124,18 +124,33 @@ void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   }
 }
 
-void DomoticzPublishBME680SensorData(BME680_DATA data) {
+void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.domoticzAPI) {
-    BME680_DOMOTICZ idx;
-    BME680Sensor.getDomoticzIDX(&idx);
-    if (idx.temperatureHumidityPressure > 0) {
+    BMx80_DOMOTICZ idx;
+    BMx80Sensor.getDomoticzIDX(&idx);
+    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+        idx.temperatureHumidityPressure > 0) {
       Domoticz.sendTemperatureAndHumidityAndPressureCommand(
           idx.temperatureHumidityPressure, data.temperature, data.humidity,
           data.pressure);
     }
-    if (idx.gasResistance > 0) {
+    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR &&
+        idx.gasResistance > 0) {
       delay(10);
       Domoticz.sendCustomSensorCommand(idx.gasResistance, data.gasResistance);
+    }
+    if (idx.temperature > 0) {
+      delay(10);
+      Domoticz.sendTemperatureCommand(idx.temperature, data.temperature);
+    }
+    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+        idx.humidity > 0) {
+      delay(10);
+      Domoticz.sendHumidityCommand(idx.humidity, data.humidity);
+    }
+    if (idx.pressure > 0) {
+      delay(10);
+      Domoticz.sendPressureCommand(idx.pressure, data.pressure);
     }
   }
 }

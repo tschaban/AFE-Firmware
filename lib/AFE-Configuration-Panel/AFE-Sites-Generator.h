@@ -15,6 +15,10 @@
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
+#if defined(T6_CONFIG)
+#include <AFE-I2C-Scanner.h>
+#include <AFE-Sensor-BMx80.h>
+#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -27,6 +31,7 @@ private:
   AFEDataAccess Data;
   AFEDevice Device;
   uint8_t language;
+  FIRMWARE firmware;
 
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
@@ -97,9 +102,10 @@ public:
 
 #if defined(T6_CONFIG)
   String addHPMA115S0Configuration();
-  String addBME680Configuration();
+  String addBMx80Configuration();
   String addBH1750Configuration();
   String addSerialPortConfiguration();
+  String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 
   /* These methods generates firmware upgrade sections */
