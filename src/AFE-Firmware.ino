@@ -82,12 +82,14 @@ byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
 #if defined(T6_CONFIG)
+#include <AFE-I2C-Scanner.h>
 #include <AFE-Sensor-BH1750.h>
 #include <AFE-Sensor-BMx80.h>
 #include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
 AFESensorBMx80 BMx80Sensor;
 AFESensorBH1750 BH1750Sensor;
+AFEI2CScanner I2CScanner;
 #endif
 
 void setup() {
@@ -229,6 +231,13 @@ void setup() {
   MQTTInit();
   DomoticzInit();
 
+#if defined(DEBUG) && defined(T6_CONFIG)
+  /* Scanning I2C for devices */
+  if (Device.getMode() == MODE_NORMAL) {
+    I2CScanner.scanAll();
+  }
+#endif
+
 #ifdef DEBUG
   Serial << endl
          << "########################### BOOTING COMPLETED "
@@ -269,7 +278,7 @@ void loop() {
         mainGate();
 #endif
 
-#if !(defined(T3_CONFIG) || defined(T5_CONFIG))
+#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
         /* Relay related events */
         mainRelay();
 #endif

@@ -1982,6 +1982,8 @@ String AFESitesGenerator::addBMx80Configuration() {
 
   String body = "<fieldset>";
 
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
   body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
@@ -2078,6 +2080,8 @@ String AFESitesGenerator::addBH1750Configuration() {
 
   String body = "<fieldset>";
 
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
   body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
@@ -2135,6 +2139,35 @@ String AFESitesGenerator::addSerialPortConfiguration() {
   return addConfigurationBlock("UART", "", body);
   ;
 }
+
+String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
+  AFEI2CScanner I2CScanner;
+  String body = "<div class=\"cf\"><label>I2C Ad";
+  body += language == 0 ? "res" : "ddress";
+  body += ": </label><select name=\"a\">";
+  body += "<option value=\"0\"";
+  body += address == 0 ? " selected=\"selected\"" : "";
+  body += ">";
+  body += language == 0 ? "Brak" : "Missing";
+  body += "</option>";
+
+  for (byte addressToScan = 1; addressToScan < 127; addressToScan++) {
+    if (I2CScanner.scan(addressToScan)) {
+      body += "<option value=\"";
+      body += addressToScan;
+      body += "\"";
+      body += addressToScan == address ? " selected=\"selected\"" : "";
+      body += ">[0x";
+      body += String(addressToScan, HEX);
+      body += "] : ";
+      body += I2CScanner.getName(addressToScan);
+      body += "</option>";
+    }
+  }
+  body += "</select></div>";
+  return body;
+}
+
 #endif
 
 String AFESitesGenerator::addUpgradeSection() {

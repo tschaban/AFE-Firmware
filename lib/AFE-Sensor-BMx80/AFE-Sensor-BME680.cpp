@@ -14,15 +14,25 @@ boolean AFESensorBME680::begin() {
   Serial << endl << "Sensor type: BME680";
 #endif
 
-  if (!bme.begin()) {
-    return false;
+  if (configuration.i2cAddress != 0) {
+#if defined(DEBUG)
+    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+#endif
+    if (!bme.begin(configuration.i2cAddress)) {
+      return false;
+    } else {
+      bme.setTemperatureOversampling(BME680_OS_8X);
+      bme.setHumidityOversampling(BME680_OS_2X);
+      bme.setPressureOversampling(BME680_OS_4X);
+      bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
+      bme.setGasHeater(320, 150); // 320*C for 150 ms
+      return true;
+    }
   } else {
-    bme.setTemperatureOversampling(BME680_OS_8X);
-    bme.setHumidityOversampling(BME680_OS_2X);
-    bme.setPressureOversampling(BME680_OS_4X);
-    bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
-    bme.setGasHeater(320, 150); // 320*C for 150 ms
-    return true;
+#if defined(DEBUG)
+    Serial << endl << "Error: Address not set";
+#endif
+    return false;
   }
 }
 

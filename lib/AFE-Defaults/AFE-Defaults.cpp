@@ -340,6 +340,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(SerialPortConfiguration);
 
   SensorBMx80Configuration.interval = 60;
+  SensorBMx80Configuration.i2cAddress = 0;
   SensorBMx80Configuration.idx.temperatureHumidityPressure = 0;
   SensorBMx80Configuration.idx.gasResistance = 0;
   SensorBMx80Configuration.idx.temperature = 0;
@@ -348,6 +349,7 @@ void AFEDefaults::set() {
   Data->saveConfiguration(SensorBMx80Configuration);
 
   SensorBH1750Configuration.interval = 60;
+  SensorBH1750Configuration.i2cAddress = 0;
   SensorBH1750Configuration.idx = 0;
   SensorBH1750Configuration.mode = 0;
   Data->saveConfiguration(SensorBH1750Configuration);

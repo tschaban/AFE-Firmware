@@ -13,6 +13,7 @@
 
 struct BH1750 {
   uint16_t interval;
+  uint8_t i2cAddress;
   uint8_t mode;
   unsigned long idx;
 };

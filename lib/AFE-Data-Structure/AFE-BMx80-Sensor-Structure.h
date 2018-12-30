@@ -22,6 +22,7 @@ struct BMx80_DOMOTICZ {
 struct BMx80 {
   uint8_t type;
   uint16_t interval;
+  uint8_t i2cAddress;
   BMx80_DOMOTICZ idx;
 };
 

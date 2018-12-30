@@ -14,14 +14,25 @@ boolean AFESensorBME280::begin() {
   Serial << endl << "Sensor type: BME280";
 #endif
 
-  if (!bme.begin()) {
-    return false;
-  } else {
-    bme.setSampling(Adafruit_BME280::BME280_MODE_FORCED,
-                    Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1,
-                    Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::FILTER_OFF);
+  if (configuration.i2cAddress != 0) {
+#if defined(DEBUG)
+    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+#endif
+    if (!bme.begin(configuration.i2cAddress)) {
+      return false;
+    } else {
+      bme.setSampling(
+          Adafruit_BME280::BME280_MODE_FORCED, Adafruit_BME280::SAMPLING_X1,
+          Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1,
+          Adafruit_BME280::FILTER_OFF);
 
-    return true;
+      return true;
+    }
+  } else {
+#if defined(DEBUG)
+    Serial << endl << "Error: Address not set";
+#endif
+    return false;
   }
 }
 

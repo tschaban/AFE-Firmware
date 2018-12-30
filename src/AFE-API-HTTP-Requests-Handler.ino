@@ -94,6 +94,15 @@ void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
+#ifdef DEBUG
+  Serial << endl << endl << "-------- Got HTTP Request --------";
+  Serial << endl << "Device: " << request.device;
+  Serial << endl << "Name: " << request.name;
+  Serial << endl << "Command: " << request.command;
+  Serial << endl << "----------------------------------" << endl;
+
+#endif
+
 #if defined(T5_CONFIG)
 
   /* Request related to gate */
@@ -127,57 +136,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
     if (noContactron) {
       sendHTTPAPIRequestStatus(request, false);
-    }
-  }
-
-#elif defined(T6_CONFIG)
-
-  /* Request related to gate */
-  if (strcmp(request.device, "HPMA115S0") == 0) {
-    HPMA115S0_DATA sensorData;
-    sensorData = ParticleSensor.get();
-    if (strcmp(request.name, "PM2.5") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
-      }
-    } else if (strcmp(request.name, "PM10") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
-      }
-    }
-  }
-  /* BMx80 */
-  else if (strcmp(request.device, "BMx80") == 0) {
-    BMx80_DATA sensorData;
-    sensorData = BMx80Sensor.get();
-    if (strcmp(request.name, "temperature") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      }
-    } else if (strcmp(request.name, "pressure") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-               strcmp(request.name, "humidity") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
-               strcmp(request.name, "gasResistance") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
-      }
-    }
-  }
-
-  /* BH1750 */
-  else if (strcmp(request.device, "BH1750") == 0) {
-    if (strcmp(request.name, "lux") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        float lux = BH1750Sensor.get();
-        sendHTTPAPIRequestStatus(request, true, lux);
-      }
     }
   }
 
@@ -324,6 +282,58 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       sendHTTPAPIRequestStatus(request, false);
     }
   }
+#endif
+
+#if defined(T6_CONFIG)
+  /* Request related to gate */
+  else if (strcmp(request.device, "HPMA115S0") == 0) {
+    HPMA115S0_DATA sensorData;
+    sensorData = ParticleSensor.get();
+    if (strcmp(request.name, "PM2.5") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
+      }
+    } else if (strcmp(request.name, "PM10") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
+      }
+    }
+  }
+  /* BMx80 */
+  else if (strcmp(request.device, "BMx80") == 0) {
+    BMx80_DATA sensorData;
+    sensorData = BMx80Sensor.get();
+    if (strcmp(request.name, "temperature") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
+      }
+    } else if (strcmp(request.name, "pressure") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
+      }
+    } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+               strcmp(request.name, "humidity") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
+      }
+    } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
+               strcmp(request.name, "gasResistance") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
+      }
+    }
+  }
+
+  /* BH1750 */
+  else if (strcmp(request.device, "BH1750") == 0) {
+    if (strcmp(request.name, "lux") == 0) {
+      if (strcmp(request.command, "get") == 0) {
+        float lux = BH1750Sensor.get();
+        sendHTTPAPIRequestStatus(request, true, lux);
+      }
+    }
+  }
+
 #endif
 
   /* Requests related to APIs */

@@ -10,19 +10,30 @@ void AFESensorBH1750::begin() {
   AFEDataAccess Data;
   configuration = Data.getBH1750SensorConfiguration();
 
-  _initialized = true;
-
-#if defined(DEBUG)
+#ifdef DEBUG
   Serial << endl << endl << "----- BH1750: Initializing -----";
 #endif
+  if (configuration.i2cAddress != 0) {
+#ifdef DEBUG
+    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+#endif
+    _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
+                                configuration.i2cAddress);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "Error: Address not set";
+#endif
+  }
 
-  bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2);
-  Serial << endl << "Sensor initialized";
-  Serial << endl << "Mode: " << configuration.mode;
-  Serial << endl << "Interval: " << configuration.interval;
-  Serial << endl << "IDX: " << configuration.idx;
-
-#if defined(DEBUG)
+#ifdef DEBUG
+  if (_initialized) {
+    Serial << endl << "Mode: " << configuration.mode;
+    Serial << endl << "Interval: " << configuration.interval;
+    Serial << endl << "IDX: " << configuration.idx;
+  }
+  Serial << endl
+         << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
   Serial << endl << "---------------------------------";
 #endif
 }

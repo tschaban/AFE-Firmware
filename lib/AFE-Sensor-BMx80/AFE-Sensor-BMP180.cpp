@@ -13,8 +13,17 @@ boolean AFESensorBMP180::begin() {
 #if defined(DEBUG)
   Serial << endl << "Sensor type: BMP180";
 #endif
-
-  return bme.begin();
+  if (configuration.i2cAddress != 0) {
+#if defined(DEBUG)
+    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+#endif
+    return bme.begin(BMP085_ULTRAHIGHRES, configuration.i2cAddress);
+  } else {
+#if defined(DEBUG)
+    Serial << endl << "Error: Address not set";
+#endif
+    return false;
+  }
 }
 
 boolean AFESensorBMP180::read() {

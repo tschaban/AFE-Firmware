@@ -831,6 +831,11 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
 
 BMx80 AFEWebServer::getBMx80SensorData() {
   BMx80 data;
+
+  if (server.arg("a").length() > 0) {
+    data.i2cAddress = server.arg("a").toInt();
+  }
+
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }
@@ -860,6 +865,10 @@ BMx80 AFEWebServer::getBMx80SensorData() {
 
 BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
+  if (server.arg("a").length() > 0) {
+    data.i2cAddress = server.arg("a").toInt();
+  }
+
   if (server.arg("i").length() > 0) {
     data.interval = server.arg("i").toInt();
   }

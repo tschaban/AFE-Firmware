@@ -16,6 +16,7 @@
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
 #if defined(T6_CONFIG)
+#include <AFE-I2C-Scanner.h>
 #include <AFE-Sensor-BMx80.h>
 #endif
 
@@ -104,6 +105,7 @@ public:
   String addBMx80Configuration();
   String addBH1750Configuration();
   String addSerialPortConfiguration();
+  String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 
   /* These methods generates firmware upgrade sections */

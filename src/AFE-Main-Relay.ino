@@ -13,7 +13,7 @@ void initRelay() {
   }
 }
 
-#if !defined(T5_CONFIG) /* Relay is not controlled in T5 firmware */
+#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
 /* Method checks if any relay should be automatically turned off */
 void mainRelay() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
