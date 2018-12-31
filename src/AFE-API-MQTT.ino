@@ -162,10 +162,10 @@ void AFEMQTT::publish(const char *topic, const char *type,
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
 #ifdef DEBUG
-    Serial << endl << endl << "-------------------- MQTT --------------------";
+    Serial << endl << endl << "----------- Publish MQTT -----------";
     Serial << endl << "Topic: " << topic;
     Serial << endl << "Message: " << message;
-    Serial << endl << "----------------------------------------------";
+    Serial << endl << "------------------------------------";
 #endif
     Broker.publish(topic, message);
   }

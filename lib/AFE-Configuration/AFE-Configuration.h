@@ -12,7 +12,7 @@
 #endif
 
 #if defined(T0_CONFIG)
-#define FIRMWARE_VERSION "1.3.0"
+#define FIRMWARE_VERSION "1.3.1"
 #define FIRMWARE_TYPE 0
 #elif defined(T0_SHELLY_1_CONFIG)
 #define FIRMWARE_VERSION "1.3.0"

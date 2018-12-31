@@ -22,6 +22,16 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
   if (length >= 1) {
 
+#ifdef DEBUG
+    Serial << endl << endl << "--------- Got MQTT request ---------";
+    Serial << endl << "Topic: " << topic;
+    Serial << endl << "Message: ";
+    for (uint8_t _i = 0; _i < length; _i++) {
+      Serial << char(payload[_i]);
+    }
+    Serial << endl << "------------------------------------" << endl;
+#endif
+
 #if !defined(T5_CONFIG) /* Relay processing */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
