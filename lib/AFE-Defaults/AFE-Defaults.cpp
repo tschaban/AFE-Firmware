@@ -64,7 +64,7 @@ void AFEDefaults::set() {
   }
 
 /* LEDs */
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   deviceConfiguration.isLED[0] = true;
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
@@ -240,7 +240,7 @@ void AFEDefaults::set() {
 #endif
 
 /* LEDs configuration */
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
 
 #if !defined(T5_CONFIG)
   addLEDConfiguration(1, 3);
@@ -356,7 +356,7 @@ void AFEDefaults::set() {
 
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   Data->saveSystemLedID(1);
 #endif
 
@@ -374,7 +374,7 @@ void AFEDefaults::addDomoticzConfiguration() {
   Data->saveConfiguration(DomoticzConfiguration);
 }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
   LED LEDConfiguration;
   LEDConfiguration.gpio = gpio;

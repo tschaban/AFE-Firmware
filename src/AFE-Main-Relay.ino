@@ -19,12 +19,12 @@ void mainRelay() {
   for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
     if (Device.configuration.isRelay[i]) {
       if (Relay[i].autoTurnOff()) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         Led.on();
 #endif
         MQTTPublishRelayState(i);
         DomoticzPublishRelayState(i);
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         Led.off();
 #endif
       }

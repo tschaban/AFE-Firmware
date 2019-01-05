@@ -6,11 +6,11 @@
 void mainHTTPRequestsHandler() {
   if (Device.configuration.httpAPI) {
     if (WebServer.httpAPIlistener()) {
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
       Led.off();
 #endif
     }
@@ -177,7 +177,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
 /* Command not implemented.Info */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
           } else if (strcmp(request.command, "enableThermostat") == 0) {
             Relay[i].Thermostat.on();
             sendHTTPAPIRequestStatus(
@@ -197,7 +197,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#if defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
           } else if (strcmp(request.command, "enableHumidistat") == 0) {
             Relay[i].Humidistat.on();
             sendHTTPAPIRequestStatus(
@@ -231,7 +231,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   /* Request related to ds18b20 */
   else if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
@@ -240,7 +240,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   /* Request related to DHT Sensor */
   else if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
@@ -284,7 +284,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
   else if (strcmp(request.device, "HPMA115S0") == 0) {
     HPMA115S0_DATA sensorData;
@@ -299,6 +299,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       }
     }
   }
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   /* BMx80 */
   else if (strcmp(request.device, "BMx80") == 0) {
     BMx80_DATA sensorData;
@@ -323,7 +326,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       }
     }
   }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
   /* BH1750 */
   else if (strcmp(request.device, "BH1750") == 0) {
     if (strcmp(request.name, "lux") == 0) {
@@ -333,7 +338,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       }
     }
   }
-
 #endif
 
   /* Requests related to APIs */

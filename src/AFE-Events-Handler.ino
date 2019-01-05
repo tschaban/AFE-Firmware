@@ -10,7 +10,7 @@ void eventsListener() {
 #endif
     /* Update relay status to Domoticz */
     if (Device.configuration.domoticzAPI) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       Led.on();
 #endif
 
@@ -45,7 +45,7 @@ void eventsListener() {
 
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       Led.off();
 #endif
     }

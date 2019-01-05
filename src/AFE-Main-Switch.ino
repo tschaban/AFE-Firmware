@@ -15,7 +15,7 @@ void mainSwitch() {
     if (Device.configuration.isSwitch[i]) {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() && Switch[i].getControlledRelayID() > 0) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         Led.on();
 #endif
 
@@ -27,7 +27,7 @@ void mainSwitch() {
         DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         Led.off();
 #endif
       }
@@ -54,11 +54,11 @@ void mainSwitchListener() {
           Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                           : Device.reboot(MODE_NORMAL);
         } else if (Switch[i].is30s()) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
           Led.on();
 #endif
           Device.setDevice();
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
           Led.off();
 #endif
           Device.reboot(MODE_ACCESS_POINT);

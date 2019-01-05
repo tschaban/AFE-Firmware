@@ -11,14 +11,14 @@ AFESwitch::AFESwitch(uint8_t id) { begin(id); }
 void AFESwitch::begin(uint8_t id) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
-#ifdef T0_SHELLY_1_CONFIG
+#ifdef HARDWARE_SWITCH_GPIO_DIGIT_INPUT
   pinMode(SwitchConfiguration.gpio, INPUT);
 #else
   pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
 #endif
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
@@ -92,14 +92,14 @@ void AFESwitch::listener() {
            */
           if (SwitchConfiguration.functionality == SWITCH_MULTI) {
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
             if (time - startTime >= 35000) {
               Led.blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 3; i++) {
                 Led.blink(200);
                 delay(200);
@@ -109,7 +109,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 2; i++) {
                 Led.blink(200);
                 delay(200);
@@ -119,7 +119,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
               Led.blink(200);
 #endif
               _pressed4fiveSeconds = true;

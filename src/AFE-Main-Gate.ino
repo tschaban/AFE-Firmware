@@ -7,7 +7,9 @@
 /* Method processes gate related events */
 void mainGate() {
   if (Gate.event()) {
+#ifdef CONFIG_HARDWARE_LED
     Led.on();
+#endif
     if (lastPublishedGateStatus != Gate.get()) {
       MQTTPublishGateState();
       DomoticzPublishGateState();
@@ -21,7 +23,9 @@ void mainGate() {
         lastPublishedContactronState[i] = Gate.Contactron[i].get();
       }
     }
+#ifdef CONFIG_HARDWARE_LED
     Led.off();
+#endif
   }
 }
 

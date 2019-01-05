@@ -2,7 +2,7 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
 
 #ifndef _AFE_Sensor_DHT_h
 #define _AFE_Sensor_DHT_h

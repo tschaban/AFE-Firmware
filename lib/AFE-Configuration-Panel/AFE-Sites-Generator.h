@@ -15,8 +15,12 @@
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
 #include <ESP8266WiFi.h>
-#if defined(T6_CONFIG)
+
+#ifdef CONFIG_HARDWARE_UART
 #include <AFE-I2C-Scanner.h>
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
 #include <AFE-Sensor-BMx80.h>
 #endif
 
@@ -36,7 +40,7 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
                                             const String title = "GPIO");
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
                                           uint8_t type);
@@ -52,6 +56,14 @@ private:
 
 #if defined(T5_CONFIG)
   const String generateGateStatesList(uint8_t id, byte state);
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+  String addThermostateMenuItem();
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+  String addHumidistatMenuItem();
 #endif
 
 public:
@@ -72,22 +84,22 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
 
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
   String addDS18B20Configuration();
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   String addDHTConfiguration();
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   String addRegulatorConfiguration(uint8_t type);
 #endif
 
@@ -100,11 +112,23 @@ public:
   String addContactronConfiguration(uint8_t id);
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
   String addHPMA115S0Configuration();
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   String addBMx80Configuration();
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
   String addBH1750Configuration();
+#endif
+
+#ifdef CONFIG_HARDWARE_UART
   String addSerialPortConfiguration();
+#endif
+
+#ifdef CONFIG_HARDWARE_UART
   String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 

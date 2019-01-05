@@ -39,7 +39,7 @@ public:
   String getMQTTConfigurationSite(uint8_t command, MQTT data);
   String getDomoticzServerConfigurationSite(uint8_t command, DOMOTICZ data);
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   String getLEDConfigurationSite(uint8_t command,
                                  LED data[sizeof(Device.configuration.isLED)],
                                  uint8_t dataLedID);
@@ -48,7 +48,7 @@ public:
   String getRelayConfigurationSite(uint8_t command, RELAY data,
                                    uint8_t relayIndex);
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   String getRelayStatConfigurationSite(uint8_t command, REGULATOR data,
                                        uint8_t regulatorType);
 #endif
@@ -57,11 +57,11 @@ public:
                                     uint8_t relayIndex);
   String getLanguageConfigurationSite(uint8_t command, uint8_t lang);
 
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
   String getDS18B20ConfigurationSite(uint8_t command, DS18B20 data);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   String getDHTConfigurationSite(uint8_t command, DH data);
 #endif
 
@@ -78,10 +78,19 @@ public:
                                   GATE data);
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
   String getSerialPortConfigurationSite(uint8_t command, SERIALPORT data);
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
   String getHPMA115S0SensorConfigurationSite(uint8_t command, HPMA115S0 data);
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   String getBMx80SensorConfigurationSite(uint8_t command, BMx80 data);
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
   String getBH1750SensorConfigurationSite(uint8_t command, BH1750 data);
 #endif
 

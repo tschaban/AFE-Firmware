@@ -124,7 +124,7 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
   return page;
 }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 String AFEConfigurationPanel::getLEDConfigurationSite(
     uint8_t command, LED data[sizeof(Device.configuration.isLED)],
     uint8_t dataLedID) {
@@ -182,7 +182,7 @@ String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
   return page;
 }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
 String AFEConfigurationPanel::getRelayStatConfigurationSite(
     uint8_t command, REGULATOR data, uint8_t regulatorType) {
 
@@ -232,18 +232,18 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
 }
 
 /* DS18B20 and DHxx Sensors */
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
 String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
                                                           DS18B20 data)
 
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
     String AFEConfigurationPanel::getDHTConfigurationSite(uint8_t command,
                                                           DH data)
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
 {
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
@@ -253,7 +253,7 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
 
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
   page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
   page += Site.addDS18B20Configuration();
 #else
@@ -333,7 +333,7 @@ String AFEConfigurationPanel::getGateConfigurationSite(const String option,
 }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
 String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
                                                              SERIALPORT data) {
   if (command == SERVER_CMD_SAVE) {
@@ -349,6 +349,9 @@ String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
 String
 AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
                                                            HPMA115S0 data) {
@@ -365,7 +368,9 @@ AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
 String AFEConfigurationPanel::getBMx80SensorConfigurationSite(uint8_t command,
                                                               BMx80 data) {
   if (command == SERVER_CMD_SAVE) {
@@ -381,7 +386,9 @@ String AFEConfigurationPanel::getBMx80SensorConfigurationSite(uint8_t command,
   page += Site.generateFooter();
   return page;
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
 String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
                                                                BH1750 data) {
   if (command == SERVER_CMD_SAVE) {
@@ -397,7 +404,6 @@ String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
   page += Site.generateFooter();
   return page;
 }
-
 #endif
 
 String AFEConfigurationPanel::firmwareUpgradeSite() {

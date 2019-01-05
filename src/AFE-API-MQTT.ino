@@ -45,7 +45,7 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -75,7 +75,7 @@ void AFEMQTT::connect() {
 
           eventConnectionEstablished = true;
           delayStartTime = 0;
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
           ledStartTime = 0;
           Led.off();
 #endif
@@ -84,7 +84,7 @@ void AFEMQTT::connect() {
           return;
         }
       }
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
@@ -110,7 +110,7 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         ledStartTime = 0;
         Led.off();
 #endif

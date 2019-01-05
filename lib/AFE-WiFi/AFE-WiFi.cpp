@@ -12,7 +12,7 @@ void AFEWiFi::begin(uint8_t mode) {
   AFEDevice Device;
   networkConfiguration = Data.getNetworkConfiguration();
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   // Init LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
@@ -52,16 +52,16 @@ void AFEWiFi::listener() {
         delayStartTime = millis();
         if (connections == 0) {
           WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
-          /*
-                    Serial << endl << "INFO: Starting establishing WiFi
-             connection"; Serial << endl
-                           << networkConfiguration.ssid << "@"
-                           << networkConfiguration.password;
-          */
+#ifdef DEBUG
+          Serial << endl << "INFO: Starting establishing WiFi connection ";
+          Serial << endl
+                 << networkConfiguration.ssid << "@"
+                 << networkConfiguration.password;
+#endif
         }
       }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -75,11 +75,11 @@ void AFEWiFi::listener() {
       if (millis() >
           delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
         connections++;
-        /*
-                Serial << endl
-                       << "INFO: WiFi connection attempt: " << connections + 1
-                       << " from " << networkConfiguration.noConnectionAttempts;
-                       */
+#ifdef DEBUG
+        Serial << endl
+               << "INFO: WiFi connection attempt: " << connections + 1
+               << " from " << networkConfiguration.noConnectionAttempts;
+#endif
         delayStartTime = 0;
       }
 
@@ -89,17 +89,17 @@ void AFEWiFi::listener() {
         sleepStartTime = millis();
         delayStartTime = 0;
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
         ledStartTime = 0;
         Led.off();
 #endif
 
         connections = 0;
-        /*
-                Serial << endl
-                       << "WARN: Not able to connect.Going to sleep mode for "
-                       << networkConfiguration.waitTimeSeries << "sec.";
-                       */
+#ifdef DEBUG
+        Serial << endl
+               << "WARN: Not able to connect.Going to sleep mode for "
+               << networkConfiguration.waitTimeSeries << "sec.";
+#endif
       }
     }
   } else {
@@ -107,16 +107,16 @@ void AFEWiFi::listener() {
       connections = 0;
       delayStartTime = 0;
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
       ledStartTime = 0;
       Led.off();
 #endif
 
-      /*
+#ifdef DEBUG
       Serial << endl
              << "INFO: Connection established"
              << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
-             */
+#endif
     }
   }
 }

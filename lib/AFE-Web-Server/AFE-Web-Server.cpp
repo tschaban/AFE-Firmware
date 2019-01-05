@@ -92,7 +92,7 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getDomoticzServerConfigurationSite(command, data));
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   } else if (optionName == "led") {
     LED data[sizeof(Device.configuration.isLED)] = {};
     uint8_t dataLedID;
@@ -105,7 +105,7 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getLEDConfigurationSite(command, data, dataLedID));
 #endif
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
   } else if (optionName == "UART") {
     SERIALPORT data;
     if (command == SERVER_CMD_SAVE) {
@@ -113,6 +113,8 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getSerialPortConfigurationSite(command, data));
+#endif
+#ifdef CONFIG_HARDWARE_HPMA115S0
   } else if (optionName == "HPMA115S0") {
     HPMA115S0 data;
     if (command == SERVER_CMD_SAVE) {
@@ -120,7 +122,8 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
-
+#endif
+#ifdef CONFIG_HARDWARE_BMX80
   } else if (optionName == "BMx80") {
     BMx80 data;
     if (command == SERVER_CMD_SAVE) {
@@ -128,6 +131,8 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getBMx80SensorConfigurationSite(command, data));
+#endif
+#ifdef CONFIG_HARDWARE_BH1750
   } else if (optionName == "BH1750") {
     BH1750 data;
     if (command == SERVER_CMD_SAVE) {
@@ -157,14 +162,15 @@ void AFEWebServer::generate() {
       Device.reboot(MODE_ACCESS_POINT);
     }
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   } else if (optionName == "ds18b20") {
     DS18B20 data = {};
     if (command == SERVER_CMD_SAVE) {
       data = getDS18B20Data();
     }
     publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
-#elif defined(T2_CONFIG) || defined(T5_CONFIG)
+#endif
+#ifdef CONFIG_HARDWARE_DHXX
   } else if (optionName == "DHT") {
     DH data = {};
     if (command == SERVER_CMD_SAVE) {
@@ -173,7 +179,7 @@ void AFEWebServer::generate() {
     publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   } else if (optionName == "thermostat" || optionName == "humidistat") {
     REGULATOR data = {};
     if (command == SERVER_CMD_SAVE) {
@@ -328,7 +334,7 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("d").length() > 0 ? data.domoticzAPI = true
                                : data.domoticzAPI = false;
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
@@ -350,12 +356,12 @@ DEVICE AFEWebServer::getDeviceData() {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
   }
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
   server.arg("ds").length() > 0 ? data.isDS18B20 = true
                                 : data.isDS18B20 = false;
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
 #endif
 
@@ -365,14 +371,18 @@ DEVICE AFEWebServer::getDeviceData() {
   }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
   server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
                                 : data.isHPMA115S0 = false;
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
   if (server.arg("b6").length() > 0) {
     data.isBMx80 = server.arg("b6").toInt();
   }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
   server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
 #endif
 
@@ -528,7 +538,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
   }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   if (server.arg("tp" + String(id)).length() > 0) {
     data.thermalProtection = server.arg("tp" + String(id)).toInt();
   }
@@ -547,7 +557,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   return data;
 }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
 REGULATOR AFEWebServer::getRegulatorData() {
   REGULATOR data;
   server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
@@ -684,7 +694,7 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
 }
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
   if (server.arg("g" + String(id)).length() > 0) {
@@ -712,7 +722,7 @@ uint8_t AFEWebServer::getSystemLEDData() {
 uint8_t AFEWebServer::getLanguageData() {
   return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
 }
-#ifdef T1_CONFIG
+#ifdef CONFIG_HARDWARE_DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
   DS18B20 data;
 
@@ -744,7 +754,7 @@ DS18B20 AFEWebServer::getDS18B20Data() {
 
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
 DH AFEWebServer::getDHTData() {
   DH data;
 
@@ -797,7 +807,7 @@ DH AFEWebServer::getDHTData() {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
 SERIALPORT AFEWebServer::getSerialPortData() {
   SERIALPORT data;
   if (server.arg("r").length() > 0) {
@@ -808,7 +818,9 @@ SERIALPORT AFEWebServer::getSerialPortData() {
   }
   return data;
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   HPMA115S0 data;
   if (server.arg("i").length() > 0) {
@@ -828,7 +840,9 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   }
   return data;
 };
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
 BMx80 AFEWebServer::getBMx80SensorData() {
   BMx80 data;
 
@@ -862,7 +876,9 @@ BMx80 AFEWebServer::getBMx80SensorData() {
 
   return data;
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
 BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
   if (server.arg("a").length() > 0) {
@@ -882,5 +898,4 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   }
   return data;
 }
-
 #endif
