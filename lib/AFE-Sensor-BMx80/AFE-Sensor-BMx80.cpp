@@ -72,6 +72,8 @@ void AFESensorBMx80::listener() {
                          ? s6.data
                          : sensorType == TYPE_BME280_SENSOR ? s2.data : s1.data;
 
+        ready = true;
+
 #if defined(DEBUG)
         Serial << endl
                << "Temperature = " << sensorData.temperature << endl
@@ -83,7 +85,6 @@ void AFESensorBMx80::listener() {
           Serial << endl << "Gas level = " << sensorData.gasResistance;
         }
 
-        ready = true;
       } else {
         Serial << endl << "No data found";
 #endif
