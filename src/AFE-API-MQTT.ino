@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #include "AFE-API-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
@@ -162,10 +161,10 @@ void AFEMQTT::publish(const char *topic, const char *type,
 void AFEMQTT::publishToMQTTBroker(const char *topic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
 #ifdef DEBUG
-    Serial << endl << endl << "-------------------- MQTT --------------------";
+    Serial << endl << endl << "----------- Publish MQTT -----------";
     Serial << endl << "Topic: " << topic;
     Serial << endl << "Message: " << message;
-    Serial << endl << "----------------------------------------------";
+    Serial << endl << "------------------------------------";
 #endif
     Broker.publish(topic, message);
   }

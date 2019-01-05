@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #include "AFE-API-Domoticz.h"
 
 AFEDomoticz::AFEDomoticz() {}
@@ -105,7 +104,6 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
   if (initialized) {
-    char _floatToChar[7];
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
     call += temperatureValue;

@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #include "AFE-Sensor-BME280.h"
 
 AFESensorBME280::AFESensorBME280(){};
@@ -15,7 +14,7 @@ boolean AFESensorBME280::begin() {
 #endif
 
   if (configuration.i2cAddress != 0) {
-#if defined(DEBUG)
+#ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
 #endif
     if (!bme.begin(configuration.i2cAddress)) {
@@ -29,7 +28,7 @@ boolean AFESensorBME280::begin() {
       return true;
     }
   } else {
-#if defined(DEBUG)
+#ifdef DEBUG
     Serial << endl << "Error: Address not set";
 #endif
     return false;
@@ -37,7 +36,10 @@ boolean AFESensorBME280::begin() {
 }
 
 boolean AFESensorBME280::read() {
+
+#ifdef DEBUG
   Serial << endl << "Sensor: BME280";
+#endif
 
   bme.takeForcedMeasurement();
 

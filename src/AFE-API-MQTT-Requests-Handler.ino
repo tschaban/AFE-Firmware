@@ -21,6 +21,15 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
   if (length >= 1) {
+#ifdef DEBUG
+    Serial << endl << endl << "--------- Got MQTT request ---------";
+    Serial << endl << "Topic: " << topic;
+    Serial << endl << "Message: ";
+    for (uint8_t _i = 0; _i < length; _i++) {
+      Serial << char(payload[_i]);
+    }
+    Serial << endl << "------------------------------------" << endl;
+#endif
 
 #if !defined(T5_CONFIG) /* Relay processing */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
@@ -117,7 +126,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #if defined(T6_CONFIG)
     if (Device.configuration.isHPMA115S0) {
-      sprintf(_mqttTopic, "%sparticle/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
           HPMA115S0_DATA sensorData;

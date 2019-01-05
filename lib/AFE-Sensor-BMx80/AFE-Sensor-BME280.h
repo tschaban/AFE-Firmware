@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #ifndef _AFE_Sensor_BME280_h
 #define _AFE_Sensor_BME280_h
 
@@ -13,6 +12,10 @@
 
 #include <AFE-Data-Access.h>
 #include <Adafruit_BME280.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFESensorBME280 {
 
@@ -32,5 +35,4 @@ public:
 
   BMx80_DATA get();
 };
-
 #endif
