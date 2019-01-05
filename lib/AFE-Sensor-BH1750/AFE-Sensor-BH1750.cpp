@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #include "AFE-Sensor-BH1750.h"
 
 AFESensorBH1750::AFESensorBH1750(){};

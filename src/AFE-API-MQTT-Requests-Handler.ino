@@ -21,7 +21,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
   if (length >= 1) {
-
 #ifdef DEBUG
     Serial << endl << endl << "--------- Got MQTT request ---------";
     Serial << endl << "Topic: " << topic;

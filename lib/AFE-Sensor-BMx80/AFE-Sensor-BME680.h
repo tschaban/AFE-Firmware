@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #ifndef _AFE_Sensor_BME680_h
 #define _AFE_Sensor_BME680_h
 

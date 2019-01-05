@@ -249,7 +249,6 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
           language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
       page += "</a></li>";
     }
-
 #endif
 
 /* Sensor DS18B20 */

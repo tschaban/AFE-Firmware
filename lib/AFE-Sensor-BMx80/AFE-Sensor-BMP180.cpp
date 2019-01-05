@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-
 #include "AFE-Sensor-BMP180.h"
 
 AFESensorBMP180::AFESensorBMP180(){};
