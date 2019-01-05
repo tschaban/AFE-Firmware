@@ -23,8 +23,8 @@ void AFESensorBH1750::begin() {
 #ifdef DEBUG
   else {
     Serial << endl << "Error: Address not set";
-#endif
   }
+#endif
 
 #ifdef DEBUG
   if (_initialized) {

@@ -14,6 +14,10 @@
 #include <AFE-Data-Access.h>
 #include <Adafruit_BMP085.h>
 
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
 class AFESensorBMP180 {
 
 private:

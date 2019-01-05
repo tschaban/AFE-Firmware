@@ -105,7 +105,6 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
   if (initialized) {
-    char _floatToChar[7];
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
     call += temperatureValue;

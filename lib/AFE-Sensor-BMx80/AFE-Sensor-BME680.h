@@ -13,6 +13,9 @@
 
 #include <AFE-Data-Access.h>
 #include <Adafruit_BME680.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFESensorBME680 {
 

@@ -127,7 +127,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #if defined(T6_CONFIG)
     if (Device.configuration.isHPMA115S0) {
-      sprintf(_mqttTopic, "%sparticle/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
           HPMA115S0_DATA sensorData;

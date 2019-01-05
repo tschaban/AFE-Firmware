@@ -10,12 +10,12 @@ boolean AFESensorBME680::begin() {
   AFEDataAccess Data;
   configuration = Data.getBMx80SensorConfiguration();
 
-#if defined(DEBUG)
+#ifdef DEBUG
   Serial << endl << "Sensor type: BME680";
 #endif
 
   if (configuration.i2cAddress != 0) {
-#if defined(DEBUG)
+#ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
 #endif
     if (!bme.begin(configuration.i2cAddress)) {
@@ -29,7 +29,7 @@ boolean AFESensorBME680::begin() {
       return true;
     }
   } else {
-#if defined(DEBUG)
+#ifdef DEBUG
     Serial << endl << "Error: Address not set";
 #endif
     return false;
@@ -37,8 +37,9 @@ boolean AFESensorBME680::begin() {
 }
 
 boolean AFESensorBME680::read() {
+#ifdef DEBUG
   Serial << endl << "Sensor: BME680";
-
+#endif
   if (bme.performReading()) {
     data.temperature = bme.temperature;
     data.pressure = bme.pressure / 100.0;

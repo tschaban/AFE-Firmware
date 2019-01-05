@@ -2331,13 +2331,9 @@ String AFESitesGenerator::addHelpSection() {
     body += language == 0 ? "browarka" : "";
     body += " ;)</p>";
 
-    body += "<a "
-            "href=\"https://www.paypal.com/cgi-bin/"
-            "webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name="
-            "Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT";
-    body += firmware.type;
-    body += "%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%"
-            "3aNonHosted\" target=\"_blank\"><img "
+    body += "<a href=\"https://";
+    body += language == 0 ? "pl" : "en";
+    body += ".donate.afe-firmware.smartnydom.pl\" target=\"_blank\"><img "
             "src=\"http://adrian.czabanowski.com/afe/donation/T";
     body += firmware.type;
     body += "/";

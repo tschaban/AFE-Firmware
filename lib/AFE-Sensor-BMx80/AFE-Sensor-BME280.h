@@ -14,6 +14,10 @@
 #include <AFE-Data-Access.h>
 #include <Adafruit_BME280.h>
 
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
 class AFESensorBME280 {
 
 private:
