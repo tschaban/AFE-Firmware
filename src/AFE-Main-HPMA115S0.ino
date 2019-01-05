@@ -1,4 +1,4 @@
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
 
 /* Initializing sensor */
 void initHPMA115S0Sensor() {
@@ -14,10 +14,16 @@ void mainHPMA115S0Sensor() {
       /* Sensor: listener */
       ParticleSensor.listener();
       if (ParticleSensor.isReady()) {
+#ifdef CONFIG_HARDWARE_LED
+        Led.on();
+#endif
         HPMA115S0_DATA sensorData;
         sensorData = ParticleSensor.get();
         MQTTPublishParticleSensorData(sensorData);
         DomoticzPublishParticleSensorData(sensorData);
+#ifdef CONFIG_HARDWARE_LED
+        Led.off();
+#endif
       }
     }
   }

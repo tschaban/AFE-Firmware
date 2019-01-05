@@ -28,7 +28,7 @@ void DomoticzPublishRelayState(uint8_t id) {
 #endif
 
 /* Temperature and Humiditity sensors */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_TEMPERATURE
 
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(float temperature) {
@@ -45,7 +45,9 @@ void DomoticzPublishTemperature(float temperature) {
     }
   }
 }
+#endif
 
+#ifdef CONFIG_HUMIDITY
 #if defined(T2_CONFIG) || defined(T5_CONFIG)
 /* It publishes humidity to Domoticz */
 void DomoticzPublishHumidity(float humidity) {
@@ -56,7 +58,9 @@ void DomoticzPublishHumidity(float humidity) {
     }
   }
 }
+#endif
 
+#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
 /* It publishes temperature and humidity to Domoticz */
 void DomoticzPublishTemperatureAndHumidity(float temperature, float humidity) {
   if (Device.configuration.domoticzAPI) {
@@ -108,7 +112,7 @@ void DomoticzPublishContactronState(uint8_t id) {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
 void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.domoticzAPI) {
     HPMA115S0_DOMOTICZ idx;
@@ -123,7 +127,9 @@ void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
     }
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
 void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.domoticzAPI) {
     BMx80_DOMOTICZ idx;
@@ -154,7 +160,9 @@ void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
     }
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
 void DomoticzPublishLightLevel(float lux) {
   if (Device.configuration.domoticzAPI) {
     unsigned long idx = BH1750Sensor.getDomoticzIDX();
@@ -164,5 +172,4 @@ void DomoticzPublishLightLevel(float lux) {
     }
   }
 }
-
 #endif

@@ -62,9 +62,7 @@ void AFEDomoticz::callURL(const String url) {
   http.end();
 }
 
-/* T1,T2,T5,T6 */
-#if !(defined(T0_CONFIG) || defined(T3_CONFIG) || defined(T4_CONFIG))
-
+#ifdef CONFIG_TEMPERATURE
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -75,7 +73,7 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_BH1750
 void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -86,7 +84,7 @@ void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+#ifdef CONFIG_HUMIDITY
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -99,7 +97,7 @@ void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_TEMPERATURE) || defined(CONFIG_HUMIDITY)
 void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
@@ -116,7 +114,7 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
 }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+#ifdef CONFIG_HUMIDITY
 uint8_t AFEDomoticz::getHumidityState(float value) {
   if (value < 40) {
     return HUMIDITY_DRY;
@@ -130,7 +128,8 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
+#if defined(CONFIG_PRESSURE))
 void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     unsigned int idx, float temperatureValue, float humidityValue,
     float pressureValue) {
@@ -148,7 +147,10 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     callURL(call);
   }
 }
+#endif
+#endif
 
+#ifdef CONFIG_PRESSURE
 void AFEDomoticz::sendPressureCommand(unsigned int idx, float pressureValue) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -158,7 +160,6 @@ void AFEDomoticz::sendPressureCommand(unsigned int idx, float pressureValue) {
     callURL(call);
   }
 }
-
 #endif
 
 #if defined(T3_CONFIG)
@@ -177,7 +178,7 @@ void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#if (defined(CONFIG_HARDWARE_HPMA115S0) && defined(CONFIG_HARDWARE_BMX80))
 void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, uint16_t value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);

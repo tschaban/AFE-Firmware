@@ -16,7 +16,7 @@ void MQTTInit() {
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   char _mqttTopic[65];
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   Led.on();
 #endif
 
@@ -54,7 +54,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           }
         }
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
         else {
 
           sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
@@ -77,7 +77,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
                            Relay[i].Thermostat.enabled() ? "on" : "off");
             }
-#ifdef T2_CONFIG
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
           } else {
             /* Checking if Hunidistat related message has been received  */
             sprintf(_mqttTopic, "%shumidistat/cmd", Relay[i].getMQTTTopic());
@@ -124,7 +124,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
       sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
@@ -135,9 +135,11 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
       }
     }
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
     if (Device.configuration.isBMx80) {
-      sprintf(_mqttTopic, "%sbmx80/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%sBMx80/cmd", MQTTConfiguration.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
           BMx80_DATA sensorData;
@@ -246,7 +248,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               Mqtt.publish("temperature", temperatureString);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
             }
             /* getHumidity */
             else if ((char)payload[2] == 't' && length == 11) {
@@ -272,7 +274,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
   }
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   Led.off();
 #endif
 }
@@ -284,7 +286,7 @@ void MQTTPublishRelayState(uint8_t id) {
                  Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_TEMPERATURE
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.mqttAPI) {
@@ -294,7 +296,7 @@ void MQTTPublishTemperature(float temperature) {
 #endif
 
 /* Humidity, HeatIndex, DewPoint */
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HUMIDITY
 /* Metod publishes humidity */
 void MQTTPublishHumidity(float humidity) {
   if (Device.configuration.mqttAPI) {
@@ -349,7 +351,7 @@ void MQTTPublishGateState() {
 }
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
 
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.mqttAPI) {
@@ -363,7 +365,9 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
     Mqtt.publish("HPMA115S0/all", message);
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
 void MQTTPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.mqttAPI) {
     String messageString = "{'temperature':'";
@@ -384,11 +388,12 @@ void MQTTPublishBMx80SensorData(BMx80_DATA data) {
     Mqtt.publish("BMx80/all", message);
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
 void MQTTPublishLightLevel(float lux) {
   if (Device.configuration.mqttAPI) {
     Mqtt.publish("BH1750/lux", lux);
   }
 }
-
 #endif

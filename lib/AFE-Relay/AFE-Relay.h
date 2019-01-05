@@ -13,16 +13,19 @@
 
 #include <AFE-Data-Access.h>
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 #include <AFE-Thermal-Protection.h>
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
 #include <AFE-Thermostat.h>
 #endif
 
-#if defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
 #include <AFE-Humidistat.h>
 #endif
 
@@ -37,7 +40,7 @@ private:
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 
@@ -53,12 +56,15 @@ private:
 #endif
 
 public:
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
   AFEThermostat Thermostat;
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   AFEThermalProtection ThermalProtection;
 #endif
 
-#if defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
   AFEHumidistat Humidistat;
 #endif
 
@@ -110,7 +116,7 @@ public:
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif

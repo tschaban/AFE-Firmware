@@ -19,7 +19,7 @@
 #include <Streaming.h>
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+#ifdef CONFIG_HUMIDITY
 #define HUMIDITY_NORMAL 0
 #define HUMIDITY_COMFORTABLE 1
 #define HUMIDITY_DRY 2
@@ -49,15 +49,14 @@ public:
   */
   void sendSwitchCommand(unsigned int idx, const char *value);
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG) ||          \
-    defined(T6_CONFIG)
+#ifdef CONFIG_TEMPERATURE
   /* It send to Domoticz temperature using following API call
      json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP
   */
   void sendTemperatureCommand(unsigned int idx, float value);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+#ifdef CONFIG_HUMIDITY
   /* It send to Domoticz humidity using following API call
      /json.htm?type=command&param=udevice&idx=IDX&nvalue=HUM&svalue=HUM_STAT
   */
@@ -65,7 +64,7 @@ public:
 
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_TEMPERATURE) || defined(CONFIG_HUMIDITY)
   /* It send to Domoticz temperature and humidity using following API call
      /json.htm?type=command&param=udevice&idx=IDX&nvalue=0&svalue=TEMP;HUM;HUM_STAT
   */
@@ -74,7 +73,7 @@ public:
                                          float humidityValue);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+#ifdef CONFIG_HUMIDITY
   /* It returns humidity state using humidity ranges. Look for value meaning at
    * HUMIDITY_ constant
    */
@@ -90,10 +89,20 @@ public:
   void sendContactronCommand(unsigned int idx, const char *value);
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_BH1750
   void sendSValueCommand(unsigned int idx, float value);
+#endif
+
+#if (defined(CONFIG_HARDWARE_HPMA115S0) && defined(CONFIG_HARDWARE_BMX80))
   void sendCustomSensorCommand(unsigned int idx, uint16_t value);
+#endif
+
+#if defined(CONFIG_PRESSURE)
   void sendPressureCommand(unsigned int idx, float pressureValue);
+#endif
+
+#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
+#if defined(CONFIG_PRESSURE)
   /* Definition:
    * https://www.domoticz.com/wiki/Domoticz_API/JSON_URL's#Temperature.2Fhumidity.2Fbarometer
    */
@@ -101,6 +110,7 @@ public:
                                                     float temperatureValue,
                                                     float humidityValue,
                                                     float pressureValue);
+#endif
 #endif
 };
 

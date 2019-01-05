@@ -26,7 +26,7 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-Device.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 AFELED Led;
 #endif
@@ -38,23 +38,26 @@ AFELED Led;
 #include <AFE-WiFi.h>
 
 /* T1 Set up, DS18B20 sensor */
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
 AFESensorDS18B20 Sensor;
 #endif
 
-/* T1 and T2 Set up */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
-float temperature;
-#endif
-
 /* T2 Setup, DHxx sensor */
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
 #include <AFE-Sensor-DHT.h>
 #include <PietteTech_DHT.h>
 void dht_wrapper();
 PietteTech_DHT dht;
 AFESensorDHT Sensor;
+
+#endif
+
+#ifdef CONFIG_TEMPERATURE
+float temperature;
+#endif
+
+#ifdef CONFIG_HUMIDITY
 float humidity;
 #endif
 
@@ -81,15 +84,24 @@ uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
 byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
 #include <AFE-I2C-Scanner.h>
+AFEI2CScanner I2CScanner;
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
 #include <AFE-Sensor-BH1750.h>
+AFESensorBH1750 BH1750Sensor;
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-BMx80.h>
+AFESensorBMx80 BMx80Sensor;
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
-AFESensorBMx80 BMx80Sensor;
-AFESensorBH1750 BH1750Sensor;
-AFEI2CScanner I2CScanner;
 #endif
 
 void setup() {
@@ -153,7 +165,7 @@ void setup() {
 #endif
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
     Led.begin(systeLedID - 1);
@@ -192,7 +204,7 @@ void setup() {
 #endif
 
     /* Initializing DS18B20 or DHTxx sensor */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
     initSensor();
 #ifdef DEBUG
     Serial << endl << "Sensors initialized";
@@ -200,11 +212,17 @@ void setup() {
 #endif
 
 /* Initializing T6 sensor */
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_I2C
     Wire.begin();
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
       initHPMA115S0Sensor();
     }
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
     if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
       BMx80Sensor.begin(TYPE_BME680_SENSOR);
     } else if (Device.configuration.isBMx80 == TYPE_BME280_SENSOR) {
@@ -212,7 +230,9 @@ void setup() {
     } else if (Device.configuration.isBMx80 == TYPE_BMP180_SENSOR) {
       BMx80Sensor.begin(TYPE_BMP180_SENSOR);
     }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
     if (Device.configuration.isBH1750) {
       BH1750Sensor.begin();
     }
@@ -231,7 +251,7 @@ void setup() {
   MQTTInit();
   DomoticzInit();
 
-#if defined(DEBUG) && defined(T6_CONFIG)
+#if defined(DEBUG) && defined(CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
   if (Device.getMode() == MODE_NORMAL) {
     I2CScanner.scanAll();
@@ -283,15 +303,21 @@ void loop() {
         mainRelay();
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
         /* Sensor: DS18B20 or DHT related code */
         mainSensor();
 #endif
 
 /* Sensor: HPMA115S0 related code  */
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
         mainHPMA115S0Sensor();
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
         mainBMx80Sensor();
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
         mainBH1750Sensor();
 #endif
 
@@ -300,7 +326,7 @@ void loop() {
 #endif
 
       } else { /* Device runs in configuration mode over WiFi */
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -309,7 +335,7 @@ void loop() {
       }
     }
 
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -327,7 +353,7 @@ void loop() {
   mainSwitch();
 
   /* Led listener */
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
   Led.loop();
 #endif
 

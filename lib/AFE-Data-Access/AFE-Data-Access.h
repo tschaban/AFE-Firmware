@@ -11,6 +11,7 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
 
@@ -70,7 +71,7 @@ public:
   /* Methods turns on / off APIs */
   void saveAPI(uint8_t apiID, boolean state);
 
-#if !defined(T0_SHELLY_1_CONFIG)
+#ifdef CONFIG_HARDWARE_LED
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
   /* Methods read and save ID of system led */
@@ -78,17 +79,17 @@ public:
   void saveSystemLedID(uint8_t id);
 #endif
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   DS18B20 getSensorConfiguration();
   void saveConfiguration(DS18B20 configuration);
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   DH getSensorConfiguration();
   void saveConfiguration(DH configuration);
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   /* Method saves regulator configuration */
   void saveConfiguration(REGULATOR configuration,
                          uint8_t type = THERMOSTAT_REGULATOR);
@@ -112,16 +113,24 @@ public:
   void saveGateState(uint8_t state);
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortConfiguration();
   void saveConfiguration(SERIALPORT configuration);
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorConfiguration();
   void saveConfiguration(HPMA115S0 configuration);
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   BMx80 getBMx80SensorConfiguration();
   void saveConfiguration(BMx80 configuration);
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration();
   void saveConfiguration(BH1750 configuration);
-
 #endif
 };
 #endif

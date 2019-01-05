@@ -20,18 +20,21 @@ void AFERelay::begin(uint8_t id) {
   sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
   /* Initialzing Thermostat functionality for a relay */
   Thermostat.begin(RelayConfiguration.thermostat);
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   /* Initialzing thermal protection functionality for a relay */
   ThermalProtection.begin(RelayConfiguration.thermalProtection);
 #endif
 
-#if defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
   Humidistat.begin(RelayConfiguration.humidistat);
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   if (RelayConfiguration.ledID > 0) {
     Led.begin(RelayConfiguration.ledID - 1);
   }
@@ -48,7 +51,7 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
     Led.on();
 #endif
     if (!invert &&
@@ -66,7 +69,7 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
     Led.off();
 #endif
     if (invert &&
@@ -146,7 +149,7 @@ void AFERelay::setTimer(float timer) {
 
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 

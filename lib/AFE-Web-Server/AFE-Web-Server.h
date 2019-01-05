@@ -53,20 +53,20 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   DS18B20 getDS18B20Data();
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   DH getDHTData();
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR getRegulatorData();
 #endif
 
@@ -79,12 +79,22 @@ private:
   GATE getGateData();
 #endif
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortData();
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorData();
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   BMx80 getBMx80SensorData();
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorData();
 #endif
+
   uint8_t getLanguageData();
 
 public:

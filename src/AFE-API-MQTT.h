@@ -35,7 +35,7 @@ private:
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
   boolean eventConnectionEstablished = false;
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
 #endif
 

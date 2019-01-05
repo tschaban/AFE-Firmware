@@ -203,7 +203,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   }
 
   /* LEDs */
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 
 #if defined(T0_CONFIG)
   index = 52;
@@ -348,7 +348,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
   Eeprom.write(879, 32, configuration.password);
 }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
 
@@ -824,7 +824,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #endif
 }
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
 DS18B20 AFEDataAccess::getSensorConfiguration() {
   DS18B20 configuration;
   configuration.gpio = Eeprom.readUInt8(370);
@@ -845,7 +845,7 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
 }
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
 DH AFEDataAccess::getSensorConfiguration() {
   DH configuration;
 #if defined(T2_CONFIG)
@@ -1008,7 +1008,7 @@ void AFEDataAccess::saveGateState(uint8_t state) {
 }
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
 void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
 
   if (type == THERMOSTAT_REGULATOR) {
@@ -1117,9 +1117,9 @@ void AFEDataAccess::saveLanguage(uint8_t language) {
   Eeprom.writeUInt8(8, language);
 }
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 uint8_t AFEDataAccess::getSystemLedID() {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+#if defined(T0_CONFIG)
   return Eeprom.readUInt8(415);
 #elif defined(T1_CONFIG)
   return Eeprom.readUInt8(439);
@@ -1167,7 +1167,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
   }
 }
 
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   HPMA115S0 configuration;
   configuration.interval = Eeprom.read(414, 5).toInt();
@@ -1183,7 +1183,9 @@ void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(926, 6, (long)configuration.idx.pm25);
   Eeprom.write(932, 6, (long)configuration.idx.pm10);
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_UART
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   SERIALPORT configuration;
   configuration.RXD = Eeprom.readUInt8(411);
@@ -1195,7 +1197,9 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(411, configuration.RXD);
   Eeprom.writeUInt8(412, configuration.TXD);
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
 BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
   BMx80 configuration;
   configuration.interval = Eeprom.read(423, 5).toInt();
@@ -1217,7 +1221,9 @@ void AFEDataAccess::saveConfiguration(BMx80 configuration) {
   Eeprom.write(956, 6, (long)configuration.idx.humidity);
   Eeprom.write(962, 6, (long)configuration.idx.pressure);
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
 BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
   BH1750 configuration;
   configuration.interval = Eeprom.read(430, 5).toInt();

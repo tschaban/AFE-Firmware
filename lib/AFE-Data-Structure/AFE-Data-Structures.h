@@ -21,7 +21,7 @@
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
 
-#ifndef T0_SHELLY_1_CONFIG
+#ifdef CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>
 #endif
 
