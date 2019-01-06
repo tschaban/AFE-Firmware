@@ -15,24 +15,40 @@ void AFEDefaults::set() {
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR RegulatorConfiguration;
 #endif
 
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   DS18B20 SensorConfiguration;
-#elif defined(T2_CONFIG)
+#endif
+
+#ifdef CONFIG_HARDWARE_DHXX
   DH SensorConfiguration;
-#elif defined(T3_CONFIG)
+#endif
+
+#if defined(T3_CONFIG)
   PIR PIRConfiguration;
-#elif defined(T5_CONFIG)
-  DH SensorConfiguration;
+#endif
+
+#if defined(T5_CONFIG)
   CONTACTRON ContactronConfiguration;
   GATE GateConfiguration;
-#elif defined(T6_CONFIG)
+#endif
+
+#ifdef CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 SensorHPMA115S0Configuration;
+#endif
+
+#ifdef CONFIG_HARDWARE_UART
   SERIALPORT SerialPortConfiguration;
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   BMx80 SensorBMx80Configuration;
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
   BH1750 SensorBH1750Configuration;
 #endif
 
@@ -72,12 +88,12 @@ void AFEDefaults::set() {
 #endif
 
 /* DS18B20 */
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   deviceConfiguration.isDS18B20 = false;
 #endif
 
 /* DHxx */
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_DHXX
   deviceConfiguration.isDHT = false;
 #endif
 
@@ -96,9 +112,16 @@ void AFEDefaults::set() {
 #endif
 
 /* HPMA115S0 Sesnor */
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
   deviceConfiguration.isHPMA115S0 = false;
+#endif
+
+#ifdef CONFIG_HARDWARE_BMX80
   deviceConfiguration.isBMx80 = 0;
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
+  deviceConfiguration.isBH1750 = 0;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -192,12 +215,14 @@ void AFEDefaults::set() {
 #endif
 
 /* Thermostat configuration */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
+#if defined(CONFIG_FUNCTIONALITY_REGULATOR) &&                                 \
+    defined(CONFIG_FUNCTIONALITY_THERMOSTAT)
   Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
 #endif
 
 /* Hunidistat confiuration */
-#if defined(T2_CONFIG)
+#if defined(CONFIG_FUNCTIONALITY_REGULATOR) &&                                 \
+    defined(CONFIG_FUNCTIONALITY_HUMIDISTAT)
   Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
 #endif
 
@@ -262,15 +287,15 @@ void AFEDefaults::set() {
   addDeviceID();
 
 /* DS18B20 or DHTxx Sensor configuration */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(CONFIG_HARDWARE_DHXX) || defined(CONFIG_HARDWARE_DS18B20)
   SensorConfiguration.gpio = 14;
   SensorConfiguration.sendOnlyChanges = true;
   SensorConfiguration.interval = 60;
-#if defined(T1_CONFIG)
+#ifdef CONFIG_HARDWARE_DS18B20
   SensorConfiguration.correction = 0;
   SensorConfiguration.unit = 0;
   SensorConfiguration.idx = 0;
-#elif defined(T2_CONFIG) || defined(T5_CONFIG)
+#else
   SensorConfiguration.gpio = 2;
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
@@ -328,17 +353,21 @@ void AFEDefaults::set() {
 #endif
 
 /* T6 HPMA115S0 Sensor */
-#if defined(T6_CONFIG)
+#ifdef CONFIG_HARDWARE_HPMA115S0
   SensorHPMA115S0Configuration.interval = 60;
   SensorHPMA115S0Configuration.timeToMeasure = 0;
   SensorHPMA115S0Configuration.idx.pm10 = 0;
   SensorHPMA115S0Configuration.idx.pm25 = 0;
   Data->saveConfiguration(SensorHPMA115S0Configuration);
+#endif
 
+#ifdef CONFIG_HARDWARE_UART
   SerialPortConfiguration.RXD = 12;
   SerialPortConfiguration.TXD = 14;
   Data->saveConfiguration(SerialPortConfiguration);
+#endif
 
+#ifdef CONFIG_HARDWARE_BMX80
   SensorBMx80Configuration.interval = 60;
   SensorBMx80Configuration.i2cAddress = 0;
   SensorBMx80Configuration.idx.temperatureHumidityPressure = 0;
@@ -347,13 +376,14 @@ void AFEDefaults::set() {
   SensorBMx80Configuration.idx.humidity = 0;
   SensorBMx80Configuration.idx.pressure = 0;
   Data->saveConfiguration(SensorBMx80Configuration);
+#endif
 
+#ifdef CONFIG_HARDWARE_BH1750
   SensorBH1750Configuration.interval = 60;
   SensorBH1750Configuration.i2cAddress = 0;
   SensorBH1750Configuration.idx = 0;
   SensorBH1750Configuration.mode = 0;
   Data->saveConfiguration(SensorBH1750Configuration);
-
 #endif
 
 #ifdef CONFIG_HARDWARE_LED

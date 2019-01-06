@@ -328,7 +328,7 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
 String AFESitesGenerator::addThermostateMenuItem() {
-  String page += "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
+  String page = "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
   page += language == 0 ? "Termostat" : "Thermostat";
   page += "</a></li>";
   return page;

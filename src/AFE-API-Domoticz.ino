@@ -97,7 +97,7 @@ void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(CONFIG_TEMPERATURE) || defined(CONFIG_HUMIDITY)
+#if defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY)
 void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
