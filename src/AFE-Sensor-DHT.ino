@@ -46,18 +46,21 @@ void AFESensorDHT::listener() {
       if (readResult == 0) {
         if (configuration.temperature.unit == UNIT_CELCIUS) {
           if (currentTemperature != dht.getCelsius()) {
-            currentTemperature = dht.getCelsius();
+            currentTemperature =
+                dht.getCelsius() + configuration.temperature.correction;
             dataInMemory = true;
           }
         } else {
           if (currentTemperature != dht.getFahrenheit()) {
-            currentTemperature = dht.getFahrenheit();
+            currentTemperature =
+                dht.getFahrenheit() + configuration.temperature.correction;
             dataInMemory = true;
           }
         }
 
         if (currentHumidity != dht.getHumidity()) {
-          currentHumidity = dht.getHumidity();
+          currentHumidity =
+              dht.getHumidity() + configuration.humidity.correction;
           dataInMemory = true;
         }
 
