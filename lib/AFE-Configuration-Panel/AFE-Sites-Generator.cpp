@@ -336,7 +336,7 @@ String AFESitesGenerator::addThermostateMenuItem() {
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
-String addHumidistatMenuItem() {
+String AFESitesGenerator::addHumidistatMenuItem() {
   String page = "<li class=\"itm\"><a href=\"\\?option=humidistat\">&#8227; ";
   page += language == 0 ? "Regulator wilgotności" : "Humidistat";
   page += "</a></li>";

@@ -129,7 +129,7 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
 #endif
 
 #if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
-#if defined(CONFIG_PRESSURE))
+#if defined(CONFIG_PRESSURE)
 void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     unsigned int idx, float temperatureValue, float humidityValue,
     float pressureValue) {
