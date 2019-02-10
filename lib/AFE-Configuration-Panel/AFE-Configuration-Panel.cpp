@@ -406,6 +406,24 @@ String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
 }
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+String AFEConfigurationPanel::getAnalogInputConfigurationSite(uint8_t command,
+                                                              ADCINPUT data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page = Site.generateHeader();
+  page += "<form action=\"/?option=analogInput&cmd=1\"  method=\"post\">";
+  page += Site.addAnalogInputConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += language == 0 ? "Zapisz" : "Save";
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+#endif
+
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);

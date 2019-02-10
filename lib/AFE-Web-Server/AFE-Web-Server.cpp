@@ -141,6 +141,15 @@ void AFEWebServer::generate() {
     publishHTML(
         ConfigurationPanel.getBH1750SensorConfigurationSite(command, data));
 #endif
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  } else if (optionName == "analogInput") {
+    ADCINPUT data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getAnalogInputData();
+    }
+    publishHTML(
+        ConfigurationPanel.getAnalogInputConfigurationSite(command, data));
+#endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
     Device.reboot(MODE_NORMAL);
@@ -384,6 +393,11 @@ DEVICE AFEWebServer::getDeviceData() {
 
 #ifdef CONFIG_HARDWARE_BH1750
   server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  server.arg("ai").length() > 0 ? data.isAnalogInput = true
+                                : data.isAnalogInput = false;
 #endif
 
   return data;
@@ -896,6 +910,37 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   if (server.arg("d").length() > 0) {
     data.idx = server.arg("d").toInt();
   }
+  return data;
+}
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+ADCINPUT AFEWebServer::getAnalogInputData() {
+  ADCINPUT data;
+  if (server.arg("g").length() > 0) {
+    data.gpio = server.arg("g").toInt();
+  }
+
+  if (server.arg("i").length() > 0) {
+    data.interval = server.arg("i").toInt();
+  }
+
+  if (server.arg("n").length() > 0) {
+    data.numberOfSamples = server.arg("n").toInt();
+  }
+
+  if (server.arg("r").length() > 0) {
+    data.idx.raw = server.arg("r").toInt();
+  }
+
+  if (server.arg("p").length() > 0) {
+    data.idx.percent = server.arg("p").toInt();
+  }
+
+  if (server.arg("v").length() > 0) {
+    data.idx.voltage = server.arg("v").toInt();
+  }
+
   return data;
 }
 #endif

@@ -178,13 +178,22 @@ void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
 }
 #endif
 
-#if (defined(CONFIG_HARDWARE_HPMA115S0) && defined(CONFIG_HARDWARE_BMX80))
-void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, uint16_t value) {
+#ifdef CONFIG_DOMOTICZ_CUSTOME_SENSOR
+void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, double value,
+                                          uint8_t precision) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
     call += "&nvalue=0&svalue=";
-    call += value;
+    call += String(value, precision);
     callURL(call);
   }
+}
+void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, float value,
+                                          uint8_t precision) {
+  sendCustomSensorCommand(idx, (double)value, precision);
+}
+
+void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, uint16_t value) {
+  sendCustomSensorCommand(idx, (double)value, 0);
 }
 #endif

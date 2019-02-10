@@ -25,6 +25,10 @@
 #include <AFE-LED-Structure.h>
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+#include <AFE-ADC-INPUT-Structure.h>
+#endif
+
 #ifdef T1_CONFIG
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif

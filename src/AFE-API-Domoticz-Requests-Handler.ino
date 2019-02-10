@@ -173,3 +173,24 @@ void DomoticzPublishLightLevel(float lux) {
   }
 }
 #endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
+  if (Device.configuration.domoticzAPI) {
+    ADCINPUT_DOMOTICZ idx;
+    AnalogInput.getDomoticzIDX(&idx);
+
+    if (idx.raw > 0) {
+      Domoticz.sendCustomSensorCommand(idx.raw, data.raw);
+    }
+    if (idx.percent > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.percent, data.percent);
+    }
+    if (idx.voltage > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.voltage, data.voltage);
+    }
+  }
+}
+#endif

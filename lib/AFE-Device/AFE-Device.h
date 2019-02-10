@@ -13,7 +13,15 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
-//#include <Streaming.h>
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+#include <AFE-Defaults.h>
+#include <FS.h>
+#endif
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEDevice {
 
@@ -46,6 +54,10 @@ public:
 
   /* Is WiFi configured */
   boolean isConfigured();
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+  boolean checkConfiguration();
+#endif
 };
 
 #endif

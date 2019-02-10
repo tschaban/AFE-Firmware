@@ -124,6 +124,10 @@ public:
   String addBH1750Configuration();
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  String addAnalogInputConfiguration();
+#endif
+
 #ifdef CONFIG_HARDWARE_UART
   String addSerialPortConfiguration();
 #endif

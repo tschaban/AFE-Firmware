@@ -94,6 +94,10 @@ public:
   String getBH1750SensorConfigurationSite(uint8_t command, BH1750 data);
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  String getAnalogInputConfigurationSite(uint8_t command, ADCINPUT data);
+#endif
+
   /* It generates site for firmware upgrade */
   String firmwareUpgradeSite();
 

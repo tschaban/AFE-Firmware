@@ -294,6 +294,15 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 #endif
 
+/* Sensor DS18B20 */
+#ifdef CONFIG_HARDWARE_ADC_VCC
+    if (Device.configuration.isAnalogInput) {
+      page += "<li class=\"itm\"><a href=\"\\?option=analogInput\">";
+      page += language == 0 ? "Wejście analogowe" : "Analog input";
+      page += "</a></li>";
+    }
+#endif
+
     /* Language, Upgrade, Exit */
     page += "<br><br><li class=\"itm\"><a "
             "href=\"\\?option=language\">[PL] Język / "
@@ -516,6 +525,15 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body += "</select>";
   body += "</div>";
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
+          "value=\"1\"";
+  body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
+  body +=
+      language == 0 ? "Pomiary z wejścia analogowego" : " Measure Analog Input";
+  body += "</label></div>";
 #endif
 
 #if defined(T3_CONFIG)
@@ -2144,6 +2162,92 @@ String AFESitesGenerator::addBH1750Configuration() {
         "Domoticz",
         language == 0
             ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+            : "If IDX is set to 0 then a value won't be sent to Domoticz",
+        body);
+  }
+
+  return page;
+}
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+String AFESitesGenerator::addAnalogInputConfiguration() {
+  ADCINPUT configuration = Data.getADCInputConfiguration();
+  DEVICE device = Data.getDeviceConfiguration();
+
+  String body = "<fieldset>";
+  body += "<div class=\"cf\"><label>GPIO</label><input name=\"g\" "
+          "type=\"number\" value=\"";
+  body += configuration.gpio;
+  body += "\" ><span class=\"hint\">";
+  body += language == 0 ? "(brak możliwości zmiany)" : "(can't be set)";
+  body += " </span></div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
+  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.interval;
+  body += "\"><span class=\"hint\">";
+  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
+                        : "seconds. Range: 5 to 86400sec";
+  body += " (24h)</span></div>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Ilośc próbek do uśrednienia odczytu"
+                        : "Number of sample measurements";
+  body += "</label><input name=\"n\" min=\"1\" max=\"255\" step=\"1\" "
+          "type=\"number\" "
+          "value=\"";
+  body += configuration.numberOfSamples;
+  body += "\"><span class=\"hint\">(1-255)</span></div><br><br>";
+
+  body += "</fieldset>";
+
+  String page = addConfigurationBlock(
+      language == 0 ? "Wejście analogowe" : "Analog input", "", body);
+
+  if (device.domoticzAPI) {
+    body = "<fieldset>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Surowe dane" : "Raw data";
+    body += "</label><input name=\"r\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.raw;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Procent" : "Percent";
+    body += "</label><input name=\"p\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.percent;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "<div class=\"cf\"><label>IDX ";
+    body += language == 0 ? "Napięcie" : "Voltage";
+    body += "</label><input name=\"v\" type=\"number\" step=\"1\" min=\"0\" "
+            "max=\"999999\"  value=\"";
+    body += configuration.idx.voltage;
+    body += "\">";
+    body += "<span class=\"hint\">";
+    body += language == 0 ? "Zakres: " : "Range: ";
+    body += "0 - 999999</span>";
+    body += "</div>";
+
+    body += "</fieldset>";
+    page += addConfigurationBlock(
+        "Domoticz",
+        language == 0
+            ? "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
             : "If IDX is set to 0 then a value won't be sent to Domoticz",
         body);
   }

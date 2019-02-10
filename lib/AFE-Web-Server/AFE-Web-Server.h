@@ -95,6 +95,10 @@ private:
   BH1750 getBH1750SensorData();
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  ADCINPUT getAnalogInputData();
+#endif
+
   uint8_t getLanguageData();
 
 public:

@@ -15,6 +15,10 @@
 #include <AFE-Data-Access.h>
 #include <AFE-EEPROM.h>
 
+#ifdef CONFIG_HARDWARE_SPIFFS
+#include <FS.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -27,6 +31,11 @@ private:
 public:
   AFEDefaults();
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  void addAnalogInputDefaultConfiguration();
+  void addDeviceDefaultConfiguration();
+#endif
+
   void addDomoticzConfiguration();
 #ifdef CONFIG_HARDWARE_LED
   void addLEDConfiguration(uint8_t id, uint8_t gpio);
@@ -35,6 +44,10 @@ public:
 
   /* Method erases EEPROM */
   void eraseConfiguration();
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+  void formatSPIFFS();
+#endif
 
   /* Method set default values */
   void set();
