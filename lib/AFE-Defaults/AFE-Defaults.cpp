@@ -124,6 +124,10 @@ void AFEDefaults::set() {
   deviceConfiguration.isBH1750 = 0;
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  deviceConfiguration.isAnalogInput = 0;
+#endif
+
   Data->saveConfiguration(deviceConfiguration);
 
   /* Network default config */
@@ -424,3 +428,82 @@ void AFEDefaults::addDeviceID() {
   Data->saveDeviceID(String(id));
 }
 void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+void AFEDefaults::addAnalogInputDefaultConfiguration() {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-analog-input.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-analog-input.json", "w");
+
+  if (configFile) {
+
+    configFile.print("{\"gpio\":17,\"interval\":60,\"numberOfSamples\":1,"
+                     "\"idx\":{\"raw\":0,\"percent\":0,\"voltage\":0}}");
+
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << "success";
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+
+void AFEDefaults::addDeviceDefaultConfiguration() {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: device.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-device.json", "w");
+
+  if (configFile) {
+    configFile.print("{\"isAnalogInput\":0}");
+
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << "success";
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+#endif
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+void AFEDefaults::formatSPIFFS() {
+  if (SPIFFS.format()) {
+#ifdef DEBUG
+    Serial << endl << "- File system formated";
+  } else {
+    Serial << endl << "- File system NOT formated";
+  }
+#endif
+}
+#endif

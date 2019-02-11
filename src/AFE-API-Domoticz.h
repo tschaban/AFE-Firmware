@@ -93,8 +93,12 @@ public:
   void sendSValueCommand(unsigned int idx, float value);
 #endif
 
-#if (defined(CONFIG_HARDWARE_HPMA115S0) && defined(CONFIG_HARDWARE_BMX80))
+#ifdef CONFIG_DOMOTICZ_CUSTOME_SENSOR
   void sendCustomSensorCommand(unsigned int idx, uint16_t value);
+  void sendCustomSensorCommand(unsigned int idx, double value,
+                               uint8_t precision = 6);
+  void sendCustomSensorCommand(unsigned int idx, float value,
+                               uint8_t precision = 2);
 #endif
 
 #if defined(CONFIG_PRESSURE)

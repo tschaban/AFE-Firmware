@@ -149,6 +149,55 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #endif
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-device.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-device.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &json = jsonBuffer.parseObject(buf.get());
+    if (json.success()) {
+#ifdef DEBUG
+      json.printTo(Serial);
+      Serial << endl;
+#endif
+      configuration.isAnalogInput = json["isAnalogInput"] == 1 ? true : false;
+#ifdef DEBUG
+      Serial << "success";
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+#endif
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(DEVICE configuration) {
@@ -253,6 +302,43 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Eeprom.write(413, configuration.isHPMA115S0);
   Eeprom.writeUInt8(422, configuration.isBMx80);
   Eeprom.write(429, configuration.isBH1750);
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-device.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-device.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &json = jsonBuffer.createObject();
+    json["isAnalogInput"] = configuration.isAnalogInput;
+    json.printTo(configFile);
+#ifdef DEBUG
+    json.printTo(Serial);
+    Serial << endl;
+#endif
+    configFile.close();
+#ifdef DEBUG
+    Serial << "success";
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
 #endif
 }
 
@@ -1238,4 +1324,109 @@ void AFEDataAccess::saveConfiguration(BH1750 configuration) {
   Eeprom.writeUInt8(436, configuration.mode);
   Eeprom.write(968, 6, (long)configuration.idx);
 }
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+
+ADCINPUT AFEDataAccess::getADCInputConfiguration() {
+  ADCINPUT configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-analog-input.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-analog-input.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &json = jsonBuffer.parseObject(buf.get());
+    if (json.success()) {
+#ifdef DEBUG
+      json.printTo(Serial);
+      Serial << endl;
+#endif
+      configuration.gpio = json["gpio"];
+      configuration.interval = json["interval"];
+      configuration.numberOfSamples = json["numberOfSamples"];
+      configuration.idx.raw = json["idx"]["raw"];
+      configuration.idx.percent = json["idx"]["percent"];
+      configuration.idx.voltage = json["idx"]["voltage"];
+#ifdef DEBUG
+      Serial << "success";
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+
+void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-analog-input.json : ";
+#endif
+
+  File configFile = SPIFFS.open("/cfg-analog-input.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &json = jsonBuffer.createObject();
+    JsonObject &idx = json.createNestedObject("idx");
+
+    json["gpio"] = configuration.gpio;
+    json["interval"] = configuration.interval;
+    json["numberOfSamples"] = configuration.numberOfSamples;
+    idx["raw"] = configuration.idx.raw;
+    idx["percent"] = configuration.idx.percent;
+    idx["voltage"] = configuration.idx.voltage;
+    json.printTo(configFile);
+#ifdef DEBUG
+    json.printTo(Serial);
+    Serial << endl;
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << "success";
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+};
 #endif

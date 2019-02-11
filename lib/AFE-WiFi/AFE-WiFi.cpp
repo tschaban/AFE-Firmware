@@ -77,8 +77,8 @@ void AFEWiFi::listener() {
         connections++;
 #ifdef DEBUG
         Serial << endl
-               << "INFO: WiFi connection attempt: " << connections + 1
-               << " from " << networkConfiguration.noConnectionAttempts;
+               << "INFO: WiFi connection attempt: " << connections << " from "
+               << networkConfiguration.noConnectionAttempts;
 #endif
         delayStartTime = 0;
       }
@@ -123,6 +123,7 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (WiFi.status() == WL_CONNECTED) {
+    delay(1);
     if (disconnected) {
       eventConnectionEstablished = true;
       disconnected = false;

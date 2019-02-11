@@ -50,7 +50,6 @@ AFESensorDS18B20 Sensor;
 void dht_wrapper();
 PietteTech_DHT dht;
 AFESensorDHT Sensor;
-
 #endif
 
 #ifdef CONFIG_TEMPERATURE
@@ -104,6 +103,15 @@ AFESensorBMx80 BMx80Sensor;
 AFESensorHPMA115S0 ParticleSensor;
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+#include <AFE-Analog-Input.h>
+AFEAnalogInput AnalogInput;
+#endif
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+#include <FS.h>
+#endif
+
 void setup() {
 
   Serial.begin(9600);
@@ -122,6 +130,28 @@ void setup() {
          << endl
          << "All classes and global variables initialized";
 #endif
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+  if (SPIFFS.begin()) {
+#ifdef DEBUG
+    Serial << endl << "File system mounted";
+#endif
+    if (Device.checkConfiguration()) {
+#ifdef DEBUG
+      Serial << endl << "SPIFFS Configuration files: success";
+    } else {
+      Serial << endl << "SPIFFS Configuration files: ERROR";
+#endif
+    }
+#ifdef DEBUG
+  } else {
+    Serial << endl << "Failed to mount file system";
+#endif
+  }
+
+#endif
+
+  Device.begin();
 
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
@@ -245,6 +275,16 @@ void setup() {
     Serial << endl << "PIR initialized";
 #endif
 #endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+    Serial << endl
+           << "Device.configuration.isAnalogInpu-"
+           << Device.configuration.isAnalogInput;
+
+    if (Device.configuration.isAnalogInput) {
+      AnalogInput.begin();
+    }
+#endif
   }
 
   /* Initializing APIs */
@@ -319,6 +359,10 @@ void loop() {
 
 #ifdef CONFIG_HARDWARE_BH1750
         mainBH1750Sensor();
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+        analogInputListner();
 #endif
 
 #if defined(T3_CONFIG)

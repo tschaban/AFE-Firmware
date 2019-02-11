@@ -29,6 +29,7 @@ boolean AFEDevice::isFirstTimeLaunch() {
 void AFEDevice::setDevice() {
   AFEDefaults Defaults;
   Defaults.eraseConfiguration();
+  Defaults.formatSPIFFS();
   Defaults.set();
 }
 
@@ -40,3 +41,33 @@ boolean AFEDevice::isConfigured() {
     return true;
   }
 }
+
+#ifdef CONFIG_HARDWARE_SPIFFS
+boolean AFEDevice::checkConfiguration() {
+  AFEDefaults Defaults;
+#ifdef CONFIG_HARDWARE_ADC_VCC
+
+  File configFile = SPIFFS.open("/cfg-device.json", "r");
+  if (!configFile) {
+#ifdef DEBUG
+    Serial << endl << "Adding default configuration for: device";
+#endif
+    Defaults.addDeviceDefaultConfiguration();
+  } else {
+    configFile.close();
+  }
+
+  configFile = SPIFFS.open("/cfg-analog-input.json", "r");
+  if (!configFile) {
+#ifdef DEBUG
+    Serial << endl << "Adding default configuration for: analog input";
+#endif
+    Defaults.addAnalogInputDefaultConfiguration();
+  } else {
+    configFile.close();
+  }
+
+#endif
+  return true;
+}
+#endif

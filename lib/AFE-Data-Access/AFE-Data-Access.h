@@ -15,6 +15,11 @@
 #include <AFE-Data-Structures.h>
 #include <AFE-EEPROM.h>
 
+#ifdef CONFIG_HARDWARE_SPIFFS
+#include <ArduinoJson.h>
+#include <FS.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -131,6 +136,11 @@ public:
 #ifdef CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration();
   void saveConfiguration(BH1750 configuration);
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  ADCINPUT getADCInputConfiguration();
+  void saveConfiguration(ADCINPUT configuration);
 #endif
 };
 #endif
