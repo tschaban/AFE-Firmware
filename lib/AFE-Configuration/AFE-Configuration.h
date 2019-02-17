@@ -12,7 +12,7 @@
 #endif
 
 #if defined(T0_CONFIG)
-#define FIRMWARE_VERSION "1.5.B1"
+#define FIRMWARE_VERSION "1.5.0"
 #define FIRMWARE_TYPE 0
 #define CONFIG_HARDWARE_LED
 #define CONFIG_HARDWARE_ADC_VCC

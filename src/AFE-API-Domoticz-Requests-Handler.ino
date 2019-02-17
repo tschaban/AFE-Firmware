@@ -6,11 +6,9 @@
 void DomoticzInit() {
   if (Device.configuration.domoticzAPI) {
     Domoticz.begin();
-    /*
-    #ifdef DEBUG
-        Serial << endl << "API: Domoticz initialized";
-    #endif
-    */
+#ifdef DEBUG
+    Serial << endl << "API: Domoticz initialized";
+#endif
   }
 }
 

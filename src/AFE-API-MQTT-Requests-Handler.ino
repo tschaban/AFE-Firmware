@@ -397,3 +397,20 @@ void MQTTPublishLightLevel(float lux) {
   }
 }
 #endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
+  if (Device.configuration.mqttAPI) {
+    String messageString = "{'raw':'";
+    messageString += data.raw;
+    messageString += "','percent':'";
+    messageString += data.percent;
+    messageString += "','voltage':'";
+    messageString += data.voltage;
+    messageString += "'}";
+    char message[messageString.length() + 1];
+    messageString.toCharArray(message, messageString.length() + 1);
+    Mqtt.publish(AnalogInput.getMQTTTopic(), message);
+  }
+}
+#endif

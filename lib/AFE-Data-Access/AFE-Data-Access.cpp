@@ -1358,6 +1358,8 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
       configuration.gpio = json["gpio"];
       configuration.interval = json["interval"];
       configuration.numberOfSamples = json["numberOfSamples"];
+      configuration.maxVCC = json["maxVCC"];
+      sprintf(configuration.mqttTopic, json["mqttTopic"]);
       configuration.idx.raw = json["idx"]["raw"];
       configuration.idx.percent = json["idx"]["percent"];
       configuration.idx.voltage = json["idx"]["voltage"];
@@ -1407,6 +1409,8 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     json["gpio"] = configuration.gpio;
     json["interval"] = configuration.interval;
     json["numberOfSamples"] = configuration.numberOfSamples;
+    json["maxVCC"] = configuration.maxVCC;
+    json["mqttTopic"] = configuration.mqttTopic;
     idx["raw"] = configuration.idx.raw;
     idx["percent"] = configuration.idx.percent;
     idx["voltage"] = configuration.idx.voltage;

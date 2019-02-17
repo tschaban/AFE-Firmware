@@ -929,6 +929,16 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
     data.numberOfSamples = server.arg("n").toInt();
   }
 
+  if (server.arg("m").length() > 0) {
+    data.maxVCC = server.arg("m").toFloat();
+  }
+
+  if (server.arg("q").length() > 0) {
+    server.arg("q").toCharArray(data.mqttTopic, sizeof(data.mqttTopic) + 1);
+  } else {
+    data.mqttTopic[0] = '\0';
+  }
+
   if (server.arg("r").length() > 0) {
     data.idx.raw = server.arg("r").toInt();
   }

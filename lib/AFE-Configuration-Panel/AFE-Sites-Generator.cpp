@@ -2177,7 +2177,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   String body = "<fieldset>";
   body += "<div class=\"cf\"><label>GPIO</label><input name=\"g\" "
-          "type=\"number\" value=\"";
+          "type=\"number\" disabled=\"disabled\" value=\"";
   body += configuration.gpio;
   body += "\" ><span class=\"hint\">";
   body += language == 0 ? "(brak możliwości zmiany)" : "(can't be set)";
@@ -2185,27 +2185,48 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
-  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
+  body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
   body += configuration.interval;
   body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
-                        : "seconds. Range: 5 to 86400sec";
+  body += language == 0 ? "sekund. Zakres: 1 do 86400sek"
+                        : "seconds. Range: 1 to 86400sec";
   body += " (24h)</span></div>";
+  body += "<div class=\"cf\"><label>";
+  body += language == 0 ? "Mierzone napięcie" : "Measured voltage";
+  body += "</label><input name=\"m\" min=\"0\" max=\"1000\""
+          "type=\"number\" value=\"";
+  body += configuration.maxVCC;
+  body += "\"><span class=\"hint\"> 0 - 999.99V</span></div>";
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Ilośc próbek do uśrednienia odczytu"
                         : "Number of sample measurements";
-  body += "</label><input name=\"n\" min=\"1\" max=\"255\" step=\"1\" "
+  body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
   body += configuration.numberOfSamples;
-  body += "\"><span class=\"hint\">(1-255)</span></div><br><br>";
+  body += "\"><span class=\"hint\">(1-999)</span></div><br><br>";
 
   body += "</fieldset>";
 
   String page = addConfigurationBlock(
       language == 0 ? "Wejście analogowe" : "Analog input", "", body);
+
+  if (device.mqttAPI) {
+    body = "<fieldset>";
+    body = "<div class=\"cf\"><label>";
+    body += language == 0 ? "Temat wiadomości" : "MQTT Topic";
+    body += "</label><input name=\"t\" type=\"text\""
+            "maxlength=\"64\" value=\"";
+    body += configuration.mqttTopic;
+    body +=
+        "\"><span class=\"hint\">Format <strong>/abc/def/</strong>. Max 64 ";
+    body += language == 0 ? "znaków" : "chars";
+    body += "</span></div>";
+    body += "</fieldset>";
+    page += addConfigurationBlock("MQTT", "", body);
+  }
 
   if (device.domoticzAPI) {
     body = "<fieldset>";

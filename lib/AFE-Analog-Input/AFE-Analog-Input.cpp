@@ -17,6 +17,7 @@ void AFEAnalogInput::begin() {
          << "- Initialized" << endl
          << "- GPIO: " << configuration.gpio
          << ", Interval: " << configuration.interval
+         << ", Max VCC: " << configuration.maxVCC
          << ", No of Samples: " << configuration.numberOfSamples;
   Serial << endl << "-------------------------------------";
 
@@ -27,7 +28,7 @@ ADCINPUT_DATA AFEAnalogInput::get() {
   ADCINPUT_DATA data;
   data.raw = analogData;
   data.percent = (float)analogData * 100 / 1024;
-  data.voltage = (double)analogData / 1024;
+  data.voltage = (double)(configuration.maxVCC * analogData / 1024);
   return data;
 }
 
@@ -56,7 +57,7 @@ void AFEAnalogInput::listener() {
       } else {
 
         analogData =
-            (uint16_t)temporaryAnalogData / configuration.numberOfSamples;
+            (uint16_t)(temporaryAnalogData / configuration.numberOfSamples);
 
 #ifdef DEBUG
         Serial << endl
@@ -83,3 +84,6 @@ void AFEAnalogInput::listener() {
 void AFEAnalogInput::getDomoticzIDX(ADCINPUT_DOMOTICZ *idx) {
   *idx = configuration.idx;
 }
+
+/* Method returns MQTT topic for this relay */
+const char *AFEAnalogInput::getMQTTTopic() { return configuration.mqttTopic; }

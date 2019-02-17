@@ -27,6 +27,8 @@ struct ADCINPUT {
   uint8_t gpio;
   uint16_t interval;
   uint8_t numberOfSamples;
+  float maxVCC;
+  char mqttTopic[64];
   ADCINPUT_DOMOTICZ idx;
 };
 

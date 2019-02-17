@@ -443,7 +443,8 @@ void AFEDefaults::addAnalogInputDefaultConfiguration() {
   if (configFile) {
 
     configFile.print("{\"gpio\":17,\"interval\":60,\"numberOfSamples\":1,"
-                     "\"idx\":{\"raw\":0,\"percent\":0,\"voltage\":0}}");
+                     "\"mqttTopic\":\"\\analogData\\\",\"maxVCC\":1,\"idx\":{"
+                     "\"raw\":0,\"percent\":0,\"voltage\":0}}");
 
 #ifdef DEBUG
     Serial << "success" << endl << "Writing JSON : ";

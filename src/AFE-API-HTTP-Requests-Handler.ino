@@ -45,7 +45,7 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
   WebServer.sendJSON(respond);
 }
 
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
                               uint8_t width = 2, uint8_t precision = 2) {
   char valueString[10];
   dtostrf(value, width, precision, valueString);
@@ -304,26 +304,24 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #ifdef CONFIG_HARDWARE_BMX80
   /* BMx80 */
   else if (strcmp(request.device, "BMx80") == 0) {
-    BMx80_DATA sensorData;
-    sensorData = BMx80Sensor.get();
-    if (strcmp(request.name, "temperature") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+    if (strcmp(request.command, "get") == 0) {
+      BMx80_DATA sensorData;
+      sensorData = BMx80Sensor.get();
+      if (strcmp(request.name, "temperature") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      }
-    } else if (strcmp(request.name, "pressure") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (strcmp(request.name, "pressure") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-               strcmp(request.name, "humidity") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+                 strcmp(request.name, "humidity") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
-               strcmp(request.name, "gasResistance") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
+                 strcmp(request.name, "gasResistance") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
       }
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
     }
   }
 #endif
@@ -335,7 +333,30 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       if (strcmp(request.command, "get") == 0) {
         float lux = BH1750Sensor.get();
         sendHTTPAPIRequestStatus(request, true, lux);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
       }
+    }
+  }
+#endif
+
+#ifdef CONFIG_HARDWARE_BH1750
+  /* Analog Input */
+  else if (strcmp(request.device, "ADC") == 0) {
+
+    if (strcmp(request.command, "get") == 0) {
+      ADCINPUT_DATA data;
+      if (strcmp(request.name, "raw") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.raw);
+      } else if (strcmp(request.name, "percent") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.percent);
+      } else if (strcmp(request.name, "voltage") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.voltage, 3, 6);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
+      }
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
     }
   }
 #endif
