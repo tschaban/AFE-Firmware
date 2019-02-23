@@ -26,8 +26,10 @@
 class AFEWiFi {
 
 private:
+  AFEDevice *Device;
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
+  uint8_t WiFiMode;
 
 #ifdef CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
@@ -52,7 +54,7 @@ public:
 
   /* Sets connection parameters and host name. Must be invoked before connect
    * method */
-  void begin(uint8_t mode);
+  void begin(uint8_t mode, AFEDevice *);
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();

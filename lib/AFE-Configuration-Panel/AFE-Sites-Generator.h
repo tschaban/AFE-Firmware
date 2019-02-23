@@ -28,12 +28,18 @@
 #include <Streaming.h>
 #endif
 
+#if defined(AFE_LANGUAGE) && AFE_LANGUAGE == pl_PL
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+
 class AFESitesGenerator {
 
 private:
   AFEEEPROM Eeprom;
   AFEDataAccess Data;
-  AFEDevice Device;
+  AFEDevice *Device;
   uint8_t language;
   FIRMWARE firmware;
 
@@ -69,6 +75,8 @@ private:
 public:
   /* Constructor*/
   AFESitesGenerator();
+
+  void begin(AFEDevice *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)

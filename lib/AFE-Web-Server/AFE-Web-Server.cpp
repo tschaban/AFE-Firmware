@@ -6,9 +6,11 @@
 
 AFEWebServer::AFEWebServer() {}
 
-void AFEWebServer::begin() {
+void AFEWebServer::begin(AFEDevice *_Device) {
   httpUpdater.setup(&server);
   server.begin();
+  Device = _Device;
+  ConfigurationPanel.begin(Device);
 }
 
 void AFEWebServer::listener() { server.handleClient(); }
@@ -52,7 +54,7 @@ void AFEWebServer::generate() {
 
   if (_refreshConfiguration) {
     _refreshConfiguration = false;
-    Device.begin();
+    Device->begin();
   }
 
   const String optionName = getOptionName();
@@ -65,7 +67,7 @@ void AFEWebServer::generate() {
     }
     publishHTML(ConfigurationPanel.getLanguageConfigurationSite(command, data));
     if (command == SERVER_CMD_SAVE) {
-      Device.reboot(Device.getMode());
+      Device->reboot(Device->getMode());
     }
   } else if (optionName == "device") {
     DEVICE data;
@@ -94,10 +96,10 @@ void AFEWebServer::generate() {
         ConfigurationPanel.getDomoticzServerConfigurationSite(command, data));
 #ifdef CONFIG_HARDWARE_LED
   } else if (optionName == "led") {
-    LED data[sizeof(Device.configuration.isLED)] = {};
+    LED data[sizeof(Device->configuration.isLED)] = {};
     uint8_t dataLedID;
     if (command == SERVER_CMD_SAVE) {
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+      for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
         data[i] = getLEDData(i);
       }
       dataLedID = getSystemLEDData();
@@ -152,23 +154,23 @@ void AFEWebServer::generate() {
 #endif
   } else if (optionName == "exit") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, true));
-    Device.reboot(MODE_NORMAL);
+    Device->reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
     publishHTML(ConfigurationPanel.getSite(optionName, command, false));
     if (command == 1) {
-      Device.setDevice();
+      Device->setDevice();
       server.client().stop();
-      Device.reboot(MODE_ACCESS_POINT);
+      Device->reboot(MODE_ACCESS_POINT);
     }
   } else if (optionName == "help") {
     publishHTML(ConfigurationPanel.getSite(
         optionName, command, command == SERVER_CMD_NONE ? false : true));
     if (command == 1) {
       server.client().stop();
-      Device.reboot(MODE_CONFIGURATION);
+      Device->reboot(MODE_CONFIGURATION);
     } else if (command == 2) {
       server.client().stop();
-      Device.reboot(MODE_ACCESS_POINT);
+      Device->reboot(MODE_ACCESS_POINT);
     }
 
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -201,8 +203,8 @@ void AFEWebServer::generate() {
 #endif
 
   } else {
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
-      if (Device.configuration.isRelay[i]) {
+    for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+      if (Device->configuration.isRelay[i]) {
         if (optionName == "relay" + String(i)) {
           RELAY data = {};
           if (command == SERVER_CMD_SAVE) {
@@ -216,8 +218,8 @@ void AFEWebServer::generate() {
       }
     }
 
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
-      if (Device.configuration.isSwitch[i]) {
+    for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+      if (Device->configuration.isSwitch[i]) {
         if (optionName == "switch" + String(i)) {
           SWITCH data = {};
           if (command == SERVER_CMD_SAVE) {
@@ -233,7 +235,7 @@ void AFEWebServer::generate() {
 
 #if defined(T3_CONFIG)
     for (uint8_t i = 0; i < 4; i++) {
-      if (Device.configuration.isPIR[i]) {
+      if (Device->configuration.isPIR[i]) {
         if (getOptionName() == "pir" + String(i)) {
           PIR data = {};
           if (getCommand() == SERVER_CMD_SAVE) {
@@ -249,8 +251,8 @@ void AFEWebServer::generate() {
 #endif
 
 #if defined(T5_CONFIG)
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-      if (Device.configuration.isContactron[i]) {
+    for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
+      if (Device->configuration.isContactron[i]) {
         if (optionName == "contactron" + String(i)) {
           CONTACTRON data = {};
           if (command == SERVER_CMD_SAVE) {
@@ -278,7 +280,7 @@ void AFEWebServer::generate() {
 
 String AFEWebServer::getOptionName() {
 
-  if (Device.getMode() == MODE_NORMAL) {
+  if (Device->getMode() == MODE_NORMAL) {
     /* Recived HTTP API Command */
     if (server.hasArg("command")) {
       /* Constructing command */
@@ -337,31 +339,31 @@ DEVICE AFEWebServer::getDeviceData() {
     data.name[0] = '\0';
   }
 
-  server.arg("h").length() > 0 ? data.httpAPI = true : data.httpAPI = false;
+  server.arg("h").length() > 0 ? data.api.http = true : data.api.http = false;
 
-  server.arg("m").length() > 0 ? data.mqttAPI = true : data.mqttAPI = false;
+  server.arg("m").length() > 0 ? data.api.mqtt = true : data.api.mqtt = false;
 
-  server.arg("d").length() > 0 ? data.domoticzAPI = true
-                               : data.domoticzAPI = false;
+  server.arg("d").length() > 0 ? data.api.domoticz = true
+                               : data.api.domoticz = false;
 #ifdef CONFIG_HARDWARE_LED
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
 #endif
 
 #if defined(T5_CONFIG)
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
     server.arg("hc").toInt() > i ? data.isContactron[i] = true
                                  : data.isContactron[i] = false;
   }
 #else
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
     server.arg("hr").toInt() > i ? data.isRelay[i] = true
                                  : data.isRelay[i] = false;
   }
 #endif
 
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
   }
@@ -375,7 +377,7 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #if defined(T3_CONFIG)
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
     server.arg("hp").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
   }
 #endif
@@ -487,9 +489,9 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data.topic, sizeof(data.topic) + 1);
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
   } else {
-    data.topic[0] = '\0';
+    data.mqtt.topic[0] = '\0';
   }
 
   return data;
@@ -541,15 +543,20 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
 #if !defined(T5_CONFIG)
   if (server.arg("pr" + String(id)).length() > 0) {
-    data.statePowerOn = server.arg("pr" + String(id)).toInt();
+    data.state.powerOn = server.arg("pr" + String(id)).toInt();
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
     server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name) + 1);
   }
 
+  if (server.arg("t" + String(id)).length() > 0) {
+    server.arg("t" + String(id))
+        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
+  }
+
   if (server.arg("mc" + String(id)).length() > 0) {
-    data.stateMQTTConnected = server.arg("mc" + String(id)).toInt();
+    data.state.MQTTConnected = server.arg("mc" + String(id)).toInt();
   }
 
 #ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
@@ -559,7 +566,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 #endif
 
   if (server.arg("x" + String(id)).length() > 0) {
-    data.idx = server.arg("x" + String(id)).toInt();
+    data.domoticz.idx = server.arg("x" + String(id)).toInt();
   }
 
 #endif
@@ -934,21 +941,21 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
   }
 
   if (server.arg("q").length() > 0) {
-    server.arg("q").toCharArray(data.mqttTopic, sizeof(data.mqttTopic) + 1);
+    server.arg("q").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
   } else {
-    data.mqttTopic[0] = '\0';
+    data.mqtt.topic[0] = '\0';
   }
 
   if (server.arg("r").length() > 0) {
-    data.idx.raw = server.arg("r").toInt();
+    data.domoticz.raw = server.arg("r").toInt();
   }
 
   if (server.arg("p").length() > 0) {
-    data.idx.percent = server.arg("p").toInt();
+    data.domoticz.percent = server.arg("p").toInt();
   }
 
   if (server.arg("v").length() > 0) {
-    data.idx.voltage = server.arg("v").toInt();
+    data.domoticz.voltage = server.arg("v").toInt();
   }
 
   return data;

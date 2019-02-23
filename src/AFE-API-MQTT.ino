@@ -18,7 +18,7 @@ void AFEMQTT::begin() {
   }
 
   Broker.setCallback(MQTTMessagesListener);
-  sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.topic);
+  sprintf(mqttTopicForSubscription, "%s#", MQTTConfiguration.mqtt.topic);
   Data = {};
 }
 
@@ -55,7 +55,7 @@ void AFEMQTT::connect() {
 
         /* LWT Topic */
         char mqttLWTMessage[38];
-        sprintf(mqttLWTMessage, "%sstate", MQTTConfiguration.topic);
+        sprintf(mqttLWTMessage, "%sstate", MQTTConfiguration.mqtt.topic);
 
         if (Broker.connect(deviceName, MQTTConfiguration.user,
                            MQTTConfiguration.password, mqttLWTMessage, 2, false,
@@ -140,7 +140,7 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::publish(const char *type, const char *message) {
   char _mqttTopic[50];
-  sprintf(_mqttTopic, "%s%s", MQTTConfiguration.topic, type);
+  sprintf(_mqttTopic, "%s%s", MQTTConfiguration.mqtt.topic, type);
   publishToMQTTBroker(_mqttTopic, message);
 }
 

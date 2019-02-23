@@ -1,7 +1,28 @@
 #include "AFE-Configuration-Panel.h"
 
 AFEConfigurationPanel::AFEConfigurationPanel() {
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "#### WARNING: This should be visible only during the upgrade."
+         << endl
+         << "Init: ConfigurationPanel";
+#endif
+
+  AFEDevice _Device;
+  _Device.begin();
+  begin(&_Device);
+}
+
+AFEConfigurationPanel::AFEConfigurationPanel(AFEDevice *_Device) {
+  begin(_Device);
+}
+
+void AFEConfigurationPanel::begin(AFEDevice *_Device) {
   language = Data.getLanguage();
+  Device = _Device;
+  Site.begin(Device);
 }
 
 String AFEConfigurationPanel::getSite(const String option, uint8_t command,
@@ -55,7 +76,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
 
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
-    Device.begin();
+    Device->begin();
   }
   String page;
   page.reserve(siteBufferSize);
@@ -126,12 +147,12 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
 
 #ifdef CONFIG_HARDWARE_LED
 String AFEConfigurationPanel::getLEDConfigurationSite(
-    uint8_t command, LED data[sizeof(Device.configuration.isLED)],
+    uint8_t command, LED data[sizeof(Device->configuration.isLED)],
     uint8_t dataLedID) {
 
   if (command == SERVER_CMD_SAVE) {
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
-      if (Device.configuration.isLED[i]) {
+    for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+      if (Device->configuration.isLED[i]) {
         Data.saveConfiguration(i, data[i]);
       } else {
         break;
@@ -144,8 +165,8 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
   page.reserve(siteBufferSize);
   page = Site.generateHeader();
   page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isLED); i++) {
-    if (Device.configuration.isLED[i]) {
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+    if (Device->configuration.isLED[i]) {
       page += Site.addLEDConfiguration(i);
     } else {
       break;

@@ -27,7 +27,7 @@ private:
   ESP8266WebServer server;
   AFEConfigurationPanel ConfigurationPanel;
   ESP8266HTTPUpdateServer httpUpdater; // Class used for firmware upgrade
-  AFEDevice Device;
+  AFEDevice *Device;
   HTTPCOMMAND httpCommand; // It stores last HTTP API request
   boolean receivedHTTPCommand =
       false; // Once HTTP API requet is recieved it's set to true
@@ -105,7 +105,7 @@ public:
   AFEWebServer();
 
   /* Method initialize WebServer and Updater server */
-  void begin();
+  void begin(AFEDevice *);
 
   /* Method listens for HTTP requests */
   void listener();

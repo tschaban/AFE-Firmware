@@ -14,6 +14,10 @@
 #include <AFE-PROTOCOL-Structure.h>
 #include <IPAddress.h>
 
+struct DOMOTICZ_BASIC_CONFIG {
+  unsigned long idx;
+};
+
 struct DOMOTICZ {
   uint8_t protocol;
   char host[40];

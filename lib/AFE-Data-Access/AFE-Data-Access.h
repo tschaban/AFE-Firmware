@@ -13,11 +13,13 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
-#include <AFE-EEPROM.h>
+//#include <AFE-EEPROM.h>
+#include <IPAddress.h>
 
 #ifdef CONFIG_HARDWARE_SPIFFS
 #include <ArduinoJson.h>
 #include <FS.h>
+#include <IPAddress.h>
 #endif
 
 #ifdef DEBUG
@@ -26,10 +28,15 @@
 
 class AFEDataAccess {
 private:
-  AFEEEPROM Eeprom;
+  // AFEEEPROM Eeprom;
+  IPAddress IPfromString(const char *address);
 
 public:
   AFEDataAccess();
+
+  /* Methods saves and reads device ID */
+  const String getDeviceUID();
+  void saveDeviceUID(const char *);
 
   DEVICE getDeviceConfiguration();
   void saveConfiguration(DEVICE configuration);
@@ -59,7 +66,7 @@ public:
   void saveConfiguration(uint8_t id, SWITCH configuration);
 
   /* Methods saves firmware version from/to EEPROM */
-  void saveVersion(String version);
+  void saveVersion(const char *);
 
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
@@ -68,10 +75,6 @@ public:
   /* Methods read and save firmware Language from/to EEPROM */
   uint8_t getLanguage();
   void saveLanguage(uint8_t language);
-
-  /* Methods saves and reads device ID */
-  const String getDeviceID();
-  void saveDeviceID(String id);
 
   /* Methods turns on / off APIs */
   void saveAPI(uint8_t apiID, boolean state);

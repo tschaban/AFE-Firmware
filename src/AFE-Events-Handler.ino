@@ -9,7 +9,7 @@ void eventsListener() {
            << "Events listener: triggered";
 #endif
     /* Update relay status to Domoticz */
-    if (Device.configuration.domoticzAPI) {
+    if (Device.configuration.api.domoticz) {
 #ifdef CONFIG_HARDWARE_LED
       Led.on();
 #endif
@@ -51,7 +51,7 @@ void eventsListener() {
     }
   } /* End of Network.eventConnected() */
 
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     if (Mqtt.eventConnected()) {
 #ifdef DEBUG
       Serial << endl
@@ -70,7 +70,7 @@ void eventsListener() {
         }
       }
 #else
-      Mqtt.publish(MQTTConfiguration.topic, "state", "connected");
+      Mqtt.publish(MQTTConfiguration.mqtt.topic, "state", "connected");
 
       /* Setting Relay state after connection to MQTT */
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {

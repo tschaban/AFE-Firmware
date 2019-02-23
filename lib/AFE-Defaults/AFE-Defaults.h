@@ -14,6 +14,7 @@
 #include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-EEPROM.h>
+#include <ESP8266WiFi.h>
 
 #ifdef CONFIG_HARDWARE_SPIFFS
 #include <FS.h>
@@ -40,7 +41,6 @@ public:
 #ifdef CONFIG_HARDWARE_LED
   void addLEDConfiguration(uint8_t id, uint8_t gpio);
 #endif
-  void addDeviceID();
 
   /* Method erases EEPROM */
   void eraseConfiguration();

@@ -6,11 +6,14 @@
 
 AFEWiFi::AFEWiFi() {}
 
-void AFEWiFi::begin(uint8_t mode) {
+void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 
   AFEDataAccess Data;
-  AFEDevice Device;
-  networkConfiguration = Data.getNetworkConfiguration();
+  Device = _Device;
+  WiFiMode = mode;
+  if (WiFiMode != MODE_ACCESS_POINT) {
+    networkConfiguration = Data.getNetworkConfiguration();
+  }
 
 #ifdef CONFIG_HARDWARE_LED
   // Init LED
@@ -20,18 +23,25 @@ void AFEWiFi::begin(uint8_t mode) {
   }
 #endif
 
-  // Cleaning @TODO is it neded?
-  Data = {};
-  WiFi.hostname(Device.configuration.name);
-  if (mode == MODE_ACCESS_POINT) {
+  WiFi.hostname(Device->configuration.name);
+  if (WiFiMode == MODE_ACCESS_POINT) {
+#ifdef DEBUG
+    Serial << endl << "Starting HotSpot: ";
+#endif
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    WiFi.softAP(Device.configuration.name);
+    WiFi.softAP(Device->configuration.name);
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
     dnsServer.start(53, "www.example.com", apIP);
+#ifdef DEBUG
+    Serial << "completed";
+#endif
   } else {
+#ifdef DEBUG
+    Serial << endl << "Starting WiFi: in WIFI_STA mode";
+#endif
     if (!networkConfiguration.isDHCP) {
       WiFi.config(networkConfiguration.ip, networkConfiguration.gateway,
                   networkConfiguration.subnet);
@@ -41,52 +51,84 @@ void AFEWiFi::begin(uint8_t mode) {
 }
 
 void AFEWiFi::listener() {
-  if (!connected()) {
-    if (sleepMode) {
-      if (millis() - sleepStartTime >=
-          networkConfiguration.waitTimeSeries * 1000) {
-        sleepMode = false;
-      }
-    } else {
-      if (delayStartTime == 0) {
-        delayStartTime = millis();
-        if (connections == 0) {
-          WiFi.begin(networkConfiguration.ssid, networkConfiguration.password);
+  if (WiFiMode != MODE_ACCESS_POINT) {
+    if (!connected()) {
+      if (sleepMode) {
+        if (millis() - sleepStartTime >=
+            networkConfiguration.waitTimeSeries * 1000) {
+          sleepMode = false;
+        }
+      } else {
+        if (delayStartTime == 0) {
+          delayStartTime = millis();
+          if (connections == 0) {
+
+            /* Checking if WiFi is configured */
+            if (strlen(networkConfiguration.ssid) == 0 ||
+                strlen(networkConfiguration.password) == 0) {
 #ifdef DEBUG
-          Serial << endl << "INFO: Starting establishing WiFi connection ";
+              Serial << endl
+                     << "WiFI is not configured. Going to configuration mode";
+#endif
+              Device->reboot(MODE_ACCESS_POINT);
+            }
+
+            WiFi.begin(networkConfiguration.ssid,
+                       networkConfiguration.password);
+#ifdef DEBUG
+            Serial << endl << "INFO: Starting establishing WiFi connection ";
+            Serial << endl
+                   << networkConfiguration.ssid << " - "
+                   << networkConfiguration.password;
+#endif
+          }
+        }
+
+#ifdef CONFIG_HARDWARE_LED
+        if (ledStartTime == 0) {
+          ledStartTime = millis();
+        }
+
+        if (millis() > ledStartTime + 500) {
+          Led.toggle();
+          ledStartTime = 0;
+        }
+#endif
+
+        if (millis() > delayStartTime +
+                           (networkConfiguration.waitTimeConnections * 1000)) {
+          connections++;
+#ifdef DEBUG
           Serial << endl
-                 << networkConfiguration.ssid << "@"
-                 << networkConfiguration.password;
+                 << "INFO: WiFi connection attempt: " << connections << " from "
+                 << networkConfiguration.noConnectionAttempts << ", IP("
+                 << WiFi.localIP() << ")";
+#endif
+          delayStartTime = 0;
+        }
+
+        if (connections == networkConfiguration.noConnectionAttempts) {
+          sleepMode = true;
+          WiFi.disconnect();
+          sleepStartTime = millis();
+          delayStartTime = 0;
+
+#ifdef CONFIG_HARDWARE_LED
+          ledStartTime = 0;
+          Led.off();
+#endif
+
+          connections = 0;
+#ifdef DEBUG
+          Serial << endl
+                 << "WARN: Not able to connect.Going to sleep mode for "
+                 << networkConfiguration.waitTimeSeries << "sec.";
 #endif
         }
       }
-
-#ifdef CONFIG_HARDWARE_LED
-      if (ledStartTime == 0) {
-        ledStartTime = millis();
-      }
-
-      if (millis() > ledStartTime + 500) {
-        Led.toggle();
-        ledStartTime = 0;
-      }
-#endif
-
-      if (millis() >
-          delayStartTime + (networkConfiguration.waitTimeConnections * 1000)) {
-        connections++;
-#ifdef DEBUG
-        Serial << endl
-               << "INFO: WiFi connection attempt: " << connections << " from "
-               << networkConfiguration.noConnectionAttempts;
-#endif
-        delayStartTime = 0;
-      }
-
-      if (connections == networkConfiguration.noConnectionAttempts) {
-        sleepMode = true;
-        WiFi.disconnect();
-        sleepStartTime = millis();
+    } else {
+      if (connections > 0) {
+        connections = 0;
         delayStartTime = 0;
 
 #ifdef CONFIG_HARDWARE_LED
@@ -94,35 +136,20 @@ void AFEWiFi::listener() {
         Led.off();
 #endif
 
-        connections = 0;
 #ifdef DEBUG
         Serial << endl
-               << "WARN: Not able to connect.Going to sleep mode for "
-               << networkConfiguration.waitTimeSeries << "sec.";
+               << "INFO: Connection established"
+               << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
 #endif
       }
     }
-  } else {
-    if (connections > 0) {
-      connections = 0;
-      delayStartTime = 0;
-
-#ifdef CONFIG_HARDWARE_LED
-      ledStartTime = 0;
-      Led.off();
-#endif
-
-#ifdef DEBUG
-      Serial << endl
-             << "INFO: Connection established"
-             << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
-#endif
-    }
   }
 }
-
 boolean AFEWiFi::connected() {
-  if (WiFi.status() == WL_CONNECTED) {
+  // Serial << WiFi.status();
+  //  if (WiFi.status() == WL_CONNECTED) {
+  if (WiFi.localIP().toString() != "0.0.0.0") {
+
     delay(1);
     if (disconnected) {
       eventConnectionEstablished = true;

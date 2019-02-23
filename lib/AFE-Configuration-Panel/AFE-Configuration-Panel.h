@@ -24,13 +24,15 @@ class AFEConfigurationPanel {
 private:
   AFESitesGenerator Site;
   AFEDataAccess Data;
-  AFEDevice Device;
+  AFEDevice *Device;
   uint8_t language;
   uint16_t siteBufferSize = 7500;
 
 public:
   /* Constructor */
   AFEConfigurationPanel();
+  AFEConfigurationPanel(AFEDevice *);
+  void begin(AFEDevice *);
 
   /* It returns configuration site */
   String getSite(const String option, uint8_t command, boolean data);
@@ -41,7 +43,7 @@ public:
 
 #ifdef CONFIG_HARDWARE_LED
   String getLEDConfigurationSite(uint8_t command,
-                                 LED data[sizeof(Device.configuration.isLED)],
+                                 LED data[sizeof(Device->configuration.isLED)],
                                  uint8_t dataLedID);
 #endif
 

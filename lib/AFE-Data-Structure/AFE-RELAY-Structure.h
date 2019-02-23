@@ -17,19 +17,22 @@
 #define RELAY_ON 1
 #define RELAY_OFF 0
 
+struct RELAY_DEFAULTS {
+  uint8_t powerOn;
+  uint8_t MQTTConnected;
+};
+
 struct RELAY {
   uint8_t gpio;
-  float timeToOff;
-  uint8_t statePowerOn;
   char name[16];
-  uint8_t stateMQTTConnected;
-  char mqttTopic[49];
-  boolean showStatusUsingLED; // is this really used?
+  float timeToOff;
+  uint8_t ledID;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
+  RELAY_DEFAULTS state;
   REGULATOR thermostat;
   REGULATOR humidistat;
   float thermalProtection;
-  uint8_t ledID;
-  unsigned long idx;
 };
 
 #endif

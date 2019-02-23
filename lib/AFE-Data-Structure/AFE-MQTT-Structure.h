@@ -13,13 +13,17 @@
 
 #include <IPAddress.h>
 
+struct MQTT_BASIC_CONFIG {
+  char topic[32];
+};
+
 struct MQTT {
   char host[32];
   IPAddress ip;
   uint16_t port;
   char user[32];
   char password[32];
-  char topic[32];
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

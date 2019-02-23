@@ -136,51 +136,60 @@ void setup() {
 #ifdef DEBUG
     Serial << endl << "File system mounted";
 #endif
-    if (Device.checkConfiguration()) {
+  }
+
 #ifdef DEBUG
-      Serial << endl << "SPIFFS Configuration files: success";
-    } else {
-      Serial << endl << "SPIFFS Configuration files: ERROR";
-#endif
-    }
-#ifdef DEBUG
-  } else {
+  else {
     Serial << endl << "Failed to mount file system";
 #endif
   }
-
 #endif
 
+#ifdef DEBUG
+  Serial << endl << "Initializing device";
+#endif
   Device.begin();
 
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
-  if (Device.isFirstTimeLaunch()) {
-    Device.setDevice();
 #ifdef DEBUG
-    Serial << endl << "First time launched";
+  Serial << endl << "Checking if first time launch: ";
 #endif
+
+  if (Device.getMode() == MODE_FIRST_TIME_LAUNCH) {
+#ifdef DEBUG
+    Serial << "YES";
+#endif
+    Device.setDevice();
   }
+#ifdef DEBUG
+  else {
+    Serial << "NO";
+  }
+#endif
 
   /* Checking if the firmware has been upgraded. Potentially runs post upgrade
    * code */
-  AFEUpgrader Upgrader;
-  if (Upgrader.upgraded()) {
-    Upgrader.upgrade();
+#ifdef DEBUG
+  Serial << endl << "Checking if firmware should be upgraded: ";
+#endif
+  AFEUpgrader *Upgrader = new AFEUpgrader();
+  if (Upgrader->upgraded()) {
+#ifdef DEBUG
+    Serial << endl << "Firmware is not up2date. Upgrading...";
+#endif
+    Upgrader->upgrade();
 #ifdef DEBUG
     Serial << endl << "Firmware upgraded";
 #endif
   }
-  Upgrader = {};
-
-  /* Checking if WiFi is configured, if not then it runs configuration panel in
-   * access point mode */
-  if (Device.getMode() != MODE_ACCESS_POINT && !Device.isConfigured()) {
 #ifdef DEBUG
-    Serial << endl << "Going to configuration mode (HotSpot)";
-#endif
-    Device.reboot(MODE_ACCESS_POINT);
+  else {
+    Serial << endl << "Firmware is up2date";
   }
+#endif
+  delete Upgrader;
+  Upgrader = NULL;
 
   /* Initializing relay */
   initRelay();
@@ -189,12 +198,12 @@ void setup() {
 #endif
 
   /* Initialzing network */
-  Network.begin(Device.getMode());
+  Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
   Serial << endl << "Network initialized";
 #endif
 
-  /* Initializing LED, checking if LED exists is made on Class level  */
+/* Initializing LED, checking if LED exists is made on Class level  */
 #ifdef CONFIG_HARDWARE_LED
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0) {
@@ -205,13 +214,19 @@ void setup() {
   if (Device.getMode() == MODE_ACCESS_POINT) {
     Led.blinkingOn(100);
   }
+#ifdef DEBUG
+  Serial << endl << "System LED initialized";
+#endif
 #endif
 
+#ifdef DEBUG
+  Serial << endl << "Connecting to the network";
+#endif
   Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
-  WebServer.begin();
+  WebServer.begin(&Device);
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif
@@ -317,7 +332,7 @@ void loop() {
 
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
-        if (Device.configuration.mqttAPI) {
+        if (Device.configuration.api.mqtt) {
           Mqtt.listener();
         }
 

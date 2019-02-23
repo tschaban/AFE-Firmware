@@ -4,7 +4,7 @@
 
 /* Initializing MQTT */
 void MQTTInit() {
-  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.mqttAPI) {
+  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.api.mqtt) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
 #ifdef DEBUG
@@ -126,7 +126,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
-      sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.mqtt.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
           HPMA115S0_DATA sensorData;
@@ -139,7 +139,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #ifdef CONFIG_HARDWARE_BMX80
     if (Device.configuration.isBMx80) {
-      sprintf(_mqttTopic, "%sBMx80/cmd", MQTTConfiguration.topic);
+      sprintf(_mqttTopic, "%sBMx80/cmd", MQTTConfiguration.mqtt.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'e' && length == 3) { // get
           BMx80_DATA sensorData;
@@ -166,7 +166,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 
     /* Gate */
-    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.topic);
+    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.mqtt.topic);
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[0] == 't' && length == 6) { // toggle
         Gate.toggle();
@@ -179,7 +179,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
     /* Turning On/Off HTTP APIs */
     sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
-            MQTTConfiguration.topic);
+            MQTTConfiguration.mqtt.topic);
 
     if (strcmp(topic, _mqttTopic) == 0) {
       if ((char)payload[1] == 'n' && length == 2) { // on
@@ -193,7 +193,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
       /* Start: Turning On/Off Domoticz APIs */
       sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
-              MQTTConfiguration.topic);
+              MQTTConfiguration.mqtt.topic);
 
       if (strcmp(topic, _mqttTopic) == 0) {
         if ((char)payload[1] == 'n' && length == 2) { // on
@@ -211,7 +211,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
         /* start: Turning Off MQTT APIs */
         sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
-                MQTTConfiguration.topic);
+                MQTTConfiguration.mqtt.topic);
 
         if (strcmp(topic, _mqttTopic) == 0) {
           if ((char)payload[1] == 'f' && length == 3) { // off
@@ -229,7 +229,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               - getHeatIndex
               - getDewPoint
            * humifity */
-          sprintf(_mqttTopic, "%scmd", MQTTConfiguration.topic);
+          sprintf(_mqttTopic, "%scmd", MQTTConfiguration.mqtt.topic);
 
           if (strcmp(topic, _mqttTopic) == 0) {
             /* Reboot */
@@ -281,7 +281,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish(Relay[id].getMQTTTopic(), "state",
                  Relay[id].get() == RELAY_ON ? "on" : "off");
   }
@@ -289,7 +289,7 @@ void MQTTPublishRelayState(uint8_t id) {
 #ifdef CONFIG_TEMPERATURE
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish("temperature", temperature);
   }
 }
@@ -299,20 +299,20 @@ void MQTTPublishTemperature(float temperature) {
 #ifdef CONFIG_HUMIDITY
 /* Metod publishes humidity */
 void MQTTPublishHumidity(float humidity) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish("humidity", humidity);
   }
 }
 /* Metod publishes HeatIndex */
 void MQTTPublishHeatIndex(float heatIndex) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish("heatIndex", heatIndex);
   }
 }
 
 /* Metod publishes Dew point */
 void MQTTPublishDewPoint(float dewPoint) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish("dewPoint", dewPoint);
   }
 }
@@ -321,7 +321,7 @@ void MQTTPublishDewPoint(float dewPoint) {
 #if defined(T3_CONFIG)
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishPIRState(uint8_t id) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish(Pir[id].getMQTTTopic(), "state",
                  Pir[id].motionDetected() ? "open" : "closed");
   }
@@ -330,7 +330,7 @@ void MQTTPublishPIRState(uint8_t id) {
 
 #if defined(T5_CONFIG)
 void MQTTPublishContactronState(uint8_t id) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
                  Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
                                                               : "closed");
@@ -338,7 +338,7 @@ void MQTTPublishContactronState(uint8_t id) {
 }
 
 void MQTTPublishGateState() {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     uint8_t gateState = Gate.get();
     Mqtt.publish("gate/state", gateState == GATE_OPEN
                                    ? "open"
@@ -354,7 +354,7 @@ void MQTTPublishGateState() {
 #ifdef CONFIG_HARDWARE_HPMA115S0
 
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     String messageString = "{'PM25':'";
     messageString += data.pm25;
     messageString += "','PM10':'";
@@ -369,7 +369,7 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
 
 #ifdef CONFIG_HARDWARE_BMX80
 void MQTTPublishBMx80SensorData(BMx80_DATA data) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     String messageString = "{'temperature':'";
     messageString += data.temperature;
     if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
@@ -392,7 +392,7 @@ void MQTTPublishBMx80SensorData(BMx80_DATA data) {
 
 #ifdef CONFIG_HARDWARE_BH1750
 void MQTTPublishLightLevel(float lux) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     Mqtt.publish("BH1750/lux", lux);
   }
 }
@@ -400,7 +400,7 @@ void MQTTPublishLightLevel(float lux) {
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
 void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     String messageString = "{'raw':'";
     messageString += data.raw;
     messageString += "','percent':'";

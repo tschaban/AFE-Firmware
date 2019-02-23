@@ -25,10 +25,6 @@
 #include <AFE-LED-Structure.h>
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-#include <AFE-ADC-INPUT-Structure.h>
-#endif
-
 #ifdef T1_CONFIG
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
@@ -48,6 +44,7 @@
 
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
  * excluded */
+#include <AFE-ADC-INPUT-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMx80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>

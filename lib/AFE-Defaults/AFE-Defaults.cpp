@@ -52,6 +52,9 @@ void AFEDefaults::set() {
   BH1750 SensorBH1750Configuration;
 #endif
 
+  /* Setting device mode to Access Point */
+  Data->saveDeviceMode(MODE_ACCESS_POINT);
+
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
@@ -59,12 +62,20 @@ void AFEDefaults::set() {
 
   Data->saveConfiguration(firmwareConfiguration);
 
+  /* Device UID */
+  byte m[6];
+  char uid[18];
+  WiFi.macAddress(m);
+  sprintf(uid, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
+          m[2]);
+  Data->saveDeviceUID(uid);
+
   sprintf(deviceConfiguration.name, "AFE-Device");
 
   /* APIs */
-  deviceConfiguration.mqttAPI = false;
-  deviceConfiguration.domoticzAPI = false;
-  deviceConfiguration.httpAPI = true;
+  deviceConfiguration.api.mqtt = false;
+  deviceConfiguration.api.domoticz = false;
+  deviceConfiguration.api.http = true;
 
 /* Relay presence */
 #if !defined(T5_CONFIG)
@@ -117,15 +128,15 @@ void AFEDefaults::set() {
 #endif
 
 #ifdef CONFIG_HARDWARE_BMX80
-  deviceConfiguration.isBMx80 = 0;
+  deviceConfiguration.isBMx80 = false;
 #endif
 
 #ifdef CONFIG_HARDWARE_BH1750
-  deviceConfiguration.isBH1750 = 0;
+  deviceConfiguration.isBH1750 = false;
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  deviceConfiguration.isAnalogInput = 0;
+  deviceConfiguration.isAnalogInput = false;
 #endif
 
   Data->saveConfiguration(deviceConfiguration);
@@ -148,7 +159,7 @@ void AFEDefaults::set() {
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
-  sprintf(MQTTConfiguration.topic, "/device/");
+  sprintf(MQTTConfiguration.mqtt.topic, "/device/");
   Data->saveConfiguration(MQTTConfiguration);
 
   /* Domoticz config */
@@ -169,18 +180,20 @@ void AFEDefaults::set() {
   RelayConfiguration.timeToOff = 0;
 #endif
 
-  RelayConfiguration.statePowerOn = 3;
-  RelayConfiguration.stateMQTTConnected = 0;
+  RelayConfiguration.state.powerOn = 3;
+  RelayConfiguration.state.MQTTConnected = 0;
 
 #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
     defined(T2_CONFIG) || defined(T6_CONFIG)
-  sprintf(RelayConfiguration.name, "switch");
+  sprintf(RelayConfiguration.name, "relay");
 #elif defined(T3_CONFIG) || defined(T4_CONFIG)
-  sprintf(RelayConfiguration.name, "switch1");
+  sprintf(RelayConfiguration.name, "relay1");
 #endif
 
   RelayConfiguration.ledID = 0;
-  RelayConfiguration.idx = 0;
+  RelayConfiguration.domoticz.idx = 0;
+
+  sprintf(RelayConfiguration.mqtt.topic, "relay/1/");
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
@@ -197,15 +210,18 @@ void AFEDefaults::set() {
 
 #if defined(T3_CONFIG) || defined(T4_CONFIG)
   RelayConfiguration.gpio = 5;
-  sprintf(RelayConfiguration.name, "switch2");
+  sprintf(RelayConfiguration.name, "relay2");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/2/");
   Data->saveConfiguration(1, RelayConfiguration);
 
   RelayConfiguration.gpio = 4;
-  sprintf(RelayConfiguration.name, "switch3");
+  sprintf(RelayConfiguration.name, "relay3");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/3/");
   Data->saveConfiguration(2, RelayConfiguration);
 
   RelayConfiguration.gpio = 15;
-  sprintf(RelayConfiguration.name, "switch4");
+  sprintf(RelayConfiguration.name, "relay4");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/4/");
   Data->saveConfiguration(3, RelayConfiguration);
 #endif
 
@@ -287,8 +303,6 @@ void AFEDefaults::set() {
   addLEDConfiguration(2, 13);
 #endif
 #endif
-
-  addDeviceID();
 
 /* DS18B20 or DHTxx Sensor configuration */
 #if defined(CONFIG_HARDWARE_DHXX) || defined(CONFIG_HARDWARE_DS18B20)
@@ -396,6 +410,19 @@ void AFEDefaults::set() {
 
   Data->saveDeviceMode(2);
   Data->saveLanguage(1);
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  ADCINPUT AnalogInputConfiguration;
+  AnalogInputConfiguration.gpio = 17;
+  AnalogInputConfiguration.interval = 60;
+  AnalogInputConfiguration.numberOfSamples = 1;
+  AnalogInputConfiguration.maxVCC = 1;
+  sprintf(AnalogInputConfiguration.mqtt.topic, "device/analogData/");
+  AnalogInputConfiguration.domoticz.raw = 0;
+  AnalogInputConfiguration.domoticz.voltage = 0;
+  AnalogInputConfiguration.domoticz.percent = 0;
+  Data->saveConfiguration(AnalogInputConfiguration);
+#endif
 }
 
 void AFEDefaults::addDomoticzConfiguration() {
@@ -417,17 +444,12 @@ void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
 }
 #endif
 
-void AFEDefaults::addDeviceID() {
-  char id[8];
-  uint8_t range;
-  for (uint8_t i = 0; i < sizeof(id); i++) {
-    range = random(3);
-    id[i] = char(range == 0 ? random(48, 57)
-                            : range == 1 ? random(65, 90) : random(97, 122));
-  }
-  Data->saveDeviceID(String(id));
+void AFEDefaults::eraseConfiguration() {
+#ifdef DEBUG
+  Serial << endl << "Erasing EEPROM";
+#endif
+  Eeprom.erase();
 }
-void AFEDefaults::eraseConfiguration() { Eeprom.erase(); }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
 void AFEDefaults::addAnalogInputDefaultConfiguration() {

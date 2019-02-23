@@ -28,8 +28,8 @@ struct ADCINPUT {
   uint16_t interval;
   uint8_t numberOfSamples;
   float maxVCC;
-  char mqttTopic[64];
-  ADCINPUT_DOMOTICZ idx;
+  MQTT_BASIC_CONFIG mqtt;
+  ADCINPUT_DOMOTICZ domoticz;
 };
 
 #endif

@@ -82,8 +82,8 @@ void AFEAnalogInput::listener() {
 }
 
 void AFEAnalogInput::getDomoticzIDX(ADCINPUT_DOMOTICZ *idx) {
-  *idx = configuration.idx;
+  *idx = configuration.domoticz;
 }
 
 /* Method returns MQTT topic for this relay */
-const char *AFEAnalogInput::getMQTTTopic() { return configuration.mqttTopic; }
+const char *AFEAnalogInput::getMQTTTopic() { return configuration.mqtt.topic; }

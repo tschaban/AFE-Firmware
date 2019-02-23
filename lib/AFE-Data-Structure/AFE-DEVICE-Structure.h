@@ -14,17 +14,22 @@
 #define MODE_NORMAL 0
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
+#define MODE_FIRST_TIME_LAUNCH 9
 
 #define API_HTTP 0
 #define API_MQTT 1
 #define API_DOMOTICZ 2
 
+struct DEVICE_API {
+  boolean mqtt;
+  boolean http;
+  boolean domoticz;
+};
+
 /* Custom DEVICE structure definition */
 struct DEVICE {
   char name[32];
-  boolean mqttAPI;
-  boolean httpAPI;
-  boolean domoticzAPI;
+  DEVICE_API api;
 #if defined(T0_CONFIG)
   boolean isLED[2];
   boolean isSwitch[2];

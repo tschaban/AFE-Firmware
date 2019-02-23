@@ -4,7 +4,7 @@
 
 /* Method listens for HTTP Requests */
 void mainHTTPRequestsHandler() {
-  if (Device.configuration.httpAPI) {
+  if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
 #ifdef CONFIG_HARDWARE_LED
       Led.on();

@@ -22,6 +22,8 @@ struct SWITCH {
   uint16_t sensitiveness;
   uint8_t functionality;
   uint8_t relayID;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif
