@@ -23,10 +23,14 @@ public:
   AFEI2CScanner();
 
 #ifdef DEBUG
+  /* Method only call in the debug mode. It scans all adesses */
   void scanAll();
 #endif
 
+  /* Method scans for device presence for inpute address. Return true if a device is found  */
   boolean scan(byte address);
+
+  /* Method returns potential name of the device based. Based on default known devices addresses */
   const char *getName(byte deviceAddress);
 };
 

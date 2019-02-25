@@ -20,6 +20,7 @@
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
+#include <AFE-PASSWORD-Structure.h>
 
 #ifdef CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>
@@ -47,7 +48,7 @@
 #endif
 
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
- * excluded */
+ * excluded. I assume they are used in Global context and that's the reason. */
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMx80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
