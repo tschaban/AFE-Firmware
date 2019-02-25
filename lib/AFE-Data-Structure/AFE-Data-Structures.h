@@ -20,6 +20,7 @@
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
+#include <AFE-PASSWORD-Structure.h>
 
 #ifdef CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>

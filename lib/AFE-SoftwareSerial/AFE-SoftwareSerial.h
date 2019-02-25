@@ -14,7 +14,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 Modification by https://github.com/tschaban
-Added diff mode of creating new instance of this class required for AFE Firmware
+Added way to create a new instance of this class required for AFE Firmware
 
 */
 
