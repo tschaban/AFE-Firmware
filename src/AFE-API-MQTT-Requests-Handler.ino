@@ -31,7 +31,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     Serial << endl << "------------------------------------" << endl;
 #endif
 
-#if !defined(T5_CONFIG) /* Relay processing */
+#ifdef CONFIG_FUNCTIONALITY_RELAY  /* Relay processing */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
         sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
@@ -121,7 +121,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
       }
     }
-
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
@@ -148,7 +147,18 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
       }
     }
+#endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+    if (Device.configuration.isAnalogInput) {
+      sprintf(_mqttTopic, "%sADC/cmd", MQTTConfiguration.mqtt.topic);
+      if (strcmp(topic, _mqttTopic) == 0) {
+        if ((char)payload[1] == 'e' && length == 3) { // get
+          ADCINPUT_DATA data = AnalogInput.get();
+          MQTTPublishAnalogInputData(data);
+        }
+      }
+    }
 #endif
 
 #else /* Gate */
@@ -277,7 +287,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #ifdef CONFIG_HARDWARE_LED
   Led.off();
 #endif
-}
+} /* End of topics listener */
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
@@ -309,7 +319,6 @@ void MQTTPublishHeatIndex(float heatIndex) {
     Mqtt.publish("heatIndex", heatIndex);
   }
 }
-
 /* Metod publishes Dew point */
 void MQTTPublishDewPoint(float dewPoint) {
   if (Device.configuration.api.mqtt) {
@@ -336,7 +345,6 @@ void MQTTPublishContactronState(uint8_t id) {
                                                               : "closed");
   }
 }
-
 void MQTTPublishGateState() {
   if (Device.configuration.api.mqtt) {
     uint8_t gateState = Gate.get();
@@ -352,7 +360,6 @@ void MQTTPublishGateState() {
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
-
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.api.mqtt) {
     String messageString = "{'PM25':'";

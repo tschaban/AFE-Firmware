@@ -86,7 +86,7 @@ void AFERelay::toggle() {
   }
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(RelayConfiguration.state.powerOn);
 }
@@ -115,6 +115,7 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 }
 #endif
 
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
 
   if (RelayConfiguration.timeToOff > 0 &&
@@ -128,11 +129,13 @@ boolean AFERelay::autoTurnOff(boolean invert) {
     return false;
   }
 }
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 const char *AFERelay::getName() { return RelayConfiguration.name; }
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
   if (RelayConfiguration.timeToOff > 0) {
     turnOffCounter = millis();
@@ -140,18 +143,23 @@ void AFERelay::setTimer(float timer) {
     RelayConfiguration.timeToOff = timer;
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_PIR
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
+#endif
 
 #ifdef CONFIG_HARDWARE_LED
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 unsigned long AFERelay::getDomoticzIDX() {
   return RelayConfiguration.domoticz.idx;
 }

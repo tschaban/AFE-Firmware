@@ -52,7 +52,7 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
   sendHTTPAPIRequestStatus(request, status, valueString);
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
@@ -140,6 +140,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 
 #else
+
+// @TODO should it be included for T5????
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
@@ -340,7 +342,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef CONFIG_HARDWARE_ADC_VCC
   /* Analog Input */
   else if (strcmp(request.device, "ADC") == 0) {
 

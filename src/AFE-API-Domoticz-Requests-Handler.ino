@@ -12,7 +12,7 @@ void DomoticzInit() {
   }
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
 /* It publishes relay state to Domoticz */
 void DomoticzPublishRelayState(uint8_t id) {
   if (Device.configuration.api.domoticz) {

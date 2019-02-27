@@ -291,17 +291,16 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   } else {
     /* Settings, Access Point */
     page += "<li class=\"itm\"><a href=\"\\?option=help&cmd=1\">";
-    page += language == 0 ? "Ustawienia" : "Settings";
+    page += L_SETTINGS;
     page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&cmd=2\">";
-    page += language == 0 ? "Ustawienia (tryb:" : "Settings (mode:";
-    page += " Access Point)";
+    page += L_SETTINGS_HOT_SPOT;
   }
   /* Information section */
   page += "</a></li></ul><br><br><h4>";
   page += L_INFORMATION;
   page += "</h4><ul class=\"lst\"><li class=\"itm\"><a "
           "href=\"https://www.smartnydom.pl/afe-firmware-";
-  page += language == 0 ? "pl" : "en";
+  page += L_LANGUAGE_SHORT;
   page += "/\" target=\"_blank\">";
   page += L_DOCUMENTATION;
   page += "</a></li></ul></div><div id=\"r\">";
@@ -332,23 +331,14 @@ String AFESitesGenerator::addDeviceConfiguration() {
   uint8_t itemsNumber = 0;
 
   String body = "<fieldset><div class=\"cf\"><label>";
-  body += language == 0 ? "Nazwa urządzenia" : "Device name";
+  body += L_DEVICE_NAME ;
   body += "</label><input name=\"dn\" type=\"text\" maxlength=\"16\" "
           "value=\"";
   body += configuration.name;
   body += "\"><span class=\"hint\">Max 16 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
-
-  String page = addConfigurationBlock(
-      language == 0 ? "Urządzenie" : "Device",
-      language == 0
-          ? "Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej "
-            "lokalnej sieci WiFi oraz jako nazwa hotspot'a urządzenia"
-          : "Name is used for device identification within your LAN and "
-            "a device's hotspot name used for configuration mode",
-      body);
-
+  String page = addConfigurationBlock(L_DEVICE,L_DEVICE_SECTION_INFO,body);
   body = "<fieldset>";
 
 /* LED */
@@ -362,8 +352,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(
-      sizeof(Device->configuration.isLED), itemsNumber, "hl",
-      language == 0 ? "Ilość Led'ów" : "Number of LEDs");
+      sizeof(Device->configuration.isLED), itemsNumber, "hl",L_NUMBER_OF_LEDS);
 
 #endif
 
@@ -402,8 +391,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(
-      sizeof(Device->configuration.isRelay), itemsNumber, "hr",
-      language == 0 ? "Ilość przekaźników" : "Number of relay");
+      sizeof(Device->configuration.isRelay), itemsNumber, "hr",L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
@@ -417,8 +405,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(
-      sizeof(Device->configuration.isSwitch), itemsNumber, "hs",
-      language == 0 ? "Ilość przycisków" : "Number of switches");
+      sizeof(Device->configuration.isSwitch), itemsNumber, "hs",L_NUMBER_OF_SWITCHES);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
@@ -505,8 +492,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
-  body +=
-      language == 0 ? "Pomiary z wejścia analogowego" : " Measure Analog Input";
+  body += L_DO_MEASURE_ADC;
   body += "</label></div>";
 #endif
 
@@ -525,39 +511,30 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body += "</fieldset>";
 
-  page += addConfigurationBlock(
-      language == 0 ? "Konfiguracja urządzenia" : "Hardware configuration",
-      language == 0 ? "Wybierz podłączone elementy do urządzenia"
-                    : "Select connected items to your device",
+  page += addConfigurationBlock(L_HARDWARE_CONFIGURATION,L_HARDWARE_CONFIGURATION_INFO,
       body);
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"m\" "
          "type=\"checkbox\" value=\"1\"";
   body += configuration.api.mqtt ? " checked=\"checked\"" : "";
   body += ">MQTT API ";
-  body += language == 0 ? "włączone" : "enabled";
+  body += L_ENABLED;
   body += "?</label></div><div class=\"cc\"><label><input name=\"h\" "
           "type=\"checkbox\" value=\"1\"";
   body += configuration.api.http ? " checked=\"checked\"" : "";
   body += ">HTTP API ";
-  body += language == 0 ? "włączone" : "enabled";
+  body += L_ENABLED;
   body += "?</label></div>";
 
   body += "<div class=\"cc\"><label><input name=\"d\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.api.domoticz ? " checked=\"checked\"" : "";
   body += ">Domoticz API ";
-  body += language == 0 ? "włączone" : "enabled";
+  body += L_ENABLED;
   body += "?</label></div>";
-
   body += "</fieldset>";
 
-  page += addConfigurationBlock(
-      language == 0 ? "Sterowanie urządzeniem" : "Device controlling mechanism",
-      language == 0
-          ? "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
-          : "Enable / Disable APIs",
-      body);
+  page += addConfigurationBlock(L_DEVICE_CONTROLLING,L_DEVICE_CONTROLLING_INFO,body);
 
   return page;
 }
@@ -569,44 +546,38 @@ String AFESitesGenerator::addNetworkConfiguration() {
 
   String body = "<fieldset>";
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Nazwa sieci WiFi" : "WiFi name";
+  body += L_SSID;
   body += "</label><input name=\"s\" type=\"text\" maxlength=\"32\" value=\"";
   body += configuration.ssid;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Hasło" : "Password";
+  body += L_PASSWORD;
   body += "</label><input type=\"password\" name=\"p\" maxlength=\"32\" "
           "value=\"";
   body += configuration.password;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>MAC</label><input "
           "type=\"text\" readonly=\"readonly\" value=\"";
   body += WiFi.macAddress();
   body += "\"></div></fieldset>";
 
   String page = addConfigurationBlock(
-      "WiFi",
-      language == 0 ? "Urządzenie bez dostępu do sieci będzie "
-                      "działać tylko w trybie sterowania ręcznego"
-                    : "Device without access to network will only work in "
-                      "manual mode",
+      "WiFi",L_NETWORK_CONFIGURATION_INFO,
       body);
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"d\" "
          "type=\"checkbox\" value=\"1\"";
   body += (configuration.isDHCP ? " checked=\"checked\"" : "");
   body += "> ";
-  body +=
-      language == 0 ? "Konfiguracja przez DHCP?" : "Configuration over DHCP";
-  body += "</label></div>";
+  body += L_DHCP_ENABLED;
+  body += "?</label></div>";
 
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Adres IP" : "IP Addess";
+  body += L_IP_ADDRESS;
   body += "</label><input name=\"d1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" "
-          "style=\"width:70px\" value=\"";
+          "step=\"1\" style=\"width:70px\" value=\"";
   body += configuration.ip[0];
   body +=
       "\">.<input name=\"d2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
@@ -621,7 +592,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
           "style=\"width:70px\" value=\"";
   body += configuration.ip[3];
   body += "\"></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Bramka" : "Gateway";
+  body += L_GATEWAY;
   body += "</label><input name=\"g1\" type=\"number\" max=\"255\" min=\"0\" "
           "step=\"1\" "
           "style=\"width:70px\" value=\"";
@@ -641,10 +612,9 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "\"></div>";
 
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Maska sieci" : "Subnet";
+  body += L_SUBNET;
   body += "</label><input name=\"s1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" "
-          "style=\"width:70px\" value=\"";
+          "step=\"1\" style=\"width:70px\" value=\"";
   body += configuration.subnet[0];
   body +=
       "\">.<input name=\"s2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
@@ -660,41 +630,31 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += configuration.subnet[3];
   body += "\"></div></fieldset>";
 
-  page += addConfigurationBlock(
-      language == 0 ? "IP urządzenia" : "IP address",
-      language == 0 ? "Możesz skonfigurować adres IP urządzenia ręcznie lub "
-                      "automatycznie za pośrednictwem DHCP"
-                    : "You can set up device's IP address manually or "
-                      "automatically by DHCP",
+  page += addConfigurationBlock(L_DEVICE_IP,L_DEVICE_IP_INFO,
       body);
 
   body = "<fieldset><div class=\"cf\"><label>";
-  body += language == 0 ? "Ilość prób łączenia się"
-                        : "Number of connection attempts";
+  body += L_NUMBER_OF_CONNECTIONS;
   body += "</label><input name=\"na\" type=\"number\" min=\"1\" max=\"255\" "
-          "step=\"1\" "
-          "value=\"";
+          "step=\"1\" value=\"";
   body += configuration.noConnectionAttempts;
   body += "\"><span class=\"hint\">1-255</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Czas między próbami łączenia się"
-                        : "Time between connections' attempts";
+  body += L_TIME_BETWEEN_CONNECTIONS;
   body += "</label><input type=\"number\" name=\"wc\" "
           "min=\"1\" max=\"255\" step=\"1\" value=\"";
   body += configuration.waitTimeConnections;
   body += "\"><span class=\"hint\">1-255 (";
-  body += language == 0 ? "sekundy" : "seconds";
+  body += L_SECONDS;
   body += ")</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Czas po jakim powtórzyć próby łączenia się"
-                        : "Sleep time before next connection attempts";
+  body += L_SLEEP_TIME;
   body += "</label><input type=\"number\" name=\"ws\" min=\"1\" max=\"255\" "
-          "step=\"1\" "
-          "value=\"";
+          "step=\"1\" value=\"";
   body += configuration.waitTimeSeries;
   body += "\"><span class=\"hint\">1-255 (";
-  body += language == 0 ? "sekundy" : "seconds";
+  body += L_SECONDS;
   body += ")</span></div></fieldset>";
 
-  page += addConfigurationBlock(language == 0 ? "Zaawansowane" : "Advanced", "",
+  page += addConfigurationBlock(L_ADVANCED, "",
                                 body);
 
   return page;
@@ -709,12 +669,11 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
                 "name=\"h\" type=\"text\" maxlength=\"32\" value=\"";
   body += configuration.host;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Adres IP" : "IP address";
+  body += L_IP_ADDRESS;
   body += "</label><input name=\"m1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" "
-          "style=\"width:70px\" value=\"";
+          "step=\"1\" style=\"width:70px\" value=\"";
   body += configuration.ip[0];
   body +=
       "\">.<input name=\"m2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
@@ -733,31 +692,31 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
           " min=\"0\" max=\"65535\" step=\"1\" value=\"";
   body += configuration.port;
   body += "\"></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Użytkownik" : "User";
+  body += L_USERNAME;
   body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
   body += configuration.user;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Hasło" : "Password";
+  body += L_PASSWORD;
   body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
           "value=\"";
   body += configuration.password;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Temat wiadomości" : "MQTT Topic";
+  body += L_MQTT_TOPIC;
   body += "</label><input name=\"t\" type=\"text\""
           "maxlength=\"32\" value=\"";
   body += configuration.mqtt.topic;
-  body += "\"><span class=\"hint\">Format <strong>/abc/def/</strong>. Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += "\"><span class=\"hint\">";
+  body += L_EXAMPLE;
+  body += "<strong>abc/def/</strong>. Max 32 ";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
 
   return addConfigurationBlock(
-      "MQTT Broker",
-      language == 0 ? "Wprowadź adres hosta np. localhost lub adres IP"
-                    : "Enter MQTT Broker hostname or its IP address",
+      "MQTT Broker",L_MQTT_CONFIGURATION_INFO,
       body);
 }
 
@@ -768,7 +727,7 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   String body = "<fieldset>";
 
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Protokół" : "Protocol";
+  body += L_PROTOCOL;
   body += "</label><select name=\"t\"><option value=\"0\"";
   body += configuration.protocol == 0 ? " selected=\"selected\"" : "";
   body += ">http://</option><option value=\"1\"";
@@ -779,30 +738,27 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += configuration.host;
   body += "\">";
   body += "<span class=\"hint\">Max 40 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>Port</label><input "
           "name=\"p\" type=\"number\""
           " min=\"0\" max=\"65535\" step=\"1\" value=\"";
   body += configuration.port;
   body += "\"></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Użytkownik" : "User";
+  body += L_USERNAME;
   body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
   body += configuration.user;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Hasło" : "Password";
+  body += L_PASSWORD;
   body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
           "value=\"";
   body += configuration.password;
   body += "\"><span class=\"hint\">Max 32 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
 
-  return addConfigurationBlock(
-      language == 0 ? "Serwer Domoticz" : "Domoticz Server",
-      language == 0 ? "Wprowadź adres hosta np. localhost lub adres IP"
-                    : "Enter Domoticz hostname or its IP address",
+  return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,L_DOMOTICZ_CONFIGURATION_INFO,
       body);
 }
 
@@ -821,8 +777,7 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   body += "\" type=\"checkbox\" value=\"1\"";
   body += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
   body += ">";
-  body += language == 0 ? "Zmień świecenie diody LED na odwrotne"
-                        : "Change LED ligtning to opposite";
+  body += L_CHANGE_LED_INDICATION;
   body += "</label></div></fieldset>";
 
   return addConfigurationBlock("LED #" + String(id + 1), "", body);
@@ -836,7 +791,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 
   body += "<option value=\"0\"";
   body += configuration == 0 ? " selected=\"selected\"" : "";
-  body += language == 0 ? ">Brak" : ">None";
+  body += L_NONE;
   body += "</option>";
 
   for (uint8_t i = 1; i <= sizeof(Device->configuration.isLED); i++) {
@@ -856,11 +811,8 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
   body += "</select></div></fieldset>";
 
   return addConfigurationBlock(
-      language == 0 ? "LED systemowy" : "System LED",
-      language == 0 ? "Wybierz diodę LED, która będzie sygnalizowała stan "
-                      "urządzenia oraz występujące zdarzenia"
-                    : "Select LED which will be informing about device status "
-                      "and its events ",
+      L_SYSTEM_LED,
+      L_SYSTEM_LED_INFO,
       body);
 }
 #endif
@@ -873,7 +825,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Nazwa" : "Name";

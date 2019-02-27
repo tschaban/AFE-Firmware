@@ -12,7 +12,6 @@
 #endif
 
 /* Parameter indicates that HTTP request requires data save */
-#define SERVER_CMD_SAVE 1
-#define SERVER_CMD_NONE 0
+
 
 #endif

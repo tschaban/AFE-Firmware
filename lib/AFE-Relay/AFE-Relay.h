@@ -47,11 +47,13 @@ private:
   char mqttTopic[50];
 
   unsigned long turnOffCounter = 0;
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
   boolean timerUnitInSeconds = true;
+#endif
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   void setRelayAfterRestore(uint8_t option);
 #endif
 
@@ -78,7 +80,7 @@ public:
   /* Method returns MQTT topic for this relay */
   const char *getMQTTTopic();
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
   void setRelayAfterRestoringPower();
@@ -101,31 +103,38 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-  /* Methodswhile added to main loop turns off relay automatically. Duration
-   * how long relay should be on must be configured */
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
+  /* Methods automatically turns off/on relay */
   boolean autoTurnOff(boolean invert = false);
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Methods returns relay name */
   const char *getName();
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
+#endif
 
+#ifdef CONFIG_HARDWARE_PIR
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
+#endif
 
 #ifdef CONFIG_HARDWARE_LED
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
 #endif
