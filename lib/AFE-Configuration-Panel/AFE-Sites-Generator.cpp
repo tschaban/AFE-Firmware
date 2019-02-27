@@ -331,14 +331,14 @@ String AFESitesGenerator::addDeviceConfiguration() {
   uint8_t itemsNumber = 0;
 
   String body = "<fieldset><div class=\"cf\"><label>";
-  body += L_DEVICE_NAME ;
+  body += L_DEVICE_NAME;
   body += "</label><input name=\"dn\" type=\"text\" maxlength=\"16\" "
           "value=\"";
   body += configuration.name;
   body += "\"><span class=\"hint\">Max 16 ";
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
-  String page = addConfigurationBlock(L_DEVICE,L_DEVICE_SECTION_INFO,body);
+  String page = addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
   body = "<fieldset>";
 
 /* LED */
@@ -351,8 +351,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(
-      sizeof(Device->configuration.isLED), itemsNumber, "hl",L_NUMBER_OF_LEDS);
+  body += generateHardwareItemsList(sizeof(Device->configuration.isLED),
+                                    itemsNumber, "hl", L_NUMBER_OF_LEDS);
 
 #endif
 
@@ -390,8 +390,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(
-      sizeof(Device->configuration.isRelay), itemsNumber, "hr",L_NUMBER_OF_RELAYS);
+  body += generateHardwareItemsList(sizeof(Device->configuration.isRelay),
+                                    itemsNumber, "hr", L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
@@ -404,8 +404,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(
-      sizeof(Device->configuration.isSwitch), itemsNumber, "hs",L_NUMBER_OF_SWITCHES);
+  body += generateHardwareItemsList(sizeof(Device->configuration.isSwitch),
+                                    itemsNumber, "hs", L_NUMBER_OF_SWITCHES);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
@@ -511,8 +511,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body += "</fieldset>";
 
-  page += addConfigurationBlock(L_HARDWARE_CONFIGURATION,L_HARDWARE_CONFIGURATION_INFO,
-      body);
+  page += addConfigurationBlock(L_HARDWARE_CONFIGURATION,
+                                L_HARDWARE_CONFIGURATION_INFO, body);
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"m\" "
          "type=\"checkbox\" value=\"1\"";
@@ -534,7 +534,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "?</label></div>";
   body += "</fieldset>";
 
-  page += addConfigurationBlock(L_DEVICE_CONTROLLING,L_DEVICE_CONTROLLING_INFO,body);
+  page += addConfigurationBlock(L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO,
+                                body);
 
   return page;
 }
@@ -563,9 +564,8 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += WiFi.macAddress();
   body += "\"></div></fieldset>";
 
-  String page = addConfigurationBlock(
-      "WiFi",L_NETWORK_CONFIGURATION_INFO,
-      body);
+  String page =
+      addConfigurationBlock("WiFi", L_NETWORK_CONFIGURATION_INFO, body);
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"d\" "
          "type=\"checkbox\" value=\"1\"";
@@ -630,8 +630,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += configuration.subnet[3];
   body += "\"></div></fieldset>";
 
-  page += addConfigurationBlock(L_DEVICE_IP,L_DEVICE_IP_INFO,
-      body);
+  page += addConfigurationBlock(L_DEVICE_IP, L_DEVICE_IP_INFO, body);
 
   body = "<fieldset><div class=\"cf\"><label>";
   body += L_NUMBER_OF_CONNECTIONS;
@@ -654,8 +653,7 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += L_SECONDS;
   body += ")</span></div></fieldset>";
 
-  page += addConfigurationBlock(L_ADVANCED, "",
-                                body);
+  page += addConfigurationBlock(L_ADVANCED, "", body);
 
   return page;
 }
@@ -715,9 +713,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
 
-  return addConfigurationBlock(
-      "MQTT Broker",L_MQTT_CONFIGURATION_INFO,
-      body);
+  return addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
 }
 
 String AFESitesGenerator::addDomoticzServerConfiguration() {
@@ -758,8 +754,8 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
 
-  return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,L_DOMOTICZ_CONFIGURATION_INFO,
-      body);
+  return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,
+                               L_DOMOTICZ_CONFIGURATION_INFO, body);
 }
 
 #ifdef CONFIG_HARDWARE_LED
@@ -810,10 +806,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 
   body += "</select></div></fieldset>";
 
-  return addConfigurationBlock(
-      L_SYSTEM_LED,
-      L_SYSTEM_LED_INFO,
-      body);
+  return addConfigurationBlock(L_SYSTEM_LED, L_SYSTEM_LED_INFO, body);
 }
 #endif
 
@@ -828,51 +821,49 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Nazwa" : "Name";
+  body += L_NAME;
   body += "</label>";
   body += "<input name=\"n" + String(id) +
           "\" type=\"text\" maxlength=\"16\" value=\"";
   body += configuration.name;
   body += "\">";
   body += "<span class=\"hint\">Max 16 ";
-  body += language == 0 ? "znaków" : "chars";
+  body += L_NUMBER_OF_CHARS;
   body += "</span>";
   body += "</div>";
 
   body += "<p class=\"cm\">";
-  body += language == 0 ? "Wartości domyślne" : "Default values";
+  body += L_DEFAULT_VALUES;
   body += "</p>";
   body += "<div class=\"cf\">";
   body += "<label>";
-  body += language == 0 ? "Po przywróceniu zasilania"
-                        : "When power is restored set it to";
+  body += L_DEFAULT_POWER_RESTORED;
   body += "</label>";
   body += "<select name=\"pr" + String(id) + "\">";
   body += "<option value=\"0\"";
   body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Brak akcji" : "No action";
+  body += L_NO_ACTION;
   body += "</option>";
   body += "<option value=\"1\"";
   body += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Wyłączony" : "Off";
+  body += L_OFF;
   body += "</option>";
   body += "<option value=\"2\"";
   body += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Włączony" : "On";
+  body += L_ON;
   body += "</option>";
   body += "<option value=\"3\"";
   body += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
+  body += L_LAST_KNOWN_STATE;
   body += "</option>";
   body += "<option value=\"4\"";
   body += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
   body += ">";
-  body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
-                        : "Opposite to the last known state";
+  body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
   body += "</option>";
   body += "</select>";
   body += "</div>";
@@ -880,48 +871,44 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (Device->configuration.api.mqtt) {
     body += "<div class=\"cf\">";
     body += "<label>";
-    body += language == 0 ? "Po podłączeniu do brokera MQTT"
-                          : "After establishing connection to MQTT Broker";
+    body += L_DEFAULT_MQTT_CONNECTED;
     body += "</label>";
     body += "<select  name=\"mc" + String(id) + "\">";
     body += "<option value=\"0\"";
     body += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0 ? "Brak akcji" : "No action";
+    body += L_NO_ACTION;
     body += "</option>";
     body += "<option value=\"1\"";
     body += (configuration.state.MQTTConnected == 1 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0 ? "Wyłączony" : "Off";
+    body += L_OFF;
     body += "</option>";
     body += "<option value=\"2\"";
     body += (configuration.state.MQTTConnected == 2 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0 ? "Włączony" : "On";
+    body += L_ON;
     body += "</option>";
     body += "<option value=\"3\"";
     body += (configuration.state.MQTTConnected == 3 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0 ? "Ostatnia zapamiętana wartość" : "Last known state";
+    body += L_LAST_KNOWN_STATE;
     body += "</option>";
     body += "<option value=\"4\"";
     body += (configuration.state.MQTTConnected == 4 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0 ? "Przeciwna do ostatniej zapamiętanej"
-                          : "Opposite to the last known state";
+    body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
     body += "</option>";
     body += "<option value=\"5\"";
     body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
                                                     : "");
     body += ">";
-    body += language == 0
-                ? "Wartość z systemu sterowania przekaźnikiem (przez MQTT)"
-                : "Get state from a relay's controlling system (over MQTT)";
+    body += L_DEFAULT_GET_FROM_MQTT;
     body += "</option>";
     body += "</select>";
     body += "</div>";
@@ -931,15 +918,14 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 /* Relay Time off / Impuls is not applicable for T3 & T6 */
 #if !(defined(T3_CONFIG) || defined(T6_CONFIG))
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Automatyczne wyłączenie przekaźnika"
-                        : "Automatic switching off of the relay";
+  body += L_AUTOMATIC_SWITCHING_OFF;
   body += "</p>";
   body += "<div class=\"cf\">";
   body += "<label>";
 #if defined(T5_CONFIG)
-  body += language == 0 ? "Długośc impulsu" : "Impulse duration";
+  body += L_IMPULSE_DURATION;
 #else
-  body += language == 0 ? "Wyłącz po" : "Switch off after";
+  body += L_SWITCH_OFF_AFTER;
 #endif
   body += "</label>";
 
@@ -953,12 +939,13 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += configuration.timeToOff;
   body += "\">";
 #if defined(T5_CONFIG)
-  body += "<span class=\"hint\">1 - 9999 milise";
-  body += language == 0 ? "kund" : "cunds";
+  body += "<span class=\"hint\">1 - 9999";
+  body += L_MILISECONDS;
 #else
   body += "<span class=\"hint\">0.01 - 86400";
-  body += language == 0 ? "sek (24h). Brak akcji jeśli jest 0"
-                        : "sec (24h). No action if it's set to 0";
+  body += L_SECONDS;
+  body += ". ";
+  body += L_NO_ACTION_IF_0;
 #endif
   body += "</span>";
   body += "</div>";
@@ -977,30 +964,28 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     {
 
       body += "<br><p class=\"cm\">";
-      body += language == 0 ? "Zabezpieczenie termiczne" : "Thermal protection";
+      body += L_THERMAL_PROTECTION;
       body += "</p>";
 
       body += "<div class=\"cf\">";
       body += "<label>";
-      body += language == 0 ? "Wyłącz powyżej" : "Switch off above";
+      body += L_SWITCH_OFF_ABOVE;
       body += "</label>";
       body += "<input name=\"tp" + String(id) +
               "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
       body += configuration.thermalProtection;
       body += "\">";
       body += "<span class=\"hint\">";
-      body += language == 0 ? "Zakres" : "Range";
+      body += L_RANGE;
       body += ": -55C : +125C (-67F : +259F). ";
-      body += language == 0 ? "Brak akcji jeśli jest 0"
-                            : "No action if it's set to 0";
+      body += L_NO_ACTION_IF_0;
       body += "</span></div>";
     }
 #endif
 
 #if (defined(CONFIG_HARDWARE_LED) || !defined(T5_CONFIG))
   body += "<br><p class=\"cm\">";
-  body += language == 0 ? "Wybierz LED sygnalizujący stan przekaźnika"
-                        : "Select LED informing about relay state";
+  body += L_SELECT_LED_4_RELAY;
   body += "</p>";
 
   body += "<div class=\"cf\">";
@@ -1008,7 +993,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "<select  name=\"l" + String(id) + "\">";
   body += "<option value=\"0\"";
   body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
-  body += language == 0 ? ">Brak" : ">None";
+  body += L_NONE;
   body += "</option>";
 
   for (uint8_t i = 1; i <= sizeof(Device->configuration.isLED); i++) {
@@ -1032,8 +1017,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</fieldset>";
 
   char title[23];
-  language == 0 ? sprintf(title, "Przekaźnik #%d", id + 1)
-                : sprintf(title, "Relay #%d", id + 1);
+  sprintf(title, "%s #%d", L_RELAY, id + 1);
 
   String page = addConfigurationBlock(title, "", body);
 
@@ -1047,17 +1031,12 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += configuration.domoticz.idx;
     body += "\">";
     body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
+    body += L_RANGE;
     body += "0 - 999999</span>";
     body += "</div>";
     body += "</fieldset>";
 
-    page += addConfigurationBlock(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
 #endif
 
@@ -1065,14 +1044,14 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body = "<fieldset>";
     body += "<div class=\"cf\">";
     body += "<label>";
-    body += language == 0 ? "Temat" : "Topic";
+    body += L_MQTT_TOPIC;
     body += "</label>";
     body += "<input name=\"t" + String(id) +
             "\" type=\"text\" maxlength=\"32\" value=\"";
     body += configuration.mqtt.topic;
     body += "\">";
     body += "<span class=\"hint\">Max 32 ";
-    body += language == 0 ? "znaków" : "chars";
+    body += L_NUMBER_OF_CHARS;
     body += "</span>";
     body += "</div>";
     body += "</fieldset>";
