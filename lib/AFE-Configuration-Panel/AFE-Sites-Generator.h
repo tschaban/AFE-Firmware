@@ -40,7 +40,6 @@ private:
   AFEEEPROM Eeprom;
   AFEDataAccess Data;
   AFEDevice *Device;
-  uint8_t language;
   FIRMWARE firmware;
 
   /* Method generates GPIO selecton list */
@@ -87,7 +86,6 @@ public:
   const char *generateFooter();
 
   /* All following methods generates configuration sections */
-  String addLanguageConfiguration();
   String addDeviceConfiguration();
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();

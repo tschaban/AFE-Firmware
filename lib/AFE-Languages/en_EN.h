@@ -43,6 +43,7 @@
 #define L_DOCUMENTATION "Documentation"
 #define L_SETTINGS "Settings"
 #define L_SETTINGS_HOT_SPOT "Settings (HotSpot mode)"
+#define L_SAVE "Save"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "chars"
@@ -96,6 +97,8 @@
 #define L_DOMOTICZ_CONFIGURATION "Domoticz Server"
 #define L_DOMOTICZ_CONFIGURATION_INFO                                          \
   "Enter Domoticz hostname or its IP address"
+#define L_NO_IF_IDX_0                                                          \
+  "If IDX is set to 0 then a value won't be sent to Domoticz"
 
 #ifdef CONFIG_HARDWARE_LED
 /* Form: Led configuration */
@@ -126,7 +129,63 @@
 #define L_SWITCH_OFF_ABOVE "Switch off above"
 #define L_RANGE "Range"
 #define L_SELECT_LED_4_RELAY "Select LED informing about relay state"
-#define L_NO_IF_IDX_0                                                          \
-  "If IDX is set to 0 then a value won't be sent to Domoticz"
+
+/* Form: Switch */
+#define L_FUNCTIONALITY "Functionality"
+#define L_SYSTEM_BUTTON "System button"
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+#define L_CONTROL_RELAY "Controlling only the relay"
+#endif
+#ifdef CONFIG_FUNCTIONALITY_GATE
+#define L_CONTROL_GATE "Controlling only the gate"
+#endif
+#define L_RELAY_CONTROLLED_BY_SWITCH "Select relay controlled by this switch"
+#define L_TYPE "Type"
+#define L_MONOSTABLE "Monostable"
+#define L_BISTABLE "Bistable"
+#define L_SENSITIVENESS "Sensitiveness"
+#define L__SENSITIVENESS_HINT                                                  \
+  "Sensitiveness should be adjusted if switch didn't behave as expected "      \
+  "while pressing it"
+#define L_SWITCH_BUTTON "Switch / Button"
+
+/* Form: Analog Input */
+#define L_CANT_CHANGE "can't be set"
+#define L_MEASURMENTS_INTERVAL "Measurement's interval"
+#define L_MEASURED_VOLTAGE "Measured voltage"
+#define L_NUMBER_OF_SAMPLES "Number of sample measurements"
+#define L_RAW_DATA "Raw data"
+#define L_PERCENT "Percent"
+#define L_VOLTAGE "Voltage"
+
+/* Form: upgrade and post upgrade */
+#define L_SELECT_FIRMWARE "Select Firmware"
+#define L_UPGRADE_INFO                                                         \
+  "Device will be automatically rebooted after "                               \
+  "upgrade<br><br><strong>Warning</strong>: after upgrade do not plug off "    \
+  "the device from power source for around a minute.<br>Device's memory will " \
+  "be formatted and default settings will be uploaded.<br><strong>This "       \
+  "process cannot be interrupted</strong>"
+#define L_UPGRADE "Upgrade"
+#define L_DONT_PLUG_OFF                                                        \
+  "<strong>Warning</strong>: don't plug off the device from a power source "   \
+  "while upgrading"
+#define L_UPGRADE_FAILED "Upgrade failed"
+#define L_UPGRADE_SUCCESSFUL "Upgrade finished succesfully"
+#define L_DEVICE_WILL_BE_REBOOTED                                              \
+  "After 15s device will be rebooted. Please wait"
+#define L_RESTORE_DEFAULT_SETTINGS "Restore default settings"
+#define L_WARNING "Warning"
+#define L_CONFIGURATION_WILL_BE_REMOVED                                        \
+  "restoring to default settings will remove all configuration's "             \
+  "information, incl. WiFi configuration"
+#define L_UPGRADE_IN_PROGRESS "Restoring configuration is in progress"
+#define L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
+  "After 20 seconds connect to WiFi network called "                           \
+  "<strong>AFE-Device</strong> and open configuration panel"
+#define L_RESTORING_DEFAULT_SETTING "Restoring to default settings"
+#define L_REBOOT_IN_PROGRESS "Reboot in progress"
+#define L_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
+#define L_REBOOT "Device reboot"
 
 #endif

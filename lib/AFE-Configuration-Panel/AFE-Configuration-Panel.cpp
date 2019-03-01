@@ -20,7 +20,6 @@ AFEConfigurationPanel::AFEConfigurationPanel(AFEDevice *_Device) {
 }
 
 void AFEConfigurationPanel::begin(AFEDevice *_Device) {
-  language = Data.getLanguage();
   Device = _Device;
   Site.begin(Device);
 }
@@ -52,25 +51,6 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getLanguageConfigurationSite(uint8_t command,
-                                                           uint8_t lang) {
-  String page;
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveLanguage(lang);
-    page += Site.generateHeader(10);
-    page += Site.addExitSection();
-  } else {
-    page += Site.generateHeader();
-    page += "<form action=\"/?option=language&cmd=1\"  method=\"post\">";
-    page += Site.addLanguageConfiguration();
-    page += "<input type=\"submit\" class=\"b bs\" value=\"";
-    page += language == 0 ? "Zapisz" : "Save";
-    page += "\"></form>";
-  }
-  page += Site.generateFooter();
-  return page;
-}
-
 String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
                                                          DEVICE data) {
 
@@ -84,7 +64,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=device&cmd=1\"  method=\"post\">";
   page += Site.addDeviceConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -102,7 +82,7 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=network&cmd=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -120,7 +100,7 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=mqtt&cmd=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -139,7 +119,7 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=domoticz&cmd=1\" method=\"post\">";
   page += Site.addDomoticzServerConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -175,7 +155,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
   page += Site.addSystemLEDConfiguration();
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -197,7 +177,7 @@ String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addRelayConfiguration(relayIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -223,7 +203,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
       : page += Site.addRegulatorConfiguration(HUMIDISTAT_REGULATOR);
 
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -246,7 +226,7 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addSwitchConfiguration(switchIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -282,7 +262,7 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
   page += Site.addDHTConfiguration();
 #endif
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -303,7 +283,7 @@ String AFEConfigurationPanel::getPIRConfigurationSite(const String option,
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addPIRConfiguration(PIRIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -328,7 +308,7 @@ String AFEConfigurationPanel::getContactronConfigurationSite(
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addContactronConfiguration(contactronIndex);
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -347,7 +327,7 @@ String AFEConfigurationPanel::getGateConfigurationSite(const String option,
   page += "<form action=\"/?option=gate&cmd=1\"  method=\"post\">";
   page += Site.addGateConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -365,7 +345,7 @@ String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=UART&cmd=1\"  method=\"post\">";
   page += Site.addSerialPortConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -384,7 +364,7 @@ AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=HPMA115S0&cmd=1\"  method=\"post\">";
   page += Site.addHPMA115S0Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -402,7 +382,7 @@ String AFEConfigurationPanel::getBMx80SensorConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=BMx80&cmd=1\"  method=\"post\">";
   page += Site.addBMx80Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -420,7 +400,7 @@ String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=BH1750&cmd=1\"  method=\"post\">";
   page += Site.addBH1750Configuration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;
@@ -438,7 +418,7 @@ String AFEConfigurationPanel::getAnalogInputConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=analogInput&cmd=1\"  method=\"post\">";
   page += Site.addAnalogInputConfiguration();
   page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += language == 0 ? "Zapisz" : "Save";
+  page += L_SAVE;
   page += "\"></form>";
   page += Site.generateFooter();
   return page;

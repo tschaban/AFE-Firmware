@@ -135,11 +135,7 @@ void setup() {
   if (SPIFFS.begin()) {
 #ifdef DEBUG
     Serial << endl << "File system mounted";
-#endif
-  }
-
-#ifdef DEBUG
-  else {
+  } else {
     Serial << endl << "Failed to mount file system";
 #endif
   }
@@ -292,10 +288,6 @@ void setup() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    Serial << endl
-           << "Device.configuration.isAnalogInpu-"
-           << Device.configuration.isAnalogInput;
-
     if (Device.configuration.isAnalogInput) {
       AnalogInput.begin();
     }

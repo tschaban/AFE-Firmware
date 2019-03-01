@@ -60,16 +60,7 @@ void AFEWebServer::generate() {
   const String optionName = getOptionName();
   uint8_t command = getCommand();
 
-  if (optionName == "language") {
-    uint8_t data;
-    if (command == SERVER_CMD_SAVE) {
-      data = getLanguageData();
-    }
-    publishHTML(ConfigurationPanel.getLanguageConfigurationSite(command, data));
-    if (command == SERVER_CMD_SAVE) {
-      Device->reboot(Device->getMode());
-    }
-  } else if (optionName == "device") {
+  if (optionName == "device") {
     DEVICE data;
     if (command == SERVER_CMD_SAVE) {
       data = getDeviceData();

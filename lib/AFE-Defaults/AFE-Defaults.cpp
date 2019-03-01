@@ -526,7 +526,7 @@ void AFEDefaults::formatSPIFFS() {
     Serial << endl << "- File system formated";
   } else {
     Serial << endl << "- File system NOT formated";
-  }
 #endif
+  }
 }
 #endif

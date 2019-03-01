@@ -25,7 +25,7 @@
 
 /* Menu */
 #define L_DEVICE "Urządzenie"
-#define L_NETWORK "Siec WiFi"
+#define L_NETWORK "Sieć WiFi"
 #define L_MQTT_BROKER "MQTT Broker"
 #define L_DOMOTICZ_SERVER "Serwer Domoticz"
 #define L_LEDS "LEDy"
@@ -41,6 +41,7 @@
 #define L_DOCUMENTATION "Dokumentacja"
 #define L_SETTINGS "Ustawienia"
 #define L_SETTINGS_HOT_SPOT "Ustawienia (Tryb HotSpot)"
+#define L_SAVE "Zapisz"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -97,6 +98,8 @@
 #define L_DOMOTICZ_CONFIGURATION "Serwer Domoticz"
 #define L_DOMOTICZ_CONFIGURATION_INFO                                          \
   "Wprowadź adres hosta np. localhost lub adres IP"
+#define L_NO_IF_IDX_0                                                          \
+  "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
 #ifdef CONFIG_HARDWARE_LED
@@ -130,7 +133,65 @@
 #define L_SWITCH_OFF_ABOVE "Wyłącz powyżej"
 #define L_RANGE "Zakres"
 #define L_SELECT_LED_4_RELAY "Wybierz LED sygnalizujący stan przekaźnika"
-#define L_NO_IF_IDX_0                                                          \
-  "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+
+/* Form: Switch */
+#define L_FUNCTIONALITY "Funkcja"
+#define L_SYSTEM_BUTTON "Przycisk systemowy"
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+#define L_CONTROL_RELAY "Tylko sterowanie przekaźnikiem"
+#endif
+#ifdef CONFIG_FUNCTIONALITY_GATE
+#define L_CONTROL_GATE "Tylko sterowanie bramą"
+#endif
+#define L_RELAY_CONTROLLED_BY_SWITCH "Przekaźnik sterowany tym przyciskiem"
+#define L_TYPE "Typ"
+#define L_MONOSTABLE "Monostabilny"
+#define L_BISTABLE "Bistabilny"
+#define L_SENSITIVENESS "Czułość"
+#define L__SENSITIVENESS_HINT                                                         \
+  "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie " \
+  "przycisku podczas jego wciskania"
+#define L_SWITCH_BUTTON "Przycisk / Włącznik"
+
+/* Form: Analog Input */
+#define L_CANT_CHANGE "brak możliwości zmiany"
+#define L_MEASURMENTS_INTERVAL "Interwał odczytów"
+#define L_MEASURED_VOLTAGE "Mierzone napięcie"
+#define L_NUMBER_OF_SAMPLES "Ilość próbek do uśrednienia odczytu"
+#define L_RAW_DATA "Surowe dane"
+#define L_PERCENT "Procent"
+#define L_VOLTAGE "Napięcie"
+
+/* Form: upgrade and post upgrade */
+#define L_SELECT_FIRMWARE "Wybierz Firmware"
+#define L_UPGRADE_INFO                                                             \
+  "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "               \
+  "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj "     \
+  "urządzenia przez conajmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
+  "domyślne ustawienia.<br><strong>Ten proces nie może zostać "                 \
+  "przerwany</strong>"
+#define L_UPGRADE "Aktualizuj"
+#define L_DONT_PLUG_OFF                                                        \
+  "<strong>UWAGA</strong>: nie odłączaj urządzenia od źródła zasilania " \
+  "podczas aktualizacji"
+#define L_UPGRADE_FAILED "Aktualizacja nie powiodła się"
+#define L_UPGRADE_SUCCESSFUL "Aktualizacja zakończona pomyślnie"
+#define L_DEVICE_WILL_BE_REBOOTED                                              \
+  "Po 15 sekundach przełącznik zostanie przeładowany. Proszę czekać"
+#define L_RESTORE_DEFAULT_SETTINGS "Przywróć ustawienia początkowe"
+#define L_WARNING "Uwaga"
+#define L_CONFIGURATION_WILL_BE_REMOVED                                            \
+  "przywrócenie ustawień początkowych usuwa wszystkie ustawienia urządzenia, " \
+  "włącznie z konfiguracją sieci WiFi"
+#define L_UPGRADE_IN_PROGRESS "Trwa przywracanie ustawień początkowych"
+#define L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
+  "Po 20 sekundach połącz się z siecią WiFi o nazwie: "                    \
+  "<strong>AFE-Device</strong>, a następnie połącz się z panelem "         \
+  "konfiguracyjnym pod adresem"
+#define L_RESTORING_DEFAULT_SETTING "Przywracanie ustawień początkowych"
+#define L_REBOOT_IN_PROGRESS "Trwa restart urządzenia"
+#define L_SITE_WILL_BE_RELOADED                                                \
+  "Strona zostanie przeładowana automatycznie... czeka"
+#define L_REBOOT "Restart urządzenia"
 
 #endif

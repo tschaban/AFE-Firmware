@@ -24,7 +24,6 @@ private:
   AFESitesGenerator Site;
   AFEDataAccess Data;
   AFEDevice *Device;
-  uint8_t language;
   uint16_t siteBufferSize = 7500;
 
 public:
@@ -56,7 +55,6 @@ public:
 
   String getSwitchConfigurationSite(uint8_t command, SWITCH data,
                                     uint8_t relayIndex);
-  String getLanguageConfigurationSite(uint8_t command, uint8_t lang);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   String getDS18B20ConfigurationSite(uint8_t command, DS18B20 data);
