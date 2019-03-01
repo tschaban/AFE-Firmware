@@ -29,7 +29,8 @@ public:
 
   void addDomoticzConfiguration();
 #ifndef T0_SHELLY_1_CONFIG
-  void addLEDConfiguration(uint8_t id, uint8_t gpio);
+  void addLEDConfiguration(uint8_t id, uint8_t gpio,
+                           boolean changeToOpposite = false);
 #endif
   void addDeviceID();
 

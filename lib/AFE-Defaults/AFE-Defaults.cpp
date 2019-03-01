@@ -64,7 +64,7 @@ void AFEDefaults::set() {
   }
 
 /* LEDs */
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   deviceConfiguration.isLED[0] = true;
   for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
     deviceConfiguration.isLED[i] = false;
@@ -128,7 +128,7 @@ void AFEDefaults::set() {
   addDomoticzConfiguration();
 
 /* Relay config */
-#ifdef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   RelayConfiguration.gpio = 4;
 #else
   RelayConfiguration.gpio = 12;
@@ -253,9 +253,9 @@ void AFEDefaults::set() {
 #endif
 
 #else /* T5 */
-  addLEDConfiguration(0, 16);
-  addLEDConfiguration(1, 14);
-  addLEDConfiguration(2, 13);
+  addLEDConfiguration(0, 2, true);
+  // addLEDConfiguration(1, 14);
+  // addLEDConfiguration(2, 13);
 #endif
 #endif
 
@@ -271,7 +271,7 @@ void AFEDefaults::set() {
   SensorConfiguration.unit = 0;
   SensorConfiguration.idx = 0;
 #elif defined(T2_CONFIG) || defined(T5_CONFIG)
-  SensorConfiguration.gpio = 2;
+  SensorConfiguration.gpio = 16;
   SensorConfiguration.type = 1;
   SensorConfiguration.temperature.correction = 0;
   SensorConfiguration.humidity.correction = 0;
@@ -306,12 +306,12 @@ void AFEDefaults::set() {
 #if defined(T5_CONFIG)
   ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
   ContactronConfiguration.bouncing = 200;
-  ContactronConfiguration.gpio = 4;
+  ContactronConfiguration.gpio = 14;
   ContactronConfiguration.ledID = 2;
   ContactronConfiguration.idx = 0;
   sprintf(ContactronConfiguration.name, "C1");
   Data->saveConfiguration(0, ContactronConfiguration);
-  ContactronConfiguration.gpio = 5;
+  ContactronConfiguration.gpio = 13;
   ContactronConfiguration.ledID = 3;
   sprintf(ContactronConfiguration.name, "C2");
   Data->saveConfiguration(1, ContactronConfiguration);
@@ -356,7 +356,7 @@ void AFEDefaults::set() {
 
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   Data->saveSystemLedID(1);
 #endif
 
@@ -374,11 +374,12 @@ void AFEDefaults::addDomoticzConfiguration() {
   Data->saveConfiguration(DomoticzConfiguration);
 }
 
-#ifndef T0_SHELLY_1_CONFIG
-void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
+#if !defined(T0_SHELLY_1_CONFIG)
+void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio,
+                                      boolean changeToOpposite) {
   LED LEDConfiguration;
   LEDConfiguration.gpio = gpio;
-  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.changeToOppositeValue = changeToOpposite;
   Data->saveConfiguration(id, LEDConfiguration);
 }
 #endif

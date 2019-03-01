@@ -31,7 +31,7 @@ void AFERelay::begin(uint8_t id) {
   Humidistat.begin(RelayConfiguration.humidistat);
 #endif
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
   if (RelayConfiguration.ledID > 0) {
     Led.begin(RelayConfiguration.ledID - 1);
   }
@@ -48,7 +48,7 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
     Led.on();
 #endif
     if (!invert &&
@@ -66,7 +66,7 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
     Led.off();
 #endif
     if (invert &&
@@ -146,7 +146,7 @@ void AFERelay::setTimer(float timer) {
 
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 
-#ifndef T0_SHELLY_1_CONFIG
+#if !defined(T0_SHELLY_1_CONFIG)
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 
