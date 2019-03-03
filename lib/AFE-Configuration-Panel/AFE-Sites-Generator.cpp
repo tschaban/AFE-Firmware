@@ -280,8 +280,12 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     }
 #endif
 
+    page += "<br><li class=\"itm\"><a href=\"\\?option=password\">";
+    page += L_SET_PASSWORD;
+    page += "</a></li>";
+
     /* Language, Upgrade, Exit */
-    page += "<br><br><li class=\"itm\"><a href=\"\\update\">";
+    page += "<br><li class=\"itm\"><a href=\"\\update\">";
     page += L_FIRMWARE_UPGRADE;
     page += "</a></li><li class=\"itm\"><a href=\"\\?option=reset\">";
     page += L_RESET_DEVICE;
@@ -755,6 +759,33 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
 
   return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,
                                L_DOMOTICZ_CONFIGURATION_INFO, body);
+}
+
+String AFESitesGenerator::addPasswordConfigurationSite() {
+
+  PASSWORD configuration = Data.getPasswordConfiguration();
+
+  String body = "<fieldset><div class=\"cc\"><label><input name=\"r\" "
+                "type=\"checkbox\" value=\"1\"";
+  body += (configuration.protect ? " checked=\"checked\"" : "");
+  body += "> ";
+  body += L_PROTECT_BY_PASSWORD;
+  body += "?</label></div>";
+
+  if (configuration.protect) {
+    body += "<div class =\"cf\"><label>";
+    body += L_PASSWORD;
+    body += "</label><input name=\"p\" type=\"text\"  maxlength=\"8\" "
+            "value=\"";
+    body += configuration.password;
+    body += "\"><span class=\"hint\">Max 8 ";
+    body += L_NUMBER_OF_CHARS;
+    body += "</span></div>";
+  }
+  body += "</fieldset>";
+
+  return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, L_SET_PASSWORD_INFO,
+                               body);
 }
 
 #ifdef CONFIG_HARDWARE_LED

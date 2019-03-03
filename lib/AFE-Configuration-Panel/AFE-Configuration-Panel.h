@@ -38,6 +38,7 @@ public:
   String getNetworkConfigurationSite(uint8_t command, NETWORK data);
   String getMQTTConfigurationSite(uint8_t command, MQTT data);
   String getDomoticzServerConfigurationSite(uint8_t command, DOMOTICZ data);
+  String getPasswordConfigurationSite(uint8_t command, PASSWORD data);
 
 #ifdef CONFIG_HARDWARE_LED
   String getLEDConfigurationSite(uint8_t command,

@@ -125,6 +125,24 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
   return page;
 }
 
+String AFEConfigurationPanel::getPasswordConfigurationSite(uint8_t command,
+                                                           PASSWORD data) {
+  if (command == SERVER_CMD_SAVE) {
+    Data.saveConfiguration(data);
+  }
+
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateHeader();
+  page += "<form action=\"/?option=password&cmd=1\" method=\"post\">";
+  page += Site.addPasswordConfigurationSite();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += L_SAVE;
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
 #ifdef CONFIG_HARDWARE_LED
 String AFEConfigurationPanel::getLEDConfigurationSite(
     uint8_t command, LED data[sizeof(Device->configuration.isLED)],

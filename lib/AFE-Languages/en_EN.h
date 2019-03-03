@@ -188,4 +188,12 @@
 #define L_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_REBOOT "Device reboot"
 
+/* Form: password */
+#define L_SET_PASSWORD "Set password"
+#define L_SET_PASSWORD_TO_PANEL "Set password to the Configuration Panel"
+#define L_SET_PASSWORD_INFO                                                    \
+  "If you forgot the password you can only reset the device to it's default "  \
+  "state to access to the Configuration Panel."
+#define L_PROTECT_BY_PASSWORD "Protect by password"
+
 #endif

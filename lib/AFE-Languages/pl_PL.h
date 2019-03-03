@@ -194,4 +194,12 @@
   "Strona zostanie przeładowana automatycznie... czeka"
 #define L_REBOOT "Restart urządzenia"
 
+/* Form: password */
+#define L_SET_PASSWORD "Ustaw hasło"
+#define L_SET_PASSWORD_TO_PANEL "Ustaw hasło do Panelu Konfiguracyjnego"
+#define L_SET_PASSWORD_INFO                                                    \
+  "Jeśli zapomnisz hasło, możesz jedynie zresetować oprogramowanie, aby "  \
+  "dostać się do Panelu Konfiguracyjnego."
+#define L_PROTECT_BY_PASSWORD "Zabezpiecz hasłem"
+
 #endif

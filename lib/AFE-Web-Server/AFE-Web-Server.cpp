@@ -85,6 +85,12 @@ void AFEWebServer::generate() {
     }
     publishHTML(
         ConfigurationPanel.getDomoticzServerConfigurationSite(command, data));
+  } else if (optionName == "password") {
+    PASSWORD data;
+    if (command == SERVER_CMD_SAVE) {
+      data = getPasswordData();
+    }
+    publishHTML(ConfigurationPanel.getPasswordConfigurationSite(command, data));
 #ifdef CONFIG_HARDWARE_LED
   } else if (optionName == "led") {
     LED data[sizeof(Device->configuration.isLED)] = {};
@@ -620,6 +626,20 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   return data;
 }
 
+PASSWORD AFEWebServer::getPasswordData() {
+  PASSWORD data;
+
+  if (server.arg("p").length() > 0) {
+    server.arg("p").toCharArray(data.password, sizeof(data.password) + 1);
+  }
+
+  if (server.arg("r").length() > 0) {
+    data.protect = server.arg("r").toInt() == 0 ? false : true;
+  }
+
+  return data;
+}
+
 #if defined(T5_CONFIG)
 CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
   CONTACTRON data;
@@ -731,9 +751,6 @@ uint8_t AFEWebServer::getSystemLEDData() {
 }
 #endif
 
-uint8_t AFEWebServer::getLanguageData() {
-  return server.arg("l").length() > 0 ? server.arg("l").toInt() : 1;
-}
 #ifdef CONFIG_HARDWARE_DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
   DS18B20 data;

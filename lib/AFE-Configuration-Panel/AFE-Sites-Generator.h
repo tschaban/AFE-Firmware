@@ -90,6 +90,7 @@ public:
   String addNetworkConfiguration();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
+  String addPasswordConfigurationSite();
 #ifdef CONFIG_HARDWARE_LED
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();

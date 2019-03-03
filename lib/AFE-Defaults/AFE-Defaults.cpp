@@ -14,6 +14,7 @@ void AFEDefaults::set() {
   MQTT MQTTConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
+  PASSWORD PasswordConfiguration;
 
 #ifdef CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR RegulatorConfiguration;
@@ -61,6 +62,11 @@ void AFEDefaults::set() {
   firmwareConfiguration.upgradeURL[0] = '\0';
 
   Data->saveConfiguration(firmwareConfiguration);
+
+  /* Setting password */
+  PasswordConfiguration.protect = false;
+  PasswordConfiguration.password[0] = '\0';
+  Data->saveConfiguration(PasswordConfiguration);
 
   /* Device UID */
   byte m[6];

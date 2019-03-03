@@ -38,6 +38,9 @@ public:
   const String getDeviceUID();
   void saveDeviceUID(const char *);
 
+  PASSWORD getPasswordConfiguration();
+  void saveConfiguration(PASSWORD configuration);
+
   DEVICE getDeviceConfiguration();
   void saveConfiguration(DEVICE configuration);
 

@@ -52,6 +52,7 @@ private:
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
+  PASSWORD getPasswordData();
 
 #ifdef CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);
@@ -98,8 +99,6 @@ private:
 #ifdef CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
 #endif
-
-  uint8_t getLanguageData();
 
 public:
   AFEWebServer();
