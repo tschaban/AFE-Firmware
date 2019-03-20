@@ -164,34 +164,45 @@ void setup() {
   }
 #endif
 
-  /* Checking if the firmware has been upgraded. Potentially runs post upgrade
-   * code */
 #ifdef DEBUG
-  Serial << endl << "Checking if firmware should be upgraded: ";
+  Serial << endl << "Checking, if WiFi should be configured: ";
 #endif
-  AFEUpgrader *Upgrader = new AFEUpgrader();
-  if (Upgrader->upgraded()) {
-#ifdef DEBUG
-    Serial << endl << "Firmware is not up2date. Upgrading...";
-#endif
-    Upgrader->upgrade();
-#ifdef DEBUG
-    Serial << endl << "Firmware upgraded";
-#endif
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << "Firmware is up2date";
-  }
-#endif
-  delete Upgrader;
-  Upgrader = NULL;
 
-  /* Initializing relay */
-  initRelay();
+  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-  Serial << endl << "Relay(s) initialized";
+    Serial << "YES";
 #endif
+  } else {
+
+    /* Checking if the firmware has been upgraded. Potentially runs post upgrade
+     * code */
+#ifdef DEBUG
+    Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
+#endif
+    AFEUpgrader *Upgrader = new AFEUpgrader();
+    if (Upgrader->upgraded()) {
+#ifdef DEBUG
+      Serial << endl << "Firmware is not up2date. Upgrading...";
+#endif
+      Upgrader->upgrade();
+#ifdef DEBUG
+      Serial << endl << "Firmware upgraded";
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << "Firmware is up2date";
+    }
+#endif
+    delete Upgrader;
+    Upgrader = NULL;
+
+    /* Initializing relay */
+    initRelay();
+#ifdef DEBUG
+    Serial << endl << "Relay(s) initialized";
+#endif
+  }
 
   /* Initialzing network */
   Network.begin(Device.getMode(), &Device);
@@ -207,7 +218,8 @@ void setup() {
   }
 
   /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == MODE_ACCESS_POINT) {
+  if (Device.getMode() == MODE_ACCESS_POINT ||
+      Device.getMode() == MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
 #ifdef DEBUG
@@ -222,6 +234,10 @@ void setup() {
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
+  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
+    WebServer.onNotFound(handleOnNotFound);
+  }
+
   WebServer.begin(&Device);
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
@@ -315,7 +331,8 @@ void setup() {
 
 void loop() {
 
-  if (Device.getMode() != MODE_ACCESS_POINT) {
+  if (Device.getMode() == MODE_NORMAL ||
+      Device.getMode() == MODE_CONFIGURATION) {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
 

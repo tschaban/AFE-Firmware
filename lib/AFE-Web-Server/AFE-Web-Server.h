@@ -36,9 +36,6 @@ private:
                                          // configuration is refreshed. Required
                                          // by generate() method
 
-  /* Method pushes HTML site from WebServer */
-  void publishHTML(String page);
-
   /* Method gets url Option parameter value */
   String getOptionName();
 
@@ -103,11 +100,17 @@ private:
 public:
   AFEWebServer();
 
+  /* Method pushes HTML site from WebServer */
+  void publishHTML(String page);
+
   /* Method initialize WebServer and Updater server */
   void begin(AFEDevice *);
 
   /* Method listens for HTTP requests */
   void listener();
+
+  /* Method listens for onNotFound */
+  void onNotFound(ESP8266WebServer::THandlerFunction fn);
 
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);

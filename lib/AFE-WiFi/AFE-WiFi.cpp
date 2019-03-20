@@ -11,7 +11,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   AFEDataAccess Data;
   Device = _Device;
   WiFiMode = mode;
-  if (WiFiMode != MODE_ACCESS_POINT) {
+  if (WiFiMode == MODE_NORMAL || WiFiMode == MODE_CONFIGURATION) {
     networkConfiguration = Data.getNetworkConfiguration();
   }
 
@@ -24,7 +24,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #endif
 
   WiFi.hostname(Device->configuration.name);
-  if (WiFiMode == MODE_ACCESS_POINT) {
+  if (WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << "Starting HotSpot: ";
 #endif
@@ -34,7 +34,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
     WiFi.softAP(Device->configuration.name);
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-    dnsServer.start(53, "www.example.com", apIP);
+    dnsServer.start(53, "*", apIP);
 #ifdef DEBUG
     Serial << "completed";
 #endif
@@ -51,7 +51,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 }
 
 void AFEWiFi::listener() {
-  if (WiFiMode != MODE_ACCESS_POINT) {
+  if (!(WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
       if (sleepMode) {
         if (millis() - sleepStartTime >=
@@ -70,7 +70,7 @@ void AFEWiFi::listener() {
               Serial << endl
                      << "WiFI is not configured. Going to configuration mode";
 #endif
-              Device->reboot(MODE_ACCESS_POINT);
+              Device->reboot(MODE_NETWORK_NOT_SET);
             }
 
             WiFi.begin(networkConfiguration.ssid,

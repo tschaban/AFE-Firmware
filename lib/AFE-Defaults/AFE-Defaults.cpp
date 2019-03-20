@@ -54,7 +54,7 @@ void AFEDefaults::set() {
 #endif
 
   /* Setting device mode to Access Point */
-  Data->saveDeviceMode(MODE_ACCESS_POINT);
+  Data->saveDeviceMode(MODE_NETWORK_NOT_SET);
 
   sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
   firmwareConfiguration.type = FIRMWARE_TYPE;
@@ -264,6 +264,8 @@ void AFEDefaults::set() {
   SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = 0;
   SwitchConfiguration.relayID = 1;
+  SwitchConfiguration.domoticz.idx = 1;
+  SwitchConfiguration.mqtt.topic[0] = '\0';
   Data->saveConfiguration(0, SwitchConfiguration);
 
 #if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
@@ -414,7 +416,6 @@ void AFEDefaults::set() {
   Data->saveSystemLedID(1);
 #endif
 
-  Data->saveDeviceMode(2);
   Data->saveLanguage(1);
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
@@ -456,74 +457,6 @@ void AFEDefaults::eraseConfiguration() {
 #endif
   Eeprom.erase();
 }
-
-#ifdef CONFIG_HARDWARE_ADC_VCC
-void AFEDefaults::addAnalogInputDefaultConfiguration() {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-analog-input.json : ";
-#endif
-
-  File configFile = SPIFFS.open("/cfg-analog-input.json", "w");
-
-  if (configFile) {
-
-    configFile.print("{\"gpio\":17,\"interval\":60,\"numberOfSamples\":1,"
-                     "\"mqttTopic\":\"\\analogData\\\",\"maxVCC\":1,\"idx\":{"
-                     "\"raw\":0,\"percent\":0,\"voltage\":0}}");
-
-#ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
-#endif
-
-    configFile.close();
-
-#ifdef DEBUG
-    Serial << "success";
-#endif
-
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-}
-
-void AFEDefaults::addDeviceDefaultConfiguration() {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: device.json : ";
-#endif
-
-  File configFile = SPIFFS.open("/cfg-device.json", "w");
-
-  if (configFile) {
-    configFile.print("{\"isAnalogInput\":0}");
-
-#ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
-#endif
-
-    configFile.close();
-
-#ifdef DEBUG
-    Serial << "success";
-#endif
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-}
-#endif
 
 #ifdef CONFIG_HARDWARE_SPIFFS
 void AFEDefaults::formatSPIFFS() {

@@ -39,7 +39,7 @@
 
     #l {
       width: 300px;
-      background: #33363b;
+      background: #282828;
       color: #eee
     }
 
@@ -78,6 +78,10 @@
       padding: .2em 1em;
       color: #777;
       font-size: 95%
+    }
+
+    a {
+      color: #3366ff;
     }
 
     .cf label,
@@ -206,36 +210,30 @@
 </head>
 
 <body>
-  <img src="http://www.smartnydom.pl/wp-content/uploads/2019/01/afe-firmware-header.jpg" style="width: 100%; " alt="AFE Firmware">
+  <h3 class="la">AFE Firmware: T0-1.0.0</h3>
   <div id="c">
     <div id="r">
       <div class="ci">
-        <h1>Uruchom: Panel Konfiguracyjny</h1>
+        <h1>Konfiguracja sieci WiFI</h1>
         <p class="cd"></p>
-
         <fieldset>
-          <div class="cf"><input name="dn" type="text" placeholder="Hasło"></div>
-          <div class="cf"><input type="submit" class="b bs" value="Tryb normalny" /> <input type="submit" class="b be" value="Tryb HotSpot" /></div>
-          <span class="hint">Jeśli nie pamiętasz hasła, możesz zresetowac urządzenie wciskając przycisk na 30sek. Didoa mrugnie 3x</span>
+          <div class="cf"><label>Sieci WiFi</label><select>
+              <option>POLICJA: Posterunek</option>
+              <option>HUAWA: 1123123</option>
+              <option>Siec</option>
+            </select> <input type="submit" class="b bc" value="Odśwież" /></div>
+          <div class="cf"><label>Hasło</label><input name="dn" type="text" placeholder="Hasło"></div>
+          <div class="cf"><label>MAC adres</label><input type="text" value="AB:10:BE:F1:01" disabled="disabled"></div>
         </fieldset>
-
-
       </div>
-      <div class="ci">
-        <h1>Wsparcie</h1>
-        <p class="cd"></p>
-        <p class="cm">Oprogramowanie dostępne jest za darmo. Jeśli spełnia Twoje oczekiwania to postaw <a href="https://www.smartnydom.pl/o-stronie/" target="_blank" style="color:#00e">autorowi</a> browarka ;)</p>
-        <a href="https://pl.donate.afe-firmware.smartnydom.pl" target="_blank"><img src="http://adrian.czabanowski.com/afe/donation/T2/1.4.0/1rTA706u/" border="0" alt="PayPal"></a>
-      </div>
+      <div class="cf"><input type="submit" class="b be" value="Połącz" /></div>
     </div>
   </div>
-
-  <div class="la">
-    <a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img src="https://img.shields.io/badge/pomoc-forum-red.svg" alt="Forum" /></a>
-    <a href="http://www.smartnydom.pl/afe-firmware-pl/" target="_blank"><img src="https://img.shields.io/badge/pomoc-dokumentacja-green.svg" alt="Dokumentacja" /></a>
-    <a href="https://www.smartnydom.pl/afe-firmware-pl/log" target="_blank"><img src="https://img.shields.io/badge/wersja%20-%201.4.0%20[T2]-blue.svg" alt="T0-2.0.0" /></a>
-    <img src="https://img.shields.io/badge/UID-de12d--13df--saw3-yellow.svg" alt="UID" />
-    <img src="https://img.shields.io/badge/PRO-None-orange.svg" alt="PRO" /></div>
+  <h1 class="hint">
+    <a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank">Forum</a> |
+    <a href="http://www.smartnydom.pl/afe-firmware-pl/" target="_blank">Dokumentcja</a> |
+    <a href="https://www.smartnydom.pl/afe-firmware-pl/log" target="_blank">Wersja: T0-2.0.0</a> |
+    UID: 12345:12345</h1>
 </body>
 
 </html>

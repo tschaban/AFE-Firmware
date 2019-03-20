@@ -44,6 +44,10 @@ void AFEWebServer::handle(const char *uri,
   server.on(uri, handler);
 }
 
+void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
+  server.onNotFound(fn);
+}
+
 HTTPCOMMAND AFEWebServer::getHTTPCommand() {
   receivedHTTPCommand = false;
   return httpCommand;
@@ -150,25 +154,41 @@ void AFEWebServer::generate() {
         ConfigurationPanel.getAnalogInputConfigurationSite(command, data));
 #endif
   } else if (optionName == "exit") {
-    publishHTML(ConfigurationPanel.getSite(optionName, command, true));
+    publishHTML(ConfigurationPanel.getSite(optionName, command));
     Device->reboot(MODE_NORMAL);
   } else if (optionName == "reset") {
-    publishHTML(ConfigurationPanel.getSite(optionName, command, false));
+    publishHTML(ConfigurationPanel.getSite(optionName, command));
     if (command == 1) {
       Device->setDevice();
       server.client().stop();
-      Device->reboot(MODE_ACCESS_POINT);
+      ESP.restart();
     }
-  } else if (optionName == "help") {
-    publishHTML(ConfigurationPanel.getSite(
-        optionName, command, command == SERVER_CMD_NONE ? false : true));
-    if (command == 1) {
-      server.client().stop();
-      Device->reboot(MODE_CONFIGURATION);
-    } else if (command == 2) {
-      server.client().stop();
-      Device->reboot(MODE_ACCESS_POINT);
+  } else if (optionName == "index") {
+    PASSWORD data;
+    boolean authorize = true;
+    if (command != MODE_NORMAL) {
+      AFEDataAccess Data;
+      PASSWORD accessControl = Data.getPasswordConfiguration();
+      if (accessControl.protect) {
+        data = getPasswordData();
+        if (strcmp(accessControl.password, data.password) != 0) {
+          authorize = false;
+        }
+      }
+
+      if (authorize) {
+        if (command == 1) {
+          publishHTML(ConfigurationPanel.getSite("exit", MODE_CONFIGURATION));
+          server.client().stop();
+          Device->reboot(MODE_CONFIGURATION);
+        } else {
+          publishHTML(ConfigurationPanel.getSite("exit", MODE_ACCESS_POINT));
+          server.client().stop();
+          Device->reboot(MODE_ACCESS_POINT);
+        }
+      }
     }
+    publishHTML(ConfigurationPanel.getIndexSite(authorize));
 
 #ifdef CONFIG_HARDWARE_DS18B20
   } else if (optionName == "ds18b20") {
@@ -198,6 +218,20 @@ void AFEWebServer::generate() {
         optionName == "thermostat" ? THERMOSTAT_REGULATOR
                                    : HUMIDISTAT_REGULATOR));
 #endif
+
+  } else if (optionName == "start") {
+    NETWORK data;
+
+    if (command == SERVER_CMD_SAVE) {
+      data = getNetworkData();
+      AFEDataAccess Data;
+      Data.saveConfiguration(data);
+      publishHTML(ConfigurationPanel.getConnectingSite());
+      Device->reboot(MODE_CONFIGURATION);
+    } else {
+      publishHTML(
+          ConfigurationPanel.getFirstLaunchConfigurationSite(command, data));
+    }
 
   } else {
     for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
@@ -306,8 +340,10 @@ String AFEWebServer::getOptionName() {
       return server.arg("command");
 
     } else {
-      return "help";
+      return "index";
     }
+  } else if (Device->getMode() == MODE_NETWORK_NOT_SET) {
+    return "start";
   } else {
     if (server.hasArg("option")) {
       return server.arg("option");
@@ -416,39 +452,56 @@ NETWORK AFEWebServer::getNetworkData() {
     data.password[0] = '\0';
   }
 
-  if (server.arg("d").length() > 0) {
-    data.isDHCP = true;
-  } else {
-    data.isDHCP = false;
-  }
-
   if (server.arg("d1").length() > 0 && server.arg("d2").length() > 0 &&
       server.arg("d3").length() > 0 && server.arg("d4").length() > 0) {
 
     data.ip = IPAddress(server.arg("d1").toInt(), server.arg("d2").toInt(),
                         server.arg("d3").toInt(), server.arg("d4").toInt());
+  } else {
+    data.ip = IPAddress(0, 0, 0, 0);
   }
+
   if (server.arg("g1").length() > 0 && server.arg("g2").length() > 0 &&
       server.arg("g3").length() > 0 && server.arg("g4").length() > 0) {
 
     data.gateway =
         IPAddress(server.arg("g1").toInt(), server.arg("g2").toInt(),
                   server.arg("g3").toInt(), server.arg("g4").toInt());
+  } else {
+    data.gateway = IPAddress(0, 0, 0, 0);
   }
+
   if (server.arg("s1").length() > 0 && server.arg("s2").length() > 0 &&
       server.arg("s3").length() > 0 && server.arg("s4").length() > 0) {
 
     data.subnet = IPAddress(server.arg("s1").toInt(), server.arg("s2").toInt(),
                             server.arg("s3").toInt(), server.arg("s4").toInt());
+  } else {
+    data.subnet = IPAddress(255, 255, 255, 0);
   }
+
   if (server.arg("na").length() > 0) {
     data.noConnectionAttempts = server.arg("na").toInt();
+  } else {
+    data.noConnectionAttempts = 20;
   }
+
   if (server.arg("wc").length() > 0) {
     data.waitTimeConnections = server.arg("wc").toInt();
+  } else {
+    data.waitTimeConnections = 1;
   }
   if (server.arg("ws").length() > 0) {
     data.waitTimeSeries = server.arg("ws").toInt();
+  } else {
+    data.waitTimeSeries = 20;
+  }
+
+  if (server.arg("d").length() > 0 ||
+      (server.arg("d").length() == 0 && server.arg("ws").length() == 0)) {
+    data.isDHCP = true;
+  } else {
+    data.isDHCP = false;
   }
 
   return data;

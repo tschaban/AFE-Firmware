@@ -24,30 +24,70 @@ void AFEConfigurationPanel::begin(AFEDevice *_Device) {
   Site.begin(Device);
 }
 
-String AFEConfigurationPanel::getSite(const String option, uint8_t command,
-                                      boolean redirect) {
+String AFEConfigurationPanel::getFirstLaunchConfigurationSite(uint8_t command,
+                                                              NETWORK data) {
+  if (command == SERVER_CMD_SAVE) {
+#ifdef DEBUG
+    Serial << endl << "Saving network parameters";
+#endif
+  }
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateOneColumnLayout();
+  page += "<form action=\"/?option=start&cmd=1\" method=\"post\">";
+  page += Site.addFirstLaunchConfiguration();
+  page += "<input type=\"submit\" class=\"b bs\" value=\"";
+  page += L_CONNECT;
+  page += "\"></form>";
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getConnectingSite() {
+  String page;
+  NETWORK data;
+
+  page.reserve(siteBufferSize);
+  page = Site.generateOneColumnLayout();
+  page += Site.addConnectingSite();
+  page += Site.generateFooter();
+  return page;
+}
+
+String AFEConfigurationPanel::getSite(const String option, uint8_t command) {
 
   String page;
-  redirect ? page = Site.generateHeader(10) : page = Site.generateHeader(0);
 
   if (option == "upgrade") {
+    page += Site.generateTwoColumnsLayout(0);
     page += Site.addUpgradeSection();
   } else if (option == "reset") {
+    page += Site.generateOneColumnLayout(10);
     page += Site.addResetSection(command);
   } else if (option == "exit") {
-    page += Site.addExitSection();
-  } else if (option == "help") {
-    if (command == 0) {
-      page += Site.addHelpSection();
-    } else if (command == 1 || command == 2) {
-      page += Site.addExitSection();
-    }
+    page += Site.generateOneColumnLayout(10);
+    page += Site.addExitSection(command);
   } else {
     page += "<h1>Page Not Found</h1>";
   }
 
-  page += Site.generateFooter();
+  page +=
+      Site.generateFooter((option == "index" && command == 0) ? true : false);
   delay(10);
+  return page;
+}
+
+String AFEConfigurationPanel::getIndexSite(boolean authorized) {
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateOneColumnLayout(0);
+  page += "<form method=\"post\">";
+  page += Site.addIndexSection(authorized);
+  page += "</form>";
+  page += Site.generateFooter((Device->getMode() == MODE_NORMAL ||
+                               Device->getMode() == MODE_CONFIGURATION)
+                                  ? true
+                                  : false);
   return page;
 }
 
@@ -60,13 +100,10 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
   }
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=device&cmd=1\"  method=\"post\">";
   page += Site.addDeviceConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -78,13 +115,10 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
   }
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=network&cmd=1\"  method=\"post\">";
   page += Site.addNetworkConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -96,13 +130,10 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=mqtt&cmd=1\"  method=\"post\">";
   page += Site.addMQTTBrokerConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -115,13 +146,10 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=domoticz&cmd=1\" method=\"post\">";
   page += Site.addDomoticzServerConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -133,13 +161,10 @@ String AFEConfigurationPanel::getPasswordConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=password&cmd=1\" method=\"post\">";
   page += Site.addPasswordConfigurationSite();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -161,7 +186,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=led&cmd=1\"  method=\"post\">";
   for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
     if (Device->configuration.isLED[i]) {
@@ -171,11 +196,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
     }
   }
   page += Site.addSystemLEDConfiguration();
-
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -189,15 +210,12 @@ String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=relay";
   page += relayIndex;
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addRelayConfiguration(relayIndex);
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -211,7 +229,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=";
   page += regulatorType == THERMOSTAT_REGULATOR ? "thermostat" : "humidistat";
   page += "&cmd=1\"  method=\"post\">";
@@ -219,11 +237,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
   regulatorType == THERMOSTAT_REGULATOR
       ? page += Site.addRegulatorConfiguration(THERMOSTAT_REGULATOR)
       : page += Site.addRegulatorConfiguration(HUMIDISTAT_REGULATOR);
-
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -238,15 +252,12 @@ String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=switch";
   page += switchIndex;
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addSwitchConfiguration(switchIndex);
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -270,7 +281,7 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
 
 #ifdef CONFIG_HARDWARE_DS18B20
   page += "<form action=\"/?option=ds18b20&cmd=1\"  method=\"post\">";
@@ -279,10 +290,7 @@ String AFEConfigurationPanel::getDS18B20ConfigurationSite(uint8_t command,
   page += "<form action=\"/?option=DHT&cmd=1\"  method=\"post\">";
   page += Site.addDHTConfiguration();
 #endif
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -295,15 +303,12 @@ String AFEConfigurationPanel::getPIRConfigurationSite(const String option,
     Data.saveConfiguration(PIRIndex, data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=pir";
   page += PIRIndex;
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addPIRConfiguration(PIRIndex);
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -320,15 +325,12 @@ String AFEConfigurationPanel::getContactronConfigurationSite(
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=contactron";
   page += contactronIndex;
   page += "&cmd=1\"  method=\"post\">";
   page += Site.addContactronConfiguration(contactronIndex);
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 
@@ -341,13 +343,10 @@ String AFEConfigurationPanel::getGateConfigurationSite(const String option,
 
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=gate&cmd=1\"  method=\"post\">";
   page += Site.addGateConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -359,13 +358,10 @@ String AFEConfigurationPanel::getSerialPortConfigurationSite(uint8_t command,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=UART&cmd=1\"  method=\"post\">";
   page += Site.addSerialPortConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -378,13 +374,10 @@ AFEConfigurationPanel::getHPMA115S0SensorConfigurationSite(uint8_t command,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=HPMA115S0&cmd=1\"  method=\"post\">";
   page += Site.addHPMA115S0Configuration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -396,13 +389,10 @@ String AFEConfigurationPanel::getBMx80SensorConfigurationSite(uint8_t command,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=BMx80&cmd=1\"  method=\"post\">";
   page += Site.addBMx80Configuration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -414,13 +404,10 @@ String AFEConfigurationPanel::getBH1750SensorConfigurationSite(uint8_t command,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=BH1750&cmd=1\"  method=\"post\">";
   page += Site.addBH1750Configuration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+  page += generateFooter();
   return page;
 }
 #endif
@@ -432,13 +419,10 @@ String AFEConfigurationPanel::getAnalogInputConfigurationSite(uint8_t command,
     Data.saveConfiguration(data);
   }
 
-  String page = Site.generateHeader();
+  String page = Site.generateTwoColumnsLayout();
   page += "<form action=\"/?option=analogInput&cmd=1\"  method=\"post\">";
   page += Site.addAnalogInputConfiguration();
-  page += "<input type=\"submit\" class=\"b bs\" value=\"";
-  page += L_SAVE;
-  page += "\"></form>";
-  page += Site.generateFooter();
+
   return page;
 }
 #endif
@@ -446,7 +430,7 @@ String AFEConfigurationPanel::getAnalogInputConfigurationSite(uint8_t command,
 String AFEConfigurationPanel::firmwareUpgradeSite() {
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader();
+  page = Site.generateTwoColumnsLayout();
   page += "<form method=\"post\" action=\"\" "
           "enctype=\"multipart/form-data\">";
   page += Site.addUpgradeSection();
@@ -458,8 +442,16 @@ String AFEConfigurationPanel::firmwareUpgradeSite() {
 String AFEConfigurationPanel::postFirmwareUpgradeSite(boolean status) {
   String page;
   page.reserve(siteBufferSize);
-  page = Site.generateHeader(15);
+  page = Site.generateOneColumnLayout(15);
   page += Site.addPostUpgradeSection(status);
   page += Site.generateFooter();
   return page;
+}
+
+const String AFEConfigurationPanel::generateFooter() {
+  String body = "<input type=\"submit\" class=\"b bs\" value=\"";
+  body += L_SAVE;
+  body += "\"></form>";
+  body += Site.generateFooter();
+  return body;
 }

@@ -32,11 +32,6 @@ private:
 public:
   AFEDefaults();
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-  void addAnalogInputDefaultConfiguration();
-  void addDeviceDefaultConfiguration();
-#endif
-
   void addDomoticzConfiguration();
 #ifdef CONFIG_HARDWARE_LED
   void addLEDConfiguration(uint8_t id, uint8_t gpio);

@@ -16,6 +16,8 @@ ESP8266HTTPUpdateServer::ESP8266HTTPUpdateServer(bool serial_debug) {
   _username = NULL;
   _password = NULL;
   _authenticated = false;
+  Device.begin();
+  ConfigurationPanel.begin(&Device);
 }
 
 void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
@@ -30,8 +32,16 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
     if (_username != NULL && _password != NULL &&
         !_server->authenticate(_username, _password))
       return _server->requestAuthentication();
-
-    _server->send(200, "text/html", ConfigurationPanel.firmwareUpgradeSite());
+#ifdef DEBUG
+    Serial << endl
+           << "Firmware upgrade. Device is in mode:  " << Device.getMode();
+#endif
+    if (Device.getMode() == MODE_ACCESS_POINT ||
+        Device.getMode() == MODE_CONFIGURATION) {
+      _server->send(200, "text/html", ConfigurationPanel.firmwareUpgradeSite());
+    } else {
+      _server->send(200, "text/html", ConfigurationPanel.getIndexSite(true));
+    }
   });
 
   // handler for the /update form POST (once file upload finishes)
@@ -54,14 +64,13 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
 
         if (upload.status == UPLOAD_FILE_START) {
           _updaterError = String();
-          if (_serial_output)
-            Serial.setDebugOutput(true);
 
           _authenticated = (_username == NULL || _password == NULL ||
                             _server->authenticate(_username, _password));
           if (!_authenticated) {
-            if (_serial_output)
-              Serial.printf("Unauthenticated Update\n");
+#ifdef DEBUG
+            Serial << endl << "Unauthenticated Update";
+#endif
             return;
           }
 
@@ -85,18 +94,19 @@ void ESP8266HTTPUpdateServer::setup(ESP8266WebServer *server, const char *path,
                    !_updaterError.length()) {
           if (Update.end(true)) { // true to set the size to the current
                                   // progress
-            if (_serial_output)
-              Serial.printf("Update Success: %u\nRebooting...\n",
-                            upload.totalSize);
+#ifdef DEBUG
+            Serial << endl
+                   << "Update Success: %u"
+                   << "Rebooting... [" << upload.totalSize << "]";
+#endif
           } else {
             _setUpdaterError();
           }
-          if (_serial_output)
-            Serial.setDebugOutput(false);
         } else if (_authenticated && upload.status == UPLOAD_FILE_ABORTED) {
           Update.end();
-          if (_serial_output)
-            Serial.println("Update was aborted");
+#ifdef DEBUG
+          Serial << endl << "Update was aborted";
+#endif
         }
         delay(0);
       });

@@ -26,6 +26,8 @@ private:
   AFEDevice *Device;
   uint16_t siteBufferSize = 7500;
 
+  const String generateFooter();
+
 public:
   /* Constructor */
   AFEConfigurationPanel();
@@ -33,7 +35,10 @@ public:
   void begin(AFEDevice *);
 
   /* It returns configuration site */
-  String getSite(const String option, uint8_t command, boolean data);
+  String getFirstLaunchConfigurationSite(uint8_t command, NETWORK data);
+  String getConnectingSite();
+  String getIndexSite(boolean authorized);
+  String getSite(const String option, uint8_t command);
   String getDeviceConfigurationSite(uint8_t command, DEVICE data);
   String getNetworkConfigurationSite(uint8_t command, NETWORK data);
   String getMQTTConfigurationSite(uint8_t command, MQTT data);

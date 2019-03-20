@@ -71,10 +71,12 @@
   "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
 
 /* Form: network configuration */
+#define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
 #define L_NETWORK_CONFIGURATION_INFO                                               \
   "Urządzenie bez dostępu do sieci będzie działać tylko w trybie sterowania " \
   "ręcznego"
 #define L_SSID "Nazwa sieci WiFi"
+#define L_REFRESH "Odśwież"
 #define L_DHCP_ENABLED "Konfiguracja przez DHCP"
 #define L_GATEWAY "Bramka"
 #define L_SUBNET "Maska sieci"
@@ -86,6 +88,14 @@
 #define L_TIME_BETWEEN_CONNECTIONS "Czas między próbami łączenia się"
 #define L_SLEEP_TIME "Czas po jakim powtórzyć próby łączenia się"
 #define L_ADVANCED "Zaawansowane"
+#define L_DEVICE_CONNECTS "Urządzenie łaczy się z siecią"
+#define L_CONNECT_TO "Połącz się z siecią WiFi"
+#define L_CONNECT "Połącz"
+#define L_SEARCH_FOR_IP_ADDRESS                                                \
+  "Następnie w konfigurację routera WiFi, wyszukaj adres IP urządzenia o "  \
+  "adresie MAC"
+#define L_FINISH_NETWORK_CONFIGURATION                                         \
+  "Dokończ konfigurację wpisująć adres IP urządzenia w przeglądarce"
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat wiadomości MQTT"
@@ -177,7 +187,7 @@
 #define L_UPGRADE_FAILED "Aktualizacja nie powiodła się"
 #define L_UPGRADE_SUCCESSFUL "Aktualizacja zakończona pomyślnie"
 #define L_DEVICE_WILL_BE_REBOOTED                                              \
-  "Po 15 sekundach przełącznik zostanie przeładowany. Proszę czekać"
+  "Po 15 sekundach oprogramowanie zostanie przeładowane. Proszę czekać"
 #define L_RESTORE_DEFAULT_SETTINGS "Przywróć ustawienia początkowe"
 #define L_WARNING "Uwaga"
 #define L_CONFIGURATION_WILL_BE_REMOVED                                            \
@@ -191,15 +201,14 @@
 #define L_RESTORING_DEFAULT_SETTING "Przywracanie ustawień początkowych"
 #define L_REBOOT_IN_PROGRESS "Trwa restart urządzenia"
 #define L_SITE_WILL_BE_RELOADED                                                \
-  "Strona zostanie przeładowana automatycznie... czeka"
+  "Strona zostanie przeładowana automatycznie... czekaj"
 #define L_REBOOT "Restart urządzenia"
 
 /* Form: password */
 #define L_SET_PASSWORD "Ustaw hasło"
 #define L_SET_PASSWORD_TO_PANEL "Ustaw hasło do Panelu Konfiguracyjnego"
 #define L_SET_PASSWORD_INFO                                                    \
-  "Jeśli zapomnisz hasło, możesz jedynie zresetować oprogramowanie, aby "  \
-  "dostać się do Panelu Konfiguracyjnego."
+  "Jeśli nie pamiętasz hasła, zresetuj urządzenie do stanu początkowego"
 #define L_PROTECT_BY_PASSWORD "Zabezpiecz hasłem"
 
 #endif

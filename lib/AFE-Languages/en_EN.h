@@ -73,9 +73,11 @@
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
 
 /* Form: network configuration */
+#define L_NETWORK_CONFIGURATION "WiFi Configuration"
 #define L_NETWORK_CONFIGURATION_INFO                                           \
   "Device without connection to network will only work in manual mode"
 #define L_SSID "WiFi name"
+#define L_REFRESH "Refresh"
 #define L_DHCP_ENABLED "Configuration over DHCP"
 #define L_GATEWAY "Gateway"
 #define L_SUBNET "Subnet"
@@ -86,6 +88,14 @@
 #define L_TIME_BETWEEN_CONNECTIONS "Time between connections' attempts"
 #define L_SLEEP_TIME "Sleep time before next connection attempts"
 #define L_ADVANCED "Advanced"
+#define L_DEVICE_CONNECTS "Device is connecting to"
+#define L_CONNECT_TO "Connect to"
+#define L_CONNECT "Connect"
+#define L_SEARCH_FOR_IP_ADDRESS                                                \
+  "In your WiFi router look for an IP address of a device with follwing MAC "  \
+  "address"
+#define L_FINISH_NETWORK_CONFIGURATION                                         \
+  "Finish configuration by entering device IP address in the browser"
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "MQTT Topic"
@@ -173,7 +183,7 @@
 #define L_UPGRADE_FAILED "Upgrade failed"
 #define L_UPGRADE_SUCCESSFUL "Upgrade finished succesfully"
 #define L_DEVICE_WILL_BE_REBOOTED                                              \
-  "After 15s device will be rebooted. Please wait"
+  "After 15s the device will be rebooted. Please wait"
 #define L_RESTORE_DEFAULT_SETTINGS "Restore default settings"
 #define L_WARNING "Warning"
 #define L_CONFIGURATION_WILL_BE_REMOVED                                        \
@@ -192,8 +202,7 @@
 #define L_SET_PASSWORD "Set password"
 #define L_SET_PASSWORD_TO_PANEL "Set password to the Configuration Panel"
 #define L_SET_PASSWORD_INFO                                                    \
-  "If you forgot the password you can only reset the device to it's default "  \
-  "state to access to the Configuration Panel."
+  "If you don't remember the password, reset the device to its default state"
 #define L_PROTECT_BY_PASSWORD "Protect by password"
 
 #endif

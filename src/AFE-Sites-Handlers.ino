@@ -17,4 +17,11 @@ void handleFavicon() {}
 /* Method handles all HTTP request */
 void handleHTTPRequests() { WebServer.generate(); }
 
+void handleOnNotFound() {
+  WebServer.publishHTML("<head><meta http-equiv=\"refresh\" content=\"0; "
+                        "url=http://192.168.5.1/\" "
+                        "/></head><body><p>Otwieram panel konfiguracyjny AFE "
+                        "Firmware...</p></body>");
+}
+
 #endif

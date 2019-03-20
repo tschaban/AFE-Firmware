@@ -11,6 +11,7 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-CSS.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
@@ -41,6 +42,8 @@ private:
   AFEDataAccess Data;
   AFEDevice *Device;
   FIRMWARE firmware;
+
+  const String generateHeader(uint8_t redirect);
 
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
@@ -80,14 +83,17 @@ public:
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  const String generateHeader(uint8_t redirect = 0);
+  const String generateOneColumnLayout(uint8_t redirect = 0);
+  const String generateTwoColumnsLayout(uint8_t redirect = 0);
 
   /* Method generates site footer */
-  const char *generateFooter();
+  const String generateFooter(boolean extended = false);
 
   /* All following methods generates configuration sections */
   String addDeviceConfiguration();
   String addNetworkConfiguration();
+  String addFirstLaunchConfiguration();
+  String addConnectingSite();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
   String addPasswordConfigurationSite();
@@ -152,10 +158,10 @@ public:
   String addResetSection(uint8_t command);
 
   /* Method addes info that device is being reset */
-  String addExitSection();
+  String addExitSection(uint8_t command);
 
   /* Method generates section shown when device is in norma mode */
-  String addHelpSection();
+  String addIndexSection(boolean authorized);
 };
 
 #endif

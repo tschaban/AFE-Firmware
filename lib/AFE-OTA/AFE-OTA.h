@@ -21,11 +21,14 @@
 
 #include "StreamString.h"
 #include <AFE-Configuration-Panel.h>
-
+#include <AFE-Device.h>
 #include <ESP8266WebServer.h>
 #include <WiFiClient.h>
 #include <WiFiServer.h>
 #include <WiFiUdp.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class ESP8266WebServer;
 
@@ -58,6 +61,7 @@ private:
   bool _authenticated;
   String _updaterError;
   AFEConfigurationPanel ConfigurationPanel;
+  AFEDevice Device;
 };
 
 #endif

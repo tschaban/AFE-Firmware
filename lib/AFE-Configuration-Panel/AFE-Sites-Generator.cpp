@@ -23,281 +23,269 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += firmware.version;
   page += " [T";
   page += firmware.type;
-  page +=
-      "]</title>"
-      "<style>#l,#r{padding:20px}.ltag,.ltit,body{margin:0}.b,.itm "
-      "a,a{text-decoration:none}body{background:#ddd;padding:15px}#c{display:"
-      "table;width:100%}#l,#r{display:table-cell}#l{width:300px;background:#"
-      "282828;color:#eee}#r{background:#eee}a,button,h1,h3,h4,input,label,li,p,"
-      "span{font-family:sans-serif}.ltag{font-weight:300;color:#b0cadb;margin-"
-      "bottom:20px}.lst{list-style:none;margin:0;padding:0}.itm "
-      "a{display:block;white-space:nowrap;padding:.2em "
-      "1em;color:#777;font-size:95%}.cf "
-      "label,.hint,input,select{display:inline-block;vertical-align:middle}."
-      "itm a:focus,.itm "
-      "a:hover{background-color:#eee;text-decoration:none;padding:.2em "
-      "1.5em;color:#000}.ci{margin-bottom:2em}.ci "
-      "h1{color:#aaa;border-bottom:1px solid "
-      "#ddd;font-size:110%;font-weight:500;letter-spacing:.1em}.ci "
-      ".cd{color:#444;line-height:1.8em;font-size:80%;font-style:italic}.cm{"
-      "color:#999;font-size:90%;margin:0 0 20px}.la{margin:0 .1em;padding:.3em "
-      "1em;color:#fff;background:#999;font-size:80%}.cc label,.cf "
-      "label{font-size:.875em}.lr{background:#ca3c3c}.bs,.lg{background:#"
-      "2fb548}fieldset{margin:0;padding:.35em 0 "
-      ".75em;border:0}.cf{margin-bottom:.5em}.cc{margin:1em 0 .5em 9.4em}.cf "
-      "label{text-align:right;width:10em;margin:0 1em 0 "
-      "0}input,select{padding:.5em .6em;border:1px solid "
-      "#ccc;box-sizing:border-box}.hint{padding-left:.3em;color:#aaa;font-size:"
-      "80%}.b{font-size:100%;padding:.5em 1em;border:1px solid "
-      "#999;border:transparent;color:#fff}.be{background:#ca3c3c}.bw{"
-      "background:#df7514}.bc{background:#42b8dd}.b:focus,.b:hover{filter:"
-      "alpha(opacity=90);background-image:-webkit-linear-gradient(transparent,"
-      "rgba(0,0,0,.05) "
-      "40%,rgba(0,0,0,.1));background-image:linear-gradient(transparent,rgba(0,"
-      "0,0,.05) 40%,rgba(0,0,0,.1))}</style>"
-      "</head>"
-      "<body>"
-      "<div id=\"c\">"
-      "<div id=\"l\">"
-      "<h3 class=\"ltit\">AFE FIRMWARE</h3>"
-      "<h4 class=\"ltag\">";
+  page += "]</title><style>";
+  page += AFE_CSS;
+  page += "</style></head><body>";
+
+  if (Device->getMode() == MODE_CONFIGURATION ||
+      Device->getMode() == MODE_NORMAL) {
+    page += "<img "
+            "src=\"http://www.smartnydom.pl/wp-content/uploads/2019/01/"
+            "afe-firmware-header.jpg\" style=\"width: 100%;display: block\" "
+            "alt=\"AFE "
+            "Firmware\">";
+  }
+
+  page += "<div id=\"c\">";
+
+  return page;
+}
+
+const String AFESitesGenerator::generateOneColumnLayout(uint8_t redirect) {
+  String page = generateHeader(redirect);
+  page += "<div id=\"r\">";
+  return page;
+}
+
+const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
+  String page = generateHeader(redirect);
+
+  page += "<div id=\"l\">";
+  if (Device->getMode() == MODE_ACCESS_POINT) {
+    "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
+  }
+  page += "<h4 class=\"ltag\">";
   page += L_FIRMWARE_NAME;
   page += "</h4><h4>MENU</h4><ul class=\"lst\">";
-  if (Device->getMode() != MODE_NORMAL) {
-    Device->begin(); // Reading configuration data
-    page += "<li class=\"itm\"><a href=\"\\?option=device\">";
-    page += L_DEVICE;
-    page += "</a></li><li class=\"itm\"><a href=\"\\?option=network\">";
-    page += L_NETWORK;
+
+  Device->begin(); // Reading configuration data
+  page += "<li class=\"itm\"><a href=\"\\?option=device\">";
+  page += L_DEVICE;
+  page += "</a></li><li class=\"itm\"><a href=\"\\?option=network\">";
+  page += L_NETWORK;
+  page += "</a></li>";
+  if (Device->configuration.api.mqtt) {
+    page += "<li class=\"itm\"><a href=\"\\?option=mqtt\">";
+    page += L_MQTT_BROKER;
     page += "</a></li>";
-    if (Device->configuration.api.mqtt) {
-      page += "<li class=\"itm\"><a href=\"\\?option=mqtt\">";
-      page += L_MQTT_BROKER;
+  }
+  if (Device->configuration.api.domoticz) {
+    page += "<li class=\"itm\"><a href=\"\\?option=domoticz\">";
+    page += L_DOMOTICZ_SERVER;
+    page += "</a></li>";
+  }
+
+  uint8_t itemPresent = 0;
+
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+    if (Device->configuration.isLED[i]) {
+      itemPresent++;
+    } else {
+      break;
+    }
+  }
+
+  if (itemPresent > 0) {
+    page += "<li class=\"itm\"><a href=\"\\?option=led\">";
+    page += L_LEDS;
+    page += "</a></li>";
+  }
+
+  /* Relay */
+  itemPresent = 0;
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+    if (Device->configuration.isRelay[i]) {
+      itemPresent++;
+    } else {
+      break;
+    }
+  }
+
+  if (itemPresent > 0) {
+    page += "<li  class=\"itm\"><a><i>";
+    page += L_RELAYS_CONFIGURATION;
+    page += "</i></a></li>";
+
+    for (uint8_t i = 0; i < itemPresent; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?option=relay";
+      page += i;
+      page += "\">&#8227; ";
+      page += L_RELAY;
+      page += ": ";
+      page += i + 1;
       page += "</a></li>";
-    }
-    if (Device->configuration.api.domoticz) {
-      page += "<li class=\"itm\"><a href=\"\\?option=domoticz\">";
-      page += L_DOMOTICZ_SERVER;
-      page += "</a></li>";
-    }
-
-    uint8_t itemPresent = 0;
-
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
-      if (Device->configuration.isLED[i]) {
-        itemPresent++;
-      } else {
-        break;
-      }
-    }
-
-    if (itemPresent > 0) {
-      page += "<li class=\"itm\"><a href=\"\\?option=led\">";
-      page += L_LEDS;
-      page += "</a></li>";
-    }
-
-    /* Relay */
-    itemPresent = 0;
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
-      if (Device->configuration.isRelay[i]) {
-        itemPresent++;
-      } else {
-        break;
-      }
-    }
-
-    if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a><i>";
-      page += L_RELAYS_CONFIGURATION;
-      page += "</i></a></li>";
-
-      for (uint8_t i = 0; i < itemPresent; i++) {
-        page += "<li class=\"itm\"><a href=\"\\?option=relay";
-        page += i;
-        page += "\">&#8227; ";
-        page += L_RELAY;
-        page += ": ";
-        page += i + 1;
-        page += "</a></li>";
 
 /* Thermostat */
 #if defined(CONFIG_HARDWARE_DS18B20) && defined(CONFIG_FUNCTIONALITY_THERMOSTAT)
-        if (Device->configuration.isDS18B20) {
-          page += addThermostateMenuItem();
-        }
+      if (Device->configuration.isDS18B20) {
+        page += addThermostateMenuItem();
+      }
 #endif
 
 /* Humidistat */
 #if defined(CONFIG_HARDWARE_DHXX) && defined(CONFIG_FUNCTIONALITY_HUMIDISTAT)
-        if (Device->configuration.isDHT) {
-          page += addThermostateMenuItem();
-          page += addHumidistatMenuItem();
-        }
+      if (Device->configuration.isDHT) {
+        page += addThermostateMenuItem();
+        page += addHumidistatMenuItem();
+      }
 #endif
-      }
     }
+  }
 
-    /* Switch */
-    itemPresent = 0;
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
-      if (Device->configuration.isSwitch[i]) {
-        itemPresent++;
-      } else {
-        break;
-      }
+  /* Switch */
+  itemPresent = 0;
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+    if (Device->configuration.isSwitch[i]) {
+      itemPresent++;
+    } else {
+      break;
     }
+  }
 
-    if (itemPresent > 0) {
-      page += "<li  class=\"itm\"><a><i>";
-      page += L_BUTTONS_SWITCHES;
-      page += "</i></a></li>";
+  if (itemPresent > 0) {
+    page += "<li  class=\"itm\"><a><i>";
+    page += L_BUTTONS_SWITCHES;
+    page += "</i></a></li>";
 
-      for (uint8_t i = 0; i < itemPresent; i++) {
-        page += "<li class=\"itm\"><a href=\"\\?option=switch";
+    for (uint8_t i = 0; i < itemPresent; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?option=switch";
+      page += i;
+      page += "\">&#8227; ";
+      page += L_SWITCH;
+      page += ": ";
+      page += i + 1;
+      page += "</a></li>";
+    }
+  }
+
+/* Pir */
+#if defined(T3_CONFIG)
+  itemPresent = 0;
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
+    if (Device->configuration.isPIR[i]) {
+      itemPresent++;
+    } else {
+      break;
+    }
+  }
+
+  if (itemPresent > 0) {
+    page += "<li class=\"itm\"><a><i>Konfiguracja czujników ruchu "
+            "(PIR)</i></a></li>";
+    for (uint8_t i = 0; i < 4; i++) {
+      if (Device->configuration.isPIR[i]) {
+        page += "<li class=\"itm\"><a href=\"\\?option=pir";
         page += i;
-        page += "\">&#8227; ";
-        page += L_SWITCH;
-        page += ": ";
+        page += "\">&#8227; Czujnik: ";
         page += i + 1;
         page += "</a></li>";
       }
     }
-
-    /* Pir */
-#if defined(T3_CONFIG)
-    itemPresent = 0;
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
-      if (Device->configuration.isPIR[i]) {
-        itemPresent++;
-      } else {
-        break;
-      }
-    }
-
-    if (itemPresent > 0) {
-      page += "<li class=\"itm\"><a><i>Konfiguracja czujników ruchu "
-              "(PIR)</i></a></li>";
-      for (uint8_t i = 0; i < 4; i++) {
-        if (Device->configuration.isPIR[i]) {
-          page += "<li class=\"itm\"><a href=\"\\?option=pir";
-          page += i;
-          page += "\">&#8227; Czujnik: ";
-          page += i + 1;
-          page += "</a></li>";
-        }
-      }
-    }
+  }
 
 #endif
 
 /* Contactrons and Gate */
 #if defined(T5_CONFIG)
-    itemPresent = 0;
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
-      if (Device->configuration.isContactron[i]) {
-        itemPresent++;
-      } else {
-        break;
-      }
+  itemPresent = 0;
+  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
+    if (Device->configuration.isContactron[i]) {
+      itemPresent++;
+    } else {
+      break;
     }
+  }
 
-    if (itemPresent > 0) {
-      page += "<li class=\"itm\"><a><i>";
-      page += language == 0 ? "Czujniki magnetyczne" : "Magnetic sensors";
-      page += "</i></a></li>";
-      for (uint8_t i = 0; i < itemPresent; i++) {
-        page += "<li class=\"itm\"><a href=\"\\?option=contactron";
-        page += i;
-        page += "\"> - ";
-        page += language == 0 ? "Czujnik: " : "Sensor: ";
-        page += i + 1;
-        page += "</a></li>";
-      }
-
-      page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
-      page +=
-          language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
+  if (itemPresent > 0) {
+    page += "<li class=\"itm\"><a><i>";
+    page += language == 0 ? "Czujniki magnetyczne" : "Magnetic sensors";
+    page += "</i></a></li>";
+    for (uint8_t i = 0; i < itemPresent; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?option=contactron";
+      page += i;
+      page += "\"> - ";
+      page += language == 0 ? "Czujnik: " : "Sensor: ";
+      page += i + 1;
       page += "</a></li>";
     }
+
+    page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
+    page +=
+        language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
+    page += "</a></li>";
+  }
 #endif
 
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_DS18B20
-    if (Device->configuration.isDS18B20) {
-      page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
-      page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
-      page += "</a></li>";
-    }
+  if (Device->configuration.isDS18B20) {
+    page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
+    page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
+    page += "</a></li>";
+  }
 #endif
 
 /* Sensor DHxx */
 #ifdef CONFIG_HARDWARE_DHXX
-    if (Device->configuration.isDHT) {
-      page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
-      page += language == 0 ? "Czujnik DHT" : "DHT sensor";
-      page += "</a></li>";
-    }
+  if (Device->configuration.isDHT) {
+    page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
+    page += language == 0 ? "Czujnik DHT" : "DHT sensor";
+    page += "</a></li>";
+  }
 #endif
 
 /* UART */
 #ifdef CONFIG_HARDWARE_UART
-    page += "<li class=\"itm\"><a href=\"\\?option=HPMA115S0\">";
+  page += "<li class=\"itm\"><a href=\"\\?option=HPMA115S0\">";
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
-    if (Device->configuration.isHPMA115S0) {
-      page += "<li class=\"itm\"><a href=\"\\?option=UART\">UART</a></li>";
+  if (Device->configuration.isHPMA115S0) {
+    page += "<li class=\"itm\"><a href=\"\\?option=UART\">UART</a></li>";
 
-      page += language == 0 ? "Czujnik cząstek PM2.5/PM10"
-                            : "PM2.5/PM10 Particle Sensor";
-      page += "</a></li>";
-    }
+    page += language == 0 ? "Czujnik cząstek PM2.5/PM10"
+                          : "PM2.5/PM10 Particle Sensor";
+    page += "</a></li>";
+  }
 #endif
 
 #ifdef CONFIG_HARDWARE_BMX80
-    if (Device->configuration.isBMx80 != 0) {
-      page += "<li class=\"itm\"><a href=\"\\?option=BMx80\">";
-      page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
-      page += "</a></li>";
-    }
+  if (Device->configuration.isBMx80 != 0) {
+    page += "<li class=\"itm\"><a href=\"\\?option=BMx80\">";
+    page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
+    page += "</a></li>";
+  }
 #endif
 
 #ifdef CONFIG_HARDWARE_BH1750
-    if (Device->configuration.isBH1750) {
-      page += "<li class=\"itm\"><a href=\"\\?option=BH1750\">";
-      page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
-      page += "</a></li>";
-    }
+  if (Device->configuration.isBH1750) {
+    page += "<li class=\"itm\"><a href=\"\\?option=BH1750\">";
+    page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
+    page += "</a></li>";
+  }
 #endif
 
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    if (Device->configuration.isAnalogInput) {
-      page += "<li class=\"itm\"><a href=\"\\?option=analogInput\">";
-      page += L_ANALOG_INPUT;
-      page += "</a></li>";
-    }
+  if (Device->configuration.isAnalogInput) {
+    page += "<li class=\"itm\"><a href=\"\\?option=analogInput\">";
+    page += L_ANALOG_INPUT;
+    page += "</a></li>";
+  }
 #endif
 
-    page += "<br><li class=\"itm\"><a href=\"\\?option=password\">";
-    page += L_SET_PASSWORD;
-    page += "</a></li>";
+  page += "<br><li class=\"itm\"><a href=\"\\?option=password\">";
+  page += L_SET_PASSWORD;
+  page += "</a></li>";
 
-    /* Language, Upgrade, Exit */
-    page += "<br><li class=\"itm\"><a href=\"\\update\">";
-    page += L_FIRMWARE_UPGRADE;
-    page += "</a></li><li class=\"itm\"><a href=\"\\?option=reset\">";
-    page += L_RESET_DEVICE;
-    page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=exit\">";
-    page += L_FINISH_CONFIGURATION;
-  } else {
-    /* Settings, Access Point */
-    page += "<li class=\"itm\"><a href=\"\\?option=help&cmd=1\">";
-    page += L_SETTINGS;
-    page += "</a></li><li class=\"itm\"><a href=\"\\?option=help&cmd=2\">";
-    page += L_SETTINGS_HOT_SPOT;
-  }
+  /* Language, Upgrade, Exit */
+  page += "<br><li class=\"itm\"><a href=\"\\update\">";
+  page += L_FIRMWARE_UPGRADE;
+  page += "</a></li><li class=\"itm\"><a href=\"\\?option=reset\">";
+  page += L_RESET_DEVICE;
+  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=exit\">";
+  page += L_FINISH_CONFIGURATION;
+
   /* Information section */
   page += "</a></li></ul><br><br><h4>";
   page += L_INFORMATION;
@@ -309,25 +297,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += "</a></li></ul></div><div id=\"r\">";
 
   return page;
-}
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
-String AFESitesGenerator::addThermostateMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
-  page += language == 0 ? "Termostat" : "Thermostat";
-  page += "</a></li>";
   return page;
 }
-#endif
-
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
-String AFESitesGenerator::addHumidistatMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?option=humidistat\">&#8227; ";
-  page += language == 0 ? "Regulator wilgotności" : "Humidistat";
-  page += "</a></li>";
-  return page;
-}
-#endif
 
 String AFESitesGenerator::addDeviceConfiguration() {
   DEVICE configuration = Device->configuration;
@@ -543,6 +515,55 @@ String AFESitesGenerator::addDeviceConfiguration() {
   return page;
 }
 
+String AFESitesGenerator::addFirstLaunchConfiguration() {
+  String body = "<fieldset><div class=\"cf\"><label>";
+  body += L_SSID;
+  body += "</label><select name=\"s\">";
+#ifdef DEBUG
+  Serial << endl << "Searching for WiFi networks: ";
+#endif
+  int numberOfNetworks = WiFi.scanNetworks();
+  for (int i = 0; i < numberOfNetworks; i++) {
+    body += "<option>";
+    body += WiFi.SSID(i);
+    body += "</option>";
+  }
+#ifdef DEBUG
+  Serial << "Completed";
+#endif
+
+  body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
+  body += L_REFRESH;
+  body +=
+      "\" formaction=\"/?option=start&cmd=0\"></div><div class=\"cf\"><label>";
+  body += L_PASSWORD;
+  body += "</label><input name=\"p\" type=\"text\" /></div></fieldset>";
+
+  return addConfigurationBlock(L_NETWORK_CONFIGURATION, "", body);
+}
+
+String AFESitesGenerator::addConnectingSite() {
+  NETWORK configuration = Data.getNetworkConfiguration();
+  String body = "<p>";
+  body += L_DEVICE_CONNECTS;
+  body += ": <strong>";
+  body += configuration.ssid;
+  body += "</strong> [";
+  body += configuration.password;
+  body += "]</p><ul><li>";
+  body += L_CONNECT_TO;
+  body += ": ";
+  body += configuration.ssid;
+  body += "</li><li>";
+  body += L_SEARCH_FOR_IP_ADDRESS;
+  body += ": ";
+  body += WiFi.macAddress();
+  body += "</li><li>";
+  body += L_FINISH_NETWORK_CONFIGURATION;
+  body += "</li></ul>";
+  return body;
+}
+
 String AFESitesGenerator::addNetworkConfiguration() {
 
   NETWORK configuration;
@@ -567,8 +588,8 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += WiFi.macAddress();
   body += "\"></div></fieldset>";
 
-  String page =
-      addConfigurationBlock("WiFi", L_NETWORK_CONFIGURATION_INFO, body);
+  String page = addConfigurationBlock(L_NETWORK_CONFIGURATION,
+                                      L_NETWORK_CONFIGURATION_INFO, body);
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"d\" "
          "type=\"checkbox\" value=\"1\"";
@@ -762,7 +783,6 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
 }
 
 String AFESitesGenerator::addPasswordConfigurationSite() {
-
   PASSWORD configuration = Data.getPasswordConfiguration();
 
   String body = "<fieldset><div class=\"cc\"><label><input name=\"r\" "
@@ -1432,6 +1452,24 @@ String AFESitesGenerator::addDHTConfiguration() {
         body);
   }
 
+  return page;
+}
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+String AFESitesGenerator::addThermostateMenuItem() {
+  String page = "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
+  page += language == 0 ? "Termostat" : "Thermostat";
+  page += "</a></li>";
+  return page;
+}
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+String AFESitesGenerator::addHumidistatMenuItem() {
+  String page = "<li class=\"itm\"><a href=\"\\?option=humidistat\">&#8227; ";
+  page += language == 0 ? "Regulator wilgotności" : "Humidistat";
+  page += "</a></li>";
   return page;
 }
 #endif
@@ -2227,12 +2265,12 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
     body += "<li style=\"color:red\">";
     body += L_UPGRADE_FAILED;
   } else {
-    body += "<li class=\"cm\">";
+    body += "<li>";
     body += L_UPGRADE_SUCCESSFUL;
   }
-  body += "</li><li class=\"cm\">";
+  body += "</li><li>";
   body += L_DEVICE_WILL_BE_REBOOTED;
-  body += "....</li></fieldset>";
+  body += "...</li></fieldset>";
   return addConfigurationBlock(L_FIRMWARE_UPGRADE, "", body);
 }
 
@@ -2259,83 +2297,84 @@ String AFESitesGenerator::addResetSection(uint8_t command) {
   return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, subtitle, body);
 }
 
-String AFESitesGenerator::addExitSection() {
-  String body = "<fieldset><div class=\"cf\"><ul><li class=\"cm\">";
+String AFESitesGenerator::addExitSection(uint8_t command) {
+  String body = "<fieldset><div class=\"cf\"><ul><li>";
   body += L_REBOOT_IN_PROGRESS;
-  body += ".....</li><li class=\"cm\">";
-  body += L_SITE_WILL_BE_RELOADED;
+  body += "</li><li>";
+  if (command != MODE_ACCESS_POINT) {
+    body += L_SITE_WILL_BE_RELOADED;
+  } else {
+    body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
+    body += ": <a href=\"http://192.168.5.1\">http://192.168.5.1</a></p>";
+  }
   body += "</li></ul></div></fieldset>";
   return addConfigurationBlock(L_REBOOT, "", body);
 }
 
-String AFESitesGenerator::addHelpSection() {
+String AFESitesGenerator::addIndexSection(boolean authorized) {
   DEVICE configuration;
   configuration = Data.getDeviceConfiguration();
 
-  String body = "<fieldset><div class=\"cf\"><label>";
-  body += "Status: running";
-  body += "</label><span></div></fieldset>";
-
-  char title[29];
-  sprintf(title, "%s: %s", L_DEVICE, configuration.name);
-  String page = addConfigurationBlock(title, "", body);
-
-  if (Device->getMode() != MODE_ACCESS_POINT) {
-
-    body = "<a href=\"https://www.smartnydom.pl/afe-firmware-";
-    body += L_LANGUAGE_SHORT;
-    body += "/log\" target=\"_blank\"><img "
-            "src=\"https://img.shields.io/badge/"
-            "version%20-%20";
-    body += firmware.version;
-    body += "%20[T";
-    body += firmware.type;
-    body += "]-blue.svg\" /></a> ";
-
-    body += "<a href=\"https://github.com/tschaban/AFE-Firmware/"
-            "issues?q=is:issue+is:open+label:Defect\" target=\"_blank\"><img "
-            "src=\"https://img.shields.io/github/issues/tschaban/AFE-Firmware/"
-            "Defect.svg\" /></a> ";
-
-    body += "<a href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
-            "target=\"_blank\"><img "
-            "src=\"https://img.shields.io/badge/help-forum-red.svg\" /></a> ";
-
-    body += "<a "
-            "href=\"https://github.com/tschaban/AFE-Firmware/blob/master/"
-            "LICENSE\" target=\"_blank\"><img "
-            "src=\"https://img.shields.io/github/license/tschaban/"
-            "AFE-Firmware.svg\" /></a>";
-
-    page += addConfigurationBlock("Firmware", "", body);
-
-    body = "<p class=\"cm\">";
-    body += ". Jeśli spełnia Twoje oczekiwania to postaw ";
-    body += " <a href=\"https://www.smartnydom.pl/o-stronie/\" "
-            "target=\"_blank\" style=\"color:#00e\">aut";
-    body += " ;)</p>";
-
-    body += "<a href=\"https://";
-    body += L_LANGUAGE_SHORT;
-    body += ".donate.afe-firmware.smartnydom.pl\" target=\"_blank\"><img "
-            "src=\"http://adrian.czabanowski.com/afe/donation/T";
-    body += firmware.type;
-    body += "/";
-    body += firmware.version;
-    body += "/";
-    // body += Data.getDeviceID();
-    body += "/\" border=\"0\" alt=\"PayPal\"></a>";
-    body += "</fieldset><br>";
-
-    page += addConfigurationBlock("Donation", "", body);
+  String body = "<fieldset>";
+  if (!authorized) {
+    body += "<h3>Hasło nie jest poprawne</h3>";
   }
+
+  body +=
+      "<div class=\"cf\"><input name=\"p\" type=\"text\" "
+      "placeholder=\"Hasło\"></div><div class=\"cf\"><input type=\"submit\" "
+      "class=\"b bs\" "
+      "value=\"Tryb normalny\" formaction=\"/?option=index&cmd=";
+
+  body += MODE_CONFIGURATION;
+  body += "\" /> <input type=\"submit\" class=\"b be\" "
+          "value=\"Tryb HotSpot\" formaction=\"/?option=index&cmd=";
+  body += MODE_ACCESS_POINT;
+  body += "\" /></div><span class=\"hint\">Jeśli nie pamiętasz "
+          "hasła, możesz zresetowac "
+          "urządzenie wciskając przycisk na 30sek. Didoa mrugnie 3x</span>";
+
+  String page =
+      addConfigurationBlock("Uruchom: Panel Konfiguracyjny", "", body);
+
+  body = "<p class=\"cm\">Oprogramowanie dostępne jest za darmo. Jeśli spełnia "
+         "Twoje oczekiwania to postaw <a "
+         "href=\"https://www.smartnydom.pl/o-stronie/\" target=\"_blank\" "
+         "style=\"color:#00e\">autorowi</a> browarka ;)</p><a "
+         "href=\"https://pl.donate.afe-firmware.smartnydom.pl\" "
+         "target=\"_blank\"><img "
+         "src=\"http://adrian.czabanowski.com/afe/donation/T2/1.4.0/1rTA706u/"
+         "\" border=\"0\" alt=\"PayPal\"></a>";
+
+  page += addConfigurationBlock("Wsparcie", "", body);
 
   return page;
 }
 
-const char *AFESitesGenerator::generateFooter() {
-  return "<hr style=\"border:0;border-top:1px solid "
-         "#eee;\"/></div></div></body></html>";
+const String AFESitesGenerator::generateFooter(boolean extended) {
+  String body = "</div></div>";
+
+  if (extended) {
+    body += "<div style=\"padding: 10px 0\"><a "
+            "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
+            "target=\"_blank\"><img "
+            "src=\"https://img.shields.io/badge/pomoc-forum-red.svg\" "
+            "alt=\"Forum\" /></a> <a "
+            "href=\"http://www.smartnydom.pl/afe-firmware-pl/\" "
+            "target=\"_blank\"><img "
+            "src=\"https://img.shields.io/badge/pomoc-dokumentacja-green.svg\" "
+            "alt=\"Dokumentacja\" /></a> <a "
+            "href=\"https://www.smartnydom.pl/afe-firmware-pl/log\" "
+            "target=\"_blank\"><img "
+            "src=\"https://img.shields.io/badge/"
+            "wersja%20-%201.4.0%20[T2]-blue.svg\" alt=\"T0-2.0.0\" /></a> <img "
+            "src=\"https://img.shields.io/badge/"
+            "UID-de12d--13df--saw3-yellow.svg\" alt=\"UID\" /> <img "
+            "src=\"https://img.shields.io/badge/PRO-None-orange.svg\" "
+            "alt=\"PRO\" /></div>";
+  }
+  body += "</body></html>";
+  return body;
 }
 
 String AFESitesGenerator::addConfigurationBlock(const String title,
