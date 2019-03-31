@@ -16,11 +16,9 @@
 //#include <AFE-EEPROM.h>
 #include <IPAddress.h>
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <IPAddress.h>
-#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -59,6 +57,9 @@ public:
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
 
+  PRO_VERSION getProVersionConfiguration();
+  void saveConfiguration(PRO_VERSION configuration);
+
 #if !defined(T5_CONFIG)
   /* Methods reads and saves relay state from/to EEPROM */
   boolean getRelayState(uint8_t id);
@@ -74,10 +75,6 @@ public:
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
-
-  /* Methods read and save firmware Language from/to EEPROM */
-  uint8_t getLanguage();
-  void saveLanguage(uint8_t language);
 
   /* Methods turns on / off APIs */
   void saveAPI(uint8_t apiID, boolean state);

@@ -63,7 +63,7 @@ String AFEConfigurationPanel::getSite(const String option, uint8_t command) {
     page += Site.addUpgradeSection();
   } else if (option == "reset") {
     page += Site.generateOneColumnLayout(10);
-    page += Site.addResetSection(command);
+    page += Site.addResetSection();
   } else if (option == "exit") {
     page += Site.generateOneColumnLayout(10);
     page += Site.addExitSection(command);
@@ -84,6 +84,11 @@ String AFEConfigurationPanel::getIndexSite(boolean authorized) {
   page += "<form method=\"post\">";
   page += Site.addIndexSection(authorized);
   page += "</form>";
+
+#ifdef DEBUG
+  Serial << endl << "Index page launch in the mode: " << Device->getMode();
+#endif
+
   page += Site.generateFooter((Device->getMode() == MODE_NORMAL ||
                                Device->getMode() == MODE_CONFIGURATION)
                                   ? true
@@ -91,13 +96,7 @@ String AFEConfigurationPanel::getIndexSite(boolean authorized) {
   return page;
 }
 
-String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
-                                                         DEVICE data) {
-
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-    Device->begin();
-  }
+String AFEConfigurationPanel::getDeviceConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -107,12 +106,7 @@ String AFEConfigurationPanel::getDeviceConfigurationSite(uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
-                                                          NETWORK data) {
-
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-  }
+String AFEConfigurationPanel::getNetworkConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -122,12 +116,7 @@ String AFEConfigurationPanel::getNetworkConfigurationSite(uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
-                                                       MQTT data) {
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-  }
-
+String AFEConfigurationPanel::getMQTTConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -137,13 +126,7 @@ String AFEConfigurationPanel::getMQTTConfigurationSite(uint8_t command,
   return page;
 }
 
-String
-AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
-                                                          DOMOTICZ data) {
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-  }
-
+String AFEConfigurationPanel::getDomoticzServerConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -153,12 +136,7 @@ AFEConfigurationPanel::getDomoticzServerConfigurationSite(uint8_t command,
   return page;
 }
 
-String AFEConfigurationPanel::getPasswordConfigurationSite(uint8_t command,
-                                                           PASSWORD data) {
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data);
-  }
-
+String AFEConfigurationPanel::getPasswordConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -168,22 +146,18 @@ String AFEConfigurationPanel::getPasswordConfigurationSite(uint8_t command,
   return page;
 }
 
+String AFEConfigurationPanel::getProVersionConfigurationSite() {
+  String page;
+  page.reserve(siteBufferSize);
+  page = Site.generateTwoColumnsLayout();
+  page += "<form action=\"/?option=pro&cmd=1\" method=\"post\">";
+  page += Site.addProVersionSite();
+  page += generateFooter();
+  return page;
+}
+
 #ifdef CONFIG_HARDWARE_LED
-String AFEConfigurationPanel::getLEDConfigurationSite(
-    uint8_t command, LED data[sizeof(Device->configuration.isLED)],
-    uint8_t dataLedID) {
-
-  if (command == SERVER_CMD_SAVE) {
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
-      if (Device->configuration.isLED[i]) {
-        Data.saveConfiguration(i, data[i]);
-      } else {
-        break;
-      }
-    }
-    Data.saveSystemLedID(dataLedID);
-  }
-
+String AFEConfigurationPanel::getLEDConfigurationSite() {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -201,13 +175,7 @@ String AFEConfigurationPanel::getLEDConfigurationSite(
 }
 #endif
 
-String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
-                                                        RELAY data,
-                                                        uint8_t relayIndex) {
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(relayIndex, data);
-  }
-
+String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t relayIndex) {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -220,13 +188,8 @@ String AFEConfigurationPanel::getRelayConfigurationSite(uint8_t command,
 }
 
 #ifdef CONFIG_FUNCTIONALITY_REGULATOR
-String AFEConfigurationPanel::getRelayStatConfigurationSite(
-    uint8_t command, REGULATOR data, uint8_t regulatorType) {
-
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(data, regulatorType);
-  }
-
+String
+AFEConfigurationPanel::getRelayStatConfigurationSite(uint8_t regulatorType) {
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();
@@ -242,13 +205,7 @@ String AFEConfigurationPanel::getRelayStatConfigurationSite(
 }
 #endif
 
-String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t command,
-                                                         SWITCH data,
-                                                         uint8_t switchIndex) {
-
-  if (command == SERVER_CMD_SAVE) {
-    Data.saveConfiguration(switchIndex, data);
-  }
+String AFEConfigurationPanel::getSwitchConfigurationSite(uint8_t switchIndex) {
 
   String page;
   page.reserve(siteBufferSize);
@@ -340,7 +297,6 @@ String AFEConfigurationPanel::getGateConfigurationSite(const String option,
   if (command == SERVER_CMD_SAVE) {
     Data.saveConfiguration(data);
   }
-
   String page;
   page.reserve(siteBufferSize);
   page = Site.generateTwoColumnsLayout();

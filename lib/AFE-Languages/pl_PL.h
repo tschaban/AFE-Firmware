@@ -41,7 +41,7 @@
 #define L_DOCUMENTATION "Dokumentacja"
 #define L_SETTINGS "Ustawienia"
 #define L_SETTINGS_HOT_SPOT "Ustawienia (Tryb HotSpot)"
-#define L_SAVE "Zapisz"
+#define L_PRO_VERSION "Wersja PRO"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -53,6 +53,11 @@
 #define L_IP_ADDRESS "Adres IP"
 #define L_NONE "Brak"
 #define L_NAME "Nazwa"
+#define L_SAVE "Zapisz"
+#define L_HELP "Pomoc"
+#define L_VERSION "Wersja"
+#define L_YES "Tak"
+#define L_NO "Nie"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
@@ -95,7 +100,7 @@
   "Następnie w konfigurację routera WiFi, wyszukaj adres IP urządzenia o "  \
   "adresie MAC"
 #define L_FINISH_NETWORK_CONFIGURATION                                         \
-  "Dokończ konfigurację wpisująć adres IP urządzenia w przeglądarce"
+  "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat wiadomości MQTT"
@@ -210,5 +215,12 @@
 #define L_SET_PASSWORD_INFO                                                    \
   "Jeśli nie pamiętasz hasła, zresetuj urządzenie do stanu początkowego"
 #define L_PROTECT_BY_PASSWORD "Zabezpiecz hasłem"
+
+/* Form: Pro version */
+#define L_PRO_VERSION "Wersja PRO"
+#define L_KEY "Klucz"
+#define L_VALID "Aktualny"
+#define L_PRO_CANNOT_BE_COFIGURED                                              \
+  "Konieczne jest podłączenie do Internetu, aby skonfigurować wersję PRO"
 
 #endif

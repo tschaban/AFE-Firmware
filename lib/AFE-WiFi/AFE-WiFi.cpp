@@ -23,6 +23,10 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   }
 #endif
 
+#ifdef DEBUG
+  Serial << endl << "Device is in mode: " << WiFiMode;
+#endif
+
   WiFi.hostname(Device->configuration.name);
   if (WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG

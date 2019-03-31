@@ -14,6 +14,39 @@
 #define SERVER_CMD_SAVE 1
 #define SERVER_CMD_NONE 0
 
+#define MODE_NORMAL 0
+#define MODE_CONFIGURATION 1
+#define MODE_ACCESS_POINT 2
+#define MODE_NETWORK_NOT_SET 4
+#define MODE_FIRST_TIME_LAUNCH 5
+
+#define API_HTTP 0
+#define API_MQTT 1
+#define API_DOMOTICZ 2
+
+/* URLs to AFE WebService */
+#define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
+#define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
+
+/* Config sites IDs */
+#define AFE_CONFIG_SITE_INDEX 0
+#define AFE_CONFIG_SITE_DEVICE 1
+#define AFE_CONFIG_SITE_NETWORK 2
+#define AFE_CONFIG_SITE_MQTT 3
+#define AFE_CONFIG_SITE_DOMOTICZ 4
+#define AFE_CONFIG_SITE_LED 5
+#define AFE_CONFIG_SITE_RELAY 6
+#define AFE_CONFIG_SITE_SWITCH 7
+#define AFE_CONFIG_SITE_PASSWORD 8
+#define AFE_CONFIG_SITE_PRO_VERSION 9
+#define AFE_CONFIG_SITE_ANALOG_INPUT 10
+#define AFE_CONFIG_SITE_EXIT 11
+#define AFE_CONFIG_SITE_RESET 12
+#define AFE_CONFIG_SITE_POST_RESET 13
+#define AFE_CONFIG_SITE_FIRST_TIME 14
+#define AFE_CONFIG_SITE_FIRST_TIME_CONNECTING 15
+#define AFE_CONFIG_SITE_UPGRADE 16
+
 /* Basic Switch */
 #if defined(T0_CONFIG)
 #define FIRMWARE_VERSION "2.0.0"

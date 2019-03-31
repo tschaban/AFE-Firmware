@@ -11,36 +11,52 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-Firmware.h>
 #include <AFE-OTA.h>
+#include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
+struct AFE_SITE_PARAMETERS {
+  uint8_t ID;
+  boolean twoColumns = true;
+  int8_t deviceID = -1;
+  boolean reboot = false;
+  uint8_t rebootMode = 0;
+  uint8_t rebootTime = 0;
+  boolean form = true;
+  boolean formButton = true;
+};
+
 class AFEWebServer {
 
 private:
   ESP8266WebServer server;
-  AFEConfigurationPanel ConfigurationPanel;
-  ESP8266HTTPUpdateServer httpUpdater; // Class used for firmware upgrade
+  // Class used for firmware upgrade
+  ESP8266HTTPUpdateServer httpUpdater;
   AFEDevice *Device;
-  HTTPCOMMAND httpCommand; // It stores last HTTP API request
-  boolean receivedHTTPCommand =
-      false; // Once HTTP API requet is recieved it's set to true
+  // It stores last HTTP API request
+  HTTPCOMMAND httpCommand;
+  // Once HTTP API requet is recieved it's set to true
+  boolean receivedHTTPCommand = false;
 
-  boolean _refreshConfiguration = false; // when it's set to true device
-                                         // configuration is refreshed. Required
-                                         // by generate() method
+  /* when it's set to true device configuration is refreshed. Required by
+   * generate() method */
+  boolean _refreshConfiguration = false;
+
+  AFEDataAccess Data;
+  AFESitesGenerator Site;
 
   /* Method gets url Option parameter value */
   String getOptionName();
-
-  /* Method gets url cmd parameter value */
   uint8_t getCommand();
+  uint8_t getSiteID();
+  uint8_t getID();
 
   /* Methods get POST data (for saveing) */
   DEVICE getDeviceData();
@@ -50,6 +66,13 @@ private:
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
   PASSWORD getPasswordData();
+  PRO_VERSION getSerialNumberData();
+
+  String generateSite(AFE_SITE_PARAMETERS *siteConfig);
+  // String getFirstLaunchConfigurationSite();
+  String getConnectingSite();
+  String getIndexSite(boolean authorized);
+  String getSite(uint8_t option, uint8_t command);
 
 #ifdef CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);

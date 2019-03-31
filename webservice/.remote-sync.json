@@ -1,0 +1,19 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "transport": "ftp",
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "watch": [],
+  "port": "21",
+  "hostname": "ftp.czabanowski.com",
+  "target": "/www/api.smartnydom.pl",
+  "username": "czabanow",
+  "password": "g6MgkUjn"
+}

@@ -12,6 +12,7 @@
 #endif
 
 #include <AFE-Device.h>
+#include <AFE-Firmware.h>
 #include <AFE-Sites-Generator.h>
 
 #ifdef DEBUG
@@ -39,28 +40,24 @@ public:
   String getConnectingSite();
   String getIndexSite(boolean authorized);
   String getSite(const String option, uint8_t command);
-  String getDeviceConfigurationSite(uint8_t command, DEVICE data);
-  String getNetworkConfigurationSite(uint8_t command, NETWORK data);
-  String getMQTTConfigurationSite(uint8_t command, MQTT data);
-  String getDomoticzServerConfigurationSite(uint8_t command, DOMOTICZ data);
-  String getPasswordConfigurationSite(uint8_t command, PASSWORD data);
+  String getDeviceConfigurationSite();
+  String getNetworkConfigurationSite();
+  String getMQTTConfigurationSite();
+  String getDomoticzServerConfigurationSite();
+  String getPasswordConfigurationSite();
+  String getProVersionConfigurationSite();
 
 #ifdef CONFIG_HARDWARE_LED
-  String getLEDConfigurationSite(uint8_t command,
-                                 LED data[sizeof(Device->configuration.isLED)],
-                                 uint8_t dataLedID);
+  String getLEDConfigurationSite();
 #endif
 
-  String getRelayConfigurationSite(uint8_t command, RELAY data,
-                                   uint8_t relayIndex);
+  String getRelayConfigurationSite(uint8_t relayIndex);
 
 #ifdef CONFIG_FUNCTIONALITY_REGULATOR
-  String getRelayStatConfigurationSite(uint8_t command, REGULATOR data,
-                                       uint8_t regulatorType);
+  String getRelayStatConfigurationSite(uint8_t regulatorType);
 #endif
 
-  String getSwitchConfigurationSite(uint8_t command, SWITCH data,
-                                    uint8_t relayIndex);
+  String getSwitchConfigurationSite(uint8_t relayIndex);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   String getDS18B20ConfigurationSite(uint8_t command, DS18B20 data);

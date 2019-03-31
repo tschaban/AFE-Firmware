@@ -43,7 +43,7 @@
 #define L_DOCUMENTATION "Documentation"
 #define L_SETTINGS "Settings"
 #define L_SETTINGS_HOT_SPOT "Settings (HotSpot mode)"
-#define L_SAVE "Save"
+#define L_PRO_VERSION "PRO Version"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "chars"
@@ -55,6 +55,11 @@
 #define L_IP_ADDRESS "Address IP"
 #define L_NONE "None"
 #define L_NAME "Name"
+#define L_SAVE "Save"
+#define L_HELP "Help"
+#define L_VERSION "Version"
+#define L_YES "Yes"
+#define L_NO "No"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
@@ -204,5 +209,12 @@
 #define L_SET_PASSWORD_INFO                                                    \
   "If you don't remember the password, reset the device to its default state"
 #define L_PROTECT_BY_PASSWORD "Protect by password"
+
+/* Form: Pro version */
+#define L_PRO_VERSION "PRO Version"
+#define L_KEY "Key"
+#define L_VALID "Valid"
+#define L_PRO_CANNOT_BE_COFIGURED                                              \
+  "Version PRO can be configured once the device is connected to the Internet"
 
 #endif

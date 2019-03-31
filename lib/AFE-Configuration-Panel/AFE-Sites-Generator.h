@@ -15,6 +15,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
+#include <AFE-Firmware.h>
 #include <ESP8266WiFi.h>
 
 #ifdef CONFIG_HARDWARE_UART
@@ -42,6 +43,8 @@ private:
   AFEDataAccess Data;
   AFEDevice *Device;
   FIRMWARE firmware;
+  AFEFirmware Firmware;
+  char deviceID[17];
 
   const String generateHeader(uint8_t redirect);
 
@@ -97,12 +100,13 @@ public:
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
   String addPasswordConfigurationSite();
+  String addRelayConfiguration(uint8_t id);
+  String addSwitchConfiguration(uint8_t id);
+
 #ifdef CONFIG_HARDWARE_LED
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
-  String addRelayConfiguration(uint8_t id);
-  String addSwitchConfiguration(uint8_t id);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   String addDS18B20Configuration();
@@ -155,13 +159,16 @@ public:
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */
-  String addResetSection(uint8_t command);
+  String addResetSection();
+  String addPostResetSection();
 
   /* Method addes info that device is being reset */
   String addExitSection(uint8_t command);
 
   /* Method generates section shown when device is in norma mode */
   String addIndexSection(boolean authorized);
+
+  String addProVersionSite();
 };
 
 #endif

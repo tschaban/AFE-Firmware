@@ -11,16 +11,6 @@
 #include "WProgram.h"
 #endif
 
-#define MODE_NORMAL 0
-#define MODE_CONFIGURATION 1
-#define MODE_ACCESS_POINT 2
-#define MODE_NETWORK_NOT_SET 8
-#define MODE_FIRST_TIME_LAUNCH 9
-
-#define API_HTTP 0
-#define API_MQTT 1
-#define API_DOMOTICZ 2
-
 struct DEVICE_API {
   boolean mqtt;
   boolean http;

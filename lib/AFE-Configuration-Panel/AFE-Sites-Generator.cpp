@@ -5,6 +5,7 @@ AFESitesGenerator::AFESitesGenerator() {}
 void AFESitesGenerator::begin(AFEDevice *_Device) {
   firmware = Data.getFirmwareConfiguration();
   Device = _Device;
+  Data.getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
 }
 
 const String AFESitesGenerator::generateHeader(uint8_t redirect) {
@@ -29,11 +30,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
 
   if (Device->getMode() == MODE_CONFIGURATION ||
       Device->getMode() == MODE_NORMAL) {
-    page += "<img "
-            "src=\"http://www.smartnydom.pl/wp-content/uploads/2019/01/"
-            "afe-firmware-header.jpg\" style=\"width: 100%;display: block\" "
-            "alt=\"AFE "
-            "Firmware\">";
+    page += "<img src=\"http://api.smartnydom.pl/logo/T";
+    page += firmware.type;
+    page += "/";
+    page += firmware.version;
+    page += "/";
+    page += deviceID;
+    page += "\" style=\"width: 100%;display: block\">";
   }
 
   page += "<div id=\"c\">";
@@ -49,28 +52,36 @@ const String AFESitesGenerator::generateOneColumnLayout(uint8_t redirect) {
 
 const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   String page = generateHeader(redirect);
-
+  Firmware.begin();
   page += "<div id=\"l\">";
   if (Device->getMode() == MODE_ACCESS_POINT) {
-    "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
+    page += "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
   }
   page += "<h4 class=\"ltag\">";
   page += L_FIRMWARE_NAME;
   page += "</h4><h4>MENU</h4><ul class=\"lst\">";
 
   Device->begin(); // Reading configuration data
-  page += "<li class=\"itm\"><a href=\"\\?option=device\">";
+  page += "<li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_DEVICE;
+  page += "\">";
   page += L_DEVICE;
-  page += "</a></li><li class=\"itm\"><a href=\"\\?option=network\">";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_NETWORK;
+  page += "\">";
   page += L_NETWORK;
   page += "</a></li>";
   if (Device->configuration.api.mqtt) {
-    page += "<li class=\"itm\"><a href=\"\\?option=mqtt\">";
+    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += AFE_CONFIG_SITE_MQTT;
+    page += "\">";
     page += L_MQTT_BROKER;
     page += "</a></li>";
   }
   if (Device->configuration.api.domoticz) {
-    page += "<li class=\"itm\"><a href=\"\\?option=domoticz\">";
+    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += AFE_CONFIG_SITE_DOMOTICZ;
+    page += "\">";
     page += L_DOMOTICZ_SERVER;
     page += "</a></li>";
   }
@@ -86,7 +97,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 
   if (itemPresent > 0) {
-    page += "<li class=\"itm\"><a href=\"\\?option=led\">";
+    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += AFE_CONFIG_SITE_LED;
+    page += "\">";
     page += L_LEDS;
     page += "</a></li>";
   }
@@ -107,7 +120,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</i></a></li>";
 
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?option=relay";
+      page += "<li class=\"itm\"><a href=\"\\?option=";
+      page += AFE_CONFIG_SITE_RELAY;
+      page += "&id=";
       page += i;
       page += "\">&#8227; ";
       page += L_RELAY;
@@ -148,7 +163,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</i></a></li>";
 
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?option=switch";
+      page += "<li class=\"itm\"><a href=\"\\?option=";
+      page += AFE_CONFIG_SITE_SWITCH;
+      page += "&id=";
       page += i;
       page += "\">&#8227; ";
       page += L_SWITCH;
@@ -267,23 +284,33 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  if (Device->configuration.isAnalogInput) {
+  if (Device->configuration.isAnalogInput && Firmware.isUnlocked()) {
     page += "<li class=\"itm\"><a href=\"\\?option=analogInput\">";
     page += L_ANALOG_INPUT;
     page += "</a></li>";
   }
 #endif
 
-  page += "<br><li class=\"itm\"><a href=\"\\?option=password\">";
+  page += "<br><li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_PASSWORD;
+  page += "\">";
   page += L_SET_PASSWORD;
   page += "</a></li>";
 
   /* Language, Upgrade, Exit */
   page += "<br><li class=\"itm\"><a href=\"\\update\">";
   page += L_FIRMWARE_UPGRADE;
-  page += "</a></li><li class=\"itm\"><a href=\"\\?option=reset\">";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_RESET;
+  page += "\">";
   page += L_RESET_DEVICE;
-  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=exit\">";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_PRO_VERSION;
+  page += "\">";
+  page += L_PRO_VERSION;
+  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=";
+  page += AFE_CONFIG_SITE_EXIT;
+  page += "\">";
   page += L_FINISH_CONFIGURATION;
 
   /* Information section */
@@ -464,11 +491,14 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
-  body += L_DO_MEASURE_ADC;
-  body += "</label></div>";
+  if (Firmware.isUnlocked()) {
+    body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
+            "value=\"1\"";
+    body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
+    body += L_DO_MEASURE_ADC;
+    body += "</label></div>";
+  }
+
 #endif
 
 #if defined(T3_CONFIG)
@@ -683,7 +713,6 @@ String AFESitesGenerator::addNetworkConfiguration() {
 }
 
 String AFESitesGenerator::addMQTTBrokerConfiguration() {
-
   MQTT configuration;
   configuration = Data.getMQTTConfiguration();
 
@@ -804,8 +833,7 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   }
   body += "</fieldset>";
 
-  return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, L_SET_PASSWORD_INFO,
-                               body);
+  return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
 #ifdef CONFIG_HARDWARE_LED
@@ -2274,27 +2302,27 @@ String AFESitesGenerator::addPostUpgradeSection(boolean status) {
   return addConfigurationBlock(L_FIRMWARE_UPGRADE, "", body);
 }
 
-String AFESitesGenerator::addResetSection(uint8_t command) {
-  String body = "<fieldset>";
-  String subtitle;
-  if (command == 0) {
-    body += "<a href=\"\\?option=reset&cmd=1\" class=\"b be\">";
-    body += L_RESTORE_DEFAULT_SETTINGS;
-    body += "</a><strong>";
-    subtitle += L_WARNING;
-    subtitle += "</strong>: ";
-    subtitle += L_CONFIGURATION_WILL_BE_REMOVED;
-  } else {
-    subtitle += "";
-    body += "<p class=\"cm\">";
-    body += L_UPGRADE_IN_PROGRESS;
-    body += "</p><p class=\"cm\">";
+String AFESitesGenerator::addResetSection() {
+  String body = "<fieldset><p class=\"cm\"><strong>";
+  body += L_WARNING;
+  body += "</strong>: ";
+  body += "</p><p class=\"cm\">";
+  body += L_CONFIGURATION_WILL_BE_REMOVED;
+  body += ": </p><input type=\"submit\" class=\"b be\" value=\"";
+  body += L_RESTORE_DEFAULT_SETTINGS;
+  body += "\"></fieldset>";
 
-    body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
-    body += ": </p><a href=\"http://192.168.5.1\">http://192.168.5.1</a>";
-  }
+  return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, "", body);
+}
+
+String AFESitesGenerator::addPostResetSection() {
+  String body = "<fieldset><p class=\"cm\">";
+  body += L_UPGRADE_IN_PROGRESS;
+  body += "</p><p class=\"cm\">";
+  body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
+  body += ": </p><a href=\"http://192.168.5.1\">http://192.168.5.1</a>";
   body += "</fieldset>";
-  return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, subtitle, body);
+  return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, "", body);
 }
 
 String AFESitesGenerator::addExitSection(uint8_t command) {
@@ -2314,25 +2342,21 @@ String AFESitesGenerator::addExitSection(uint8_t command) {
 String AFESitesGenerator::addIndexSection(boolean authorized) {
   DEVICE configuration;
   configuration = Data.getDeviceConfiguration();
-
   String body = "<fieldset>";
   if (!authorized) {
     body += "<h3>Hasło nie jest poprawne</h3>";
   }
 
   body +=
-      "<div class=\"cf\"><input name=\"p\" type=\"text\" "
+      "<form method=\"post\"><div class=\"cf\"><input name=\"p\" type=\"text\" "
       "placeholder=\"Hasło\"></div><div class=\"cf\"><input type=\"submit\" "
       "class=\"b bs\" "
-      "value=\"Tryb normalny\" formaction=\"/?option=index&cmd=";
-
+      "value=\"Tryb normalny\" formaction=\"/?option=0&id=";
   body += MODE_CONFIGURATION;
   body += "\" /> <input type=\"submit\" class=\"b be\" "
-          "value=\"Tryb HotSpot\" formaction=\"/?option=index&cmd=";
+          "value=\"Tryb HotSpot\" formaction=\"/?option=0&id=";
   body += MODE_ACCESS_POINT;
-  body += "\" /></div><span class=\"hint\">Jeśli nie pamiętasz "
-          "hasła, możesz zresetowac "
-          "urządzenie wciskając przycisk na 30sek. Didoa mrugnie 3x</span>";
+  body += "\" /></div></form>";
 
   String page =
       addConfigurationBlock("Uruchom: Panel Konfiguracyjny", "", body);
@@ -2351,27 +2375,65 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
   return page;
 }
 
+String AFESitesGenerator::addProVersionSite() {
+  PRO_VERSION configuration = Data.getProVersionConfiguration();
+  String body;
+  if (Device->getMode() == MODE_CONFIGURATION) {
+    body = "<fieldset>";
+    body += "<div class=\"cf\"><label>";
+    body += L_KEY;
+    body += "</label><input name=\"k\" type=\"text\" maxlength=\"18\" value=\"";
+    body += configuration.serial;
+    body += "\"></div>";
+    body += "<div class=\"cf\"><label>";
+    body += L_VALID;
+    body += "?</label><span>";
+    body += configuration.valid ? L_YES : L_NO;
+    body += "</span></div>";
+    body += "<input name=\"v\" type=\"hidden\" value=\"";
+    body += configuration.valid;
+    body += "\">";
+    body += "</fieldset>";
+  } else {
+    body = "<h3>";
+    body += L_PRO_CANNOT_BE_COFIGURED;
+    body += "</h3>";
+  }
+  return addConfigurationBlock(L_PRO_VERSION, "", body);
+}
+
 const String AFESitesGenerator::generateFooter(boolean extended) {
   String body = "</div></div>";
 
   if (extended) {
-    body += "<div style=\"padding: 10px 0\"><a "
+    body += "<div style=\"padding: 5px 0\"><a "
             "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
-            "target=\"_blank\"><img "
-            "src=\"https://img.shields.io/badge/pomoc-forum-red.svg\" "
-            "alt=\"Forum\" /></a> <a "
-            "href=\"http://www.smartnydom.pl/afe-firmware-pl/\" "
-            "target=\"_blank\"><img "
-            "src=\"https://img.shields.io/badge/pomoc-dokumentacja-green.svg\" "
-            "alt=\"Dokumentacja\" /></a> <a "
-            "href=\"https://www.smartnydom.pl/afe-firmware-pl/log\" "
-            "target=\"_blank\"><img "
-            "src=\"https://img.shields.io/badge/"
-            "wersja%20-%201.4.0%20[T2]-blue.svg\" alt=\"T0-2.0.0\" /></a> <img "
-            "src=\"https://img.shields.io/badge/"
-            "UID-de12d--13df--saw3-yellow.svg\" alt=\"UID\" /> <img "
-            "src=\"https://img.shields.io/badge/PRO-None-orange.svg\" "
-            "alt=\"PRO\" /></div>";
+            "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
+    body += L_HELP;
+    body += "-Forum-red.svg\"alt=\"Forum\" /></a> <a "
+            "href=\"http://www.smartnydom.pl/afe-firmware-";
+    body += L_LANGUAGE_SHORT;
+    body += "/\" target=\"_blank\"><img src=\"https://img.shields.io/badge/";
+    body += L_HELP;
+    body += "-";
+    body += L_DOCUMENTATION;
+    body += "-green.svg\" alt=\"";
+    body += L_DOCUMENTATION;
+    body +=
+        "\" /></a> <a href=\"https://www.smartnydom.pl/afe-firmware-pl/log\" "
+        "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
+    body += L_VERSION;
+    body += "%20-%20";
+    body += FIRMWARE_VERSION;
+    body += "[T";
+    body += FIRMWARE_TYPE;
+    body += "]-blue.svg\" alt=\"T";
+    body += FIRMWARE_TYPE;
+    body += "-";
+    body += FIRMWARE_VERSION;
+    body += "\" /></a> <img src=\"https://img.shields.io/badge/PRO-";
+    body += Firmware.isUnlocked() ? L_YES : L_NO;
+    body += "-orange.svg\" alt=\"PRO\" /></div>";
   }
   body += "</body></html>";
   return body;
@@ -2408,7 +2470,6 @@ const String AFESitesGenerator::generateConfigParameter_GPIO(
 const String AFESitesGenerator::generateHardwareItemsList(
     uint8_t noOfItems, uint8_t noOffConnected, const char *field,
     const char *label) {
-
   String body = "<div class=\"cf\"><label>";
   body += label;
   body += "</label>";

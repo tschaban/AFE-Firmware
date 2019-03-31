@@ -15,6 +15,7 @@ void AFEDefaults::set() {
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
   PASSWORD PasswordConfiguration;
+  PRO_VERSION ProConfiguration;
 
 #ifdef CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR RegulatorConfiguration;
@@ -67,6 +68,10 @@ void AFEDefaults::set() {
   PasswordConfiguration.protect = false;
   PasswordConfiguration.password[0] = '\0';
   Data->saveConfiguration(PasswordConfiguration);
+
+  ProConfiguration.serial[0] = '\0';
+  ProConfiguration.valid = false;
+  Data->saveConfiguration(ProConfiguration);
 
   /* Device UID */
   byte m[6];
@@ -415,8 +420,6 @@ void AFEDefaults::set() {
 #ifdef CONFIG_HARDWARE_LED
   Data->saveSystemLedID(1);
 #endif
-
-  Data->saveLanguage(1);
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
   ADCINPUT AnalogInputConfiguration;

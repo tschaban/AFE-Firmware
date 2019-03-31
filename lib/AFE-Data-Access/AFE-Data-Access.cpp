@@ -26,17 +26,17 @@ const String AFEDataAccess::getDeviceUID() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<30> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+
+    StaticJsonDocument<30> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      uid = root.get<char *>("uid");
+      uid = doc["uid"].as<String>();
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -72,20 +72,108 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<30> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["uid"] = uid;
-    root.printTo(configFile);
+    StaticJsonDocument<30> doc;
+
+    doc["uid"] = uid;
+    serializeJson(doc, configFile);
 
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+
+PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
+  PRO_VERSION configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-pro-version.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-pro-version.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonDocument<50> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
+#ifdef DEBUG
+      serializeJson(doc, Serial);
+#endif
+      configuration.valid = doc["valid"].as<bool>();
+      sprintf(configuration.serial, doc["serial"].as<char *>());
+#ifdef DEBUG
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-pro-version.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-pro-version.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonDocument<65> doc;
+
+    doc["valid"] = configuration.valid;
+    doc["serial"] = configuration.serial;
+
+    serializeJson(doc, configFile);
+#ifdef DEBUG
+    serializeJson(doc, Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -117,19 +205,17 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<80> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<80> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      configuration.protect = root.get<bool>("protect");
-      sprintf(configuration.password, root["password"]);
+      configuration.protect = doc["protect"].as<bool>();
+      sprintf(configuration.password, doc["password"].as<char *>());
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -165,21 +251,19 @@ void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<80> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["protect"] = configuration.protect;
-    root["password"] = configuration.password;
-    root.printTo(configFile);
+    StaticJsonDocument<80> doc;
+
+    doc["protect"] = configuration.protect;
+    doc["password"] = configuration.password;
+    serializeJson(doc, configFile);
 
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -210,37 +294,35 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<400> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<400> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      sprintf(configuration.name, root["name"]);
-      configuration.api.http = root["api"]["http"];
-      configuration.api.mqtt = root["api"]["mqtt"];
-      configuration.api.domoticz = root["api"]["domoticz"];
+      sprintf(configuration.name, doc["name"].as<char *>());
+      configuration.api.http = doc["api"]["http"].as<bool>();
+      configuration.api.mqtt = doc["api"]["mqtt"].as<bool>();
+      configuration.api.domoticz = doc["api"]["domoticz"].as<bool>();
 
       for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
-        configuration.isLED[i] = root["led"][i];
+        configuration.isLED[i] = doc["led"][i].as<bool>();
       }
 
       for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-        configuration.isSwitch[i] = root["switch"][i];
+        configuration.isSwitch[i] = doc["switch"][i].as<bool>();
       }
 
       for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-        configuration.isRelay[i] = root["relay"][i];
+        configuration.isRelay[i] = doc["relay"][i].as<bool>();
       }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-      configuration.isAnalogInput = root["isAnalogInput"] == 1 ? true : false;
+      configuration.isAnalogInput = doc["isAnalogInput"].as<bool>();
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -417,46 +499,43 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<400> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<400> doc;
 
-    root["name"] = configuration.name;
+    doc["name"] = configuration.name;
 
-    JsonObject &jsonAPI = root.createNestedObject("api");
+    JsonObject jsonAPI = doc.createNestedObject("api");
     jsonAPI["http"] = configuration.api.http;
     jsonAPI["mqtt"] = configuration.api.mqtt;
     jsonAPI["domoticz"] = configuration.api.domoticz;
 
-    JsonArray &jsonLED = root.createNestedArray("led");
+    JsonArray jsonLED = doc.createNestedArray("led");
     for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
       jsonLED.add(configuration.isLED[i]);
     }
 
-    JsonArray &jsonSwitch = root.createNestedArray("switch");
+    JsonArray jsonSwitch = doc.createNestedArray("switch");
     for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
       jsonSwitch.add(configuration.isSwitch[i]);
     }
 
-    JsonArray &jsonRelay = root.createNestedArray("relay");
+    JsonArray jsonRelay = doc.createNestedArray("relay");
     for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
       jsonRelay.add(configuration.isRelay[i]);
     }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    root["isAnalogInput"] = configuration.isAnalogInput;
+    doc["isAnalogInput"] = configuration.isAnalogInput;
 #endif
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -589,21 +668,19 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<100> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<100> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      configuration.type = root["type"];
-      sprintf(configuration.version, root["version"]);
-      sprintf(configuration.upgradeURL, root["upgradeURL"]);
-      configuration.autoUpgrade = root["autoUpgrade"];
+      configuration.type = doc["type"].as<unsigned short>();
+      sprintf(configuration.version, doc["version"].as<char *>());
+      sprintf(configuration.upgradeURL, doc["upgradeURL"].as<char *>());
+      configuration.autoUpgrade = doc["autoUpgrade"].as<bool>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -640,23 +717,20 @@ void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<100> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<100> doc;
 
-    root["type"] = configuration.type;
-    root["version"] = configuration.version;
-    root["autoUpgrade"] = configuration.autoUpgrade;
-    root["upgradeURL"] = configuration.upgradeURL;
-    root.printTo(configFile);
+    doc["type"] = configuration.type;
+    doc["version"] = configuration.version;
+    doc["autoUpgrade"] = configuration.autoUpgrade;
+    doc["upgradeURL"] = configuration.upgradeURL;
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -688,30 +762,30 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<300> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      sprintf(configuration.ssid, root["ssid"]);
-      sprintf(configuration.password, root["password"]);
+      sprintf(configuration.ssid, doc["ssid"].as<char *>());
+      sprintf(configuration.password, doc["password"].as<char *>());
 
-      configuration.isDHCP = root["isDHCP"];
+      configuration.isDHCP = doc["isDHCP"].as<bool>();
 
-      configuration.ip = IPfromString(root["ip"]);
-      configuration.gateway = IPfromString(root["gateway"]);
-      configuration.subnet = IPfromString(root["subnet"]);
+      configuration.ip = IPfromString(doc["ip"]);
+      configuration.gateway = IPfromString(doc["gateway"]);
+      configuration.subnet = IPfromString(doc["subnet"]);
 
-      configuration.noConnectionAttempts = root["noConnectionAttempts"];
-      configuration.waitTimeConnections = root["waitTimeConnections"];
-      configuration.waitTimeSeries = root["waitTimeSeries"];
+      configuration.noConnectionAttempts =
+          doc["noConnectionAttempts"].as<unsigned short>();
+      configuration.waitTimeConnections =
+          doc["waitTimeConnections"].as<unsigned short>();
+      configuration.waitTimeSeries = doc["waitTimeSeries"].as<unsigned short>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -748,30 +822,27 @@ void AFEDataAccess::saveConfiguration(NETWORK configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<300> doc;
 
-    root["ssid"] = configuration.ssid;
-    root["password"] = configuration.password;
-    root["isDHCP"] = configuration.isDHCP;
-    root["ip"] = configuration.ip.toString();
-    root["gateway"] = configuration.gateway.toString();
-    root["subnet"] = configuration.subnet.toString();
+    doc["ssid"] = configuration.ssid;
+    doc["password"] = configuration.password;
+    doc["isDHCP"] = configuration.isDHCP;
+    doc["ip"] = configuration.ip.toString();
+    doc["gateway"] = configuration.gateway.toString();
+    doc["subnet"] = configuration.subnet.toString();
 
-    root["noConnectionAttempts"] = configuration.noConnectionAttempts;
-    root["waitTimeConnections"] = configuration.waitTimeConnections;
-    root["waitTimeSeries"] = configuration.waitTimeSeries;
+    doc["noConnectionAttempts"] = configuration.noConnectionAttempts;
+    doc["waitTimeConnections"] = configuration.waitTimeConnections;
+    doc["waitTimeSeries"] = configuration.waitTimeSeries;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -803,25 +874,23 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      sprintf(configuration.host, root["host"]);
+      sprintf(configuration.host, doc["host"].as<char *>());
 
-      configuration.ip = IPfromString(root["ip"]);
-      configuration.port = root["port"];
-      sprintf(configuration.user, root["user"]);
-      sprintf(configuration.password, root["password"]);
-      sprintf(configuration.mqtt.topic, root["topic"]);
+      configuration.ip = IPfromString(doc["ip"]);
+      configuration.port = doc["port"].as<unsigned int>();
+      sprintf(configuration.user, doc["user"].as<char *>());
+      sprintf(configuration.password, doc["password"].as<char *>());
+      sprintf(configuration.mqtt.topic, doc["topic"].as<char *>());
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -858,26 +927,23 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<200> doc;
 
-    root["host"] = configuration.host;
-    root["ip"] = configuration.ip.toString();
-    root["port"] = configuration.port;
-    root["user"] = configuration.user;
-    root["password"] = configuration.password;
-    root["topic"] = configuration.mqtt.topic;
+    doc["host"] = configuration.host;
+    doc["ip"] = configuration.ip.toString();
+    doc["port"] = configuration.port;
+    doc["user"] = configuration.user;
+    doc["password"] = configuration.password;
+    doc["topic"] = configuration.mqtt.topic;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -908,23 +974,21 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      configuration.protocol = root["protocol"];
-      sprintf(configuration.host, root["host"]);
-      configuration.port = root["port"];
-      sprintf(configuration.user, root["user"]);
-      sprintf(configuration.password, root["password"]);
+      configuration.protocol = doc["protocol"];
+      sprintf(configuration.host, doc["host"].as<char *>());
+      configuration.port = doc["port"].as<unsigned int>();
+      sprintf(configuration.user, doc["user"].as<char *>());
+      sprintf(configuration.password, doc["password"].as<char *>());
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -960,24 +1024,21 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<200> doc;
 
-    root["protocol"] = configuration.protocol;
-    root["host"] = configuration.host;
-    root["port"] = configuration.port;
-    root["user"] = configuration.user;
-    root["password"] = configuration.password;
-    root.printTo(configFile);
+    doc["protocol"] = configuration.protocol;
+    doc["host"] = configuration.host;
+    doc["port"] = configuration.port;
+    doc["user"] = configuration.user;
+    doc["password"] = configuration.password;
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -1013,21 +1074,19 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<50> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      configuration.gpio = root.get<int>("gpio");
+      configuration.gpio = doc["gpio"].as<unsigned char>();
       configuration.changeToOppositeValue =
-          root.get<bool>("changeToOppositeValue");
+          doc["changeToOppositeValue"].as<bool>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -1066,20 +1125,18 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["gpio"] = configuration.gpio;
-    root["changeToOppositeValue"] = configuration.changeToOppositeValue;
-    root.printTo(configFile);
+    StaticJsonDocument<50> doc;
+
+    doc["gpio"] = configuration.gpio;
+    doc["changeToOppositeValue"] = configuration.changeToOppositeValue;
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -1114,26 +1171,25 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      configuration.gpio = root.get<int>("gpio");
-      sprintf(configuration.name, root.get<char *>("name"));
-      configuration.timeToOff = root.get<float>("timeToOff");
-      configuration.state.powerOn = root.get<float>("statePowerOn");
-      configuration.state.MQTTConnected = root.get<int>("stateMQTTConnected");
-      configuration.domoticz.idx = root.get<long>("idx");
-      sprintf(configuration.mqtt.topic, root.get<char *>("MQTTTopic"));
-      configuration.ledID = root.get<int>("ledID");
+      configuration.gpio = doc["gpio"].as<unsigned char>();
+      sprintf(configuration.name, doc["name"].as<char *>());
+      configuration.timeToOff = doc["timeToOff"].as<float>();
+      configuration.state.powerOn = doc["statePowerOn"].as<unsigned short>();
+      configuration.state.MQTTConnected =
+          doc["stateMQTTConnected"].as<unsigned short>();
+      configuration.domoticz.idx = doc["idx"].as<unsigned long>();
+      sprintf(configuration.mqtt.topic, doc["MQTTTopic"].as<char *>());
+      configuration.ledID = doc["ledID"].as<unsigned short>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -1317,28 +1373,25 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<200> doc;
 
-    root["gpio"] = configuration.gpio;
-    root["name"] = configuration.name;
-    root["timeToOff"] = configuration.timeToOff;
-    root["statePowerOn"] = configuration.state.powerOn;
-    root["stateMQTTConnected"] = configuration.state.MQTTConnected;
-    root["ledID"] = configuration.ledID;
-    root["idx"] = configuration.domoticz.idx;
-    root["MQTTTopic"] = configuration.mqtt.topic;
+    doc["gpio"] = configuration.gpio;
+    doc["name"] = configuration.name;
+    doc["timeToOff"] = configuration.timeToOff;
+    doc["statePowerOn"] = configuration.state.powerOn;
+    doc["stateMQTTConnected"] = configuration.state.MQTTConnected;
+    doc["ledID"] = configuration.ledID;
+    doc["idx"] = configuration.domoticz.idx;
+    doc["MQTTTopic"] = configuration.mqtt.topic;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -1480,25 +1533,23 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
 
-      configuration.gpio = root.get<int>("gpio");
-      configuration.type = root.get<int>("type");
-      configuration.sensitiveness = root.get<int>("sensitiveness");
-      configuration.functionality = root.get<int>("functionality");
-      configuration.relayID = root.get<int>("relayID");
-      sprintf(configuration.mqtt.topic, root.get<char *>("MQTTTopic"));
-      configuration.domoticz.idx = root.get<int>("idx");
+      configuration.gpio = doc["gpio"].as<unsigned short>();
+      configuration.type = doc["type"].as<unsigned short>();
+      configuration.sensitiveness = doc["sensitiveness"].as<unsigned int>();
+      configuration.functionality = doc["functionality"].as<unsigned short>();
+      configuration.relayID = doc["relayID"].as<unsigned short>();
+      sprintf(configuration.mqtt.topic, doc["MQTTTopic"].as<char *>());
+      configuration.domoticz.idx = doc["idx"].as<unsigned long>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -1538,27 +1589,24 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<200> doc;
 
-    root["gpio"] = configuration.gpio;
-    root["type"] = configuration.type;
-    root["sensitiveness"] = configuration.sensitiveness;
-    root["functionality"] = configuration.functionality;
-    root["relayID"] = configuration.relayID;
-    root["idx"] = configuration.domoticz.idx;
-    root["MQTTTopic"] = configuration.mqtt.topic;
+    doc["gpio"] = configuration.gpio;
+    doc["type"] = configuration.type;
+    doc["sensitiveness"] = configuration.sensitiveness;
+    doc["functionality"] = configuration.functionality;
+    doc["relayID"] = configuration.relayID;
+    doc["idx"] = configuration.domoticz.idx;
+    doc["MQTTTopic"] = configuration.mqtt.topic;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -1833,18 +1881,16 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<50> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      state = root.get<bool>("state");
+      state = doc["state"].as<bool>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -1883,21 +1929,18 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<50> doc;
 
-    root["state"] = state;
+    doc["state"] = state;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -1929,14 +1972,14 @@ uint8_t AFEDataAccess::getDeviceMode() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &json = jsonBuffer.parseObject(buf.get());
-    if (json.success()) {
+    StaticJsonDocument<50> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      json.printTo(Serial);
+      serializeJson(doc, Serial);
       Serial << endl;
 #endif
-      mode = json["mode"];
+      mode = doc["mode"].as<unsigned short>();
 #ifdef DEBUG
       Serial << "success";
 #endif
@@ -1974,109 +2017,17 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &json = jsonBuffer.createObject();
-    json["mode"] = mode;
-    json.printTo(configFile);
+    StaticJsonDocument<50> doc;
+    doc["mode"] = mode;
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    json.printTo(Serial);
+    serializeJson(doc, Serial);
     Serial << endl;
 #endif
     configFile.close();
 
 #ifdef DEBUG
     Serial << "success";
-#endif
-
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-}
-
-uint8_t AFEDataAccess::getLanguage() {
-  uint8_t language = 0;
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-ui-language.json : ";
-#endif
-
-  File configFile = SPIFFS.open("cfg-ui-language.json", "r");
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
-#endif
-
-    size_t size = configFile.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<100> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
-#ifdef DEBUG
-      root.printTo(Serial);
-#endif
-      language = root["language"];
-#ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
-#endif
-    }
-
-#ifdef DEBUG
-    else {
-      Serial << "failure";
-    }
-#endif
-
-    configFile.close();
-  }
-
-#ifdef DEBUG
-  else {
-    Serial << "failure";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-
-  return language;
-}
-void AFEDataAccess::saveLanguage(uint8_t language) {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-ui-language.json : ";
-#endif
-
-  File configFile = SPIFFS.open("cfg-ui-language.json", "w");
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
-#endif
-
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-
-    root["language"] = language;
-    root.printTo(configFile);
-#ifdef DEBUG
-    root.printTo(Serial);
-#endif
-    configFile.close();
-
-#ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
 #endif
 
   }
@@ -2109,18 +2060,16 @@ uint8_t AFEDataAccess::getSystemLedID() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<50> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      id = root.get<int>("id");
+      id = doc["id"].as<unsigned short>();
 
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -2156,21 +2105,18 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<50> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    StaticJsonDocument<50> doc;
 
-    root["id"] = id;
+    doc["id"] = id;
 
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }
@@ -2290,24 +2236,25 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    StaticJsonDocument<300> doc;
+    DeserializationError error = deserializeJson(doc, configFile);
+    if (!error) {
 #ifdef DEBUG
-      root.printTo(Serial);
+      serializeJson(doc, Serial);
 #endif
-      configuration.gpio = root["gpio"];
-      configuration.interval = root["interval"];
-      configuration.numberOfSamples = root["numberOfSamples"];
-      configuration.maxVCC = root["maxVCC"];
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
-      configuration.domoticz.raw = root["idx"]["raw"];
-      configuration.domoticz.percent = root["idx"]["percent"];
-      configuration.domoticz.voltage = root["idx"]["voltage"];
+      configuration.gpio = doc["gpio"].as<unsigned short>();
+      configuration.interval = doc["interval"].as<unsigned int>();
+      configuration.numberOfSamples =
+          doc["numberOfSamples"].as<unsigned short>();
+      configuration.maxVCC = doc["maxVCC"].as<float>();
+      sprintf(configuration.mqtt.topic, doc["mqttTopic"].as<char *>());
+      configuration.domoticz.raw = doc["idx"]["raw"].as<unsigned long>();
+      configuration.domoticz.percent =
+          doc["idx"]["percent"].as<unsigned long>();
+      configuration.domoticz.voltage =
+          doc["idx"]["voltage"].as<unsigned long>();
 #ifdef DEBUG
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
     }
 
@@ -2344,28 +2291,26 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<300> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    JsonObject &idx = root.createNestedObject("idx");
+    StaticJsonDocument<300> doc;
 
-    root["gpio"] = configuration.gpio;
-    root["interval"] = configuration.interval;
-    root["numberOfSamples"] = configuration.numberOfSamples;
-    root["maxVCC"] = configuration.maxVCC;
-    root["mqttTopic"] = configuration.mqtt.topic;
+    JsonObject idx = doc.createNestedObject("idx");
+
+    doc["gpio"] = configuration.gpio;
+    doc["interval"] = configuration.interval;
+    doc["numberOfSamples"] = configuration.numberOfSamples;
+    doc["maxVCC"] = configuration.maxVCC;
+    doc["mqttTopic"] = configuration.mqtt.topic;
     idx["raw"] = configuration.domoticz.raw;
     idx["percent"] = configuration.domoticz.percent;
     idx["voltage"] = configuration.domoticz.voltage;
-    root.printTo(configFile);
+    serializeJson(doc, configFile);
 #ifdef DEBUG
-    root.printTo(Serial);
+    serializeJson(doc, Serial);
 #endif
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+    Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
 #endif
 
   }

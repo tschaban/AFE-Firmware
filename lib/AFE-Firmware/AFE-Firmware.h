@@ -12,6 +12,11 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <ArduinoJson.h>
+#include <ESP8266HTTPClient.h>
+
+#define AFE_WEBSERVICE_VALIDATE_KEY 0
+#define AFE_WEBSERVICE_ADD_KEY 1
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -20,22 +25,20 @@
 class AFEFirmware {
 
 private:
-
+  AFEDataAccess Data;
+  PRO_VERSION Pro;
 
 public:
   /* Constructor */
   AFEFirmware();
 
+  void begin();
+
   /* Returns if firmware version if pro */
   boolean isUnlocked();
 
-/* Returns information about the pro version, incl. limits */
-  PRO_VERSION getProVersionInfo();
-
-/* Checking the version */
-  void validate();
-
-
+  /* Validating if the key is valid */
+  boolean callService(uint8_t method);
 };
 
 #endif

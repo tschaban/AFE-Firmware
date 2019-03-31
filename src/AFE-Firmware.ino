@@ -31,6 +31,7 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 AFELED Led;
 #endif
 
+#include <AFE-Firmware.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -61,6 +62,7 @@ float humidity;
 #endif
 
 AFEDataAccess Data;
+AFEFirmware Firmware;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
@@ -108,9 +110,7 @@ AFESensorHPMA115S0 ParticleSensor;
 AFEAnalogInput AnalogInput;
 #endif
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <FS.h>
-#endif
 
 void setup() {
 
@@ -131,7 +131,6 @@ void setup() {
          << "All classes and global variables initialized";
 #endif
 
-#ifdef CONFIG_HARDWARE_SPIFFS
   if (SPIFFS.begin()) {
 #ifdef DEBUG
     Serial << endl << "File system mounted";
@@ -139,7 +138,6 @@ void setup() {
     Serial << endl << "Failed to mount file system";
 #endif
   }
-#endif
 
 #ifdef DEBUG
   Serial << endl << "Initializing device";
@@ -157,6 +155,7 @@ void setup() {
     Serial << "YES";
 #endif
     Device.setDevice();
+    Device.begin();
   }
 #ifdef DEBUG
   else {
@@ -243,6 +242,9 @@ void setup() {
   Serial << endl << "WebServer initialized";
 #endif
 
+  /* Initializing Firmware: version PRO */
+  Firmware.begin();
+
   /* Initializing switches */
   initSwitch();
 #ifdef DEBUG
@@ -304,7 +306,7 @@ void setup() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    if (Device.configuration.isAnalogInput) {
+    if (Device.configuration.isAnalogInput && Firmware.isUnlocked()) {
       AnalogInput.begin();
     }
 #endif
