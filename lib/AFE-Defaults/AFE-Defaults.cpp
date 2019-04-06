@@ -260,16 +260,16 @@ void AFEDefaults::set() {
 /* Switch config */
 #ifdef T0_SHELLY_1_CONFIG
   SwitchConfiguration.gpio = 5;
-  SwitchConfiguration.type = 1;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
 #else
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = 0;
 #endif
 
   SwitchConfiguration.sensitiveness = 50;
-  SwitchConfiguration.functionality = 0;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
   SwitchConfiguration.relayID = 1;
-  SwitchConfiguration.domoticz.idx = 1;
+  SwitchConfiguration.domoticz.idx = 0;
   SwitchConfiguration.mqtt.topic[0] = '\0';
   Data->saveConfiguration(0, SwitchConfiguration);
 
@@ -284,7 +284,7 @@ void AFEDefaults::set() {
 
 #if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
     defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-  SwitchConfiguration.functionality = 1;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
   Data->saveConfiguration(1, SwitchConfiguration);
 #endif
 

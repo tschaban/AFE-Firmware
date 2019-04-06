@@ -76,8 +76,10 @@ public:
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
-  /* Methods turns on / off APIs */
+/* Methods turns on / off APIs */
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);
+#endif
 
 #ifdef CONFIG_HARDWARE_LED
   LED getLEDConfiguration(uint8_t id);

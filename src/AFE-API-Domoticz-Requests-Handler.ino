@@ -57,7 +57,7 @@ void DomoticzPublishTemperatureAndHumidity(unsigned long idx, float temperature,
 #endif
 
 /* Pir */
-#if defined(T3_CONFIG)
+#ifdef CONFIG_HARDWARE_PIR
 /* It publishes gate state to Domoticz */
 void DomoticzPublishPirState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
@@ -70,7 +70,7 @@ void DomoticzPublishPirState(uint8_t id) {
 #endif
 
 /* Gate and Contactron */
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
 /* It publishes gate state to Domoticz */
 void DomoticzPublishGateState() {
   if (Device.configuration.api.domoticz) {

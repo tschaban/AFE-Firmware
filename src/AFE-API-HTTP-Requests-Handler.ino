@@ -103,7 +103,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
 
   /* Request related to gate */
   if (strcmp(request.device, "gate") == 0) {
@@ -139,9 +139,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
   }
 
-#else
+#endif
 
-// @TODO should it be included for T5????
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  // @TODO should it be included for T5????
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
@@ -235,7 +236,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_DS18B20
   /* Request related to ds18b20 */
-  else if (strcmp(request.device, "ds18b20") == 0) {
+  if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
         : sendHTTPAPIRequestStatus(request, false);
@@ -244,7 +245,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_DHXX
   /* Request related to DHT Sensor */
-  else if (strcmp(request.device, "dht") == 0) {
+  if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
       strcmp(request.command, "get") == 0
           ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
@@ -267,8 +268,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#if defined(T3_CONFIG)
-  else if (strcmp(request.device, "pir") == 0) {
+#ifdef CONFIG_HARDWARE_PIR
+  if (strcmp(request.device, "pir") == 0) {
     boolean pirSendFailure = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
       if (Device.configuration.isPIR[i]) {
@@ -288,7 +289,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
-  else if (strcmp(request.device, "HPMA115S0") == 0) {
+  if (strcmp(request.device, "HPMA115S0") == 0) {
     HPMA115S0_DATA sensorData;
     sensorData = ParticleSensor.get();
     if (strcmp(request.name, "PM2.5") == 0) {
@@ -305,7 +306,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_BMX80
   /* BMx80 */
-  else if (strcmp(request.device, "BMx80") == 0) {
+  if (strcmp(request.device, "BMx80") == 0) {
     if (strcmp(request.command, "get") == 0) {
       BMx80_DATA sensorData;
       sensorData = BMx80Sensor.get();
@@ -330,7 +331,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_BH1750
   /* BH1750 */
-  else if (strcmp(request.device, "BH1750") == 0) {
+  if (strcmp(request.device, "BH1750") == 0) {
     if (strcmp(request.name, "lux") == 0) {
       if (strcmp(request.command, "get") == 0) {
         float lux = BH1750Sensor.get();
@@ -344,7 +345,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
   /* Analog Input */
-  else if (strcmp(request.device, "ADC") == 0) {
+  if (strcmp(request.device, "ADC") == 0) {
 
     if (strcmp(request.command, "get") == 0) {
       ADCINPUT_DATA data;
@@ -363,8 +364,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
   /* Requests related to APIs */
-  else if (strcmp(request.device, "api") == 0) {
+  if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
         strcmp(request.name, "http") == 0
             ? API_HTTP
@@ -395,13 +397,21 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
-  } else if (strcmp(request.command, "reboot") == 0) { // reboot
+  }
+#endif
+
+  if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==
              0) { // configurationMode
-    sendHTTPAPIRequestStatus(request, true);
-    Device.reboot(MODE_CONFIGURATION);
+    PASSWORD password = Data.getPasswordConfiguration();
+    if (!password.protect) {
+      sendHTTPAPIRequestStatus(request, true);
+      Device.reboot(MODE_CONFIGURATION);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
     /* No such device or commend not implemented */
   } else {
     sendHTTPAPIRequestStatus(request, false);

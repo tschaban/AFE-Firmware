@@ -13,7 +13,7 @@
 
 struct PASSWORD {
   boolean protect;
-  char password[9];
+  char password[10];
 };
 
 #endif

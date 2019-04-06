@@ -14,8 +14,8 @@
 #include <IPAddress.h>
 
 struct NETWORK {
-  char ssid[32];
-  char password[32];
+  char ssid[33];
+  char password[33];
   uint8_t isDHCP;
   IPAddress ip;
   IPAddress gateway;

@@ -16,6 +16,7 @@ void handleFavicon() {}
 
 /* Method handles all HTTP request */
 void handleHTTPRequests() { WebServer.generate(); }
+void handleUpload() { WebServer.generate(true); }
 
 void handleOnNotFound() {
   WebServer.publishHTML("<head><meta http-equiv=\"refresh\" content=\"0; "

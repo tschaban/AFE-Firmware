@@ -57,29 +57,29 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   if (Device->getMode() == MODE_ACCESS_POINT) {
     page += "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
   }
-  page += "<h4 class=\"ltag\">";
+  page += "<h4>";
   page += L_FIRMWARE_NAME;
-  page += "</h4><h4>MENU</h4><ul class=\"lst\">";
+  page += "</h4><ul class=\"lst\">";
 
   Device->begin(); // Reading configuration data
-  page += "<li class=\"itm\"><a href=\"\\?option=";
+  page += "<li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_DEVICE;
   page += "\">";
   page += L_DEVICE;
-  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_NETWORK;
   page += "\">";
   page += L_NETWORK;
   page += "</a></li>";
   if (Device->configuration.api.mqtt) {
-    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_MQTT;
     page += "\">";
     page += L_MQTT_BROKER;
     page += "</a></li>";
   }
   if (Device->configuration.api.domoticz) {
-    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_DOMOTICZ;
     page += "\">";
     page += L_DOMOTICZ_SERVER;
@@ -97,7 +97,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 
   if (itemPresent > 0) {
-    page += "<li class=\"itm\"><a href=\"\\?option=";
+    page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_LED;
     page += "\">";
     page += L_LEDS;
@@ -120,9 +120,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</i></a></li>";
 
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?option=";
+      page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_RELAY;
-      page += "&id=";
+      page += "&i=";
       page += i;
       page += "\">&#8227; ";
       page += L_RELAY;
@@ -163,9 +163,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</i></a></li>";
 
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?option=";
+      page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_SWITCH;
-      page += "&id=";
+      page += "&i=";
       page += i;
       page += "\">&#8227; ";
       page += L_SWITCH;
@@ -191,7 +191,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
             "(PIR)</i></a></li>";
     for (uint8_t i = 0; i < 4; i++) {
       if (Device->configuration.isPIR[i]) {
-        page += "<li class=\"itm\"><a href=\"\\?option=pir";
+        page += "<li class=\"itm\"><a href=\"\\?o=pir";
         page += i;
         page += "\">&#8227; Czujnik: ";
         page += i + 1;
@@ -218,7 +218,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += language == 0 ? "Czujniki magnetyczne" : "Magnetic sensors";
     page += "</i></a></li>";
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?option=contactron";
+      page += "<li class=\"itm\"><a href=\"\\?o=contactron";
       page += i;
       page += "\"> - ";
       page += language == 0 ? "Czujnik: " : "Sensor: ";
@@ -226,7 +226,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "</a></li>";
     }
 
-    page += "<li class=\"itm\"><a href=\"\\?option=gate\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=gate\">";
     page +=
         language == 0 ? "Konfiguracja bram/drzwi" : "Gate/Door configuration";
     page += "</a></li>";
@@ -236,7 +236,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_DS18B20
   if (Device->configuration.isDS18B20) {
-    page += "<li class=\"itm\"><a href=\"\\?option=ds18b20\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=ds18b20\">";
     page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
     page += "</a></li>";
   }
@@ -245,7 +245,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 /* Sensor DHxx */
 #ifdef CONFIG_HARDWARE_DHXX
   if (Device->configuration.isDHT) {
-    page += "<li class=\"itm\"><a href=\"\\?option=DHT\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=DHT\">";
     page += language == 0 ? "Czujnik DHT" : "DHT sensor";
     page += "</a></li>";
   }
@@ -253,12 +253,12 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* UART */
 #ifdef CONFIG_HARDWARE_UART
-  page += "<li class=\"itm\"><a href=\"\\?option=HPMA115S0\">";
+  page += "<li class=\"itm\"><a href=\"\\?o=HPMA115S0\">";
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
   if (Device->configuration.isHPMA115S0) {
-    page += "<li class=\"itm\"><a href=\"\\?option=UART\">UART</a></li>";
+    page += "<li class=\"itm\"><a href=\"\\?o=UART\">UART</a></li>";
 
     page += language == 0 ? "Czujnik cząstek PM2.5/PM10"
                           : "PM2.5/PM10 Particle Sensor";
@@ -268,7 +268,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 #ifdef CONFIG_HARDWARE_BMX80
   if (Device->configuration.isBMx80 != 0) {
-    page += "<li class=\"itm\"><a href=\"\\?option=BMx80\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=BMx80\">";
     page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
     page += "</a></li>";
   }
@@ -276,7 +276,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 #ifdef CONFIG_HARDWARE_BH1750
   if (Device->configuration.isBH1750) {
-    page += "<li class=\"itm\"><a href=\"\\?option=BH1750\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=BH1750\">";
     page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
     page += "</a></li>";
   }
@@ -285,45 +285,40 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput && Firmware.isUnlocked()) {
-    page += "<li class=\"itm\"><a href=\"\\?option=analogInput\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_ANALOG_INPUT;
+    page += "\">";
     page += L_ANALOG_INPUT;
     page += "</a></li>";
   }
 #endif
 
-  page += "<br><li class=\"itm\"><a href=\"\\?option=";
+  page += "<br><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_PASSWORD;
   page += "\">";
   page += L_SET_PASSWORD;
   page += "</a></li>";
 
   /* Language, Upgrade, Exit */
-  page += "<br><li class=\"itm\"><a href=\"\\update\">";
+  page += "<br></li><li class=\"itm\"><a href=\"\\?o=";
+  page += AFE_CONFIG_SITE_UPGRADE;
+  page += "\">";
   page += L_FIRMWARE_UPGRADE;
-  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_RESET;
   page += "\">";
   page += L_RESET_DEVICE;
-  page += "</a></li><li class=\"itm\"><a href=\"\\?option=";
+  page += "</a></li><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_PRO_VERSION;
   page += "\">";
   page += L_PRO_VERSION;
-  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?option=";
+  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_EXIT;
   page += "\">";
   page += L_FINISH_CONFIGURATION;
 
   /* Information section */
-  page += "</a></li></ul><br><br><h4>";
-  page += L_INFORMATION;
-  page += "</h4><ul class=\"lst\"><li class=\"itm\"><a "
-          "href=\"https://www.smartnydom.pl/afe-firmware-";
-  page += L_LANGUAGE_SHORT;
-  page += "/\" target=\"_blank\">";
-  page += L_DOCUMENTATION;
   page += "</a></li></ul></div><div id=\"r\">";
-
-  return page;
 
   return page;
 }
@@ -564,8 +559,7 @@ String AFESitesGenerator::addFirstLaunchConfiguration() {
 
   body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
   body += L_REFRESH;
-  body +=
-      "\" formaction=\"/?option=start&cmd=0\"></div><div class=\"cf\"><label>";
+  body += "\" formaction=\"/?o=start&c=0\"></div><div class=\"cf\"><label>";
   body += L_PASSWORD;
   body += "</label><input name=\"p\" type=\"text\" /></div></fieldset>";
 
@@ -897,54 +891,38 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += "<div class=\"cf\"><label>";
   body += L_NAME;
-  body += "</label>";
-  body += "<input name=\"n" + String(id) +
+  body += "</label><input name=\"n" + String(id) +
           "\" type=\"text\" maxlength=\"16\" value=\"";
   body += configuration.name;
-  body += "\">";
-  body += "<span class=\"hint\">Max 16 ";
+  body += "\"><span class=\"hint\">Max 16 ";
   body += L_NUMBER_OF_CHARS;
-  body += "</span>";
-  body += "</div>";
-
-  body += "<p class=\"cm\">";
+  body += "</span></div><p class=\"cm\">";
   body += L_DEFAULT_VALUES;
-  body += "</p>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += "</p><div class=\"cf\"><label>";
   body += L_DEFAULT_POWER_RESTORED;
-  body += "</label>";
-  body += "<select name=\"pr" + String(id) + "\">";
-  body += "<option value=\"0\"";
+  body += "</label><select name=\"pr" + String(id) + "\"><option value=\"0\"";
   body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_NO_ACTION;
-  body += "</option>";
-  body += "<option value=\"1\"";
+  body += "</option><option value=\"1\"";
   body += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_OFF;
-  body += "</option>";
-  body += "<option value=\"2\"";
+  body += "</option><option value=\"2\"";
   body += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_ON;
-  body += "</option>";
-  body += "<option value=\"3\"";
+  body += "</option><option value=\"3\"";
   body += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_LAST_KNOWN_STATE;
-  body += "</option>";
-  body += "<option value=\"4\"";
+  body += "</option><option value=\"4\"";
   body += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
-  body += "</option>";
-  body += "</select>";
-  body += "</div>";
+  body += "</option></select></div>";
 
   if (Device->configuration.api.mqtt) {
     body += "<div class=\"cf\">";
@@ -997,9 +975,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #if !(defined(T3_CONFIG) || defined(T6_CONFIG))
   body += "<br><p class=\"cm\">";
   body += L_AUTOMATIC_SWITCHING_OFF;
-  body += "</p>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += "</p><div class=\"cf\"><label>";
 #if defined(T5_CONFIG)
   body += L_IMPULSE_DURATION;
 #else
@@ -1025,8 +1001,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += ". ";
   body += L_NO_ACTION_IF_0;
 #endif
-  body += "</span>";
-  body += "</div>";
+  body += "</span></div>";
 
 #endif /* T3/T6 exclusion end */
 
@@ -1066,10 +1041,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += L_SELECT_LED_4_RELAY;
   body += "</p>";
 
-  body += "<div class=\"cf\">";
-  body += "<label>LED</label>";
-  body += "<select  name=\"l" + String(id) + "\">";
-  body += "<option value=\"0\"";
+  body += "<div class=\"cf\"><label>LED</label><select  name=\"l" + String(id) +
+          "\"><option value=\"0\"";
   body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
   body += L_NONE;
   body += "</option>";
@@ -1088,8 +1061,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
   }
 
-  body += "</select>";
-  body += "</div>";
+  body += "</select></div>";
 #endif
 
   body += "</fieldset>";
@@ -1101,39 +1073,12 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #if !defined(T5_CONFIG)
   if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
-    body += "<div class=\"cf\">";
-    body += "<label>IDX</label>";
-    body += "<input name=\"x" + String(id) +
-            "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
-    body += configuration.domoticz.idx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += L_RANGE;
-    body += " 0 - 999999</span>";
-    body += "</div>";
-    body += "</fieldset>";
-
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    page += addDomoticzIDXItem(configuration.domoticz.idx, id);
   }
 #endif
 
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += L_MQTT_TOPIC;
-    body += "</label>";
-    body += "<input name=\"t" + String(id) +
-            "\" type=\"text\" maxlength=\"32\" value=\"";
-    body += configuration.mqtt.topic;
-    body += "\">";
-    body += "<span class=\"hint\">Max 32 ";
-    body += L_NUMBER_OF_CHARS;
-    body += "</span>";
-    body += "</div>";
-    body += "</fieldset>";
-    page += addConfigurationBlock("MQTT", "", body);
+    page += addMQTTTopicItem(configuration.mqtt.topic, id);
   }
 
   return page;
@@ -1189,13 +1134,28 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
   body += "</div><div class=\"cf\"><label>";
   body += L_FUNCTIONALITY;
-  body += "</label><select name=\"f" + String(id) + "\">";
-  body += "<option value=\"0\"";
-  body += (configuration.functionality == 0 ? " selected=\"selected\"" : "");
+  body += "</label><select name=\"f" + String(id) + "\"><option value=\"";
+  body += SWITCH_FUNCTIONALITY_NONE;
+  body += "\"";
+  body += (configuration.functionality == SWITCH_FUNCTIONALITY_NONE
+               ? " selected=\"selected\""
+               : "");
+  body += ">";
+  body += L_NONE;
+  body += "</option><option value=\"";
+  body += SWITCH_FUNCTIONALITY_MULTI;
+  body += "\"";
+  body += (configuration.functionality == SWITCH_FUNCTIONALITY_MULTI
+               ? " selected=\"selected\""
+               : "");
   body += ">";
   body += L_SYSTEM_BUTTON;
-  body += "</option><option value=\"1\"";
-  body += (configuration.functionality == 1 ? " selected=\"selected\"" : "");
+  body += "</option><option value=\"";
+  body += SWITCH_FUNCTIONALITY_RELAY;
+  body += "\"";
+  body += (configuration.functionality == SWITCH_FUNCTIONALITY_RELAY
+               ? " selected=\"selected\""
+               : "");
   body += ">";
 #ifdef CONFIG_FUNCTIONALITY_GATE
   body += L_CONTROL_GATE;
@@ -1226,7 +1186,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   body += "</select></div><div class=\"cf\"><label>";
   body += L_TYPE;
-  body += "</label><select name=\"t" + String(id) + "\"><option value=\"0\"";
+  body += "</label><select name=\"m" + String(id) + "\"><option value=\"0\"";
   body += (configuration.type == 0 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_MONOSTABLE;
@@ -1242,14 +1202,24 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
           "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
           "value=\"";
   body += configuration.sensitiveness;
-  body += "\"><span class=\"hint\">0 - 999 (";
+  body += "\"><span class=\"hint\">0-999 (";
   body += L_MILISECONDS;
   body += ")</span></div></fieldset>";
 
   char title[23];
   sprintf(title, "%s #%d", L_SWITCH_BUTTON, id + 1);
 
-  return addConfigurationBlock(title, "", body);
+  String page = addConfigurationBlock(title, "", body);
+
+  if (Device->configuration.api.domoticz) {
+    page += addDomoticzIDXItem(configuration.domoticz.idx, id);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    page += addMQTTTopicItem(configuration.mqtt.topic, id);
+  }
+
+  return page;
 }
 
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -1276,9 +1246,8 @@ String AFESitesGenerator::addDS18B20Configuration() {
   body += " (24h)</span>";
   body += "</div>";
 
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"o\" type=\"checkbox\" value=\"1\"";
+  body += "<div class=\"cc\"><label><input name=\"o\" type=\"checkbox\" "
+          "value=\"1\"";
   body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
   body += language == 0
               ? ">Wysyłać dane tylko, gdy wartość temperatury zmieni się"
@@ -1289,31 +1258,22 @@ String AFESitesGenerator::addDS18B20Configuration() {
   body += "<div class=\"cf\">";
   body += "<label>";
   body += language == 0 ? "Korekta wartości o" : "Temperature correction";
-  body += "</label>";
-  body += "<input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
-          "step=\"0.01\" "
-          "value=\"";
+  body +=
+      "</label><input name=\"c\" type=\"number\" min=\"-9.99\" max=\"9.99\" "
+      "step=\"0.01\" "
+      "value=\"";
   body += configuration.correction;
   body += "\">";
   body += "<span class=\"hint\">";
   body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99 - +9.99</span>";
-  body += "</div>";
-  body += "<div class=\"cf\">";
-  body += "<label>";
+  body += ": -9.99 - +9.99</span></div><div class=\"cf\"><label>";
   body += language == 0 ? "Jednostka" : "Unit";
-  body += "</label>";
-  body += "<select  name=\"u\">";
-  body += "<option value=\"0\"";
+  body += "</label><select name=\"u\"><option value=\"0\"";
   body += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
   body += language == 0 ? "Celsjusz" : "Celsius";
-  body += "</option>";
-  body += "<option value=\"1\"";
+  body += "</option>option value=\"1\"";
   body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">Fahrenheit</option>";
-  body += "</select>";
-  body += "</div>";
-  body += "</fieldset>";
+  body += ">Fahrenheit</option></select></div></fieldset>";
 
   String page =
       addConfigurationBlock(language == 0 ? "Czujnik temperatury DS18B20"
@@ -1486,7 +1446,7 @@ String AFESitesGenerator::addDHTConfiguration() {
 
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
 String AFESitesGenerator::addThermostateMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?option=thermostat\">&#8227; ";
+  String page = "<li class=\"itm\"><a href=\"\\?o=thermostat\">&#8227; ";
   page += language == 0 ? "Termostat" : "Thermostat";
   page += "</a></li>";
   return page;
@@ -1495,7 +1455,7 @@ String AFESitesGenerator::addThermostateMenuItem() {
 
 #ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
 String AFESitesGenerator::addHumidistatMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?option=humidistat\">&#8227; ";
+  String page = "<li class=\"itm\"><a href=\"\\?o=humidistat\">&#8227; ";
   page += language == 0 ? "Regulator wilgotności" : "Humidistat";
   page += "</a></li>";
   return page;
@@ -2158,9 +2118,9 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   String body =
       "<fieldset><div class=\"cf\"><label>GPIO</label><input name=\"g\" "
-      "type=\"number\" disabled=\"disabled\" value=\"";
+      "type=\"number\" value=\"";
   body += configuration.gpio;
-  body += "\" ><span class=\"hint\">(";
+  body += "\"><span class=\"hint\">(";
   body += L_CANT_CHANGE;
   body += ")</span></div><div class=\"cf\"><label>";
   body += L_MEASURMENTS_INTERVAL;
@@ -2168,61 +2128,32 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
           "type=\"number\" "
           "value=\"";
   body += configuration.interval;
-  body += "\"><span class=\"hint\">1 - 86400 (24h) ";
+  body += "\"><span class=\"hint\">1-86400 (24h) ";
   body += L_SECONDS;
   body += "</span></div><div class=\"cf\"><label>";
   body += L_MEASURED_VOLTAGE;
-  body += "</label><input name=\"m\" min=\"0\" max=\"1000\""
+  body += "</label><input name=\"m\" min=\"0\" max=\"1000\"  step=\"0.01\""
           "type=\"number\" value=\"";
   body += configuration.maxVCC;
-  body += "\"><span class=\"hint\"> 0 - 999.99V</span></div><div "
+  body += "\"><span class=\"hint\"> 0-999.99V</span></div><div "
           "class=\"cf\"><label>";
   body += L_NUMBER_OF_SAMPLES;
   body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
   body += configuration.numberOfSamples;
-  body += "\"><span class=\"hint\">1 - 999</span></div><br><br></fieldset>";
+  body += "\"><span class=\"hint\">1-999</span></div><br><br></fieldset>";
 
   String page = addConfigurationBlock(L_ANALOG_INPUT, "", body);
 
   if (device.api.mqtt) {
-    body = "<fieldset><div class=\"cf\"><label>";
-    body += L_MQTT_TOPIC;
-    body += "</label><input name=\"q\" type=\"text\""
-            "maxlength=\"64\" value=\"";
-    body += configuration.mqtt.topic;
-    body += "\"><span class=\"hint\">Format <strong>abc/def/</strong>. Max 64 ";
-    body += L_NUMBER_OF_CHARS;
-    body += "</span></div></fieldset>";
-    page += addConfigurationBlock("MQTT", "", body);
+    page += addMQTTTopicItem(configuration.mqtt.topic, 0);
   }
 
   if (Device->configuration.api.domoticz) {
-    body = "<fieldset><div class=\"cf\"><label>IDX ";
-    body += L_RAW_DATA;
-    body += "</label><input name=\"r\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.domoticz.raw;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += L_RANGE;
-    body += " 0 - 999999</span></div><div class=\"cf\"><label>IDX ";
-    body += L_PERCENT;
-    body += "</label><input name=\"p\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.domoticz.percent;
-    body += "\"><span class=\"hint\">";
-    body += L_RANGE;
-    body += " 0 - 999999</span></div><div class=\"cf\"><label>IDX ";
-    body += L_VOLTAGE;
-    body += "</label><input name=\"v\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.domoticz.voltage;
-    body += "\"><span class=\"hint\">";
-    body += L_RANGE;
-    body += " 0 - 999999</span></div></fieldset>";
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    page += addDomoticzIDXItem(configuration.domoticz.raw, 0, L_RAW_DATA);
+    page += addDomoticzIDXItem(configuration.domoticz.percent, 1, L_PERCENT);
+    page += addDomoticzIDXItem(configuration.domoticz.voltage, 2, L_VOLTAGE);
   }
 
   return page;
@@ -2275,14 +2206,17 @@ String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
 #endif
 
 String AFESitesGenerator::addUpgradeSection() {
-  String body = "<fieldset><div class=\"cf\"><label>";
+  String body = "<form method=\"post\" action=\"upgrade?o=";
+  body += AFE_CONFIG_SITE_POST_UPGRADE;
+  body += "\" enctype=\"multipart/form-data\">";
+  body += "<fieldset><div class=\"cf\"><label>";
   body += L_SELECT_FIRMWARE;
   body += "</label><input class=\"bs\" name=\"update\" type=\"file\" "
           "accept=\".bin\"></div><p class=\"cm\">";
   body += L_UPGRADE_INFO;
   body += ".</p><button type=\"submit\" class=\"b be\">";
   body += L_UPGRADE;
-  body += "</button></fieldset>";
+  body += "</button></fieldset></form>";
   return addConfigurationBlock(L_FIRMWARE_UPGRADE, L_DONT_PLUG_OFF, body);
 }
 
@@ -2351,10 +2285,10 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
       "<form method=\"post\"><div class=\"cf\"><input name=\"p\" type=\"text\" "
       "placeholder=\"Hasło\"></div><div class=\"cf\"><input type=\"submit\" "
       "class=\"b bs\" "
-      "value=\"Tryb normalny\" formaction=\"/?option=0&id=";
+      "value=\"Tryb normalny\" formaction=\"/?o=0&i=";
   body += MODE_CONFIGURATION;
   body += "\" /> <input type=\"submit\" class=\"b be\" "
-          "value=\"Tryb HotSpot\" formaction=\"/?option=0&id=";
+          "value=\"Tryb HotSpot\" formaction=\"/?o=0&i=";
   body += MODE_ACCESS_POINT;
   body += "\" /></div></form>";
 
@@ -2595,3 +2529,29 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
   return body;
 }
 #endif
+
+const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id) {
+  String body = "<fieldset><div class=\"cf\"><label>";
+  body += L_MQTT_TOPIC;
+  body += "</label><input name=\"t" + String(id) +
+          "\" type=\"text\" maxlength=\"32\" value=\"";
+  body += topic;
+  body += "\"><span class=\"hint\">Max 32 ";
+  body += L_NUMBER_OF_CHARS;
+  body += "</span></div></fieldset>";
+  return addConfigurationBlock("MQTT", "", body);
+}
+
+const String AFESitesGenerator::addDomoticzIDXItem(unsigned long idx,
+                                                   uint8_t id,
+                                                   const String title) {
+  String body =
+      "<fieldset><div class=\"cf\"><label>IDX</label><input name=\"x" +
+      String(id) +
+      "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
+  body += idx;
+  body += "\"><span class=\"hint\">";
+  body += L_RANGE;
+  body += " 0-999999</span></div></fieldset>";
+  return addConfigurationBlock("Domoticz" + title, L_NO_IF_IDX_0, body);
+}

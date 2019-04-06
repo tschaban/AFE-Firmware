@@ -6,7 +6,7 @@
 
 /* Firmware names */
 #ifdef T0_CONFIG
-#define L_FIRMWARE_NAME "WiFi Switch"
+#define L_FIRMWARE_NAME "WIFI SWITCH"
 #elif T0_SHELLY_1_CONFIG
 #define L_FIRMWARE_NAME "for Shelly-1"
 #elif T1_CONFIG
@@ -40,7 +40,7 @@
 #define L_RESET_DEVICE "Reset to orginal state"
 #define L_FINISH_CONFIGURATION "Finish configuration"
 #define L_INFORMATION "INFORMATION"
-#define L_DOCUMENTATION "Documentation"
+//#define L_DOCUMENTATION "Documentation"
 #define L_SETTINGS "Settings"
 #define L_SETTINGS_HOT_SPOT "Settings (HotSpot mode)"
 #define L_PRO_VERSION "PRO Version"
@@ -169,9 +169,9 @@
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
 #define L_MEASURED_VOLTAGE "Measured voltage"
 #define L_NUMBER_OF_SAMPLES "Number of sample measurements"
-#define L_RAW_DATA "Raw data"
-#define L_PERCENT "Percent"
-#define L_VOLTAGE "Voltage"
+#define L_RAW_DATA ": raw data"
+#define L_PERCENT ": percent"
+#define L_VOLTAGE ": voltage"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Select Firmware"

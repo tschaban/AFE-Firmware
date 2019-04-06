@@ -14,9 +14,9 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware.h>
-#include <AFE-OTA.h>
 #include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
+#include <WiFiUdp.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -37,8 +37,6 @@ class AFEWebServer {
 
 private:
   ESP8266WebServer server;
-  // Class used for firmware upgrade
-  ESP8266HTTPUpdateServer httpUpdater;
   AFEDevice *Device;
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
@@ -52,11 +50,15 @@ private:
   AFEDataAccess Data;
   AFESitesGenerator Site;
 
+  boolean upgradeFailed = false;
+
   /* Method gets url Option parameter value */
-  String getOptionName();
+  boolean getOptionName();
   uint8_t getCommand();
   uint8_t getSiteID();
   uint8_t getID();
+
+  String generateSite(AFE_SITE_PARAMETERS *siteConfig);
 
   /* Methods get POST data (for saveing) */
   DEVICE getDeviceData();
@@ -67,12 +69,6 @@ private:
   SWITCH getSwitchData(uint8_t id);
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
-
-  String generateSite(AFE_SITE_PARAMETERS *siteConfig);
-  // String getFirstLaunchConfigurationSite();
-  String getConnectingSite();
-  String getIndexSite(boolean authorized);
-  String getSite(uint8_t option, uint8_t command);
 
 #ifdef CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);
@@ -137,10 +133,13 @@ public:
 
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
+  void handleFirmwareUpgrade(const char *uri,
+                             ESP8266WebServer::THandlerFunction handlerUpgrade,
+                             ESP8266WebServer::THandlerFunction handlerUpload);
 
   /* Method generate HTML side. It reads also data from HTTP requests arguments
    * and pass them to Configuration Panel class */
-  void generate();
+  void generate(boolean upload = false);
 
   /* Method listens for HTTP API requests. If get True command is in httpCommand
    */

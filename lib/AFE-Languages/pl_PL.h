@@ -6,7 +6,7 @@
 
 /* Firmware names */
 #ifdef T0_CONFIG
-#define L_FIRMWARE_NAME "Włącznik WiFi"
+#define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
 #elif T0_SHELLY_1_CONFIG
 #define L_FIRMWARE_NAME "dla Shelly-1"
 #elif T1_CONFIG
@@ -37,7 +37,7 @@
 #define L_FIRMWARE_UPGRADE "Aktualizacja oprogramowania"
 #define L_RESET_DEVICE "Ustawienia początkowe"
 #define L_FINISH_CONFIGURATION "Zakoncz konfigurację"
-#define L_INFORMATION "INFORMACJE"
+//#define L_INFORMATION "INFORMACJE"
 #define L_DOCUMENTATION "Dokumentacja"
 #define L_SETTINGS "Ustawienia"
 #define L_SETTINGS_HOT_SPOT "Ustawienia (Tryb HotSpot)"
@@ -173,9 +173,9 @@
 #define L_MEASURMENTS_INTERVAL "Interwał odczytów"
 #define L_MEASURED_VOLTAGE "Mierzone napięcie"
 #define L_NUMBER_OF_SAMPLES "Ilość próbek do uśrednienia odczytu"
-#define L_RAW_DATA "Surowe dane"
-#define L_PERCENT "Procent"
-#define L_VOLTAGE "Napięcie"
+#define L_RAW_DATA ": surowe dane"
+#define L_PERCENT ": procent"
+#define L_VOLTAGE ": napięcie"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"

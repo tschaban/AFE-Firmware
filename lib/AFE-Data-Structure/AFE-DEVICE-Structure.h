@@ -19,7 +19,7 @@ struct DEVICE_API {
 
 /* Custom DEVICE structure definition */
 struct DEVICE {
-  char name[32];
+  char name[33];
   DEVICE_API api;
 #if defined(T0_CONFIG)
   boolean isLED[2];

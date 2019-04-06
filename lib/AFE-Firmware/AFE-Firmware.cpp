@@ -31,17 +31,39 @@ boolean AFEFirmware::callService(uint8_t method) {
   http.begin(url);
   int httpCode = http.GET();
   if (httpCode > 0) {
-    StaticJsonDocument<135> doc;
-    DeserializationError error = deserializeJson(doc, http.getString());
+    /* ArduinoJson v5 */
+    StaticJsonBuffer<135> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(http.getString());
 
-    if (!error) {
+    /* ArduinoJson v6
+    StaticJsonDocument<135> root;
+    DeserializationError error = deserializeJson(root, http.getString());
+*/
+    /* ArduinoJson v5*/
+    if (root.success()) {
 #ifdef DEBUG
-      serializeJson(doc, Serial);
+      root.printTo(Serial);
 #endif
-      Pro.valid = doc["status"].as<boolean>();
+
+      /* ArduinoJson v6
+      if (!error) {
+  #ifdef DEBUG
+        serializeJson(root, Serial);
+  #endif
+  */
+      Pro.valid = root["status"];
 
 #ifdef DEBUG
-      Serial << endl << "success" << endl << "JSON Buffer size: " << doc.size();
+      /* ArduinoJson v5 */
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+
+      /* ArduinoJson v6
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << root.size();*/
+
 #endif
 
       Data.saveConfiguration(Pro);

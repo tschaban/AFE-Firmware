@@ -7,7 +7,7 @@
 AFEWebServer::AFEWebServer() {}
 
 void AFEWebServer::begin(AFEDevice *_Device) {
-  httpUpdater.setup(&server);
+  // httpUpdater.setup(&server);
   server.begin();
   Device = _Device;
   Site.begin(Device);
@@ -23,12 +23,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   }
 
   if (siteConfig->form) {
-    page += "<form  method=\"post\" action=\"/?cmd=";
+    page += "<form  method=\"post\" action=\"/?c=";
     page += SERVER_CMD_SAVE;
-    page += "&option=";
+    page += "&o=";
     page += siteConfig->ID;
     if (siteConfig->deviceID >= 0) {
-      page += "&id=";
+      page += "&i=";
       page += siteConfig->deviceID;
     }
     page += "\">";
@@ -73,6 +73,15 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     break;
   case AFE_CONFIG_SITE_UPGRADE:
     page += Site.addUpgradeSection();
+    break;
+  case AFE_CONFIG_SITE_POST_UPGRADE:
+    page += Site.addPostUpgradeSection(upgradeFailed);
+    break;
+  case AFE_CONFIG_SITE_RELAY:
+    page += Site.addRelayConfiguration(siteConfig->deviceID);
+    break;
+  case AFE_CONFIG_SITE_SWITCH:
+    page += Site.addSwitchConfiguration(siteConfig->deviceID);
     break;
 #ifdef CONFIG_HARDWARE_ADC_VCC
   case AFE_CONFIG_SITE_ANALOG_INPUT:
@@ -172,8 +181,11 @@ String AFEWebServer::getSite(uint8_t option, uint8_t command) {
 }
 */
 
-void AFEWebServer::generate() {
-  /* @TODO this method is not writen well */
+void AFEWebServer::generate(boolean upload) {
+
+  if (getOptionName()) {
+    return;
+  }
 
   if (_refreshConfiguration) {
     _refreshConfiguration = false;
@@ -224,6 +236,14 @@ void AFEWebServer::generate() {
       Data.saveSystemLedID(getSystemLEDData());
       break;
 #endif
+    case AFE_CONFIG_SITE_RELAY:
+      Data.saveConfiguration(siteConfig.deviceID,
+                             getRelayData(siteConfig.deviceID));
+      break;
+    case AFE_CONFIG_SITE_SWITCH:
+      Data.saveConfiguration(siteConfig.deviceID,
+                             getSwitchData(siteConfig.deviceID));
+      break;
     case AFE_CONFIG_SITE_RESET:
       siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
       siteConfig.reboot = true;
@@ -278,32 +298,105 @@ void AFEWebServer::generate() {
     case AFE_CONFIG_SITE_RESET:
       siteConfig.formButton = false;
       break;
+    case AFE_CONFIG_SITE_UPGRADE:
+      siteConfig.form = false;
+      break;
+    case AFE_CONFIG_SITE_POST_UPGRADE:
+      if (!upload) {
+        siteConfig.form = false;
+        siteConfig.twoColumns = false;
+        siteConfig.rebootTime = 15;
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = Device->getMode();
+      }
+      break;
     }
   }
 
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "---------------- Opening WebSite -----------------";
-  Serial << endl << "Site ID: " << siteConfig.ID;
-  Serial << endl
-         << "Site Type: "
-         << (siteConfig.twoColumns ? "Two Columns" : "One Column");
-  Serial << endl << "Device ID: " << siteConfig.deviceID;
-  Serial << endl << "Command: " << command;
-  Serial << endl << "Reboot: " << (siteConfig.reboot ? "Yes" : "No");
-  if (siteConfig.reboot) {
-    Serial << endl << " - Mode: " << siteConfig.rebootMode;
-    Serial << endl << " - Time: " << siteConfig.rebootTime;
-  }
+  if (upload) {
+    HTTPUpload &upload = server.upload();
+    String _updaterError;
+    if (upload.status == UPLOAD_FILE_START) {
+      WiFiUDP::stopAll();
 
-  Serial << endl
-         << "--------------------------------------------------" << endl;
+#ifdef DEBUG
+      Serial << endl
+             << endl
+             << "---------------- Firmware upgrade -----------------";
+      Serial << endl << "Update: " << upload.filename.c_str();
+#endif
+
+      uint32_t maxSketchSpace =
+          (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+#ifdef DEBUG
+      Serial << endl << "Max sketch space: " << maxSketchSpace << endl;
+#endif
+
+      if (!Update.begin(maxSketchSpace)) { // start with max available size
+#ifdef DEBUG
+        Update.printError(Serial);
+#endif
+        upgradeFailed = true;
+      }
+    } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+#ifdef DEBUG
+      Serial << ".";
+#endif
+
+      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+#ifdef DEBUG
+        Update.printError(Serial);
+#endif
+        upgradeFailed = true;
+      }
+    } else if (upload.status == UPLOAD_FILE_END && !_updaterError.length()) {
+      if (Update.end(true)) { // true to set the size to the current
+                              // progress
+#ifdef DEBUG
+        Serial << endl
+               << "Update Success. Firmware size: " << upload.totalSize << endl
+               << "Rebooting...";
+        Serial << endl << "---------------------------------------------------";
+#endif
+      } else {
+#ifdef DEBUG
+        Update.printError(Serial);
+#endif
+        upgradeFailed = true;
+      }
+    } else if (upload.status == UPLOAD_FILE_ABORTED) {
+      Update.end();
+#ifdef DEBUG
+      Serial << endl << "Update was aborted";
+      Serial << endl << "---------------------------------------------------";
+#endif
+    }
+    delay(0);
+  } else {
+
+#ifdef DEBUG
+    Serial << endl
+           << endl
+           << "---------------- Opening WebSite -----------------";
+    Serial << endl << "Site ID: " << siteConfig.ID;
+    Serial << endl
+           << "Site Type: "
+           << (siteConfig.twoColumns ? "Two Columns" : "One Column");
+    Serial << endl << "Device ID: " << siteConfig.deviceID;
+    Serial << endl << "Command: " << command;
+    Serial << endl << "Reboot: " << (siteConfig.reboot ? "Yes" : "No");
+    if (siteConfig.reboot) {
+      Serial << endl << " - Mode: " << siteConfig.rebootMode;
+      Serial << endl << " - Time: " << siteConfig.rebootTime;
+    }
+
+    Serial << endl
+           << "--------------------------------------------------" << endl;
 
 #endif
 
-  publishHTML(generateSite(&siteConfig));
-
+    publishHTML(generateSite(&siteConfig));
+  }
   /* Post page generation actions */
 
   /* Reseting device */
@@ -508,7 +601,7 @@ void AFEWebServer::generate() {
 
 /* Methods related to the url request */
 
-String AFEWebServer::getOptionName() {
+boolean AFEWebServer::getOptionName() {
   /* Recived HTTP API Command */
   if (server.hasArg("command")) {
     /* Constructing command */
@@ -534,11 +627,8 @@ String AFEWebServer::getOptionName() {
       memset(httpCommand.source, 0, sizeof httpCommand.source);
     }
     receivedHTTPCommand = true;
-    return server.arg("command");
-
-  } else {
-    return "index";
   }
+  return receivedHTTPCommand;
 }
 
 uint8_t AFEWebServer::getSiteID() {
@@ -548,8 +638,8 @@ uint8_t AFEWebServer::getSiteID() {
   } else if (Device->getMode() == MODE_NORMAL) {
     return AFE_CONFIG_SITE_INDEX;
   } else {
-    if (server.hasArg("option")) {
-      return server.arg("option").toInt();
+    if (server.hasArg("o")) {
+      return server.arg("o").toInt();
     } else {
       return AFE_CONFIG_SITE_DEVICE;
     }
@@ -557,16 +647,16 @@ uint8_t AFEWebServer::getSiteID() {
 }
 
 uint8_t AFEWebServer::getCommand() {
-  if (server.hasArg("cmd")) {
-    return server.arg("cmd").toInt();
+  if (server.hasArg("c")) {
+    return server.arg("c").toInt();
   } else {
     return SERVER_CMD_NONE;
   }
 }
 
 uint8_t AFEWebServer::getID() {
-  if (server.hasArg("id")) {
-    return server.arg("id").toInt();
+  if (server.hasArg("i")) {
+    return server.arg("i").toInt();
   } else {
     return -1;
   }
@@ -608,6 +698,12 @@ void AFEWebServer::sendJSON(String json) {
 void AFEWebServer::handle(const char *uri,
                           ESP8266WebServer::THandlerFunction handler) {
   server.on(uri, handler);
+}
+
+void AFEWebServer::handleFirmwareUpgrade(
+    const char *uri, ESP8266WebServer::THandlerFunction handlerUpgrade,
+    ESP8266WebServer::THandlerFunction handlerUpload) {
+  server.on(uri, HTTP_POST, handlerUpgrade, handlerUpload);
 }
 
 void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
@@ -696,13 +792,13 @@ DEVICE AFEWebServer::getDeviceData() {
 NETWORK AFEWebServer::getNetworkData() {
   NETWORK data;
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.ssid, sizeof(data.ssid) + 1);
+    server.arg("s").toCharArray(data.ssid, sizeof(data.ssid));
   } else {
     data.ssid[0] = '\0';
   }
 
   if (server.arg("p").length() > 0) {
-    server.arg("p").toCharArray(data.password, sizeof(data.password) + 1);
+    server.arg("p").toCharArray(data.password, sizeof(data.password));
   } else {
     data.password[0] = '\0';
   }
@@ -765,7 +861,7 @@ NETWORK AFEWebServer::getNetworkData() {
 MQTT AFEWebServer::getMQTTData() {
   MQTT data;
   if (server.arg("h").length() > 0) {
-    server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
+    server.arg("h").toCharArray(data.host, sizeof(data.host));
   } else {
     data.host[0] = '\0';
   }
@@ -782,19 +878,19 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("u").length() > 0) {
-    server.arg("u").toCharArray(data.user, sizeof(data.user) + 1);
+    server.arg("u").toCharArray(data.user, sizeof(data.user));
   } else {
     data.user[0] = '\0';
   }
 
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.password, sizeof(data.password) + 1);
+    server.arg("s").toCharArray(data.password, sizeof(data.password));
   } else {
     data.password[0] = '\0';
   }
 
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
@@ -810,7 +906,7 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
   }
 
   if (server.arg("h").length() > 0) {
-    server.arg("h").toCharArray(data.host, sizeof(data.host) + 1);
+    server.arg("h").toCharArray(data.host, sizeof(data.host));
   } else {
     data.host[0] = '\0';
   }
@@ -820,12 +916,12 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
   }
 
   if (server.arg("u").length() > 0) {
-    server.arg("u").toCharArray(data.user, sizeof(data.user) + 1);
+    server.arg("u").toCharArray(data.user, sizeof(data.user));
   } else {
     data.user[0] = '\0';
   }
   if (server.arg("s").length() > 0) {
-    server.arg("s").toCharArray(data.password, sizeof(data.password) + 1);
+    server.arg("s").toCharArray(data.password, sizeof(data.password));
   } else {
     data.password[0] = '\0';
   }
@@ -840,29 +936,32 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.gpio = server.arg("g" + String(id)).toInt();
   }
 
-#if !(defined(T3_CONFIG) || defined(T6_CONFIG))
+#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   if (server.arg("ot" + String(id)).length() > 0) {
     data.timeToOff = server.arg("ot" + String(id)).toFloat();
   }
 #endif
 
-#if !defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+
   if (server.arg("pr" + String(id)).length() > 0) {
     data.state.powerOn = server.arg("pr" + String(id)).toInt();
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name) + 1);
+    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
   }
 
   if (server.arg("t" + String(id)).length() > 0) {
     server.arg("t" + String(id))
-        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
+        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("mc" + String(id)).length() > 0) {
-    data.state.MQTTConnected = server.arg("mc" + String(id)).toInt();
-  }
+  data.state.MQTTConnected = server.arg("mc" + String(id)).length() > 0
+                                 ? server.arg("mc" + String(id)).toInt()
+                                 : 0;
 
 #ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   if (server.arg("tp" + String(id)).length() > 0) {
@@ -870,9 +969,9 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   }
 #endif
 
-  if (server.arg("x" + String(id)).length() > 0) {
-    data.domoticz.idx = server.arg("x" + String(id)).toInt();
-  }
+  data.domoticz.idx = server.arg("x" + String(id)).length() > 0
+                          ? server.arg("x" + String(id)).toInt()
+                          : 0;
 
 #endif
 
@@ -886,8 +985,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   SWITCH data;
 
-  if (server.arg("t" + String(id)).length() > 0) {
-    data.type = server.arg("t" + String(id)).toInt();
+  if (server.arg("m" + String(id)).length() > 0) {
+    data.type = server.arg("m" + String(id)).toInt();
   }
 
   if (server.arg("s" + String(id)).length() > 0) {
@@ -906,6 +1005,17 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
     data.relayID = server.arg("r" + String(id)).toInt();
   }
 
+  data.domoticz.idx = server.arg("x" + String(id)).length() > 0
+                          ? server.arg("x" + String(id)).toInt()
+                          : 0;
+
+  if (server.arg("t" + String(id)).length() > 0) {
+    server.arg("t" + String(id))
+        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
+  }
+
   return data;
 }
 
@@ -913,7 +1023,7 @@ PASSWORD AFEWebServer::getPasswordData() {
   PASSWORD data;
 
   if (server.arg("p").length() > 0) {
-    server.arg("p").toCharArray(data.password, sizeof(data.password) + 1);
+    server.arg("p").toCharArray(data.password, sizeof(data.password));
   }
 
   if (server.arg("r").length() > 0) {
@@ -927,7 +1037,7 @@ PRO_VERSION AFEWebServer::getSerialNumberData() {
   PRO_VERSION data;
 
   if (server.arg("k").length() > 0) {
-    server.arg("k").toCharArray(data.serial, sizeof(data.serial) + 1);
+    server.arg("k").toCharArray(data.serial, sizeof(data.serial));
   }
 
   if (server.arg("v").length() > 0) {
@@ -1270,22 +1380,22 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
     data.maxVCC = server.arg("m").toFloat();
   }
 
-  if (server.arg("q").length() > 0) {
-    server.arg("q").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic) + 1);
+  if (server.arg("t0").length() > 0) {
+    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("r").length() > 0) {
-    data.domoticz.raw = server.arg("r").toInt();
+  if (server.arg("x0").length() > 0) {
+    data.domoticz.raw = server.arg("x0").toInt();
   }
 
-  if (server.arg("p").length() > 0) {
-    data.domoticz.percent = server.arg("p").toInt();
+  if (server.arg("x1").length() > 0) {
+    data.domoticz.percent = server.arg("x1").toInt();
   }
 
-  if (server.arg("v").length() > 0) {
-    data.domoticz.voltage = server.arg("v").toInt();
+  if (server.arg("x2").length() > 0) {
+    data.domoticz.voltage = server.arg("x2").toInt();
   }
 
   return data;

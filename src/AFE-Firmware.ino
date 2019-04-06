@@ -212,7 +212,7 @@ void setup() {
 /* Initializing LED, checking if LED exists is made on Class level  */
 #ifdef CONFIG_HARDWARE_LED
   uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0) {
+  if (systeLedID > 0 && Device.configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
   }
 
@@ -233,6 +233,7 @@ void setup() {
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
+  WebServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
   if (Device.getMode() == MODE_NETWORK_NOT_SET) {
     WebServer.onNotFound(handleOnNotFound);
   }

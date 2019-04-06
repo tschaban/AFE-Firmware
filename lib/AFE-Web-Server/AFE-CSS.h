@@ -2,11 +2,11 @@
 #define _AFE_CSS_h
 
 #define AFE_CSS                                                                \
-  "#l,#r{padding:20px;display:table-cell}.ltag,.ltit,body{margin:0}.b,.itm "   \
+  "#l,#r{padding:20px;display:table-cell}.ltit,body{margin:0}.b,.itm "         \
   "a,a{text-decoration:none}body{background:#ddd;padding:15px}#c{display:"     \
   "table;width:100%}#l{width:300px;background:#33363b;color:#eee}#r{"          \
   "background:#eee}a,button,h1,h3,h4,input,label,li,p,span{font-family:sans-"  \
-  "serif}.ltag{font-weight:300;color:#b0cadb;margin-bottom:20px}.lst{list-"    \
+  "serif}.lst{list-"                                                           \
   "style:none;margin:0;padding:0}.itm "                                        \
   "a{display:block;white-space:nowrap;padding:.2em "                           \
   "1em;color:#777;font-size:95%}a{color:#36f}.cf "                             \

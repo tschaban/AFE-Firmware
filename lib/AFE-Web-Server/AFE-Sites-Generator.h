@@ -65,6 +65,10 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+  const String addMQTTTopicItem(char *topic, uint8_t id);
+  const String addDomoticzIDXItem(unsigned long idx, uint8_t id,
+                                  const String title = "");
+
 #if defined(T5_CONFIG)
   const String generateGateStatesList(uint8_t id, byte state);
 #endif

@@ -24,7 +24,7 @@ struct RELAY_DEFAULTS {
 
 struct RELAY {
   uint8_t gpio;
-  char name[16];
+  char name[17];
   float timeToOff;
   uint8_t ledID;
   DOMOTICZ_BASIC_CONFIG domoticz;

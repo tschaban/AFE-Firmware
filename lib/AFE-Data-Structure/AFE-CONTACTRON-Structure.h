@@ -22,8 +22,8 @@ struct CONTACTRON {
   byte outputDefaultState;
   uint8_t ledID;
   uint16_t bouncing;
-  char name[16];
-  char mqttTopic[49];
+  char name[17];
+  char mqttTopic[50];
   unsigned long idx;
 };
 

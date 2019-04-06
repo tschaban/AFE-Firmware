@@ -31,6 +31,9 @@ private:
   boolean pressed = false; // It's set to true once button pressed physically
   boolean _pressed = false;
 
+  boolean phisicallyPressed = false;
+  boolean phisicallyState = false;
+
   /* Forst one is set to true after X secodns. Second one controls LED */
   boolean pressed4fiveSeconds = false;
   boolean _pressed4fiveSeconds = false;
@@ -47,19 +50,19 @@ private:
 public:
   /* Constructors */
   AFESwitch();
-  AFESwitch(uint8_t id);
 
   /* Init switch */
-  void begin(uint8_t id);
+  void begin(uint8_t id, AFEDevice *);
 
   /* Method: returns TRUE if state of the switch is pressed. It does not mean it
    * has to be pressed physically (applicable for BiStable switch types */
   boolean getState();
+  boolean getPhisicalState();
 
   /* Method returns true if switch has been pressed. Sensitiveness it taken into
    * account. It does not mean switch is pressed physically. Once True capture
    * getState() method should be called to get the state of the Switch */
-  boolean isPressed();
+  boolean isPressed(boolean phisically = false);
 
   /* Method returns true after switch is pressed for 5sec. */
   boolean is5s();
@@ -79,6 +82,11 @@ public:
 
   /* Method returns ID of the relay controlled by the switch */
   uint8_t getControlledRelayID();
+
+  /* Method returns MQTT topic for this switch */
+  const char *getMQTTTopic();
+
+  uint32_t getDomoticzIDX();
 };
 
 #endif

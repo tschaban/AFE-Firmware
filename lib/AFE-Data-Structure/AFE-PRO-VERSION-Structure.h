@@ -12,7 +12,7 @@
 #endif
 
 struct PRO_VERSION {
-  char serial[18];
+  char serial[19];
   boolean valid;
 };
 

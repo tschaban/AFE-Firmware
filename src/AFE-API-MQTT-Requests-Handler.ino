@@ -28,15 +28,30 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     for (uint8_t _i = 0; _i < length; _i++) {
       Serial << char(payload[_i]);
     }
-    Serial << endl << "------------------------------------" << endl;
+    Serial << endl << "Processing: ";
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY  /* Relay processing */
+#ifdef CONFIG_FUNCTIONALITY_RELAY /* Relay processing */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
       if (Device.configuration.isRelay[i]) {
-        sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
 
+#ifdef DEBUG
+        Serial << endl << " - Checking if Relay[" << i << "] request ";
+#endif
+        sprintf(_mqttTopic, "%sstate", Relay[i].getMQTTTopic());
         if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+          Serial << "YES";
+#endif
+          return;
+        }
+
+        sprintf(_mqttTopic, "%scmd", Relay[i].getMQTTTopic());
+        if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+          Serial << "YES";
+#endif
+
           if ((char)payload[1] == 'n' && length == 2) { // on
             Relay[i].on();
             Mqtt.publish(Relay[i].getMQTTTopic(), "state", "on");
@@ -52,6 +67,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
             MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);
           }
+          return;
         }
 
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -109,15 +125,23 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         break;
       }
     }
+#endif
 
-#if defined(T3_CONFIG)
+#ifdef CONFIG_HARDWARE_PIR
     for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
       if (Device.configuration.isPIR[i]) {
+#ifdef DEBUG
+        Serial << endl << " - Checking if PIR[" << i << "] request ";
+#endif
         sprintf(_mqttTopic, "%scmd", Pir[i].getMQTTTopic());
         if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+          Serial << "YES";
+#endif
           if ((char)payload[1] == 'e' && length == 3) { // get
             MQTTPublishPIRState(i);
           }
+          return;
         }
       }
     }
@@ -125,13 +149,20 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
+#ifdef DEBUG
+      Serial << endl << " - Checking if HPMA115S0 request ";
+#endif
       sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.mqtt.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+        Serial << "YES";
+#endif
         if ((char)payload[1] == 'e' && length == 3) { // get
           HPMA115S0_DATA sensorData;
           sensorData = ParticleSensor.get();
           MQTTPublishParticleSensorData(sensorData);
         }
+        return;
       }
     }
 #endif
@@ -151,17 +182,24 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
     if (Device.configuration.isAnalogInput) {
+#ifdef DEBUG
+      Serial << endl << " - Checking if Analog Input request ";
+#endif
       sprintf(_mqttTopic, "%sADC/cmd", MQTTConfiguration.mqtt.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+        Serial << "YES";
+#endif
         if ((char)payload[1] == 'e' && length == 3) { // get
           ADCINPUT_DATA data = AnalogInput.get();
           MQTTPublishAnalogInputData(data);
         }
+        return;
       }
     }
 #endif
 
-#else /* Gate */
+#ifdef CONFIG_FUNCTIONALITY_GATE /* Gate */
 
     /* Contactrons */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
@@ -183,15 +221,24 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       } else if ((char)payload[0] == 'g' && length == 3) { // get
         MQTTPublishGateState();
       }
-    } // @TODO powinno byc else here
+    }
+#endif
 
-#endif /* Relay and Gate processing */
+/* Control over APIs Turning On/Off them */
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+
+#ifdef DEBUG
+    Serial << endl << " - Checking if API control request ";
+#endif
 
     /* Turning On/Off HTTP APIs */
     sprintf(_mqttTopic, "%sconfiguration/api/http/cmd",
             MQTTConfiguration.mqtt.topic);
 
     if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+      Serial << "Yes: HTTP";
+#endif
       if ((char)payload[1] == 'n' && length == 2) { // on
         Data.saveAPI(API_HTTP, true);
         Device.begin();
@@ -199,93 +246,122 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         Data.saveAPI(API_HTTP, false);
         Device.begin();
       }
-    } else {
+      return;
+    }
 
-      /* Start: Turning On/Off Domoticz APIs */
-      sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
-              MQTTConfiguration.mqtt.topic);
+    /* Start: Turning On/Off Domoticz APIs */
+    sprintf(_mqttTopic, "%sconfiguration/api/domoticz/cmd",
+            MQTTConfiguration.mqtt.topic);
 
-      if (strcmp(topic, _mqttTopic) == 0) {
-        if ((char)payload[1] == 'n' && length == 2) { // on
-          Data.saveAPI(API_DOMOTICZ, true);
-          Device.begin();
-          DomoticzInit();
+    if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+      Serial << "Yes: Domoticz";
+#endif
+      if ((char)payload[1] == 'n' && length == 2) { // on
+        Data.saveAPI(API_DOMOTICZ, true);
+        Device.begin();
+        DomoticzInit();
 
-        } else if ((char)payload[1] == 'f' && length == 3) { // off
-          Data.saveAPI(API_DOMOTICZ, false);
-          Device.begin();
-          Domoticz.disconnect();
-        }
-        /* Stop: Turning On/Off Domoticz APIs */
-      } else {
+      } else if ((char)payload[1] == 'f' && length == 3) { // off
+        Data.saveAPI(API_DOMOTICZ, false);
+        Device.begin();
+        Domoticz.disconnect();
+      }
+      /* Stop: Turning On/Off Domoticz APIs */
+      return;
+    }
 
-        /* start: Turning Off MQTT APIs */
-        sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
-                MQTTConfiguration.mqtt.topic);
+    /* start: Turning Off MQTT APIs */
+    sprintf(_mqttTopic, "%sconfiguration/api/mqtt/cmd",
+            MQTTConfiguration.mqtt.topic);
 
-        if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[1] == 'f' && length == 3) { // off
-            Data.saveAPI(API_MQTT, false);
-            Device.begin();
-            Mqtt.disconnect();
-          }
-          /* Stop: Turning Off MQTT APIs */
-        } else {
-          /* Start: other mqtt requests
-              - reboot,
-              - configurationMode
-              - getTemperature
-              - getHumidity
-              - getHeatIndex
-              - getDewPoint
-           * humifity */
-          sprintf(_mqttTopic, "%scmd", MQTTConfiguration.mqtt.topic);
+    if (strcmp(topic, _mqttTopic) == 0) {
+#ifdef DEBUG
+      Serial << "Yes: MQTT";
+#endif
+      if ((char)payload[1] == 'f' && length == 3) { // off
+        Data.saveAPI(API_MQTT, false);
+        Device.begin();
+        Mqtt.disconnect();
+      }
+      /* Stop: Turning Off MQTT APIs */
+      return;
+    }
+#endif
 
-          if (strcmp(topic, _mqttTopic) == 0) {
-            /* Reboot */
-            if ((char)payload[2] == 'b' && length == 6) {
-              Device.reboot(MODE_NORMAL);
-            }
-            /* configurationMode */
-            else if ((char)payload[2] == 'n' && length == 17) {
-              Device.reboot(MODE_CONFIGURATION);
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
-            }
-            /* getTemperature */
-            else if ((char)payload[2] == 't' && length == 14) {
-              char temperatureString[6];
-              dtostrf(Sensor.getTemperature(), 2, 2, temperatureString);
-              Mqtt.publish("temperature", temperatureString);
+#ifdef DEBUG
+    Serial << endl << " - Checking device level requests ";
+#endif
+    sprintf(_mqttTopic, "%scmd", MQTTConfiguration.mqtt.topic);
+
+    if (strcmp(topic, _mqttTopic) == 0) {
+      /* Reboot */
+      if ((char)payload[2] == 'b' && length == 6) {
+#ifdef DEBUG
+        Serial << "Yes: reboot";
+#endif
+        Device.reboot(MODE_NORMAL);
+      }
+      /* configurationMode */
+    } else if ((char)payload[2] == 'n' && length == 17) {
+#ifdef DEBUG
+      Serial << "Yes: Configuration Mode";
+#endif
+      PASSWORD password = Data.getPasswordConfiguration();
+      if (!password.protect) {
+        Device.reboot(MODE_CONFIGURATION);
+      }
+    }
+#ifdef CONFIG_TEMPERATURE
+    /* getTemperature */
+    else if ((char)payload[2] == 't' && length == 14) {
+#ifdef DEBUG
+      Serial << "Yes: temperature";
+#endif
+      char temperatureString[6];
+      dtostrf(Sensor.getTemperature(), 2, 2, temperatureString);
+      Mqtt.publish("temperature", temperatureString);
+    }
 #endif
 
 #ifdef CONFIG_HARDWARE_DHXX
-            }
-            /* getHumidity */
-            else if ((char)payload[2] == 't' && length == 11) {
-              char humidityString[6];
-              dtostrf(Sensor.getHumidity(), 2, 2, humidityString);
-              Mqtt.publish("humidity", humidityString);
-            }
-            /* getHeatIndex */
-            else if ((char)payload[3] == 'H' && length == 12) {
-              char heatIndex[6];
-              dtostrf(Sensor.getHeatIndex(), 2, 2, heatIndex);
-              Mqtt.publish("heatIndex", heatIndex);
-            }
-            /* getDewPoint */
-            else if ((char)payload[3] == 'D' && length == 12) {
-              char heatIndex[6];
-              dtostrf(Sensor.getDewPoint(), 2, 2, heatIndex);
-              Mqtt.publish("dewPoint", heatIndex);
+    /* getHumidity */
+    else if ((char)payload[2] == 't' && length == 11) {
+#ifdef DEBUG
+      Serial << "Yes: humidity";
 #endif
-            }
-          }
-        } /* End of other methods */
-      }
+      char humidityString[6];
+      dtostrf(Sensor.getHumidity(), 2, 2, humidityString);
+      Mqtt.publish("humidity", humidityString);
     }
-  }
+    /* getHeatIndex */
+    else if ((char)payload[3] == 'H' && length == 12) {
+#ifdef DEBUG
+      Serial << "Yes: heat index";
+#endif
+      char heatIndex[6];
+      dtostrf(Sensor.getHeatIndex(), 2, 2, heatIndex);
+      Mqtt.publish("heatIndex", heatIndex);
+    }
+    /* getDewPoint */
+    else if ((char)payload[3] == 'D' && length == 12) {
+#ifdef DEBUG
+      Serial << "Yes: dewPoint";
+#endif
+      char heatIndex[6];
+      dtostrf(Sensor.getDewPoint(), 2, 2, heatIndex);
+      Mqtt.publish("dewPoint", heatIndex);
+    }
+#endif
+
+  } /* End of other methods */
+
 #ifdef CONFIG_HARDWARE_LED
   Led.off();
+#endif
+
+#ifdef DEBUG
+  Serial << endl << "------------------------------------" << endl;
 #endif
 } /* End of topics listener */
 
