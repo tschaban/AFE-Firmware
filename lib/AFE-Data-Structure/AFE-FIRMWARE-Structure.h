@@ -12,7 +12,7 @@
 #endif
 
 struct FIRMWARE {
-  char version[7];
+  char version[10];
   uint8_t type;
   uint8_t autoUpgrade;
   char upgradeURL[120];

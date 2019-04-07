@@ -30,7 +30,7 @@
 #include <Streaming.h>
 #endif
 
-#if defined(AFE_LANGUAGE) && AFE_LANGUAGE == pl_PL
+#if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
 #include <en_EN.h>
@@ -65,7 +65,9 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
-  const String addMQTTTopicItem(char *topic, uint8_t id);
+  const String addMQTTTopicItem(char *topic, uint8_t id,
+                                const String title = "MQTT",
+                                const String subtitle = "");
   const String addDomoticzIDXItem(unsigned long idx, uint8_t id,
                                   const String title = "");
 

@@ -690,7 +690,7 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-      configuration.type = root["type"];
+      configuration.type = root["type"].as<int>();
       sprintf(configuration.version, root["version"]);
       sprintf(configuration.upgradeURL, root["upgradeURL"]);
       configuration.autoUpgrade = root["autoUpgrade"];
@@ -2299,7 +2299,7 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<170> jsonBuffer;
+    StaticJsonBuffer<300> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -2313,6 +2313,10 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
       configuration.domoticz.raw = root["idx"]["raw"];
       configuration.domoticz.percent = root["idx"]["percent"];
       configuration.domoticz.voltage = root["idx"]["voltage"];
+      configuration.domoticz.voltageCalculated =
+          root["idx"]["voltageCalculated"];
+      configuration.divider.Ra = root["divider"]["Ra"];
+      configuration.divider.Rb = root["divider"]["Rb"];
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
@@ -2353,9 +2357,10 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<206> jsonBuffer;
+    StaticJsonBuffer<300> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &idx = root.createNestedObject("idx");
+    JsonObject &divider = root.createNestedObject("divider");
 
     root["gpio"] = configuration.gpio;
     root["interval"] = configuration.interval;
@@ -2365,6 +2370,9 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     idx["raw"] = configuration.domoticz.raw;
     idx["percent"] = configuration.domoticz.percent;
     idx["voltage"] = configuration.domoticz.voltage;
+    idx["voltageCalculated"] = configuration.domoticz.voltageCalculated;
+    divider["Ra"] = configuration.divider.Ra;
+    divider["Rb"] = configuration.divider.Rb;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);

@@ -40,7 +40,7 @@
 #define L_RESET_DEVICE "Reset to orginal state"
 #define L_FINISH_CONFIGURATION "Finish configuration"
 #define L_INFORMATION "INFORMATION"
-//#define L_DOCUMENTATION "Documentation"
+#define L_DOCUMENTATION "Documentation"
 #define L_SETTINGS "Settings"
 #define L_SETTINGS_HOT_SPOT "Settings (HotSpot mode)"
 #define L_PRO_VERSION "PRO Version"
@@ -60,6 +60,13 @@
 #define L_VERSION "Version"
 #define L_YES "Yes"
 #define L_NO "No"
+
+/* Form: index */
+#define L_WRONG_PASSWORD "Incorrect password"
+#define L_NORMAL_MODE "Normal mode"
+#define L_HOTSPOT_MODE "HotSpot Mode"
+#define L_LAUNCH_CONFIGURATION_PANEL "Launch: Configuration Panel"
+#define L_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
@@ -103,9 +110,10 @@
   "Finish configuration by entering device IP address in the browser"
 
 /* Form: MQTT Broker */
-#define L_MQTT_TOPIC "MQTT Topic"
-#define L_EXAMPLE "Example"
+#define L_MQTT_TOPIC "Topic"
+#define L_MQTT_MAIN_TOPIC "First part of MQTT Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
+#define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 
 /* Form: Domoticz server configuration */
 #define L_PROTOCOL "Protocol"
@@ -167,11 +175,13 @@
 /* Form: Analog Input */
 #define L_CANT_CHANGE "can't be set"
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
-#define L_MEASURED_VOLTAGE "Measured voltage"
-#define L_NUMBER_OF_SAMPLES "Number of sample measurements"
+#define L_MEASURED_VOLTAGE "Max input voltage on ADC"
+#define L_NUMBER_OF_SAMPLES "Number of measurement samples"
 #define L_RAW_DATA ": raw data"
 #define L_PERCENT ": percent"
 #define L_VOLTAGE ": voltage"
+#define L_VOLTAGE_CALCULATED ": voltage calculated"
+#define L_RESISTOR "Resistor"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Select Firmware"

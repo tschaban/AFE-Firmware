@@ -70,14 +70,14 @@ void eventsListener() {
         }
       }
 #else
-      Mqtt.publish(MQTTConfiguration.mqtt.topic, "state", "connected");
+      Mqtt.publishTopic("lwt", "connected");
 
       /* Setting Relay state after connection to MQTT */
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
           if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
             /* Requesting state from MQTT Broker / service */
-            Mqtt.publish(Relay[i].getMQTTTopic(), "get", "defaultState");
+            Mqtt.publishTopic(Relay[i].getMQTTTopic(), "defaultState", "get");
           } else {
             /* Updating relay state after setting default value after MQTT
              * connected */

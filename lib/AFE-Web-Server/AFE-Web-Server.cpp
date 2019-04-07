@@ -889,8 +889,8 @@ MQTT AFEWebServer::getMQTTData() {
     data.password[0] = '\0';
   }
 
-  if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  if (server.arg("t0").length() > 0) {
+    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
@@ -1380,23 +1380,28 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
     data.maxVCC = server.arg("m").toFloat();
   }
 
+  if (server.arg("ra").length() > 0) {
+    data.divider.Ra = server.arg("ra").toFloat();
+  }
+
+  if (server.arg("rb").length() > 0) {
+    data.divider.Rb = server.arg("rb").toFloat();
+  }
+
   if (server.arg("t0").length() > 0) {
     server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("x0").length() > 0) {
-    data.domoticz.raw = server.arg("x0").toInt();
-  }
-
-  if (server.arg("x1").length() > 0) {
-    data.domoticz.percent = server.arg("x1").toInt();
-  }
-
-  if (server.arg("x2").length() > 0) {
-    data.domoticz.voltage = server.arg("x2").toInt();
-  }
+  data.domoticz.raw =
+      server.arg("x0").length() > 0 ? server.arg("x0").toInt() : 0;
+  data.domoticz.percent =
+      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : 0;
+  data.domoticz.voltage =
+      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
+  data.domoticz.voltageCalculated =
+      server.arg("x3").length() > 0 ? server.arg("x3").toInt() : 0;
 
   return data;
 }

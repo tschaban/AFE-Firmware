@@ -749,18 +749,12 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += configuration.password;
   body += "\"><span class=\"hint\">Max 32 ";
   body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_MQTT_TOPIC;
-  body += "</label><input name=\"t\" type=\"text\""
-          "maxlength=\"32\" value=\"";
-  body += configuration.mqtt.topic;
-  body += "\"><span class=\"hint\">";
-  body += L_EXAMPLE;
-  body += " <strong>abc/def/</strong>. Max 32 ";
-  body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
 
-  return addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
+  String page =
+      addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
+  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC);
+  return page;
 }
 
 String AFESitesGenerator::addDomoticzServerConfiguration() {
@@ -2137,10 +2131,19 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   body += configuration.maxVCC;
   body += "\"><span class=\"hint\"> 0-999.99V</span></div><div "
           "class=\"cf\"><label>";
+  body += L_RESISTOR;
+  body += " R[A]</label><input name=\"ra\" min=\"0\" max=\"90000000\"  "
+          "step=\"0.01\" type=\"number\" value=\"";
+  body += configuration.divider.Ra;
+  body += "\"></div><div class=\"cf\"><label>";
+  body += L_RESISTOR;
+  body += " R[B]</label><input name=\"rb\" min=\"0\" max=\"90000000\"  "
+          "step=\"0.01\" type=\"number\" value=\"";
+  body += configuration.divider.Rb;
+  body += "\"></div><div class=\"cf\"><label>";
   body += L_NUMBER_OF_SAMPLES;
   body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
+          "type=\"number\" value=\"";
   body += configuration.numberOfSamples;
   body += "\"><span class=\"hint\">1-999</span></div><br><br></fieldset>";
 
@@ -2154,6 +2157,8 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
     page += addDomoticzIDXItem(configuration.domoticz.raw, 0, L_RAW_DATA);
     page += addDomoticzIDXItem(configuration.domoticz.percent, 1, L_PERCENT);
     page += addDomoticzIDXItem(configuration.domoticz.voltage, 2, L_VOLTAGE);
+    page += addDomoticzIDXItem(configuration.domoticz.voltageCalculated, 3,
+                               L_VOLTAGE_CALCULATED);
   }
 
   return page;
@@ -2278,34 +2283,39 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
   configuration = Data.getDeviceConfiguration();
   String body = "<fieldset>";
   if (!authorized) {
-    body += "<h3>Hasło nie jest poprawne</h3>";
+    body += "<h3>";
+    body += L_WRONG_PASSWORD;
+    body += "</h3>";
   }
 
   body +=
       "<form method=\"post\"><div class=\"cf\"><input name=\"p\" type=\"text\" "
-      "placeholder=\"Hasło\"></div><div class=\"cf\"><input type=\"submit\" "
-      "class=\"b bs\" "
-      "value=\"Tryb normalny\" formaction=\"/?o=0&i=";
+      "placeholder=\"";
+  body += L_PASSWORD;
+  body += "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "
+          "value=\"";
+  body += L_NORMAL_MODE;
+  body += "\" formaction=\"/?o=0&i=";
   body += MODE_CONFIGURATION;
-  body += "\" /> <input type=\"submit\" class=\"b be\" "
-          "value=\"Tryb HotSpot\" formaction=\"/?o=0&i=";
+  body += "\" /> <input type=\"submit\" class=\"b be\" value=\"";
+  body += L_HOTSPOT_MODE;
+  body += "\" formaction=\"/?o=0&i=";
   body += MODE_ACCESS_POINT;
   body += "\" /></div></form>";
 
-  String page =
-      addConfigurationBlock("Uruchom: Panel Konfiguracyjny", "", body);
+  String page = addConfigurationBlock(L_LAUNCH_CONFIGURATION_PANEL, "", body);
+  /*
+    body = "<p class=\"cm\">Oprogramowanie dostępne jest za darmo. Jeśli spełnia
+    " "Twoje oczekiwania to postaw <a "
+           "href=\"https://www.smartnydom.pl/o-stronie/\" target=\"_blank\" "
+           "style=\"color:#00e\">autorowi</a> browarka ;)</p><a "
+           "href=\"https://pl.donate.afe-firmware.smartnydom.pl\" "
+           "target=\"_blank\"><img "
+           "src=\"http://adrian.czabanowski.com/afe/donation/T2/1.4.0/1rTA706u/"
+           "\" border=\"0\" alt=\"PayPal\"></a>";
 
-  body = "<p class=\"cm\">Oprogramowanie dostępne jest za darmo. Jeśli spełnia "
-         "Twoje oczekiwania to postaw <a "
-         "href=\"https://www.smartnydom.pl/o-stronie/\" target=\"_blank\" "
-         "style=\"color:#00e\">autorowi</a> browarka ;)</p><a "
-         "href=\"https://pl.donate.afe-firmware.smartnydom.pl\" "
-         "target=\"_blank\"><img "
-         "src=\"http://adrian.czabanowski.com/afe/donation/T2/1.4.0/1rTA706u/"
-         "\" border=\"0\" alt=\"PayPal\"></a>";
-
-  page += addConfigurationBlock("Wsparcie", "", body);
-
+    page += addConfigurationBlock("Wsparcie", "", body);
+  */
   return page;
 }
 
@@ -2530,7 +2540,9 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 }
 #endif
 
-const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id) {
+const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id,
+                                                 const String title,
+                                                 const String subtitle) {
   String body = "<fieldset><div class=\"cf\"><label>";
   body += L_MQTT_TOPIC;
   body += "</label><input name=\"t" + String(id) +
@@ -2539,7 +2551,7 @@ const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id) {
   body += "\"><span class=\"hint\">Max 32 ";
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
-  return addConfigurationBlock("MQTT", "", body);
+  return addConfigurationBlock(title, subtitle, body);
 }
 
 const String AFESitesGenerator::addDomoticzIDXItem(unsigned long idx,

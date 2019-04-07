@@ -168,7 +168,12 @@ void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
     }
     if (idx.voltage > 0) {
       delay(10);
-      Domoticz.sendCustomSensorCommand(idx.voltage, data.voltage);
+      Domoticz.sendCustomSensorCommand(idx.voltage, data.voltageCalculated);
+    }
+    if (idx.voltageCalculated > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.voltageCalculated,
+                                       data.voltageCalculated);
     }
   }
 }

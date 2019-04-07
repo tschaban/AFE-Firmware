@@ -15,11 +15,13 @@ void AFEAnalogInput::begin() {
   Serial << endl << endl << "------------ AC VCC Input ------------";
   Serial << endl
          << "- Initialized" << endl
-         << "- GPIO: " << configuration.gpio
-         << ", Interval: " << configuration.interval
-         << ", Max VCC: " << configuration.maxVCC
-         << ", No of Samples: " << configuration.numberOfSamples;
-  Serial << endl << "-------------------------------------";
+         << "- GPIO: " << configuration.gpio << endl
+         << "- Interval: " << configuration.interval << endl
+         << "- Max VCC: " << configuration.maxVCC << endl
+         << "- No of Samples: " << configuration.numberOfSamples << endl
+         << "- R[A]: " << configuration.divider.Ra << endl
+         << "- R[B]: " << configuration.divider.Rb << endl
+         << "-------------------------------------";
 
 #endif
 }
@@ -29,6 +31,13 @@ ADCINPUT_DATA AFEAnalogInput::get() {
   data.raw = analogData;
   data.percent = (float)analogData * 100 / 1024;
   data.voltage = (double)(configuration.maxVCC * analogData / 1024);
+  if (configuration.divider.Rb > 0) {
+    data.voltageCalculated =
+        (data.voltage * (configuration.divider.Ra + configuration.divider.Rb)) /
+        configuration.divider.Rb;
+  } else {
+    data.voltageCalculated = data.voltage;
+  }
   return data;
 }
 

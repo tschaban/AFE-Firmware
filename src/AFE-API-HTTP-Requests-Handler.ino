@@ -355,6 +355,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         sendHTTPAPIRequestStatus(request, true, data.percent);
       } else if (strcmp(request.name, "voltage") == 0) {
         sendHTTPAPIRequestStatus(request, true, data.voltage, 3, 6);
+      } else if (strcmp(request.name, "voltageCalculated") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.voltageCalculated, 3, 6);
       } else {
         sendHTTPAPIRequestStatus(request, false);
       }

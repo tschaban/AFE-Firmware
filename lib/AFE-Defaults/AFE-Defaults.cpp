@@ -170,7 +170,7 @@ void AFEDefaults::set() {
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
-  sprintf(MQTTConfiguration.mqtt.topic, "/device/");
+  sprintf(MQTTConfiguration.mqtt.topic, "device");
   Data->saveConfiguration(MQTTConfiguration);
 
   /* Domoticz config */
@@ -204,7 +204,7 @@ void AFEDefaults::set() {
   RelayConfiguration.ledID = 0;
   RelayConfiguration.domoticz.idx = 0;
 
-  sprintf(RelayConfiguration.mqtt.topic, "relay/1/");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/1");
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
@@ -222,17 +222,17 @@ void AFEDefaults::set() {
 #if defined(T3_CONFIG) || defined(T4_CONFIG)
   RelayConfiguration.gpio = 5;
   sprintf(RelayConfiguration.name, "relay2");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/2/");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/2");
   Data->saveConfiguration(1, RelayConfiguration);
 
   RelayConfiguration.gpio = 4;
   sprintf(RelayConfiguration.name, "relay3");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/3/");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/3");
   Data->saveConfiguration(2, RelayConfiguration);
 
   RelayConfiguration.gpio = 15;
   sprintf(RelayConfiguration.name, "relay4");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/4/");
+  sprintf(RelayConfiguration.mqtt.topic, "relay/4");
   Data->saveConfiguration(3, RelayConfiguration);
 #endif
 
@@ -427,10 +427,13 @@ void AFEDefaults::set() {
   AnalogInputConfiguration.interval = 60;
   AnalogInputConfiguration.numberOfSamples = 1;
   AnalogInputConfiguration.maxVCC = 1;
-  sprintf(AnalogInputConfiguration.mqtt.topic, "device/analogData/");
+  sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
   AnalogInputConfiguration.domoticz.percent = 0;
+  AnalogInputConfiguration.domoticz.voltageCalculated = 0;
+  AnalogInputConfiguration.divider.Ra = 0;
+  AnalogInputConfiguration.divider.Ra = 0;
   Data->saveConfiguration(AnalogInputConfiguration);
 #endif
 }

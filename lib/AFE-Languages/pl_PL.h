@@ -59,6 +59,13 @@
 #define L_YES "Tak"
 #define L_NO "Nie"
 
+/* Form: index */
+#define L_WRONG_PASSWORD "Hasło nie jest poprawne"
+#define L_NORMAL_MODE "Tryb normalny"
+#define L_HOTSPOT_MODE "Tryb HotSpot"
+#define L_LAUNCH_CONFIGURATION_PANEL "Uruchom: Panel Konfiguracyjny"
+#define L_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
+
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
 #define L_DEVICE_SECTION_INFO                                                  \
@@ -103,10 +110,12 @@
   "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
 
 /* Form: MQTT Broker */
-#define L_MQTT_TOPIC "Temat wiadomości MQTT"
-#define L_EXAMPLE "Przykład"
+#define L_MQTT_TOPIC "Temat"
+#define L_MQTT_MAIN_TOPIC "Pierwszy człon tematów MQTT"
 #define L_MQTT_CONFIGURATION_INFO                                              \
   "Wprowadź adres hosta np. localhost lub adres IP"
+#define L_MQTT_TOPIC_EMPTY                                                     \
+  "Jeśli niewprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
 
 /* Form:Domoticz server configuration */
 #define L_PROTOCOL "Protokół"
@@ -114,7 +123,7 @@
 #define L_DOMOTICZ_CONFIGURATION_INFO                                          \
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_NO_IF_IDX_0                                                          \
-  "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
+  "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
 #ifdef CONFIG_HARDWARE_LED
@@ -171,11 +180,13 @@
 /* Form: Analog Input */
 #define L_CANT_CHANGE "brak możliwości zmiany"
 #define L_MEASURMENTS_INTERVAL "Interwał odczytów"
-#define L_MEASURED_VOLTAGE "Mierzone napięcie"
+#define L_MEASURED_VOLTAGE "Max napięcie wejściowe na ADC"
 #define L_NUMBER_OF_SAMPLES "Ilość próbek do uśrednienia odczytu"
 #define L_RAW_DATA ": surowe dane"
 #define L_PERCENT ": procent"
 #define L_VOLTAGE ": napięcie"
+#define L_VOLTAGE_CALCULATED ": napięcie przeliczone"
+#define L_RESISTOR "Rezystor"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"

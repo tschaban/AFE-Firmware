@@ -39,8 +39,6 @@ private:
   unsigned long ledStartTime = 0;
 #endif
 
-  /* Method pushes to the MQTT Broker MQTT Message */
-  void publishToMQTTBroker(const char *topic, const char *message);
   /* Connecting to MQTT Broker */
   void connect();
 
@@ -57,14 +55,12 @@ public:
 
   void begin();
 
-  /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
-  void publish(const char *type, const char *message);
-  void publish(const char *type, float value, uint8_t width = 2,
-               uint8_t precision = 2);
-
-  /* Publishing MQTT Message to a specific MQTT Topic. It calls private method
-   * publish MQTT Broker */
-  void publish(const char *topic, const char *type, const char *message);
+  /* Publishes data to MQTT Broker */
+  void publishTopic(const char *subTopic, const char *message);
+  void publishTopic(const char *subTopic, const char *type,
+                    const char *message);
+  void publishTopic(const char *subTopic, const char *type, float value,
+                    uint8_t width = 2, uint8_t precision = 2);
 
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
    * default values */
