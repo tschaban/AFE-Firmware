@@ -6,11 +6,11 @@
 void mainHTTPRequestsHandler() {
   if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }

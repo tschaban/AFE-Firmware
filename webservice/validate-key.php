@@ -33,6 +33,7 @@ $_device_id = (isset($_GET["deviceID"]) && !empty($_GET["deviceID"])) ? $_GET["d
 $debug->push("- Key number: " . $_key);
 $debug->push("- Device ID: " . $_device_id);
 $_result["status"] = false;
+$_result["error"] = "Ok";
 
 /* Ending code if input parameters are empty */
 if ($_key=="Null" || $_device_id == "Null") {
@@ -56,15 +57,19 @@ if ($_key=="Null" || $_device_id == "Null") {
     if ($_deviceKeyNumber==false) {
       $_result["error"] = "Key# has not been set for a device";
     } else {
-      $Key = new key($_key);
-      if ($Key->found()) {
-         if ($Key->isValid()) {
+      if ($_deviceKeyNumber == $_key) {
+        $Key = new key($_key);
+        if ($Key->found()) {
+          if ($Key->isValid()) {
              $_result["status"] = true;
-         } else {
+           } else {
              $_result["error"] = "Key# is not valid";
-         }
-      } else {
+           }
+        } else {
          $_result["error"] = "Key# has not been found";
+        }
+      } else {
+        $_result["error"] = "Key# does not match";
       }
     }
   }
@@ -78,4 +83,8 @@ if (!$DEBUG) {
 }
 $debug->push("Completed");
 
+$debug->push("Sending Pushover");
+$Notification = new pushover();
+$Notification->send("Checking key", "D:".$_device_id."\nK:".$_key."\nStatus: ".$_result["error"]);
+$debug->push(" - done");
 ?>

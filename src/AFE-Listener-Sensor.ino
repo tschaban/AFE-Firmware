@@ -34,7 +34,7 @@ void mainSensor() {
     if (Sensor.isReady()) {
       unsigned long idx = 0;
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       temperature = Sensor.getTemperature();
@@ -136,7 +136,7 @@ void mainSensor() {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }

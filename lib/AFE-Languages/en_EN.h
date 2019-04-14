@@ -28,7 +28,7 @@
 #define L_NETWORK "Network"
 #define L_MQTT_BROKER "MQTT Broker"
 #define L_DOMOTICZ_SERVER "Domoticz Server"
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #define L_LEDS "LEDs"
 #endif
 #define L_RELAYS_CONFIGURATION "Relays configuration"
@@ -75,7 +75,7 @@
   "hotspot name used for configuration mode"
 #define L_HARDWARE_CONFIGURATION "Hardware configuration"
 #define L_HARDWARE_CONFIGURATION_INFO "Select connected items to your device"
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #define L_NUMBER_OF_LEDS "Number of LEDs"
 #endif
 #define L_NUMBER_OF_RELAYS "Number of relays"
@@ -123,7 +123,7 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"
 
@@ -182,6 +182,7 @@
 #define L_VOLTAGE ": voltage"
 #define L_VOLTAGE_CALCULATED ": voltage calculated"
 #define L_RESISTOR "Resistor"
+#define L_VOLTAGE_DIVIDER "Voltage Divider"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Select Firmware"

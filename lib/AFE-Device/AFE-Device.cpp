@@ -23,7 +23,5 @@ void AFEDevice::saveMode(uint8_t mode) { Data.saveDeviceMode(mode); }
 
 void AFEDevice::setDevice() {
   AFEDefaults Defaults;
-  Defaults.eraseConfiguration();
-  Defaults.formatSPIFFS();
   Defaults.set();
 }

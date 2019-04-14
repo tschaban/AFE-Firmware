@@ -16,9 +16,6 @@ void MQTTInit() {
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
   char _mqttTopic[88];
-#ifdef CONFIG_HARDWARE_LED
-  Led.on();
-#endif
 
   if (length >= 1) {
 #ifdef DEBUG
@@ -362,10 +359,6 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     #endif
     */
   }
-
-#ifdef CONFIG_HARDWARE_LED
-  Led.off();
-#endif
 
 #ifdef DEBUG
   Serial << endl << "------------------------------------" << endl;

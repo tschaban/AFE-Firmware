@@ -38,6 +38,7 @@ class AFEWebServer {
 private:
   ESP8266WebServer server;
   AFEDevice *Device;
+  AFEFirmware *Firmware;
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -70,7 +71,7 @@ private:
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
@@ -123,7 +124,7 @@ public:
   void publishHTML(String page);
 
   /* Method initialize WebServer and Updater server */
-  void begin(AFEDevice *);
+  void begin(AFEDevice *, AFEFirmware *);
 
   /* Method listens for HTTP requests */
   void listener();

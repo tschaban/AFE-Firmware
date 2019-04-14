@@ -81,7 +81,7 @@ public:
   void saveAPI(uint8_t apiID, boolean state);
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
   /* Methods read and save ID of system led */

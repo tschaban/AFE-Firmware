@@ -6,11 +6,12 @@
 
 AFEWebServer::AFEWebServer() {}
 
-void AFEWebServer::begin(AFEDevice *_Device) {
+void AFEWebServer::begin(AFEDevice *_Device, AFEFirmware *_Firmware) {
   // httpUpdater.setup(&server);
   server.begin();
   Device = _Device;
-  Site.begin(Device);
+  Firmware = _Firmware;
+  Site.begin(_Device, _Firmware);
 }
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
@@ -39,7 +40,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addIndexSection(siteConfig->deviceID == -1 ? true : false);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
-    page += Site.addFirstLaunchConfiguration();
+    page += Site.addNetworkConfiguration();
     break;
   case AFE_CONFIG_SITE_FIRST_TIME_CONNECTING:
     page += Site.addConnectingSite();
@@ -88,7 +89,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addAnalogInputConfiguration();
     break;
 #endif
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
       if (Device->configuration.isLED[i]) {
@@ -228,7 +229,7 @@ void AFEWebServer::generate(boolean upload) {
       Data.saveConfiguration(getAnalogInputData());
       break;
 #endif
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     case AFE_CONFIG_SITE_LED:
       for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
         Data.saveConfiguration(i, getLEDData(i));
@@ -254,9 +255,8 @@ void AFEWebServer::generate(boolean upload) {
       break;
     case AFE_CONFIG_SITE_PRO_VERSION:
       Data.saveConfiguration(getSerialNumberData());
-      AFEFirmware Firmware;
-      Firmware.begin();
-      Firmware.callService(AFE_WEBSERVICE_ADD_KEY);
+      Firmware->begin();
+      Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
       break;
     }
   } else if (command == SERVER_CMD_NONE) {
@@ -400,9 +400,9 @@ void AFEWebServer::generate(boolean upload) {
   /* Post page generation actions */
 
   /* Reseting device */
-  if (siteConfig.ID == AFE_CONFIG_SITE_POST_RESET) {
-    Device->setDevice();
-  }
+  //  if (siteConfig.ID == AFE_CONFIG_SITE_POST_RESET) {
+  //    Device->setDevice();
+  //  }
 
   /* Rebooting device */
   if (siteConfig.reboot) {
@@ -729,7 +729,7 @@ DEVICE AFEWebServer::getDeviceData() {
 
   server.arg("d").length() > 0 ? data.api.domoticz = true
                                : data.api.domoticz = false;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
@@ -808,8 +808,6 @@ NETWORK AFEWebServer::getNetworkData() {
 
     data.ip = IPAddress(server.arg("d1").toInt(), server.arg("d2").toInt(),
                         server.arg("d3").toInt(), server.arg("d4").toInt());
-  } else {
-    data.ip = IPAddress(0, 0, 0, 0);
   }
 
   if (server.arg("g1").length() > 0 && server.arg("g2").length() > 0 &&
@@ -818,8 +816,6 @@ NETWORK AFEWebServer::getNetworkData() {
     data.gateway =
         IPAddress(server.arg("g1").toInt(), server.arg("g2").toInt(),
                   server.arg("g3").toInt(), server.arg("g4").toInt());
-  } else {
-    data.gateway = IPAddress(0, 0, 0, 0);
   }
 
   if (server.arg("s1").length() > 0 && server.arg("s2").length() > 0 &&
@@ -827,25 +823,18 @@ NETWORK AFEWebServer::getNetworkData() {
 
     data.subnet = IPAddress(server.arg("s1").toInt(), server.arg("s2").toInt(),
                             server.arg("s3").toInt(), server.arg("s4").toInt());
-  } else {
-    data.subnet = IPAddress(255, 255, 255, 0);
   }
 
   if (server.arg("na").length() > 0) {
     data.noConnectionAttempts = server.arg("na").toInt();
-  } else {
-    data.noConnectionAttempts = 20;
   }
 
   if (server.arg("wc").length() > 0) {
     data.waitTimeConnections = server.arg("wc").toInt();
-  } else {
-    data.waitTimeConnections = 1;
   }
+
   if (server.arg("ws").length() > 0) {
     data.waitTimeSeries = server.arg("ws").toInt();
-  } else {
-    data.waitTimeSeries = 20;
   }
 
   if (server.arg("d").length() > 0 ||
@@ -1158,7 +1147,7 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
   if (server.arg("g" + String(id)).length() > 0) {

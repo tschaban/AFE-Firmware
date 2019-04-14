@@ -5,9 +5,10 @@
 
 AFEFirmware::AFEFirmware(){};
 
-void AFEFirmware::begin() { Pro = Data.getProVersionConfiguration(); }
-
-boolean AFEFirmware::isUnlocked() { return Pro.valid; }
+void AFEFirmware::begin() {
+  Pro = Data.getProVersionConfiguration();
+  miliseconds = millis();
+}
 
 boolean AFEFirmware::callService(uint8_t method) {
   HTTPClient http;
@@ -21,9 +22,8 @@ boolean AFEFirmware::callService(uint8_t method) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << "------------ "
          << (method == AFE_WEBSERVICE_VALIDATE_KEY ? "Validating" : "Adding")
-         << " serial number ------------" << endl
+         << " serial number" << endl
          << "URL: " << url << endl
          << "response: ";
 #endif
@@ -83,4 +83,48 @@ boolean AFEFirmware::callService(uint8_t method) {
   http.end();
 
   return Pro.valid;
+}
+
+void AFEFirmware::reValidateKey() {
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "-------------------- CHECKING KEY -----------------------" << endl
+         << "After: " << minutes << " minutes";
+#endif
+
+  if (strlen(Pro.serial) == 0 && Pro.valid) {
+    Pro.valid = false;
+#ifdef DEBUG
+    Serial << endl << "WARN: Valid with no Key";
+#endif
+    Data.saveConfiguration(Pro);
+  } else if (strlen(Pro.serial) > 0) {
+    boolean _valid = callService(AFE_WEBSERVICE_VALIDATE_KEY);
+    if (_valid != Pro.valid) {
+#ifdef DEBUG
+      Serial << endl
+             << "Key status is not up2date. Saving it state: Valid: " << endl
+             << (_valid ? "YES" : "NO");
+#endif
+      Pro.valid = _valid;
+      Data.saveConfiguration(Pro);
+    }
+  }
+
+#ifdef DEBUG
+  Serial << endl << "---------------------------------------------------------";
+#endif
+}
+
+void AFEFirmware::listener() {
+  if (millis() - miliseconds > 59999) {
+    minutes++;
+    miliseconds = millis();
+    if (minutes == AFE_KEY_FREQUENCY_VALIDATION) {
+      reValidateKey();
+      minutes = 0;
+    }
+  }
 }

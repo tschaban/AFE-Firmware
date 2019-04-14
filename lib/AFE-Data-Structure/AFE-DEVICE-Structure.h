@@ -22,9 +22,9 @@ struct DEVICE {
   char name[33];
   DEVICE_API api;
 #if defined(T0_CONFIG)
-  boolean isLED[2];
-  boolean isSwitch[2];
-  boolean isRelay[1];
+  boolean isLED[CONFIG_HARDWARE_NUMBER_OF_LEDS];
+  boolean isSwitch[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+  boolean isRelay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #ifdef CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif

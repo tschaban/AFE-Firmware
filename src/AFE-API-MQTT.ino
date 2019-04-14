@@ -59,7 +59,7 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -90,7 +90,7 @@ void AFEMQTT::connect() {
 
           eventConnectionEstablished = true;
           delayStartTime = 0;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           ledStartTime = 0;
           Led.off();
 #endif
@@ -99,7 +99,7 @@ void AFEMQTT::connect() {
           return;
         }
       }
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
@@ -125,7 +125,7 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         ledStartTime = 0;
         Led.off();
 #endif
@@ -155,6 +155,7 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
+    Led.on();
     char _mqttTopic[83];
     sprintf(_mqttTopic, "%s/%s", MQTTConfiguration.mqtt.topic, subTopic);
 #ifdef DEBUG
@@ -164,6 +165,7 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
     Serial << endl << "------------------------------------";
 #endif
     Broker.publish(_mqttTopic, message);
+    Led.off();
   }
 }
 

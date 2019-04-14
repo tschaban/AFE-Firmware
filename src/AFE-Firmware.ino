@@ -26,7 +26,7 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-Device.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 AFELED Led;
 #endif
@@ -142,6 +142,7 @@ void setup() {
 #ifdef DEBUG
   Serial << endl << "Initializing device";
 #endif
+
   Device.begin();
 
   /* Checking if the device is launched for a first time. If so it loades
@@ -178,7 +179,9 @@ void setup() {
 #ifdef DEBUG
     Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
 #endif
+
     AFEUpgrader *Upgrader = new AFEUpgrader();
+
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
       Serial << endl << "Firmware is not up2date. Upgrading...";
@@ -198,6 +201,7 @@ void setup() {
 
     /* Initializing relay */
     initRelay();
+
 #ifdef DEBUG
     Serial << endl << "Relay(s) initialized";
 #endif
@@ -209,9 +213,17 @@ void setup() {
   Serial << endl << "Network initialized";
 #endif
 
-/* Initializing LED, checking if LED exists is made on Class level  */
-#ifdef CONFIG_HARDWARE_LED
+  /* Initializing LED, checking if LED exists is made on Class level  */
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
+
+#ifdef DEBUG
+  Serial << endl << "System LED ID: " << systeLedID;
+  Serial << endl
+         << "Is system LED enabld : "
+         << (Device.configuration.isLED[systeLedID - 1] ? "YES" : "NO");
+#endif
+
   if (systeLedID > 0 && Device.configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
   }
@@ -238,13 +250,13 @@ void setup() {
     WebServer.onNotFound(handleOnNotFound);
   }
 
-  WebServer.begin(&Device);
+  /* Initializing Firmware: version PRO */
+  Firmware.begin();
+
+  WebServer.begin(&Device, &Firmware);
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif
-
-  /* Initializing Firmware: version PRO */
-  Firmware.begin();
 
   /* Initializing switches */
   initSwitch();
@@ -307,7 +319,7 @@ void setup() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    if (Device.configuration.isAnalogInput && Firmware.isUnlocked()) {
+    if (Device.configuration.isAnalogInput && Firmware.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
@@ -396,8 +408,11 @@ void loop() {
         mainPIR();
 #endif
 
+        /* Checking if Key is still valid */
+        Firmware.listener();
+
       } else { /* Device runs in configuration mode over WiFi */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -406,7 +421,7 @@ void loop() {
       }
     }
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -424,7 +439,7 @@ void loop() {
   mainSwitch();
 
   /* Led listener */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   Led.loop();
 #endif
 

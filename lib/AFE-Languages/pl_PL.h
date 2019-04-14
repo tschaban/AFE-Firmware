@@ -126,7 +126,7 @@
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Zmień świecenie diody LED na odwrotne"
 
@@ -187,6 +187,7 @@
 #define L_VOLTAGE ": napięcie"
 #define L_VOLTAGE_CALCULATED ": napięcie przeliczone"
 #define L_RESISTOR "Rezystor"
+#define L_VOLTAGE_DIVIDER "Dzielnik napięcia"
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"

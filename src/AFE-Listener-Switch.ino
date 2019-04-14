@@ -17,7 +17,7 @@ void mainSwitch() {
       if (Switch[i].isPressed() &&
           Switch[i].getFunctionality() != SWITCH_FUNCTIONALITY_NONE &&
           Switch[i].getControlledRelayID() > 0) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
 
@@ -31,7 +31,7 @@ void mainSwitch() {
         DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }
@@ -76,11 +76,11 @@ void mainSwitchListener() {
           Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
                                           : Device.reboot(MODE_NORMAL);
         } else if (Switch[i].is30s()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           Led.on();
 #endif
           Device.setDevice();
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           Led.off();
 #endif
           Device.reboot(MODE_ACCESS_POINT);

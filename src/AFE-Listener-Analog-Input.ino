@@ -6,13 +6,13 @@ void analogInputListner() {
     if (Device.configuration.isAnalogInput) {
       AnalogInput.listener();
       if (AnalogInput.isReady()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
         ADCINPUT_DATA data = AnalogInput.get();
         MQTTPublishAnalogInputData(data);
         DomoticzPublishAnalogInputData(data);
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }

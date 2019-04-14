@@ -35,7 +35,7 @@ private:
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
   boolean eventConnectionEstablished = false;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   unsigned long ledStartTime = 0;
 #endif
 

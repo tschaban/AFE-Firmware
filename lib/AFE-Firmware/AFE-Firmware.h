@@ -26,19 +26,24 @@ class AFEFirmware {
 
 private:
   AFEDataAccess Data;
-  PRO_VERSION Pro;
+  unsigned long miliseconds = 0;
+  unsigned long minutes = 0;
 
 public:
+  PRO_VERSION Pro;
+
   /* Constructor */
   AFEFirmware();
 
   void begin();
 
-  /* Returns if firmware version if pro */
-  boolean isUnlocked();
-
   /* Validating if the key is valid */
   boolean callService(uint8_t method);
+
+  /* Checking if the key is still valid */
+  void reValidateKey();
+
+  void listener();
 };
 
 #endif

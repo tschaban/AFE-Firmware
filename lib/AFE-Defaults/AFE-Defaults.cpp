@@ -12,10 +12,16 @@ void AFEDefaults::set() {
   FIRMWARE firmwareConfiguration;
   NETWORK networkConfiguration;
   MQTT MQTTConfiguration;
+  DOMOTICZ DomoticzConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
   PASSWORD PasswordConfiguration;
   PRO_VERSION ProConfiguration;
+
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  LED LEDConfiguration;
+#endif
 
 #ifdef CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR RegulatorConfiguration;
@@ -54,6 +60,14 @@ void AFEDefaults::set() {
   BH1750 SensorBH1750Configuration;
 #endif
 
+  if (SPIFFS.format()) {
+#ifdef DEBUG
+    Serial << endl << "- File system formated";
+  } else {
+    Serial << endl << "- File system NOT formated";
+#endif
+  }
+
   /* Setting device mode to Access Point */
   Data->saveDeviceMode(MODE_NETWORK_NOT_SET);
 
@@ -89,32 +103,32 @@ void AFEDefaults::set() {
   deviceConfiguration.api.http = true;
 
 /* Relay presence */
-#if !defined(T5_CONFIG)
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     deviceConfiguration.isRelay[i] = false;
   }
 #endif
 
   /* Switch presence */
-  deviceConfiguration.isSwitch[0] = true;
-  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = false;
   }
 
-/* LEDs */
-#ifdef CONFIG_HARDWARE_LED
+/* LEDs presence */
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   deviceConfiguration.isLED[0] = true;
-  for (uint8_t i = 1; i < sizeof(deviceConfiguration.isLED); i++) {
+  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     deviceConfiguration.isLED[i] = false;
   }
 #endif
 
-/* DS18B20 */
+/* DS18B20 presence */
 #ifdef CONFIG_HARDWARE_DS18B20
   deviceConfiguration.isDS18B20 = false;
 #endif
 
-/* DHxx */
+/* DHxx presence */
 #ifdef CONFIG_HARDWARE_DHXX
   deviceConfiguration.isDHT = false;
 #endif
@@ -157,16 +171,16 @@ void AFEDefaults::set() {
   networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
   networkConfiguration.ip = IPAddress(0, 0, 0, 0);
-  networkConfiguration.gateway = IPAddress(0, 0, 0, 0);
+  networkConfiguration.gateway = networkConfiguration.ip;
   networkConfiguration.subnet = IPAddress(255, 255, 255, 0);
-  networkConfiguration.noConnectionAttempts = 10;
+  networkConfiguration.noConnectionAttempts = 30;
   networkConfiguration.waitTimeConnections = 1;
-  networkConfiguration.waitTimeSeries = 60;
+  networkConfiguration.waitTimeSeries = 20;
   Data->saveConfiguration(networkConfiguration);
 
   /* MQTT Default config */
   MQTTConfiguration.host[0] = '\0';
-  MQTTConfiguration.ip = IPAddress(0, 0, 0, 0);
+  MQTTConfiguration.ip = networkConfiguration.ip;
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
@@ -174,7 +188,13 @@ void AFEDefaults::set() {
   Data->saveConfiguration(MQTTConfiguration);
 
   /* Domoticz config */
-  addDomoticzConfiguration();
+
+  DomoticzConfiguration.protocol = 0;
+  DomoticzConfiguration.host[0] = '\0';
+  DomoticzConfiguration.user[0] = '\0';
+  DomoticzConfiguration.password[0] = '\0';
+  DomoticzConfiguration.port = 8080;
+  Data->saveConfiguration(DomoticzConfiguration);
 
 /* Relay config */
 #ifdef T0_SHELLY_1_CONFIG
@@ -183,57 +203,32 @@ void AFEDefaults::set() {
   RelayConfiguration.gpio = 12;
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
   RelayConfiguration.timeToOff = 200;
-#else /* Configuration not related to T5 */
+#endif
 
-#if !(defined(T3_CONFIG) || defined(T6_CONFIG)) /* Not used in T3 & T6*/
+#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   RelayConfiguration.timeToOff = 0;
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+
   RelayConfiguration.state.powerOn = 3;
   RelayConfiguration.state.MQTTConnected = 0;
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T6_CONFIG)
-  sprintf(RelayConfiguration.name, "relay");
-#elif defined(T3_CONFIG) || defined(T4_CONFIG)
-  sprintf(RelayConfiguration.name, "relay1");
-#endif
-
   RelayConfiguration.ledID = 0;
   RelayConfiguration.domoticz.idx = 0;
-
-  sprintf(RelayConfiguration.mqtt.topic, "relay/1");
 
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
 #endif
 
-  /* Saving defulat relay state */
-  for (uint8_t i = 0; i < sizeof(deviceConfiguration.isRelay); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+    sprintf(RelayConfiguration.name, "relay%d", i + 1);
+    sprintf(RelayConfiguration.mqtt.topic, "relay/%d", i + 1);
     Data->saveRelayState(i, false);
+    Data->saveConfiguration(i, RelayConfiguration);
   }
 
-#endif /* End of configuration not related to T5 */
-
-  Data->saveConfiguration(0, RelayConfiguration);
-
-#if defined(T3_CONFIG) || defined(T4_CONFIG)
-  RelayConfiguration.gpio = 5;
-  sprintf(RelayConfiguration.name, "relay2");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/2");
-  Data->saveConfiguration(1, RelayConfiguration);
-
-  RelayConfiguration.gpio = 4;
-  sprintf(RelayConfiguration.name, "relay3");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/3");
-  Data->saveConfiguration(2, RelayConfiguration);
-
-  RelayConfiguration.gpio = 15;
-  sprintf(RelayConfiguration.name, "relay4");
-  sprintf(RelayConfiguration.mqtt.topic, "relay/4");
-  Data->saveConfiguration(3, RelayConfiguration);
 #endif
 
 /* Regulator config */
@@ -257,64 +252,32 @@ void AFEDefaults::set() {
   Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
 #endif
 
-/* Switch config */
-#ifdef T0_SHELLY_1_CONFIG
-  SwitchConfiguration.gpio = 5;
+  /* Switch config */
   SwitchConfiguration.type = SWITCH_TYPE_MONO;
-#else
-  SwitchConfiguration.gpio = 0;
-  SwitchConfiguration.type = 0;
-#endif
-
-  SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
-  SwitchConfiguration.relayID = 1;
+  SwitchConfiguration.sensitiveness = 50;
   SwitchConfiguration.domoticz.idx = 0;
   SwitchConfiguration.mqtt.topic[0] = '\0';
-  Data->saveConfiguration(0, SwitchConfiguration);
 
-#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T2_CONFIG) ||          \
-    defined(T5_CONFIG) || defined(T6_CONFIG)
-  SwitchConfiguration.gpio = 14;
-  SwitchConfiguration.type = 1;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG)
-  SwitchConfiguration.gpio = 9;
-  SwitchConfiguration.relayID = 2;
+#ifdef T0_SHELLY_1_CONFIG
+  SwitchConfiguration.gpio = 5;
+  SwitchConfiguration.relayID = 1;
+#else
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.relayID = 0;
 #endif
 
-#if defined(T0_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
-    defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
-  Data->saveConfiguration(1, SwitchConfiguration);
-#endif
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    Data->saveConfiguration(i, SwitchConfiguration);
+  }
 
-#if defined(T3_CONFIG) || defined(T4_CONFIG)
-  SwitchConfiguration.gpio = 10;
-  SwitchConfiguration.relayID = 3;
-  Data->saveConfiguration(2, SwitchConfiguration);
-  SwitchConfiguration.gpio = 14;
-  SwitchConfiguration.relayID = 4;
-  Data->saveConfiguration(3, SwitchConfiguration);
-#endif
-
-/* LEDs configuration */
-#ifdef CONFIG_HARDWARE_LED
-
-#if !defined(T5_CONFIG)
-  addLEDConfiguration(1, 3);
-  addLEDConfiguration(0, 13);
-
-#if defined(T3_CONFIG) || defined(T4_CONFIG)
-  addLEDConfiguration(2, 13);
-  addLEDConfiguration(3, 13);
-  addLEDConfiguration(4, 13);
-#endif
-
-#else /* T5 */
-  addLEDConfiguration(0, 16);
-  addLEDConfiguration(1, 14);
-  addLEDConfiguration(2, 13);
-#endif
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+    Data->saveConfiguration(i, LEDConfiguration);
+  }
 #endif
 
 /* DS18B20 or DHTxx Sensor configuration */
@@ -417,7 +380,8 @@ void AFEDefaults::set() {
   Data->saveConfiguration(SensorBH1750Configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   Data->saveSystemLedID(1);
 #endif
 
@@ -437,41 +401,3 @@ void AFEDefaults::set() {
   Data->saveConfiguration(AnalogInputConfiguration);
 #endif
 }
-
-void AFEDefaults::addDomoticzConfiguration() {
-  DOMOTICZ DomoticzConfiguration;
-  DomoticzConfiguration.protocol = 0;
-  DomoticzConfiguration.host[0] = '\0';
-  DomoticzConfiguration.user[0] = '\0';
-  DomoticzConfiguration.password[0] = '\0';
-  DomoticzConfiguration.port = 8080;
-  Data->saveConfiguration(DomoticzConfiguration);
-}
-
-#ifdef CONFIG_HARDWARE_LED
-void AFEDefaults::addLEDConfiguration(uint8_t id, uint8_t gpio) {
-  LED LEDConfiguration;
-  LEDConfiguration.gpio = gpio;
-  LEDConfiguration.changeToOppositeValue = false;
-  Data->saveConfiguration(id, LEDConfiguration);
-}
-#endif
-
-void AFEDefaults::eraseConfiguration() {
-#ifdef DEBUG
-  Serial << endl << "Erasing EEPROM";
-#endif
-  Eeprom.erase();
-}
-
-#ifdef CONFIG_HARDWARE_SPIFFS
-void AFEDefaults::formatSPIFFS() {
-  if (SPIFFS.format()) {
-#ifdef DEBUG
-    Serial << endl << "- File system formated";
-  } else {
-    Serial << endl << "- File system NOT formated";
-#endif
-  }
-}
-#endif

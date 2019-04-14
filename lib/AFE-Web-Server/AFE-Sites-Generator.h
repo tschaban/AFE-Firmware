@@ -43,7 +43,7 @@ private:
   AFEDataAccess Data;
   AFEDevice *Device;
   FIRMWARE firmware;
-  AFEFirmware Firmware;
+  AFEFirmware *Firmware;
   char deviceID[17];
 
   const String generateHeader(uint8_t redirect);
@@ -67,7 +67,9 @@ private:
 
   const String addMQTTTopicItem(char *topic, uint8_t id,
                                 const String title = "MQTT",
-                                const String subtitle = "");
+                                const String subtitle = "",
+                                boolean showMainTopic = true);
+
   const String addDomoticzIDXItem(unsigned long idx, uint8_t id,
                                   const String title = "");
 
@@ -87,7 +89,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDevice *);
+  void begin(AFEDevice *, AFEFirmware *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
@@ -101,7 +103,6 @@ public:
   /* All following methods generates configuration sections */
   String addDeviceConfiguration();
   String addNetworkConfiguration();
-  String addFirstLaunchConfiguration();
   String addConnectingSite();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
@@ -109,7 +110,7 @@ public:
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif

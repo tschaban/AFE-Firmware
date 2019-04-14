@@ -2,9 +2,10 @@
 
 AFESitesGenerator::AFESitesGenerator() {}
 
-void AFESitesGenerator::begin(AFEDevice *_Device) {
+void AFESitesGenerator::begin(AFEDevice *_Device, AFEFirmware *_Firmware) {
   firmware = Data.getFirmwareConfiguration();
   Device = _Device;
+  Firmware = _Firmware;
   Data.getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
 }
 
@@ -36,7 +37,9 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += firmware.version;
     page += "/";
     page += deviceID;
-    page += "\" style=\"width: 100%;display: block\">";
+    page += "\" style=\"width: 100%;display: block\" alt=\"AFE Firmware\">";
+  } else {
+    page += "<h3 class=\"la\">AFE Firmware</h3>";
   }
 
   page += "<div id=\"c\">";
@@ -52,7 +55,6 @@ const String AFESitesGenerator::generateOneColumnLayout(uint8_t redirect) {
 
 const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   String page = generateHeader(redirect);
-  Firmware.begin();
   page += "<div id=\"l\">";
   if (Device->getMode() == MODE_ACCESS_POINT) {
     page += "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
@@ -284,7 +286,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* Sensor DS18B20 */
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  if (Device->configuration.isAnalogInput && Firmware.isUnlocked()) {
+  if (Device->configuration.isAnalogInput && Firmware->Pro.valid) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_ANALOG_INPUT;
     page += "\">";
@@ -339,7 +341,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body = "<fieldset>";
 
 /* LED */
-#ifdef CONFIG_HARDWARE_LED
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
     if (Device->configuration.isLED[i]) {
       itemsNumber++;
@@ -486,7 +489,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  if (Firmware.isUnlocked()) {
+  if (Firmware->Pro.valid) {
     body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
             "value=\"1\"";
     body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
@@ -540,32 +543,6 @@ String AFESitesGenerator::addDeviceConfiguration() {
   return page;
 }
 
-String AFESitesGenerator::addFirstLaunchConfiguration() {
-  String body = "<fieldset><div class=\"cf\"><label>";
-  body += L_SSID;
-  body += "</label><select name=\"s\">";
-#ifdef DEBUG
-  Serial << endl << "Searching for WiFi networks: ";
-#endif
-  int numberOfNetworks = WiFi.scanNetworks();
-  for (int i = 0; i < numberOfNetworks; i++) {
-    body += "<option>";
-    body += WiFi.SSID(i);
-    body += "</option>";
-  }
-#ifdef DEBUG
-  Serial << "Completed";
-#endif
-
-  body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
-  body += L_REFRESH;
-  body += "\" formaction=\"/?o=start&c=0\"></div><div class=\"cf\"><label>";
-  body += L_PASSWORD;
-  body += "</label><input name=\"p\" type=\"text\" /></div></fieldset>";
-
-  return addConfigurationBlock(L_NETWORK_CONFIGURATION, "", body);
-}
-
 String AFESitesGenerator::addConnectingSite() {
   NETWORK configuration = Data.getNetworkConfiguration();
   String body = "<p>";
@@ -594,13 +571,33 @@ String AFESitesGenerator::addNetworkConfiguration() {
   configuration = Data.getNetworkConfiguration();
 
   String body = "<fieldset>";
+  char _ssid[sizeof(configuration.ssid)];
   body += "<div class=\"cf\"><label>";
   body += L_SSID;
-  body += "</label><input name=\"s\" type=\"text\" maxlength=\"32\" value=\"";
-  body += configuration.ssid;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
+  body += "</label><select name=\"s\">";
+#ifdef DEBUG
+  Serial << endl << "Searching for WiFi networks: ";
+#endif
+  int numberOfNetworks = WiFi.scanNetworks();
+  for (int i = 0; i < numberOfNetworks; i++) {
+    body += "<option value=\"";
+    body += WiFi.SSID(i);
+    WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+    body +=
+        strcmp(_ssid, configuration.ssid) == 0 ? " selected=\"selected\"" : "";
+    body += "\">";
+    body += WiFi.SSID(i);
+    body += "</option>";
+  }
+#ifdef DEBUG
+  Serial << "Completed";
+#endif
+
+  body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
+  body += L_REFRESH;
+  body += "\" formaction=\"/?o=";
+  body += AFE_CONFIG_SITE_NETWORK;
+  body += "&c=0\"></div><div class=\"cf\"><label>";
   body += L_PASSWORD;
   body += "</label><input type=\"password\" name=\"p\" maxlength=\"32\" "
           "value=\"";
@@ -753,7 +750,8 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   String page =
       addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
-  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC);
+  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC, "",
+                           false);
   return page;
 }
 
@@ -824,7 +822,8 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
-#ifdef CONFIG_HARDWARE_LED
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -919,6 +918,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += "</option></select></div>";
 
   if (Device->configuration.api.mqtt) {
+
     body += "<div class=\"cf\">";
     body += "<label>";
     body += L_DEFAULT_MQTT_CONNECTED;
@@ -1030,7 +1030,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
 #endif
 
-#if (defined(CONFIG_HARDWARE_LED) || !defined(T5_CONFIG))
+#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0 && defined(CONFIG_FUNCTIONALITY_RELAY)
+
   body += "<br><p class=\"cm\">";
   body += L_SELECT_LED_4_RELAY;
   body += "</p>";
@@ -2119,12 +2121,20 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   body += ")</span></div><div class=\"cf\"><label>";
   body += L_MEASURMENTS_INTERVAL;
   body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
+          "type=\"number\" value=\"";
   body += configuration.interval;
   body += "\"><span class=\"hint\">1-86400 (24h) ";
   body += L_SECONDS;
   body += "</span></div><div class=\"cf\"><label>";
+  body += L_NUMBER_OF_SAMPLES;
+  body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
+          "type=\"number\" value=\"";
+  body += configuration.numberOfSamples;
+  body += "\"><span class=\"hint\">1-999</span></div></fieldset>";
+
+  String page = addConfigurationBlock(L_ANALOG_INPUT, "", body);
+
+  body = "<fieldset><div class=\"cf\"><label>";
   body += L_MEASURED_VOLTAGE;
   body += "</label><input name=\"m\" min=\"0\" max=\"1000\"  step=\"0.01\""
           "type=\"number\" value=\"";
@@ -2140,14 +2150,9 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   body += " R[B]</label><input name=\"rb\" min=\"0\" max=\"90000000\"  "
           "step=\"0.01\" type=\"number\" value=\"";
   body += configuration.divider.Rb;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_NUMBER_OF_SAMPLES;
-  body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
-          "type=\"number\" value=\"";
-  body += configuration.numberOfSamples;
-  body += "\"><span class=\"hint\">1-999</span></div><br><br></fieldset>";
+  body += "\"></div></fieldset>";
 
-  String page = addConfigurationBlock(L_ANALOG_INPUT, "", body);
+  page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
   if (device.api.mqtt) {
     page += addMQTTTopicItem(configuration.mqtt.topic, 0);
@@ -2376,7 +2381,7 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
     body += "-";
     body += FIRMWARE_VERSION;
     body += "\" /></a> <img src=\"https://img.shields.io/badge/PRO-";
-    body += Firmware.isUnlocked() ? L_YES : L_NO;
+    body += Firmware->Pro.valid ? L_YES : L_NO;
     body += "-orange.svg\" alt=\"PRO\" /></div>";
   }
   body += "</body></html>";
@@ -2542,12 +2547,24 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 
 const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id,
                                                  const String title,
-                                                 const String subtitle) {
+                                                 const String subtitle,
+                                                 boolean showMainTopic) {
+
+  MQTT configurationMQTT;
+  configurationMQTT = Data.getMQTTConfiguration();
+
   String body = "<fieldset><div class=\"cf\"><label>";
   body += L_MQTT_TOPIC;
-  body += "</label><input name=\"t" + String(id) +
+  body += "</label>";
+  if (showMainTopic) {
+    body += "<input type=\"text\" value=\"";
+    body += configurationMQTT.mqtt.topic;
+    body += "/\" disabled=\"disabled\" style=\"width:70px;\">";
+  }
+  body += "<input name=\"t" + String(id) +
           "\" type=\"text\" maxlength=\"32\" value=\"";
   body += topic;
+
   body += "\"><span class=\"hint\">Max 32 ";
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";

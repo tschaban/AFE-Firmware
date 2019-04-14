@@ -51,7 +51,7 @@ if ($Device->found()) { /* Device has been found */
   if ($Device->checkIfUpgraded($_type,$_version)) { /* Checking if firmware version has been upgraded */
     $Device->updateVersion($_type,$_version);
     $Notification = new pushover();
-    $Notification->send("AFE Firmware", "Upgraded: to version: T" . $_type . "/" . $_version);
+    $Notification->send("Upgraded", "To version: T" . $_type . "/" . $_version);
   } else { /* Updating last Seen date */
     $Device->updateLastSeenDate();
   }
@@ -60,7 +60,7 @@ if ($Device->found()) { /* Device has been found */
   $Location = new localization(C_USER_IP);
   $Location->add($_device_id);
   $Notification = new pushover();
-  $Notification->send("AFE Firmware", "Installed: T" . $_type . "/" . $_version
+  $Notification->send("Installed", "Version: T" . $_type . "/" . $_version
   . "\nUser location: " . $Location->getCountryCode() . "/" . $Location->getCity());
 }
 

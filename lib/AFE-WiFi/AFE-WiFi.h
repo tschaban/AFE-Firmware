@@ -14,7 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 #endif
 
@@ -31,7 +31,7 @@ private:
   unsigned long delayStartTime = 0;
   uint8_t WiFiMode;
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   unsigned long ledStartTime = 0;
 #endif
 
@@ -41,7 +41,7 @@ private:
                              // X number of connection failures
   DNSServer dnsServer;
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
 

@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 #endif
 //#include <Streaming.h>
@@ -43,7 +43,7 @@ private:
 
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
 

@@ -18,7 +18,7 @@ void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
 #endif
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
   if (systeLedID > 0 && _Device->configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
@@ -105,14 +105,14 @@ void AFESwitch::listener() {
            */
           if (SwitchConfiguration.functionality == SWITCH_FUNCTIONALITY_MULTI) {
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
             if (time - startTime >= 35000) {
               Led.blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 3; i++) {
                 Led.blink(200);
                 delay(200);
@@ -122,7 +122,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 2; i++) {
                 Led.blink(200);
                 delay(200);
@@ -132,7 +132,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               Led.blink(200);
 #endif
               _pressed4fiveSeconds = true;
