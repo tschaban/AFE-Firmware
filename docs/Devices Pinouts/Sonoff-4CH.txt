@@ -1,0 +1,11 @@
+GPIO13	Status LED (blue)
+GPIO12	Relay 1
+GPIO05	Relay 2
+GPIO04	Relay 3
+GPIO15	Relay 4
+GPIO00	Button 1 / Flash
+GPIO09	Button 2
+GPIO10	Button 3
+GPIO14	Button 4
+GPIO07	2.5mm jack
+GPIO08	2.5mm jack
