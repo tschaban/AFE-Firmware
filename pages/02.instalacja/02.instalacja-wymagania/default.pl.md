@@ -2,9 +2,12 @@
 title: Wymagania
 ---
 
-* Konwerter USB na TTL 3.3V oparty na układzie CP2102 (Sterowniki do CP210x jeśli system sam nie doładuje)  lub CH340
+* Konwerter USB na TTL 3.3V oparty np. na układzie CP2102 lub CH340
+
+![](dongle-front.png)
+
 * Oprogramowanie NodeMCU Flasher pobrane w zależności od wersji Windows
-	* NodeMCU Flasher 32 Bit
-	* NodeMCU Flasher 64 Bit
-* Kable wtyczka USB – gniazdo USB – do podłączenia Konwertera USB-TTL z komputerem
+	* [NodeMCU Flasher 32 Bit](https://github.com/nodemcu/nodemcu-flasher/blob/master/Win32/Release/ESP8266Flasher.exe)
+	* [NodeMCU Flasher 64 Bit](https://github.com/nodemcu/nodemcu-flasher/blob/master/Win64/Release/ESP8266Flasher.exe)
 * 4 przewody, aby podłączyć konwerter USB-TTL z przełącznikiem – gniazdem szpilkowym
+* (Opcjonalnie dla wygody) Kable wtyczka USB – gniazdo USB – do podłączenia Konwertera USB-TTL z komputerem
