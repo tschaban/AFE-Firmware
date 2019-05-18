@@ -8,4 +8,6 @@ Jeżli masz zamiar wgrać firmware AFE do urządzeń typu Sonoff, Shelly itp. to
 
 AFE nie współpracuje z oprogramowaniem Supla. Nie można sterować urządzeniami z firmware AFE oprogramowaniem Supla. Supla działa tylko z urządzeniami z zainstalowanym firmware Supla.
 
+Przeczytaj: [Politykę Prywatności dot. AFE Firmware](/postawowe-informacje/polityka-prywatnosci?target=_blank)
+
 !! Jeśli nie rozumiesz powyższych punktów lub z którymiś nie zgadzasz się, to nie możesz instalować oprogramowania AFE Firmware

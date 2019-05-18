@@ -4,7 +4,7 @@ title: 'Instrukcja instalacji Sonoff'
 
 Poniższy przykład opisuje, jak wgrać AFE Firmware do urządzenia Sonoff Basic za pomocą NodeMCU Flasher
 
-**Krok 1.** Ściągamy najnowszą wersję AFE Firmware, do pobrania tutaj.
+**Krok 1.** Ściągamy najnowszą wersję AFE Firmware, do pobrania [tutaj](/pliki-to-pobrania?target=_blank).
 
 **Krok 2.** Rozbieramy obudowę, aby dostać się do środka. Widzimy tutaj 5 otworów pod przyciskiem. Te 5 otworów to złącza, które wykorzystamy do załadowania firmware
 
