@@ -1,6 +1,6 @@
 ---
 title: 'Pierwsze uruchomienie'
-media_order: 'afe-firmware-wyszukiwanie-wifi-afe-device.png,afe-firmware-konfiguracja-wiifi-pierwsze-uruchomienie.png'
+media_order: 'afe-firmware-wyszukiwanie-wifi-afe-device.png,afe-firmware-konfiguracja-wiifi-pierwsze-uruchomienie.png,afe-firmware-mac-adres-pierwsze-uruchomienie.png'
 ---
 
 * Pierwsze uruchomienie może trwać ok 1 minutę
@@ -46,9 +46,12 @@ Adres IP: 192.168.1.100
 ---
 Po skonfigurowaniu oraz zapisaniu parametrów sieci WiFi urządzenie zostanie ponownie uruchomiona i będzie próbowało nawiązać połączenie z siecią WiFi.
 
-Jeśli do urządzenia podłączona jest dioda LED do GPIO13 to podczas łączenia się z siecią WiFi dioda będzie migać. Po podłączeniu się do sieci WiFi dioda przestanie migać.
+!!! Jeśli do urządzenia podłączona jest dioda LED do GPIO13 to podczas łączenia się z siecią WiFi dioda będzie migać z częstotliwością około 1 sekundy. Po podłączeniu się do sieci WiFi dioda powinna migać kilka razu na sekundę.
 
-Po nawiązaniu połączenia z siecią WiFi możemy dokończyć konfigurację. W tym celu należy wprowadzić adres IP urządzenia nadany przez router WiFi lub adres IP nadany ręcznie podczas konfiguracji.
+Po nawiązaniu połączenia z siecią WiFi możemy dokończyć konfigurację. W tym celu należy wprowadzić adres IP urządzenia nadany przez router WiFi lub adres IP nadany ręcznie podczas konfiguracji do przeglądarki internetowej.
 
 >Adres IP urządzenia można odnaleść w konfiguracji routera WiFi. Należy wyszukać adres IP urządzenia z adresem MAC podanym na ekranie konfiguracji AFE Firmware. 
+![](afe-firmware-mac-adres-pierwsze-uruchomienie.png)
 >Aby odszukać adres IP urządzenia w routerze WiFi należy sprawdzić w dokumentacji routera lub poprosić o pomoc na [Forum AFE Firmware](https://www.smartnydom.pl/forum/afe-firmware/?target=_blank)
+
+---

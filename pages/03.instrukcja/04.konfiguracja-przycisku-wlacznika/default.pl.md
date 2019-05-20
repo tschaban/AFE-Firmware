@@ -1,0 +1,4 @@
+---
+title: 'Konfiguracja przycisku / włącznika'
+---
+
