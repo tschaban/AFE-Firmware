@@ -1,25 +1,43 @@
 ---
 title: 'Konfiguracja urządzenia'
-media_order: 'afe-firmware-konfiguracja-urzadzenia-api.png,afe-firmware-konfiguracja-urzadzenia-nazwa.png,afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png'
+media_order: 'afe-firmware-konfiguracja-urzadzenia-api.png,afe-firmware-konfiguracja-urzadzenia-nazwa.png,afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png,afe-firmware-konfiguracja-urzadzenia.png'
 ---
 
-Konfiguracja nazwy urządzenia, sprzętu oraz mechanizmów sterowania urządzeniem
+Forumularz konfiguracji urządzenia umożliwia 
+* nadanie unikalnej nazwy urządzeniu, 
+* określenie elementów, jak diody LED, przkaźniki, przyciski, czujniki podłączone do ESP8266/8285 oraz 
+* wybranie mechanizmów integracji (API) z systemami do automatyki.
+
+Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządzenie** w menu Panelu Konfiguracyjnego AFE Firmware.
+
+![](afe-firmware-konfiguracja-urzadzenia.png)
+
+#### Sekcja: Urządzenie
 
 ![](afe-firmware-konfiguracja-urzadzenia-nazwa.png)
 
-Nazwa urządzenia
-Powinna to być unikalną nazwą urządzenia w ramach twojej lokalnej sieci (LAN).
-Podczas konfiguracji urządzenia w trybie Access Point wpisana wartość będzie nazwa sieci WiFi urządzenia
-Maksymalnie: 16 znaków
-Wymagane
-Uwaga: jeśli używane jest MQTT do sterowania urządzeniem konieczne jest, aby każde urządzenie łączące się do MQTT Brokera miało unikalną nazwę. Nie jest to konieczne dla sterowania przez HTTP API
+##### Nazwa urządzenia
+* Powinna to być unikalną nazwą urządzenia w ramach twojej lokalnej sieci (LAN).
+* Podczas konfiguracji urządzenia w trybie Access Point (HotSpot) wpisana wartość stanie się nazwą sieci WiFi urządzenia
+* Wprowadzenie **Nazwy** jest wymagane
 
+! Jeśli do sterowania urządzeniami wykorzystywany jest MQTT API to każde urządzenia łączące się z brokerem MQTT musi mieć unikalną nazwię
 
 ![](afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png)
 
-Sprzęt
-Tutaj wybierasz jakie elementy typu przekaźniki, czujniki, diody LED itp są podłączone do urządzania. Jakie elementy są do wyboru uzależnione jest od wersji AFE Firmware. Włączenie danego elementu powoduj uaktywnienie sekcji konfiguracji w menu panelu konfiguracji dla danego elementu urządzenia.
+#### Sekcja: Konfiguracja urządzenia
+
+* W tej sekcji wybierane są jakie elementy typu przekaźniki, czujniki, diody LED itp są podłączone do urządzania
+
+!!!! Jakie elementy są do wyboru uzależnione jest od wersji AFE Firmware
+
+* Włączenie danego elementu powoduj uaktywnienie sekcji konfiguracji w menu panelu konfiguracji dla danego elementu urządzenia
+* Liczba określa ile elementów danego typu jest podłączonych do ESP8266/8285
 
 ![](afe-firmware-konfiguracja-urzadzenia-api.png)
 
-Włączanie / wyłączanie mechanizmów sterowania urządzeniem (API). Włączanie danego API, jeśli tego wymaga, uaktywnia sekcję konfiguracyjną w menu Panelu Konfiguracyjnym. W zależności od wersji oprogramowania dostępne są do wybrania odpowiednie API np. MQTT, HTTP
+#### Sekcja: Sterowanie urządzeniem
+* Włączanie / wyłączanie mechanizmów sterowania urządzeniem (API)
+* Włączanie danego API, jeśli tego wymaga, uaktywnia sekcję konfiguracyjną w menu Panelu Konfiguracyjny
+* Domoticz API wymaga do swojego poprawnego działania, również włączone HTTP API
+>Które API wybrać? W przypadku Domoticz odpowiedź jest stosunkwo prosta: Domoticz API + HTTP API. W przypadku innych systemtów do sterowania inteligentnym domem np. openHAB, HomeAssistant wybór należy do Ciebie. Osobiście zachęcam korzystać z protokołu MQTT. Został on stworzyny właśnie z fokusem na transmisję danych dla urządzeń IoT i nie tylko.
