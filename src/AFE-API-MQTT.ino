@@ -11,8 +11,17 @@ void AFEMQTT::begin() {
   Broker.setClient(esp);
   if (strlen(MQTTConfiguration.host) > 0) {
     Broker.setServer(MQTTConfiguration.host, MQTTConfiguration.port);
-  } else if (MQTTConfiguration.ip[0] > 0) {
-    Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+  } else if (strlen(MQTTConfiguration.ip) > 0) {
+    IPAddress ip;
+    if (ip.fromString(MQTTConfiguration.ip)) {
+      Broker.setServer(MQTTConfiguration.ip, MQTTConfiguration.port);
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl
+             << "ERROR: Problem with MQTT IP address: " << MQTTConfiguration.ip;
+    }
+#endif
   } else {
     isConfigured = false;
   }
@@ -25,9 +34,7 @@ void AFEMQTT::begin() {
          << endl
          << "---------------------- MQTT ----------------------" << endl
          << "Host: " << MQTTConfiguration.host << endl
-         << "IP: " << MQTTConfiguration.ip[0] << "." << MQTTConfiguration.ip[1]
-         << "." << MQTTConfiguration.ip[2] << "." << MQTTConfiguration.ip[3]
-         << endl
+         << "IP: " << MQTTConfiguration.ip << endl
          << "Port: " << MQTTConfiguration.port << endl
          << "User: " << MQTTConfiguration.user << endl
          << "Password: " << MQTTConfiguration.password << endl

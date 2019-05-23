@@ -105,6 +105,7 @@ public:
   String addNetworkConfiguration();
   String addConnectingSite();
   String addMQTTBrokerConfiguration();
+  String addMQTTTopicsConfiguration();
   String addDomoticzServerConfiguration();
   String addPasswordConfigurationSite();
   String addRelayConfiguration(uint8_t id);

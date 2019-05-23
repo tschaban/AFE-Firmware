@@ -794,9 +794,9 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
 
       configuration.isDHCP = root["isDHCP"];
 
-      configuration.ip = IPfromString(root["ip"]);
-      configuration.gateway = IPfromString(root["gateway"]);
-      configuration.subnet = IPfromString(root["subnet"]);
+      sprintf(configuration.ip, root["ip"]);
+      sprintf(configuration.gateway, root["gateway"]);
+      sprintf(configuration.subnet, root["subnet"]);
 
       configuration.noConnectionAttempts = root["noConnectionAttempts"];
       configuration.waitTimeConnections = root["waitTimeConnections"];
@@ -847,9 +847,9 @@ void AFEDataAccess::saveConfiguration(NETWORK configuration) {
     root["ssid"] = configuration.ssid;
     root["password"] = configuration.password;
     root["isDHCP"] = configuration.isDHCP;
-    root["ip"] = configuration.ip.toString();
-    root["gateway"] = configuration.gateway.toString();
-    root["subnet"] = configuration.subnet.toString();
+    root["ip"] = configuration.ip;
+    root["gateway"] = configuration.gateway;
+    root["subnet"] = configuration.subnet;
 
     root["noConnectionAttempts"] = configuration.noConnectionAttempts;
     root["waitTimeConnections"] = configuration.waitTimeConnections;
@@ -904,8 +904,7 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
 #endif
 
       sprintf(configuration.host, root["host"]);
-
-      configuration.ip = IPfromString(root["ip"]);
+      sprintf(configuration.ip, root["ip"]);
       configuration.port = root["port"];
       sprintf(configuration.user, root["user"]);
       sprintf(configuration.password, root["password"]);
@@ -954,7 +953,7 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
     StaticJsonBuffer<271> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["host"] = configuration.host;
-    root["ip"] = configuration.ip.toString();
+    root["ip"] = configuration.ip;
     root["port"] = configuration.port;
     root["user"] = configuration.user;
     root["password"] = configuration.password;
@@ -980,6 +979,12 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Serial << endl << "--------------------------------------------------";
 #endif
 }
+
+MQTT_TOPICS AFEDataAccess::getMQTTTopicsConfiguration() {
+  MQTT_TOPICS configuration;
+  return configuration;
+}
+void AFEDataAccess::saveConfiguration(MQTT_TOPICS configuration) {}
 
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
@@ -2405,4 +2410,99 @@ IPAddress AFEDataAccess::IPfromString(const char *address) {
 #endif
   };
   return ip;
+}
+
+uint16_t AFEDataAccess::readNumberOfReboots() {
+  uint16_t numberOfReboots = 1;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: data-reboots.json : ";
+#endif
+
+  File configFile = SPIFFS.open("data-reboots.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      numberOfReboots = root["reboots"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return numberOfReboots;
+}
+
+void AFEDataAccess::saveRebooted() {
+  uint16_t _temp = readNumberOfReboots();
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: data-reboots.json : ";
+#endif
+
+  File configFile = SPIFFS.open("data-reboots.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["reboots"] = _temp + 1;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 }

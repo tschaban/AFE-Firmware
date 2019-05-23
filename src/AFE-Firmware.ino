@@ -208,6 +208,7 @@ void setup() {
   }
 
   /* Initialzing network */
+
   Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
   Serial << endl << "Network initialized";
@@ -216,6 +217,7 @@ void setup() {
   /* Initializing LED, checking if LED exists is made on Class level  */
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
+  delay(0);
 
 #ifdef DEBUG
   Serial << endl << "System LED ID: " << systeLedID;
@@ -335,6 +337,8 @@ void setup() {
     I2CScanner.scanAll();
   }
 #endif
+
+  Data.saveRebooted();
 
 #ifdef DEBUG
   Serial << endl

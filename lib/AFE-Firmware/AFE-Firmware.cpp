@@ -12,6 +12,7 @@ void AFEFirmware::begin() {
 
 boolean AFEFirmware::callService(uint8_t method) {
   HTTPClient http;
+  WiFiClient client;
 
   String url = (method == AFE_WEBSERVICE_VALIDATE_KEY ? AFE_URL_VALIDATE_KEY
                                                       : AFE_URL_ADD_KEY);
@@ -28,7 +29,7 @@ boolean AFEFirmware::callService(uint8_t method) {
          << "response: ";
 #endif
 
-  http.begin(url);
+  http.begin(client, url);
   int httpCode = http.GET();
   if (httpCode > 0) {
     /* ArduinoJson v5 */

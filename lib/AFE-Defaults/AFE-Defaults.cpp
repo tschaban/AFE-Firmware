@@ -110,7 +110,8 @@ void AFEDefaults::set() {
 #endif
 
   /* Switch presence */
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+  deviceConfiguration.isSwitch[0] = true;
+  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = false;
   }
 
@@ -170,9 +171,9 @@ void AFEDefaults::set() {
   networkConfiguration.ssid[0] = '\0';
   networkConfiguration.password[0] = '\0';
   networkConfiguration.isDHCP = true;
-  networkConfiguration.ip = IPAddress(0, 0, 0, 0);
-  networkConfiguration.gateway = networkConfiguration.ip;
-  networkConfiguration.subnet = IPAddress(255, 255, 255, 0);
+  networkConfiguration.ip[0] = '\0';
+  networkConfiguration.gateway[0] = '\0';
+  networkConfiguration.subnet[0] = '\0';
   networkConfiguration.noConnectionAttempts = 30;
   networkConfiguration.waitTimeConnections = 1;
   networkConfiguration.waitTimeSeries = 20;
@@ -180,7 +181,7 @@ void AFEDefaults::set() {
 
   /* MQTT Default config */
   MQTTConfiguration.host[0] = '\0';
-  MQTTConfiguration.ip = networkConfiguration.ip;
+  MQTTConfiguration.ip[0] = '\0';
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;

@@ -51,7 +51,7 @@ void AFEDomoticz::callURL(const String url) {
   Serial << endl << "----------------------------------------" << endl;
 #endif
 
-  http.begin(url);
+  http.begin(client, url);
   http.GET();
 
   //#ifdef DEBUG

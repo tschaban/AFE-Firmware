@@ -11,13 +11,17 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   AFEDataAccess Data;
   Device = _Device;
   WiFiMode = mode;
+
   if (WiFiMode == MODE_NORMAL || WiFiMode == MODE_CONFIGURATION) {
     networkConfiguration = Data.getNetworkConfiguration();
   }
 
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   // Init LED
+
   uint8_t systeLedID = Data.getSystemLedID();
+  delay(0);
+
   if (systeLedID > 0 && Device->configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
   }
@@ -28,6 +32,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #endif
 
   WiFi.hostname(Device->configuration.name);
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
   if (WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << "Starting HotSpot: ";
@@ -47,8 +52,35 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
     Serial << endl << "Starting WiFi: in WIFI_STA mode";
 #endif
     if (!networkConfiguration.isDHCP) {
-      WiFi.config(networkConfiguration.ip, networkConfiguration.gateway,
-                  networkConfiguration.subnet);
+      IPAddress ip;
+      if (!ip.fromString(networkConfiguration.ip)) {
+#ifdef DEBUG
+        Serial << endl
+               << "ERROR: Problem with WIFI IP address: "
+               << networkConfiguration.ip;
+#endif
+      }
+      IPAddress gateway;
+      if (!gateway.fromString(networkConfiguration.gateway)) {
+#ifdef DEBUG
+        Serial << endl
+               << "ERROR: Problem with WIFI gateway address: "
+               << networkConfiguration.gateway;
+#endif
+      }
+      IPAddress subnet;
+      if (!subnet.fromString(networkConfiguration.subnet)) {
+#ifdef DEBUG
+        Serial << endl
+               << "ERROR: Problem with WIFI subnet address: "
+               << networkConfiguration.subnet;
+#endif
+      }
+
+      WiFi.config(ip, gateway, subnet);
+#ifdef DEBUG
+      Serial << endl << "Settting fixed IP";
+#endif
     }
     WiFi.mode(WIFI_STA);
   }
@@ -150,9 +182,9 @@ void AFEWiFi::listener() {
   }
 }
 boolean AFEWiFi::connected() {
-  // Serial << WiFi.status();
-  //  if (WiFi.status() == WL_CONNECTED) {
-  if (WiFi.localIP().toString() != "0.0.0.0") {
+  if ((networkConfiguration.isDHCP &&
+       WiFi.localIP().toString() != "(IP unset)") ||
+      (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
 
     delay(1);
     if (disconnected) {

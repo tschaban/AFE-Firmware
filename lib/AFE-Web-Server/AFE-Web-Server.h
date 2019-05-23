@@ -65,6 +65,7 @@ private:
   DEVICE getDeviceData();
   NETWORK getNetworkData();
   MQTT getMQTTData();
+  MQTT_TOPICS getMQTTTopicsData();
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);

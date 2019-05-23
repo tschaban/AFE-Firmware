@@ -13,6 +13,7 @@
 
 #include <AFE-Data-Access.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
 #include <rBase64.h>
 
 #ifdef DEBUG
@@ -36,6 +37,7 @@ private:
 
   const String getApiCall(const char *param, unsigned int idx);
   void callURL(const String url);
+  WiFiClient client;
 
 public:
   DOMOTICZ configuration;

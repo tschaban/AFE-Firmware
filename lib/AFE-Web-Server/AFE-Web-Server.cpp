@@ -54,6 +54,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   case AFE_CONFIG_SITE_MQTT:
     page += Site.addMQTTBrokerConfiguration();
     break;
+  case AFE_CONFIG_SITE_MQTT_TOPICS:
+    page += Site.addMQTTTopicsConfiguration();
+    break;
   case AFE_CONFIG_SITE_DOMOTICZ:
     page += Site.addDomoticzServerConfiguration();
     break;
@@ -218,6 +221,9 @@ void AFEWebServer::generate(boolean upload) {
     case AFE_CONFIG_SITE_MQTT:
       Data.saveConfiguration(getMQTTData());
       break;
+    case AFE_CONFIG_SITE_MQTT_TOPICS:
+      Data.saveConfiguration(getMQTTTopicsData());
+      break;
     case AFE_CONFIG_SITE_DOMOTICZ:
       Data.saveConfiguration(getDomoticzServerData());
       break;
@@ -276,12 +282,8 @@ void AFEWebServer::generate(boolean upload) {
         if (authorize) {
           siteConfig.rebootMode = siteConfig.deviceID;
           siteConfig.ID = AFE_CONFIG_SITE_EXIT;
-          if (siteConfig.deviceID ==
-              MODE_CONFIGURATION) { /* Reboot only if connected to local WiFi */
-            siteConfig.reboot = true;
-            siteConfig.rebootTime = 10;
-          }
-        } else {
+          siteConfig.reboot = true;
+          siteConfig.rebootTime = 10;
         }
       }
       break;
@@ -803,26 +805,22 @@ NETWORK AFEWebServer::getNetworkData() {
     data.password[0] = '\0';
   }
 
-  if (server.arg("d1").length() > 0 && server.arg("d2").length() > 0 &&
-      server.arg("d3").length() > 0 && server.arg("d4").length() > 0) {
-
-    data.ip = IPAddress(server.arg("d1").toInt(), server.arg("d2").toInt(),
-                        server.arg("d3").toInt(), server.arg("d4").toInt());
+  if (server.arg("i1").length() > 0) {
+    server.arg("i1").toCharArray(data.ip, sizeof(data.ip));
+  } else {
+    data.ip[0] = '\0';
   }
 
-  if (server.arg("g1").length() > 0 && server.arg("g2").length() > 0 &&
-      server.arg("g3").length() > 0 && server.arg("g4").length() > 0) {
-
-    data.gateway =
-        IPAddress(server.arg("g1").toInt(), server.arg("g2").toInt(),
-                  server.arg("g3").toInt(), server.arg("g4").toInt());
+  if (server.arg("i2").length() > 0) {
+    server.arg("i2").toCharArray(data.gateway, sizeof(data.gateway));
+  } else {
+    data.gateway[0] = '\0';
   }
 
-  if (server.arg("s1").length() > 0 && server.arg("s2").length() > 0 &&
-      server.arg("s3").length() > 0 && server.arg("s4").length() > 0) {
-
-    data.subnet = IPAddress(server.arg("s1").toInt(), server.arg("s2").toInt(),
-                            server.arg("s3").toInt(), server.arg("s4").toInt());
+  if (server.arg("i3").length() > 0) {
+    server.arg("i3").toCharArray(data.subnet, sizeof(data.subnet));
+  } else {
+    data.subnet[0] = '\0';
   }
 
   if (server.arg("na").length() > 0) {
@@ -855,11 +853,10 @@ MQTT AFEWebServer::getMQTTData() {
     data.host[0] = '\0';
   }
 
-  if (server.arg("m1").length() > 0 && server.arg("m2").length() > 0 &&
-      server.arg("m3").length() > 0 && server.arg("m4").length() > 0) {
-
-    data.ip = IPAddress(server.arg("m1").toInt(), server.arg("m2").toInt(),
-                        server.arg("m3").toInt(), server.arg("m4").toInt());
+  if (server.arg("i").length() > 0) {
+    server.arg("i").toCharArray(data.ip, sizeof(data.ip));
+  } else {
+    data.ip[0] = '\0';
   }
 
   if (server.arg("p").length() > 0) {
@@ -882,6 +879,17 @@ MQTT AFEWebServer::getMQTTData() {
     server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
+  }
+
+  return data;
+}
+
+MQTT_TOPICS AFEWebServer::getMQTTTopicsData() {
+  MQTT_TOPICS data;
+  if (server.arg("l").length() > 0) {
+    server.arg("l").toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
+  } else {
+    data.lwt.topic[0] = '\0';
   }
 
   return data;

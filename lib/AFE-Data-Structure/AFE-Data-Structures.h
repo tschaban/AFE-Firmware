@@ -15,8 +15,8 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
-
 #include <AFE-MQTT-Structure.h>
+
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-PASSWORD-Structure.h>
 #include <AFE-PRO-VERSION-Structure.h>

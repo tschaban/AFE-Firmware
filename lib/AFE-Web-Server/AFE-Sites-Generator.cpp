@@ -25,6 +25,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += firmware.version;
   page += " [T";
   page += firmware.type;
+  page += "-";
+  page += Data.readNumberOfReboots();
   page += "]</title><style>";
   page += AFE_CSS;
   page += "</style></head><body>";
@@ -583,9 +585,10 @@ String AFESitesGenerator::addNetworkConfiguration() {
     body += "<option value=\"";
     body += WiFi.SSID(i);
     WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+    body += "\"";
     body +=
         strcmp(_ssid, configuration.ssid) == 0 ? " selected=\"selected\"" : "";
-    body += "\">";
+    body += ">";
     body += WiFi.SSID(i);
     body += "</option>";
   }
@@ -617,62 +620,18 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += (configuration.isDHCP ? " checked=\"checked\"" : "");
   body += "> ";
   body += L_DHCP_ENABLED;
-  body += "?</label></div>";
-
-  body += "<div class=\"cf\"><label>";
+  body += "?</label></div><div class=\"cf\"><label>";
   body += L_IP_ADDRESS;
-  body += "</label><input name=\"d1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" style=\"width:70px\" value=\"";
-  body += configuration.ip[0];
-  body +=
-      "\">.<input name=\"d2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.ip[1];
-  body +=
-      "\">.<input name=\"d3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.ip[2];
-  body += "\">.";
-  body += "<input name=\"d4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.ip[3];
+  body += "</label><input name=\"i1\" type=\"text\" value=\"";
+  body += configuration.ip;
   body += "\"></div><div class=\"cf\"><label>";
   body += L_GATEWAY;
-  body += "</label><input name=\"g1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" "
-          "style=\"width:70px\" value=\"";
-  body += configuration.gateway[0];
-  body +=
-      "\">.<input name=\"g2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.gateway[1];
-  body +=
-      "\">.<input name=\"g3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.gateway[2];
-  body +=
-      "\">.<input name=\"g4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.gateway[3];
-  body += "\"></div>";
-
-  body += "<div class=\"cf\"><label>";
+  body += "</label><input name=\"i2\" type=\"text\" value=\"";
+  body += configuration.gateway;
+  body += "\"></div><div class=\"cf\"><label>";
   body += L_SUBNET;
-  body += "</label><input name=\"s1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" style=\"width:70px\" value=\"";
-  body += configuration.subnet[0];
-  body +=
-      "\">.<input name=\"s2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.subnet[1];
-  body +=
-      "\">.<input name=\"s3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.subnet[2];
-  body +=
-      "\">.<input name=\"s4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.subnet[3];
+  body += "</label><input name=\"i3\" type=\"text\" value=\"";
+  body += configuration.subnet;
   body += "\"></div></fieldset>";
 
   page += addConfigurationBlock(L_DEVICE_IP, L_DEVICE_IP_INFO, body);
@@ -714,21 +673,47 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   body += L_NUMBER_OF_CHARS;
   body += "</span></div><div class=\"cf\"><label>";
   body += L_IP_ADDRESS;
-  body += "</label><input name=\"m1\" type=\"number\" max=\"255\" min=\"0\" "
-          "step=\"1\" style=\"width:70px\" value=\"";
-  body += configuration.ip[0];
-  body +=
-      "\">.<input name=\"m2\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.ip[1];
-  body +=
-      "\">.<input name=\"m3\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.ip[2];
-  body +=
-      "\">.<input name=\"m4\" type=\"number\" max=\"255\" min=\"0\" step=\"1\" "
-      "style=\"width:70px\" value=\"";
-  body += configuration.ip[3];
+  body += "</label><input name=\"i\" type=\"text\" value=\"";
+  body += configuration.ip;
+  body += "\"></div><div class=\"cf\"><label>Port</label><input name=\"p\" "
+          "type=\"number\""
+          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
+  body += configuration.port;
+  body += "\"></div><div class=\"cf\"><label>";
+  body += L_USERNAME;
+  body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
+  body += configuration.user;
+  body += "\"><span class=\"hint\">Max 32 ";
+  body += L_NUMBER_OF_CHARS;
+  body += "</span></div><div class=\"cf\"><label>";
+  body += L_PASSWORD;
+  body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
+          "value=\"";
+  body += configuration.password;
+  body += "\"><span class=\"hint\">Max 32 ";
+  body += L_NUMBER_OF_CHARS;
+  body += "</span></div></fieldset>";
+
+  String page =
+      addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
+  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC, "",
+                           false);
+  return page;
+}
+
+String AFESitesGenerator::addMQTTTopicsConfiguration() {
+  MQTT configuration;
+  configuration = Data.getMQTTConfiguration();
+
+  String body = "<fieldset><div class=\"cf\"><label>Hostname</label><input "
+                "name=\"h\" type=\"text\" maxlength=\"32\" value=\"";
+  body += configuration.host;
+  body += "\"><span class=\"hint\">Max 32 ";
+  body += L_NUMBER_OF_CHARS;
+  body += "</span></div><div class=\"cf\"><label>";
+  body += L_IP_ADDRESS;
+  body += "</label><input name=\"i\" type=\"text\" value=\"";
+  body += configuration.ip;
   body += "\"></div><div class=\"cf\"><label>Port</label><input name=\"p\" "
           "type=\"number\""
           " min=\"0\" max=\"65535\" step=\"1\" value=\"";

@@ -18,7 +18,6 @@
 
 #include <ArduinoJson.h>
 #include <FS.h>
-#include <IPAddress.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -31,6 +30,9 @@ private:
 
 public:
   AFEDataAccess();
+
+  uint16_t readNumberOfReboots();
+  void saveRebooted();
 
   /* Methods saves and reads device ID */
   const String getDeviceUID();
@@ -50,6 +52,9 @@ public:
 
   MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
+
+  MQTT_TOPICS getMQTTTopicsConfiguration();
+  void saveConfiguration(MQTT_TOPICS configuration);
 
   DOMOTICZ getDomoticzConfiguration();
   void saveConfiguration(DOMOTICZ configuration);

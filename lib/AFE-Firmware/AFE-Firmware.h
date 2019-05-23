@@ -14,6 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <ArduinoJson.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
 
 #define AFE_WEBSERVICE_VALIDATE_KEY 0
 #define AFE_WEBSERVICE_ADD_KEY 1
