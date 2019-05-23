@@ -40,4 +40,4 @@ Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządze
 * Włączanie / wyłączanie mechanizmów sterowania urządzeniem (API)
 * Włączanie danego API, jeśli tego wymaga, uaktywnia sekcję konfiguracyjną w menu Panelu Konfiguracyjny
 * Domoticz API wymaga do swojego poprawnego działania, również włączone HTTP API
->Które API wybrać? W przypadku Domoticz odpowiedź jest stosunkwo prosta: Domoticz API + HTTP API. W przypadku innych systemtów do sterowania inteligentnym domem np. openHAB, HomeAssistant wybór należy do Ciebie. Osobiście zachęcam korzystać z protokołu MQTT. Został on stworzyny właśnie z fokusem na transmisję danych dla urządzeń IoT i nie tylko.
+>Które API wybrać? W przypadku Domoticz odpowiedź jest stosunkwo prosta: Domoticz API + HTTP API. W przypadku innych systemtów do sterowania inteligentnym domem np. openHAB, HomeAssistant wybór należy do Ciebie. Osobiście zachęcam korzystać z protokołu MQTT. Został on stworzyny właśnie z fokusem na transmisję danych dla urządzeń IoT i nie tylko. MQTT wykorzystuje duzi gracze FB, Amazon. Jest szybki i nie ma dużo narzutu na transmisję danych.
