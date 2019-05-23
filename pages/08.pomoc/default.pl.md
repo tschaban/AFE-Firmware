@@ -2,7 +2,6 @@
 title: Pomoc
 ---
 
-Aby uzyskać pomoc zajrzyj na dedykowane Forum dla AFE Firmware
+Aby uzyskać dalszą pomoc zajrzyj na dedykowane [Forum dla AFE Firmware](https://www.smartnydom.pl/forum/afe-firmware/?target=_blank)
 
-##### [Forum AFE Firmware](https://www.smartnydom.pl/forum/afe-firmware/?target=_blank)
 ![](afe-firmware-forum.png)

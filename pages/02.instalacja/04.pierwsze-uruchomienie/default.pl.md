@@ -41,7 +41,7 @@ Adres IP: 192.168.1.100
 ! Błędne ustawienia adresu IP, bramki lub maski sieci może spowodować utratę dostępu do urządzenia. W takiej sytuacji, konieczne może być, ponowne wgranie firmware z wcześniejszym wyczyszczeniem całej pamięci flash urządzenia 
 
 * Ostatnia sekcja z tytułem **Zaawansowane**, pozwala na ustawienie dodatkowych parametrów dotyczących nawiązywania połączenia z siecią WiFi
->Sugeruję nie zmieniać tych parametrów podczas pierwszego uruchomienia urządzenia. Parametry zostały opisane na stronie Konfiguracja sieci WiFi
+>Sugeruję nie zmieniać tych parametrów podczas pierwszego uruchomienia urządzenia. Parametry zostały opisane na stronie [Konfiguracja sieci WiFi](/konfiguracja/konfiguracja-sieci-wifi)
 
 ---
 Po skonfigurowaniu oraz zapisaniu parametrów sieci WiFi urządzenie zostanie ponownie uruchomiona i będzie próbowało nawiązać połączenie z siecią WiFi.
