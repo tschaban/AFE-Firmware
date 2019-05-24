@@ -65,10 +65,16 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+  const String addFormItemText(const char *type, const char *name,
+                               const char *label, const char *value,
+                               const char *size = "?", const char *min = "?",
+                               const char *max = "?", const char *step = "?",
+                               const char *hint = "?",
+                               boolean readonly = false);
+
   const String addMQTTTopicItem(char *topic, uint8_t id,
                                 const String title = "MQTT",
-                                const String subtitle = "",
-                                boolean showMainTopic = true);
+                                const String subtitle = "");
 
   const String addDomoticzIDXItem(unsigned long idx, uint8_t id,
                                   const String title = "");
@@ -105,7 +111,6 @@ public:
   String addNetworkConfiguration();
   String addConnectingSite();
   String addMQTTBrokerConfiguration();
-  String addMQTTTopicsConfiguration();
   String addDomoticzServerConfiguration();
   String addPasswordConfigurationSite();
   String addRelayConfiguration(uint8_t id);

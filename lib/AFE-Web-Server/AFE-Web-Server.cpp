@@ -54,9 +54,6 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   case AFE_CONFIG_SITE_MQTT:
     page += Site.addMQTTBrokerConfiguration();
     break;
-  case AFE_CONFIG_SITE_MQTT_TOPICS:
-    page += Site.addMQTTTopicsConfiguration();
-    break;
   case AFE_CONFIG_SITE_DOMOTICZ:
     page += Site.addDomoticzServerConfiguration();
     break;
@@ -220,9 +217,6 @@ void AFEWebServer::generate(boolean upload) {
       break;
     case AFE_CONFIG_SITE_MQTT:
       Data.saveConfiguration(getMQTTData());
-      break;
-    case AFE_CONFIG_SITE_MQTT_TOPICS:
-      Data.saveConfiguration(getMQTTTopicsData());
       break;
     case AFE_CONFIG_SITE_DOMOTICZ:
       Data.saveConfiguration(getDomoticzServerData());
@@ -879,17 +873,6 @@ MQTT AFEWebServer::getMQTTData() {
     server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
-  }
-
-  return data;
-}
-
-MQTT_TOPICS AFEWebServer::getMQTTTopicsData() {
-  MQTT_TOPICS data;
-  if (server.arg("l").length() > 0) {
-    server.arg("l").toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
-  } else {
-    data.lwt.topic[0] = '\0';
   }
 
   return data;

@@ -327,18 +327,84 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   return page;
 }
 
+const String AFESitesGenerator::addFormItemText(
+    const char *type, const char *name, const char *label, const char *value,
+    const char *size, const char *min, const char *max, const char *step,
+    const char *hint, boolean readonly) {
+  String item;
+  item = "<div class=\"cf\"><label>";
+  item += label;
+  item += "</label><input name=\"";
+  item += name;
+  item += "\" type=\"";
+  item += type;
+  item += "\" ";
+  if (readonly) {
+    item += "readonly=\"readonly\" ";
+  }
+  if (strcmp(size, "?") != 0) {
+    item += "maxlength=\"";
+    item += size;
+    item += "\" ";
+  }
+  if (strcmp(type, "number") == 0) {
+    if (strcmp(min, "?") != 0) {
+      item += "min=\"";
+      item += min;
+      item += "\" ";
+    }
+    if (strcmp(max, "?") != 0) {
+      item += "max=\"";
+      item += max;
+      item += "\" ";
+    }
+    if (strcmp(step, "?") != 0) {
+      item += "step=\"";
+      item += step;
+      item += "\" ";
+    }
+  }
+  item += "value=\"";
+  item += value;
+  item += "\">";
+  if (strcmp(size, "?") != 0) {
+    item += "<span class=\"hint\">Max ";
+    item += size;
+    item += " ";
+    item += L_NUMBER_OF_CHARS;
+    item += "</span>";
+  }
+
+  if (strcmp(type, "number") == 0) {
+    if (strcmp(min, "?") != 0 && strcmp(max, "?") != 0) {
+      item += "<span class=\"hint\"> ";
+      item += min;
+      item += " - ";
+      item += max;
+      if (strcmp(hint, "?") != 0) {
+        item += " ";
+        item += hint;
+      }
+      item += "</span>";
+    } else if (strcmp(hint, "?") != 0) {
+      item += "<span class=\"hint\">";
+      item += hint;
+      item += "</span>";
+    }
+  }
+
+  item += "</div>";
+  return item;
+}
+
 String AFESitesGenerator::addDeviceConfiguration() {
   DEVICE configuration = Device->configuration;
   uint8_t itemsNumber = 0;
 
-  String body = "<fieldset><div class=\"cf\"><label>";
-  body += L_DEVICE_NAME;
-  body += "</label><input name=\"dn\" type=\"text\" maxlength=\"16\" "
-          "value=\"";
-  body += configuration.name;
-  body += "\"><span class=\"hint\">Max 16 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div></fieldset>";
+  String body = "<fieldset>";
+  body +=
+      addFormItemText("text", "dn", L_DEVICE_NAME, configuration.name, "16");
+  body += "</fieldset>";
   String page = addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
   body = "<fieldset>";
 
@@ -600,17 +666,17 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += L_REFRESH;
   body += "\" formaction=\"/?o=";
   body += AFE_CONFIG_SITE_NETWORK;
-  body += "&c=0\"></div><div class=\"cf\"><label>";
-  body += L_PASSWORD;
-  body += "</label><input type=\"password\" name=\"p\" maxlength=\"32\" "
-          "value=\"";
-  body += configuration.password;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>MAC</label><input "
-          "type=\"text\" readonly=\"readonly\" value=\"";
-  body += WiFi.macAddress();
-  body += "\"></div></fieldset>";
+  body += "&c=0\"></div>";
+  body += addFormItemText("password", "p", L_PASSWORD, configuration.password,
+                          "32");
+
+  char _ip[18];
+  WiFi.macAddress().toCharArray(_ip, 18);
+
+  body +=
+      addFormItemText("text", "m", "MAC", _ip, "?", "?", "?", "?", "?", true);
+
+  body += "</fieldset>";
 
   String page = addConfigurationBlock(L_NETWORK_CONFIGURATION,
                                       L_NETWORK_CONFIGURATION_INFO, body);
@@ -620,42 +686,34 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += (configuration.isDHCP ? " checked=\"checked\"" : "");
   body += "> ";
   body += L_DHCP_ENABLED;
-  body += "?</label></div><div class=\"cf\"><label>";
-  body += L_IP_ADDRESS;
-  body += "</label><input name=\"i1\" type=\"text\" value=\"";
-  body += configuration.ip;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_GATEWAY;
-  body += "</label><input name=\"i2\" type=\"text\" value=\"";
-  body += configuration.gateway;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_SUBNET;
-  body += "</label><input name=\"i3\" type=\"text\" value=\"";
-  body += configuration.subnet;
-  body += "\"></div></fieldset>";
+  body += "?</label></div>";
+
+  body += addFormItemText("text", "i1", L_IP_ADDRESS, configuration.ip);
+  body += addFormItemText("text", "i2", L_GATEWAY, configuration.gateway);
+  body += addFormItemText("text", "i3", L_SUBNET, configuration.subnet);
+
+  body += "</fieldset>";
 
   page += addConfigurationBlock(L_DEVICE_IP, L_DEVICE_IP_INFO, body);
 
-  body = "<fieldset><div class=\"cf\"><label>";
-  body += L_NUMBER_OF_CONNECTIONS;
-  body += "</label><input name=\"na\" type=\"number\" min=\"1\" max=\"255\" "
-          "step=\"1\" value=\"";
-  body += configuration.noConnectionAttempts;
-  body += "\"><span class=\"hint\">1-255</span></div><div class=\"cf\"><label>";
-  body += L_TIME_BETWEEN_CONNECTIONS;
-  body += "</label><input type=\"number\" name=\"wc\" "
-          "min=\"1\" max=\"255\" step=\"1\" value=\"";
-  body += configuration.waitTimeConnections;
-  body += "\"><span class=\"hint\">1-255 (";
-  body += L_SECONDS;
-  body += ")</span></div><div class=\"cf\"><label>";
-  body += L_SLEEP_TIME;
-  body += "</label><input type=\"number\" name=\"ws\" min=\"1\" max=\"255\" "
-          "step=\"1\" value=\"";
-  body += configuration.waitTimeSeries;
-  body += "\"><span class=\"hint\">1-255 (";
-  body += L_SECONDS;
-  body += ")</span></div></fieldset>";
+  char _int[4];
+  sprintf(_int, "%d", configuration.noConnectionAttempts);
+
+  body = "<fieldset>";
+  body += addFormItemText("number", "na", L_NUMBER_OF_CONNECTIONS, _int, "?",
+                          "1", "255", "1");
+
+  sprintf(_int, "%d", configuration.waitTimeConnections);
+
+  body += addFormItemText("number", "wc", L_TIME_BETWEEN_CONNECTIONS, _int, "?",
+                          "1", "255", "1", L_SECONDS);
+
+  sprintf(_int, "%d", configuration.waitTimeSeries);
+
+  body += addFormItemText("number", "ws", L_SLEEP_TIME, _int, "?", "1", "255",
+                          "1", L_SECONDS);
+
+  body += "</fieldset>";
 
   page += addConfigurationBlock(L_ADVANCED, "", body);
 
@@ -696,47 +754,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   String page =
       addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
-  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC, "",
-                           false);
-  return page;
-}
-
-String AFESitesGenerator::addMQTTTopicsConfiguration() {
-  MQTT configuration;
-  configuration = Data.getMQTTConfiguration();
-
-  String body = "<fieldset><div class=\"cf\"><label>Hostname</label><input "
-                "name=\"h\" type=\"text\" maxlength=\"32\" value=\"";
-  body += configuration.host;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_IP_ADDRESS;
-  body += "</label><input name=\"i\" type=\"text\" value=\"";
-  body += configuration.ip;
-  body += "\"></div><div class=\"cf\"><label>Port</label><input name=\"p\" "
-          "type=\"number\""
-          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
-  body += configuration.port;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_USERNAME;
-  body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
-  body += configuration.user;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_PASSWORD;
-  body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
-          "value=\"";
-  body += configuration.password;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div></fieldset>";
-
-  String page =
-      addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
-  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_MAIN_TOPIC, "",
-                           false);
+  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_TOPIC_LWT, "");
   return page;
 }
 
@@ -869,14 +887,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += generateConfigParameter_GPIO(filed, configuration.gpio);
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY
-  body += "<div class=\"cf\"><label>";
-  body += L_NAME;
-  body += "</label><input name=\"n" + String(id) +
-          "\" type=\"text\" maxlength=\"16\" value=\"";
-  body += configuration.name;
-  body += "\"><span class=\"hint\">Max 16 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><p class=\"cm\">";
+  body += "<p class=\"cm\">";
   body += L_DEFAULT_VALUES;
   body += "</p><div class=\"cf\"><label>";
   body += L_DEFAULT_POWER_RESTORED;
@@ -1054,12 +1065,22 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #if !defined(T5_CONFIG)
   if (Device->configuration.api.domoticz) {
+
+    page += "<fieldset><div class=\"cf\"><label>";
+    page += L_NAME;
+    page += "</label><input name=\"n" + String(id) +
+            "\" type=\"text\" maxlength=\"16\" value=\"";
+    page += configuration.name;
+    page += "\"><span class=\"hint\">Max 16 ";
+    page += L_NUMBER_OF_CHARS;
+    page += "</span></div></fieldset>";
+
     page += addDomoticzIDXItem(configuration.domoticz.idx, id);
   }
 #endif
 
   if (Device->configuration.api.mqtt) {
-    page += addMQTTTopicItem(configuration.mqtt.topic, id);
+    page += addMQTTTopicItem(configuration.mqtt.topic, id, L_RELAY_MQTT_TOPIC);
   }
 
   return page;
@@ -1197,7 +1218,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   }
 
   if (Device->configuration.api.mqtt) {
-    page += addMQTTTopicItem(configuration.mqtt.topic, id);
+    page += addMQTTTopicItem(configuration.mqtt.topic, id, L_SWITCH_MQTT_TOPIC);
   }
 
   return page;
@@ -2532,8 +2553,7 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 
 const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id,
                                                  const String title,
-                                                 const String subtitle,
-                                                 boolean showMainTopic) {
+                                                 const String subtitle) {
 
   MQTT configurationMQTT;
   configurationMQTT = Data.getMQTTConfiguration();
@@ -2541,16 +2561,11 @@ const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id,
   String body = "<fieldset><div class=\"cf\"><label>";
   body += L_MQTT_TOPIC;
   body += "</label>";
-  if (showMainTopic) {
-    body += "<input type=\"text\" value=\"";
-    body += configurationMQTT.mqtt.topic;
-    body += "/\" disabled=\"disabled\" style=\"width:70px;\">";
-  }
   body += "<input name=\"t" + String(id) +
-          "\" type=\"text\" maxlength=\"32\" value=\"";
+          "\" type=\"text\" maxlength=\"64\" value=\"";
   body += topic;
 
-  body += "\"><span class=\"hint\">Max 32 ";
+  body += "\"><span class=\"hint\">Max 64 ";
   body += L_NUMBER_OF_CHARS;
   body += "</span></div></fieldset>";
   return addConfigurationBlock(title, subtitle, body);

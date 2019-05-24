@@ -111,7 +111,7 @@
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
-#define L_MQTT_MAIN_TOPIC "First part of MQTT Topic"
+#define L_MQTT_TOPIC_LWT "LWT Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 
@@ -152,6 +152,7 @@
 #define L_SWITCH_OFF_ABOVE "Switch off above"
 #define L_RANGE "Range"
 #define L_SELECT_LED_4_RELAY "Select LED informing about relay state"
+#define L_RELAY_MQTT_TOPIC "MQTT Topic to control the relay"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Functionality"
@@ -171,6 +172,7 @@
   "Sensitiveness should be adjusted if switch didn't behave as expected "      \
   "while pressing it"
 #define L_SWITCH_BUTTON "Switch / Button"
+#define L_SWITCH_MQTT_TOPIC "MQTT Topic to monitor the state of the switch"
 
 /* Form: Analog Input */
 #define L_CANT_CHANGE "can't be set"

@@ -185,7 +185,7 @@ void AFEDefaults::set() {
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
-  sprintf(MQTTConfiguration.mqtt.topic, "device");
+  MQTTConfiguration.mqtt.topic[0] = '\0';
   Data->saveConfiguration(MQTTConfiguration);
 
   /* Domoticz config */
@@ -224,8 +224,8 @@ void AFEDefaults::set() {
 #endif
 
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    sprintf(RelayConfiguration.name, "relay%d", i + 1);
-    sprintf(RelayConfiguration.mqtt.topic, "relay/%d", i + 1);
+    RelayConfiguration.name[0] = '\0';
+    RelayConfiguration.mqtt.topic[0] = '\0';
     Data->saveRelayState(i, false);
     Data->saveConfiguration(i, RelayConfiguration);
   }

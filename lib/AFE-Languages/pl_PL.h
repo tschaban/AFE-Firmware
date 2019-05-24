@@ -111,7 +111,7 @@
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
-#define L_MQTT_MAIN_TOPIC "Pierwszy człon tematów MQTT"
+#define L_MQTT_TOPIC_LWT "Temat wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO                                              \
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY                                                     \
@@ -157,6 +157,7 @@
 #define L_SWITCH_OFF_ABOVE "Wyłącz powyżej"
 #define L_RANGE "Zakres"
 #define L_SELECT_LED_4_RELAY "Wybierz LED sygnalizujący stan przekaźnika"
+#define L_RELAY_MQTT_TOPIC "Temat MQTT sterujący przekaźnikiem"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"
@@ -176,6 +177,7 @@
   "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie " \
   "przycisku podczas jego wciskania"
 #define L_SWITCH_BUTTON "Przycisk / Włącznik"
+#define L_SWITCH_MQTT_TOPIC "Temat MQTT do monitorowania stanu przycisku"
 
 /* Form: Analog Input */
 #define L_CANT_CHANGE "brak możliwości zmiany"
