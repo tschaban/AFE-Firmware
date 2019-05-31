@@ -95,4 +95,14 @@ void AFEAnalogInput::getDomoticzIDX(ADCINPUT_DOMOTICZ *idx) {
 }
 
 /* Method returns MQTT topic for this relay */
-const char *AFEAnalogInput::getMQTTTopic() { return configuration.mqtt.topic; }
+const char *AFEAnalogInput::getMQTTCommandTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+const char *AFEAnalogInput::getMQTTStateTopic() {
+  return configuration.mqtt.topic;
+}

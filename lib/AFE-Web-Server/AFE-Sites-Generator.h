@@ -65,19 +65,11 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
-  const String addFormItemText(const char *type, const char *name,
-                               const char *label, const char *value,
-                               const char *size = "?", const char *min = "?",
-                               const char *max = "?", const char *step = "?",
-                               const char *hint = "?",
-                               boolean readonly = false);
-
-  const String addMQTTTopicItem(char *topic, uint8_t id,
-                                const String title = "MQTT",
-                                const String subtitle = "");
-
-  const String addDomoticzIDXItem(unsigned long idx, uint8_t id,
-                                  const String title = "");
+  const String addItem(const char *type, const char *name, const char *label,
+                       const char *value, const char *size = "?",
+                       const char *min = "?", const char *max = "?",
+                       const char *step = "?", const char *hint = "?",
+                       boolean readonly = false);
 
 #if defined(T5_CONFIG)
   const String generateGateStatesList(uint8_t id, byte state);

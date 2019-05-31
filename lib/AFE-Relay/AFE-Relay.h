@@ -40,11 +40,12 @@ private:
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
 
+  char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
+
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
-
-  char mqttTopic[50];
 
   unsigned long turnOffCounter = 0;
 #ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
@@ -78,7 +79,8 @@ public:
   void begin(uint8_t id);
 
   /* Method returns MQTT topic for this relay */
-  const char *getMQTTTopic();
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Method sets relay state after device is turned on / power is restored / or

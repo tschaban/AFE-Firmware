@@ -38,10 +38,7 @@ void mainSwitch() {
 
       if (Switch[i].isPressed(true)) {
         if (Device.configuration.api.mqtt) {
-          if (strlen(Switch[i].getMQTTTopic()) > 0) {
-            Mqtt.publishTopic(Switch[i].getMQTTTopic(),
-                              Switch[i].getPhisicalState() ? "open" : "closed");
-          }
+          MQTTPublishSwitchState(i);
         }
 
         if (Device.configuration.api.domoticz) {

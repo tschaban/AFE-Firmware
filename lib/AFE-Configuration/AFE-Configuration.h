@@ -24,6 +24,8 @@
 #define API_MQTT 1
 #define API_DOMOTICZ 2
 
+#define MAX_MQTT_TOPIC_LENGTH 70
+
 /* URLs to AFE WebService */
 #define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
 #define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"

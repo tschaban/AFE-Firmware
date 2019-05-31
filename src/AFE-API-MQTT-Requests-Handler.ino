@@ -15,8 +15,6 @@ void MQTTInit() {
 
 /* Method is launched after MQTT Message is received */
 void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
-  char _mqttTopic[88];
-
   if (length >= 1) {
 #ifdef DEBUG
     Serial << endl << endl << "--------- Got MQTT request ---------";
@@ -36,29 +34,18 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         Serial << endl << " - Checking if Relay[" << i << "] request ";
 #endif
 
-        sprintf(_mqttTopic, "%s/%s", MQTTConfiguration.mqtt.topic,
-                Relay[i].getMQTTTopic());
-
-        if (strcmp(topic, _mqttTopic) == 0) {
-#ifdef DEBUG
-          Serial << "YES: finishing";
-#endif
-          return;
-        }
-
-        sprintf(_mqttTopic, "%s/cmd", _mqttTopic);
-        if (strcmp(topic, _mqttTopic) == 0) {
+        if (strcmp(topic, Relay[i].getMQTTCommandTopic()) == 0) {
 #ifdef DEBUG
           Serial << "YES";
 #endif
 
           if ((char)payload[1] == 'n' && length == 2) { // on
             Relay[i].on();
-            Mqtt.publishTopic(Relay[i].getMQTTTopic(), "on");
+            MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);
           } else if ((char)payload[1] == 'f' && length == 3) { // off
             Relay[i].off();
-            Mqtt.publishTopic(Relay[i].getMQTTTopic(), "off");
+            MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);
           } else if ((char)payload[1] == 'e' && length == 3) { // get
             MQTTPublishRelayState(i);
@@ -186,18 +173,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       Serial << endl << " - Checking if Analog Input request ";
 #endif
 
-      sprintf(_mqttTopic, "%s/%s", MQTTConfiguration.mqtt.topic,
-              AnalogInput.getMQTTTopic());
-
-      if (strcmp(topic, _mqttTopic) == 0) {
-#ifdef DEBUG
-        Serial << "YES: finishing";
-#endif
-        return;
-      }
-
-      sprintf(_mqttTopic, "%s/cmd", _mqttTopic);
-      if (strcmp(topic, _mqttTopic) == 0) {
+      if (strcmp(topic, AnalogInput.getMQTTCommandTopic()) == 0) {
 #ifdef DEBUG
         Serial << "YES";
 #endif
@@ -368,10 +344,19 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publishTopic(Relay[id].getMQTTTopic(), "state",
+    Mqtt.publishTopic(Relay[id].getMQTTStateTopic(),
                       Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
+
+/* Metod publishes Relay state (used eg by HTTP API) */
+void MQTTPublishSwitchState(uint8_t id) {
+  if (Device.configuration.api.mqtt) {
+    Mqtt.publishTopic(Switch[id].getMQTTStateTopic(),
+                      Switch[id].getPhisicalState() ? "open" : "closed");
+  }
+}
+
 #ifdef CONFIG_TEMPERATURE
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
@@ -499,7 +484,7 @@ void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
     messageString += "'}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publishTopic(AnalogInput.getMQTTTopic(), message);
+    Mqtt.publishTopic(AnalogInput.getMQTTStateTopic(), message);
   }
 }
 #endif

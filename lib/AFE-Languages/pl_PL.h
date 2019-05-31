@@ -115,7 +115,8 @@
 #define L_MQTT_CONFIGURATION_INFO                                              \
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY                                                     \
-  "Jeśli niewprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
+  "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT " \
+  "Brokera"
 
 /* Form:Domoticz server configuration */
 #define L_PROTOCOL "Protokół"
@@ -184,10 +185,10 @@
 #define L_MEASURMENTS_INTERVAL "Interwał odczytów"
 #define L_MEASURED_VOLTAGE "Max napięcie wejściowe na ADC"
 #define L_NUMBER_OF_SAMPLES "Ilość próbek do uśrednienia odczytu"
-#define L_RAW_DATA ": surowe dane"
-#define L_PERCENT ": procent"
-#define L_VOLTAGE ": napięcie"
-#define L_VOLTAGE_CALCULATED ": napięcie przeliczone"
+#define L_RAW_DATA "IDX Surowe Dane"
+#define L_PERCENT "IDX Procent"
+#define L_VOLTAGE "IDX Napięcie na wejściu"
+#define L_VOLTAGE_CALCULATED "IDX Napięcie przeliczone"
 #define L_RESISTOR "Rezystor"
 #define L_VOLTAGE_DIVIDER "Dzielnik napięcia"
 

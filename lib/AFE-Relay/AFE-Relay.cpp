@@ -35,7 +35,23 @@ void AFERelay::begin(uint8_t id) {
 #endif
 }
 
-const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqtt.topic; }
+const char *AFERelay::getMQTTCommandTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFERelay::getMQTTStateTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
 
 byte AFERelay::get() {
   return digitalRead(RelayConfiguration.gpio) == HIGH ? RELAY_ON : RELAY_OFF;

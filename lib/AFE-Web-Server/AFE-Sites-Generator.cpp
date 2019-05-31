@@ -327,10 +327,11 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   return page;
 }
 
-const String AFESitesGenerator::addFormItemText(
-    const char *type, const char *name, const char *label, const char *value,
-    const char *size, const char *min, const char *max, const char *step,
-    const char *hint, boolean readonly) {
+const String AFESitesGenerator::addItem(const char *type, const char *name,
+                                        const char *label, const char *value,
+                                        const char *size, const char *min,
+                                        const char *max, const char *step,
+                                        const char *hint, boolean readonly) {
   String item;
   item = "<div class=\"cf\"><label>";
   item += label;
@@ -374,10 +375,11 @@ const String AFESitesGenerator::addFormItemText(
     item += L_NUMBER_OF_CHARS;
     item += "</span>";
   }
-
   if (strcmp(type, "number") == 0) {
     if (strcmp(min, "?") != 0 && strcmp(max, "?") != 0) {
       item += "<span class=\"hint\"> ";
+      item += L_RANGE;
+      item += " ";
       item += min;
       item += " - ";
       item += max;
@@ -392,7 +394,6 @@ const String AFESitesGenerator::addFormItemText(
       item += "</span>";
     }
   }
-
   item += "</div>";
   return item;
 }
@@ -402,8 +403,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   uint8_t itemsNumber = 0;
 
   String body = "<fieldset>";
-  body +=
-      addFormItemText("text", "dn", L_DEVICE_NAME, configuration.name, "16");
+  body += addItem("text", "dn", L_DEVICE_NAME, configuration.name, "16");
   body += "</fieldset>";
   String page = addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
   body = "<fieldset>";
@@ -667,14 +667,12 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += "\" formaction=\"/?o=";
   body += AFE_CONFIG_SITE_NETWORK;
   body += "&c=0\"></div>";
-  body += addFormItemText("password", "p", L_PASSWORD, configuration.password,
-                          "32");
+  body += addItem("password", "p", L_PASSWORD, configuration.password, "32");
 
   char _ip[18];
   WiFi.macAddress().toCharArray(_ip, 18);
 
-  body +=
-      addFormItemText("text", "m", "MAC", _ip, "?", "?", "?", "?", "?", true);
+  body += addItem("text", "m", "MAC", _ip, "?", "?", "?", "?", "?", true);
 
   body += "</fieldset>";
 
@@ -688,9 +686,9 @@ String AFESitesGenerator::addNetworkConfiguration() {
   body += L_DHCP_ENABLED;
   body += "?</label></div>";
 
-  body += addFormItemText("text", "i1", L_IP_ADDRESS, configuration.ip);
-  body += addFormItemText("text", "i2", L_GATEWAY, configuration.gateway);
-  body += addFormItemText("text", "i3", L_SUBNET, configuration.subnet);
+  body += addItem("text", "i1", L_IP_ADDRESS, configuration.ip);
+  body += addItem("text", "i2", L_GATEWAY, configuration.gateway);
+  body += addItem("text", "i3", L_SUBNET, configuration.subnet);
 
   body += "</fieldset>";
 
@@ -700,18 +698,16 @@ String AFESitesGenerator::addNetworkConfiguration() {
   sprintf(_int, "%d", configuration.noConnectionAttempts);
 
   body = "<fieldset>";
-  body += addFormItemText("number", "na", L_NUMBER_OF_CONNECTIONS, _int, "?",
-                          "1", "255", "1");
+  body += addItem("number", "na", L_NUMBER_OF_CONNECTIONS, _int, "?", "1",
+                  "255", "1");
 
   sprintf(_int, "%d", configuration.waitTimeConnections);
-
-  body += addFormItemText("number", "wc", L_TIME_BETWEEN_CONNECTIONS, _int, "?",
-                          "1", "255", "1", L_SECONDS);
+  body += addItem("number", "wc", L_TIME_BETWEEN_CONNECTIONS, _int, "?", "1",
+                  "255", "1", L_SECONDS);
 
   sprintf(_int, "%d", configuration.waitTimeSeries);
-
-  body += addFormItemText("number", "ws", L_SLEEP_TIME, _int, "?", "1", "255",
-                          "1", L_SECONDS);
+  body += addItem("number", "ws", L_SLEEP_TIME, _int, "?", "1", "255", "1",
+                  L_SECONDS);
 
   body += "</fieldset>";
 
@@ -724,37 +720,26 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   MQTT configuration;
   configuration = Data.getMQTTConfiguration();
 
-  String body = "<fieldset><div class=\"cf\"><label>Hostname</label><input "
-                "name=\"h\" type=\"text\" maxlength=\"32\" value=\"";
-  body += configuration.host;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_IP_ADDRESS;
-  body += "</label><input name=\"i\" type=\"text\" value=\"";
-  body += configuration.ip;
-  body += "\"></div><div class=\"cf\"><label>Port</label><input name=\"p\" "
-          "type=\"number\""
-          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
-  body += configuration.port;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_USERNAME;
-  body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
-  body += configuration.user;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_PASSWORD;
-  body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
-          "value=\"";
-  body += configuration.password;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div></fieldset>";
+  String body = "<fieldset>";
+
+  body += addItem("text", "h", "Hostname", configuration.host, "32");
+  body += addItem("text", "i", L_IP_ADDRESS, configuration.ip);
+
+  char _number[6];
+  sprintf(_number, "%d", configuration.port);
+  body += addItem("number", "p", "Port", _number, "?", "0", "65535", "1");
+
+  body += addItem("text", "u", L_USERNAME, configuration.user, "32");
+  body += addItem("password", "s", L_PASSWORD, configuration.password, "32");
+
+  body += "</fieldset>";
 
   String page =
       addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
-  page += addMQTTTopicItem(configuration.mqtt.topic, 0, L_MQTT_TOPIC_LWT, "");
+  body = "<fieldset>";
+  body += addItem("text", "t0", L_MQTT_TOPIC, configuration.lwt.topic, "64");
+  body += "</fieldset>";
+  page += addConfigurationBlock(L_MQTT_TOPIC_LWT, L_MQTT_TOPIC_EMPTY, body);
   return page;
 }
 
@@ -770,31 +755,17 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   body += configuration.protocol == 0 ? " selected=\"selected\"" : "";
   body += ">http://</option><option value=\"1\"";
   body += configuration.protocol == 1 ? " selected=\"selected\"" : "";
-  body += ">https://</option></select></div><div class=\"cf\">";
-  body += "<label>Hostname/IP</label><input name=\"h\" type=\"text\" "
-          "maxlength=\"40\" value=\"";
-  body += configuration.host;
-  body += "\">";
-  body += "<span class=\"hint\">Max 40 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>Port</label><input "
-          "name=\"p\" type=\"number\""
-          " min=\"0\" max=\"65535\" step=\"1\" value=\"";
-  body += configuration.port;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_USERNAME;
-  body += "</label><input name=\"u\" type=\"text\"  maxlength=\"32\" value=\"";
-  body += configuration.user;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_PASSWORD;
-  body += "</label><input name=\"s\" type=\"password\"  maxlength=\"32\" "
-          "value=\"";
-  body += configuration.password;
-  body += "\"><span class=\"hint\">Max 32 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div></fieldset>";
+  body += ">https://</option></select></div>";
+
+  body += addItem("text", "h", "Hostname/IP", configuration.host, "40");
+
+  char _number[6];
+  sprintf(_number, "%d", configuration.port);
+  body += addItem("number", "p", "Port", _number, "?", "0", "65535", "1");
+  body += addItem("text", "u", L_USERNAME, configuration.user, "32");
+  body += addItem("password", "s", L_PASSWORD, configuration.password, "32");
+
+  body += "</fieldset>";
 
   return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,
                                L_DOMOTICZ_CONFIGURATION_INFO, body);
@@ -811,14 +782,7 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   body += "?</label></div>";
 
   if (configuration.protect) {
-    body += "<div class =\"cf\"><label>";
-    body += L_PASSWORD;
-    body += "</label><input name=\"p\" type=\"text\"  maxlength=\"8\" "
-            "value=\"";
-    body += configuration.password;
-    body += "\"><span class=\"hint\">Max 8 ";
-    body += L_NUMBER_OF_CHARS;
-    body += "</span></div>";
+    body += addItem("text", "p", L_PASSWORD, configuration.password, "8");
   }
   body += "</fieldset>";
 
@@ -832,10 +796,10 @@ String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   configuration = Data.getLEDConfiguration(id);
 
   String body = "<fieldset>";
-  char filed[13];
-  sprintf(filed, "g%d", id);
+  char field[13];
+  sprintf(field, "g%d", id);
   body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO(field, configuration.gpio);
   body += "<label style=\"width: 300px;\"><input name=\"o";
   body += id;
   body += "\" type=\"checkbox\" value=\"1\"";
@@ -881,10 +845,13 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   RELAY configuration = Data.getRelayConfiguration(id);
   String body = "<fieldset>";
-  char filed[13];
-  sprintf(filed, "g%d", id);
+  char field[13];
+  sprintf(field, "g%d", id);
 
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO(field, configuration.gpio);
+
+  sprintf(field, "n%d", id);
+  body += addItem("text", field, L_NAME, configuration.name, "16");
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   body += "<p class=\"cm\">";
@@ -1066,21 +1033,27 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #if !defined(T5_CONFIG)
   if (Device->configuration.api.domoticz) {
 
-    page += "<fieldset><div class=\"cf\"><label>";
-    page += L_NAME;
-    page += "</label><input name=\"n" + String(id) +
-            "\" type=\"text\" maxlength=\"16\" value=\"";
-    page += configuration.name;
-    page += "\"><span class=\"hint\">Max 16 ";
-    page += L_NUMBER_OF_CHARS;
-    page += "</span></div></fieldset>";
+    body = "<fieldset>";
 
-    page += addDomoticzIDXItem(configuration.domoticz.idx, id);
+    sprintf(field, "x%d", id);
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
+
+    body += "</fieldset>";
+
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
 #endif
 
   if (Device->configuration.api.mqtt) {
-    page += addMQTTTopicItem(configuration.mqtt.topic, id, L_RELAY_MQTT_TOPIC);
+
+    body = "<fieldset>";
+    sprintf(field, "t%d", id);
+    body +=
+        addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;
@@ -1130,10 +1103,10 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   configuration = Data.getSwitchConfiguration(id);
 
   String body = "<fieldset>";
-  char filed[13];
-  sprintf(filed, "g%d", id);
+  char field[13];
+  sprintf(field, "g%d", id);
   body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO(field, configuration.gpio);
   body += "</div><div class=\"cf\"><label>";
   body += L_FUNCTIONALITY;
   body += "</label><select name=\"f" + String(id) + "\"><option value=\"";
@@ -1198,15 +1171,15 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L_BISTABLE;
   body += "</option></select></div><br><p class=\"cm\">";
   body += L__SENSITIVENESS_HINT;
-  body += "</p><div class=\"cf\"><label>";
-  body += L_SENSITIVENESS;
-  body += "</label><input name=\"s" + String(id) +
-          "\" type=\"number\" max=\"999\" min=\"0\" step=\"1\" "
-          "value=\"";
-  body += configuration.sensitiveness;
-  body += "\"><span class=\"hint\">0-999 (";
-  body += L_MILISECONDS;
-  body += ")</span></div></fieldset>";
+  body += "</p>";
+
+  sprintf(field, "s%d", id);
+  char _number[4];
+  sprintf(_number, "%d", configuration.sensitiveness);
+
+  body += addItem("number", field, L_SENSITIVENESS, _number, "?", "0", "999",
+                  "1", L_MILISECONDS);
+  body += "</fieldset>";
 
   char title[23];
   sprintf(title, "%s #%d", L_SWITCH_BUTTON, id + 1);
@@ -1214,11 +1187,26 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   String page = addConfigurationBlock(title, "", body);
 
   if (Device->configuration.api.domoticz) {
-    page += addDomoticzIDXItem(configuration.domoticz.idx, id);
+    body = "<fieldset>";
+
+    sprintf(field, "x%d", id);
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
+
+    body += "</fieldset>";
+
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
 
   if (Device->configuration.api.mqtt) {
-    page += addMQTTTopicItem(configuration.mqtt.topic, id, L_SWITCH_MQTT_TOPIC);
+    body = "<fieldset>";
+    sprintf(field, "t%d", id);
+    body +=
+        addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;
@@ -1470,10 +1458,10 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
   DEVICE device = Data.getDeviceConfiguration();
 
   String body = "<fieldset>";
-  char filed[13];
-  sprintf(filed, "g%d", id);
+  char field[13];
+  sprintf(field, "g%d", id);
   body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO(field, configuration.gpio);
   body += "</div>";
 
   body += "<div class=\"cf\">";
@@ -1615,10 +1603,10 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   DEVICE deviceConfiguration = Device->configuration;
 
   String body = "<fieldset>";
-  char filed[13];
-  sprintf(filed, "g%d", id);
+  char field[13];
+  sprintf(field, "g%d", id);
   body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(filed, configuration.gpio);
+  body += generateConfigParameter_GPIO(field, configuration.gpio);
   body += "</div><div class=\"cf\"><label>";
   body += language == 0 ? "Nazwa" : "Name";
   body += "</label><input name=\"n" + String(id) +
@@ -2118,58 +2106,68 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
 
-  String body =
-      "<fieldset><div class=\"cf\"><label>GPIO</label><input name=\"g\" "
-      "type=\"number\" value=\"";
-  body += configuration.gpio;
-  body += "\"><span class=\"hint\">(";
-  body += L_CANT_CHANGE;
-  body += ")</span></div><div class=\"cf\"><label>";
-  body += L_MEASURMENTS_INTERVAL;
-  body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
-          "type=\"number\" value=\"";
-  body += configuration.interval;
-  body += "\"><span class=\"hint\">1-86400 (24h) ";
-  body += L_SECONDS;
-  body += "</span></div><div class=\"cf\"><label>";
-  body += L_NUMBER_OF_SAMPLES;
-  body += "</label><input name=\"n\" min=\"1\" max=\"999\" step=\"1\" "
-          "type=\"number\" value=\"";
-  body += configuration.numberOfSamples;
-  body += "\"><span class=\"hint\">1-999</span></div></fieldset>";
+  String body = "<fieldset>";
+
+  char _number[13];
+
+  sprintf(_number, "%d", configuration.gpio);
+  body += addItem("number", "g", "GPIO", _number, "?", "?", "?", "?");
+
+  Serial << "aaaaaaaaaa=" << configuration.interval;
+
+  sprintf(_number, "%d", configuration.interval);
+  body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "1",
+                  "86400", "1", L_SECONDS);
+
+  sprintf(_number, "%d", configuration.numberOfSamples);
+  body += addItem("number", "n", L_NUMBER_OF_SAMPLES, _number, "?", "1", "999",
+                  "1");
+
+  body += "</fieldset>";
 
   String page = addConfigurationBlock(L_ANALOG_INPUT, "", body);
 
-  body = "<fieldset><div class=\"cf\"><label>";
-  body += L_MEASURED_VOLTAGE;
-  body += "</label><input name=\"m\" min=\"0\" max=\"1000\"  step=\"0.01\""
-          "type=\"number\" value=\"";
-  body += configuration.maxVCC;
-  body += "\"><span class=\"hint\"> 0-999.99V</span></div><div "
-          "class=\"cf\"><label>";
-  body += L_RESISTOR;
-  body += " R[A]</label><input name=\"ra\" min=\"0\" max=\"90000000\"  "
-          "step=\"0.01\" type=\"number\" value=\"";
-  body += configuration.divider.Ra;
-  body += "\"></div><div class=\"cf\"><label>";
-  body += L_RESISTOR;
-  body += " R[B]</label><input name=\"rb\" min=\"0\" max=\"90000000\"  "
-          "step=\"0.01\" type=\"number\" value=\"";
-  body += configuration.divider.Rb;
-  body += "\"></div></fieldset>";
+  body = "<fieldset>";
+
+  dtostrf((float)configuration.maxVCC, 3, 2, _number);
+  body += addItem("number", "m", L_MEASURED_VOLTAGE, _number, "?", "0", "1000",
+                  "0.01", "V");
+
+  dtostrf((float)configuration.divider.Ra, 1, 2, _number);
+  body += addItem("number", "ra", "R[a]", _number, "?", "0", "90000000", "0.01",
+                  "Om");
+
+  dtostrf((float)configuration.divider.Rb, 1, 2, _number);
+  body += addItem("number", "rb", "R[b]", _number, "?", "0", "90000000", "0.01",
+                  "Om");
+  body += "</fieldset>";
 
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
   if (device.api.mqtt) {
-    page += addMQTTTopicItem(configuration.mqtt.topic, 0);
+    body = "<fieldset>";
+    body += addItem("text", "t0", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
 
   if (Device->configuration.api.domoticz) {
-    page += addDomoticzIDXItem(configuration.domoticz.raw, 0, L_RAW_DATA);
-    page += addDomoticzIDXItem(configuration.domoticz.percent, 1, L_PERCENT);
-    page += addDomoticzIDXItem(configuration.domoticz.voltage, 2, L_VOLTAGE);
-    page += addDomoticzIDXItem(configuration.domoticz.voltageCalculated, 3,
-                               L_VOLTAGE_CALCULATED);
+
+    body = "<fieldset>";
+
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.raw);
+    body += addItem("number", "x0", L_RAW_DATA, _idx, "?", "0", "999999", "1");
+    sprintf(_idx, "%d", configuration.domoticz.percent);
+    body += addItem("number", "x1", L_PERCENT, _idx, "?", "0", "999999", "1");
+    sprintf(_idx, "%d", configuration.domoticz.voltage);
+    body += addItem("number", "x2", L_VOLTAGE, _idx, "?", "0", "999999", "1");
+    sprintf(_idx, "%d", configuration.domoticz.voltageCalculated);
+    body += addItem("number", "x3", L_VOLTAGE_CALCULATED, _idx, "?", "0",
+                    "999999", "1");
+    body += "</fieldset>";
+
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
 
   return page;
@@ -2335,11 +2333,7 @@ String AFESitesGenerator::addProVersionSite() {
   String body;
   if (Device->getMode() == MODE_CONFIGURATION) {
     body = "<fieldset>";
-    body += "<div class=\"cf\"><label>";
-    body += L_KEY;
-    body += "</label><input name=\"k\" type=\"text\" maxlength=\"18\" value=\"";
-    body += configuration.serial;
-    body += "\"></div>";
+    body += addItem("text", "k", L_KEY, configuration.serial, "18");
     body += "<div class=\"cf\"><label>";
     body += L_VALID;
     body += "?</label><span>";
@@ -2550,37 +2544,3 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
   return body;
 }
 #endif
-
-const String AFESitesGenerator::addMQTTTopicItem(char *topic, uint8_t id,
-                                                 const String title,
-                                                 const String subtitle) {
-
-  MQTT configurationMQTT;
-  configurationMQTT = Data.getMQTTConfiguration();
-
-  String body = "<fieldset><div class=\"cf\"><label>";
-  body += L_MQTT_TOPIC;
-  body += "</label>";
-  body += "<input name=\"t" + String(id) +
-          "\" type=\"text\" maxlength=\"64\" value=\"";
-  body += topic;
-
-  body += "\"><span class=\"hint\">Max 64 ";
-  body += L_NUMBER_OF_CHARS;
-  body += "</span></div></fieldset>";
-  return addConfigurationBlock(title, subtitle, body);
-}
-
-const String AFESitesGenerator::addDomoticzIDXItem(unsigned long idx,
-                                                   uint8_t id,
-                                                   const String title) {
-  String body =
-      "<fieldset><div class=\"cf\"><label>IDX</label><input name=\"x" +
-      String(id) +
-      "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
-  body += idx;
-  body += "\"><span class=\"hint\">";
-  body += L_RANGE;
-  body += " 0-999999</span></div></fieldset>";
-  return addConfigurationBlock("Domoticz" + title, L_NO_IF_IDX_0, body);
-}

@@ -38,9 +38,18 @@ void AFEMQTT::begin() {
          << "Port: " << MQTTConfiguration.port << endl
          << "User: " << MQTTConfiguration.user << endl
          << "Password: " << MQTTConfiguration.password << endl
-         << "Topic: " << MQTTConfiguration.mqtt.topic << endl
+         << "LWT Topic: " << MQTTConfiguration.lwt.topic << endl
          << "--------------------------------------------------";
 #endif
+}
+
+void AFEMQTT::subscribe(const char *topic) {
+#ifdef DEBUG
+  Serial << endl << "MQTT: Subscribing to : " << topic;
+#endif
+  if (strlen(topic) > 0) {
+    Broker.subscribe(topic);
+  }
 }
 
 void AFEMQTT::disconnect() {
@@ -74,26 +83,9 @@ void AFEMQTT::connect() {
       if (delayStartTime == 0) {
         delayStartTime = millis();
 
-        /* LWT Topic */
-        char _mqttSting[37];
-        sprintf(_mqttSting, "%s/lwt", MQTTConfiguration.mqtt.topic);
-
-        if (Broker.connect(deviceName, MQTTConfiguration.user,
-                           MQTTConfiguration.password, _mqttSting, 2, false,
-                           "disconnected")) {
-
-          sprintf(_mqttSting, "%s/#", MQTTConfiguration.mqtt.topic);
-#ifdef DEBUG
-          Serial << endl
-                 << "MQTT: Connected" << endl
-                 << "MQTT: Subscribing to : " << _mqttSting;
-#endif
-
-          Broker.subscribe((char *)_mqttSting);
-
-#ifdef DEBUG
-          Serial << endl << "MQTT: Subsribed";
-#endif
+        if (Broker.connect(
+                deviceName, MQTTConfiguration.user, MQTTConfiguration.password,
+                MQTTConfiguration.lwt.topic, 2, false, "disconnected")) {
 
           eventConnectionEstablished = true;
           delayStartTime = 0;
@@ -163,22 +155,22 @@ void AFEMQTT::setReconnectionParams(
 void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
     Led.on();
-    char _mqttTopic[83];
-    sprintf(_mqttTopic, "%s/%s", MQTTConfiguration.mqtt.topic, subTopic);
 #ifdef DEBUG
     Serial << endl << endl << "----------- Publish MQTT -----------";
-    Serial << endl << "Topic: " << _mqttTopic;
+    Serial << endl << "Topic: " << subTopic;
     Serial << endl << "Message: " << message;
     Serial << endl << "------------------------------------";
 #endif
-    Broker.publish(_mqttTopic, message);
+    if (strlen(subTopic) > 0) {
+      Broker.publish(subTopic, message);
+    }
     Led.off();
   }
 }
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *type,
                            const char *message) {
-  char _mqttTopic[50];
+  char _mqttTopic[MAX_MQTT_TOPIC_LENGTH];
   sprintf(_mqttTopic, "%s/%s", subTopic, type);
   publishTopic(_mqttTopic, message);
 }
@@ -195,3 +187,5 @@ boolean AFEMQTT::eventConnected() {
   eventConnectionEstablished = false;
   return returnValue;
 }
+
+const char *AFEMQTT::getLWTTopic() { return MQTTConfiguration.lwt.topic; }

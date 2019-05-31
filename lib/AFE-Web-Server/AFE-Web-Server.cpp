@@ -870,9 +870,9 @@ MQTT AFEWebServer::getMQTTData() {
   }
 
   if (server.arg("t0").length() > 0) {
-    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+    server.arg("t0").toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
   } else {
-    data.mqtt.topic[0] = '\0';
+    data.lwt.topic[0] = '\0';
   }
 
   return data;
@@ -1004,11 +1004,11 @@ PASSWORD AFEWebServer::getPasswordData() {
 
   if (server.arg("p").length() > 0) {
     server.arg("p").toCharArray(data.password, sizeof(data.password));
+  } else {
+    data.password[0] = '\0';
   }
 
-  if (server.arg("r").length() > 0) {
-    data.protect = server.arg("r").toInt() == 0 ? false : true;
-  }
+  data.protect = server.arg("r").length() > 0 ? true : false;
 
   return data;
 }

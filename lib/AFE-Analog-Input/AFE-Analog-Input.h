@@ -28,6 +28,8 @@ private:
   uint16_t temporaryAnalogData = 0;
   uint8_t counterOfSamplings = 0;
 
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+
 public:
   /* Constructor */
   AFEAnalogInput();
@@ -48,7 +50,8 @@ public:
   void getDomoticzIDX(ADCINPUT_DOMOTICZ *idx);
 
   /* Method returns MQTT topic for analog input */
-  const char *getMQTTTopic();
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 };
 
 #endif

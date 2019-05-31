@@ -185,7 +185,7 @@ void AFEDefaults::set() {
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
   MQTTConfiguration.port = 1883;
-  MQTTConfiguration.mqtt.topic[0] = '\0';
+  MQTTConfiguration.lwt.topic[0] = '\0';
   Data->saveConfiguration(MQTTConfiguration);
 
   /* Domoticz config */

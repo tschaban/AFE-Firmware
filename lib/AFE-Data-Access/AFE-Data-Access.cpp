@@ -908,7 +908,7 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
       configuration.port = root["port"];
       sprintf(configuration.user, root["user"]);
       sprintf(configuration.password, root["password"]);
-      sprintf(configuration.mqtt.topic, root["topic"]);
+      sprintf(configuration.lwt.topic, root["lwt"]);
 
 #ifdef DEBUG
       Serial << endl
@@ -957,7 +957,7 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
     root["port"] = configuration.port;
     root["user"] = configuration.user;
     root["password"] = configuration.password;
-    root["topic"] = configuration.mqtt.topic;
+    root["lwt"] = configuration.lwt.topic;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -979,12 +979,6 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
   Serial << endl << "--------------------------------------------------";
 #endif
 }
-
-MQTT_TOPICS AFEDataAccess::getMQTTTopicsConfiguration() {
-  MQTT_TOPICS configuration;
-  return configuration;
-}
-void AFEDataAccess::saveConfiguration(MQTT_TOPICS configuration) {}
 
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;

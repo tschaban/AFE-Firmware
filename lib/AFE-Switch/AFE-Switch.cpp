@@ -188,7 +188,14 @@ uint8_t AFESwitch::getControlledRelayID() {
   return SwitchConfiguration.relayID;
 }
 
-const char *AFESwitch::getMQTTTopic() { return SwitchConfiguration.mqtt.topic; }
+const char *AFESwitch::getMQTTStateTopic() {
+  if (strlen(SwitchConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", SwitchConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
 
 uint32_t AFESwitch::getDomoticzIDX() {
   return SwitchConfiguration.domoticz.idx;

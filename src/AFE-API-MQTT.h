@@ -54,6 +54,7 @@ public:
       uint8_t duration_between_next_connection_attempts_series);
 
   void begin();
+  void subscribe(const char *);
 
   /* Publishes data to MQTT Broker */
   void publishTopic(const char *subTopic, const char *message);
@@ -71,6 +72,8 @@ public:
 
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
+
+  const char *getLWTTopic();
 };
 
 #endif

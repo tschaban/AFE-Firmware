@@ -43,6 +43,9 @@ private:
 
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
+
+  char mqttStateTopic[sizeof(SwitchConfiguration.mqtt.topic) + 6];
+
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
@@ -84,7 +87,7 @@ public:
   uint8_t getControlledRelayID();
 
   /* Method returns MQTT topic for this switch */
-  const char *getMQTTTopic();
+  const char *getMQTTStateTopic();
 
   uint32_t getDomoticzIDX();
 };

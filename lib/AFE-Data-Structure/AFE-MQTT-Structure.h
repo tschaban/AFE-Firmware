@@ -14,7 +14,7 @@
 #include <AFE-Configuration.h>
 
 struct MQTT_BASIC_CONFIG {
-  char topic[33];
+  char topic[65];
 };
 
 struct MQTT {
@@ -23,14 +23,7 @@ struct MQTT {
   uint16_t port;
   char user[33];
   char password[33];
-  MQTT_BASIC_CONFIG mqtt;
-};
-
-struct MQTT_TOPICS {
   MQTT_BASIC_CONFIG lwt;
-  MQTT_BASIC_CONFIG relays[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
-  MQTT_BASIC_CONFIG switches[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
-  MQTT_BASIC_CONFIG adc;
 };
 
 #endif
