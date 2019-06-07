@@ -2130,16 +2130,17 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   body = "<fieldset>";
 
   dtostrf((float)configuration.maxVCC, 3, 2, _number);
+
   body += addItem("number", "m", L_MEASURED_VOLTAGE, _number, "?", "0", "1000",
                   "0.01", "V");
 
-  dtostrf((float)configuration.divider.Ra, 1, 2, _number);
-  body += addItem("number", "ra", "R[a]", _number, "?", "0", "90000000", "0.01",
-                  "Om");
+  sprintf(_number, "%d", (uint32_t)configuration.divider.Ra);
+  body +=
+      addItem("number", "ra", "R[a]", _number, "?", "0", "90000000", "1", "Om");
 
-  dtostrf((float)configuration.divider.Rb, 1, 2, _number);
-  body += addItem("number", "rb", "R[b]", _number, "?", "0", "90000000", "0.01",
-                  "Om");
+  sprintf(_number, "%d", (uint32_t)configuration.divider.Rb);
+  body +=
+      addItem("number", "rb", "R[b]", _number, "?", "0", "90000000", "1", "Om");
   body += "</fieldset>";
 
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);

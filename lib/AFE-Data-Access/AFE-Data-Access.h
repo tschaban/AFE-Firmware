@@ -13,7 +13,7 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
-//#include <AFE-EEPROM.h>
+#include <ESP8266WiFi.h>
 #include <IPAddress.h>
 
 #include <ArduinoJson.h>
@@ -36,10 +36,16 @@ public:
 
   /* Methods saves and reads device ID */
   const String getDeviceUID();
-  void saveDeviceUID(const char *);
+  void saveDeviceUID(const char *, boolean create = false);
+  void createDeviceUIDFile();
+
+  PRO_VERSION getProVersionConfiguration();
+  void saveConfiguration(PRO_VERSION configuration, boolean create = false);
+  void createProVersionConfigurationFile();
 
   PASSWORD getPasswordConfiguration();
-  void saveConfiguration(PASSWORD configuration);
+  void saveConfiguration(PASSWORD configuration, boolean create = false);
+  void createPasswordConfigurationFile();
 
   DEVICE getDeviceConfiguration();
   void saveConfiguration(DEVICE configuration);
@@ -58,9 +64,6 @@ public:
 
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
-
-  PRO_VERSION getProVersionConfiguration();
-  void saveConfiguration(PRO_VERSION configuration);
 
 #if !defined(T5_CONFIG)
   /* Methods reads and saves relay state from/to EEPROM */

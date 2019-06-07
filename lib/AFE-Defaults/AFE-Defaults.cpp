@@ -15,8 +15,10 @@ void AFEDefaults::set() {
   DOMOTICZ DomoticzConfiguration;
   RELAY RelayConfiguration;
   SWITCH SwitchConfiguration;
-  PASSWORD PasswordConfiguration;
-  PRO_VERSION ProConfiguration;
+
+  Data->createDeviceUIDFile();
+  Data->createProVersionConfigurationFile();
+  Data->createPasswordConfigurationFile();
 
 #if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
     CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
@@ -77,23 +79,6 @@ void AFEDefaults::set() {
   firmwareConfiguration.upgradeURL[0] = '\0';
 
   Data->saveConfiguration(firmwareConfiguration);
-
-  /* Setting password */
-  PasswordConfiguration.protect = false;
-  PasswordConfiguration.password[0] = '\0';
-  Data->saveConfiguration(PasswordConfiguration);
-
-  ProConfiguration.serial[0] = '\0';
-  ProConfiguration.valid = false;
-  Data->saveConfiguration(ProConfiguration);
-
-  /* Device UID */
-  byte m[6];
-  char uid[18];
-  WiFi.macAddress(m);
-  sprintf(uid, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
-          m[2]);
-  Data->saveDeviceUID(uid);
 
   sprintf(deviceConfiguration.name, "AFE-Device");
 

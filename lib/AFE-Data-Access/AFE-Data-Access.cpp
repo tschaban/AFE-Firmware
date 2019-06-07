@@ -59,7 +59,7 @@ const String AFEDataAccess::getDeviceUID() {
 #endif
   return uid;
 }
-void AFEDataAccess::saveDeviceUID(const char *uid) {
+void AFEDataAccess::saveDeviceUID(const char *uid, boolean create) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -67,7 +67,8 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
   Serial << endl << "Opening file: cfg-device-uid.json : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-device-uid.json", "w");
+  File configFile = create ? SPIFFS.open("cfg-device-uid.json", "w")
+                           : SPIFFS.open("cfg-device-uid.json", "r+");
 
   if (configFile) {
 #ifdef DEBUG
@@ -89,7 +90,6 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
   else {
@@ -97,6 +97,18 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
   }
   Serial << endl << "--------------------------------------------------";
 #endif
+}
+void AFEDataAccess::createDeviceUIDFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-device-uid.json";
+#endif
+
+  byte m[6];
+  char uid[18];
+  WiFi.macAddress(m);
+  sprintf(uid, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
+          m[2]);
+  saveDeviceUID(uid, true);
 }
 
 PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
@@ -152,7 +164,8 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
+void AFEDataAccess::saveConfiguration(PRO_VERSION configuration,
+                                      boolean create) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -160,7 +173,8 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
   Serial << endl << "Opening file: cfg-pro-version.json : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-pro-version.json", "w");
+  File configFile = create ? SPIFFS.open("cfg-pro-version.json", "w")
+                           : SPIFFS.open("cfg-pro-version.json", "r+");
 
   if (configFile) {
 #ifdef DEBUG
@@ -191,6 +205,16 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
   }
   Serial << endl << "--------------------------------------------------";
 #endif
+}
+
+void AFEDataAccess::createProVersionConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-pro-version.json";
+#endif
+  PRO_VERSION ProConfiguration;
+  ProConfiguration.serial[0] = '\0';
+  ProConfiguration.valid = false;
+  saveConfiguration(ProConfiguration, true);
 }
 
 PASSWORD AFEDataAccess::getPasswordConfiguration() {
@@ -246,7 +270,7 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
 #endif
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
+void AFEDataAccess::saveConfiguration(PASSWORD configuration, boolean create) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -254,7 +278,8 @@ void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
   Serial << endl << "Opening file: cfg-password.json : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-password.json", "w");
+  File configFile = create ? SPIFFS.open("cfg-password.json", "w")
+                           : SPIFFS.open("cfg-password.json", "r+");
 
   if (configFile) {
 #ifdef DEBUG
@@ -285,6 +310,15 @@ void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
   }
   Serial << endl << "--------------------------------------------------";
 #endif
+}
+void AFEDataAccess::createPasswordConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-password.json";
+#endif
+  PASSWORD PasswordConfiguration;
+  PasswordConfiguration.protect = false;
+  PasswordConfiguration.password[0] = '\0';
+  saveConfiguration(PasswordConfiguration, true);
 }
 
 DEVICE AFEDataAccess::getDeviceConfiguration() {
@@ -2356,7 +2390,7 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<300> jsonBuffer;
+    StaticJsonBuffer<350> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &idx = root.createNestedObject("idx");
     JsonObject &divider = root.createNestedObject("divider");
