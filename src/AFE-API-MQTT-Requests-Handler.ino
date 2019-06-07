@@ -353,11 +353,11 @@ void MQTTPublishGateState() {
 
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.mqttAPI) {
-    String messageString = "{'PM25':'";
+    String messageString = "{\"PM25\":";
     messageString += data.pm25;
-    messageString += "','PM10':'";
+    messageString += ",\"PM10\":";
     messageString += data.pm10;
-    messageString += "'}";
+    messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
     Mqtt.publish("HPMA115S0/all", message);
@@ -366,19 +366,19 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
 
 void MQTTPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.mqttAPI) {
-    String messageString = "{'temperature':'";
+    String messageString = "{\"temperature\":";
     messageString += data.temperature;
     if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
-      messageString += "','humidity':'";
+      messageString += ",\"humidity\":";
       messageString += data.humidity;
     }
     if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
-      messageString += "','gasResistance':'";
+      messageString += ",\"gasResistance\":";
       messageString += data.gasResistance;
     }
-    messageString += "','pressure':'";
+    messageString += ",\"pressure\":";
     messageString += data.pressure;
-    messageString += "'}";
+    messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
     Mqtt.publish("BMx80/all", message);
