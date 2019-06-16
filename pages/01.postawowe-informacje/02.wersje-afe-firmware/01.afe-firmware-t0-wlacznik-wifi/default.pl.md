@@ -1,5 +1,5 @@
 ---
-title: 'AFE Firmware T0 - włącznik WiFi'
+title: 'T0 - włącznik WiFi'
 ---
 
 **Sprzęt:**
@@ -25,7 +25,7 @@ title: 'AFE Firmware T0 - włącznik WiFi'
 * Aktualizacja oprogramowania przez przeglądarkę
 
 ** Gotowe moduły **
-* Idealnie pasuje do urządzeń, jak Sonoff Basic, SV, S20, Dual R2 (PSF-B04-GL), Touch, 4CH, 4CH Pro, Geekcreit, Oittm WiFI Smart Plug, Yunshan WiFi Relay, Koogeek Smart Plug, Shelly 1,  itp. z chipem ESP8266/8255
+* Idealnie pasuje do urządzeń, jak Sonoff Basic, SV, S20, Dual R2 (PSF-B04-GL), Touch, 4CH, 4CH Pro, Geekcreit, Oittm WiFI Smart Plug, Yunshan WiFi Relay, Koogeek Smart Plug, Shelly 1,  itp. z chipem ESP8266/8285
 * Nie jest kompatybilne z Sonoff Dual w pierwszej wersji
 
 

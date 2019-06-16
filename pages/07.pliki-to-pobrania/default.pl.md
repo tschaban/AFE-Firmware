@@ -11,7 +11,7 @@ debugger: false
 ### AFE Firmware T0: Włącznik WiFi
 * Podstawowa wersja z opcją automatycznego wyłączania do 4 przekaźników
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
-* [Informacje szczegółowe](l/postawowe-informacje/afe%20firmware%20-%20wersje/afe-firmware-t0-wlacznik-wifi) dotyczące AFE Firmware T0
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t0-wlacznik-wifi) dotyczące AFE Firmware T0
 
 ![](afe-firmware-t0-logo.png)
 

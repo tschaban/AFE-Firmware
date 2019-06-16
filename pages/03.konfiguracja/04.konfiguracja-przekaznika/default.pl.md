@@ -93,7 +93,9 @@ Jeśli do ESP8266/8285 podłączona jest [dioda LED](/konfiguracja/konfiguracja-
 
 !! Sekcja konfiguracyjna widoczna jest tylko, gdy [włączone jest Domoticz API](/konfiguracja/konfiguracja-urzadzenia)
 
-Aby mieć możliwość podglądu stanu przekaźnika w Domoticz, konieczne jest wprwadzenie IDX Urządzenia przypisane w Domoticz, do konkretnego przekaźnika.
+Aby mieć możliwość podglądu stanu przekaźnika w Domoticz, konieczne jest wprowadzenie IDX Urządzenia przypisane w Domoticz do konkretnego przekaźnika.
+
+Tutaj znajdziesz: [jak znaleść IDX urządzenia w Domoticz](/integracja-api/domoticz-api/gdzie-znalezc-idx).
 
 ![](afe-firmware-konfiguracja-przekaznik-domoticz.png)
 
@@ -101,6 +103,18 @@ Aby mieć możliwość podglądu stanu przekaźnika w Domoticz, konieczne jest w
 * Wartość z zakresu 1 do 999999
 * W przypadku wprowadzenia 0, stan przekaźnika nie będzie wysyłany do Domoticz
 
+#### Sekcja: konfiguracja tematu MQTT sterującego przekaźnikiem
 
+!! Sekcja konfiguracyjna widoczna jest tylko, gdy [włączone jest MQTT API](/konfiguracja/konfiguracja-urzadzenia)
+
+Aby było możliwe sterowanie przekaźnikiem z wykorzytaniem [MQTT API](/integracja-api/mqtt), konieczne jest ustawienie Tematu MQTT sterujacego przekaźnikiem
+ 
 ![](afe-firmware-konfiguracja-przekaznik-mqtt.png)
 
+##### Temat
+* Temat wiadomości w formacie MQTT
+* Maksymalnie 64 znaki
+* Jeśli temat nie zostanie wprowadzony, przekaźnikeim nie będzie można sterować za pomocą [wiadomości MQTT.](/integracja-api/mqtt) Moduł również nie będzie wysyłał stanu przekaźnika do brokera MQTT przy ręcznej zmianie stanu przekaźnika. 
+* **Ważne:** Temat MQTT nie może kończyć się znakiem **/**
+
+> Tutaj znajdziejsz: [Najlepsze praktyki dotyczące formatów tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
