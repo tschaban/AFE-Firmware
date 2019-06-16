@@ -1,6 +1,6 @@
 ---
 title: 'Konfiguracja przycisku / włącznika'
-media_order: 'afe-firmware-konfiguracja-przycisk-czulosc.png,afe-firmware-konfiguracja-przycisk-domoticz.png,afe-firmware-konfiguracja-przycisk-menu.png,afe-firmware-konfiguracja-przycisk-mqtt.png,afe-firmware-konfiguracja-przycisk-przycisk.png'
+media_order: 'afe-firmware-konfiguracja-przycisk-czulosc.png,afe-firmware-konfiguracja-przycisk-domoticz.png,afe-firmware-konfiguracja-przycisk-menu.png,afe-firmware-konfiguracja-przycisk-przycisk.png,afe-firmware-konfiguracja-przycisk-mqtt.png'
 ---
 
 Do ESP8266/8285 można w zależności od wersji AFE podłączyć od 1 do N przycisków, które moga pełnić różne funkcje.
@@ -46,6 +46,9 @@ Ekran do konfiguracji przycisku uruchamia się zaznaczając element Przycisk  w 
 	* bistabilny
 
 > Najpopularniejszym przyciskiem/włącznikiem monostabilnym jest przycisk dzwonkowy. Przycisk/włącznik bistabilny to taki, który ma dwa stany: włączony/wyłączony - większość przycisków w ścianie do włączania oświetlenia to przyciski bistabilne.
+ 
+
+#### Sekcja: czułość (bouncing)
 
 ![](afe-firmware-konfiguracja-przycisk-czulosc.png)
 
@@ -75,9 +78,11 @@ Tutaj znajdziesz: [jak znaleść IDX urządzenia w Domoticz](/integracja-api/dom
 
 !! Sekcja konfiguracyjna widoczna jest tylko, gdy [włączone jest MQTT API](/konfiguracja/konfiguracja-urzadzenia)
 
+> Na ogół nie ma potrzeby wysyłania stanu przycisku jeśli przycisk służy do włączania / wyłączania przekaźnika. Wystarczające jest wysyłanie do systemu automatki informacji o stanie przekaźnika. 
+
 ![](afe-firmware-konfiguracja-przycisk-mqtt.png)
 
-Aby było możliwe uzyskanie informacji o stanie przycisku [MQTT API](/integracja-api/mqtt), konieczne jest ustawienie Tematu MQTT, pod który będzie wysyłana informacja przy każdej zmianie stanu przycisku.
+Aby było możliwe uzyskanie informacji o stanie przycisku przez [MQTT API](/integracja-api/mqtt), konieczne jest ustawienie Tematu MQTT, pod który będzie wysyłana informacja przy każdej zmianie stanu przycisku.
  
 ##### Temat
 * Temat wiadomości w formacie MQTT
@@ -88,4 +93,6 @@ Aby było możliwe uzyskanie informacji o stanie przycisku [MQTT API](/integracj
 > Tutaj znajdziejsz: [Najlepsze praktyki dotyczące formatów tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
 
 
-!!! **Podpowiedź**: wysyłanie stanu przycisku do przycisku do Domoticz, czy innego systemu do automatyki może uruchamiać dowolne regułu. Przycisk można zastąpić innym elementem np. kontaktronem, czujnikiem magnetycznym, czujnikem ruchu, czy jakimkolwiek innym elementem, który zwiera/rozwiera układ
+!!! **Podpowiedź 1**: wysyłanie stanu przycisku do przycisku do Domoticz, czy innego systemu do automatyki może uruchamiać dowolne regułu.
+
+!!! **Podpowiedź 2**: Przycisk można zastąpić innym elementem np. kontaktronem, czujnikiem magnetycznym, czujnikem ruchu, czy jakimkolwiek innym elementem, który zwiera/rozwiera układ
