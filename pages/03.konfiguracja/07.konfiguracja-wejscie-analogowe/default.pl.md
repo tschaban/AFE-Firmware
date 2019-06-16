@@ -1,0 +1,4 @@
+---
+title: 'Konfiguracja wejścia analogowego'
+---
+
