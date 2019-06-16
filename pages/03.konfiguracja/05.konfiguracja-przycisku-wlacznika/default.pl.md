@@ -1,6 +1,19 @@
 ---
 title: 'Konfiguracja przycisku / włącznika'
+media_order: 'afe-firmware-konfiguracja-przycisk-czulosc.png,afe-firmware-konfiguracja-przycisk-domoticz.png,afe-firmware-konfiguracja-przycisk-menu.png,afe-firmware-konfiguracja-przycisk-mqtt.png,afe-firmware-konfiguracja-przycisk-przycisk.png'
 ---
+
+Do ESP8266/8285 można w zależności od wersji AFE podłączyć od 1 do N przycisków, które moga pełnić różne funkcje.
+
+Ekran do konfiguracji przycisku uruchamia się zaznaczając element Przycisk  w menu Panelu Konfiguracyjnego AFE Firmware.
+
+!!!! W zależności od AFE Firmware oraz [wyboru ilości podłączonych do ESP8266/8285 przycisków](/konfiguracja/konfiguracja-urzadzenia), odpowiednia ilość przycisków będzie dostępna do konfiguracji
+
+![](afe-firmware-konfiguracja-przycisk-menu.png)
+
+#### Sekcja: przycisk / włącznik
+
+![](afe-firmware-konfiguracja-przycisk-przycisk.png)
 
 ##### GPIO
 
@@ -23,6 +36,9 @@ title: 'Konfiguracja przycisku / włącznika'
 	* wciśnięcie dłużej niż 10sek – uruchamianie Panelu Konfiguracyjnego w trybie HotSpot ([dioda systemowa LED](/konfiguracja/konfiguracja-diody-led/dioda-systemowa) mignie 2x)
 	* wciśnięcie 30 - 35 sekund - ustawianie wartości domyślnych  ([dioda systemowa LED](/konfiguracja/konfiguracja-diody-led/dioda-systemowa) mignie 3x)
 
+##### Przekaźnik sterowany tym przyciskiem
+* Przycisk może włączać lub wyłączac przekaźnik podłaczony do modułu. 
+* Do wyboru mam jeden z podłączonych do urządzenia przekaźników
 
 ##### Typ
 * Przycisk / włącznik może mieć typ:
@@ -31,6 +47,7 @@ title: 'Konfiguracja przycisku / włącznika'
 
 > Najpopularniejszym przyciskiem/włącznikiem monostabilnym jest przycisk dzwonkowy. Przycisk/włącznik bistabilny to taki, który ma dwa stany: włączony/wyłączony - większość przycisków w ścianie do włączania oświetlenia to przyciski bistabilne.
 
+![](afe-firmware-konfiguracja-przycisk-czulosc.png)
 
 ##### Czułość (bouncing)
 * Parametr określa czas reakcji przycisku / włącznika
@@ -42,6 +59,8 @@ title: 'Konfiguracja przycisku / włącznika'
 #### Sekcja: Domoticz
 
 !! Sekcja konfiguracyjna widoczna jest tylko, gdy [włączone jest Domoticz API](/konfiguracja/konfiguracja-urzadzenia)
+
+![](afe-firmware-konfiguracja-przycisk-domoticz.png)
 
 Aby mieć możliwość podglądu stanu przycisku w Domoticz, konieczne jest wprowadzenie IDX Urządzenia przypisane w Domoticz do konkretnego przycisku.
 
@@ -55,6 +74,8 @@ Tutaj znajdziesz: [jak znaleść IDX urządzenia w Domoticz](/integracja-api/dom
 #### Sekcja: konfiguracja tematu MQTT informującego o stanie przycisku
 
 !! Sekcja konfiguracyjna widoczna jest tylko, gdy [włączone jest MQTT API](/konfiguracja/konfiguracja-urzadzenia)
+
+![](afe-firmware-konfiguracja-przycisk-mqtt.png)
 
 Aby było możliwe uzyskanie informacji o stanie przycisku [MQTT API](/integracja-api/mqtt), konieczne jest ustawienie Tematu MQTT, pod który będzie wysyłana informacja przy każdej zmianie stanu przycisku.
  
