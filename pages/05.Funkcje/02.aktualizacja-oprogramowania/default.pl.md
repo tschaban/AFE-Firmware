@@ -1,21 +1,24 @@
 ---
 title: 'Aktualizacja oprogramowania'
+media_order: afe-firmware-aktualizacja-oprogramowania.png
 ---
 
 Urządzenie z AFE Firmware umożliwia aktualizację lub zmianę typu AFE Firmware na inną przez przeglądarkę.
 
 Aby zaktualizować lub zmienić typ AFE Firmware
 
-* uruchom Panel Konfiguracyjny
-* przejdź do sekcji Aktualizacja firmware
-* wybierz wcześniej pobraną wersję firmware, która będzie wgrywana
-* wciśnij przycisk Aktualizuj.
+* [pobierz AFE Firmware](/pliki-to-pobrania/afe-firmware), które będzie wgrywane
+* uruchom Panel Konfiguracyjny, a następnie wybierz opcje **Aktualizacja oprogramowania** w menu AFE Firmware
+
+![](afe-firmware-aktualizacja-oprogramowania.png)
+
+* przejdź do sekcji Aktualizacja firmware, a następnie wciśnij przycisk **Wybierz plik**
+* wskaż wcześniej pobraną wersję firmware, która będzie wgrywana
+* wciśnij przycisk **Aktualizuj**.
 * po aktualizacji, urządzenie zostanie zresetowane z nowym firmware
 
-jeśli zmieniasz typ oprogramowania, wyszukaj sieć WiFi o nawie AFE-Device, połącz się z nią a następnie skonfiguruj ponownie urządzenie
+!! Podczas aktualizacji firmware przez przeglądarkę nie odłączaj urządzenia od źródła zasilania
 
-!! podczas aktualizacji firmware przez przeglądarkę nie odłączaj urządzenia od źródła zasilania
+! Przy zmianie oprogramowania, część parameterów konfiguracyjnych może wymagać rekonfigurację.
 
-! jeśli coś pójdzie nie tak, wgraj nową wersję firmware przez adapter USB-TTL
-
-!! zmiana typu AFE Firmware kasuje całą zawartość pamięci urządzenia. Oznacza to, że urządzenia trzeba ponownie skonfigurować w trybie Access Point
+! Przy zmianie oprogramowania z wersji 1.x do wersji 2.x nie jest kopiowana konfiguracja. Urządzenie należy [skonfigurować od początku w trybie HotSpot.](/instalacja/pierwsze-uruchomienie)
