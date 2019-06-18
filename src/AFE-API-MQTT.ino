@@ -83,10 +83,17 @@ void AFEMQTT::connect() {
       if (delayStartTime == 0) {
         delayStartTime = millis();
 
-        if (Broker.connect(
-                deviceName, MQTTConfiguration.user, MQTTConfiguration.password,
-                MQTTConfiguration.lwt.topic, 2, false, "disconnected")) {
+        /* Connecing to MQTT Broker depending on LWT topics being set or no */
+        boolean _connected =
+            strlen(MQTTConfiguration.lwt.topic) > 0
+                ? Broker.connect(deviceName, MQTTConfiguration.user,
+                                 MQTTConfiguration.password,
+                                 MQTTConfiguration.lwt.topic, 2, false,
+                                 "disconnected")
+                : Broker.connect(deviceName, MQTTConfiguration.user,
+                                 MQTTConfiguration.password);
 
+        if (_connected) {
           eventConnectionEstablished = true;
           delayStartTime = 0;
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
@@ -154,17 +161,31 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.on();
+#endif
 #ifdef DEBUG
     Serial << endl << endl << "----------- Publish MQTT -----------";
     Serial << endl << "Topic: " << subTopic;
     Serial << endl << "Message: " << message;
-    Serial << endl << "------------------------------------";
 #endif
     if (strlen(subTopic) > 0) {
       Broker.publish(subTopic, message);
+#ifdef DEBUG
+      Serial << endl << "Status: published";
+#endif
     }
+#ifdef DEBUG
+    else {
+      Serial << endl << "Status: failure, not MQTT Topic";
+    }
+#endif
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.off();
+#endif
+#ifdef DEBUG
+    Serial << endl << "------------------------------------";
+#endif
   }
 }
 

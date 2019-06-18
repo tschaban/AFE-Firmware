@@ -25,8 +25,6 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += firmware.version;
   page += " [T";
   page += firmware.type;
-  page += "-";
-  page += Data.readNumberOfReboots();
   page += "]</title><style>";
   page += AFE_CSS;
   page += "</style></head><body>";
@@ -2113,8 +2111,6 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   sprintf(_number, "%d", configuration.gpio);
   body += addItem("number", "g", "GPIO", _number, "?", "?", "?", "?");
 
-  Serial << "aaaaaaaaaa=" << configuration.interval;
-
   sprintf(_number, "%d", configuration.interval);
   body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "1",
                   "86400", "1", L_SECONDS);
@@ -2361,7 +2357,7 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
             "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
     body += L_HELP;
     body += "-Forum-red.svg\"alt=\"Forum\" /></a> <a "
-            "href=\"http://www.smartnydom.pl/afe-firmware-";
+            "href=\"https://afe.smartnydom.pl/";
     body += L_LANGUAGE_SHORT;
     body += "/\" target=\"_blank\"><img src=\"https://img.shields.io/badge/";
     body += L_HELP;
@@ -2369,9 +2365,10 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
     body += L_DOCUMENTATION;
     body += "-green.svg\" alt=\"";
     body += L_DOCUMENTATION;
-    body +=
-        "\" /></a> <a href=\"https://www.smartnydom.pl/afe-firmware-pl/log\" "
-        "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
+    body += "\" /></a> <a href=\"https://afe.smartnydom.pl/";
+    body += L_LANGUAGE_SHORT;
+    body += "/pliki-to-pobrania/historia-zmian\" "
+            "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
     body += L_VERSION;
     body += "%20-%20";
     body += FIRMWARE_VERSION;

@@ -12,6 +12,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>

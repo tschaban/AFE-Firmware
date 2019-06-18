@@ -186,7 +186,7 @@ boolean AFEWiFi::connected() {
        WiFi.localIP().toString() != "(IP unset)") ||
       (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
 
-    delay(1);
+    delay(10);
     if (disconnected) {
       eventConnectionEstablished = true;
       disconnected = false;

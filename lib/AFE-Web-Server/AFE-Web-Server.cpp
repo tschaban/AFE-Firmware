@@ -232,7 +232,9 @@ void AFEWebServer::generate(boolean upload) {
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     case AFE_CONFIG_SITE_LED:
       for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
-        Data.saveConfiguration(i, getLEDData(i));
+        if (Device->configuration.isLED[i]) {
+          Data.saveConfiguration(i, getLEDData(i));
+        }
       }
       Data.saveSystemLedID(getSystemLEDData());
       break;
@@ -422,9 +424,8 @@ void AFEWebServer::generate(boolean upload) {
       data = getHPMA115S0SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command, data));
-  #endif
-  #ifdef CONFIG_HARDWARE_BMX80
+        ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command,
+  data)); #endif #ifdef CONFIG_HARDWARE_BMX80
   }
   else if (optionName == "BMx80") {
     BMx80 data;
@@ -484,9 +485,8 @@ void AFEWebServer::generate(boolean upload) {
     if (command == SERVER_CMD_SAVE) {
       data = getDS18B20Data();
     }
-    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command, data));
-  #endif
-  #ifdef CONFIG_HARDWARE_DHXX
+    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command,
+  data)); #endif #ifdef CONFIG_HARDWARE_DHXX
   }
   else if (optionName == "DHT") {
     DH data = {};

@@ -18,6 +18,8 @@
 #define SWITCH_FUNCTIONALITY_MULTI 1
 #define SWITCH_FUNCTIONALITY_RELAY 2
 
+#define SWITCH_SENSITIVENESS 50
+
 struct SWITCH {
   uint8_t gpio;
   uint8_t type;

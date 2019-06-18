@@ -5,21 +5,23 @@
 #define L_LANGUAGE_SHORT "pl"
 
 /* Firmware names */
-#ifdef T0_CONFIG
-#define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
-#elif T0_SHELLY_1_CONFIG
+#if defined(DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "dla Shelly-1"
-#elif T1_CONFIG
+#elif defined(DEVICE_SONOFF_BASIC_V1)
+#define L_FIRMWARE_NAME "dla Sonoff Basic"
+#elif defined(T0_CONFIG)
+#define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
+#elif defined(T1_CONFIG)
 #define L_FIRMWARE_NAME "Włącznik z czujnikiem temperatury"
-#elif T2_CONFIG
+#elif defined(T2_CONFIG)
 #define L_FIRMWARE_NAME "Włącznik z czujnikiem temperatury i wilgotności"
-#elif T3_CONFIG
+#elif defined(T3_CONFIG)
 #define L_FIRMWARE_NAME "dla 4 włączników i czujników ruchu"
-#elif T4_CONFIG
+#elif defined(T4_CONFIG)
 #define L_FIRMWARE_NAME "dla 4 włączników WiFi"
-#elif T5_CONFIG
+#elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "do kontrolowania sterownika bramy"
-#elif T6_CONFIG
+#elif defined(T6_CONFIG)
 #define L_FIRMWARE_NAME "Stacja Pogody"
 #endif
 

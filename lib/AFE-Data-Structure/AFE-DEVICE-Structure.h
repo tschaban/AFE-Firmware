@@ -11,6 +11,8 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+
 struct DEVICE_API {
   boolean mqtt;
   boolean http;
@@ -28,10 +30,6 @@ struct DEVICE {
 #ifdef CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
-#elif defined(T0_SHELLY_1_CONFIG)
-  boolean isLED[0];
-  boolean isSwitch[1];
-  boolean isRelay[1];
 #elif defined(T1_CONFIG)
   boolean isLED[2];
   boolean isRelay[1];

@@ -423,11 +423,11 @@ void MQTTPublishGateState() {
 #ifdef CONFIG_HARDWARE_HPMA115S0
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.api.mqtt) {
-    String messageString = "{'PM25':'";
+    String messageString = "{\"PM25\":";
     messageString += data.pm25;
-    messageString += "','PM10':'";
+    messageString += ",\"PM10\":";
     messageString += data.pm10;
-    messageString += "'}";
+    messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
     Mqtt.publish("HPMA115S0/all", message);
@@ -438,19 +438,19 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
 #ifdef CONFIG_HARDWARE_BMX80
 void MQTTPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.api.mqtt) {
-    String messageString = "{'temperature':'";
+    String messageString = "{\"temperature\":";
     messageString += data.temperature;
     if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
-      messageString += "','humidity':'";
+      messageString += ",\"humidity\":";
       messageString += data.humidity;
     }
     if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
-      messageString += "','gasResistance':'";
+      messageString += ",\"gasResistance\":";
       messageString += data.gasResistance;
     }
-    messageString += "','pressure':'";
+    messageString += ",\"pressure\":";
     messageString += data.pressure;
-    messageString += "'}";
+    messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
     Mqtt.publish("BMx80/all", message);
@@ -471,17 +471,17 @@ void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
   char valueString[10];
 
   if (Device.configuration.api.mqtt) {
-    String messageString = "{'raw':'";
+    String messageString = "{\"raw\":";
     messageString += data.raw;
-    messageString += "','percent':'";
+    messageString += ",\"percent\":";
     messageString += data.percent;
-    messageString += "','voltage':'";
+    messageString += ",\"voltage\":";
     dtostrf(data.voltage, 10, 6, valueString);
     messageString += valueString;
-    messageString += "','voltageCalculated':'";
+    messageString += ",\"voltageCalculated\":";
     dtostrf(data.voltageCalculated, 10, 6, valueString);
     messageString += valueString;
-    messageString += "'}";
+    messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
     Mqtt.publishTopic(AnalogInput.getMQTTStateTopic(), message);

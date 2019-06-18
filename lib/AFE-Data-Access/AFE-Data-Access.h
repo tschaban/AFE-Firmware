@@ -31,48 +31,45 @@ private:
 public:
   AFEDataAccess();
 
-  uint16_t readNumberOfReboots();
-  void saveRebooted();
+  boolean formatFileSystem();
 
-  /* Methods saves and reads device ID */
   const String getDeviceUID();
-  void saveDeviceUID(const char *, boolean create = false);
+  void saveDeviceUID(const char *);
   void createDeviceUIDFile();
-
-  PRO_VERSION getProVersionConfiguration();
-  void saveConfiguration(PRO_VERSION configuration, boolean create = false);
-  void createProVersionConfigurationFile();
-
-  PASSWORD getPasswordConfiguration();
-  void saveConfiguration(PASSWORD configuration, boolean create = false);
-  void createPasswordConfigurationFile();
 
   DEVICE getDeviceConfiguration();
   void saveConfiguration(DEVICE configuration);
+  void createDeviceConfigurationFile();
 
   FIRMWARE getFirmwareConfiguration();
   void saveConfiguration(FIRMWARE configuration);
+  void createFirmwareConfigurationFile();
 
   NETWORK getNetworkConfiguration();
   void saveConfiguration(NETWORK configuration);
+  void createNetworkConfigurationFile();
 
   MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
+  void createMQTTConfigurationFile();
 
   DOMOTICZ getDomoticzConfiguration();
   void saveConfiguration(DOMOTICZ configuration);
+  void createDomoticzConfigurationFile();
 
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
+  void createRelayConfigurationFile();
 
-#if !defined(T5_CONFIG)
-  /* Methods reads and saves relay state from/to EEPROM */
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
+  void createRelayStateFile();
 #endif
 
   SWITCH getSwitchConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, SWITCH configuration);
+  void createSwitchConfigurationFile();
 
   /* Methods saves firmware version from/to EEPROM */
   void saveVersion(const char *);
@@ -81,17 +78,29 @@ public:
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
-/* Methods turns on / off APIs */
-#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
-  void saveAPI(uint8_t apiID, boolean state);
+  PRO_VERSION getProVersionConfiguration();
+  void saveConfiguration(PRO_VERSION configuration);
+  void createProVersionConfigurationFile();
+
+  PASSWORD getPasswordConfiguration();
+  void saveConfiguration(PASSWORD configuration);
+  void createPasswordConfigurationFile();
+
+  /* ADC Inout create/read/write methods */
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  ADCINPUT getADCInputConfiguration();
+  void saveConfiguration(ADCINPUT configuration);
+  void createADCInputConfigurationFile();
 #endif
 
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
+  void createLEDConfigurationFile();
   /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
+  void createSystemLedIDConfigurationFile();
 #endif
 
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -148,9 +157,9 @@ public:
   void saveConfiguration(BH1750 configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-  ADCINPUT getADCInputConfiguration();
-  void saveConfiguration(ADCINPUT configuration);
+/* Methods turns on / off APIs */
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+  void saveAPI(uint8_t apiID, boolean state);
 #endif
 };
 #endif

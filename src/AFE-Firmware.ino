@@ -338,8 +338,6 @@ void setup() {
   }
 #endif
 
-  Data.saveRebooted();
-
 #ifdef DEBUG
   Serial << endl
          << "########################### BOOTING COMPLETED "
