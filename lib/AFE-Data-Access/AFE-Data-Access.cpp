@@ -368,6 +368,12 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.isAnalogInput = root["isAnalogInput"];
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
+      for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+        configuration.isContactron[i] = false;
+      }
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
@@ -2635,55 +2641,248 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
 }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
 CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
-  uint8_t nextContactron = 24;
-  MQTT configurationMQTT;
 
-  configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
-  configuration.outputDefaultState =
-      Eeprom.readUInt8(416 + id * nextContactron);
-  configuration.ledID = Eeprom.readUInt8(417 + id * nextContactron);
-  configuration.bouncing = Eeprom.read(418 + id * nextContactron, 4).toInt();
+  char fileName[22];
+  sprintf(fileName, "cfg-contactron-%d.json", id);
 
-  Eeprom.read(422 + id * nextContactron, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
 
-  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
-                                   sizeof(configurationMQTT.topic));
+  File configFile = SPIFFS.open(fileName, "r");
 
-  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
-          configuration.name);
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
 
-  configuration.idx = Eeprom.read(942 + id * 6, 6).toInt();
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<300> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.gpio = root["gpio"];
+      sprintf(configuration.name, root["name"]);
+      configuration.outputDefaultState = root["outputDefaultState"];
+      configuration.bouncing = root["bouncing"];
+      configuration.ledID = root["ledID"];
+      configuration.domoticz.idx = root["idx"];
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
-  uint8_t nextContactron = 24;
-  Eeprom.writeUInt8(415 + id * nextContactron, configuration.gpio);
-  Eeprom.writeUInt8(416 + id * nextContactron,
-                    configuration.outputDefaultState);
-  Eeprom.writeUInt8(417 + id * nextContactron, configuration.ledID);
-  Eeprom.write(418 + id * nextContactron, 4, (long)configuration.bouncing);
-  Eeprom.write(422 + id * nextContactron, 16, configuration.name);
-  Eeprom.write(942 + id * 6, 6, (long)configuration.idx);
+  char fileName[22];
+  sprintf(fileName, "cfg-contactron-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration.gpio;
+    root["name"] = configuration.name;
+    root["outputDefaultState"] = configuration.outputDefaultState;
+    root["bouncing"] = configuration.bouncing;
+    root["ledID"] = configuration.ledID;
+    root["idx"] = configuration.domoticz.idx;
+    root["MQTTTopic"] = configuration.mqtt.topic;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createContractonConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-relay-xx.json";
+#endif
+  CONTACTRON ContactronConfiguration;
+  ContactronConfiguration.bouncing = 200;
+  ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
+  ContactronConfiguration.domoticz.idx = 0;
+  ContactronConfiguration.mqtt.topic[0] = '\0';
+  ContactronConfiguration.gpio = 14;
+  ContactronConfiguration.ledID = 2;
+  saveConfiguration(0, ContactronConfiguration);
+  ContactronConfiguration.gpio = 13;
+  ContactronConfiguration.ledID = 3;
+  saveConfiguration(1, ContactronConfiguration);
 }
 
 GATE AFEDataAccess::getGateConfiguration() {
   GATE configuration;
-  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
-    configuration.state[i] = Eeprom.readUInt8(467 + i);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-gate.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-gate.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<300> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      /*
+      for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+        configuration.state[i] = Eeprom.readUInt8(467 + i);
+      }
+      */
+
+      configuration.domoticz.idx = root["idx"];
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
   }
-  configuration.idx = Eeprom.read(936, 6).toInt();
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(GATE configuration) {
-  for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
-    Eeprom.writeUInt8(467 + i, configuration.state[i]);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-gate.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-gate.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    /*
+    for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
+      Eeprom.writeUInt8(467 + i, configuration.state[i]);
+    }
+    */
+
+    root["idx"] = configuration.domoticz.idx;
+    root["MQTTTopic"] = configuration.mqtt.topic;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
   }
-  Eeprom.write(936, 6, (long)configuration.idx);
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createGateConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-relay-xx.json";
+#endif
+
+  saveGateState(0);
 }
 
 uint8_t AFEDataAccess::getGateState() { return Eeprom.readUInt8(471); }

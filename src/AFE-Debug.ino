@@ -13,9 +13,7 @@ void debugListener() {
   if (time - debugStartTime >= DEBUG_INTERVAL * 1000) {
     Serial << endl << endl << "----------- DEBUGGER ------------";
     getAvailableMem();
-#ifdef CONFIG_HARDWARE_SPIFFS
     getFileSystemInfo();
-#endif
     debugStartTime = 0;
     Serial << endl << "---------------------------------" << endl;
   }
@@ -26,7 +24,6 @@ void getAvailableMem() {
          << "- Free Memory = " << system_get_free_heap_size() / 1024 << "kB";
 }
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 void getFileSystemInfo() {
   FSInfo fileSystem;
   SPIFFS.info(fileSystem);
@@ -35,6 +32,5 @@ void getFileSystemInfo() {
          << fileSystem.totalBytes / 1024 << "kB"
          << " Max.open files " << fileSystem.maxOpenFiles;
 }
-#endif
 
 #endif

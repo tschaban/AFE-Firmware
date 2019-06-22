@@ -90,4 +90,24 @@ boolean AFEGate::event() {
   }
 }
 
-unsigned long AFEGate::getDomoticzIDX() { return gateConfiguration.idx; }
+const char *AFEGate::getMQTTCommandTopic() {
+  if (strlen(gateConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", gateConfiguration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFEGate::getMQTTStateTopic() {
+  if (strlen(gateConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", gateConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
+
+unsigned long AFEGate::getDomoticzIDX() {
+  return gateConfiguration.domoticz.idx;
+}

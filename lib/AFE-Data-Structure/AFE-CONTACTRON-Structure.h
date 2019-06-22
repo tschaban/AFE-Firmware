@@ -23,8 +23,8 @@ struct CONTACTRON {
   uint8_t ledID;
   uint16_t bouncing;
   char name[17];
-  char mqttTopic[50];
-  unsigned long idx;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

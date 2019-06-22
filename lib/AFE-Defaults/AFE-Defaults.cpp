@@ -50,9 +50,9 @@ void AFEDefaults::set() {
     PIR PIRConfiguration;
 #endif
 
-#if defined(T5_CONFIG)
-    CONTACTRON ContactronConfiguration;
-    GATE GateConfiguration;
+#ifdef CONFIG_FUNCTIONALITY_GATE
+    Data->createContractonConfigurationFile();
+    Data->createGateConfigurationFile();
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
@@ -85,13 +85,6 @@ void AFEDefaults::set() {
 #if defined(T3_CONFIG)
     for (uint8_t i = 1; i < sizeof(deviceConfiguration.isPIR); i++) {
       deviceConfiguration.isPIR[i] = false;
-    }
-#endif
-
-/* Contactron */
-#if defined(T5_CONFIG)
-    for (uint8_t i = 1; i < sizeof(deviceConfiguration.isContactron); i++) {
-      deviceConfiguration.isContactron[i] = false;
     }
 #endif
 
@@ -168,31 +161,6 @@ void AFEDefaults::set() {
 
       Data->saveConfiguration(i, PIRConfiguration);
     }
-#endif
-
-/* T5: Contactron and Gate configuration */
-#if defined(T5_CONFIG)
-    ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
-    ContactronConfiguration.bouncing = 200;
-    ContactronConfiguration.gpio = 4;
-    ContactronConfiguration.ledID = 2;
-    ContactronConfiguration.idx = 0;
-    sprintf(ContactronConfiguration.name, "C1");
-    Data->saveConfiguration(0, ContactronConfiguration);
-    ContactronConfiguration.gpio = 5;
-    ContactronConfiguration.ledID = 3;
-    sprintf(ContactronConfiguration.name, "C2");
-    Data->saveConfiguration(1, ContactronConfiguration);
-
-    GateConfiguration.state[0] = GATE_OPEN;
-    GateConfiguration.state[1] = GATE_PARTIALLY_OPEN;
-    GateConfiguration.state[2] = GATE_PARTIALLY_OPEN;
-    GateConfiguration.state[3] = GATE_CLOSED;
-    GateConfiguration.idx = 0;
-
-    Data->saveConfiguration(GateConfiguration);
-    Data->saveGateState(0);
-
 #endif
 
 /* T6 HPMA115S0 Sensor */

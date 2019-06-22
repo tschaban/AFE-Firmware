@@ -14,10 +14,8 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <AFE-Defaults.h>
 #include <FS.h>
-#endif
 
 #ifdef DEBUG
 #include <Streaming.h>

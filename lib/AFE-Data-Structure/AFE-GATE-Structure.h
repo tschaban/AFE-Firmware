@@ -18,7 +18,8 @@
 
 struct GATE {
   uint8_t state[4];
-  unsigned long idx;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

@@ -32,6 +32,9 @@ private:
 
   void convert();
 
+  char mqttCommandTopic[sizeof(ContactronConfiguration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(ContactronConfiguration.mqtt.topic) + 6];
+
 public:
   /* Constructors */
   AFEContactron();
@@ -46,7 +49,8 @@ public:
   const char *getName();
 
   /* Method returns MQTT topic for this contactron */
-  const char *getMQTTTopic();
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 
   /* Method returns true if cotactron state ahs changed */
   boolean changed();

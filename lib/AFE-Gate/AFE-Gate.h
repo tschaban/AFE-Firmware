@@ -16,9 +16,13 @@
 #include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
 #include <AFE-Relay.h>
-//#include <Streaming.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEGate {
+
+private:
   AFEDevice Device;
   AFEDataAccess Data;
   GATE gateConfiguration;
@@ -28,6 +32,9 @@ class AFEGate {
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();
+
+  char mqttCommandTopic[sizeof(gateConfiguration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(gateConfiguration.mqtt.topic) + 6];
 
 public:
   /* Via this class there is access to contactrons */
@@ -52,6 +59,10 @@ public:
   /* It should be added to main loop to listen for gate state changes and
    * request to be processed by the class */
   void listener();
+
+  /* Get MQTT Topics */
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 
   /* Return IDX in Domoticz */
   unsigned long getDomoticzIDX();

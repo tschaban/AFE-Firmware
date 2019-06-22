@@ -191,8 +191,8 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     /* Contactrons */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
-        sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
-        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
+        if (strcmp(topic, Gate.Contactron[i].getMQTTCommandTopic()) == 0 &&
+            (char)payload[1] == 'e') { // get
           MQTTPublishContactronState(i);
         }
       } else {
@@ -201,8 +201,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 
     /* Gate */
-    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.mqtt.topic);
-    if (strcmp(topic, _mqttTopic) == 0) {
+    if (strcmp(topic, Gate.getMQTTCommandTopic()) == 0) {
       if ((char)payload[0] == 't' && length == 6) { // toggle
         Gate.toggle();
       } else if ((char)payload[0] == 'g' && length == 3) { // get
@@ -401,21 +400,22 @@ void MQTTPublishPIRState(uint8_t id) {
 #if defined(T5_CONFIG)
 void MQTTPublishContactronState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
-                 Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
-                                                              : "closed");
+    Mqtt.publishTopic(Gate.Contactron[id].getMQTTStateTopic(),
+                      Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
+                                                                   : "closed");
   }
 }
 void MQTTPublishGateState() {
   if (Device.configuration.api.mqtt) {
     uint8_t gateState = Gate.get();
-    Mqtt.publish("gate/state", gateState == GATE_OPEN
-                                   ? "open"
-                                   : gateState == GATE_CLOSED
-                                         ? "closed"
-                                         : gateState == GATE_PARTIALLY_OPEN
-                                               ? "partiallyOpen"
-                                               : "unknown");
+    Mqtt.publishTopic(Gate.getMQTTStateTopic(),
+                      gateState == GATE_OPEN
+                          ? "open"
+                          : gateState == GATE_CLOSED
+                                ? "closed"
+                                : gateState == GATE_PARTIALLY_OPEN
+                                      ? "partiallyOpen"
+                                      : "unknown");
   }
 }
 #endif

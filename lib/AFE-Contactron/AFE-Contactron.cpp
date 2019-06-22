@@ -53,6 +53,24 @@ const char *AFEContactron::getMQTTTopic() {
   return ContactronConfiguration.mqttTopic;
 }
 
+const char *AFEContactron::getMQTTCommandTopic() {
+  if (strlen(ContactronConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", ContactronConfiguration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFEContactron::getMQTTStateTopic() {
+  if (strlen(ContactronConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", ContactronConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
+
 boolean AFEContactron::changed() {
   if (_changed) {
     _changed = false;
