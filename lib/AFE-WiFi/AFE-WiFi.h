@@ -18,7 +18,6 @@
 #include <AFE-LED.h>
 #endif
 
-#include <DNSServer.h>
 #include <ESP8266WiFi.h>
 #ifdef DEBUG
 #include <Streaming.h>
@@ -39,8 +38,6 @@ private:
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
-  DNSServer dnsServer;
-
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
@@ -62,9 +59,6 @@ public:
   /* Returns true if device just connected to the network. It's set to true each
    * time it connected. */
   boolean eventConnected();
-
-  /* Method listens for HTTP request while device is in Access Point mode */
-  void APListener();
 
   /* Method checks if device is connected to WiFi - if it's not then it connects
    * to it */

@@ -37,9 +37,13 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
     page += firmware.version;
     page += "/";
     page += deviceID;
+    page += "/";
+    page += AFE_DEVICE_TYPE_ID;
     page += "\" style=\"width: 100%;display: block\" alt=\"AFE Firmware\">";
   } else {
-    page += "<h3 class=\"la\">AFE Firmware</h3>";
+    page += "<h3 class=\"la\">AFE Firmware: ";
+    page += AFE_DEVICE_TYPE_NAME;
+    page += "</h3>";
   }
 
   page += "<div id=\"c\">";
@@ -645,7 +649,17 @@ String AFESitesGenerator::addNetworkConfiguration() {
   Serial << endl << "Searching for WiFi networks: ";
 #endif
   int numberOfNetworks = WiFi.scanNetworks();
+
+#ifdef DEBUG
+  Serial << endl << " - found: " << numberOfNetworks;
+#endif
+
   for (int i = 0; i < numberOfNetworks; i++) {
+
+#ifdef DEBUG
+    Serial << endl << " - " << WiFi.SSID(i);
+#endif
+
     body += "<option value=\"";
     body += WiFi.SSID(i);
     WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
@@ -656,9 +670,6 @@ String AFESitesGenerator::addNetworkConfiguration() {
     body += WiFi.SSID(i);
     body += "</option>";
   }
-#ifdef DEBUG
-  Serial << "Completed";
-#endif
 
   body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
   body += L_REFRESH;
@@ -2378,7 +2389,11 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
     body += FIRMWARE_TYPE;
     body += "-";
     body += FIRMWARE_VERSION;
-    body += "\" /></a> <img src=\"https://img.shields.io/badge/PRO-";
+    body += "\" /></a> <img src=\"https://img.shields.io/badge/Device-";
+    body += AFE_DEVICE_TYPE_NAME;
+    body += "-lightgrey.svg\" alt=\"DeviceID ";
+    body += AFE_DEVICE_TYPE_ID;
+    body += "\" /> <img src=\"https://img.shields.io/badge/PRO-";
     body += Firmware->Pro.valid ? L_YES : L_NO;
     body += "-orange.svg\" alt=\"PRO\" /></div>";
   }

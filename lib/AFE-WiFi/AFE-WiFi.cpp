@@ -41,9 +41,6 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     WiFi.softAP(Device->configuration.name);
-    dnsServer.setTTL(300);
-    dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-    dnsServer.start(53, "*", apIP);
 #ifdef DEBUG
     Serial << "completed";
 #endif
@@ -197,8 +194,6 @@ boolean AFEWiFi::connected() {
     return false;
   }
 }
-
-void AFEWiFi::APListener() { dnsServer.processNextRequest(); }
 
 boolean AFEWiFi::eventConnected() {
   boolean returnValue = eventConnectionEstablished;

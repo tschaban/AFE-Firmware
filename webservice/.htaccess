@@ -4,7 +4,7 @@ RewriteBase /
 
 RewriteRule ^key/validate/([a-fA-F\.0-9\-]+)/([a-zA-Z\.0-9\-]+)?$$ validate-key.php?deviceID=$1&keyNumber=$2 [NC,QSA,L]
 RewriteRule ^key/add/([a-fA-F\.0-9\-]+)/([a-zA-Z\.0-9\-]+)?$$ add-key.php?deviceID=$1&keyNumber=$2 [NC,QSA,L]
-RewriteRule ^logo/T([0-9]+)?/?([a-zA-Z\.0-9]+)?/?([a-zA-Z0-9\-]+)?/?$$ generate-header.php?firmwareType=$1&firmwareVersion=$2&deviceID=$3 [NC,QSA,L]
+RewriteRule ^logo/T([0-9]+)?/?([a-zA-Z\.0-9]+)?/?([a-zA-Z0-9\-]+)?/?([0-9]+)?/?$$ generate-header.php?firmwareType=$1&firmwareVersion=$2&deviceID=$3&deviceTypeID=$4 [NC,QSA,L]
 
 #RewriteRule ^development/T([0-9]+)?/?([a-zA-Z\.0-9]+)?/?([a-zA-Z0-9]+)?/?$$ /afe/dev-generate-logo.php?type=$1&version=$2&device=$3 [END]
 

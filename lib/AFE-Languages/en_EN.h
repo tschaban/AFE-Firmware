@@ -31,9 +31,7 @@
 #define L_NETWORK "Network"
 #define L_MQTT_BROKER "MQTT Broker"
 #define L_DOMOTICZ_SERVER "Domoticz Server"
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #define L_LEDS "LEDs"
-#endif
 #define L_RELAYS_CONFIGURATION "Relays configuration"
 #define L_RELAY "Relay"
 #define L_BUTTONS_SWITCHES "Button / Switches"

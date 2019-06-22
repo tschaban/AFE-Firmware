@@ -148,7 +148,9 @@ void setup() {
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
 #ifdef DEBUG
-  Serial << endl << "Checking if first time launch: ";
+  Serial << endl
+         << "Checking if first time launch: Device.getMode()= "
+         << Device.getMode() << " : ";
 #endif
 
   if (Device.getMode() == MODE_FIRST_TIME_LAUNCH) {
@@ -432,7 +434,6 @@ void loop() {
 #endif
     Network.listener();
   } else { /* Deviced runs in Access Point mode */
-    Network.APListener();
     WebServer.listener();
   }
 

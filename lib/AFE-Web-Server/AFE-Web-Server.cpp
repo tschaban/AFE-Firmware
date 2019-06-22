@@ -375,7 +375,7 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef DEBUG
     Serial << endl
            << endl
-           << "---------------- Opening WebSite -----------------";
+           << "---------------- Site Generated WebSite -----------------";
     Serial << endl << "Site ID: " << siteConfig.ID;
     Serial << endl
            << "Site Type: "
@@ -389,7 +389,8 @@ void AFEWebServer::generate(boolean upload) {
     }
 
     Serial << endl
-           << "--------------------------------------------------" << endl;
+           << "---------------------------------------------------------"
+           << endl;
 
 #endif
 
