@@ -1,6 +1,6 @@
 ---
 title: 'Domoticz API'
-media_order: 'domoticz-dodawanie-urzadzenia.png,domoticz-dodawanie-wirtualnego-czujnika.png,domoticz-dodawanie-wirtualnego-czujnika-formularz.png,domoticz-dodawanie-wirtualnego-przycisku-formularz.png,domoticz-przelaczniki.png,domoticz-urzadzenia.png,domoticz-edytowane-przycisku.png,domoticz-ustawianie-akcji-przekaznika.png,domoticz-zmiana-typu-przelacznika.png'
+media_order: 'domoticz-dodawanie-urzadzenia.png,domoticz-dodawanie-wirtualnego-czujnika.png,domoticz-dodawanie-wirtualnego-czujnika-formularz.png,domoticz-dodawanie-wirtualnego-przycisku-formularz.png,domoticz-przelaczniki.png,domoticz-urzadzenia.png,domoticz-edytowane-przycisku.png,domoticz-ustawianie-akcji-przekaznika.png,domoticz-zmiana-typu-przelacznika.png,afe-firmware-konfiguracja-przekaznik-domoticz.png'
 ---
 
 * Domoticz API umożliwia dwukierunkową integrację między urządzeniem z AFE Firmware, a Domoticz
@@ -71,6 +71,23 @@ media_order: 'domoticz-dodawanie-urzadzenia.png,domoticz-dodawanie-wirtualnego-c
 * _ADRES-IP-URZADZENIA_ - to adres IP urządzenia z zainstlowanym AFE Firmware
 * _NAZWA-PRZEKAZNIKA_, definiowany jest w AFE Firmware w [konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
 
-! Z doświadczenia wiem, że wielu użytkowników AFE Firmware zapomina dodawać ten fragment **&source=domoticz** do komendy sterującej. Nie dodanie tego elementu, może spowodować, że Domoticz + Urządzenie z AFE Firmware wpadnie w pętlę włączania / wyłączania się
+! Z doświadczenia wiem, że wielu użytkowników AFE Firmware zapomina dodawać ten fragment **&source=domoticz** do komendy sterującej. Jeśli ten fragment nie zostanie dodany do komendy sterującej, może to spowodować, że Domoticz + Urządzenie z AFE Firmware wpadnie w pętlę włączania / wyłączania się
 
 ![](domoticz-ustawianie-akcji-przekaznika.png)
+
+* W tym momencie zakończona została konfiguracja w Domoticz
+* W kolejnych krokach wpisane zostaną identyfikatory IDX w konfiguracji AFE Firmware
+* Otwieramy Panel Konfiguracyjny AFE Firmware
+* Otwieramy f[ormularz konfiguracyjny przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika), a następnie w polu IDX wprowadzamy identyfikator zapamiętany w poprzednich krokach
+
+![](afe-firmware-konfiguracja-przekaznik-domoticz.png)
+
+* Podobną czynność przeprowadzamy dla przycisku/włącznika, jeśli takowy dodaliśmy
+* Otwieramy [formularz konfiguracji przycisku/włącznika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przycisku-wlacznika), a następnie w polu IDX wprowadzamy identyfikator zapamiętany w poprzednich krokach
+
+---
+
+W tym momencie jeśli wszystko dobrze poszło, Domoticz i urządzenie z AFE Firmware powinny ze sobą współpracować.
+
+! Chcęc zwrócić uwagę, że Domoticz odświeża dane w przeglądarce w interwałach ok 8-9 sekundowych. Jeśli przekaźnik w urządzeniu z AFE Firmware zostanie przełączony ręcznie, to status w Domoticz, będzie odświeżony z maksymalnie 8-9 sekundowym opóźnieniem.
+

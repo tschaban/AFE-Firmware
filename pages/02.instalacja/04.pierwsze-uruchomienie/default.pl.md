@@ -13,11 +13,9 @@ media_order: 'afe-firmware-wyszukiwanie-wifi-afe-device.png,afe-firmware-konfigu
 
 ![](afe-firmware-wyszukiwanie-wifi-afe-device.png)
 
-* Po podłączaniu do sieci WiFI o nazwie AFE-Device powinna uruchomić się przeglądarka Internetowa (testowane na Windows oraz iOS), a następnie po chwili powinna uruchomić się automatycznie strona konfiguracyjna AFE Firmware
-
-!!!! Jeśli przeglądarka lub strona konfiguracyjna AFE Firmware nie uruchomi się automatycznie to otwórz przeglądarkę Internetową, a następnie otwórz stronę o adresie URL: http://192.168.5.1
-
-Strona konfiguracyjna otwarta podczas pierwszego uruchomienia urządzenia służy do wprowadzenia konfiguracji sieci WiFi. Wprowadzamy tutaj parametery sieci WiFi, która mamy w domu/biurze
+* Po podłączaniu do sieci WiFI o nazwie AFE-Device otwórz przeglądarkę Internetową, a następnie wprowadz adresie URL: http://192.168.5.1
+* Po chwili powinna uruchomić się strona konfiguracyjna połączenia do sieci WiFi
+*  Wprowadzamy tutaj parametery sieci WiFi, którą mamy w domu/biurze
 
 ![](afe-firmware-konfiguracja-wiifi-pierwsze-uruchomienie.png)
 
