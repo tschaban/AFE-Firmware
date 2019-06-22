@@ -11,21 +11,9 @@
 #include "WProgram.h"
 #endif
 
-struct PRO_VERSION_SERIAL_NUMBER {
-  char number[15];
-};
-
-struct PRO_VERSION_DEVICE_LIMITS {
-  uint8_t available;
-  uint8_t used;
-};
-
 struct PRO_VERSION {
-  PRO_VERSION_SERIAL_NUMBER serial;
-  PRO_VERSION_DEVICE_LIMITS limits;
+  char serial[19];
   boolean valid;
-  date lastCheck;
 };
-
 
 #endif

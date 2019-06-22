@@ -46,18 +46,8 @@ public:
   /* Method saves current device mode to EEPROM */
   void saveMode(uint8_t mode);
 
-  /* Method returns true if device is launched for a first time */
-  boolean isFirstTimeLaunch();
-
   /* Method sets the device to it's default state */
   void setDevice();
-
-  /* Is WiFi configured */
-  boolean isConfigured();
-
-#ifdef CONFIG_HARDWARE_SPIFFS
-  boolean checkConfiguration();
-#endif
 };
 
 #endif

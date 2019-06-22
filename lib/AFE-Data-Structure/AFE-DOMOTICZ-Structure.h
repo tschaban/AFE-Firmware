@@ -14,12 +14,16 @@
 #include <AFE-PROTOCOL-Structure.h>
 #include <IPAddress.h>
 
+struct DOMOTICZ_BASIC_CONFIG {
+  uint32_t idx;
+};
+
 struct DOMOTICZ {
   uint8_t protocol;
-  char host[40];
+  char host[41];
   uint16_t port;
-  char user[32];
-  char password[32];
+  char user[33];
+  char password[33];
 };
 
 #endif

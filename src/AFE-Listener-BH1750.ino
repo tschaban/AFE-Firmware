@@ -7,13 +7,13 @@ void mainBH1750Sensor() {
       /* Sensor: listener */
       BH1750Sensor.listener();
       if (BH1750Sensor.isReady()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
         float sensorData = BH1750Sensor.get();
         MQTTPublishLightLevel(sensorData);
         DomoticzPublishLightLevel(sensorData);
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }

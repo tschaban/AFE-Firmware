@@ -20,7 +20,7 @@ void mainPIR() {
       /* Code related to detecting motion */
       if (Pir[i].stateChanged()) {
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
 
@@ -52,7 +52,7 @@ void mainPIR() {
           }
         }
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }
@@ -60,13 +60,13 @@ void mainPIR() {
       /* Relay autoTurnOff code */
       if (Relay[Pir[i].configuration.relayId].autoTurnOff(
               Pir[i].configuration.invertRelayState)) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
         MQTTPublishRelayState(i);
         DomoticzPublishRelayState(Pir[i].configuration.relayId);
         Relay[Pir[i].configuration.relayId].clearTimer();
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }

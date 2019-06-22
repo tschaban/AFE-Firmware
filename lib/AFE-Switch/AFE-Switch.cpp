@@ -6,9 +6,9 @@
 
 AFESwitch::AFESwitch(){};
 
-AFESwitch::AFESwitch(uint8_t id) { begin(id); }
+// AFESwitch::AFESwitch(uint8_t id) { begin(id); }
 
-void AFESwitch::begin(uint8_t id) {
+void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
 #ifdef HARDWARE_SWITCH_GPIO_DIGIT_INPUT
@@ -18,9 +18,9 @@ void AFESwitch::begin(uint8_t id) {
 #endif
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0) {
+  if (systeLedID > 0 && _Device->configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
   }
 #endif
@@ -29,12 +29,23 @@ void AFESwitch::begin(uint8_t id) {
 
 boolean AFESwitch::getState() { return state; }
 
-boolean AFESwitch::isPressed() {
-  if (pressed) {
-    pressed = false;
-    return true;
+boolean AFESwitch::getPhisicalState() { return phisicallyState; }
+
+boolean AFESwitch::isPressed(boolean phisically) {
+  if (phisically) {
+    if (phisicallyPressed) {
+      phisicallyPressed = false;
+      return true;
+    } else {
+      return false;
+    }
   } else {
-    return false;
+    if (pressed) {
+      pressed = false;
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -86,20 +97,22 @@ void AFESwitch::listener() {
             state = !state;
             _pressed = true;
             pressed = true;
+            phisicallyPressed = true;
+            phisicallyState = currentState;
           }
 
           /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds
            */
-          if (SwitchConfiguration.functionality == SWITCH_MULTI) {
+          if (SwitchConfiguration.functionality == SWITCH_FUNCTIONALITY_MULTI) {
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
             if (time - startTime >= 35000) {
               Led.blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 3; i++) {
                 Led.blink(200);
                 delay(200);
@@ -109,7 +122,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 2; i++) {
                 Led.blink(200);
                 delay(200);
@@ -119,7 +132,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               Led.blink(200);
 #endif
               _pressed4fiveSeconds = true;
@@ -129,12 +142,17 @@ void AFESwitch::listener() {
           state = !state;
           previousState = currentState;
           pressed = true;
+          phisicallyPressed = true;
+          phisicallyState = currentState;
         }
       }
 
-    } else if (currentState == previousState && startTime > 0) {
+      //  Serial << endl << "press=" << pressed << " _press=" << _pressed;
+
+    } else if (currentState == previousState && startTime > 0 &&
+               SwitchConfiguration.type == SWITCH_TYPE_MONO) {
       /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds */
-      if (SwitchConfiguration.functionality == SWITCH_MULTI) {
+      if (SwitchConfiguration.functionality == SWITCH_FUNCTIONALITY_MULTI) {
 
         if (time - startTime >= 5000 && time - startTime < 10000) {
           pressed4fiveSeconds = true;
@@ -155,6 +173,9 @@ void AFESwitch::listener() {
 
       startTime = 0;
       _pressed = false;
+
+      phisicallyPressed = true;
+      phisicallyState = currentState;
     }
   }
 }
@@ -165,4 +186,17 @@ uint8_t AFESwitch::getFunctionality() {
 
 uint8_t AFESwitch::getControlledRelayID() {
   return SwitchConfiguration.relayID;
+}
+
+const char *AFESwitch::getMQTTStateTopic() {
+  if (strlen(SwitchConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", SwitchConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
+
+uint32_t AFESwitch::getDomoticzIDX() {
+  return SwitchConfiguration.domoticz.idx;
 }

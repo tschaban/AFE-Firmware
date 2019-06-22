@@ -35,12 +35,10 @@ private:
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
   boolean eventConnectionEstablished = false;
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   unsigned long ledStartTime = 0;
 #endif
 
-  /* Method pushes to the MQTT Broker MQTT Message */
-  void publishToMQTTBroker(const char *topic, const char *message);
   /* Connecting to MQTT Broker */
   void connect();
 
@@ -56,15 +54,14 @@ public:
       uint8_t duration_between_next_connection_attempts_series);
 
   void begin();
+  void subscribe(const char *);
 
-  /* Publishing MQTT Message. It calls private method publishToMQTTBroker */
-  void publish(const char *type, const char *message);
-  void publish(const char *type, float value, uint8_t width = 2,
-               uint8_t precision = 2);
-
-  /* Publishing MQTT Message to a specific MQTT Topic. It calls private method
-   * publish MQTT Broker */
-  void publish(const char *topic, const char *type, const char *message);
+  /* Publishes data to MQTT Broker */
+  void publishTopic(const char *subTopic, const char *message);
+  void publishTopic(const char *subTopic, const char *type,
+                    const char *message);
+  void publishTopic(const char *subTopic, const char *type, float value,
+                    uint8_t width = 2, uint8_t precision = 2);
 
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
    * default values */
@@ -75,6 +72,8 @@ public:
 
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
+
+  const char *getLWTTopic();
 };
 
 #endif

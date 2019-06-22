@@ -32,7 +32,9 @@ void mainSensor() {
     /* Sensor: listener */
     Sensor.listener();
     if (Sensor.isReady()) {
-#ifdef CONFIG_HARDWARE_LED
+      unsigned long idx = 0;
+
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       temperature = Sensor.getTemperature();
@@ -80,7 +82,14 @@ void mainSensor() {
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishTemperature(temperature);
-      DomoticzPublishTemperature(temperature);
+
+#if defined(T1_CONFIG)
+      idx = Sensor.getDomoticzIDX();
+#elif (defined(T2_CONFIG) || defined(T5_CONFIG))
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE);
+#endif
+
+      DomoticzPublishTemperature(idx, temperature);
 
 #ifdef CONFIG_HARDWARE_DHXX
       humidity = Sensor.getHumidity();
@@ -106,11 +115,17 @@ void mainSensor() {
         }
       }
 #endif
+
+#ifdef CONFIG_HUMIDITY
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
-      DomoticzPublishHumidity(humidity);
-      delay(10);
-      DomoticzPublishTemperatureAndHumidity(temperature, humidity);
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_HUMIDITY);
+      DomoticzPublishHumidity(idx, humidity);
+#endif
+
+#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY);
+      DomoticzPublishTemperatureAndHumidity(idx, temperature, humidity);
       if (Sensor.publishHeatIndex()) {
         MQTTPublishHeatIndex(Sensor.getHeatIndex());
       }
@@ -118,7 +133,10 @@ void mainSensor() {
         MQTTPublishDewPoint(Sensor.getDewPoint());
       }
 #endif
-#ifdef CONFIG_HARDWARE_LED
+
+#endif
+
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }

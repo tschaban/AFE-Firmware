@@ -4,13 +4,13 @@
 
 /* Method listens for HTTP Requests */
 void mainHTTPRequestsHandler() {
-  if (Device.configuration.httpAPI) {
+  if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
@@ -45,14 +45,14 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
   WebServer.sendJSON(respond);
 }
 
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, float value,
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
                               uint8_t width = 2, uint8_t precision = 2) {
   char valueString[10];
   dtostrf(value, width, precision, valueString);
   sendHTTPAPIRequestStatus(request, status, valueString);
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
@@ -103,7 +103,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
 
   /* Request related to gate */
   if (strcmp(request.device, "gate") == 0) {
@@ -139,7 +139,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     }
   }
 
-#else
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  // @TODO should it be included for T5????
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
@@ -233,7 +236,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_DS18B20
   /* Request related to ds18b20 */
-  else if (strcmp(request.device, "ds18b20") == 0) {
+  if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
         ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
         : sendHTTPAPIRequestStatus(request, false);
@@ -242,7 +245,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_DHXX
   /* Request related to DHT Sensor */
-  else if (strcmp(request.device, "dht") == 0) {
+  if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
       strcmp(request.command, "get") == 0
           ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
@@ -265,8 +268,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#if defined(T3_CONFIG)
-  else if (strcmp(request.device, "pir") == 0) {
+#ifdef CONFIG_HARDWARE_PIR
+  if (strcmp(request.device, "pir") == 0) {
     boolean pirSendFailure = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
       if (Device.configuration.isPIR[i]) {
@@ -286,7 +289,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
-  else if (strcmp(request.device, "HPMA115S0") == 0) {
+  if (strcmp(request.device, "HPMA115S0") == 0) {
     HPMA115S0_DATA sensorData;
     sensorData = ParticleSensor.get();
     if (strcmp(request.name, "PM2.5") == 0) {
@@ -303,45 +306,69 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef CONFIG_HARDWARE_BMX80
   /* BMx80 */
-  else if (strcmp(request.device, "BMx80") == 0) {
-    BMx80_DATA sensorData;
-    sensorData = BMx80Sensor.get();
-    if (strcmp(request.name, "temperature") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+  if (strcmp(request.device, "BMx80") == 0) {
+    if (strcmp(request.command, "get") == 0) {
+      BMx80_DATA sensorData;
+      sensorData = BMx80Sensor.get();
+      if (strcmp(request.name, "temperature") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      }
-    } else if (strcmp(request.name, "pressure") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (strcmp(request.name, "pressure") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-               strcmp(request.name, "humidity") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
+                 strcmp(request.name, "humidity") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-      }
-    } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
-               strcmp(request.name, "gasResistance") == 0) {
-      if (strcmp(request.command, "get") == 0) {
+      } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
+                 strcmp(request.name, "gasResistance") == 0) {
         sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
       }
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
     }
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_BH1750
   /* BH1750 */
-  else if (strcmp(request.device, "BH1750") == 0) {
+  if (strcmp(request.device, "BH1750") == 0) {
     if (strcmp(request.name, "lux") == 0) {
       if (strcmp(request.command, "get") == 0) {
         float lux = BH1750Sensor.get();
         sendHTTPAPIRequestStatus(request, true, lux);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
       }
     }
   }
 #endif
 
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  /* Analog Input */
+  if (strcmp(request.device, "ADC") == 0) {
+
+    if (strcmp(request.command, "get") == 0) {
+      ADCINPUT_DATA data;
+      if (strcmp(request.name, "raw") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.raw);
+      } else if (strcmp(request.name, "percent") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.percent);
+      } else if (strcmp(request.name, "voltage") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.voltage, 3, 6);
+      } else if (strcmp(request.name, "voltageCalculated") == 0) {
+        sendHTTPAPIRequestStatus(request, true, data.voltageCalculated, 3, 6);
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
+      }
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+  }
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
   /* Requests related to APIs */
-  else if (strcmp(request.device, "api") == 0) {
+  if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
         strcmp(request.name, "http") == 0
             ? API_HTTP
@@ -372,13 +399,21 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }
-  } else if (strcmp(request.command, "reboot") == 0) { // reboot
+  }
+#endif
+
+  if (strcmp(request.command, "reboot") == 0) { // reboot
     sendHTTPAPIRequestStatus(request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==
              0) { // configurationMode
-    sendHTTPAPIRequestStatus(request, true);
-    Device.reboot(MODE_CONFIGURATION);
+    PASSWORD password = Data.getPasswordConfiguration();
+    if (!password.protect) {
+      sendHTTPAPIRequestStatus(request, true);
+      Device.reboot(MODE_CONFIGURATION);
+    } else {
+      sendHTTPAPIRequestStatus(request, false);
+    }
     /* No such device or commend not implemented */
   } else {
     sendHTTPAPIRequestStatus(request, false);

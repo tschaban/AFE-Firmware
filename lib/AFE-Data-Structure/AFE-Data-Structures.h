@@ -15,19 +15,16 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
-
 #include <AFE-MQTT-Structure.h>
+
 #include <AFE-NETWORK-Structure.h>
+#include <AFE-PASSWORD-Structure.h>
+#include <AFE-PRO-VERSION-Structure.h>
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
-#include <AFE-PASSWORD-Structure.h>
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED-Structure.h>
-#endif
-
-#ifdef CONFIG_HARDWARE_ADC_VCC
-#include <AFE-ADC-INPUT-Structure.h>
 #endif
 
 #ifdef T1_CONFIG
@@ -48,7 +45,8 @@
 #endif
 
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
- * excluded. I assume they are used in Global context and that's the reason. */
+ * excluded */
+#include <AFE-ADC-INPUT-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMx80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>

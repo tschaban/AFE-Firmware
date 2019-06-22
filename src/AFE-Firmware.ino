@@ -26,11 +26,12 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-Device.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 AFELED Led;
 #endif
 
+#include <AFE-Firmware.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -61,6 +62,7 @@ float humidity;
 #endif
 
 AFEDataAccess Data;
+AFEFirmware Firmware;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
@@ -108,9 +110,7 @@ AFESensorHPMA115S0 ParticleSensor;
 AFEAnalogInput AnalogInput;
 #endif
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <FS.h>
-#endif
 
 void setup() {
 
@@ -131,87 +131,133 @@ void setup() {
          << "All classes and global variables initialized";
 #endif
 
-#ifdef CONFIG_HARDWARE_SPIFFS
   if (SPIFFS.begin()) {
 #ifdef DEBUG
     Serial << endl << "File system mounted";
-#endif
-    if (Device.checkConfiguration()) {
-#ifdef DEBUG
-      Serial << endl << "SPIFFS Configuration files: success";
-    } else {
-      Serial << endl << "SPIFFS Configuration files: ERROR";
-#endif
-    }
-#ifdef DEBUG
   } else {
     Serial << endl << "Failed to mount file system";
 #endif
   }
 
+#ifdef DEBUG
+  Serial << endl << "Initializing device";
 #endif
 
   Device.begin();
 
   /* Checking if the device is launched for a first time. If so it loades
    * default configuration to EEPROM */
-  if (Device.isFirstTimeLaunch()) {
+#ifdef DEBUG
+  Serial << endl
+         << "Checking if first time launch: Device.getMode()= "
+         << Device.getMode() << " : ";
+#endif
+
+  if (Device.getMode() == MODE_FIRST_TIME_LAUNCH) {
+#ifdef DEBUG
+    Serial << "YES";
+#endif
     Device.setDevice();
+    Device.begin();
+  }
 #ifdef DEBUG
-    Serial << endl << "First time launched";
+  else {
+    Serial << "NO";
+  }
+#endif
+
+#ifdef DEBUG
+  Serial << endl << "Checking, if WiFi should be configured: ";
+#endif
+
+  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
+#ifdef DEBUG
+    Serial << "YES";
+#endif
+  } else {
+
+    /* Checking if the firmware has been upgraded. Potentially runs post upgrade
+     * code */
+#ifdef DEBUG
+    Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
+#endif
+
+    AFEUpgrader *Upgrader = new AFEUpgrader();
+
+    if (Upgrader->upgraded()) {
+#ifdef DEBUG
+      Serial << endl << "Firmware is not up2date. Upgrading...";
+#endif
+      Upgrader->upgrade();
+#ifdef DEBUG
+      Serial << endl << "Firmware upgraded";
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << "Firmware is up2date";
+    }
+#endif
+    delete Upgrader;
+    Upgrader = NULL;
+
+    /* Initializing relay */
+    initRelay();
+
+#ifdef DEBUG
+    Serial << endl << "Relay(s) initialized";
 #endif
   }
-
-  /* Checking if the firmware has been upgraded. Potentially runs post upgrade
-   * code */
-  AFEUpgrader Upgrader;
-  if (Upgrader.upgraded()) {
-    Upgrader.upgrade();
-#ifdef DEBUG
-    Serial << endl << "Firmware upgraded";
-#endif
-  }
-  Upgrader = {};
-
-  /* Checking if WiFi is configured, if not then it runs configuration panel in
-   * access point mode */
-  if (Device.getMode() != MODE_ACCESS_POINT && !Device.isConfigured()) {
-#ifdef DEBUG
-    Serial << endl << "Going to configuration mode (HotSpot)";
-#endif
-    Device.reboot(MODE_ACCESS_POINT);
-  }
-
-  /* Initializing relay */
-  initRelay();
-#ifdef DEBUG
-  Serial << endl << "Relay(s) initialized";
-#endif
 
   /* Initialzing network */
-  Network.begin(Device.getMode());
+
+  Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
   Serial << endl << "Network initialized";
 #endif
 
   /* Initializing LED, checking if LED exists is made on Class level  */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0) {
+  delay(0);
+
+#ifdef DEBUG
+  Serial << endl << "System LED ID: " << systeLedID;
+  Serial << endl
+         << "Is system LED enabld : "
+         << (Device.configuration.isLED[systeLedID - 1] ? "YES" : "NO");
+#endif
+
+  if (systeLedID > 0 && Device.configuration.isLED[systeLedID - 1]) {
     Led.begin(systeLedID - 1);
   }
 
   /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == MODE_ACCESS_POINT) {
+  if (Device.getMode() == MODE_ACCESS_POINT ||
+      Device.getMode() == MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
+#ifdef DEBUG
+  Serial << endl << "System LED initialized";
+#endif
 #endif
 
+#ifdef DEBUG
+  Serial << endl << "Connecting to the network";
+#endif
   Network.listener();
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
-  WebServer.begin();
+  WebServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
+  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
+    WebServer.onNotFound(handleOnNotFound);
+  }
+
+  /* Initializing Firmware: version PRO */
+  Firmware.begin();
+
+  WebServer.begin(&Device, &Firmware);
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif
@@ -277,11 +323,7 @@ void setup() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    Serial << endl
-           << "Device.configuration.isAnalogInpu-"
-           << Device.configuration.isAnalogInput;
-
-    if (Device.configuration.isAnalogInput) {
+    if (Device.configuration.isAnalogInput && Firmware.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
@@ -308,7 +350,8 @@ void setup() {
 
 void loop() {
 
-  if (Device.getMode() != MODE_ACCESS_POINT) {
+  if (Device.getMode() == MODE_NORMAL ||
+      Device.getMode() == MODE_CONFIGURATION) {
     if (Network.connected()) {
       if (Device.getMode() == MODE_NORMAL) {
 
@@ -317,7 +360,7 @@ void loop() {
 
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
-        if (Device.configuration.mqttAPI) {
+        if (Device.configuration.api.mqtt) {
           Mqtt.listener();
         }
 
@@ -369,8 +412,11 @@ void loop() {
         mainPIR();
 #endif
 
+        /* Checking if Key is still valid */
+        Firmware.listener();
+
       } else { /* Device runs in configuration mode over WiFi */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -379,7 +425,7 @@ void loop() {
       }
     }
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     else {
       if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -388,7 +434,6 @@ void loop() {
 #endif
     Network.listener();
   } else { /* Deviced runs in Access Point mode */
-    Network.APListener();
     WebServer.listener();
   }
 
@@ -397,7 +442,7 @@ void loop() {
   mainSwitch();
 
   /* Led listener */
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   Led.loop();
 #endif
 

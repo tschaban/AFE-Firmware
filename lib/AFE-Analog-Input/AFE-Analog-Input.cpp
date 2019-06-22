@@ -15,10 +15,13 @@ void AFEAnalogInput::begin() {
   Serial << endl << endl << "------------ AC VCC Input ------------";
   Serial << endl
          << "- Initialized" << endl
-         << "- GPIO: " << configuration.gpio
-         << ", Interval: " << configuration.interval
-         << ", No of Samples: " << configuration.numberOfSamples;
-  Serial << endl << "-------------------------------------";
+         << "- GPIO: " << configuration.gpio << endl
+         << "- Interval: " << configuration.interval << endl
+         << "- Max VCC: " << configuration.maxVCC << endl
+         << "- No of Samples: " << configuration.numberOfSamples << endl
+         << "- R[A]: " << configuration.divider.Ra << endl
+         << "- R[B]: " << configuration.divider.Rb << endl
+         << "-------------------------------------";
 
 #endif
 }
@@ -27,7 +30,14 @@ ADCINPUT_DATA AFEAnalogInput::get() {
   ADCINPUT_DATA data;
   data.raw = analogData;
   data.percent = (float)analogData * 100 / 1024;
-  data.voltage = (double)analogData / 1024;
+  data.voltage = (double)(configuration.maxVCC * analogData / 1024);
+  if (configuration.divider.Rb > 0) {
+    data.voltageCalculated =
+        (data.voltage * (configuration.divider.Ra + configuration.divider.Rb)) /
+        configuration.divider.Rb;
+  } else {
+    data.voltageCalculated = data.voltage;
+  }
   return data;
 }
 
@@ -56,7 +66,7 @@ void AFEAnalogInput::listener() {
       } else {
 
         analogData =
-            (uint16_t)temporaryAnalogData / configuration.numberOfSamples;
+            (uint16_t)(temporaryAnalogData / configuration.numberOfSamples);
 
 #ifdef DEBUG
         Serial << endl
@@ -81,5 +91,18 @@ void AFEAnalogInput::listener() {
 }
 
 void AFEAnalogInput::getDomoticzIDX(ADCINPUT_DOMOTICZ *idx) {
-  *idx = configuration.idx;
+  *idx = configuration.domoticz;
+}
+
+/* Method returns MQTT topic for this relay */
+const char *AFEAnalogInput::getMQTTCommandTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+const char *AFEAnalogInput::getMQTTStateTopic() {
+  return configuration.mqtt.topic;
 }

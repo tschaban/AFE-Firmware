@@ -1,18 +1,18 @@
 #ifdef CONFIG_HARDWARE_ADC_VCC
 
-/* Main code for processing sesnor */
+/* Main code for analog input listener */
 void analogInputListner() {
   {
     if (Device.configuration.isAnalogInput) {
-      /* Sensor: listener */
       AnalogInput.listener();
       if (AnalogInput.isReady()) {
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
-        // MQTTPublishLightLevel(sensorData);
-        DomoticzPublishAnalogInputData(AnalogInput.get());
-#ifdef CONFIG_HARDWARE_LED
+        ADCINPUT_DATA data = AnalogInput.get();
+        MQTTPublishAnalogInputData(data);
+        DomoticzPublishAnalogInputData(data);
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }

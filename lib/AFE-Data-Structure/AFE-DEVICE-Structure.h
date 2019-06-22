@@ -11,31 +11,25 @@
 #include "WProgram.h"
 #endif
 
-#define MODE_NORMAL 0
-#define MODE_CONFIGURATION 1
-#define MODE_ACCESS_POINT 2
+#include <AFE-Configuration.h>
 
-#define API_HTTP 0
-#define API_MQTT 1
-#define API_DOMOTICZ 2
+struct DEVICE_API {
+  boolean mqtt;
+  boolean http;
+  boolean domoticz;
+};
 
 /* Custom DEVICE structure definition */
 struct DEVICE {
-  char name[32];
-  boolean mqttAPI;
-  boolean httpAPI;
-  boolean domoticzAPI;
+  char name[33];
+  DEVICE_API api;
 #if defined(T0_CONFIG)
-  boolean isLED[2];
-  boolean isSwitch[2];
-  boolean isRelay[1];
+  boolean isLED[CONFIG_HARDWARE_NUMBER_OF_LEDS];
+  boolean isSwitch[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+  boolean isRelay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #ifdef CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
-#elif defined(T0_SHELLY_1_CONFIG)
-  boolean isLED[0];
-  boolean isSwitch[1];
-  boolean isRelay[1];
 #elif defined(T1_CONFIG)
   boolean isLED[2];
   boolean isRelay[1];

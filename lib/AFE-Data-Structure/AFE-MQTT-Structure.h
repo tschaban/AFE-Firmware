@@ -11,15 +11,19 @@
 #include "WProgram.h"
 #endif
 
-#include <IPAddress.h>
+#include <AFE-Configuration.h>
+
+struct MQTT_BASIC_CONFIG {
+  char topic[65];
+};
 
 struct MQTT {
-  char host[32];
-  IPAddress ip;
+  char host[33];
+  char ip[16];
   uint16_t port;
-  char user[32];
-  char password[32];
-  char topic[32];
+  char user[33];
+  char password[33];
+  MQTT_BASIC_CONFIG lwt;
 };
 
 #endif

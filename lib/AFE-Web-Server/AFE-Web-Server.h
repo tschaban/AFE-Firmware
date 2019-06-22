@@ -11,39 +11,55 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Configuration-Panel.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-OTA.h>
+#include <AFE-Firmware.h>
+#include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
+#include <WiFiUdp.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
+struct AFE_SITE_PARAMETERS {
+  uint8_t ID;
+  boolean twoColumns = true;
+  int8_t deviceID = -1;
+  boolean reboot = false;
+  uint8_t rebootMode = 0;
+  uint8_t rebootTime = 0;
+  boolean form = true;
+  boolean formButton = true;
+};
+
 class AFEWebServer {
 
 private:
   ESP8266WebServer server;
-  AFEConfigurationPanel ConfigurationPanel;
-  ESP8266HTTPUpdateServer httpUpdater; // Class used for firmware upgrade
-  AFEDevice Device;
-  HTTPCOMMAND httpCommand; // It stores last HTTP API request
-  boolean receivedHTTPCommand =
-      false; // Once HTTP API requet is recieved it's set to true
+  AFEDevice *Device;
+  AFEFirmware *Firmware;
+  // It stores last HTTP API request
+  HTTPCOMMAND httpCommand;
+  // Once HTTP API requet is recieved it's set to true
+  boolean receivedHTTPCommand = false;
 
-  boolean _refreshConfiguration = false; // when it's set to true device
-                                         // configuration is refreshed. Required
-                                         // by generate() method
+  /* when it's set to true device configuration is refreshed. Required by
+   * generate() method */
+  boolean _refreshConfiguration = false;
 
-  /* Method pushes HTML site from WebServer */
-  void publishHTML(String page);
+  AFEDataAccess Data;
+  AFESitesGenerator Site;
+
+  boolean upgradeFailed = false;
 
   /* Method gets url Option parameter value */
-  String getOptionName();
-
-  /* Method gets url cmd parameter value */
+  boolean getOptionName();
   uint8_t getCommand();
+  uint8_t getSiteID();
+  uint8_t getID();
+
+  String generateSite(AFE_SITE_PARAMETERS *siteConfig);
 
   /* Methods get POST data (for saveing) */
   DEVICE getDeviceData();
@@ -52,8 +68,10 @@ private:
   DOMOTICZ getDomoticzServerData();
   RELAY getRelayData(uint8_t id);
   SWITCH getSwitchData(uint8_t id);
+  PASSWORD getPasswordData();
+  PRO_VERSION getSerialNumberData();
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
@@ -99,23 +117,30 @@ private:
   ADCINPUT getAnalogInputData();
 #endif
 
-  uint8_t getLanguageData();
-
 public:
   AFEWebServer();
 
+  /* Method pushes HTML site from WebServer */
+  void publishHTML(String page);
+
   /* Method initialize WebServer and Updater server */
-  void begin();
+  void begin(AFEDevice *, AFEFirmware *);
 
   /* Method listens for HTTP requests */
   void listener();
 
+  /* Method listens for onNotFound */
+  void onNotFound(ESP8266WebServer::THandlerFunction fn);
+
   /* Method adds URL for listen */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
+  void handleFirmwareUpgrade(const char *uri,
+                             ESP8266WebServer::THandlerFunction handlerUpgrade,
+                             ESP8266WebServer::THandlerFunction handlerUpload);
 
   /* Method generate HTML side. It reads also data from HTTP requests arguments
    * and pass them to Configuration Panel class */
-  void generate();
+  void generate(boolean upload = false);
 
   /* Method listens for HTTP API requests. If get True command is in httpCommand
    */

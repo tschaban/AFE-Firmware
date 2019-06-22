@@ -14,7 +14,11 @@
 #define SWITCH_TYPE_MONO 0 // Mono stable switch
 #define SWITCH_TYPE_BI 1   // Bistable switch
 
-#define SWITCH_MULTI 0
+#define SWITCH_FUNCTIONALITY_NONE 0
+#define SWITCH_FUNCTIONALITY_MULTI 1
+#define SWITCH_FUNCTIONALITY_RELAY 2
+
+#define SWITCH_SENSITIVENESS 50
 
 struct SWITCH {
   uint8_t gpio;
@@ -22,6 +26,8 @@ struct SWITCH {
   uint16_t sensitiveness;
   uint8_t functionality;
   uint8_t relayID;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

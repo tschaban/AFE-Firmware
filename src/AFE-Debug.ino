@@ -1,6 +1,6 @@
 #if defined(DEBUG)
 
-#define DEBUG_INTERVAL 10
+#define DEBUG_INTERVAL 60
 unsigned long debugStartTime = 0;
 
 void debugListener() {

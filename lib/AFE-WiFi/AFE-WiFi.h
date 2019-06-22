@@ -14,11 +14,10 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 #endif
 
-#include <DNSServer.h>
 #include <ESP8266WiFi.h>
 #ifdef DEBUG
 #include <Streaming.h>
@@ -26,10 +25,12 @@
 class AFEWiFi {
 
 private:
+  AFEDevice *Device;
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
+  uint8_t WiFiMode;
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   unsigned long ledStartTime = 0;
 #endif
 
@@ -37,9 +38,7 @@ private:
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
-  DNSServer dnsServer;
-
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
 
@@ -52,7 +51,7 @@ public:
 
   /* Sets connection parameters and host name. Must be invoked before connect
    * method */
-  void begin(uint8_t mode);
+  void begin(uint8_t mode, AFEDevice *);
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
@@ -60,9 +59,6 @@ public:
   /* Returns true if device just connected to the network. It's set to true each
    * time it connected. */
   boolean eventConnected();
-
-  /* Method listens for HTTP request while device is in Access Point mode */
-  void APListener();
 
   /* Method checks if device is connected to WiFi - if it's not then it connects
    * to it */

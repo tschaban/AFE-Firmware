@@ -12,7 +12,8 @@
 #endif
 
 struct PASSWORD {
-  char password[8];
+  boolean protect;
+  char password[10];
 };
 
 #endif

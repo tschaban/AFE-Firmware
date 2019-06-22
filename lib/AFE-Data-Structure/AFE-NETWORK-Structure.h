@@ -11,15 +11,13 @@
 #include "WProgram.h"
 #endif
 
-#include <IPAddress.h>
-
 struct NETWORK {
-  char ssid[32];
-  char password[32];
+  char ssid[33];
+  char password[33];
   uint8_t isDHCP;
-  IPAddress ip;
-  IPAddress gateway;
-  IPAddress subnet;
+  char ip[16];
+  char gateway[16];
+  char subnet[16];
   uint8_t noConnectionAttempts;
   uint8_t waitTimeConnections;
   uint8_t waitTimeSeries;

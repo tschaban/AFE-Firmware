@@ -9,8 +9,8 @@ void eventsListener() {
            << "Events listener: triggered";
 #endif
     /* Update relay status to Domoticz */
-    if (Device.configuration.domoticzAPI) {
-#ifdef CONFIG_HARDWARE_LED
+    if (Device.configuration.api.domoticz) {
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
 
@@ -45,18 +45,20 @@ void eventsListener() {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
   } /* End of Network.eventConnected() */
 
-  if (Device.configuration.mqttAPI) {
+  if (Device.configuration.api.mqtt) {
     if (Mqtt.eventConnected()) {
 #ifdef DEBUG
       Serial << endl
              << "Connected to MQTT Server: triggering post connection updates";
 #endif
+
+/* Subsribing to MQTT Topics */
 
 /* Publishing mesages after connection to MQTT Broker has been established */
 #if defined(T5_CONFIG)
@@ -70,14 +72,19 @@ void eventsListener() {
         }
       }
 #else
-      Mqtt.publish(MQTTConfiguration.topic, "state", "connected");
+
+      Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
 
       /* Setting Relay state after connection to MQTT */
       for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
         if (Device.configuration.isRelay[i]) {
+
+          /* Subscribing to MQTT Topic for Relay*/
+          Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
+
           if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
             /* Requesting state from MQTT Broker / service */
-            Mqtt.publish(Relay[i].getMQTTTopic(), "get", "defaultState");
+            Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
           } else {
             /* Updating relay state after setting default value after MQTT
              * connected */
@@ -87,6 +94,20 @@ void eventsListener() {
           break;
         }
       }
+
+      /* Publishing state of Switch to MQTT */
+      for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+        if (Device.configuration.isSwitch[i]) {
+          MQTTPublishSwitchState(i);
+        }
+      }
+
+/* Subscribing to MQTT ADC commands */
+#ifdef CONFIG_HARDWARE_ADC_VCC
+      if (Device.configuration.isAnalogInput) {
+        Mqtt.subscribe(AnalogInput.getMQTTCommandTopic());
+      }
+#endif
 
 #if defined(T3_CONFIG)
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {

@@ -12,22 +12,32 @@
 #endif
 
 struct ADCINPUT_DOMOTICZ {
-  unsigned long raw;
-  unsigned long percent;
-  unsigned long voltage;
+  uint32_t raw;
+  uint32_t percent;
+  uint32_t voltage;
+  uint32_t voltageCalculated;
 };
 
 struct ADCINPUT_DATA {
   uint16_t raw;
   float percent;
   double voltage;
+  double voltageCalculated;
+};
+
+struct VOLTAGE_DIVIDER {
+  double Ra;
+  double Rb;
 };
 
 struct ADCINPUT {
   uint8_t gpio;
-  uint16_t interval;
-  uint8_t numberOfSamples;
-  ADCINPUT_DOMOTICZ idx;
+  uint32_t interval;
+  uint16_t numberOfSamples;
+  double maxVCC;
+  MQTT_BASIC_CONFIG mqtt;
+  ADCINPUT_DOMOTICZ domoticz;
+  VOLTAGE_DIVIDER divider;
 };
 
 #endif

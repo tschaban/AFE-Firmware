@@ -14,12 +14,6 @@ void AFERelay::begin(uint8_t id) {
 
   pinMode(RelayConfiguration.gpio, OUTPUT);
 
-#if !defined(T5_CONFIG) // Not required for T5
-  MQTT MQTTConfiguration;
-  MQTTConfiguration = Data.getMQTTConfiguration();
-  sprintf(mqttTopic, "%s%s/", MQTTConfiguration.topic, RelayConfiguration.name);
-#endif
-
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
   /* Initialzing Thermostat functionality for a relay */
   Thermostat.begin(RelayConfiguration.thermostat);
@@ -34,14 +28,30 @@ void AFERelay::begin(uint8_t id) {
   Humidistat.begin(RelayConfiguration.humidistat);
 #endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   if (RelayConfiguration.ledID > 0) {
     Led.begin(RelayConfiguration.ledID - 1);
   }
 #endif
 }
 
-const char *AFERelay::getMQTTTopic() { return RelayConfiguration.mqttTopic; }
+const char *AFERelay::getMQTTCommandTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFERelay::getMQTTStateTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
 
 byte AFERelay::get() {
   return digitalRead(RelayConfiguration.gpio) == HIGH ? RELAY_ON : RELAY_OFF;
@@ -51,7 +61,7 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
   if (get() == RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.on();
 #endif
     if (!invert &&
@@ -69,7 +79,7 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
   if (get() == RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.off();
 #endif
     if (invert &&
@@ -92,17 +102,17 @@ void AFERelay::toggle() {
   }
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 void AFERelay::setRelayAfterRestoringPower() {
-  setRelayAfterRestore(RelayConfiguration.statePowerOn);
+  setRelayAfterRestore(RelayConfiguration.state.powerOn);
 }
 
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
-  if (RelayConfiguration.stateMQTTConnected ==
+  if (RelayConfiguration.state.MQTTConnected ==
       5) { // request state from MQTT Broker
     return false;
   } else {
-    setRelayAfterRestore(RelayConfiguration.stateMQTTConnected);
+    setRelayAfterRestore(RelayConfiguration.state.MQTTConnected);
     return true;
   }
 }
@@ -121,6 +131,7 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 }
 #endif
 
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
 
   if (RelayConfiguration.timeToOff > 0 &&
@@ -134,11 +145,13 @@ boolean AFERelay::autoTurnOff(boolean invert) {
     return false;
   }
 }
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 const char *AFERelay::getName() { return RelayConfiguration.name; }
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
   if (RelayConfiguration.timeToOff > 0) {
     turnOffCounter = millis();
@@ -146,17 +159,24 @@ void AFERelay::setTimer(float timer) {
     RelayConfiguration.timeToOff = timer;
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_PIR
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
+#endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
-unsigned long AFERelay::getDomoticzIDX() { return RelayConfiguration.idx; }
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+unsigned long AFERelay::getDomoticzIDX() {
+  return RelayConfiguration.domoticz.idx;
+}
 #endif

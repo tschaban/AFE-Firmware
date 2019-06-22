@@ -20,9 +20,9 @@
 
 struct PIR {
   uint8_t gpio;
-  char name[16];
+  char name[17];
   boolean state;
-  char mqttTopic[49];
+  char mqttTopic[50];
   uint8_t ledId;
   uint8_t relayId;
   uint16_t howLongKeepRelayOn;

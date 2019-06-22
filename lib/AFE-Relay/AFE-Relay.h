@@ -13,7 +13,7 @@
 
 #include <AFE-Data-Access.h>
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 #endif
 
@@ -40,18 +40,21 @@ private:
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
 
-#ifdef CONFIG_HARDWARE_LED
+  char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
+
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
 
-  char mqttTopic[50];
-
   unsigned long turnOffCounter = 0;
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
   boolean timerUnitInSeconds = true;
+#endif
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   void setRelayAfterRestore(uint8_t option);
 #endif
 
@@ -76,9 +79,10 @@ public:
   void begin(uint8_t id);
 
   /* Method returns MQTT topic for this relay */
-  const char *getMQTTTopic();
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
   void setRelayAfterRestoringPower();
@@ -101,31 +105,38 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-  /* Methodswhile added to main loop turns off relay automatically. Duration
-   * how long relay should be on must be configured */
+#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
+  /* Methods automatically turns off/on relay */
   boolean autoTurnOff(boolean invert = false);
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Methods returns relay name */
   const char *getName();
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
+#endif
 
+#ifdef CONFIG_HARDWARE_PIR
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
+#endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
+#endif
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
 #endif

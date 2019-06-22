@@ -13,12 +13,11 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
-#include <AFE-EEPROM.h>
+#include <ESP8266WiFi.h>
+#include <IPAddress.h>
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <ArduinoJson.h>
 #include <FS.h>
-#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -26,62 +25,82 @@
 
 class AFEDataAccess {
 private:
-  AFEEEPROM Eeprom;
+  // AFEEEPROM Eeprom;
+  IPAddress IPfromString(const char *address);
 
 public:
   AFEDataAccess();
 
+  boolean formatFileSystem();
+
+  const String getDeviceUID();
+  void saveDeviceUID(const char *);
+  void createDeviceUIDFile();
+
   DEVICE getDeviceConfiguration();
   void saveConfiguration(DEVICE configuration);
+  void createDeviceConfigurationFile();
 
   FIRMWARE getFirmwareConfiguration();
   void saveConfiguration(FIRMWARE configuration);
+  void createFirmwareConfigurationFile();
 
   NETWORK getNetworkConfiguration();
   void saveConfiguration(NETWORK configuration);
+  void createNetworkConfigurationFile();
 
   MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
+  void createMQTTConfigurationFile();
 
   DOMOTICZ getDomoticzConfiguration();
   void saveConfiguration(DOMOTICZ configuration);
+  void createDomoticzConfigurationFile();
 
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
+  void createRelayConfigurationFile();
 
-#if !defined(T5_CONFIG)
-  /* Methods reads and saves relay state from/to EEPROM */
+#ifdef CONFIG_FUNCTIONALITY_RELAY
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
+  void createRelayStateFile();
 #endif
 
   SWITCH getSwitchConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, SWITCH configuration);
+  void createSwitchConfigurationFile();
 
   /* Methods saves firmware version from/to EEPROM */
-  void saveVersion(String version);
+  void saveVersion(const char *);
 
   /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
-  /* Methods read and save firmware Language from/to EEPROM */
-  uint8_t getLanguage();
-  void saveLanguage(uint8_t language);
+  PRO_VERSION getProVersionConfiguration();
+  void saveConfiguration(PRO_VERSION configuration);
+  void createProVersionConfigurationFile();
 
-  /* Methods saves and reads device ID */
-  const String getDeviceID();
-  void saveDeviceID(String id);
+  PASSWORD getPasswordConfiguration();
+  void saveConfiguration(PASSWORD configuration);
+  void createPasswordConfigurationFile();
 
-  /* Methods turns on / off APIs */
-  void saveAPI(uint8_t apiID, boolean state);
+  /* ADC Inout create/read/write methods */
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  ADCINPUT getADCInputConfiguration();
+  void saveConfiguration(ADCINPUT configuration);
+  void createADCInputConfigurationFile();
+#endif
 
-#ifdef CONFIG_HARDWARE_LED
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
+  void createLEDConfigurationFile();
   /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
+  void createSystemLedIDConfigurationFile();
 #endif
 
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -138,9 +157,9 @@ public:
   void saveConfiguration(BH1750 configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-  ADCINPUT getADCInputConfiguration();
-  void saveConfiguration(ADCINPUT configuration);
+/* Methods turns on / off APIs */
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+  void saveAPI(uint8_t apiID, boolean state);
 #endif
 };
 #endif

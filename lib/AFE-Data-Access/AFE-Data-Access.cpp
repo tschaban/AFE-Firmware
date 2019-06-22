@@ -6,159 +6,24 @@
 
 AFEDataAccess::AFEDataAccess() {}
 
-/* DEVICE Read / Save */
-
-DEVICE AFEDataAccess::getDeviceConfiguration() {
-  DEVICE configuration;
-
-  Eeprom.read(9, 16).toCharArray(configuration.name,
-                                 sizeof(configuration.name));
-
-  /* APIs for all the version */
-  configuration.httpAPI = Eeprom.read(25);
-  configuration.mqttAPI = Eeprom.read(228);
-  configuration.domoticzAPI = Eeprom.read(800);
-
-/* T0: Leds and 2nd switches */
-#if defined(T0_CONFIG)
-  configuration.isLED[0] = Eeprom.read(366);
-  configuration.isLED[1] = Eeprom.read(418);
-  configuration.isSwitch[1] = Eeprom.read(402);
+boolean AFEDataAccess::formatFileSystem() {
+#ifdef DEBUG
+  Serial << endl << endl << "Formatig File System";
 #endif
+  return SPIFFS.format();
+}
 
-/* T0, Shelly-1, T5: Relay and first switch */
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.isRelay[0] = Eeprom.read(369);
-  configuration.isSwitch[0] = Eeprom.read(395);
-#endif
-
-/* T1,T2,T4,T5, T6: Led */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) ||          \
-    defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-
-#if defined(T1_CONFIG)
-  uint8_t index = 77;
-#elif defined(T2_CONFIG)
-  uint8_t index = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
-    defined(T6_CONFIG)
-  uint8_t index = 3;
-#endif
-
-  for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
-    configuration.isLED[i] = Eeprom.read(366 + i * index);
-  }
-#endif
-
-/* T1: Relay, Switch, isDS18b20 */
-#if defined(T1_CONFIG)
-  index = 40;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    configuration.isRelay[i] = Eeprom.read(396 + i * index);
-  }
-
-  index = 7;
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(382 + i * index);
-  }
-#endif
-
-/* T2: Relay, Switch */
-#if defined(T2_CONFIG)
-  index = 0;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    configuration.isRelay[i] = Eeprom.read(404 + i * index);
-  }
-
-  index = 7;
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(390 + i * index);
-  }
-#endif
-
-/* T3: Relay, Switch, PIR */
-#if defined(T3_CONFIG)
-  index = 21;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    configuration.isRelay[i] = Eeprom.read(381 + i * index);
-  }
-
-  index = 7;
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(470 + i * index);
-  }
-
-  index = 27;
-  for (uint8_t i = 0; i < sizeof(configuration.isPIR); i++) {
-    configuration.isPIR[i] = Eeprom.read(505 + i * index);
-  }
-#endif
-
-/* T4: Relay, Switch */
-#if defined(T4_CONFIG)
-  index = 27;
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-    configuration.isRelay[i] = Eeprom.read(382 + i * index);
-  }
-
-  index = 8;
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(490 + i * index);
-  }
-#endif
-
-/* T5: Relay, Switch, Contactron */
-#if defined(T5_CONFIG)
-  index = 8;
-
-  configuration.isRelay[0] = true; // Relay must be present - hardcoded
-
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(398 + i * index);
-  }
-
-  index = 24;
-  for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-    configuration.isContactron[i] = Eeprom.read(414 + i * index);
-  }
-#endif
-
-/* T6: Relay, Switch, HPMA115S0 */
-#if defined(T6_CONFIG)
-  configuration.isRelay[0] = Eeprom.read(373);
-
-  index = 8;
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-    configuration.isSwitch[i] = Eeprom.read(395 + i * index);
-  }
-
-  configuration.isHPMA115S0 = Eeprom.read(413);
-  configuration.isBMx80 = Eeprom.readUInt8(422);
-  configuration.isBH1750 = Eeprom.read(429);
-
-#endif
-
-/* T1,T2,T3: Sensors */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
-#if defined(T1_CONFIG)
-  configuration.isDS18B20 = Eeprom.read(369);
-#elif defined(T2_CONFIG)
-  configuration.isDHT = Eeprom.read(369);
-#else
-  configuration.isDHT = Eeprom.read(376);
-#endif
-#endif
-
-#ifdef CONFIG_HARDWARE_ADC_VCC
+const String AFEDataAccess::getDeviceUID() {
+  String uid;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-device.json : ";
+  Serial << endl << "Opening file: cfg-device-uid.json : ";
 #endif
 
-  File configFile = SPIFFS.open("/cfg-device.json", "r");
+  File configFile = SPIFFS.open("cfg-device-uid.json", "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -168,16 +33,122 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &json = jsonBuffer.parseObject(buf.get());
-    if (json.success()) {
+
+    StaticJsonBuffer<30> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
 #ifdef DEBUG
-      json.printTo(Serial);
-      Serial << endl;
+      root.printTo(Serial);
 #endif
-      configuration.isAnalogInput = json["isAnalogInput"] == 1 ? true : false;
+      uid = root.get<char *>("uid");
 #ifdef DEBUG
-      Serial << "success";
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+  return uid;
+}
+void AFEDataAccess::saveDeviceUID(const char *uid) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-device-uid.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-device-uid.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<30> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["uid"] = uid;
+    root.printTo(configFile);
+
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createDeviceUIDFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-device-uid.json";
+#endif
+
+  byte m[6];
+  char uid[18];
+  WiFi.macAddress(m);
+  sprintf(uid, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
+          m[2]);
+  saveDeviceUID(uid);
+}
+
+PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
+  PRO_VERSION configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-pro-version.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-pro-version.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration.valid = root["valid"];
+      sprintf(configuration.serial, root["serial"]);
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
 #endif
     }
 
@@ -197,114 +168,372 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   Serial << endl << "--------------------------------------------------";
 #endif
 
+  return configuration;
+}
+void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-pro-version.json : ";
+#endif
+  File configFile = SPIFFS.open("cfg-pro-version.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<69> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["valid"] = configuration.valid;
+    root["serial"] = configuration.serial;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createProVersionConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-pro-version.json";
+#endif
+  PRO_VERSION ProConfiguration;
+  ProConfiguration.serial[0] = '\0';
+  ProConfiguration.valid = false;
+  saveConfiguration(ProConfiguration);
+}
+
+PASSWORD AFEDataAccess::getPasswordConfiguration() {
+  PASSWORD configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-password.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-password.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration.protect = root["protect"];
+      sprintf(configuration.password, root["password"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
 #endif
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(DEVICE configuration) {
-  uint8_t index;
-  Eeprom.write(9, 16, configuration.name);
-
-/* Relay */
-#if defined(T3_CONFIG)
-  index = 21;
-#elif defined(T4_CONFIG)
-  index = 27;
+void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-password.json : ";
 #endif
 
-  for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T5_CONFIG)
-    Eeprom.write(369, configuration.isRelay[i]);
-#elif defined(T1_CONFIG)
-    Eeprom.write(396, configuration.isRelay[i]);
-#elif defined(T2_CONFIG)
-    Eeprom.write(404, configuration.isRelay[i]);
-#elif defined(T3_CONFIG)
-    Eeprom.write(381 + i * index, configuration.isRelay[i]);
-#elif defined(T4_CONFIG)
-    Eeprom.write(382 + i * index, configuration.isRelay[i]);
-#elif defined(T6_CONFIG)
-    Eeprom.write(373, configuration.isRelay[i]);
+  File configFile = SPIFFS.open("cfg-password.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
 #endif
+
+    StaticJsonBuffer<59> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["protect"] = configuration.protect;
+    root["password"] = configuration.password;
+    root.printTo(configFile);
+
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
   }
-
-/* Switches */
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
-  index = 7;
-#elif defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-  index = 8;
-#endif
-
-  for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-    Eeprom.write(395 + i * index, configuration.isSwitch[i]);
-#elif defined(T1_CONFIG)
-    Eeprom.write(382 + i * index, configuration.isSwitch[i]);
-#elif defined(T2_CONFIG)
-    Eeprom.write(390 + i * index, configuration.isSwitch[i]);
-#elif defined(T3_CONFIG)
-    Eeprom.write(470 + i * index, configuration.isSwitch[i]);
-#elif defined(T4_CONFIG)
-    Eeprom.write(490 + i * index, configuration.isSwitch[i]);
-#elif defined(T5_CONFIG)
-    Eeprom.write(398 + i * index, configuration.isSwitch[i]);
-#endif
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
   }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createPasswordConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-password.json";
+#endif
+  PASSWORD PasswordConfiguration;
+  PasswordConfiguration.protect = false;
+  PasswordConfiguration.password[0] = '\0';
+  saveConfiguration(PasswordConfiguration);
+}
 
-  /* LEDs */
-#ifdef CONFIG_HARDWARE_LED
-
-#if defined(T0_CONFIG)
-  index = 52;
-#elif defined(T1_CONFIG)
-  index = 77;
-#elif defined(T2_CONFIG)
-  index = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
-    defined(T6_CONFIG)
-  index = 3;
+DEVICE AFEDataAccess::getDeviceConfiguration() {
+  DEVICE configuration;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-device.json : ";
 #endif
 
-  for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
-    Eeprom.write(366 + i * index, configuration.isLED[i]);
-  }
+  File configFile = SPIFFS.open("cfg-device.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
 #endif
 
-  /* APIs */
-  saveAPI(API_MQTT, configuration.mqttAPI);
-  saveAPI(API_HTTP, configuration.httpAPI);
-  saveAPI(API_DOMOTICZ, configuration.domoticzAPI);
-
-  /* Sensors */
-#if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
-#if defined(T1_CONFIG)
-  Eeprom.write(369, configuration.isDS18B20);
-#elif defined(T2_CONFIG)
-  Eeprom.write(369, configuration.isDHT);
-#else
-
-  Eeprom.write(376, configuration.isDHT);
-  index = 24;
-  for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-    Eeprom.write(414 + i * index, configuration.isContactron[i]);
-  }
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<400> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
 #endif
-#endif
+      sprintf(configuration.name, root["name"]);
+      configuration.api.http = root["api"]["http"];
+      configuration.api.mqtt = root["api"]["mqtt"];
+      configuration.api.domoticz = root["api"]["domoticz"];
 
-#if defined(T3_CONFIG)
-  index = 27;
-  for (uint8_t i = 0; i < sizeof(configuration.isPIR); i++) {
-    Eeprom.write(505 + i * index, configuration.isPIR[i]);
-  }
-#endif
+      for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+        configuration.isLED[i] = root["led"][i];
+      }
 
-#if defined(T6_CONFIG)
-  Eeprom.write(413, configuration.isHPMA115S0);
-  Eeprom.writeUInt8(422, configuration.isBMx80);
-  Eeprom.write(429, configuration.isBH1750);
-#endif
+      for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+        configuration.isSwitch[i] = root["switch"][i];
+      }
+
+      for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+        configuration.isRelay[i] = root["relay"][i];
+      }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
+      configuration.isAnalogInput = root["isAnalogInput"];
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return configuration;
+  /*
+   Eeprom.read(9, 16).toCharArray(configuration.name,
+                                  sizeof(configuration.name));
+
+
+   configuration.api.http = Eeprom.read(25);
+   configuration.api.mqtt = Eeprom.read(228);
+   configuration.api.domoticz = Eeprom.read(800);
+
+
+ #if defined(T0_CONFIG)
+   configuration.isLED[0] = Eeprom.read(366);
+   configuration.isLED[1] = Eeprom.read(418);
+   configuration.isSwitch[1] = Eeprom.read(402);
+ #endif
+
+
+ #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+   configuration.isRelay[0] = Eeprom.read(369);
+   configuration.isSwitch[0] = Eeprom.read(395);
+ #endif
+
+
+ #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) || \
+     defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
+
+ #if defined(T1_CONFIG)
+   uint8_t index = 77;
+ #elif defined(T2_CONFIG)
+   uint8_t index = 98;
+ #elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) || \
+     defined(T6_CONFIG)
+   uint8_t index = 3;
+ #endif
+
+   for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+     configuration.isLED[i] = Eeprom.read(366 + i * index);
+   }
+ #endif
+
+
+ #if defined(T1_CONFIG)
+   index = 40;
+   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+     configuration.isRelay[i] = Eeprom.read(396 + i * index);
+   }
+
+   index = 7;
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(382 + i * index);
+   }
+ #endif
+
+
+ #if defined(T2_CONFIG)
+   index = 0;
+   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+     configuration.isRelay[i] = Eeprom.read(404 + i * index);
+   }
+
+   index = 7;
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(390 + i * index);
+   }
+ #endif
+
+
+ #if defined(T3_CONFIG)
+   index = 21;
+   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+     configuration.isRelay[i] = Eeprom.read(381 + i * index);
+   }
+
+   index = 7;
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(470 + i * index);
+   }
+
+   index = 27;
+   for (uint8_t i = 0; i < sizeof(configuration.isPIR); i++) {
+     configuration.isPIR[i] = Eeprom.read(505 + i * index);
+   }
+ #endif
+
+
+ #if defined(T4_CONFIG)
+   index = 27;
+   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+     configuration.isRelay[i] = Eeprom.read(382 + i * index);
+   }
+
+   index = 8;
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(490 + i * index);
+   }
+ #endif
+
+
+ #if defined(T5_CONFIG)
+   index = 8;
+
+   configuration.isRelay[0] = true; // Relay must be present - hardcoded
+
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(398 + i * index);
+   }
+
+   index = 24;
+   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+     configuration.isContactron[i] = Eeprom.read(414 + i * index);
+   }
+ #endif
+
+
+ #if defined(T6_CONFIG)
+   configuration.isRelay[0] = Eeprom.read(373);
+
+   index = 8;
+   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+     configuration.isSwitch[i] = Eeprom.read(395 + i * index);
+   }
+
+   configuration.isHPMA115S0 = Eeprom.read(413);
+   configuration.isBMx80 = Eeprom.readUInt8(422);
+   configuration.isBH1750 = Eeprom.read(429);
+
+ #endif
+
+
+ #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+ #if defined(T1_CONFIG)
+   configuration.isDS18B20 = Eeprom.read(369);
+ #elif defined(T2_CONFIG)
+   configuration.isDHT = Eeprom.read(369);
+ #else
+   configuration.isDHT = Eeprom.read(376);
+ #endif
+ #endif
+ */
+}
+void AFEDataAccess::saveConfiguration(DEVICE configuration) {
+
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -312,25 +541,54 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Serial << endl << "Opening file: cfg-device.json : ";
 #endif
 
-  File configFile = SPIFFS.open("/cfg-device.json", "w");
+  File configFile = SPIFFS.open("cfg-device.json", "w");
 
   if (configFile) {
 #ifdef DEBUG
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &json = jsonBuffer.createObject();
-    json["isAnalogInput"] = configuration.isAnalogInput;
-    json.printTo(configFile);
+    StaticJsonBuffer<400> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration.name;
+
+    JsonObject &jsonAPI = root.createNestedObject("api");
+    jsonAPI["http"] = configuration.api.http;
+    jsonAPI["mqtt"] = configuration.api.mqtt;
+    jsonAPI["domoticz"] = configuration.api.domoticz;
+
+    JsonArray &jsonLED = root.createNestedArray("led");
+    for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+      jsonLED.add(configuration.isLED[i]);
+    }
+
+    JsonArray &jsonSwitch = root.createNestedArray("switch");
+    for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+      jsonSwitch.add(configuration.isSwitch[i]);
+    }
+
+    JsonArray &jsonRelay = root.createNestedArray("relay");
+    for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+      jsonRelay.add(configuration.isRelay[i]);
+    }
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+    root["isAnalogInput"] = configuration.isAnalogInput;
+#endif
+
+    root.printTo(configFile);
+
 #ifdef DEBUG
-    json.printTo(Serial);
-    Serial << endl;
+    root.printTo(Serial);
 #endif
     configFile.close();
+
 #ifdef DEBUG
-    Serial << "success";
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
 #endif
+
   }
 #ifdef DEBUG
   else {
@@ -339,576 +597,1917 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
   Serial << endl << "--------------------------------------------------";
 #endif
 
+  /*
+    uint8_t index;
+    Eeprom.write(9, 16, configuration.name);
+
+  #if defined(T3_CONFIG)
+    index = 21;
+  #elif defined(T4_CONFIG)
+    index = 27;
+  #endif
+
+    for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T5_CONFIG)
+      Eeprom.write(369, configuration.isRelay[i]);
+  #elif defined(T1_CONFIG)
+      Eeprom.write(396, configuration.isRelay[i]);
+  #elif defined(T2_CONFIG)
+      Eeprom.write(404, configuration.isRelay[i]);
+  #elif defined(T3_CONFIG)
+      Eeprom.write(381 + i * index, configuration.isRelay[i]);
+  #elif defined(T4_CONFIG)
+      Eeprom.write(382 + i * index, configuration.isRelay[i]);
+  #elif defined(T6_CONFIG)
+      Eeprom.write(373, configuration.isRelay[i]);
+  #endif
+    }
+
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG)
+|| \ defined(T2_CONFIG) || defined(T3_CONFIG) index = 7; #elif
+defined(T4_CONFIG)
+  || defined(T5_CONFIG) || defined(T6_CONFIG) index = 8; #endif
+
+    for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
+      Eeprom.write(395 + i * index, configuration.isSwitch[i]);
+  #elif defined(T1_CONFIG)
+      Eeprom.write(382 + i * index, configuration.isSwitch[i]);
+  #elif defined(T2_CONFIG)
+      Eeprom.write(390 + i * index, configuration.isSwitch[i]);
+  #elif defined(T3_CONFIG)
+      Eeprom.write(470 + i * index, configuration.isSwitch[i]);
+  #elif defined(T4_CONFIG)
+      Eeprom.write(490 + i * index, configuration.isSwitch[i]);
+  #elif defined(T5_CONFIG)
+      Eeprom.write(398 + i * index, configuration.isSwitch[i]);
+  #endif
+    }
+
+  #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+
+  #if defined(T0_CONFIG)
+    index = 52;
+  #elif defined(T1_CONFIG)
+    index = 77;
+  #elif defined(T2_CONFIG)
+    index = 98;
+  #elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) || \
+      defined(T6_CONFIG)
+    index = 3;
+  #endif
+
+    for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+      Eeprom.write(366 + i * index, configuration.isLED[i]);
+    }
+  #endif
+
+    saveAPI(API_MQTT, configuration.api.mqtt);
+    saveAPI(API_HTTP, configuration.api.http);
+    saveAPI(API_DOMOTICZ, configuration.api.domoticz);
+
+
+  #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
+  #if defined(T1_CONFIG)
+    Eeprom.write(369, configuration.isDS18B20);
+  #elif defined(T2_CONFIG)
+    Eeprom.write(369, configuration.isDHT);
+  #else
+
+    Eeprom.write(376, configuration.isDHT);
+    index = 24;
+    for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+      Eeprom.write(414 + i * index, configuration.isContactron[i]);
+    }
+  #endif
+  #endif
+
+  #if defined(T3_CONFIG)
+    index = 27;
+    for (uint8_t i = 0; i < sizeof(configuration.isPIR); i++) {
+      Eeprom.write(505 + i * index, configuration.isPIR[i]);
+    }
+  #endif
+
+  #if defined(T6_CONFIG)
+    Eeprom.write(413, configuration.isHPMA115S0);
+    Eeprom.writeUInt8(422, configuration.isBMx80);
+    Eeprom.write(429, configuration.isBH1750);
+  #endif
+
+
+  */
+}
+void AFEDataAccess::createDeviceConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-device.json";
 #endif
+  DEVICE deviceConfiguration;
+  sprintf(deviceConfiguration.name, "AFE-Device");
+  /* APIs */
+  deviceConfiguration.api.mqtt = false;
+  deviceConfiguration.api.domoticz = false;
+  deviceConfiguration.api.http = true;
+
+/* Relay presence */
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  deviceConfiguration.isRelay[0] = true;
+#elif defined(DEVICE_SHELLY_1)
+  deviceConfiguration.isRelay[0] = true;
+#elif defined(DEVICE_SONOFF_4CH)
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+    deviceConfiguration.isRelay[i] = true;
+  }
+#elif defined(DEVICE_SONOFF_TOUCH_1G)
+  deviceConfiguration.isRelay[0] = true;
+#elif defined(DEVICE_SONOFF_TOUCH_2G)
+  deviceConfiguration.isRelay[0] = true;
+  deviceConfiguration.isRelay[1] = true;
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+    deviceConfiguration.isRelay[i] = true;
+  }
+#else
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+    deviceConfiguration.isRelay[i] = false;
+  }
+#endif
+#endif
+
+/* Switch presence */
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  deviceConfiguration.isSwitch[0] = true;
+  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    deviceConfiguration.isSwitch[i] = false;
+  }
+#elif defined(DEVICE_SONOFF_4CH)
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    deviceConfiguration.isSwitch[i] = true;
+  }
+#elif defined(DEVICE_SONOFF_TOUCH_1G)
+  deviceConfiguration.isSwitch[0] = true;
+#elif defined(DEVICE_SONOFF_TOUCH_2G)
+  deviceConfiguration.isSwitch[0] = true;
+  deviceConfiguration.isSwitch[1] = true;
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    deviceConfiguration.isSwitch[i] = true;
+  }
+#elif defined(DEVICE_SHELLY_1)
+  deviceConfiguration.isSwitch[0] = true;
+#else
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    deviceConfiguration.isSwitch[i] = false;
+  }
+#endif
+
+/* LEDs presence */
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  deviceConfiguration.isLED[0] = true;
+  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+    deviceConfiguration.isLED[i] = false;
+  }
+#elif defined(DEVICE_SONOFF_4CH)
+  deviceConfiguration.isLED[0] = true;
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  deviceConfiguration.isLED[0] = true;
+#else
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+    deviceConfiguration.isLED[i] = false;
+  }
+#endif
+#endif
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+  deviceConfiguration.isAnalogInput = false;
+#endif
+
+  saveConfiguration(deviceConfiguration);
 }
 
 FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
   FIRMWARE configuration;
 
-  Eeprom.read(0, 7).toCharArray(configuration.version,
-                                sizeof(configuration.version));
-  Eeprom.read(28, 120).toCharArray(configuration.upgradeURL,
-                                   sizeof(configuration.upgradeURL));
-  configuration.type = Eeprom.readUInt8(7);
-  configuration.autoUpgrade = Eeprom.readUInt8(27);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-firmware.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-firmware.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<100> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration.type = root["type"].as<int>();
+      sprintf(configuration.version, root["version"]);
+      sprintf(configuration.upgradeURL, root["upgradeURL"]);
+      configuration.autoUpgrade = root["autoUpgrade"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
-  Eeprom.write(0, 7, configuration.version);
-  Eeprom.writeUInt8(7, configuration.type);
-  Eeprom.writeUInt8(27, configuration.autoUpgrade);
-  Eeprom.write(28, 120, configuration.upgradeURL);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-firmware.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-firmware.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<100> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["type"] = configuration.type;
+    root["version"] = configuration.version;
+    root["autoUpgrade"] = configuration.autoUpgrade;
+    root["upgradeURL"] = configuration.upgradeURL;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createFirmwareConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-firmware.json";
+#endif
+  FIRMWARE firmwareConfiguration;
+  sprintf(firmwareConfiguration.version, FIRMWARE_VERSION);
+  firmwareConfiguration.type = FIRMWARE_TYPE;
+  firmwareConfiguration.autoUpgrade = 0;
+  firmwareConfiguration.upgradeURL[0] = '\0';
+  saveConfiguration(firmwareConfiguration);
+}
+
+void AFEDataAccess::saveVersion(const char *version) {
+  FIRMWARE configuration = getFirmwareConfiguration();
+  sprintf(configuration.version, version);
+  saveConfiguration(configuration);
+}
+
+uint8_t AFEDataAccess::getDeviceMode() {
+  uint8_t mode = MODE_FIRST_TIME_LAUNCH;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-device-mode.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-device-mode.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<34> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+      Serial << endl;
+#endif
+      mode = root["mode"];
+#ifdef DEBUG
+      Serial << "success";
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+    }
+#endif
+
+    configFile.close();
+
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return mode;
+}
+void AFEDataAccess::saveDeviceMode(uint8_t mode) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-device-mode.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-device-mode.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["mode"] = mode;
+#ifdef DEBUG
+    uint16_t fileSize =
+#endif
+        root.printTo(configFile);
+#ifdef DEBUG
+    Serial << endl
+           << (fileSize == 0 ? "ERROR: while writing a file. Size="
+                             : "File size=")
+           << fileSize << endl;
+#endif
+
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 }
 
 NETWORK AFEDataAccess::getNetworkConfiguration() {
   NETWORK configuration;
 
-  Eeprom.read(148, 32).toCharArray(configuration.ssid,
-                                   sizeof(configuration.ssid));
-  Eeprom.read(180, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-network.json : ";
+#endif
 
-  configuration.isDHCP = Eeprom.read(212);
-  configuration.ip = Eeprom.readIP(213);
-  configuration.gateway = Eeprom.readIP(217);
-  configuration.subnet = Eeprom.readIP(221);
-  configuration.noConnectionAttempts = Eeprom.readUInt8(225);
-  configuration.waitTimeConnections = Eeprom.readUInt8(226);
-  configuration.waitTimeSeries = Eeprom.readUInt8(227);
+  File configFile = SPIFFS.open("cfg-network.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<162> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration.ssid, root["ssid"]);
+      sprintf(configuration.password, root["password"]);
+
+      configuration.isDHCP = root["isDHCP"];
+
+      sprintf(configuration.ip, root["ip"]);
+      sprintf(configuration.gateway, root["gateway"]);
+      sprintf(configuration.subnet, root["subnet"]);
+
+      configuration.noConnectionAttempts = root["noConnectionAttempts"];
+      configuration.waitTimeConnections = root["waitTimeConnections"];
+      configuration.waitTimeSeries = root["waitTimeSeries"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(NETWORK configuration) {
-  Eeprom.write(148, 32, configuration.ssid);
-  Eeprom.write(180, 32, configuration.password);
-  Eeprom.write(212, configuration.isDHCP);
-  Eeprom.writeIP(213, configuration.ip);
-  Eeprom.writeIP(217, configuration.gateway);
-  Eeprom.writeIP(221, configuration.subnet);
-  Eeprom.writeUInt8(225, configuration.noConnectionAttempts);
-  Eeprom.writeUInt8(226, configuration.waitTimeConnections);
-  Eeprom.writeUInt8(227, configuration.waitTimeSeries);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-network.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-network.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<282> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["ssid"] = configuration.ssid;
+    root["password"] = configuration.password;
+    root["isDHCP"] = configuration.isDHCP;
+    root["ip"] = configuration.ip;
+    root["gateway"] = configuration.gateway;
+    root["subnet"] = configuration.subnet;
+
+    root["noConnectionAttempts"] = configuration.noConnectionAttempts;
+    root["waitTimeConnections"] = configuration.waitTimeConnections;
+    root["waitTimeSeries"] = configuration.waitTimeSeries;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createNetworkConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-network.json";
+#endif
+  NETWORK networkConfiguration;
+  /* Network default config */
+  networkConfiguration.ssid[0] = '\0';
+  networkConfiguration.password[0] = '\0';
+  networkConfiguration.isDHCP = true;
+  networkConfiguration.ip[0] = '\0';
+  networkConfiguration.gateway[0] = '\0';
+  networkConfiguration.subnet[0] = '\0';
+  networkConfiguration.noConnectionAttempts = 30;
+  networkConfiguration.waitTimeConnections = 1;
+  networkConfiguration.waitTimeSeries = 20;
+  saveConfiguration(networkConfiguration);
 }
 
 MQTT AFEDataAccess::getMQTTConfiguration() {
   MQTT configuration;
 
-  Eeprom.read(229, 32).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.ip = Eeprom.readIP(261);
-  configuration.port = Eeprom.read(265, 5).toInt();
-  Eeprom.read(270, 32).toCharArray(configuration.user,
-                                   sizeof(configuration.user));
-  Eeprom.read(302, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
-  Eeprom.read(334, 32).toCharArray(configuration.topic,
-                                   sizeof(configuration.topic));
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-mqtt-broker.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-mqtt-broker.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<114> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration.host, root["host"]);
+      sprintf(configuration.ip, root["ip"]);
+      configuration.port = root["port"];
+      sprintf(configuration.user, root["user"]);
+      sprintf(configuration.password, root["password"]);
+      sprintf(configuration.lwt.topic, root["lwt"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(MQTT configuration) {
-  Eeprom.write(229, 32, configuration.host);
-  Eeprom.writeIP(261, configuration.ip);
-  Eeprom.write(265, 5, (long)configuration.port);
-  Eeprom.write(270, 32, configuration.user);
-  Eeprom.write(302, 32, configuration.password);
-  Eeprom.write(334, 32, configuration.topic);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-mqtt-broker.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-mqtt-broker.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<271> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["host"] = configuration.host;
+    root["ip"] = configuration.ip;
+    root["port"] = configuration.port;
+    root["user"] = configuration.user;
+    root["password"] = configuration.password;
+    root["lwt"] = configuration.lwt.topic;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createMQTTConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-mqtt-broker.json";
+#endif
+  MQTT MQTTConfiguration;
+  /* MQTT Default config */
+  MQTTConfiguration.host[0] = '\0';
+  MQTTConfiguration.ip[0] = '\0';
+  MQTTConfiguration.user[0] = '\0';
+  MQTTConfiguration.password[0] = '\0';
+  MQTTConfiguration.port = 1883;
+  MQTTConfiguration.lwt.topic[0] = '\0';
+  saveConfiguration(MQTTConfiguration);
 }
 
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+#endif
 
-  configuration.protocol = Eeprom.readUInt8(801);
-  Eeprom.read(802, 40).toCharArray(configuration.host,
-                                   sizeof(configuration.host));
-  configuration.port = Eeprom.read(842, 5).toInt();
-  Eeprom.read(847, 32).toCharArray(configuration.user, 32);
-  Eeprom.read(879, 32).toCharArray(configuration.password,
-                                   sizeof(configuration.password));
+  File configFile = SPIFFS.open("cfg-domoticz-server.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<98> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.protocol = root["protocol"];
+      sprintf(configuration.host, root["host"]);
+      configuration.port = root["port"];
+      sprintf(configuration.user, root["user"]);
+      sprintf(configuration.password, root["password"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
-  Eeprom.writeUInt8(801, configuration.protocol);
-  Eeprom.write(802, 40, configuration.host);
-  Eeprom.write(842, 5, (long)configuration.port);
-  Eeprom.write(847, 32, configuration.user);
-  Eeprom.write(879, 32, configuration.password);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-domoticz-server.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<211> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["protocol"] = configuration.protocol;
+    root["host"] = configuration.host;
+    root["port"] = configuration.port;
+    root["user"] = configuration.user;
+    root["password"] = configuration.password;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createDomoticzConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-domoticz-server.json";
+#endif
+  DOMOTICZ DomoticzConfiguration;
+  DomoticzConfiguration.protocol = 0;
+  DomoticzConfiguration.host[0] = '\0';
+  DomoticzConfiguration.user[0] = '\0';
+  DomoticzConfiguration.password[0] = '\0';
+  DomoticzConfiguration.port = 8080;
+  saveConfiguration(DomoticzConfiguration);
 }
 
-#ifdef CONFIG_HARDWARE_LED
+#if (CONFIG_HARDWARE_NUMBER_OF_LEDS > 0)
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
 
-#if defined(T0_CONFIG)
-  uint8_t nextLED = 52;
-#elif defined(T1_CONFIG)
-  uint8_t nextLED = 77;
-#elif defined(T2_CONFIG)
-  uint8_t nextLED = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
-    defined(T6_CONFIG)
-  uint8_t nextLED = 3;
+  char fileName[15];
+  sprintf(fileName, "cfg-led-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  configuration.gpio = Eeprom.readUInt8(367 + id * nextLED);
-  configuration.changeToOppositeValue = Eeprom.read(368 + id * nextLED);
+  File configFile = SPIFFS.open(fileName, "r");
 
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.gpio = root["gpio"];
+      configuration.changeToOppositeValue = root["changeToOppositeValue"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
+  char fileName[15];
+  sprintf(fileName, "cfg-led-%d.json", id);
 
-#if defined(T0_CONFIG)
-  uint8_t nextLED = 52;
-#elif defined(T1_CONFIG)
-  uint8_t nextLED = 77;
-#elif defined(T2_CONFIG)
-  uint8_t nextLED = 98;
-#elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) ||        \
-    defined(T6_CONFIG)
-  uint8_t nextLED = 3;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  Eeprom.writeUInt8(367 + id * nextLED, configuration.gpio);
-  Eeprom.write(368 + id * nextLED, configuration.changeToOppositeValue);
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration.gpio;
+    root["changeToOppositeValue"] = configuration.changeToOppositeValue;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createLEDConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-led.json";
+#endif
+  LED LEDConfiguration;
+  LEDConfiguration.changeToOppositeValue = false;
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  LEDConfiguration.gpio = 13;
+  saveConfiguration(0, LEDConfiguration);
+  LEDConfiguration.gpio = 14;
+  saveConfiguration(1, LEDConfiguration);
+#elif defined(DEVICE_SONOFF_4CH)
+  LEDConfiguration.gpio = 13;
+  saveConfiguration(0, LEDConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_1G)
+  LEDConfiguration.gpio = 13;
+  saveConfiguration(0, LEDConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_2G)
+  LEDConfiguration.gpio = 13;
+  saveConfiguration(0, LEDConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  LEDConfiguration.gpio = 13;
+  saveConfiguration(0, LEDConfiguration);
+#else
+  LEDConfiguration.gpio = 13;
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+    saveConfiguration(i, LEDConfiguration);
+  }
+#endif
+}
+uint8_t AFEDataAccess::getSystemLedID() {
+  uint8_t id = 0;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-system-led.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-system-led.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<34> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      id = root["id"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+  return id;
+}
+void AFEDataAccess::saveSystemLedID(uint8_t id) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-system-led.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-system-led.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<34> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["id"] = id;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createSystemLedIDConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-system-led.json";
+#endif
+  saveSystemLedID(1);
 }
 #endif
 
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
-  MQTT configurationMQTT;
+  char fileName[17];
+  sprintf(fileName, "cfg-relay-%d.json", id);
 
-#if defined(T3_CONFIG)
-  uint8_t nextRelay = 21;
-#elif defined(T4_CONFIG)
-  uint8_t nextRelay = 27;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(370);
-#elif defined(T1_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(397);
-#elif defined(T2_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(405);
-#elif defined(T3_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(382 + id * nextRelay);
-#elif defined(T4_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(383 + id * nextRelay);
-#elif defined(T5_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(462);
-#elif defined(T6_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(374);
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.timeToOff = Eeprom.read(372, 5).toFloat();
-#elif defined(T1_CONFIG)
-  configuration.timeToOff = Eeprom.read(399, 5).toFloat();
-#elif defined(T2_CONFIG)
-  configuration.timeToOff = Eeprom.read(407, 5).toFloat();
-#elif defined(T4_CONFIG)
-  configuration.timeToOff = Eeprom.read(385 + id * nextRelay, 5).toFloat();
-#elif defined(T5_CONFIG)
-  configuration.timeToOff = Eeprom.read(463, 4).toInt();
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<146> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
 #endif
 
-/* Below parameters are not related to T5 version */
-#if !defined(T5_CONFIG)
+      configuration.gpio = root["gpio"];
+      sprintf(configuration.name, root["name"]);
+      configuration.timeToOff = root["timeToOff"];
+      configuration.state.powerOn = root["statePowerOn"];
+      configuration.state.MQTTConnected = root["stateMQTTConnected"];
+      configuration.domoticz.idx = root["idx"];
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+      configuration.ledID = root["ledID"];
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(377);
-#elif defined(T1_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(404);
-#elif defined(T2_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(412);
-#elif defined(T3_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(384 + id * nextRelay);
-#elif defined(T4_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(390 + id * nextRelay);
-#elif defined(T6_CONFIG)
-  configuration.statePowerOn = Eeprom.readUInt8(376);
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.read(378, 16).toCharArray(configuration.name,
-                                   sizeof(configuration.name));
-#elif defined(T1_CONFIG)
-  Eeprom.read(405, 16).toCharArray(configuration.name,
-                                   sizeof(configuration.name));
-#elif defined(T2_CONFIG)
-  Eeprom.read(413, 16).toCharArray(configuration.name,
-                                   sizeof(configuration.name));
-#elif defined(T3_CONFIG)
-  Eeprom.read(385 + id * nextRelay, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
-#elif defined(T4_CONFIG)
-  Eeprom.read(391 + id * nextRelay, 16)
-      .toCharArray(configuration.name, sizeof(configuration.name));
-#elif defined(T6_CONFIG)
-  Eeprom.read(377, 16).toCharArray(configuration.name,
-                                   sizeof(configuration.name));
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
 #endif
+  /*
+  #if defined(T3_CONFIG)
+    uint8_t nextRelay = 21;
+  #elif defined(T4_CONFIG)
+    uint8_t nextRelay = 27;
+  #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(394);
-#elif defined(T1_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(421);
-#elif defined(T2_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(429);
-#elif defined(T3_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(401 + id * nextRelay);
-#elif defined(T4_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(407 + id * nextRelay);
-#elif defined(T6_CONFIG)
-  configuration.stateMQTTConnected = Eeprom.readUInt8(393);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(370);
+  #elif defined(T1_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(397);
+  #elif defined(T2_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(405);
+  #elif defined(T3_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(382 + id * nextRelay);
+  #elif defined(T4_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(383 + id * nextRelay);
+  #elif defined(T5_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(462);
+  #elif defined(T6_CONFIG)
+    configuration.gpio = Eeprom.readUInt8(374);
+  #endif
 
-  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
-                                   sizeof(configurationMQTT.topic));
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    configuration.timeToOff = Eeprom.read(372, 5).toFloat();
+  #elif defined(T1_CONFIG)
+    configuration.timeToOff = Eeprom.read(399, 5).toFloat();
+  #elif defined(T2_CONFIG)
+    configuration.timeToOff = Eeprom.read(407, 5).toFloat();
+  #elif defined(T4_CONFIG)
+    configuration.timeToOff = Eeprom.read(385 + id * nextRelay, 5).toFloat();
+  #elif defined(T5_CONFIG)
+    configuration.timeToOff = Eeprom.read(463, 4).toInt();
+  #endif
 
-  sprintf(configuration.mqttTopic, "%s%s/", configurationMQTT.topic,
-          configuration.name);
 
-#if defined(T0_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(421);
-#elif defined(T1_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(442);
-#elif defined(T2_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(463);
-#elif defined(T3_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(618 + id);
-#elif defined(T4_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(531 + id);
-#elif defined(T6_CONFIG)
-  configuration.ledID = Eeprom.readUInt8(394);
-#endif
+  #if !defined(T5_CONFIG)
 
-#if !defined(T6_CONFIG)
-  configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
-#else
-  configuration.idx = Eeprom.read(920, 6).toInt();
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(377);
+  #elif defined(T1_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(404);
+  #elif defined(T2_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(412);
+  #elif defined(T3_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(384 + id * nextRelay);
+  #elif defined(T4_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(390 + id * nextRelay);
+  #elif defined(T6_CONFIG)
+    configuration.statePowerOn = Eeprom.readUInt8(376);
+  #endif
 
-/* Saving thermostat configuration*/
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-#if defined(T1_CONFIG)
-  configuration.thermostat.turnOn = Eeprom.read(423, 5).toFloat();
-  configuration.thermostat.turnOff = Eeprom.read(428, 5).toFloat();
-  configuration.thermostat.turnOnAbove = Eeprom.read(433);
-  configuration.thermostat.turnOffAbove = Eeprom.read(434);
-  configuration.thermostat.enabled = isRegulatorEnabled(THERMOSTAT_REGULATOR);
-#else
-  configuration.thermostat.turnOn = Eeprom.read(431, 5).toFloat();
-  configuration.thermostat.turnOff = Eeprom.read(436, 5).toFloat();
-  configuration.thermostat.turnOnAbove = Eeprom.read(441);
-  configuration.thermostat.turnOffAbove = Eeprom.read(442);
-  configuration.thermostat.enabled = isRegulatorEnabled(THERMOSTAT_REGULATOR);
-#endif
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.read(378, 16).toCharArray(configuration.name,
+                                     sizeof(configuration.name));
+  #elif defined(T1_CONFIG)
+    Eeprom.read(405, 16).toCharArray(configuration.name,
+                                     sizeof(configuration.name));
+  #elif defined(T2_CONFIG)
+    Eeprom.read(413, 16).toCharArray(configuration.name,
+                                     sizeof(configuration.name));
+  #elif defined(T3_CONFIG)
+    Eeprom.read(385 + id * nextRelay, 16)
+        .toCharArray(configuration.name, sizeof(configuration.name));
+  #elif defined(T4_CONFIG)
+    Eeprom.read(391 + id * nextRelay, 16)
+        .toCharArray(configuration.name, sizeof(configuration.name));
+  #elif defined(T6_CONFIG)
+    Eeprom.read(377, 16).toCharArray(configuration.name,
+                                     sizeof(configuration.name));
+  #endif
 
-  /* Saving humiditistat configuration*/
-#if defined(T2_CONFIG)
-  configuration.humidistat.turnOn = Eeprom.read(444, 5).toFloat();
-  configuration.humidistat.turnOff = Eeprom.read(449, 5).toFloat();
-  configuration.humidistat.turnOnAbove = Eeprom.read(454);
-  configuration.humidistat.turnOffAbove = Eeprom.read(455);
-  configuration.humidistat.enabled = isRegulatorEnabled(HUMIDISTAT_REGULATOR);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(394);
+  #elif defined(T1_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(421);
+  #elif defined(T2_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(429);
+  #elif defined(T3_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(401 + id * nextRelay);
+  #elif defined(T4_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(407 + id * nextRelay);
+  #elif defined(T6_CONFIG)
+    configuration.stateMQTTConnected = Eeprom.readUInt8(393);
+  #endif
 
-/* Saving thermal protection configuration */
-#if defined(T1_CONFIG)
-  configuration.thermalProtection = Eeprom.read(436, 3).toInt();
-#elif defined(T2_CONFIG)
-  configuration.thermalProtection = Eeprom.read(457, 3).toInt();
-#endif
+    Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
+                                     sizeof(configurationMQTT.topic));
 
-#endif /* End of code not related to T5 */
+
+
+  #if defined(T0_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(421);
+  #elif defined(T1_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(442);
+  #elif defined(T2_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(463);
+  #elif defined(T3_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(618 + id);
+  #elif defined(T4_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(531 + id);
+  #elif defined(T6_CONFIG)
+    configuration.ledID = Eeprom.readUInt8(394);
+  #endif
+
+  #if !defined(T6_CONFIG)
+    configuration.idx = Eeprom.read(930 + 6 * id, 6).toInt();
+  #else
+    configuration.idx = Eeprom.read(920, 6).toInt();
+  #endif
+
+  #if defined(T1_CONFIG) || defined(T2_CONFIG)
+  #if defined(T1_CONFIG)
+    configuration.thermostat.turnOn = Eeprom.read(423, 5).toFloat();
+    configuration.thermostat.turnOff = Eeprom.read(428, 5).toFloat();
+    configuration.thermostat.turnOnAbove = Eeprom.read(433);
+    configuration.thermostat.turnOffAbove = Eeprom.read(434);
+    configuration.thermostat.enabled =
+  isRegulatorEnabled(THERMOSTAT_REGULATOR); #else
+    configuration.thermostat.turnOn = Eeprom.read(431, 5).toFloat();
+    configuration.thermostat.turnOff = Eeprom.read(436, 5).toFloat();
+    configuration.thermostat.turnOnAbove = Eeprom.read(441);
+    configuration.thermostat.turnOffAbove = Eeprom.read(442);
+    configuration.thermostat.enabled =
+  isRegulatorEnabled(THERMOSTAT_REGULATOR); #endif #endif
+
+  #if defined(T2_CONFIG)
+    configuration.humidistat.turnOn = Eeprom.read(444, 5).toFloat();
+    configuration.humidistat.turnOff = Eeprom.read(449, 5).toFloat();
+    configuration.humidistat.turnOnAbove = Eeprom.read(454);
+    configuration.humidistat.turnOffAbove = Eeprom.read(455);
+    configuration.humidistat.enabled =
+  isRegulatorEnabled(HUMIDISTAT_REGULATOR); #endif
+
+
+  #if defined(T1_CONFIG)
+    configuration.thermalProtection = Eeprom.read(436, 3).toInt();
+  #elif defined(T2_CONFIG)
+    configuration.thermalProtection = Eeprom.read(457, 3).toInt();
+  #endif
+
+  #endif
+  */
 
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
+  char fileName[17];
+  sprintf(fileName, "cfg-relay-%d.json", id);
 
-#if defined(T3_CONFIG)
-  uint8_t nextRelay = 21;
-#elif defined(T4_CONFIG)
-  uint8_t nextRelay = 27;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(370, configuration.gpio);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(397, configuration.gpio);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(405, configuration.gpio);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(382 + id * nextRelay, configuration.gpio);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(383 + id * nextRelay, configuration.gpio);
-#elif defined(T5_CONFIG)
-  Eeprom.writeUInt8(462, configuration.gpio);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(374, configuration.gpio);
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.write(372, 5, configuration.timeToOff);
-#elif defined(T1_CONFIG)
-  Eeprom.write(399, 5, configuration.timeToOff);
-#elif defined(T2_CONFIG)
-  Eeprom.write(407, 5, configuration.timeToOff);
-#elif defined(T4_CONFIG)
-  Eeprom.write(385 + id * nextRelay, 5, configuration.timeToOff);
-#elif defined(T5_CONFIG)
-  Eeprom.write(463, 4, configuration.timeToOff);
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration.gpio;
+    root["name"] = configuration.name;
+    root["timeToOff"] = configuration.timeToOff;
+    root["statePowerOn"] = configuration.state.powerOn;
+    root["stateMQTTConnected"] = configuration.state.MQTTConnected;
+    root["ledID"] = configuration.ledID;
+    root["idx"] = configuration.domoticz.idx;
+    root["MQTTTopic"] = configuration.mqtt.topic;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
 #endif
 
-#if !defined(T5_CONFIG) /* Below paramters are not related to T5 */
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(377, configuration.statePowerOn);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(404, configuration.statePowerOn);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(412, configuration.statePowerOn);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(384 + id * nextRelay, configuration.statePowerOn);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(390 + id * nextRelay, configuration.statePowerOn);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(376, configuration.statePowerOn);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
 #endif
+  /*
+  #if defined(T3_CONFIG)
+    uint8_t nextRelay = 21;
+  #elif defined(T4_CONFIG)
+    uint8_t nextRelay = 27;
+  #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.write(378, 16, configuration.name);
-#elif defined(T1_CONFIG)
-  Eeprom.write(405, 16, configuration.name);
-#elif defined(T2_CONFIG)
-  Eeprom.write(413, 16, configuration.name);
-#elif defined(T3_CONFIG)
-  Eeprom.write(385 + id * nextRelay, 16, configuration.name);
-#elif defined(T4_CONFIG)
-  Eeprom.write(391 + id * nextRelay, 16, configuration.name);
-#elif defined(T6_CONFIG)
-  Eeprom.write(377, 16, configuration.name);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.writeUInt8(370, configuration.gpio);
+  #elif defined(T1_CONFIG)
+    Eeprom.writeUInt8(397, configuration.gpio);
+  #elif defined(T2_CONFIG)
+    Eeprom.writeUInt8(405, configuration.gpio);
+  #elif defined(T3_CONFIG)
+    Eeprom.writeUInt8(382 + id * nextRelay, configuration.gpio);
+  #elif defined(T4_CONFIG)
+    Eeprom.writeUInt8(383 + id * nextRelay, configuration.gpio);
+  #elif defined(T5_CONFIG)
+    Eeprom.writeUInt8(462, configuration.gpio);
+  #elif defined(T6_CONFIG)
+    Eeprom.writeUInt8(374, configuration.gpio);
+  #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(394, configuration.stateMQTTConnected);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(421, configuration.stateMQTTConnected);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(429, configuration.stateMQTTConnected);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(401 + id * nextRelay, configuration.stateMQTTConnected);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(407 + id * nextRelay, configuration.stateMQTTConnected);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(393, configuration.stateMQTTConnected);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.write(372, 5, configuration.timeToOff);
+  #elif defined(T1_CONFIG)
+    Eeprom.write(399, 5, configuration.timeToOff);
+  #elif defined(T2_CONFIG)
+    Eeprom.write(407, 5, configuration.timeToOff);
+  #elif defined(T4_CONFIG)
+    Eeprom.write(385 + id * nextRelay, 5, configuration.timeToOff);
+  #elif defined(T5_CONFIG)
+    Eeprom.write(463, 4, configuration.timeToOff);
+  #endif
 
-#if defined(T0_CONFIG)
-  Eeprom.writeUInt8(421, configuration.ledID);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(442, configuration.ledID);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(463, configuration.ledID);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(618 + id, configuration.ledID);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(531 + id, configuration.ledID);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(394, configuration.ledID);
-#endif
+  #if !defined(T5_CONFIG)
 
-#if !defined(T6_CONFIG)
-  Eeprom.write(930 + 6 * id, 6, (long)configuration.idx);
-#else
-  Eeprom.write(920, 6, (long)configuration.idx);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.writeUInt8(377, configuration.statePowerOn);
+  #elif defined(T1_CONFIG)
+    Eeprom.writeUInt8(404, configuration.statePowerOn);
+  #elif defined(T2_CONFIG)
+    Eeprom.writeUInt8(412, configuration.statePowerOn);
+  #elif defined(T3_CONFIG)
+    Eeprom.writeUInt8(384 + id * nextRelay, configuration.statePowerOn);
+  #elif defined(T4_CONFIG)
+    Eeprom.writeUInt8(390 + id * nextRelay, configuration.statePowerOn);
+  #elif defined(T6_CONFIG)
+    Eeprom.writeUInt8(376, configuration.statePowerOn);
+  #endif
 
-#if defined(T1_CONFIG)
-  Eeprom.write(436, 3, configuration.thermalProtection);
-#elif defined(T2_CONFIG)
-  Eeprom.write(457, 3, configuration.thermalProtection);
-#endif
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.write(378, 16, configuration.name);
+  #elif defined(T1_CONFIG)
+    Eeprom.write(405, 16, configuration.name);
+  #elif defined(T2_CONFIG)
+    Eeprom.write(413, 16, configuration.name);
+  #elif defined(T3_CONFIG)
+    Eeprom.write(385 + id * nextRelay, 16, configuration.name);
+  #elif defined(T4_CONFIG)
+    Eeprom.write(391 + id * nextRelay, 16, configuration.name);
+  #elif defined(T6_CONFIG)
+    Eeprom.write(377, 16, configuration.name);
+  #endif
 
-#endif /* End of the code related to T5 */
+  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
+    Eeprom.writeUInt8(394, configuration.stateMQTTConnected);
+  #elif defined(T1_CONFIG)
+    Eeprom.writeUInt8(421, configuration.stateMQTTConnected);
+  #elif defined(T2_CONFIG)
+    Eeprom.writeUInt8(429, configuration.stateMQTTConnected);
+  #elif defined(T3_CONFIG)
+    Eeprom.writeUInt8(401 + id * nextRelay, configuration.stateMQTTConnected);
+  #elif defined(T4_CONFIG)
+    Eeprom.writeUInt8(407 + id * nextRelay, configuration.stateMQTTConnected);
+  #elif defined(T6_CONFIG)
+    Eeprom.writeUInt8(393, configuration.stateMQTTConnected);
+  #endif
+
+  #if defined(T0_CONFIG)
+    Eeprom.writeUInt8(421, configuration.ledID);
+  #elif defined(T1_CONFIG)
+    Eeprom.writeUInt8(442, configuration.ledID);
+  #elif defined(T2_CONFIG)
+    Eeprom.writeUInt8(463, configuration.ledID);
+  #elif defined(T3_CONFIG)
+    Eeprom.writeUInt8(618 + id, configuration.ledID);
+  #elif defined(T4_CONFIG)
+    Eeprom.writeUInt8(531 + id, configuration.ledID);
+  #elif defined(T6_CONFIG)
+    Eeprom.writeUInt8(394, configuration.ledID);
+  #endif
+
+  #if !defined(T6_CONFIG)
+    Eeprom.write(930 + 6 * id, 6, (long)configuration.idx);
+  #else
+    Eeprom.write(920, 6, (long)configuration.idx);
+  #endif
+
+  #if defined(T1_CONFIG)
+    Eeprom.write(436, 3, configuration.thermalProtection);
+  #elif defined(T2_CONFIG)
+    Eeprom.write(457, 3, configuration.thermalProtection);
+  #endif
+
+  #endif
+  */
 }
+void AFEDataAccess::createRelayConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-relay-xx.json";
+#endif
+  RELAY RelayConfiguration;
+
+  /* Relay config */
+
+#ifdef CONFIG_FUNCTIONALITY_GATE
+  RelayConfiguration.timeToOff = 200;
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+  RelayConfiguration.timeToOff = 0;
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  RelayConfiguration.state.powerOn = 3;
+  RelayConfiguration.state.MQTTConnected = 0;
+  RelayConfiguration.ledID = 0;
+  RelayConfiguration.domoticz.idx = 0;
+  RelayConfiguration.name[0] = '\0';
+  RelayConfiguration.mqtt.topic[0] = '\0';
+#endif
+
+#if defined(T1_CONFIG) || defined(T2_CONFIG)
+  RelayConfiguration.thermalProtection = 0;
+#endif
+
+/* SONOFF Basic v1 */
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  RelayConfiguration.gpio = 12;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+/* SONOFF 4CH */
+#elif defined(DEVICE_SONOFF_4CH)
+  RelayConfiguration.gpio = 12;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+  RelayConfiguration.gpio = 5;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(1, false);
+#endif
+  saveConfiguration(1, RelayConfiguration);
+  RelayConfiguration.gpio = 4;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(2, false);
+#endif
+  saveConfiguration(2, RelayConfiguration);
+
+  RelayConfiguration.gpio = 15;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(3, false);
+#endif
+  saveConfiguration(3, RelayConfiguration);
+/* SONOFF Touch 1G */
+#elif defined(DEVICE_SONOFF_TOUCH_1G)
+  RelayConfiguration.gpio = 12;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+/* SONOFF Touch 2G */
+#elif defined(DEVICE_SONOFF_TOUCH_2G)
+  RelayConfiguration.gpio = 12;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+  RelayConfiguration.gpio = 5;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(1, false);
+#endif
+  saveConfiguration(1, RelayConfiguration);
+
+/* SONOFF Touch 3G */
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  RelayConfiguration.gpio = 12;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+  RelayConfiguration.gpio = 5;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(1, false);
+#endif
+  saveConfiguration(1, RelayConfiguration);
+  RelayConfiguration.gpio = 4;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(2, false);
+#endif
+  saveConfiguration(2, RelayConfiguration);
+
+  /* Shelly-1 */
+
+#elif defined(DEVICE_SHELLY_1)
+  RelayConfiguration.gpio = 4;
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, RelayConfiguration);
+
+/* Clean */
+#else
+  RelayConfiguration.gpio = 12;
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+    saveRelayState(i, false);
+#endif
+    saveConfiguration(i, RelayConfiguration);
+  }
+#endif
+}
+
+/* Relay state methods*/
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+boolean AFEDataAccess::getRelayState(uint8_t id) {
+  boolean state = false;
+  char fileName[23];
+  sprintf(fileName, "cfg-relay-state-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<34> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      state = root["state"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+  return state;
+}
+void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
+  char fileName[23];
+  sprintf(fileName, "cfg-relay-state-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<50> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["state"] = state;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+#endif /* End: Relay */
 
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
 
-#if defined(T0_CONFIG) || defined(T1_CONFIG) || defined(T0_SHELLY_1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
-  uint8_t nextSwitch = 7;
-#elif defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-  uint8_t nextSwitch = 8;
+  char fileName[18];
+  sprintf(fileName, "cfg-switch-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(396 + id * nextSwitch);
-#elif defined(T1_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(383 + id * nextSwitch);
-#elif defined(T2_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(391 + id * nextSwitch);
-#elif defined(T3_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(471 + id * nextSwitch);
-#elif defined(T4_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(491 + id * nextSwitch);
-#elif defined(T5_CONFIG)
-  configuration.gpio = Eeprom.readUInt8(399 + id * nextSwitch);
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  configuration.type = Eeprom.readUInt8(397 + id * nextSwitch);
-#elif defined(T1_CONFIG)
-  configuration.type = Eeprom.readUInt8(384 + id * nextSwitch);
-#elif defined(T2_CONFIG)
-  configuration.type = Eeprom.readUInt8(392 + id * nextSwitch);
-#elif defined(T3_CONFIG)
-  configuration.type = Eeprom.readUInt8(472 + id * nextSwitch);
-#elif defined(T4_CONFIG)
-  configuration.type = Eeprom.readUInt8(492 + id * nextSwitch);
-#elif defined(T5_CONFIG)
-  configuration.type = Eeprom.readUInt8(400 + id * nextSwitch);
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<130> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  configuration.sensitiveness = Eeprom.read(398 + id * nextSwitch, 3).toInt();
-#elif defined(T1_CONFIG)
-  configuration.sensitiveness = Eeprom.read(385 + id * nextSwitch, 3).toInt();
-#elif defined(T2_CONFIG)
-  configuration.sensitiveness = Eeprom.read(393 + id * nextSwitch, 3).toInt();
-#elif defined(T3_CONFIG)
-  configuration.sensitiveness = Eeprom.read(473 + id * nextSwitch, 3).toInt();
-#elif defined(T4_CONFIG)
-  configuration.sensitiveness = Eeprom.read(493 + id * nextSwitch, 3).toInt();
-#elif defined(T5_CONFIG)
-  configuration.sensitiveness = Eeprom.read(401 + id * nextSwitch, 3).toInt();
+      configuration.gpio = root["gpio"];
+      configuration.type = root["type"];
+      configuration.sensitiveness = root["sensitiveness"];
+      configuration.functionality = root["functionality"];
+      configuration.relayID = root["relayID"];
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+      configuration.domoticz.idx = root["idx"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(401 + id * nextSwitch);
-#elif defined(T1_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(388 + id * nextSwitch);
-#elif defined(T2_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(396 + id * nextSwitch);
-#elif defined(T3_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(476 + id * nextSwitch);
-#elif defined(T4_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(496 + id * nextSwitch);
-#elif defined(T5_CONFIG)
-  configuration.functionality = Eeprom.readUInt8(404 + id * nextSwitch);
-#endif
+    configFile.close();
+  }
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  configuration.relayID =
-      Eeprom.readUInt8(416 + id); /* It's in EEPROM one after the other one */
-#elif defined(T1_CONFIG)
-  configuration.relayID =
-      Eeprom.readUInt8(440 + id); /* It's in EEPROM one after the other one */
-#elif defined(T2_CONFIG)
-  configuration.relayID =
-      Eeprom.readUInt8(461 + id); /* It's in EEPROM one after the other one */
-#elif defined(T3_CONFIG)
-  configuration.relayID =
-      Eeprom.readUInt8(622 + id); /* It's in EEPROM one after the other one */
-#elif defined(T4_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(497 + id * nextSwitch);
-#elif defined(T5_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(405 + id * nextSwitch);
-#elif defined(T6_CONFIG)
-  configuration.relayID = Eeprom.readUInt8(402 + id * nextSwitch);
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T1_CONFIG) || \
-    defined(T2_CONFIG) || defined(T3_CONFIG)
-  uint8_t nextSwitch = 7;
-#elif defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-  uint8_t nextSwitch = 8;
+  char fileName[18];
+  sprintf(fileName, "cfg-switch-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  Eeprom.writeUInt8(396 + id * nextSwitch, configuration.gpio);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(383 + id * nextSwitch, configuration.gpio);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(391 + id * nextSwitch, configuration.gpio);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(471 + id * nextSwitch, configuration.gpio);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(491 + id * nextSwitch, configuration.gpio);
-#elif defined(T5_CONFIG)
-  Eeprom.writeUInt8(399 + id * nextSwitch, configuration.gpio);
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  Eeprom.writeUInt8(397 + id * nextSwitch, configuration.type);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(384 + id * nextSwitch, configuration.type);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(392 + id * nextSwitch, configuration.type);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(472 + id * nextSwitch, configuration.type);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(492 + id * nextSwitch, configuration.type);
-#elif defined(T5_CONFIG)
-  Eeprom.writeUInt8(400 + id * nextSwitch, configuration.type);
+    StaticJsonBuffer<163> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration.gpio;
+    root["type"] = configuration.type;
+    root["sensitiveness"] = configuration.sensitiveness;
+    root["functionality"] = configuration.functionality;
+    root["relayID"] = configuration.relayID;
+    root["idx"] = configuration.domoticz.idx;
+    root["MQTTTopic"] = configuration.mqtt.topic;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
 #endif
 
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  Eeprom.write(398 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T1_CONFIG)
-  Eeprom.write(385 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T2_CONFIG)
-  Eeprom.write(393 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T3_CONFIG)
-  Eeprom.write(473 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T4_CONFIG)
-  Eeprom.write(493 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#elif defined(T5_CONFIG)
-  Eeprom.write(401 + id * nextSwitch, 3, (long)configuration.sensitiveness);
-#endif
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG) || defined(T6_CONFIG)
-  Eeprom.writeUInt8(401 + id * nextSwitch, configuration.functionality);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(388 + id * nextSwitch, configuration.functionality);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(396 + id * nextSwitch, configuration.functionality);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(476 + id * nextSwitch, configuration.functionality);
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(496 + id * nextSwitch, configuration.functionality);
-#elif defined(T5_CONFIG)
-  Eeprom.writeUInt8(404 + id * nextSwitch, configuration.functionality);
-#endif
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(
-      416 + id,
-      configuration.relayID); /* It's in EEPROM one after the other one */
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(
-      440 + id,
-      configuration.relayID); /* It's in EEPROM one after the other one */
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(
-      461 + id,
-      configuration.relayID); /* It's in EEPROM one after the other one */
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(
-      622 + id,
-      configuration.relayID); /* It's in EEPROM one after the other one */
-#elif defined(T4_CONFIG)
-  Eeprom.writeUInt8(497 + id * nextSwitch, configuration.relayID);
-#elif defined(T5_CONFIG)
-  Eeprom.writeUInt8(405 + id * nextSwitch, configuration.relayID);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(402 + id * nextSwitch, configuration.relayID);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
 #endif
 }
+void AFEDataAccess::createSwitchConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-switch.json";
+#endif
+  SWITCH SwitchConfiguration;
+
+  SwitchConfiguration.sensitiveness = SWITCH_SENSITIVENESS;
+  SwitchConfiguration.relayID = 1;
+  SwitchConfiguration.mqtt.topic[0] = '\0';
+  SwitchConfiguration.domoticz.idx = 0;
+
+#if defined(DEVICE_SONOFF_BASIC_V1)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.type = SWITCH_TYPE_BI;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  saveConfiguration(1, SwitchConfiguration);
+  SwitchConfiguration.gpio = 1;
+  saveConfiguration(2, SwitchConfiguration);
+  SwitchConfiguration.gpio = 3;
+  saveConfiguration(3, SwitchConfiguration);
+#elif defined(DEVICE_SONOFF_4CH)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 9;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  SwitchConfiguration.relayID = 2;
+  saveConfiguration(1, SwitchConfiguration);
+  SwitchConfiguration.gpio = 10;
+  SwitchConfiguration.relayID = 3;
+  saveConfiguration(2, SwitchConfiguration);
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.relayID = 4;
+  saveConfiguration(3, SwitchConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_1G)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_2G)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 9;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  SwitchConfiguration.relayID = 2;
+  saveConfiguration(1, SwitchConfiguration);
+#elif defined(DEVICE_SONOFF_TOUCH_3G)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 9;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  SwitchConfiguration.relayID = 2;
+  saveConfiguration(1, SwitchConfiguration);
+  SwitchConfiguration.gpio = 10;
+  SwitchConfiguration.relayID = 3;
+  saveConfiguration(2, SwitchConfiguration);
+#elif defined(DEVICE_SHELLY_1)
+  SwitchConfiguration.gpio = 5;
+  SwitchConfiguration.type = SWITCH_TYPE_BI;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  saveConfiguration(0, SwitchConfiguration);
+#else
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 14;
+  SwitchConfiguration.type = SWITCH_TYPE_BI;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+    SwitchConfiguration.relayID = i + 1;
+    saveConfiguration(i, SwitchConfiguration);
+  }
+#endif
+}
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+ADCINPUT AFEDataAccess::getADCInputConfiguration() {
+  ADCINPUT configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-analog-input.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-analog-input.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<300> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration.gpio = root["gpio"];
+      configuration.interval = root["interval"];
+      configuration.numberOfSamples = root["numberOfSamples"];
+      configuration.maxVCC = root["maxVCC"];
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      configuration.domoticz.raw = root["idx"]["raw"];
+      configuration.domoticz.percent = root["idx"]["percent"];
+      configuration.domoticz.voltage = root["idx"]["voltage"];
+      configuration.domoticz.voltageCalculated =
+          root["idx"]["voltageCalculated"];
+      configuration.divider.Ra = root["divider"]["Ra"];
+      configuration.divider.Rb = root["divider"]["Rb"];
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-analog-input.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-analog-input.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<350> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &idx = root.createNestedObject("idx");
+    JsonObject &divider = root.createNestedObject("divider");
+
+    root["gpio"] = configuration.gpio;
+    root["interval"] = configuration.interval;
+    root["numberOfSamples"] = configuration.numberOfSamples;
+    root["maxVCC"] = configuration.maxVCC;
+    root["mqttTopic"] = configuration.mqtt.topic;
+    idx["raw"] = configuration.domoticz.raw;
+    idx["percent"] = configuration.domoticz.percent;
+    idx["voltage"] = configuration.domoticz.voltage;
+    idx["voltageCalculated"] = configuration.domoticz.voltageCalculated;
+    divider["Ra"] = configuration.divider.Ra;
+    divider["Rb"] = configuration.divider.Rb;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+};
+void AFEDataAccess::createADCInputConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-analog-input.json";
+#endif
+  ADCINPUT AnalogInputConfiguration;
+  AnalogInputConfiguration.gpio = 17;
+  AnalogInputConfiguration.interval = 60;
+  AnalogInputConfiguration.numberOfSamples = 1;
+  AnalogInputConfiguration.maxVCC = 1;
+  sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
+  AnalogInputConfiguration.domoticz.raw = 0;
+  AnalogInputConfiguration.domoticz.voltage = 0;
+  AnalogInputConfiguration.domoticz.percent = 0;
+  AnalogInputConfiguration.domoticz.voltageCalculated = 0;
+  AnalogInputConfiguration.divider.Ra = 0;
+  AnalogInputConfiguration.divider.Rb = 0;
+  saveConfiguration(AnalogInputConfiguration);
+}
+#endif
 
 #ifdef CONFIG_HARDWARE_DS18B20
 DS18B20 AFEDataAccess::getSensorConfiguration() {
@@ -1143,115 +2742,22 @@ void AFEDataAccess::saveRegulatorState(boolean state, uint8_t type) {
 }
 #endif
 
-void AFEDataAccess::saveVersion(String version) { Eeprom.write(0, 7, version); }
-
-/* Relay state methods*/
-#if !defined(T5_CONFIG)
-boolean AFEDataAccess::getRelayState(uint8_t id) {
-
-#if defined(T3_CONFIG)
-  uint8_t nextRelay = 21;
-#elif defined(T4_CONFIG)
-  uint8_t nextRelay = 27;
-#endif
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  return Eeprom.read(371);
-#elif defined(T1_CONFIG)
-  return Eeprom.read(398);
-#elif defined(T2_CONFIG)
-  return Eeprom.read(406);
-#elif defined(T3_CONFIG)
-  return Eeprom.read(383 + id * nextRelay);
-#elif defined(T4_CONFIG)
-  return Eeprom.read(384 + id * nextRelay);
-#elif defined(T6_CONFIG)
-  return Eeprom.read(375);
-#endif
-}
-void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-
-#if defined(T3_CONFIG)
-  uint8_t nextRelay = 21;
-#elif defined(T4_CONFIG)
-  uint8_t nextRelay = 27;
-#endif
-
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.write(371, state);
-#elif defined(T1_CONFIG)
-  Eeprom.write(398, state);
-#elif defined(T2_CONFIG)
-  Eeprom.write(406, state);
-#elif defined(T3_CONFIG)
-  Eeprom.write(383 + id * nextRelay, state);
-#elif defined(T4_CONFIG)
-  Eeprom.write(384 + id * nextRelay, state);
-#elif defined(T6_CONFIG)
-  Eeprom.write(375, state);
-#endif
-}
-#endif /* End: Relay */
-
-uint8_t AFEDataAccess::getDeviceMode() { return Eeprom.readUInt8(26); }
-void AFEDataAccess::saveDeviceMode(uint8_t mode) {
-  Eeprom.writeUInt8(26, mode);
-}
-
-uint8_t AFEDataAccess::getLanguage() { return Eeprom.readUInt8(8); }
-void AFEDataAccess::saveLanguage(uint8_t language) {
-  Eeprom.writeUInt8(8, language);
-}
-
-#ifdef CONFIG_HARDWARE_LED
-uint8_t AFEDataAccess::getSystemLedID() {
-#if defined(T0_CONFIG)
-  return Eeprom.readUInt8(415);
-#elif defined(T1_CONFIG)
-  return Eeprom.readUInt8(439);
-#elif defined(T2_CONFIG)
-  return Eeprom.readUInt8(460);
-#elif defined(T3_CONFIG)
-  return Eeprom.readUInt8(617);
-#elif defined(T4_CONFIG) || defined(T5_CONFIG)
-  return Eeprom.readUInt8(530);
-#elif defined(T6_CONFIG)
-  return Eeprom.readUInt8(372);
-#endif
-}
-
-void AFEDataAccess::saveSystemLedID(uint8_t id) {
-#if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-  Eeprom.writeUInt8(415, id);
-#elif defined(T1_CONFIG)
-  Eeprom.writeUInt8(439, id);
-#elif defined(T2_CONFIG)
-  Eeprom.writeUInt8(460, id);
-#elif defined(T3_CONFIG)
-  Eeprom.writeUInt8(617, id);
-#elif defined(T4_CONFIG) || defined(T5_CONFIG)
-  Eeprom.writeUInt8(530, id);
-#elif defined(T6_CONFIG)
-  Eeprom.writeUInt8(372, id);
-#endif
-}
-#endif
-
-const String AFEDataAccess::getDeviceID() { return Eeprom.read(1000, 8); }
-void AFEDataAccess::saveDeviceID(String id) { Eeprom.write(1000, 8, id); }
-
+#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
 void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+  DEVICE configuration = getDeviceConfiguration();
   if (apiID == API_HTTP) {
-    Eeprom.write(25, state);
+    configuration.api.http = state;
   } else if (apiID == API_MQTT) {
-    Eeprom.write(228, state);
+    configuration.api.mqtt = state;
   } else if (apiID == API_DOMOTICZ) {
-    Eeprom.write(800, state);
+    configuration.api.domoticz = state;
     if (state) {
-      Eeprom.write(25, true);
+      configuration.api.http = true;
     }
   }
+  saveConfiguration(configuration);
 }
+#endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
@@ -1262,7 +2768,6 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   configuration.idx.pm10 = Eeprom.read(932, 6).toInt();
   return configuration;
 }
-
 void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
   Eeprom.write(414, 5, (long)configuration.interval);
   Eeprom.write(419, 3, (long)configuration.timeToMeasure);
@@ -1278,7 +2783,6 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   configuration.TXD = Eeprom.readUInt8(412);
   return configuration;
 }
-
 void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Eeprom.writeUInt8(411, configuration.RXD);
   Eeprom.writeUInt8(412, configuration.TXD);
@@ -1297,7 +2801,6 @@ BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
   configuration.idx.pressure = Eeprom.read(962, 6).toInt();
   return configuration;
 }
-
 void AFEDataAccess::saveConfiguration(BMx80 configuration) {
   Eeprom.write(423, 5, (long)configuration.interval);
   Eeprom.writeUInt8(428, configuration.i2cAddress);
@@ -1326,107 +2829,14 @@ void AFEDataAccess::saveConfiguration(BH1750 configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-
-ADCINPUT AFEDataAccess::getADCInputConfiguration() {
-  ADCINPUT configuration;
-
+IPAddress AFEDataAccess::IPfromString(const char *address) {
+  IPAddress ip;
+  if (!ip.fromString(address)) {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-analog-input.json : ";
+    Serial << endl
+           << "ERROR: converting from IP String (" << address
+           << ") to IP address";
 #endif
-
-  File configFile = SPIFFS.open("/cfg-analog-input.json", "r");
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
-#endif
-
-    size_t size = configFile.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &json = jsonBuffer.parseObject(buf.get());
-    if (json.success()) {
-#ifdef DEBUG
-      json.printTo(Serial);
-      Serial << endl;
-#endif
-      configuration.gpio = json["gpio"];
-      configuration.interval = json["interval"];
-      configuration.numberOfSamples = json["numberOfSamples"];
-      configuration.idx.raw = json["idx"]["raw"];
-      configuration.idx.percent = json["idx"]["percent"];
-      configuration.idx.voltage = json["idx"]["voltage"];
-#ifdef DEBUG
-      Serial << "success";
-#endif
-    }
-
-#ifdef DEBUG
-    else {
-      Serial << "failure";
-    }
-#endif
-
-    configFile.close();
-  }
-
-#ifdef DEBUG
-  else {
-    Serial << "failure";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-
-  return configuration;
+  };
+  return ip;
 }
-
-void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-analog-input.json : ";
-#endif
-
-  File configFile = SPIFFS.open("/cfg-analog-input.json", "w");
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
-#endif
-
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject &json = jsonBuffer.createObject();
-    JsonObject &idx = json.createNestedObject("idx");
-
-    json["gpio"] = configuration.gpio;
-    json["interval"] = configuration.interval;
-    json["numberOfSamples"] = configuration.numberOfSamples;
-    idx["raw"] = configuration.idx.raw;
-    idx["percent"] = configuration.idx.percent;
-    idx["voltage"] = configuration.idx.voltage;
-    json.printTo(configFile);
-#ifdef DEBUG
-    json.printTo(Serial);
-    Serial << endl;
-#endif
-    configFile.close();
-
-#ifdef DEBUG
-    Serial << "success";
-#endif
-
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
-  }
-  Serial << endl << "--------------------------------------------------";
-#endif
-};
-#endif

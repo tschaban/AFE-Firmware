@@ -11,9 +11,11 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-CSS.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-EEPROM.h>
+#include <AFE-Firmware.h>
 #include <ESP8266WiFi.h>
 
 #ifdef CONFIG_HARDWARE_UART
@@ -28,14 +30,23 @@
 #include <Streaming.h>
 #endif
 
+#if AFE_LANGUAGE == 0
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+
 class AFESitesGenerator {
 
 private:
   AFEEEPROM Eeprom;
   AFEDataAccess Data;
-  AFEDevice Device;
-  uint8_t language;
+  AFEDevice *Device;
   FIRMWARE firmware;
+  AFEFirmware *Firmware;
+  char deviceID[17];
+
+  const String generateHeader(uint8_t redirect);
 
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
@@ -54,6 +65,12 @@ private:
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
 
+  const String addItem(const char *type, const char *name, const char *label,
+                       const char *value, const char *size = "?",
+                       const char *min = "?", const char *max = "?",
+                       const char *step = "?", const char *hint = "?",
+                       boolean readonly = false);
+
 #if defined(T5_CONFIG)
   const String generateGateStatesList(uint8_t id, byte state);
 #endif
@@ -70,26 +87,31 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
+  void begin(AFEDevice *, AFEFirmware *);
+
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  const String generateHeader(uint8_t redirect = 0);
+  const String generateOneColumnLayout(uint8_t redirect = 0);
+  const String generateTwoColumnsLayout(uint8_t redirect = 0);
 
   /* Method generates site footer */
-  const char *generateFooter();
+  const String generateFooter(boolean extended = false);
 
   /* All following methods generates configuration sections */
-  String addLanguageConfiguration();
   String addDeviceConfiguration();
   String addNetworkConfiguration();
+  String addConnectingSite();
   String addMQTTBrokerConfiguration();
   String addDomoticzServerConfiguration();
-#ifdef CONFIG_HARDWARE_LED
+  String addPasswordConfigurationSite();
+  String addRelayConfiguration(uint8_t id);
+  String addSwitchConfiguration(uint8_t id);
+
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
-  String addRelayConfiguration(uint8_t id);
-  String addSwitchConfiguration(uint8_t id);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   String addDS18B20Configuration();
@@ -142,13 +164,16 @@ public:
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */
-  String addResetSection(uint8_t command);
+  String addResetSection();
+  String addPostResetSection();
 
   /* Method addes info that device is being reset */
-  String addExitSection();
+  String addExitSection(uint8_t command);
 
   /* Method generates section shown when device is in norma mode */
-  String addHelpSection();
+  String addIndexSection(boolean authorized);
+
+  String addProVersionSite();
 };
 
 #endif

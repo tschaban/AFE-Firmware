@@ -4,20 +4,18 @@
 
 /* Initializing Domoticz API */
 void DomoticzInit() {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     Domoticz.begin();
-    /*
-    #ifdef DEBUG
-        Serial << endl << "API: Domoticz initialized";
-    #endif
-    */
+#ifdef DEBUG
+    Serial << endl << "API: Domoticz initialized";
+#endif
   }
 }
 
-#if !defined(T5_CONFIG) // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
 /* It publishes relay state to Domoticz */
 void DomoticzPublishRelayState(uint8_t id) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     unsigned long idx = Relay[id].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendSwitchCommand(idx,
@@ -31,55 +29,38 @@ void DomoticzPublishRelayState(uint8_t id) {
 #ifdef CONFIG_TEMPERATURE
 
 /* It publishes temperature to Domoticz */
-void DomoticzPublishTemperature(float temperature) {
-
-  if (Device.configuration.domoticzAPI) {
-#if defined(T1_CONFIG)
-    unsigned long idx = Sensor.getDomoticzIDX();
-#elif defined(T2_CONFIG) || defined(T5_CONFIG)
-    unsigned long idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE);
-#endif
-
-    if (idx > 0) {
-      Domoticz.sendTemperatureCommand(idx, temperature);
-    }
+void DomoticzPublishTemperature(unsigned long idx, float temperature) {
+  if (Device.configuration.api.domoticz && idx > 0) {
+    Domoticz.sendTemperatureCommand(idx, temperature);
   }
 }
 #endif
 
 #ifdef CONFIG_HUMIDITY
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
 /* It publishes humidity to Domoticz */
-void DomoticzPublishHumidity(float humidity) {
-  if (Device.configuration.domoticzAPI) {
-    unsigned long idx = Sensor.getDomoticzIDX(IDX_TYPE_HUMIDITY);
-    if (idx > 0) {
-      Domoticz.sendHumidityCommand(idx, humidity);
-    }
+void DomoticzPublishHumidity(unsigned long idx, float humidity) {
+  if (Device.configuration.api.domoticz && idx > 0) {
+    Domoticz.sendHumidityCommand(idx, humidity);
   }
 }
 #endif
 
 #if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
 /* It publishes temperature and humidity to Domoticz */
-void DomoticzPublishTemperatureAndHumidity(float temperature, float humidity) {
-  if (Device.configuration.domoticzAPI) {
-    unsigned long idx =
-        Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY);
-    if (idx > 0) {
-      Domoticz.sendTemperatureAndHumidityCommand(idx, temperature, humidity);
-    }
+void DomoticzPublishTemperatureAndHumidity(unsigned long idx, float temperature,
+                                           float humidity) {
+  if (Device.configuration.api.domoticz && idx > 0) {
+    Domoticz.sendTemperatureAndHumidityCommand(idx, temperature, humidity);
   }
 }
-#endif
 
 #endif
 
 /* Pir */
-#if defined(T3_CONFIG)
+#ifdef CONFIG_HARDWARE_PIR
 /* It publishes gate state to Domoticz */
 void DomoticzPublishPirState(uint8_t id) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     unsigned long idx = Pir[id].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendPirCommand(idx, Pir[id].motionDetected() ? "On" : "Off");
@@ -89,10 +70,10 @@ void DomoticzPublishPirState(uint8_t id) {
 #endif
 
 /* Gate and Contactron */
-#if defined(T5_CONFIG)
+#ifdef CONFIG_FUNCTIONALITY_GATE
 /* It publishes gate state to Domoticz */
 void DomoticzPublishGateState() {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     unsigned long idx = Gate.getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendGateCommand(idx, Gate.get() == GATE_OPEN ? "On" : "Off");
@@ -102,7 +83,7 @@ void DomoticzPublishGateState() {
 
 /* It publishes contactron state to Domoticz */
 void DomoticzPublishContactronState(uint8_t id) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     unsigned long idx = Gate.Contactron[id].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendContactronCommand(
@@ -114,7 +95,7 @@ void DomoticzPublishContactronState(uint8_t id) {
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
 void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     HPMA115S0_DOMOTICZ idx;
     ParticleSensor.getDomoticzIDX(&idx);
     if (idx.pm25 > 0) {
@@ -131,7 +112,7 @@ void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
 
 #ifdef CONFIG_HARDWARE_BMX80
 void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     BMx80_DOMOTICZ idx;
     BMx80Sensor.getDomoticzIDX(&idx);
     if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
@@ -145,15 +126,13 @@ void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
       delay(10);
       Domoticz.sendCustomSensorCommand(idx.gasResistance, data.gasResistance);
     }
-    if (idx.temperature > 0) {
-      delay(10);
-      Domoticz.sendTemperatureCommand(idx.temperature, data.temperature);
+
+    DomoticzPublishTemperature(idx.temperature, data.temperature);
+
+    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
+      DomoticzPublishHumidity(idx.humidity, data.humidity);
     }
-    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-        idx.humidity > 0) {
-      delay(10);
-      Domoticz.sendHumidityCommand(idx.humidity, data.humidity);
-    }
+
     if (idx.pressure > 0) {
       delay(10);
       Domoticz.sendPressureCommand(idx.pressure, data.pressure);
@@ -164,7 +143,7 @@ void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
 
 #ifdef CONFIG_HARDWARE_BH1750
 void DomoticzPublishLightLevel(float lux) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     unsigned long idx = BH1750Sensor.getDomoticzIDX();
 
     if (idx > 0) {
@@ -176,7 +155,7 @@ void DomoticzPublishLightLevel(float lux) {
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
 void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
-  if (Device.configuration.domoticzAPI) {
+  if (Device.configuration.api.domoticz) {
     ADCINPUT_DOMOTICZ idx;
     AnalogInput.getDomoticzIDX(&idx);
 
@@ -189,7 +168,12 @@ void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
     }
     if (idx.voltage > 0) {
       delay(10);
-      Domoticz.sendCustomSensorCommand(idx.voltage, data.voltage);
+      Domoticz.sendCustomSensorCommand(idx.voltage, data.voltageCalculated);
+    }
+    if (idx.voltageCalculated > 0) {
+      delay(10);
+      Domoticz.sendCustomSensorCommand(idx.voltageCalculated,
+                                       data.voltageCalculated);
     }
   }
 }

@@ -15,6 +15,22 @@
 void handleFavicon() {}
 
 /* Method handles all HTTP request */
-void handleHTTPRequests() { WebServer.generate(); }
+void handleHTTPRequests() {
+
+#ifdef DEBUG
+  Serial << ".";
+#endif
+
+  WebServer.generate();
+}
+void handleUpload() { WebServer.generate(true); }
+
+void handleOnNotFound() {
+  String page = "<head><meta http-equiv=\"refresh\" content=\"0; "
+                "url=http://192.168.5.1/\" /></head><body><p>";
+  page += L_OPENING_CONFIG_PANEL;
+  page += "</p></body>";
+  WebServer.publishHTML(page);
+}
 
 #endif
