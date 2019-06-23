@@ -6,7 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 (Up to 4 relays)
+   - T4 - decommisioned
    - T5 Gate
    - T6 Wheater station
 
@@ -16,7 +16,7 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 */
 
 /* Includes libraries for debugging in development compilation only */
-#if defined(DEBUG)
+#ifdef DEBUG
 #include <Streaming.h>
 #endif
 
@@ -25,18 +25,18 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-/* Shelly-1 device does not have LED. Excluding LED related code */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-#include <AFE-LED.h>
-AFELED Led;
-#endif
-
 #include <AFE-Firmware.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
+
+/* Shelly-1 device does not have LED. Excluding LED related code */
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#include <AFE-LED.h>
+AFELED Led;
+#endif
 
 /* T1 Set up, DS18B20 sensor */
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -77,7 +77,7 @@ MQTT MQTTConfiguration;
 AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 GATE GateState;
 AFEGate Gate;
@@ -110,8 +110,6 @@ AFESensorHPMA115S0 ParticleSensor;
 AFEAnalogInput AnalogInput;
 #endif
 
-#include <FS.h>
-
 void setup() {
 
   Serial.begin(9600);
@@ -130,14 +128,6 @@ void setup() {
          << endl
          << "All classes and global variables initialized";
 #endif
-
-  if (SPIFFS.begin()) {
-#ifdef DEBUG
-    Serial << endl << "File system mounted";
-  } else {
-    Serial << endl << "Failed to mount file system";
-#endif
-  }
 
 #ifdef DEBUG
   Serial << endl << "Initializing device";
@@ -271,7 +261,7 @@ void setup() {
   if (Device.getMode() == MODE_NORMAL) {
 
 /* Initializing Gate */
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
     Gate.begin();
     GateState = Data.getGateConfiguration();
 #ifdef DEBUG
@@ -368,7 +358,7 @@ void loop() {
          * requests or HTTP API requests if it's turned on */
         WebServer.listener();
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
         /* Listening for gate events */
         Gate.listener();
 #endif
@@ -376,7 +366,7 @@ void loop() {
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
         /* Gate related events */
         mainGate();
 #endif

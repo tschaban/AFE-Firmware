@@ -4,7 +4,15 @@
 
 #include "AFE-Data-Access.h"
 
-AFEDataAccess::AFEDataAccess() {}
+AFEDataAccess::AFEDataAccess() {
+  if (SPIFFS.begin()) {
+#ifdef DEBUG
+    Serial << endl << "File system mounted";
+  } else {
+    Serial << endl << "Failed to mount file system";
+#endif
+  }
+}
 
 boolean AFEDataAccess::formatFileSystem() {
 #ifdef DEBUG
@@ -370,14 +378,18 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
 #ifdef CONFIG_FUNCTIONALITY_GATE
       for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-        configuration.isContactron[i] = false;
+        configuration.isContactron[i] = root["contactron"][i];
+        ;
       }
 #endif
 
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size()
+             << (400 < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -494,23 +506,6 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
      configuration.isSwitch[i] = Eeprom.read(490 + i * index);
    }
  #endif
-
-
- #if defined(T5_CONFIG)
-   index = 8;
-
-   configuration.isRelay[0] = true; // Relay must be present - hardcoded
-
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(398 + i * index);
-   }
-
-   index = 24;
-   for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
-     configuration.isContactron[i] = Eeprom.read(414 + i * index);
-   }
- #endif
-
 
  #if defined(T6_CONFIG)
    configuration.isRelay[0] = Eeprom.read(373);
@@ -2755,11 +2750,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
 }
 void AFEDataAccess::createContractonConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-relay-xx.json";
+  Serial << endl << "Creating file: cfg-contactron-xx.json";
 #endif
   CONTACTRON ContactronConfiguration;
-  ContactronConfiguration.bouncing = 200;
-  ContactronConfiguration.outputDefaultState = CONTACTRON_NO;
+  // ContactronConfiguration.bouncing = 200;
+  // ContactronConfiguration.outputDefaultState;
   ContactronConfiguration.domoticz.idx = 0;
   ContactronConfiguration.mqtt.topic[0] = '\0';
   ContactronConfiguration.gpio = 14;
@@ -2879,16 +2874,108 @@ void AFEDataAccess::saveConfiguration(GATE configuration) {
 }
 void AFEDataAccess::createGateConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-relay-xx.json";
+  Serial << endl << "Creating file: cfg-gate.json";
 #endif
-
+  GATE GateConfiguration;
+  // dodact stact
+  GateConfiguration.domoticz.idx = 0;
+  GateConfiguration.mqtt.topic[0] = '\0';
+  saveConfiguration(GateConfiguration);
   saveGateState(0);
 }
 
-uint8_t AFEDataAccess::getGateState() { return Eeprom.readUInt8(471); }
+uint8_t AFEDataAccess::getGateState() {
+  uint8_t state;
 
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-gate-state.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-gate-state.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<34> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      state = root["state"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+  return state;
+}
 void AFEDataAccess::saveGateState(uint8_t state) {
-  Eeprom.writeUInt8(471, state);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-gate-state.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-gate-state.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    String fileContent;
+
+    fileContent = "{\"state\":";
+    fileContent += state;
+    fileContent += "}";
+    configFile.print(configFile);
+#ifdef DEBUG
+    Serial << endl
+           << "Saving: " << fileContent << endl
+           << "Content size= " << fileContent.length() << endl
+           << "File size=" << configFile.size();
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl << "success";
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 }
 #endif
 

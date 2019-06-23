@@ -1053,7 +1053,7 @@ REGULATOR AFEWebServer::getRegulatorData() {
 }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_CONTACTRON
 CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
   CONTACTRON data;
 
@@ -1078,12 +1078,14 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
   }
 
   if (server.arg("x" + String(id)).length() > 0) {
-    data.idx = server.arg("x" + String(id)).toInt();
+    data.domoticz.idx = server.arg("x" + String(id)).toInt();
   }
 
   return data;
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_GATE
 GATE AFEWebServer::getGateData() {
   GATE data;
   for (uint8_t i = 0; i < sizeof(data.state); i++) {
@@ -1093,7 +1095,7 @@ GATE AFEWebServer::getGateData() {
   }
 
   if (server.arg("x").length() > 0) {
-    data.idx = server.arg("x").toInt();
+    data.domoticz.idx = server.arg("x").toInt();
   }
 
   return data;

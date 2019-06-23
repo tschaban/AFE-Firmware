@@ -128,10 +128,13 @@ public:
   void saveConfiguration(uint8_t id, PIR configuration);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_CONTACTRON
   CONTACTRON getContactronConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, CONTACTRON configuration);
   void createContractonConfigurationFile();
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
   GATE getGateConfiguration();
   void saveConfiguration(GATE configuration);
   void createGateConfigurationFile();

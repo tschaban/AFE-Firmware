@@ -14,12 +14,14 @@
 #define SERVER_CMD_SAVE 1
 #define SERVER_CMD_NONE 0
 
+/* Device operating modes */
 #define MODE_NORMAL 0
 #define MODE_CONFIGURATION 1
 #define MODE_ACCESS_POINT 2
 #define MODE_NETWORK_NOT_SET 4
 #define MODE_FIRST_TIME_LAUNCH 5
 
+/* APIs */
 #define API_HTTP 0
 #define API_MQTT 1
 #define API_DOMOTICZ 2
@@ -292,5 +294,16 @@
 #define CONFIG_RELAY_AUTOONOFF_LISTENER
 #endif
 #endif
+
+/* Enabling hardware for Gate functionality: Gate and Contactron */
+#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifndef CONFIG_HARDWARE_GATE
+#define CONFIG_HARDWARE_GATE
+#endif
+#ifndef CONFIG_HARDWARE_CONTACTRON
+#define CONFIG_HARDWARE_CONTACTRON
+#endif
+#endif
+/* End of: Enabling hardware for Gate functionality: Gate and Contactron */
 
 #endif

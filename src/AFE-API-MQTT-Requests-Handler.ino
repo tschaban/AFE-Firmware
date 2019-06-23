@@ -340,6 +340,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 } /* End of topics listener */
 
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
@@ -347,6 +348,7 @@ void MQTTPublishRelayState(uint8_t id) {
                       Relay[id].get() == RELAY_ON ? "on" : "off");
   }
 }
+#endif
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishSwitchState(uint8_t id) {

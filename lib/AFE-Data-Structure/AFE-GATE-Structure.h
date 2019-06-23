@@ -11,6 +11,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
 #define GATE_OPEN 0           // Open
 #define GATE_CLOSED 1         // Closed
 #define GATE_PARTIALLY_OPEN 2 // Being opened

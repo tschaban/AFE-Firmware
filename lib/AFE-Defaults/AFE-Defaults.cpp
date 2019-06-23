@@ -50,8 +50,11 @@ void AFEDefaults::set() {
     PIR PIRConfiguration;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_CONTACTRON
     Data->createContractonConfigurationFile();
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
     Data->createGateConfigurationFile();
 #endif
 

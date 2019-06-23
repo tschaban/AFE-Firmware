@@ -27,6 +27,11 @@
 #include <AFE-LED-Structure.h>
 #endif
 
+#ifdef CONFIG_FUNCTIONALITY_GATE
+#include <AFE-CONTACTRON-Structure.h>
+#include <AFE-GATE-Structure.h>
+#endif
+
 #ifdef T1_CONFIG
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
@@ -37,11 +42,6 @@
 
 #ifdef T3_CONFIG
 #include <AFE-PIR-Sensor-Structure.h>
-#endif
-
-#ifdef T5_CONFIG
-#include <AFE-CONTACTRON-Structure.h>
-#include <AFE-GATE-Structure.h>
 #endif
 
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are

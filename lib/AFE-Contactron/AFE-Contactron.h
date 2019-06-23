@@ -26,7 +26,6 @@ private:
   boolean _changed = false; // True if contractor changed state
 
   unsigned long startTime = 0;
-  char mqttTopic[50];
 
   AFELED ContactronLed;
 

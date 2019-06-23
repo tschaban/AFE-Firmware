@@ -61,6 +61,7 @@
 #define L_VERSION "Version"
 #define L_YES "Yes"
 #define L_NO "No"
+#define L_SENSOR "Sensor"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Incorrect password"
@@ -230,5 +231,34 @@
 #define L_VALID "Valid"
 #define L_PRO_CANNOT_BE_COFIGURED                                              \
   "Version PRO can be configured once the device is connected to the Internet"
+
+/* Form: Contactron */
+#ifdef CONFIG_HARDWARE_CONTACTRON
+#define L_LED_ASSIGNED_TO_SENSOR "LED assigned to the sensor"
+#define L_SET_CONTACTRON_SENSITIVENESS                                         \
+  "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
+  "expected"
+#define L_MAGNETIC_SENSOR "Magnetic'scanf sensor"
+#define L_MAGNETIC_SENSORS "Magnetic'scanf sensors"
+#define L_NUMBER_OF_MAGNETIC_SENSORS "Number of magnetic's sensors"
+
+#endif
+
+/* Form: Gate */
+#ifdef CONFIG_HARDWARE_GATE
+#define L_IF_MAGNETIC_SENSOR "If magnetic sensor"
+#define L_AND_SENSOR "and sensor"
+#define L_IS_OPEN "is open"
+#define L_ARE_OPEN "are open"
+#define L_THEN "then"
+#define L_IS_CLOSED "is closed"
+#define L_ARE_CLOSED "są zamknięte"
+#define L_GATES_STATES_CONFIGURATION "Gate states configuration"
+#define L_SET_GATE_STATE "Set gate's state to"
+#define L_OPENED "Opened"
+#define L_CLOSED "Closed"
+#define L_PARTIALLY_OPENED "Partially opened"
+#define L_GATE_CONFIGURATION "Gate/Door configuration"
+#endif
 
 #endif

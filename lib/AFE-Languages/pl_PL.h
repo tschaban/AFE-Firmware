@@ -60,6 +60,7 @@
 #define L_VERSION "Wersja"
 #define L_YES "Tak"
 #define L_NO "Nie"
+#define L_SENSOR "Czujnik"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -239,5 +240,32 @@
 #define L_VALID "Aktualny"
 #define L_PRO_CANNOT_BE_COFIGURED                                              \
   "Konieczne jest podłączenie do Internetu, aby skonfigurować wersję PRO"
+
+/* Form: Contactron */
+#ifdef CONFIG_HARDWARE_CONTACTRON
+#define L_LED_ASSIGNED_TO_SENSOR "LED przypisany do czujnika"
+#define L_SET_CONTACTRON_SENSITIVENESS                                                   \
+  "Czułość należy ustawić eksperymentalnie, aż uzyska się pożądane działanie " \
+  "czujnika magnetycznego"
+#define L_MAGNETIC_SENSOR "Czujnik magnetyczny"
+#define L_MAGNETIC_SENSORS "Czujniki magnetyczne"
+#define L_NUMBER_OF_MAGNETIC_SENSORS "Ilość czujników magnetycznych"
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+#define L_IF_MAGNETIC_SENSOR "Jeśli czujnik magnetyczny"
+#define L_AND_SENSOR "oraz czujnik"
+#define L_IS_OPEN "jest otwarty"
+#define L_ARE_OPEN "są otwarte"
+#define L_THEN "to"
+#define L_IS_CLOSED "jest zamknięty"
+#define L_ARE_CLOSED "są zamknięte"
+#define L_GATES_STATES_CONFIGURATION "Konfiguracja stanów bramy"
+#define L_SET_GATE_STATE "Ustaw stan bramy na"
+#define L_OPENED "Otwarta"
+#define L_CLOSED "Zamknięta"
+#define L_PARTIALLY_OPENED "Częściowo otwarta"
+#define L_GATE_CONFIGURATION "Konfiguracja bram/drzwi"
+#endif
 
 #endif
