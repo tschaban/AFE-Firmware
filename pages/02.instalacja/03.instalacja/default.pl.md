@@ -24,6 +24,8 @@ Poniższy przykład opisuje, jak wgrać AFE Firmware do urządzenia Sonoff Basic
 
 **Krok 4.** Konfigurujemy NodeMCU Flasher
 
+> Przed wgraniem firmware rozważ jeszcze [wyczyszczenie całej zawartości pamięci flash ESP8266/8285](https://afe.smartnydom.pl/pl/instalacja/instalacja-zanim-zainstalujesz-firmware/instalacja/formatowanie-esp). Bardziej dobra praktyka, niż konieczność.
+
 W zakładce **Advanced** ustawiamy następujące parametry:
 
  ![Ustawienia wgrywania](https://www.smartnydom.pl/wp-content/uploads/2017/12/afe-firmware-spi-mode.jpg)

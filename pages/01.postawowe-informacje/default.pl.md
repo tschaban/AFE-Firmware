@@ -1,6 +1,9 @@
 ---
 title: 'Podstawowe informacje'
 media_order: donate-logo.jpg
+process:
+    markdown: true
+    twig: true
 ---
 
 ![](donate-logo.jpg)

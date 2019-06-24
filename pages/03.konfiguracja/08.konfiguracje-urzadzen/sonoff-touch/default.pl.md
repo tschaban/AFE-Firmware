@@ -9,8 +9,8 @@ title: 'Sonoff Touch'
 | GPIO0	| TouchPad #1 |
 | GPIO12 | Relay #1 oraz podświetlenie TouchPad'a #1 |
 | GPIO13 | Niebieski LED |
-| GPIO1	| RX pin (do użycia do zewnętrznych czujników) |
-| GPIO3	| TX pin (do użycia do zewnętrznych czujników) |
+| GPIO3	| RX pin (do użycia do zewnętrznych czujników) |
+| GPIO1	| TX pin (do użycia do zewnętrznych czujników) |
 
 #### Sonoff Touch T1 2 Przyciski
 
