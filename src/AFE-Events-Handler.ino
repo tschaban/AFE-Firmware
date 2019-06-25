@@ -25,7 +25,7 @@ void eventsListener() {
         }
       }
 #else
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
           DomoticzPublishRelayState(i);
         } else {
@@ -76,7 +76,7 @@ void eventsListener() {
       Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
 
       /* Setting Relay state after connection to MQTT */
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Subscribing to MQTT Topic for Relay*/
@@ -96,7 +96,7 @@ void eventsListener() {
       }
 
       /* Publishing state of Switch to MQTT */
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
         if (Device.configuration.isSwitch[i]) {
           MQTTPublishSwitchState(i);
         }

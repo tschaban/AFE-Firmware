@@ -1,6 +1,6 @@
 /* Initializing Switches */
 void initSwitch() {
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     if (Device.configuration.isSwitch[i]) {
       Switch[i].begin(i, &Device);
     } else {
@@ -12,7 +12,7 @@ void initSwitch() {
 /* Method processes Switch related events */
 void mainSwitch() {
   if (Device.getMode() == MODE_NORMAL) {
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
       if (Device.configuration.isSwitch[i]) {
         /* One of the switches has been shortly pressed */
         if (Switch[i].isPressed() &&
@@ -61,7 +61,7 @@ void mainSwitch() {
 void mainSwitchListener() {
 
   /* Listens for switch events */
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     if (Device.configuration.isSwitch[i]) {
 
       Switch[i].listener();
