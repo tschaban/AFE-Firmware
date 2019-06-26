@@ -41,7 +41,7 @@ void mainSensor() {
 
 /* Thermostat */
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Thermostat listener */
@@ -62,7 +62,7 @@ void mainSensor() {
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Thermal Protection listener */
@@ -96,7 +96,7 @@ void mainSensor() {
 
 /* Humidistat */
 #if !defined(T5_CONFIG)
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Humiditstat listener */

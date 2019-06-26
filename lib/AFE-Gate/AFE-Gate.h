@@ -28,7 +28,7 @@ private:
   GATE gateConfiguration;
   uint8_t numberOfContractors = 0;
   boolean _event = false;
-  AFERelay Relay[sizeof(Device.configuration.isRelay)];
+  AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

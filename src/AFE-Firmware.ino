@@ -68,8 +68,8 @@ AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
-AFESwitch Switch[sizeof(Device.configuration.isSwitch)];
-AFERelay Relay[sizeof(Device.configuration.isRelay)];
+AFESwitch Switch[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 MQTT MQTTConfiguration;
 
 #if defined(T3_CONFIG)

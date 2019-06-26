@@ -359,6 +359,10 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
       configuration.api.domoticz = root["api"]["domoticz"];
+      /* HTTP API must be ON when Domoticz is ON */
+      if (configuration.api.domoticz && !configuration.api.http) {
+        configuration.api.http = true;
+      }
 
       for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
         configuration.isLED[i] = root["led"][i];
@@ -704,6 +708,8 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   Serial << endl << "Creating file: cfg-device.json";
 #endif
   DEVICE deviceConfiguration;
+  uint8_t index = 0; // Used to added config to max allowed in T0 dispite the
+                     // fact how many items is available per specifict hardware
   sprintf(deviceConfiguration.name, "AFE-Device");
   /* APIs */
   deviceConfiguration.api.mqtt = false;
@@ -714,27 +720,36 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef CONFIG_FUNCTIONALITY_RELAY
 #if defined(DEVICE_SONOFF_BASIC_V1)
   deviceConfiguration.isRelay[0] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(DEVICE_SHELLY_1)
   deviceConfiguration.isRelay[0] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(DEVICE_SONOFF_4CH)
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     deviceConfiguration.isRelay[i] = true;
   }
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
   deviceConfiguration.isRelay[0] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(DEVICE_SONOFF_TOUCH_2G)
   deviceConfiguration.isRelay[0] = true;
   deviceConfiguration.isRelay[1] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     deviceConfiguration.isRelay[i] = true;
   }
-#else
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
+#endif
+  /* Adding remaining configuration files */
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
     deviceConfiguration.isRelay[i] = false;
   }
+
 #endif
-#endif
+
+  index = 0; // See description above
 
 /* Switch presence */
 #if defined(DEVICE_SONOFF_BASIC_V1)
@@ -742,43 +757,56 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = false;
   }
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_4CH)
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = true;
   }
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
   deviceConfiguration.isSwitch[0] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_2G)
   deviceConfiguration.isSwitch[0] = true;
   deviceConfiguration.isSwitch[1] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = true;
   }
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SHELLY_1)
   deviceConfiguration.isSwitch[0] = true;
-#else
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
+#endif
+  /* Adding remaining configuration files */
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
     deviceConfiguration.isSwitch[i] = false;
   }
-#endif
 
 /* LEDs presence */
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+
+  index = 0; // See description above
+
 #if defined(DEVICE_SONOFF_BASIC_V1)
   deviceConfiguration.isLED[0] = true;
   for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     deviceConfiguration.isLED[i] = false;
   }
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_4CH)
   deviceConfiguration.isLED[0] = true;
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   deviceConfiguration.isLED[0] = true;
-#else
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
+#endif
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
     deviceConfiguration.isLED[i] = false;
   }
-#endif
+
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
@@ -1469,30 +1497,35 @@ void AFEDataAccess::createLEDConfigurationFile() {
   Serial << endl << "Creating file: cfg-led.json";
 #endif
   LED LEDConfiguration;
+  uint8_t index = 0;
   LEDConfiguration.changeToOppositeValue = false;
 #if defined(DEVICE_SONOFF_BASIC_V1)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
   LEDConfiguration.gpio = 14;
   saveConfiguration(1, LEDConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_4CH)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_TOUCH_2G)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
-#else
+  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
+#endif
   LEDConfiguration.gpio = 13;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
     saveConfiguration(i, LEDConfiguration);
   }
-#endif
 }
 uint8_t AFEDataAccess::getSystemLedID() {
   uint8_t id = 0;
@@ -1960,7 +1993,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   Serial << endl << "Creating file: cfg-relay-xx.json";
 #endif
   RELAY RelayConfiguration;
-
+  uint8_t index = 0;
   /* Relay config */
 
 #ifdef CONFIG_FUNCTIONALITY_GATE
@@ -1991,7 +2024,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(0, false);
 #endif
   saveConfiguration(0, RelayConfiguration);
-
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF 4CH */
 #elif defined(DEVICE_SONOFF_4CH)
   RelayConfiguration.gpio = 12;
@@ -2016,6 +2049,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(3, false);
 #endif
   saveConfiguration(3, RelayConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 1G */
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
   RelayConfiguration.gpio = 12;
@@ -2023,7 +2057,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(0, false);
 #endif
   saveConfiguration(0, RelayConfiguration);
-
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 2G */
 #elif defined(DEVICE_SONOFF_TOUCH_2G)
   RelayConfiguration.gpio = 12;
@@ -2037,7 +2071,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(1, false);
 #endif
   saveConfiguration(1, RelayConfiguration);
-
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 3G */
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   RelayConfiguration.gpio = 12;
@@ -2056,7 +2090,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(2, false);
 #endif
   saveConfiguration(2, RelayConfiguration);
-
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
   /* Shelly-1 */
 
 #elif defined(DEVICE_SHELLY_1)
@@ -2065,17 +2099,16 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(0, false);
 #endif
   saveConfiguration(0, RelayConfiguration);
-
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* Clean */
-#else
+#endif
   RelayConfiguration.gpio = 12;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
 #ifdef CONFIG_FUNCTIONALITY_RELAY
     saveRelayState(i, false);
 #endif
     saveConfiguration(i, RelayConfiguration);
   }
-#endif
 }
 
 /* Relay state methods*/
@@ -2295,6 +2328,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   Serial << endl << "Creating file: cfg-switch.json";
 #endif
   SWITCH SwitchConfiguration;
+  uint8_t index = 0;
 
   SwitchConfiguration.sensitiveness = SWITCH_SENSITIVENESS;
   SwitchConfiguration.relayID = 1;
@@ -2314,6 +2348,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(2, SwitchConfiguration);
   SwitchConfiguration.gpio = 3;
   saveConfiguration(3, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_4CH)
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = SWITCH_TYPE_MONO;
@@ -2329,11 +2364,13 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.gpio = 14;
   SwitchConfiguration.relayID = 4;
   saveConfiguration(3, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = SWITCH_TYPE_MONO;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
   saveConfiguration(0, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_2G)
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = SWITCH_TYPE_MONO;
@@ -2343,6 +2380,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
   SwitchConfiguration.relayID = 2;
   saveConfiguration(1, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = SWITCH_TYPE_MONO;
@@ -2355,24 +2393,30 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.gpio = 10;
   SwitchConfiguration.relayID = 3;
   saveConfiguration(2, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SHELLY_1)
   SwitchConfiguration.gpio = 5;
   SwitchConfiguration.type = SWITCH_TYPE_BI;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
   saveConfiguration(0, SwitchConfiguration);
-#else
-  SwitchConfiguration.gpio = 0;
-  SwitchConfiguration.type = SWITCH_TYPE_MONO;
-  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
-  saveConfiguration(0, SwitchConfiguration);
-  SwitchConfiguration.gpio = 14;
-  SwitchConfiguration.type = SWITCH_TYPE_BI;
-  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
-  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    SwitchConfiguration.relayID = i + 1;
-    saveConfiguration(i, SwitchConfiguration);
-  }
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #endif
+  if (index == 0) {
+    SwitchConfiguration.gpio = 0;
+    SwitchConfiguration.type = SWITCH_TYPE_MONO;
+    SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+    saveConfiguration(0, SwitchConfiguration);
+    index = 1;
+  }
+  if (index < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
+    SwitchConfiguration.gpio = 14;
+    SwitchConfiguration.type = SWITCH_TYPE_BI;
+    SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+    for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
+      SwitchConfiguration.relayID = i + 1;
+      saveConfiguration(i, SwitchConfiguration);
+    }
+  }
 }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC

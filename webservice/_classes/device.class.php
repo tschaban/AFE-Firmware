@@ -51,7 +51,7 @@ class device
       $q = "UPDATE " . C_TABLE_PREFIX . "devices SET firmware_type='".$type.
       "',device_type_id = ".$deviceType.
       ",firmware_version = '".$version.
-      "', last_seen_on = CURRENT_TIMESTAMP() WHERE id = '" .  $this->_id . "'";
+      "', last_seen_on = CURRENT_TIMESTAMP(), firmware_upgraded_on = CURRENT_TIMESTAMP() WHERE id = '" .  $this->_id . "'";
       return $this->_db->executeQuery($q);
     }
 
