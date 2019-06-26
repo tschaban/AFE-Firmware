@@ -91,7 +91,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   case AFE_CONFIG_SITE_LED:
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
       if (Device->configuration.isLED[i]) {
         page += Site.addLEDConfiguration(i);
       } else {
@@ -231,7 +231,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     case AFE_CONFIG_SITE_LED:
-      for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
         if (Device->configuration.isLED[i]) {
           Data.saveConfiguration(i, getLEDData(i));
         }
@@ -522,7 +522,7 @@ void AFEWebServer::generate(boolean upload) {
     }
   }
   else {
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
       if (Device->configuration.isRelay[i]) {
         if (optionName == "relay" + String(i)) {
           if (command == SERVER_CMD_SAVE) {
@@ -535,7 +535,7 @@ void AFEWebServer::generate(boolean upload) {
       }
     }
 
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
       if (Device->configuration.isSwitch[i]) {
         if (optionName == "switch" + String(i)) {
           SWITCH data = {};
@@ -727,7 +727,7 @@ DEVICE AFEWebServer::getDeviceData() {
   server.arg("d").length() > 0 ? data.api.domoticz = true
                                : data.api.domoticz = false;
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
 #endif
@@ -738,13 +738,13 @@ DEVICE AFEWebServer::getDeviceData() {
                                  : data.isContactron[i] = false;
   }
 #else
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     server.arg("hr").toInt() > i ? data.isRelay[i] = true
                                  : data.isRelay[i] = false;
   }
 #endif
 
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     server.arg("hs").toInt() > i ? data.isSwitch[i] = true
                                  : data.isSwitch[i] = false;
   }

@@ -94,7 +94,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
   uint8_t itemPresent = 0;
 
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     if (Device->configuration.isLED[i]) {
       itemPresent++;
     } else {
@@ -112,7 +112,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
   /* Relay */
   itemPresent = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     if (Device->configuration.isRelay[i]) {
       itemPresent++;
     } else {
@@ -155,7 +155,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
   /* Switch */
   itemPresent = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     if (Device->configuration.isSwitch[i]) {
       itemPresent++;
     } else {
@@ -413,7 +413,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 /* LED */
 #if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
     CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     if (Device->configuration.isLED[i]) {
       itemsNumber++;
     } else {
@@ -421,8 +421,8 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(sizeof(Device->configuration.isLED),
-                                    itemsNumber, "hl", L_NUMBER_OF_LEDS);
+  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_LEDS, itemsNumber,
+                                    "hl", L_NUMBER_OF_LEDS);
 
 #endif
 
@@ -442,7 +442,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
                     : "Number of magnetic sensors");
 
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     if (Device->configuration.isSwitch[i]) {
       itemsNumber++;
     } else {
@@ -452,7 +452,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #else
   /* Relay */
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isRelay); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     if (Device->configuration.isRelay[i]) {
       itemsNumber++;
     } else {
@@ -460,13 +460,13 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(sizeof(Device->configuration.isRelay),
+  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_RELAYS,
                                     itemsNumber, "hr", L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isSwitch); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
     if (Device->configuration.isSwitch[i]) {
       itemsNumber++;
     } else {
@@ -474,7 +474,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
     }
   }
 
-  body += generateHardwareItemsList(sizeof(Device->configuration.isSwitch),
+  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
                                     itemsNumber, "hs", L_NUMBER_OF_SWITCHES);
 
 #ifdef CONFIG_HARDWARE_DS18B20
@@ -831,7 +831,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     if (Device->configuration.isLED[i - 1]) {
       body += "<option value=\"";
       body += i;
@@ -1015,7 +1015,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     if (Device->configuration.isLED[i - 1]) {
       body += "<option value=\"";
       body += i;
@@ -1154,7 +1154,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= sizeof(Device->configuration.isRelay); i++) {
+  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     if (Device->configuration.isRelay[i - 1]) {
       body += "<option value=\"";
       body += i;
@@ -1642,7 +1642,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += language == 0 ? ">Brak" : ">None";
   body += "</option>";
 
-  for (uint8_t i = 1; i <= sizeof(Device->configuration.isLED); i++) {
+  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
     if (Device->configuration.isLED[i - 1]) {
       body += "<option value=\"";
       body += i;

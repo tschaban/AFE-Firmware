@@ -27,7 +27,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY /* Relay processing */
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
       if (Device.configuration.isRelay[i]) {
 
 #ifdef DEBUG

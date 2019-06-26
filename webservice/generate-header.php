@@ -27,7 +27,7 @@ $_empty = "Null";
 $_type = isset($_GET["firmwareType"]) ? strlen($_GET["firmwareType"]) == 0 ? $_empty : $_GET["firmwareType"] : $_empty;
 $_version = (isset($_GET["firmwareVersion"]) && !empty($_GET["firmwareVersion"])) ? $_GET["firmwareVersion"] : $_empty;
 $_device_id = (isset($_GET["deviceID"]) && !empty($_GET["deviceID"])) ? $_GET["deviceID"] : $_empty;
-$_device_type_id = (isset($_GET["deviceTypeID"]) && !empty($_GET["deviceTypeID"])) ? $_GET["deviceTypeID"] : $_empty;
+$_device_type_id = (isset($_GET["deviceTypeID"]) && !empty($_GET["deviceTypeID"])) ? $_GET["deviceTypeID"] : 0;
 
 $debug->push("- Firmware type: " . $_type);
 $debug->push("- Firmware version: " . $_version);

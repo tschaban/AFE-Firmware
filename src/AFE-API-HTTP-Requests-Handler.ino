@@ -147,7 +147,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
     boolean noRelay = true;
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isRelay); i++) {
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
       if (Device.configuration.isRelay[i]) {
         if (strcmp(request.name, Relay[i].getName()) == 0) {
           noRelay = false;
