@@ -1,9 +1,7 @@
 ---
 title: 'O AFE Firmware'
-media_order: '18-10-05 18-59-28 7188-1.jpg,donate-logo.jpg'
+media_order: '18-10-05 18-59-28 7188-1.jpg'
 ---
-
-![](donate-logo.jpg)
 
 AFE Firmware to oprogramowanie dla urządzeń zbudowanych na chip’ie ESP8266 lub ESP8285 jak na przykład [Sonoff](https://www.smartnydom.pl/przelacznik-sonoff/?target=_blank), [Shelly](https://www.smartnydom.pl/wlacznik-wifi-shelly-1/?target=_blank), [GeekCreit](https://www.smartnydom.pl/geekcreit-4ch-afe-firmware/?target=_blank), ... (długa lista), czy we [własnych konstrukcjach](https://www.smartnydom.pl/bezprzewodowy-czujnik-temperatury-oraz-wilgotnosci?target=_blank). Wykorzystuję je w swoich instalacjach do różnych zastosowań.
 

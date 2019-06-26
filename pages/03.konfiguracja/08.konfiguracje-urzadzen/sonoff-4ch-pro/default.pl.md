@@ -15,5 +15,5 @@ title: 'Sonoff 4CH (Pro)'
 | GPIO4 | Przekaźnik #3  i czerwony LED |
 | GPIO15 | Przekaźnik #4  i czerwony LED |
 | GPIO13 | Niebieski LED |
-| GPIO1	| RX pin (do użycia do zewnętrznych czujników) |
-| GPIO3	| TX pin (do użycia do zewnętrznych czujników) |
+| GPIO3	| RX pin (do użycia do zewnętrznych czujników) |
+| GPIO1	| TX pin (do użycia do zewnętrznych czujników) |

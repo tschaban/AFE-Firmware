@@ -10,4 +10,4 @@ AFE nie współpracuje z oprogramowaniem Supla. Nie można sterować urządzenia
 
 Przeczytaj: [Politykę Prywatności dot. AFE Firmware](/postawowe-informacje/polityka-prywatnosci?target=_blank)
 
-!! Jeśli nie rozumiesz powyższych punktów lub z którymiś nie zgadzasz się, to nie możesz instalować oprogramowania AFE Firmware
+!! Jeśli nie rozumiesz powyższych punktów lub z którymś nie zgadzasz się, to nie możesz instalować oprogramowania AFE Firmware
