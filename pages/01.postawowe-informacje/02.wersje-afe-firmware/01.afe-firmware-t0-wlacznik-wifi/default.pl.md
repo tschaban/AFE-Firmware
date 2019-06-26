@@ -20,6 +20,7 @@ title: 'T0 - włącznik WiFi'
 * Automatyczne wyłączanie przekaźników po zadanym czasie
 * Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 * LED może informwać o stanie przekaźnika
+* Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Konfiguracja przez przeglądarkę w języko PL lub EN
 * Możliwość nadania stałego adresu IP dla urządzenia
 * Aktualizacja oprogramowania przez przeglądarkę
