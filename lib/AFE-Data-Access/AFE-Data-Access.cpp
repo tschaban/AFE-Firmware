@@ -351,6 +351,10 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
       configuration.api.domoticz = root["api"]["domoticz"];
+      /* HTTP API must be ON when Domoticz is ON */
+      if (configuration.api.domoticz && !configuration.api.http) {
+        configuration.api.http = true;
+      }
 
       for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
         configuration.isLED[i] = root["led"][i];
