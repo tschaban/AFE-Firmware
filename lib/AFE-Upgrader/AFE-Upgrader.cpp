@@ -18,11 +18,9 @@ boolean AFEUpgrader::upgraded() {
 }
 
 void AFEUpgrader::upgrade() {
-  if (FirmwareConfiguration.type != FIRMWARE_TYPE) {
-    upgradeTypeOfFirmware();
-  } else {
-    Data.saveVersion(FIRMWARE_VERSION);
-  }
+  sprintf(FirmwareConfiguration.version, FIRMWARE_VERSION);
+  FirmwareConfiguration.type = FIRMWARE_TYPE;
+  Data.saveConfiguration(&FirmwareConfiguration);
 }
 
 void AFEUpgrader::upgradeTypeOfFirmware() {}
