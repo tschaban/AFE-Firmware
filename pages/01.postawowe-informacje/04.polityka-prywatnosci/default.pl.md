@@ -47,3 +47,5 @@ Na tej stronie znajdziesz informacje dotyczące gromadzenia, przetwarzania i wyk
 
 > Zagregowanie dane statystyczne o zainstalowanych typach i wersjach oprogramowania AFE Firmware mogą zostać publicznie udostępnione na stronie: [Smart'ny Dom](https://www.smartnydom.pl)
 
+
+[aaaa]: test

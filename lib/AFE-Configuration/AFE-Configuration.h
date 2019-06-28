@@ -90,7 +90,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define FIRMWARE_VERSION "2.0.1"
+#define FIRMWARE_VERSION "2.0.2"
 #define FIRMWARE_TYPE 0
 
 // ADC Measurments available for all devices expect Shelly-1

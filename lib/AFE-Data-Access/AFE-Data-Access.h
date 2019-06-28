@@ -42,7 +42,7 @@ public:
   void createDeviceConfigurationFile();
 
   FIRMWARE getFirmwareConfiguration();
-  void saveConfiguration(FIRMWARE configuration);
+  void saveConfiguration(FIRMWARE *);
   void createFirmwareConfigurationFile();
 
   NETWORK getNetworkConfiguration();
