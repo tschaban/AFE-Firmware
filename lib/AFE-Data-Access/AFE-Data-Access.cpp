@@ -871,7 +871,7 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
+void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -888,10 +888,10 @@ void AFEDataAccess::saveConfiguration(FIRMWARE configuration) {
 
     StaticJsonBuffer<100> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["type"] = configuration.type;
-    root["version"] = configuration.version;
-    root["autoUpgrade"] = configuration.autoUpgrade;
-    root["upgradeURL"] = configuration.upgradeURL;
+    root["type"] = configuration->type;
+    root["version"] = configuration->version;
+    root["autoUpgrade"] = configuration->autoUpgrade;
+    root["upgradeURL"] = configuration->upgradeURL;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -921,13 +921,13 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   firmwareConfiguration.type = FIRMWARE_TYPE;
   firmwareConfiguration.autoUpgrade = 0;
   firmwareConfiguration.upgradeURL[0] = '\0';
-  saveConfiguration(firmwareConfiguration);
+  saveConfiguration(&firmwareConfiguration);
 }
 
 void AFEDataAccess::saveVersion(const char *version) {
   FIRMWARE configuration = getFirmwareConfiguration();
   sprintf(configuration.version, version);
-  saveConfiguration(configuration);
+  saveConfiguration(&configuration);
 }
 
 uint8_t AFEDataAccess::getDeviceMode() {
