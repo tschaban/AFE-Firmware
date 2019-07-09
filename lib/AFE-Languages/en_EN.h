@@ -238,8 +238,8 @@
 #define L_SET_CONTACTRON_SENSITIVENESS                                         \
   "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
   "expected"
-#define L_MAGNETIC_SENSOR "Magnetic'scanf sensor"
-#define L_MAGNETIC_SENSORS "Magnetic'scanf sensors"
+#define L_MAGNETIC_SENSOR "Magnetic's sensor"
+#define L_MAGNETIC_SENSORS "Magnetic's sensors"
 #define L_NUMBER_OF_MAGNETIC_SENSORS "Number of magnetic's sensors"
 
 #endif

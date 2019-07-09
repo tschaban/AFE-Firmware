@@ -38,7 +38,7 @@ public:
   void createDeviceUIDFile();
 
   DEVICE getDeviceConfiguration();
-  void saveConfiguration(DEVICE configuration);
+  void saveConfiguration(DEVICE *);
   void createDeviceConfigurationFile();
 
   FIRMWARE getFirmwareConfiguration();

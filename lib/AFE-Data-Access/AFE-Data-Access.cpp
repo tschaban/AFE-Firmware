@@ -330,6 +330,7 @@ void AFEDataAccess::createPasswordConfigurationFile() {
   saveConfiguration(PasswordConfiguration);
 }
 
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 400
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 #ifdef DEBUG
@@ -349,7 +350,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<400> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -364,15 +365,15 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
         configuration.api.http = true;
       }
 
-      for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
         configuration.isLED[i] = root["led"][i];
       }
 
-      for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
         configuration.isSwitch[i] = root["switch"][i];
       }
 
-      for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         configuration.isRelay[i] = root["relay"][i];
       }
 
@@ -380,8 +381,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.isAnalogInput = root["isAnalogInput"];
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
-      for (uint8_t i = 0; i < sizeof(configuration.isContactron); i++) {
+#ifdef CONFIG_HARDWARE_CONTACTRON
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
         configuration.isContactron[i] = root["contactron"][i];
         ;
       }
@@ -391,7 +392,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       Serial << endl
              << "success" << endl
              << "JSON Buffer size: " << jsonBuffer.size()
-             << (400 < jsonBuffer.size() + 10
+             << (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10
                      ? "WARNING: Buffor size might be to small"
                      : "Buffor size: OK");
 #endif
@@ -537,7 +538,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
  #endif
  */
 }
-void AFEDataAccess::saveConfiguration(DEVICE configuration) {
+void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef DEBUG
   Serial << endl
@@ -553,32 +554,39 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<400> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["name"] = configuration.name;
+    root["name"] = configuration->name;
 
     JsonObject &jsonAPI = root.createNestedObject("api");
-    jsonAPI["http"] = configuration.api.http;
-    jsonAPI["mqtt"] = configuration.api.mqtt;
-    jsonAPI["domoticz"] = configuration.api.domoticz;
+    jsonAPI["http"] = configuration->api.http;
+    jsonAPI["mqtt"] = configuration->api.mqtt;
+    jsonAPI["domoticz"] = configuration->api.domoticz;
 
     JsonArray &jsonLED = root.createNestedArray("led");
-    for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
-      jsonLED.add(configuration.isLED[i]);
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+      jsonLED.add(configuration->isLED[i]);
     }
 
     JsonArray &jsonSwitch = root.createNestedArray("switch");
-    for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-      jsonSwitch.add(configuration.isSwitch[i]);
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+      jsonSwitch.add(configuration->isSwitch[i]);
     }
 
     JsonArray &jsonRelay = root.createNestedArray("relay");
-    for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-      jsonRelay.add(configuration.isRelay[i]);
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+      jsonRelay.add(configuration->isRelay[i]);
     }
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-    root["isAnalogInput"] = configuration.isAnalogInput;
+    root["isAnalogInput"] = configuration->isAnalogInput;
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
+    JsonArray &jsonContactron = root.createNestedArray("contactron");
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
+      jsonContactron.add(configuration->isContactron[i]);
+    }
 #endif
 
     root.printTo(configFile);
@@ -591,7 +599,10 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size()
+           << (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }
@@ -813,7 +824,14 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   deviceConfiguration.isAnalogInput = false;
 #endif
 
-  saveConfiguration(deviceConfiguration);
+#ifdef CONFIG_HARDWARE_CONTACTRON
+  index = 0; // See description above
+  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+    deviceConfiguration.isContactron[i] = false;
+  }
+#endif
+
+  saveConfiguration(&deviceConfiguration);
 }
 
 FIRMWARE AFEDataAccess::getFirmwareConfiguration() {

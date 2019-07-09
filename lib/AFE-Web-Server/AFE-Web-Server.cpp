@@ -89,6 +89,16 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addAnalogInputConfiguration();
     break;
 #endif
+#ifdef CONFIG_HARDWARE_CONTACTRON
+  case AFE_CONFIG_SITE_CONTACTRON:
+    page += Site.addContactronConfiguration(siteConfig->deviceID);
+    break;
+#endif
+#ifdef CONFIG_HARDWARE_GATE
+  case AFE_CONFIG_SITE_GATE:
+    page += Site.addGateConfiguration();
+    break;
+#endif
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
@@ -210,7 +220,10 @@ void AFEWebServer::generate(boolean upload) {
       siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
       break;
     case AFE_CONFIG_SITE_DEVICE:
-      Data.saveConfiguration(getDeviceData());
+      DEVICE configuration;
+      configuration = getDeviceData();
+      Data.saveConfiguration(&configuration);
+      configuration = {0};
       break;
     case AFE_CONFIG_SITE_NETWORK:
       Data.saveConfiguration(getNetworkData());
@@ -260,6 +273,18 @@ void AFEWebServer::generate(boolean upload) {
       Firmware->begin();
       Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
       break;
+#ifdef CONFIG_HARDWARE_CONTACTRON
+    case AFE_CONFIG_SITE_CONTACTRON:
+      Data.saveConfiguration(siteConfig.deviceID,
+                             getContactronData(siteConfig.deviceID));
+      break;
+
+#endif
+#ifdef CONFIG_HARDWARE_GATE
+    case AFE_CONFIG_SITE_GATE:
+      Data.saveConfiguration(getGateData());
+      break;
+#endif
     }
   } else if (command == SERVER_CMD_NONE) {
     switch (siteConfig.ID) {

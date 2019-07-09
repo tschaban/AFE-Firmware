@@ -211,7 +211,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 /* Contactrons and Gate */
 #ifdef CONFIG_HARDWARE_CONTACTRON
   itemPresent = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
     if (Device->configuration.isContactron[i]) {
       itemPresent++;
     } else {
@@ -224,7 +224,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += L_MAGNETIC_SENSORS;
     page += "</i></a></li>";
     for (uint8_t i = 0; i < itemPresent; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?o=contactron";
+      page += "<li class=\"itm\"><a href=\"\\?o=";
+      page += AFE_CONFIG_SITE_CONTACTRON;
+      page += "&i=";
       page += i;
       page += "\"> - ";
       page += L_SENSOR;
@@ -233,7 +235,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "</a></li>";
     }
 #ifdef CONFIG_HARDWARE_GATE
-    page += "<li class=\"itm\"><a href=\"\\?o=gate\">";
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_GATE;
+    page += "\">";
     page += L_GATE_CONFIGURATION;
     page += "</a></li>";
   }
@@ -357,9 +361,9 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 /* Contactrons */
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_CONTACTRON
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
     if (Device->configuration.isContactron[i]) {
       itemsNumber++;
     } else {
@@ -1539,7 +1543,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 #ifdef CONFIG_HARDWARE_CONTACTRON
 String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   CONTACTRON configuration = Data.getContactronConfiguration(id);
-  DEVICE deviceConfiguration = Device->configuration;
+  // DEVICE deviceConfiguration = Device->configuration;
 
   String body = "<fieldset>";
   char field[3];

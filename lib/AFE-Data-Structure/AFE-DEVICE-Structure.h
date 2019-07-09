@@ -62,10 +62,10 @@ struct DEVICE {
   boolean isAnalogInput;
 #endif
 #elif defined(T5_CONFIG)
-  boolean isLED[3];
-  boolean isSwitch[2];
-  boolean isRelay[1];
-  boolean isContactron[2];
+  boolean isLED[CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
+  boolean isSwitch[CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
+  boolean isRelay[CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
+  boolean isContactron[CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS];
   boolean isDHT;
 #ifdef CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
