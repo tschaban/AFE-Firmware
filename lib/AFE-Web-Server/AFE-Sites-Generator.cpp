@@ -1565,9 +1565,6 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
       (configuration.outputDefaultState == 1 ? " selected=\"selected\"" : "");
   body += ">NC</option></select></div>";
 
-  sprintf(field, "n%d", id);
-  body += addItem("text", field, L_NAME, configuration.name, "16");
-
   body += "<div class=\"cf\"><label>";
   body += L_LED_ASSIGNED_TO_SENSOR;
   body += "</label><select  name=\"l" + String(id) + "\"><option value=\"0\"";

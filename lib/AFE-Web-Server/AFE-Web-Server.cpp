@@ -1100,10 +1100,19 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
 
   if (server.arg("n" + String(id)).length() > 0) {
     server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
   if (server.arg("x" + String(id)).length() > 0) {
     data.domoticz.idx = server.arg("x" + String(id)).toInt();
+  }
+
+  if (server.arg("t" + String(id)).length() > 0) {
+    server.arg("t" + String(id))
+        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
   return data;
@@ -1119,8 +1128,14 @@ GATE AFEWebServer::getGateData() {
     }
   }
 
-  if (server.arg("x").length() > 0) {
-    data.domoticz.idx = server.arg("x").toInt();
+  if (server.arg("x0").length() > 0) {
+    data.domoticz.idx = server.arg("x0").toInt();
+  }
+
+  if (server.arg("t0").length() > 0) {
+    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
   return data;

@@ -2947,7 +2947,7 @@ void AFEDataAccess::createGateConfigurationFile() {
 }
 
 uint8_t AFEDataAccess::getGateState() {
-  uint8_t state;
+  uint8_t state = GATE_CLOSED;
 
 #ifdef DEBUG
   Serial << endl
