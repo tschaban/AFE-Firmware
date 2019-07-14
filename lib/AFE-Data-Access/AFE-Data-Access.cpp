@@ -388,6 +388,10 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       }
 #endif
 
+#ifdef CONFIG_HARDWARE_GATE
+      configuration.noOfGates = root["noOfGates"];
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
@@ -587,6 +591,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
       jsonContactron.add(configuration->isContactron[i]);
     }
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+    root["noOfGates"] = configuration->noOfGates;
 #endif
 
     root.printTo(configFile);
@@ -829,6 +837,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
     deviceConfiguration.isContactron[i] = false;
   }
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+  deviceConfiguration.noOfGates = 1;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -2699,6 +2711,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_GATE
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 200
 CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
 
@@ -2722,7 +2735,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<300> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CONTACTRON> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -2740,7 +2753,10 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size()
+             << (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -2780,7 +2796,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CONTACTRON> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["gpio"] = configuration.gpio;
     root["name"] = configuration.name;
@@ -2799,7 +2815,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size()
+           << (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }
@@ -2827,7 +2846,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
   saveConfiguration(1, ContactronConfiguration);
 }
 
-GATE AFEDataAccess::getGateConfiguration() {
+#define AFE_CONFIG_FILE_BUFFER_GATE 200
+GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   GATE configuration;
 
 #ifdef DEBUG
@@ -2860,13 +2880,20 @@ GATE AFEDataAccess::getGateConfiguration() {
       }
       */
 
+      configuration.relayId = root["relayId"];
+      configuration.contactronId[0] = root["contactrons"][0];
+      configuration.contactronId[1] = root["contactrons"][1];
+
       configuration.domoticz.idx = root["idx"];
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
 
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size()
+             << (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -2888,7 +2915,7 @@ GATE AFEDataAccess::getGateConfiguration() {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(GATE configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -2903,13 +2930,26 @@ void AFEDataAccess::saveConfiguration(GATE configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    JsonArray &jsonContactron = root.createNestedArray("contactrons");
     /*
     for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
       Eeprom.writeUInt8(467 + i, configuration.state[i]);
     }
     */
+    root["relayId"] = configuration.relayId;
+
+    /* This code is to avoid user selects 1st sensor to none and the 2nd that
+     * exists */
+    if (configuration.contactronId[0] == 0 &&
+        configuration.contactronId[1] > 0) {
+      configuration.contactronId[0] = configuration.contactronId[1];
+      configuration.contactronId[1] = 0;
+    }
+
+    jsonContactron.add(configuration.contactronId[0]);
+    jsonContactron.add(configuration.contactronId[1]);
 
     root["idx"] = configuration.domoticz.idx;
     root["MQTTTopic"] = configuration.mqtt.topic;
@@ -2923,7 +2963,10 @@ void AFEDataAccess::saveConfiguration(GATE configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size()
+           << (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }
@@ -2940,13 +2983,17 @@ void AFEDataAccess::createGateConfigurationFile() {
 #endif
   GATE GateConfiguration;
   // dodact stact
+
+  GateConfiguration.contactronId[0] = 0;
+  GateConfiguration.contactronId[1] = 0;
+  GateConfiguration.relayId = 0;
   GateConfiguration.domoticz.idx = 0;
   GateConfiguration.mqtt.topic[0] = '\0';
   saveConfiguration(GateConfiguration);
   saveGateState(0);
 }
 
-uint8_t AFEDataAccess::getGateState() {
+uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = GATE_CLOSED;
 
 #ifdef DEBUG
@@ -2998,7 +3045,7 @@ uint8_t AFEDataAccess::getGateState() {
 #endif
   return state;
 }
-void AFEDataAccess::saveGateState(uint8_t state) {
+void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #ifdef DEBUG
   Serial << endl
          << endl

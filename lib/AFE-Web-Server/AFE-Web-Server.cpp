@@ -282,7 +282,8 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef CONFIG_HARDWARE_GATE
     case AFE_CONFIG_SITE_GATE:
-      Data.saveConfiguration(getGateData());
+      Data.saveConfiguration(siteConfig.deviceID,
+                             getGateData(siteConfig.deviceID));
       break;
 #endif
     }
@@ -757,12 +758,20 @@ DEVICE AFEWebServer::getDeviceData() {
   }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
     server.arg("hc").toInt() > i ? data.isContactron[i] = true
                                  : data.isContactron[i] = false;
   }
-#else
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+  if (server.arg("gs").length() > 0) {
+    data.noOfGates = server.arg("gs").toInt();
+  }
+#endif
+
+#ifdef CONFIG_HARDWARE_RELAY
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     server.arg("hr").toInt() > i ? data.isRelay[i] = true
                                  : data.isRelay[i] = false;
@@ -965,15 +974,15 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.mqtt.topic[0] = '\0';
   }
 
-  data.state.MQTTConnected = server.arg("mc" + String(id)).length() > 0
-                                 ? server.arg("mc" + String(id)).toInt()
-                                 : 0;
-
 #ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   if (server.arg("tp" + String(id)).length() > 0) {
     data.thermalProtection = server.arg("tp" + String(id)).toInt();
   }
 #endif
+
+  data.state.MQTTConnected = server.arg("mc" + String(id)).length() > 0
+                                 ? server.arg("mc" + String(id)).toInt()
+                                 : 0;
 
   data.domoticz.idx = server.arg("x" + String(id)).length() > 0
                           ? server.arg("x" + String(id)).toInt()
@@ -1120,8 +1129,9 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-GATE AFEWebServer::getGateData() {
+GATE AFEWebServer::getGateData(uint8_t id) {
   GATE data;
+
   for (uint8_t i = 0; i < sizeof(data.state); i++) {
     if (server.arg("s" + String(i)).length() > 0) {
       data.state[i] = server.arg("s" + String(i)).toInt();

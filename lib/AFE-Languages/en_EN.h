@@ -85,6 +85,9 @@
 #define L_DO_MEASURE_ADC "Measurements from Analog Input"
 #define L_DEVICE_CONTROLLING "Device controlling mechanism"
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
+#ifdef CONFIG_HARDWARE_GATE
+#define L_CONTROLLED_GATES "Gates/Doors controlled"
+#endif
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "WiFi Configuration"
@@ -246,6 +249,7 @@
 
 /* Form: Gate */
 #ifdef CONFIG_HARDWARE_GATE
+#define L_GATE "Gate/Door"
 #define L_IF_MAGNETIC_SENSOR "If magnetic sensor"
 #define L_AND_SENSOR "and sensor"
 #define L_IS_OPEN "is open"
@@ -259,6 +263,8 @@
 #define L_CLOSED "Closed"
 #define L_PARTIALLY_OPENED "Partially opened"
 #define L_GATE_CONFIGURATION "Gate/Door configuration"
+#define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
+#define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
 #endif
 
 #endif

@@ -135,11 +135,11 @@ public:
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-  GATE getGateConfiguration();
-  void saveConfiguration(GATE configuration);
+  GATE getGateConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, GATE configuration);
   void createGateConfigurationFile();
-  uint8_t getGateState();
-  void saveGateState(uint8_t state);
+  uint8_t getGateState(uint8_t id);
+  void saveGateState(uint8_t id, uint8_t state);
 #endif
 
 #ifdef CONFIG_HARDWARE_UART

@@ -20,6 +20,8 @@
 #define GATE_UNKNOWN 9        // Unknown state
 
 struct GATE {
+  uint8_t relayId;
+  uint8_t contactronId[2];
   uint8_t state[4];
   DOMOTICZ_BASIC_CONFIG domoticz;
   MQTT_BASIC_CONFIG mqtt;

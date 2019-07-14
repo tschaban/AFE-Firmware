@@ -6,7 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 - decommisioned
+   - T4 - decommissioned
    - T5 Gate
    - T6 Wheater station
 

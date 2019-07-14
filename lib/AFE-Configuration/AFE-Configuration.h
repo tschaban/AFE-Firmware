@@ -72,14 +72,16 @@
 #define FIRMWARE_VERSION "2.0.2"
 #define FIRMWARE_TYPE 0
 
-// ADC Measurments available for all devices expect Shelly-1
-#ifndef DEVICE_SHELLY_1
-#define CONFIG_HARDWARE_ADC_VCC
-#endif
-
+/* Functionalities */
 #define CONFIG_FUNCTIONALITY_RELAY
 #define CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#ifndef DEVICE_SHELLY_1
+#define CONFIG_FUNCTIONALITY_ADC
+#endif
+/* Enables API On/Off via APIs */
+//#define CONFIG_FUNCTIONALITY_API_CONTROL
 
+/* Max number of hardware items */
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
@@ -114,9 +116,6 @@
 #define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 5
 #define CONFIG_HARDWARE_NUMBER_OF_LEDS 5
 #endif
-
-/* Enables API On/Off via APIs */
-//#define CONFIG_FUNCTIONALITY_API_CONTROL
 
 /* Basic Switch + DS18B20 */
 #elif defined(T1_CONFIG)
@@ -154,19 +153,26 @@
 #elif defined(T5_CONFIG)
 #define FIRMWARE_VERSION "2.0.0.B1"
 #define FIRMWARE_TYPE 5
+
+/* Functionalities */
+#define CONFIG_FUNCTIONALITY_RELAY
+#define CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #define CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 #define CONFIG_FUNCTIONALITY_GATE
-//#define CONFIG_HARDWARE_ADC_VCC
+//#define CONFIG_FUNCTIONALITY_ADC
 
+/* Max number of hardware items */
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 2
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 3
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS 3
+#define CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
 
 #define CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
 #define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 5
 #define CONFIG_HARDWARE_NUMBER_OF_LEDS 3
 #define CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 3
+#define CONFIG_HARDWARE_NUMBER_OF_GATES 2
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
@@ -180,6 +186,13 @@
 #endif
 
 /* Configs related to functionalities */
+#ifdef CONFIG_FUNCTIONALITY_RELAY
+
+#ifndef CONFIG_HARDWARE_RELAY
+#define CONFIG_HARDWARE_RELAY
+#endif
+
+#endif
 
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
 
@@ -193,6 +206,41 @@
 
 #ifndef CONFIG_FUNCTIONALITY_REGULATOR
 #define CONFIG_FUNCTIONALITY_REGULATOR
+#endif
+
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_ADC
+/* Harware set up for ADC functionality */
+#ifndef CONFIG_HARDWARE_ADC_VCC
+#define CONFIG_HARDWARE_ADC_VCC
+#endif
+
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+/* Below three enables Relay.autoTurnOff */
+#ifndef CONFIG_RELAY_AUTOONOFF_LISTENER
+#define CONFIG_RELAY_AUTOONOFF_LISTENER
+#endif
+#endif
+
+#ifdef CONFIG_FUNCTIONALITY_GATE
+/* Enabling hardware for Gate functionality: Gate and Contactron */
+#ifndef CONFIG_RELAY_AUTOONOFF_LISTENER
+#define CONFIG_RELAY_AUTOONOFF_LISTENER
+#endif
+
+#ifndef CONFIG_HARDWARE_RELAY
+#define CONFIG_HARDWARE_RELAY
+#endif
+
+#ifndef CONFIG_HARDWARE_GATE
+#define CONFIG_HARDWARE_GATE
+#endif
+
+#ifndef CONFIG_HARDWARE_CONTACTRON
+#define CONFIG_HARDWARE_CONTACTRON
 #endif
 
 #endif
@@ -266,34 +314,11 @@
 #endif
 #endif
 
-/* Below three enables Relay.autoTurnOff */
-#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-#ifndef CONFIG_RELAY_AUTOONOFF_LISTENER
-#define CONFIG_RELAY_AUTOONOFF_LISTENER
-#endif
-#endif
-
 #ifdef CONFIG_HARDWARE_PIR
 #ifndef CONFIG_RELAY_AUTOONOFF_LISTENER
 #define CONFIG_RELAY_AUTOONOFF_LISTENER
 #endif
 #endif
-
-/* Enabling hardware for Gate functionality: Gate and Contactron */
-#ifdef CONFIG_FUNCTIONALITY_GATE
-
-#ifndef CONFIG_RELAY_AUTOONOFF_LISTENER
-#define CONFIG_RELAY_AUTOONOFF_LISTENER
-#endif
-
-#ifndef CONFIG_HARDWARE_GATE
-#define CONFIG_HARDWARE_GATE
-#endif
-#ifndef CONFIG_HARDWARE_CONTACTRON
-#define CONFIG_HARDWARE_CONTACTRON
-#endif
-#endif
-/* End of: Enabling hardware for Gate functionality: Gate and Contactron */
 
 /* Config sites IDs */
 #define AFE_CONFIG_SITE_INDEX 0

@@ -62,6 +62,7 @@ struct DEVICE {
   boolean isAnalogInput;
 #endif
 #elif defined(T5_CONFIG)
+  uint8_t noOfGates;
   boolean isLED[CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
   boolean isSwitch[CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
   boolean isRelay[CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];

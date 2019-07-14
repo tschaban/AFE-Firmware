@@ -85,6 +85,10 @@
 #define L_DEVICE_CONTROLLING_INFO                                              \
   "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
 
+#ifdef CONFIG_HARDWARE_GATE
+#define L_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
+#endif
+
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
 #define L_NETWORK_CONFIGURATION_INFO                                               \
@@ -253,6 +257,7 @@
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
+#define L_GATE "Brama/Drzwi"
 #define L_IF_MAGNETIC_SENSOR "Jeśli czujnik magnetyczny"
 #define L_AND_SENSOR "oraz czujnik"
 #define L_IS_OPEN "jest otwarty"
@@ -265,7 +270,9 @@
 #define L_OPENED "Otwarta"
 #define L_CLOSED "Zamknięta"
 #define L_PARTIALLY_OPENED "Częściowo otwarta"
-#define L_GATE_CONFIGURATION "Konfiguracja bram/drzwi"
+#define L_GATE_CONFIGURATION "Konfiguracja bramy/drzwi"
+#define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
+#define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
 #endif
 
 #endif
