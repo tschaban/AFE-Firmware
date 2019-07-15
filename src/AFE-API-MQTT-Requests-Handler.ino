@@ -186,12 +186,12 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE /* Gate */
+#ifdef CONFIG_HARDWARE_CONTACTRON
 
     /* Contactrons */
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
-        if (strcmp(topic, Gate.Contactron[i].getMQTTCommandTopic()) == 0 &&
+        if (strcmp(topic, Gate[1].Contactron[i].getMQTTCommandTopic()) == 0 &&
             (char)payload[1] == 'e') { // get
           MQTTPublishContactronState(i);
         }
@@ -199,13 +199,15 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         break;
       }
     }
-
-    /* Gate */
-    if (strcmp(topic, Gate.getMQTTCommandTopic()) == 0) {
-      if ((char)payload[0] == 't' && length == 6) { // toggle
-        Gate.toggle();
-      } else if ((char)payload[0] == 'g' && length == 3) { // get
-        MQTTPublishGateState();
+#endif
+#ifdef CONFIG_HARDWARE_GATE
+    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+      if (strcmp(topic, Gate[i].getMQTTCommandTopic()) == 0) {
+        if ((char)payload[0] == 't' && length == 6) { // toggle
+          Gate[i].toggle();
+        } else if ((char)payload[0] == 'g' && length == 3) { // get
+          MQTTPublishGateState(i);
+        }
       }
     }
 #endif
@@ -399,18 +401,22 @@ void MQTTPublishPIRState(uint8_t id) {
 }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_CONTACTRON
 void MQTTPublishContactronState(uint8_t id) {
+  // @TODO HARDCODED !!!!
   if (Device.configuration.api.mqtt) {
-    Mqtt.publishTopic(Gate.Contactron[id].getMQTTStateTopic(),
-                      Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
-                                                                   : "closed");
+    Mqtt.publishTopic(
+        Gate[1].Contactron[id].getMQTTStateTopic(),
+        Gate[1].Contactron[id].get() == CONTACTRON_OPEN ? "open" : "closed");
   }
 }
-void MQTTPublishGateState() {
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+void MQTTPublishGateState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    uint8_t gateState = Gate.get();
-    Mqtt.publishTopic(Gate.getMQTTStateTopic(),
+    uint8_t gateState = Gate[id].get();
+    Mqtt.publishTopic(Gate[id].getMQTTStateTopic(),
                       gateState == GATE_OPEN
                           ? "open"
                           : gateState == GATE_CLOSED

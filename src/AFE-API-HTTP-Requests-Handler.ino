@@ -70,7 +70,7 @@ void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
 #endif
 
 /* Gate and Contactron responses */
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
 /* It constructs HTTP response related to gate and calls HTTP push */
 void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
@@ -82,7 +82,9 @@ void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                 ? "closed"
                 : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_CONTACTRON
 /* It constructs HTTP response related to contactron and calls HTTP push */
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                                         byte value) {
@@ -103,29 +105,36 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_GATE
 
   /* Request related to gate */
   if (strcmp(request.device, "gate") == 0) {
-    if (strcmp(request.command, "toggle") == 0) {
-      Gate.toggle();
-      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
-    } else if (strcmp(request.command, "get") == 0) { // get
-      sendHTTPAPIGateRequestStatus(request, true, Gate.get());
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
+    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+      // @TODO dodac name
+      if (strcmp(request.command, "toggle") == 0) {
+        Gate[i].toggle();
+        sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
+      } else if (strcmp(request.command, "get") == 0) { // get
+        sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
+      } else {
+        sendHTTPAPIRequestStatus(request, false);
+      }
     }
   }
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
   /* Request relared to contactron */
-  else if (strcmp(request.device, "contactron") == 0) {
+  if (strcmp(request.device, "contactron") == 0) {
     boolean noContactron = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
       if (Device.configuration.isContactron[i]) {
-        if (strcmp(request.name, Gate.Contactron[i].getName()) == 0) {
+        // @TODO hardcoded change !!!
+        if (strcmp(request.name, Gate[1].Contactron[i].getName()) == 0) {
           noContactron = false;
           if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIContactronRequestStatus(request, true,
-                                               Gate.Contactron[i].get());
+                                               Gate[1].Contactron[i].get());
           } else {
             sendHTTPAPIRequestStatus(request, false);
           }

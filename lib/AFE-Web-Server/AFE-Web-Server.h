@@ -94,7 +94,7 @@ private:
 
 #if defined(T5_CONFIG)
   CONTACTRON getContactronData(uint8_t id);
-  GATE getGateData(uint8_t id);
+  GATE getGateData();
 #endif
 
 #ifdef CONFIG_HARDWARE_UART

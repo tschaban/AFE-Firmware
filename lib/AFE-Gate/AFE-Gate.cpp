@@ -6,30 +6,46 @@
 
 AFEGate::AFEGate(){};
 
-void AFEGate::begin() {
-  gateConfiguration = Data.getGateConfiguration();
+void AFEGate::begin(uint8_t id) {
 
-  Relay[0].begin(0);
+#ifdef DEBUG
+  Serial << endl << "Initializing the Gate: " << id;
+#endif
 
-  // Relay[0].setRelayAfterRestoringPower(); I think it's not required
+  gateId = id;
+  gateConfiguration = Data.getGateConfiguration(gateId);
 
-  Relay[0].setTimerUnitToSeconds(false);
+#ifdef DEBUG
+  Serial << endl << "Initializing the Gate: " << id << ", relay";
+#endif
 
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-    if (Device.configuration.isContactron[i]) {
-      Contactron[i].begin(i);
-      numberOfContractors++;
-    } else {
-      break;
-    }
+  Relay.begin(gateConfiguration.relayId);
+  Relay.setTimerUnitToSeconds(false);
+
+#ifdef DEBUG
+  Serial << endl << "Initializing the Gate: " << id << ", contactrons";
+#endif
+
+  /* How many contactrons monitors the gate. Default 0 set in class init */
+  if (gateConfiguration.contactronId[1] > 0) {
+    numberOfContractors = 2;
+    Contactron[0].begin(gateConfiguration.contactronId[0]);
+    Contactron[1].begin(gateConfiguration.contactronId[1]);
+  } else if (gateConfiguration.contactronId[0] > 1) {
+    numberOfContractors = 1;
+    Contactron[0].begin(gateConfiguration.contactronId[0]);
   }
+
+#ifdef DEBUG
+  Serial << endl << "Number of contactrons: " << numberOfContractors;
+#endif
 }
 
 void AFEGate::toggle() {
-  Relay[0].on();
+  Relay.on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractors == 0) {
-    Data.saveGateState(get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
+    Data.saveGateState(gateId, get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
     _event = true;
   }
 }
@@ -63,7 +79,7 @@ uint8_t AFEGate::getGateStateBasedOnContractons() {
 uint8_t AFEGate::get() {
   if (numberOfContractors ==
       0) { // If there is not contactorns then get gate state from EEPROM
-    return Data.getGateState();
+    return Data.getGateState(gateId);
   } else { // Get gate state based on contactrons
     return getGateStateBasedOnContractons();
   }
@@ -71,7 +87,7 @@ uint8_t AFEGate::get() {
 
 void AFEGate::listener() {
 
-  Relay[0].autoTurnOff();
+  Relay.autoTurnOff();
 
   for (uint8_t i = 0; i < numberOfContractors; i++) {
     Contactron[i].listener();

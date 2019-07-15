@@ -22,8 +22,9 @@ void mainSwitch() {
           Led.on();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
-          Gate.toggle();
+#ifdef CONFIG_HARDWARE_GATE
+          // @TODO HARDCODED
+          Gate[1].toggle();
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY

@@ -12,7 +12,7 @@ void DomoticzInit() {
   }
 }
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
+#ifdef CONFIG_FUNCTIONALITY_RELAY
 /* It publishes relay state to Domoticz */
 void DomoticzPublishRelayState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
@@ -27,7 +27,6 @@ void DomoticzPublishRelayState(uint8_t id) {
 
 /* Temperature and Humiditity sensors */
 #ifdef CONFIG_TEMPERATURE
-
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(unsigned long idx, float temperature) {
   if (Device.configuration.api.domoticz && idx > 0) {
@@ -70,24 +69,28 @@ void DomoticzPublishPirState(uint8_t id) {
 #endif
 
 /* Gate and Contactron */
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_GATE
 /* It publishes gate state to Domoticz */
-void DomoticzPublishGateState() {
+void DomoticzPublishGateState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    unsigned long idx = Gate.getDomoticzIDX();
+    unsigned long idx = Gate[id].getDomoticzIDX();
     if (idx > 0) {
-      Domoticz.sendGateCommand(idx, Gate.get() == GATE_OPEN ? "On" : "Off");
+      Domoticz.sendGateCommand(idx, Gate[id].get() == GATE_OPEN ? "On" : "Off");
     }
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_CONTACTRON
 /* It publishes contactron state to Domoticz */
-void DomoticzPublishContactronState(uint8_t id) {
+void DomoticzPublishContactronState(uint8_t gateId, uint8_t contactronId) {
   if (Device.configuration.api.domoticz) {
-    unsigned long idx = Gate.Contactron[id].getDomoticzIDX();
+    unsigned long idx = Gate[gateId].Contactron[contactronId].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendContactronCommand(
-          idx, Gate.Contactron[id].get() == CONTACTRON_OPEN ? "On" : "Off");
+          idx, Gate[gateId].Contactron[contactronId].get() == CONTACTRON_OPEN
+                   ? "On"
+                   : "Off");
     }
   }
 }

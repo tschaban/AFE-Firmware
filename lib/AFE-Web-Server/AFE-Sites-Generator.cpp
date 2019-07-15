@@ -1656,17 +1656,18 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-String AFESitesGenerator::addGateConfiguration() {
+String AFESitesGenerator::addGateConfiguration(uint8_t id) {
 
-  GATE gateConfiguration = Data.getGateConfiguration();
+  GATE gateConfiguration = Data.getGateConfiguration(id);
   DEVICE deviceConfiguration = Device->configuration;
   uint8_t noOfContactrons = deviceConfiguration.isContactron[1] ? 2 : 1;
   CONTACTRON configuration[noOfContactrons];
 
   String body = "<fieldset>";
 
-  uint8_t numberOfItems = 0;
+  body += addItem("text", "n", L_NAME, gateConfiguration.name, "16");
 
+  uint8_t numberOfItems = 0;
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
     if (deviceConfiguration.isRelay[i]) {
       numberOfItems++;

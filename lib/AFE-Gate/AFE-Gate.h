@@ -26,9 +26,10 @@ private:
   AFEDevice Device;
   AFEDataAccess Data;
   GATE gateConfiguration;
+  uint8_t gateId; // ID of the gate
   uint8_t numberOfContractors = 0;
   boolean _event = false;
-  AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
+  AFERelay Relay;
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();
@@ -44,7 +45,7 @@ public:
   AFEGate();
 
   /* Initializing gate */
-  void begin();
+  void begin(uint8_t id);
 
   /* Triggering gate state changed and saving it's new value if there is not
    * contactrons */

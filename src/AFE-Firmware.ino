@@ -79,8 +79,8 @@ AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 
 #ifdef CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
-GATE GateState;
-AFEGate Gate;
+GATE GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
+AFEGate Gate[CONFIG_HARDWARE_NUMBER_OF_GATES];
 uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
 byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
 #endif
@@ -262,11 +262,13 @@ void setup() {
 
 /* Initializing Gate */
 #ifdef CONFIG_HARDWARE_GATE
-    Gate.begin();
-    GateState = Data.getGateConfiguration();
+    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+      Gate[i].begin(i);
+      GateState[i] = Data.getGateConfiguration(i);
 #ifdef DEBUG
-    Serial << endl << "Gate initialized";
+      Serial << endl << "Gate: " << i << " initialized";
 #endif
+    }
 #endif
 
     /* Initializing DS18B20 or DHTxx sensor */
@@ -360,7 +362,9 @@ void loop() {
 
 #ifdef CONFIG_HARDWARE_GATE
         /* Listening for gate events */
-        Gate.listener();
+        for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+          Gate[i].listener();
+        }
 #endif
 
         /* Checking if there was received HTTP API Command */

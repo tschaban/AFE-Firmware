@@ -2838,26 +2838,29 @@ void AFEDataAccess::createContractonConfigurationFile() {
   // ContactronConfiguration.outputDefaultState;
   ContactronConfiguration.domoticz.idx = 0;
   ContactronConfiguration.mqtt.topic[0] = '\0';
-  ContactronConfiguration.gpio = 14;
-  ContactronConfiguration.ledID = 2;
-  saveConfiguration(0, ContactronConfiguration);
-  ContactronConfiguration.gpio = 13;
-  ContactronConfiguration.ledID = 3;
-  saveConfiguration(1, ContactronConfiguration);
+  ContactronConfiguration.gpio = 0;
+  ContactronConfiguration.ledID = 0;
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+    sprintf(ContactronConfiguration.name, "C%d", i + 1);
+    saveConfiguration(i, ContactronConfiguration);
+  }
 }
 
 #define AFE_CONFIG_FILE_BUFFER_GATE 200
 GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   GATE configuration;
 
+  char fileName[16];
+  sprintf(fileName, "cfg-gate-%d.json", id);
+
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-gate.json : ";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-gate.json", "r");
+  File configFile = SPIFFS.open(fileName, "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -2881,6 +2884,7 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       */
 
       configuration.relayId = root["relayId"];
+      sprintf(configuration.name, root["name"]);
       configuration.contactronId[0] = root["contactrons"][0];
       configuration.contactronId[1] = root["contactrons"][1];
 
@@ -2916,14 +2920,18 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
+
+  char fileName[16];
+  sprintf(fileName, "cfg-gate-%d.json", id);
+
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-gate.json : ";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-gate.json", "w");
+  File configFile = SPIFFS.open(fileName, "w");
 
   if (configFile) {
 #ifdef DEBUG
@@ -2939,11 +2947,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     }
     */
     root["relayId"] = configuration.relayId;
+    root["name"] = configuration.name;
 
-    /* This code is to avoid user selects 1st sensor to none and the 2nd that
-     * exists */
-    if (configuration.contactronId[0] == 0 &&
-        configuration.contactronId[1] > 0) {
+    /* Contractors selection validaton */
+    if ((configuration.contactronId[0] == 0 &&
+         configuration.contactronId[1] > 0) ||
+        (configuration.contactronId[0] > 0 &&
+         configuration.contactronId[0] == configuration.contactronId[1])) {
       configuration.contactronId[0] = configuration.contactronId[1];
       configuration.contactronId[1] = 0;
     }
@@ -2979,7 +2989,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
 }
 void AFEDataAccess::createGateConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-gate.json";
+  Serial << endl << "Creating file: cfg-gate-XX.json";
 #endif
   GATE GateConfiguration;
   // dodact stact
@@ -2989,21 +2999,27 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.relayId = 0;
   GateConfiguration.domoticz.idx = 0;
   GateConfiguration.mqtt.topic[0] = '\0';
-  saveConfiguration(GateConfiguration);
-  saveGateState(0);
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
+    sprintf(GateConfiguration.name, "G%d", i + 1);
+    saveConfiguration(i, GateConfiguration);
+    saveGateState(i, GATE_UNKNOWN);
+  }
 }
 
 uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = GATE_CLOSED;
 
+  char fileName[22];
+  sprintf(fileName, "cfg-gate-state-%d.json", id);
+
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-gate-state.json : ";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-gate-state.json", "r");
+  File configFile = SPIFFS.open(fileName, "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -3046,14 +3062,18 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
   return state;
 }
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
+
+  char fileName[22];
+  sprintf(fileName, "cfg-gate-state-%d.json", id);
+
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-gate-state.json : ";
+  Serial << endl << "Opening file: " << fileName << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-gate-state.json", "w");
+  File configFile = SPIFFS.open(fileName, "w");
 
   if (configFile) {
 #ifdef DEBUG

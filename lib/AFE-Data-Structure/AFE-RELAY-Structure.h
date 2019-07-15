@@ -13,10 +13,6 @@
 
 #include <AFE-REGULATOR-Structure.h>
 
-/* Relay states */
-#define RELAY_ON 1
-#define RELAY_OFF 0
-
 struct RELAY_DEFAULTS {
   uint8_t powerOn;
   uint8_t MQTTConnected;

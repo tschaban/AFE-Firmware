@@ -86,8 +86,11 @@ public:
   void sendPirCommand(unsigned int idx, const char *value);
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
   void sendGateCommand(unsigned int idx, const char *value);
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
   void sendContactronCommand(unsigned int idx, const char *value);
 #endif
 

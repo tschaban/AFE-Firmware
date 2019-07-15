@@ -129,8 +129,11 @@ public:
   String addPIRConfiguration(uint8_t id);
 #endif
 
-#if defined(T5_CONFIG)
-  String addGateConfiguration();
+#ifdef CONFIG_HARDWARE_GATE
+  String addGateConfiguration(uint8_t id);
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
   String addContactronConfiguration(uint8_t id);
 #endif
 

@@ -96,7 +96,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #ifdef CONFIG_HARDWARE_GATE
   case AFE_CONFIG_SITE_GATE:
-    page += Site.addGateConfiguration();
+    page += Site.addGateConfiguration(siteConfig->deviceID);
     break;
 #endif
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
@@ -282,8 +282,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef CONFIG_HARDWARE_GATE
     case AFE_CONFIG_SITE_GATE:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getGateData(siteConfig.deviceID));
+      Data.saveConfiguration(siteConfig.deviceID, getGateData());
       break;
 #endif
     }
@@ -965,6 +964,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 
   if (server.arg("n" + String(id)).length() > 0) {
     server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
   if (server.arg("t" + String(id)).length() > 0) {
@@ -1129,8 +1130,26 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-GATE AFEWebServer::getGateData(uint8_t id) {
+GATE AFEWebServer::getGateData() {
   GATE data;
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
+  }
+
+  if (server.arg("r").length() > 0) {
+    data.relayId = server.arg("r").toInt();
+  }
+
+  if (server.arg("c1").length() > 0) {
+    data.contactronId[0] = server.arg("c1").toInt();
+  }
+
+  if (server.arg("c2").length() > 0) {
+    data.contactronId[1] = server.arg("c2").toInt();
+  }
 
   for (uint8_t i = 0; i < sizeof(data.state); i++) {
     if (server.arg("s" + String(i)).length() > 0) {
