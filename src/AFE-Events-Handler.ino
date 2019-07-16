@@ -21,15 +21,9 @@ void eventsListener() {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-        if (Device.configuration.isContactron[i]) {
-          // @TODO HARDCODED CHANGE
-          DomoticzPublishContactronState(1, i);
-          // @TODO HARDCODED CHANGE
-          lastPublishedContactronState[i] = Gate[1].Contactron[i].get();
-        } else {
-          break;
-        }
+      for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        DomoticzPublishContactronState(i);
+        lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
 
@@ -78,14 +72,9 @@ void eventsListener() {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-        if (Device.configuration.isContactron[i]) {
-          MQTTPublishContactronState(i);
-          // @TODO HARDCODED
-          lastPublishedContactronState[i] = Gate[1].Contactron[i].get();
-        } else {
-          break;
-        }
+      for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        MQTTPublishContactronState(i);
+        lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
 

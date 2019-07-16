@@ -83,14 +83,12 @@ void DomoticzPublishGateState(uint8_t id) {
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
 /* It publishes contactron state to Domoticz */
-void DomoticzPublishContactronState(uint8_t gateId, uint8_t contactronId) {
+void DomoticzPublishContactronState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    unsigned long idx = Gate[gateId].Contactron[contactronId].getDomoticzIDX();
+    unsigned long idx = Contactron[id].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendContactronCommand(
-          idx, Gate[gateId].Contactron[contactronId].get() == CONTACTRON_OPEN
-                   ? "On"
-                   : "Off");
+          idx, Contactron[id].get() == CONTACTRON_OPEN ? "On" : "Off");
     }
   }
 }

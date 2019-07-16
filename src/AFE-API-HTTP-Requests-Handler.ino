@@ -96,6 +96,8 @@ void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
+  boolean deviceNotExist = true;
+
 #ifdef DEBUG
   Serial << endl << endl << "-------- Got HTTP Request --------";
   Serial << endl << "Device: " << request.device;
@@ -109,43 +111,45 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
   /* Request related to gate */
   if (strcmp(request.device, "gate") == 0) {
-    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
-      // @TODO dodac name
-      if (strcmp(request.command, "toggle") == 0) {
-        Gate[i].toggle();
-        sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
-      } else if (strcmp(request.command, "get") == 0) { // get
-        sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
+    for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+      if (strcmp(request.name, Gate[i].configuration.name) == 0) {
+        deviceNotExist = false;
+        if (strcmp(request.command, "toggle") == 0) {
+          Gate[i].toggle();
+          sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
+        } else if (strcmp(request.command, "get") == 0) { // get
+          sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
+        } else {
+          sendHTTPAPIRequestStatus(request, false);
+        }
       }
     }
+    if (deviceNotExist) {
+      sendHTTPAPIRequestStatus(request, false);
+    }
+    return;
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
   /* Request relared to contactron */
   if (strcmp(request.device, "contactron") == 0) {
-    boolean noContactron = true;
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-      if (Device.configuration.isContactron[i]) {
-        // @TODO hardcoded change !!!
-        if (strcmp(request.name, Gate[1].Contactron[i].getName()) == 0) {
-          noContactron = false;
-          if (strcmp(request.command, "get") == 0) {
-            sendHTTPAPIContactronRequestStatus(request, true,
-                                               Gate[1].Contactron[i].get());
-          } else {
-            sendHTTPAPIRequestStatus(request, false);
-          }
+    for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+      // @TODO hardcoded change !!!
+      if (strcmp(request.name, Contactron[i].configuration.name) == 0) {
+        deviceNotExist = false;
+        if (strcmp(request.command, "get") == 0) {
+          sendHTTPAPIContactronRequestStatus(request, true,
+                                             Gate[1].Contactron[i].get());
+        } else {
+          sendHTTPAPIRequestStatus(request, false);
         }
-      } else {
-        break;
       }
     }
-    if (noContactron) {
+    if (deviceNotExist) {
       sendHTTPAPIRequestStatus(request, false);
     }
+    return;
   }
 
 #endif
@@ -155,11 +159,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
-    boolean noRelay = true;
     for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
       if (Device.configuration.isRelay[i]) {
         if (strcmp(request.name, Relay[i].getName()) == 0) {
-          noRelay = false;
+          deviceNotExist = false;
           if (strcmp(request.command, "on") == 0) {
             Relay[i].on();
             MQTTPublishRelayState(i); // MQTT Listener library
@@ -237,9 +240,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         break;
       }
     }
-    if (noRelay) {
+    if (deviceNotExist) {
       sendHTTPAPIRequestStatus(request, false);
     }
+    return;
   }
 #endif
 
@@ -355,7 +359,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #ifdef CONFIG_HARDWARE_ADC_VCC
   /* Analog Input */
   if (strcmp(request.device, "ADC") == 0) {
-
     if (strcmp(request.command, "get") == 0) {
       ADCINPUT_DATA data;
       if (strcmp(request.name, "raw") == 0) {

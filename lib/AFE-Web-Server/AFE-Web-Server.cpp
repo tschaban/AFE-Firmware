@@ -696,21 +696,39 @@ void AFEWebServer::listener() { server.handleClient(); }
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(String page) {
+
+#ifdef DEBUG
+  Serial << endl << "Site streaming started";
+  Serial << endl << "RAM Free: " << system_get_free_heap_size();
+#endif
+
+  server.send(200, "text/html", page);
+  return;
+
   uint16_t pageSize = page.length();
-  uint16_t size = 1024;
+  uint16_t size = 512;
   server.setContentLength(pageSize);
   if (pageSize > size) {
+    Serial << page.substring(0, size);
+    delay(100);
     server.send(200, "text/html", page.substring(0, size));
+    delay(100);
     uint16_t transfered = size;
     uint16_t nextChunk;
     while (transfered < pageSize) {
       nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+      Serial << endl << endl << page.substring(transfered, nextChunk);
+      delay(100);
       server.sendContent(page.substring(transfered, nextChunk));
+      delay(100);
       transfered = nextChunk;
     }
   } else {
     server.send(200, "text/html", page);
   }
+#ifdef DEBUG
+  Serial << endl << "Site streaming completed";
+#endif
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -739,8 +757,8 @@ DEVICE AFEWebServer::getDeviceData() {
   _refreshConfiguration =
       true; // it will cause that device configuration will be refeshed
 
-  if (server.arg("dn").length() > 0) {
-    server.arg("dn").toCharArray(data.name, sizeof(data.name));
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
     data.name[0] = '\0';
   }
@@ -753,33 +771,32 @@ DEVICE AFEWebServer::getDeviceData() {
                                : data.api.domoticz = false;
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
+    server.arg("l").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
-    server.arg("hc").toInt() > i ? data.isContactron[i] = true
-                                 : data.isContactron[i] = false;
+  if (server.arg("co").length() > 0) {
+    data.noOfContactrons = server.arg("co").toInt();
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-  if (server.arg("gs").length() > 0) {
-    data.noOfGates = server.arg("gs").toInt();
+  if (server.arg("g").length() > 0) {
+    data.noOfGates = server.arg("g").toInt();
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_RELAY
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    server.arg("hr").toInt() > i ? data.isRelay[i] = true
-                                 : data.isRelay[i] = false;
+    server.arg("r").toInt() > i ? data.isRelay[i] = true
+                                : data.isRelay[i] = false;
   }
 #endif
 
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    server.arg("hs").toInt() > i ? data.isSwitch[i] = true
-                                 : data.isSwitch[i] = false;
+    server.arg("s").toInt() > i ? data.isSwitch[i] = true
+                                : data.isSwitch[i] = false;
   }
 #ifdef CONFIG_HARDWARE_DS18B20
   server.arg("ds").length() > 0 ? data.isDS18B20 = true
@@ -787,17 +804,17 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #ifdef CONFIG_HARDWARE_DHXX
-  server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
+  server.arg("dh").length() > 0 ? data.isDHT = true : data.isDHT = false;
 #endif
 
 #if defined(T3_CONFIG)
   for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
-    server.arg("hp").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
+    server.arg("p").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
   }
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
-  server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
+  server.arg("hp").length() > 0 ? data.isHPMA115S0 = true
                                 : data.isHPMA115S0 = false;
 #endif
 
@@ -812,9 +829,11 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-  server.arg("ai").length() > 0 ? data.isAnalogInput = true
+  server.arg("ad").length() > 0 ? data.isAnalogInput = true
                                 : data.isAnalogInput = false;
 #endif
+
+  Serial << endl << "pre save=" << data.noOfContactrons;
 
   return data;
 }
@@ -1145,10 +1164,14 @@ GATE AFEWebServer::getGateData() {
 
   if (server.arg("c1").length() > 0) {
     data.contactronId[0] = server.arg("c1").toInt();
+  } else {
+    data.contactronId[0] = 0;
   }
 
   if (server.arg("c2").length() > 0) {
     data.contactronId[1] = server.arg("c2").toInt();
+  } else {
+    data.contactronId[1] = 0;
   }
 
   for (uint8_t i = 0; i < sizeof(data.state); i++) {

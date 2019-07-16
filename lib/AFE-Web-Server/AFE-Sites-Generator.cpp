@@ -116,7 +116,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += L_GATE_CONFIGURATION;
     page += "</i></a></li>";
 
-    for (uint8_t i = 1; i <= Device->configuration.noOfGates; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
       page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_GATE;
       page += "&i=";
@@ -124,7 +124,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "\">&#8227; ";
       page += L_GATE;
       page += ": ";
-      page += i;
+      page += i + 1;
       page += "</a></li>";
     }
   }
@@ -228,20 +228,12 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* Contactrons and Gate */
 #ifdef CONFIG_HARDWARE_CONTACTRON
-  itemPresent = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
-    if (Device->configuration.isContactron[i]) {
-      itemPresent++;
-    } else {
-      break;
-    }
-  }
 
-  if (itemPresent > 0) {
+  if (Device->configuration.noOfContactrons > 0) {
     page += "<li class=\"itm\"><a><i>";
     page += L_MAGNETIC_SENSORS;
     page += "</i></a></li>";
-    for (uint8_t i = 0; i < itemPresent; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfContactrons; i++) {
       page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_CONTACTRON;
       page += "&i=";
@@ -351,7 +343,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   uint8_t itemsNumber = 0;
 
   String body = "<fieldset>";
-  body += addItem("text", "dn", L_DEVICE_NAME, configuration.name, "16");
+  body += addItem("text", "n", L_DEVICE_NAME, configuration.name, "16");
   body += "</fieldset>";
   String page = addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
   body = "<fieldset>";
@@ -368,32 +360,16 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_LEDS, itemsNumber,
-                                    "hl", L_NUMBER_OF_LEDS);
+                                    "l", L_NUMBER_OF_LEDS);
 
 #endif
 
 /* Contactrons */
 #ifdef CONFIG_HARDWARE_CONTACTRON
-  itemsNumber = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
-    if (Device->configuration.isContactron[i]) {
-      itemsNumber++;
-    } else {
-      break;
-    }
-  }
-  body += generateHardwareItemsList(sizeof(Device->configuration.isContactron),
-                                    itemsNumber, "hc",
-                                    L_NUMBER_OF_MAGNETIC_SENSORS);
 
-  itemsNumber = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    if (Device->configuration.isSwitch[i]) {
-      itemsNumber++;
-    } else {
-      break;
-    }
-  }
+  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+                                    Device->configuration.noOfContactrons, "co",
+                                    L_NUMBER_OF_MAGNETIC_SENSORS);
 
 #endif
 
@@ -409,7 +385,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_RELAYS,
-                                    itemsNumber, "hr", L_NUMBER_OF_RELAYS);
+                                    itemsNumber, "r", L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
@@ -423,7 +399,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
-                                    itemsNumber, "hs", L_NUMBER_OF_SWITCHES);
+                                    itemsNumber, "s", L_NUMBER_OF_SWITCHES);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
@@ -434,7 +410,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef CONFIG_HARDWARE_DHXX
-  body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
+  body += "<div class=\"cc\"><label><input name =\"dh\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isDHT ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
@@ -443,7 +419,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef CONFIG_HARDWARE_HPMA115S0
-  body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
+  body += "<div class=\"cc\"><label><input name =\"hp\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
   body += language == 0 ? "Czujnik" : " Sensor";
@@ -508,7 +484,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
   if (Firmware->Pro.valid) {
-    body += "<div class=\"cc\"><label><input name =\"ai\" type=\"checkbox\" "
+    body += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
             "value=\"1\"";
     body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
     body += L_DO_MEASURE_ADC;
@@ -526,7 +502,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   }
 
   body += generateHardwareItemsList(
-      sizeof(Device->configuration.isPIR), itemsNumber, "hp",
+      sizeof(Device->configuration.isPIR), itemsNumber, "p",
       language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
 
@@ -538,7 +514,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body = "<fieldset>";
 
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_GATES,
-                                    Device->configuration.noOfGates, "gs",
+                                    Device->configuration.noOfGates, "g",
                                     L_NUMBER_OF_CONTROLLED_GATES);
 
   body += "</fieldset>";
@@ -1658,18 +1634,19 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 #ifdef CONFIG_HARDWARE_GATE
 String AFESitesGenerator::addGateConfiguration(uint8_t id) {
 
+  Serial << endl << "Generating site: Gate, ID=" << id;
+  //  AFEGate Gate;
+  // Gate.begin(id);
+
   GATE gateConfiguration = Data.getGateConfiguration(id);
-  DEVICE deviceConfiguration = Device->configuration;
-  uint8_t noOfContactrons = deviceConfiguration.isContactron[1] ? 2 : 1;
-  CONTACTRON configuration[noOfContactrons];
+  CONTACTRON contactronConfiguration[2];
 
   String body = "<fieldset>";
-
   body += addItem("text", "n", L_NAME, gateConfiguration.name, "16");
 
   uint8_t numberOfItems = 0;
   for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    if (deviceConfiguration.isRelay[i]) {
+    if (Device->configuration.isRelay[i]) {
       numberOfItems++;
     }
   }
@@ -1677,21 +1654,40 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
   body += generateHardwareItemsList(numberOfItems, gateConfiguration.relayId,
                                     "r", L_RELAY_ID_CONTROLLING_GATE);
 
-  // @TODO Hardcoded number of contactrons
-  body += generateHardwareItemsList(3, gateConfiguration.contactronId[0], "c1",
-                                    L_MAGNETIC_SENSOR);
+  if (Device->configuration.noOfContactrons > 0) {
+    body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+                                      gateConfiguration.contactronId[0], "c1",
+                                      L_MAGNETIC_SENSOR);
+  }
 
-  body += generateHardwareItemsList(3, gateConfiguration.contactronId[1], "c2",
-                                    L_MAGNETIC_SENSOR);
+  /* If there is more than a one contactron connected, add option to assigne it
+   * to the gate */
+
+  if (Device->configuration.noOfContactrons > 1) {
+    body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+                                      gateConfiguration.contactronId[1], "c2",
+                                      L_MAGNETIC_SENSOR);
+  }
 
   body += "</fieldset>";
 
   String page = addConfigurationBlock(L_GATE_CONFIGURATION, "", body);
-  if (gateConfiguration.contactronId[0] > 0 ||
-      gateConfiguration.contactronId[1] > 0) {
 
-    for (uint8_t i = 0; i < noOfContactrons; i++) {
-      configuration[i] = Data.getContactronConfiguration(i);
+  /* Add section of Gate states configuration is there is at least one
+   * contactron connected to the device and assigned to the Gate */
+
+  uint8_t numberOfContractons = 0;
+  if (gateConfiguration.contactronId[1] > 0) {
+    numberOfContractons = 2;
+  } else if (gateConfiguration.contactronId[0] > 1) {
+    numberOfContractons = 1;
+  }
+
+  if (numberOfContractons > 0) {
+
+    for (uint8_t i = 0; i < numberOfContractons; i++) {
+      contactronConfiguration[i] =
+          Data.getContactronConfiguration(gateConfiguration.contactronId[i]);
     }
 
     body = "<fieldset>";
@@ -1699,13 +1695,13 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     body += "<p class=\"cm\">";
     body += L_IF_MAGNETIC_SENSOR;
     body += ": <strong>";
-    body += configuration[0].name;
+    body += contactronConfiguration[0].name;
 
-    if (noOfContactrons == 2) {
+    if (numberOfContractons == 2) {
       body += "</strong> ";
       body += L_AND_SENSOR;
       body += ": <strong>";
-      body += configuration[1].name;
+      body += contactronConfiguration[1].name;
       body += "</strong> ";
       body += L_ARE_OPEN;
     } else {
@@ -1716,17 +1712,17 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     body += L_THEN;
     body += ":</p>";
     body += generateGateStatesList(0, gateConfiguration.state[0]);
-    if (noOfContactrons == 2) {
+    if (numberOfContractons == 2) {
       body += "<br><br><p class=\"cm\">";
       body += L_IF_MAGNETIC_SENSOR;
       body += ": <strong>";
-      body += configuration[0].name;
+      body += contactronConfiguration[0].name;
       body += "</strong> ";
       body += L_IS_OPEN;
       body += " ";
       body += L_AND_SENSOR;
       body += ": <strong>";
-      body += configuration[1].name;
+      body += contactronConfiguration[1].name;
       body += "</strong> ";
       body += L_IS_CLOSED;
       body += " ";
@@ -1738,13 +1734,13 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
       body += "<br><br><p class=\"cm\">";
       body += L_IF_MAGNETIC_SENSOR;
       body += ": <strong>";
-      body += configuration[0].name;
+      body += contactronConfiguration[0].name;
       body += "</strong> ";
       body += L_IS_CLOSED;
       body += " ";
       body += L_AND_SENSOR;
       body += ": <strong>";
-      body += configuration[1].name;
+      body += contactronConfiguration[1].name;
       body += "</strong> ";
       body += L_IS_OPEN;
       body += " ";
@@ -1759,12 +1755,12 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
 
     body += L_IF_MAGNETIC_SENSOR;
     body += ": <strong>";
-    body += configuration[0].name;
-    if (noOfContactrons == 2) {
+    body += contactronConfiguration[0].name;
+    if (numberOfContractons == 2) {
       body += "</strong> ";
       body += L_AND_SENSOR;
       body += ": <strong>";
-      body += configuration[1].name;
+      body += contactronConfiguration[1].name;
       body += "</strong> ";
       body += L_ARE_CLOSED;
     } else {
@@ -2425,6 +2421,8 @@ const String AFESitesGenerator::generateHardwareItemsList(
     body += ">";
     body += i;
     body += "</option>";
+    /* @TODO IS IT NEEDED */
+    delay(0);
   }
 
   body += "</select>";

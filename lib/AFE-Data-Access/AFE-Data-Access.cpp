@@ -4,15 +4,7 @@
 
 #include "AFE-Data-Access.h"
 
-AFEDataAccess::AFEDataAccess() {
-  if (SPIFFS.begin()) {
-#ifdef DEBUG
-    Serial << endl << "File system mounted";
-  } else {
-    Serial << endl << "Failed to mount file system";
-#endif
-  }
-}
+AFEDataAccess::AFEDataAccess() {}
 
 boolean AFEDataAccess::formatFileSystem() {
 #ifdef DEBUG
@@ -382,10 +374,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
-        configuration.isContactron[i] = root["contactron"][i];
-        ;
-      }
+      configuration.noOfContactrons = root["noOfContactrons"];
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
@@ -395,7 +384,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size()
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
              << (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10
                      ? "WARNING: Buffor size might be to small"
                      : "Buffor size: OK");
@@ -587,10 +576,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-    JsonArray &jsonContactron = root.createNestedArray("contactron");
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS; i++) {
-      jsonContactron.add(configuration->isContactron[i]);
-    }
+
+    Serial << endl << "ssssssss=" << configuration->noOfContactrons;
+
+    root["noOfContactrons"] = configuration->noOfContactrons;
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
@@ -607,7 +596,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size()
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
            << (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
@@ -833,10 +822,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-  index = 0; // See description above
-  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
-    deviceConfiguration.isContactron[i] = false;
-  }
+  deviceConfiguration.noOfContactrons = 1;
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
@@ -1656,6 +1642,8 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 }
 #endif
 
+#ifdef CONFIG_HARDWARE_RELAY
+#define AFE_CONFIG_FILE_BUFFER_RELAY 146
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   char fileName[17];
@@ -1670,6 +1658,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   File configFile = SPIFFS.open(fileName, "r");
 
+  Serial << endl << "FILE OPENED";
+
   if (configFile) {
 #ifdef DEBUG
     Serial << "success" << endl << "Reading JSON : ";
@@ -1678,7 +1668,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<146> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -1697,7 +1687,10 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_RELAY < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -1880,7 +1873,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<200> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["gpio"] = configuration.gpio;
     root["name"] = configuration.name;
@@ -1900,7 +1893,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_RELAY < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }
@@ -2142,7 +2138,6 @@ void AFEDataAccess::createRelayConfigurationFile() {
 }
 
 /* Relay state methods*/
-#ifdef CONFIG_FUNCTIONALITY_RELAY
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
   char fileName[23];
@@ -2710,7 +2705,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_FILE_BUFFER_CONTACTRON 200
 CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   CONTACTRON configuration;
@@ -2753,7 +2748,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size()
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
              << (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10
                      ? "WARNING: Buffor size might be to small"
                      : "Buffor size: OK");
@@ -2845,7 +2840,9 @@ void AFEDataAccess::createContractonConfigurationFile() {
     saveConfiguration(i, ContactronConfiguration);
   }
 }
+#endif
 
+#ifdef CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_FILE_BUFFER_GATE 200
 GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   GATE configuration;
@@ -2870,7 +2867,7 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<300> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -2888,13 +2885,19 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       configuration.contactronId[0] = root["contactrons"][0];
       configuration.contactronId[1] = root["contactrons"][1];
 
+      /* @TODO Hardcoded */
+      configuration.state[0] = GATE_OPEN;
+      configuration.state[1] = GATE_CLOSED;
+      configuration.state[2] = GATE_CLOSED;
+      configuration.state[3] = GATE_PARTIALLY_OPEN;
+
       configuration.domoticz.idx = root["idx"];
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
 
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size()
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
              << (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10
                      ? "WARNING: Buffor size might be to small"
                      : "Buffor size: OK");
@@ -2973,7 +2976,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size()
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
            << (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
@@ -3006,6 +3009,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   }
 }
 
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 34
 uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = GATE_CLOSED;
 
@@ -3029,7 +3033,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<34> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE_STATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -3040,7 +3044,10 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_GATE_STATE < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 

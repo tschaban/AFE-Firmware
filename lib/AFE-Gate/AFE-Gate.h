@@ -22,24 +22,10 @@
 
 class AFEGate {
 
-private:
-  AFEDevice Device;
-  AFEDataAccess Data;
-  GATE gateConfiguration;
-  uint8_t gateId; // ID of the gate
-  uint8_t numberOfContractors = 0;
-  boolean _event = false;
-  AFERelay Relay;
-
-  /* Returns gate state based on contactron state */
-  uint8_t getGateStateBasedOnContractons();
-
-  char mqttCommandTopic[sizeof(gateConfiguration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(gateConfiguration.mqtt.topic) + 6];
-
 public:
   /* Via this class there is access to contactrons */
-  AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
+  AFEContactron Contactron[2];
+  GATE configuration;
 
   /* Constructors */
   AFEGate();
@@ -54,6 +40,12 @@ public:
   /* Returns gate state*/
   uint8_t get();
 
+  /* Returns number of contactrons for a gate */
+  uint8_t getNoOfContactrons();
+
+  /* Returns contactron ID for selected contactron index (1,2) */
+  uint8_t getContactronId(uint8_t index);
+
   /* Returns true if gate state has changed */
   boolean event();
 
@@ -67,6 +59,21 @@ public:
 
   /* Return IDX in Domoticz */
   unsigned long getDomoticzIDX();
+
+private:
+  AFEDevice Device;
+  AFEDataAccess Data;
+
+  uint8_t gateId; // ID of the gate
+  uint8_t numberOfContractons = 0;
+  boolean _event = false;
+  AFERelay Relay;
+
+  /* Returns gate state based on contactron state */
+  uint8_t getGateStateBasedOnContractons();
+
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 };
 
 #endif

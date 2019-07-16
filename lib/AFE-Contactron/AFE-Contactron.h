@@ -18,23 +18,9 @@
 
 class AFEContactron {
 
-private:
-  CONTACTRON ContactronConfiguration;
-  boolean _initialized = false;
-  boolean state;            // It stores actual contactron state
-  byte _state;              // This contains contactron state to return
-  boolean _changed = false; // True if contractor changed state
-
-  unsigned long startTime = 0;
-
-  AFELED ContactronLed;
-
-  void convert();
-
-  char mqttCommandTopic[sizeof(ContactronConfiguration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(ContactronConfiguration.mqtt.topic) + 6];
-
 public:
+  CONTACTRON configuration;
+
   /* Constructors */
   AFEContactron();
   AFEContactron(uint8_t id);
@@ -43,9 +29,6 @@ public:
 
   /* Method returns contactorn state */
   byte get();
-
-  /* Methods returns contactron name */
-  const char *getName();
 
   /* Method returns MQTT topic for this contactron */
   const char *getMQTTCommandTopic();
@@ -59,6 +42,22 @@ public:
 
   /* Return IDX in Domoticz */
   unsigned long getDomoticzIDX();
+
+protected:
+private:
+  boolean _initialized = false;
+  boolean state;            // It stores actual contactron state
+  byte _state;              // This contains contactron state to return
+  boolean _changed = false; // True if contractor changed state
+
+  unsigned long startTime = 0;
+
+  AFELED ContactronLed;
+
+  void convert();
+
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 };
 
 #endif

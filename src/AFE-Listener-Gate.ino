@@ -6,7 +6,7 @@
 
 /* Method processes gate related events */
 void mainGate() {
-  for (uint8_t gateId = 1; gateId <= Device.configuration.noOfGates; gateId++) {
+  for (uint8_t gateId = 0; gateId < Device.configuration.noOfGates; gateId++) {
     if (Gate[gateId].event()) {
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
@@ -16,6 +16,7 @@ void mainGate() {
         DomoticzPublishGateState(gateId);
         lastPublishedGateStatus = Gate[gateId].get();
       }
+      /*
       for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
         if (Device.configuration.isContactron[i] &&
             lastPublishedContactronState[i] !=
@@ -25,6 +26,7 @@ void mainGate() {
           lastPublishedContactronState[i] = Gate[gateId].Contactron[i].get();
         }
       }
+      */
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif

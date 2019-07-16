@@ -82,7 +82,12 @@ AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 GATE GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
 AFEGate Gate[CONFIG_HARDWARE_NUMBER_OF_GATES];
 uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
-byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
+#include <AFE-Contactron.h>
+AFEContactron Contactron[CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+byte lastPublishedContactronState[CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
 
 #ifdef CONFIG_HARDWARE_UART
@@ -112,8 +117,11 @@ AFEAnalogInput AnalogInput;
 
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   delay(10);
+
+  /* FOR TESTING PURPOSE ONLY */
+//  ESP.wdtDisable();
 
 /* Turn off publishing information to Serial for production compilation */
 #if !defined(DEBUG)
@@ -126,12 +134,18 @@ void setup() {
          << "################################ BOOTING "
             "################################"
          << endl
-         << "All classes and global variables initialized";
+         << "All classes and global variables initialized" << endl
+         << "Initializing device" << endl
+         << "File system: ";
 #endif
 
+  if (SPIFFS.begin()) {
 #ifdef DEBUG
-  Serial << endl << "Initializing device";
+    Serial << "mounted";
+  } else {
+    Serial << "ERROR: not mounted";
 #endif
+  }
 
   Device.begin();
 
@@ -192,7 +206,7 @@ void setup() {
     Upgrader = NULL;
 
     /* Initializing relay */
-    initRelay();
+    //  initRelay();
 
 #ifdef DEBUG
     Serial << endl << "Relay(s) initialized";
@@ -267,6 +281,16 @@ void setup() {
       GateState[i] = Data.getGateConfiguration(i);
 #ifdef DEBUG
       Serial << endl << "Gate: " << i << " initialized";
+#endif
+    }
+#endif
+
+/* Initializing Contactrons */
+#ifdef CONFIG_HARDWARE_CONTACTRON
+    for (uint8_t i = 1; i <= Device.configuration.noOfContactrons; i++) {
+      Contactron[i].begin(i);
+#ifdef DEBUG
+      Serial << endl << "Contactron: " << i << " initialized";
 #endif
     }
 #endif

@@ -187,16 +187,11 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-
     /* Contactrons */
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-      if (Device.configuration.isContactron[i]) {
-        if (strcmp(topic, Gate[1].Contactron[i].getMQTTCommandTopic()) == 0 &&
-            (char)payload[1] == 'e') { // get
-          MQTTPublishContactronState(i);
-        }
-      } else {
-        break;
+    for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+      if (strcmp(topic, Gate[1].Contactron[i].getMQTTCommandTopic()) == 0 &&
+          (char)payload[1] == 'e') { // get
+        MQTTPublishContactronState(i);
       }
     }
 #endif
@@ -403,11 +398,10 @@ void MQTTPublishPIRState(uint8_t id) {
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
 void MQTTPublishContactronState(uint8_t id) {
-  // @TODO HARDCODED !!!!
   if (Device.configuration.api.mqtt) {
-    Mqtt.publishTopic(
-        Gate[1].Contactron[id].getMQTTStateTopic(),
-        Gate[1].Contactron[id].get() == CONTACTRON_OPEN ? "open" : "closed");
+    Mqtt.publishTopic(Contactron[id].getMQTTStateTopic(),
+                      Contactron[id].get() == CONTACTRON_OPEN ? "open"
+                                                              : "closed");
   }
 }
 #endif

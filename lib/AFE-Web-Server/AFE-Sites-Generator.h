@@ -26,6 +26,10 @@
 #include <AFE-Sensor-BMx80.h>
 #endif
 
+#ifdef CONFIG_HARDWARE_GATE
+#include <AFE-Gate.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif

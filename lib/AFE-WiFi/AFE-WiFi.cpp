@@ -131,6 +131,7 @@ void AFEWiFi::listener() {
         if (millis() > delayStartTime +
                            (networkConfiguration.waitTimeConnections * 1000)) {
           connections++;
+          delay(0);
 #ifdef DEBUG
           Serial << endl
                  << "INFO: WiFi connection attempt: " << connections << " from "

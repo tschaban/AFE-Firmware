@@ -10,19 +10,19 @@ AFEContactron::AFEContactron(uint8_t id) { begin(id); }
 
 void AFEContactron::begin(uint8_t id) {
   AFEDataAccess Data;
-  ContactronConfiguration = Data.getContactronConfiguration(id);
-  pinMode(ContactronConfiguration.gpio, INPUT_PULLUP);
-  state = digitalRead(ContactronConfiguration.gpio);
+  configuration = Data.getContactronConfiguration(id);
+  pinMode(configuration.gpio, INPUT_PULLUP);
+  state = digitalRead(configuration.gpio);
   state = state;
-  if (ContactronConfiguration.ledID > 0) {
-    ContactronLed.begin(ContactronConfiguration.ledID - 1);
+  if (configuration.ledID > 0) {
+    ContactronLed.begin(configuration.ledID - 1);
   }
   _initialized = true;
   convert();
 }
 
 void AFEContactron::convert() {
-  if (ContactronConfiguration.outputDefaultState == CONTACTRON_NO) {
+  if (configuration.outputDefaultState == CONTACTRON_NO) {
     if (state) {
       ContactronLed.on();
       _state = CONTACTRON_OPEN;
@@ -43,11 +43,9 @@ void AFEContactron::convert() {
 
 byte AFEContactron::get() { return _state; }
 
-const char *AFEContactron::getName() { return ContactronConfiguration.name; }
-
 const char *AFEContactron::getMQTTCommandTopic() {
-  if (strlen(ContactronConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", ContactronConfiguration.mqtt.topic);
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
@@ -55,8 +53,8 @@ const char *AFEContactron::getMQTTCommandTopic() {
 }
 
 const char *AFEContactron::getMQTTStateTopic() {
-  if (strlen(ContactronConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", ContactronConfiguration.mqtt.topic);
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
     mqttStateTopic[0] = '\0';
   }
@@ -74,7 +72,7 @@ boolean AFEContactron::changed() {
 
 void AFEContactron::listener() {
   if (_initialized) {
-    boolean currentState = digitalRead(ContactronConfiguration.gpio);
+    boolean currentState = digitalRead(configuration.gpio);
     unsigned long time = millis();
 
     if (currentState != state) { // contactron stage changed
@@ -83,7 +81,7 @@ void AFEContactron::listener() {
         startTime = time;
       }
 
-      if (time - startTime >= ContactronConfiguration.bouncing) {
+      if (time - startTime >= configuration.bouncing) {
         state = currentState;
         convert();
         _changed = true;
@@ -96,5 +94,5 @@ void AFEContactron::listener() {
 }
 
 unsigned long AFEContactron::getDomoticzIDX() {
-  return ContactronConfiguration.domoticz.idx;
+  return configuration.domoticz.idx;
 }
