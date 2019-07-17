@@ -2843,7 +2843,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-#define AFE_CONFIG_FILE_BUFFER_GATE 200
+#define AFE_CONFIG_FILE_BUFFER_GATE 210
 GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   GATE configuration;
 
@@ -2885,11 +2885,9 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       configuration.contactronId[0] = root["contactrons"][0];
       configuration.contactronId[1] = root["contactrons"][1];
 
-      /* @TODO Hardcoded */
-      configuration.state[0] = GATE_OPEN;
-      configuration.state[1] = GATE_CLOSED;
-      configuration.state[2] = GATE_CLOSED;
-      configuration.state[3] = GATE_PARTIALLY_OPEN;
+      for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+        configuration.state[i] = root["states"][i];
+      }
 
       configuration.domoticz.idx = root["idx"];
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
@@ -2944,6 +2942,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonArray &jsonContactron = root.createNestedArray("contactrons");
+    JsonArray &jsonStates = root.createNestedArray("states");
     /*
     for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
       Eeprom.writeUInt8(467 + i, configuration.state[i]);
@@ -2963,6 +2962,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
 
     jsonContactron.add(configuration.contactronId[0]);
     jsonContactron.add(configuration.contactronId[1]);
+
+    for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+      jsonStates.add(configuration.state[i]);
+    }
 
     root["idx"] = configuration.domoticz.idx;
     root["MQTTTopic"] = configuration.mqtt.topic;
@@ -3002,6 +3005,11 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.relayId = 0;
   GateConfiguration.domoticz.idx = 0;
   GateConfiguration.mqtt.topic[0] = '\0';
+
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+    GateConfiguration.state[i] = GATE_UNKNOWN;
+  }
+
   for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
     sprintf(GateConfiguration.name, "G%d", i + 1);
     saveConfiguration(i, GateConfiguration);

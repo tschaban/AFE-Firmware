@@ -787,124 +787,171 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   RELAY configuration = Data.getRelayConfiguration(id);
+
+#ifdef CONFIG_HARDWARE_GATE
+  GATE gateConfiguration;
+  boolean isGateRelay = false;
+  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
+    gateConfiguration = Data.getGateConfiguration(i);
+    if (gateConfiguration.relayId > 0 && gateConfiguration.relayId - 1 == id) {
+      isGateRelay = true;
+    }
+  }
+#endif
+
   String body = "<fieldset>";
   char field[13];
   sprintf(field, "g%d", id);
 
   body += generateConfigParameter_GPIO(field, configuration.gpio);
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef CONFIG_HARDWARE_GATE
+  /* Below code is conditioned for the Gate functionality only. It's not shown
+   * if the relay is assigned to the Gate */
+  if (!isGateRelay) {
+#endif
 
-  sprintf(field, "n%d", id);
-  body += addItem("text", field, L_NAME, configuration.name, "16");
+    sprintf(field, "n%d", id);
+    body += addItem("text", field, L_NAME, configuration.name, "16");
 
-  body += "<p class=\"cm\">";
-  body += L_DEFAULT_VALUES;
-  body += "</p><div class=\"cf\"><label>";
-  body += L_DEFAULT_POWER_RESTORED;
-  body += "</label><select name=\"pr" + String(id) + "\"><option value=\"0\"";
-  body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_NO_ACTION;
-  body += "</option><option value=\"1\"";
-  body += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_OFF;
-  body += "</option><option value=\"2\"";
-  body += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_ON;
-  body += "</option><option value=\"3\"";
-  body += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_LAST_KNOWN_STATE;
-  body += "</option><option value=\"4\"";
-  body += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
-  body += "</option></select></div>";
-
-  if (Device->configuration.api.mqtt) {
-
-    body += "<div class=\"cf\">";
-    body += "<label>";
-    body += L_DEFAULT_MQTT_CONNECTED;
-    body += "</label>";
-    body += "<select  name=\"mc" + String(id) + "\">";
-    body += "<option value=\"0\"";
-    body += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
-                                                    : "");
+    body += "<p class=\"cm\">";
+    body += L_DEFAULT_VALUES;
+    body += "</p><div class=\"cf\"><label>";
+    body += L_DEFAULT_POWER_RESTORED;
+    body += "</label><select name=\"pr" + String(id) + "\"><option value=\"0\"";
+    body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_NO_ACTION;
-    body += "</option>";
-    body += "<option value=\"1\"";
-    body += (configuration.state.MQTTConnected == 1 ? " selected=\"selected\""
-                                                    : "");
+    body += "</option><option value=\"1\"";
+    body += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_OFF;
-    body += "</option>";
-    body += "<option value=\"2\"";
-    body += (configuration.state.MQTTConnected == 2 ? " selected=\"selected\""
-                                                    : "");
+    body += "</option><option value=\"2\"";
+    body += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_ON;
-    body += "</option>";
-    body += "<option value=\"3\"";
-    body += (configuration.state.MQTTConnected == 3 ? " selected=\"selected\""
-                                                    : "");
+    body += "</option><option value=\"3\"";
+    body += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_LAST_KNOWN_STATE;
-    body += "</option>";
-    body += "<option value=\"4\"";
-    body += (configuration.state.MQTTConnected == 4 ? " selected=\"selected\""
-                                                    : "");
+    body += "</option><option value=\"4\"";
+    body += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
-    body += "</option>";
-    body += "<option value=\"5\"";
-    body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
-                                                    : "");
-    body += ">";
-    body += L_DEFAULT_GET_FROM_MQTT;
-    body += "</option>";
-    body += "</select>";
-    body += "</div>";
+    body += "</option></select></div>";
+
+    if (Device->configuration.api.mqtt) {
+
+      body += "<div class=\"cf\">";
+      body += "<label>";
+      body += L_DEFAULT_MQTT_CONNECTED;
+      body += "</label>";
+      body += "<select  name=\"mc" + String(id) + "\">";
+      body += "<option value=\"0\"";
+      body += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_NO_ACTION;
+      body += "</option>";
+      body += "<option value=\"1\"";
+      body += (configuration.state.MQTTConnected == 1 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_OFF;
+      body += "</option>";
+      body += "<option value=\"2\"";
+      body += (configuration.state.MQTTConnected == 2 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_ON;
+      body += "</option>";
+      body += "<option value=\"3\"";
+      body += (configuration.state.MQTTConnected == 3 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_LAST_KNOWN_STATE;
+      body += "</option>";
+      body += "<option value=\"4\"";
+      body += (configuration.state.MQTTConnected == 4 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
+      body += "</option>";
+      body += "<option value=\"5\"";
+      body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
+                                                      : "");
+      body += ">";
+      body += L_DEFAULT_GET_FROM_MQTT;
+      body += "</option>";
+      body += "</select>";
+      body += "</div>";
+    }
+
+#ifdef CONFIG_HARDWARE_GATE
   }
 #endif
 
-/* Relay Time off / Impuls is not applicable for T3 & T6 */
-#if !(defined(T3_CONFIG) || defined(T6_CONFIG))
-  body += "<br><p class=\"cm\">";
-  body += L_AUTOMATIC_SWITCHING_OFF;
-  body += "</p><div class=\"cf\"><label>";
-#if defined(T5_CONFIG)
-  body += L_IMPULSE_DURATION;
+#ifdef CONFIG_HARDWARE_GATE
+  /* Below code is conditioned for the Gate functionality only. It's not shown
+   * if the relay is assigned to the Gate */
+  if (!isGateRelay) {
+#endif
+    body += "<br><p class=\"cm\">";
+    body += L_AUTOMATIC_SWITCHING_OFF;
+    body += "</p>";
+#ifdef CONFIG_HARDWARE_GATE
+  }
+#endif
+
+  body += "<div class=\"cf\"><label>";
+
+#ifdef CONFIG_HARDWARE_GATE
+  if (isGateRelay) {
+    body += L_IMPULSE_DURATION;
+  } else {
+    body += L_SWITCH_OFF_AFTER;
+  }
 #else
   body += L_SWITCH_OFF_AFTER;
 #endif
+
   body += "</label>";
 
-#if defined(T5_CONFIG)
-  body += "<input name=\"ot" + String(id) +
-          "\" type=\"number\" step=\"1\" max=\"9999\" min=\"1\" value=\"";
+#ifdef CONFIG_HARDWARE_GATE
+  if (isGateRelay) {
+    body += "<input name=\"ot" + String(id) +
+            "\" type=\"number\" step=\"1\" max=\"9999\" min=\"1\" value=\"";
+  } else {
+    body +=
+        "<input name=\"ot" + String(id) +
+        "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
+  }
 #else
   body += "<input name=\"ot" + String(id) +
           "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
 #endif
+
   body += configuration.timeToOff;
   body += "\">";
-#if defined(T5_CONFIG)
-  body += "<span class=\"hint\">1 - 9999";
-  body += L_MILISECONDS;
+
+#ifdef CONFIG_HARDWARE_GATE
+  if (isGateRelay) {
+    body += "<span class=\"hint\">1 - 9999 ";
+    body += L_MILISECONDS;
+  } else {
+    body += "<span class=\"hint\">0.01 - 86400 ";
+    body += L_SECONDS;
+    body += ". ";
+    body += L_NO_ACTION_IF_0;
+  }
 #else
   body += "<span class=\"hint\">0.01 - 86400 ";
   body += L_SECONDS;
   body += ". ";
   body += L_NO_ACTION_IF_0;
 #endif
-  body += "</span></div>";
 
-#endif /* T3/T6 exclusion end */
+  body += "</span></div>";
 
 #ifdef CONFIG_HARDWARE_DS18B20
   if (Device->isDS18B20)
@@ -937,34 +984,45 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
 #endif
 
+#ifdef CONFIG_HARDWARE_GATE
+  /* Excluded code below for Gate functionality and the relay assigned to the
+   * gate */
+  if (!isGateRelay) {
+#endif
+
 #if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
-    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0 && defined(CONFIG_FUNCTIONALITY_RELAY)
+    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
-  body += "<br><p class=\"cm\">";
-  body += L_SELECT_LED_4_RELAY;
-  body += "</p>";
+    body += "<br><p class=\"cm\">";
+    body += L_SELECT_LED_4_RELAY;
+    body += "</p>";
 
-  body += "<div class=\"cf\"><label>LED</label><select  name=\"l" + String(id) +
-          "\"><option value=\"0\"";
-  body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
-  body += L_NONE;
-  body += "</option>";
+    body += "<div class=\"cf\"><label>LED</label><select  name=\"l" +
+            String(id) + "\"><option value=\"0\"";
+    body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+    body += L_NONE;
+    body += "</option>";
 
-  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    if (Device->configuration.isLED[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.ledID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
+    for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
+      if (Device->configuration.isLED[i - 1]) {
+        body += "<option value=\"";
+        body += i;
+        body += "\"";
+        body += configuration.ledID == i ? " selected=\"selected\"" : "";
+        body += ">";
+        body += i;
+        body += "</option>";
+      } else {
+        break;
+      }
     }
-  }
 
-  body += "</select></div>";
+    body += "</select></div>";
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+    /* LED Exclusion for a relay assigned to ta gate */
+  }
 #endif
 
   body += "</fieldset>";
@@ -974,30 +1032,39 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.domoticz) {
+#ifdef CONFIG_HARDWARE_GATE
+  /* Excluded code below for Gate functionality and the relay assigned to the
+   * gate */
+  if (!isGateRelay) {
+#endif
 
-    body = "<fieldset>";
+    if (Device->configuration.api.domoticz) {
 
-    sprintf(field, "x%d", id);
-    char _idx[7];
-    sprintf(_idx, "%d", configuration.domoticz.idx);
-    body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
+      body = "<fieldset>";
 
-    body += "</fieldset>";
+      sprintf(field, "x%d", id);
+      char _idx[7];
+      sprintf(_idx, "%d", configuration.domoticz.idx);
+      body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
 
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+      body += "</fieldset>";
+
+      page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    }
+
+    if (Device->configuration.api.mqtt) {
+
+      body = "<fieldset>";
+      sprintf(field, "t%d", id);
+      body +=
+          addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+      body += "</fieldset>";
+      page +=
+          addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    }
+#ifdef CONFIG_HARDWARE_GATE
   }
-
-  if (Device->configuration.api.mqtt) {
-
-    body = "<fieldset>";
-    sprintf(field, "t%d", id);
-    body +=
-        addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
-  }
-
+#endif
   return page;
 }
 
@@ -1633,11 +1700,6 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 
 #ifdef CONFIG_HARDWARE_GATE
 String AFESitesGenerator::addGateConfiguration(uint8_t id) {
-
-  Serial << endl << "Generating site: Gate, ID=" << id;
-  //  AFEGate Gate;
-  // Gate.begin(id);
-
   GATE gateConfiguration = Data.getGateConfiguration(id);
   CONTACTRON contactronConfiguration[2];
 
@@ -1655,16 +1717,16 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
                                     "r", L_RELAY_ID_CONTROLLING_GATE);
 
   if (Device->configuration.noOfContactrons > 0) {
-    body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+    body += generateHardwareItemsList(Device->configuration.noOfContactrons,
                                       gateConfiguration.contactronId[0], "c1",
                                       L_MAGNETIC_SENSOR);
   }
 
-  /* If there is more than a one contactron connected, add option to assigne it
-   * to the gate */
+  /* If there is more than a one contactron connected, add option to assigne
+   * it to the gate */
 
   if (Device->configuration.noOfContactrons > 1) {
-    body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+    body += generateHardwareItemsList(Device->configuration.noOfContactrons,
                                       gateConfiguration.contactronId[1], "c2",
                                       L_MAGNETIC_SENSOR);
   }
@@ -1679,15 +1741,20 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
   uint8_t numberOfContractons = 0;
   if (gateConfiguration.contactronId[1] > 0) {
     numberOfContractons = 2;
-  } else if (gateConfiguration.contactronId[0] > 1) {
+  } else if (gateConfiguration.contactronId[0] > 0) {
     numberOfContractons = 1;
   }
+
+#ifdef DEBUG
+  Serial << endl
+         << "Number of contactros set for the gate: " << numberOfContractons;
+#endif
 
   if (numberOfContractons > 0) {
 
     for (uint8_t i = 0; i < numberOfContractons; i++) {
-      contactronConfiguration[i] =
-          Data.getContactronConfiguration(gateConfiguration.contactronId[i]);
+      contactronConfiguration[i] = Data.getContactronConfiguration(
+          gateConfiguration.contactronId[i] - 1);
     }
 
     body = "<fieldset>";

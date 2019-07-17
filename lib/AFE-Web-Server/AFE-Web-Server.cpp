@@ -965,21 +965,19 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
 RELAY AFEWebServer::getRelayData(uint8_t id) {
   RELAY data;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g" + String(id)).length()
+                  ? server.arg("g" + String(id)).toInt()
+                  : 0;
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-  if (server.arg("ot" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("ot" + String(id)).toFloat();
-  }
+  data.timeToOff = server.arg("ot" + String(id)).length() > 0
+                       ? server.arg("ot" + String(id)).toFloat()
+                       : 0;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
-
-  if (server.arg("pr" + String(id)).length() > 0) {
-    data.state.powerOn = server.arg("pr" + String(id)).toInt();
-  }
+  data.state.powerOn = server.arg("pr" + String(id)).length() > 0
+                           ? server.arg("pr" + String(id)).toInt()
+                           : 0;
 
   if (server.arg("n" + String(id)).length() > 0) {
     server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
@@ -995,9 +993,9 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   }
 
 #ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  if (server.arg("tp" + String(id)).length() > 0) {
-    data.thermalProtection = server.arg("tp" + String(id)).toInt();
-  }
+  data.thermalProtection = server.arg("tp" + String(id)).length() > 0
+                               ? server.arg("tp" + String(id)).toInt()
+                               : 0;
 #endif
 
   data.state.MQTTConnected = server.arg("mc" + String(id)).length() > 0
@@ -1008,11 +1006,9 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
                           ? server.arg("x" + String(id)).toInt()
                           : 0;
 
-#endif
-
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.ledID = server.arg("l" + String(id)).toInt();
-  }
+  data.ledID = server.arg("l" + String(id)).length() > 0
+                   ? server.arg("l" + String(id)).toInt()
+                   : 0;
 
   return data;
 }
