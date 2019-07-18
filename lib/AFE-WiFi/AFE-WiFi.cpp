@@ -22,7 +22,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   uint8_t systeLedID = Data.getSystemLedID();
   delay(0);
 
-  if (systeLedID > 0 && Device->configuration.isLED[systeLedID - 1]) {
+  if (systeLedID > 0 && Device->configuration.noOfLEDs >= systeLedID) {
     Led.begin(systeLedID - 1);
   }
 #endif

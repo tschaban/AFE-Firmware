@@ -61,7 +61,7 @@ public:
   void saveConfiguration(uint8_t id, RELAY configuration);
   void createRelayConfigurationFile();
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef CONFIG_HARDWARE_RELAY
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();

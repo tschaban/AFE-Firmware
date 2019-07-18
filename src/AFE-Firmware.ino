@@ -206,7 +206,7 @@ void setup() {
     Upgrader = NULL;
 
     /* Initializing relay */
-    //  initRelay();
+    initRelay();
 
 #ifdef DEBUG
     Serial << endl << "Relay(s) initialized";
@@ -222,18 +222,15 @@ void setup() {
 
   /* Initializing LED, checking if LED exists is made on Class level  */
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  uint8_t systeLedID = Data.getSystemLedID();
+  uint8_t systemLedID = Data.getSystemLedID();
   delay(0);
 
 #ifdef DEBUG
-  Serial << endl << "System LED ID: " << systeLedID;
-  Serial << endl
-         << "Is system LED enabld : "
-         << (Device.configuration.isLED[systeLedID - 1] ? "YES" : "NO");
+  Serial << endl << "System LED ID: " << systemLedID;
 #endif
 
-  if (systeLedID > 0 && Device.configuration.isLED[systeLedID - 1]) {
-    Led.begin(systeLedID - 1);
+  if (systemLedID > 0 && Device.configuration.noOfLEDs >= systemLedID) {
+    Led.begin(systemLedID - 1);
   }
 
   /* If device in configuration mode then it starts LED blinking */
@@ -276,7 +273,7 @@ void setup() {
 
 /* Initializing Gate */
 #ifdef CONFIG_HARDWARE_GATE
-    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+    for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
       Gate[i].begin(i);
       GateState[i] = Data.getGateConfiguration(i);
 #ifdef DEBUG

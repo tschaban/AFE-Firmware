@@ -322,7 +322,7 @@ void AFEDataAccess::createPasswordConfigurationFile() {
   saveConfiguration(PasswordConfiguration);
 }
 
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 400
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 240
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 #ifdef DEBUG
@@ -357,17 +357,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
         configuration.api.http = true;
       }
 
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-        configuration.isLED[i] = root["led"][i];
-      }
-
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-        configuration.isSwitch[i] = root["switch"][i];
-      }
-
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-        configuration.isRelay[i] = root["relay"][i];
-      }
+      configuration.noOfLEDs = root["noOfLEDs"];
+      configuration.noOfSwitches = root["noOfSwitches"];
+      configuration.noOfRelays = root["noOfRelays"];
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
       configuration.isAnalogInput = root["isAnalogInput"];
@@ -556,29 +548,18 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     jsonAPI["mqtt"] = configuration->api.mqtt;
     jsonAPI["domoticz"] = configuration->api.domoticz;
 
-    JsonArray &jsonLED = root.createNestedArray("led");
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-      jsonLED.add(configuration->isLED[i]);
-    }
+    root["noOfLEDs"] = configuration->noOfLEDs;
+    root["noOfSwitches"] = configuration->noOfSwitches;
 
-    JsonArray &jsonSwitch = root.createNestedArray("switch");
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-      jsonSwitch.add(configuration->isSwitch[i]);
-    }
-
-    JsonArray &jsonRelay = root.createNestedArray("relay");
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-      jsonRelay.add(configuration->isRelay[i]);
-    }
+#ifdef CONFIG_HARDWARE_RELAY
+    root["noOfRelays"] = configuration->noOfRelays;
+#endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
     root["isAnalogInput"] = configuration->isAnalogInput;
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-
-    Serial << endl << "ssssssss=" << configuration->noOfContactrons;
-
     root["noOfContactrons"] = configuration->noOfContactrons;
 #endif
 
@@ -716,8 +697,6 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   Serial << endl << "Creating file: cfg-device.json";
 #endif
   DEVICE deviceConfiguration;
-  uint8_t index = 0; // Used to added config to max allowed in T0 dispite the
-                     // fact how many items is available per specifict hardware
   sprintf(deviceConfiguration.name, "AFE-Device");
   /* APIs */
   deviceConfiguration.api.mqtt = false;
@@ -725,96 +704,16 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   deviceConfiguration.api.http = true;
 
 /* Relay presence */
-#ifdef CONFIG_FUNCTIONALITY_RELAY
-#if defined(DEVICE_SONOFF_BASIC_V1)
-  deviceConfiguration.isRelay[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(DEVICE_SHELLY_1)
-  deviceConfiguration.isRelay[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(DEVICE_SONOFF_4CH)
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    deviceConfiguration.isRelay[i] = true;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(DEVICE_SONOFF_TOUCH_1G)
-  deviceConfiguration.isRelay[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(DEVICE_SONOFF_TOUCH_2G)
-  deviceConfiguration.isRelay[0] = true;
-  deviceConfiguration.isRelay[1] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(DEVICE_SONOFF_TOUCH_3G)
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    deviceConfiguration.isRelay[i] = true;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#endif
-  /* Adding remaining configuration files */
-  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
-    deviceConfiguration.isRelay[i] = false;
-  }
-
+#ifdef CONFIG_HARDWARE_RELAY
+  deviceConfiguration.noOfRelays = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
-  index = 0; // See description above
-
-/* Switch presence */
-#if defined(DEVICE_SONOFF_BASIC_V1)
-  deviceConfiguration.isSwitch[0] = true;
-  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    deviceConfiguration.isSwitch[i] = false;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#elif defined(DEVICE_SONOFF_4CH)
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    deviceConfiguration.isSwitch[i] = true;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#elif defined(DEVICE_SONOFF_TOUCH_1G)
-  deviceConfiguration.isSwitch[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#elif defined(DEVICE_SONOFF_TOUCH_2G)
-  deviceConfiguration.isSwitch[0] = true;
-  deviceConfiguration.isSwitch[1] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#elif defined(DEVICE_SONOFF_TOUCH_3G)
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    deviceConfiguration.isSwitch[i] = true;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#elif defined(DEVICE_SHELLY_1)
-  deviceConfiguration.isSwitch[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
-#endif
-  /* Adding remaining configuration files */
-  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
-    deviceConfiguration.isSwitch[i] = false;
-  }
+  /* Switch presence */
+  deviceConfiguration.noOfSwitches = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 
 /* LEDs presence */
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-
-  index = 0; // See description above
-
-#if defined(DEVICE_SONOFF_BASIC_V1)
-  deviceConfiguration.isLED[0] = true;
-  for (uint8_t i = 1; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    deviceConfiguration.isLED[i] = false;
-  }
-  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
-#elif defined(DEVICE_SONOFF_4CH)
-  deviceConfiguration.isLED[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
-#elif defined(DEVICE_SONOFF_TOUCH_3G)
-  deviceConfiguration.isLED[0] = true;
-  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
-#endif
-  index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
-  for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
-    deviceConfiguration.isLED[i] = false;
-  }
-
+  deviceConfiguration.noOfLEDs = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
@@ -822,11 +721,12 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
-  deviceConfiguration.noOfContactrons = 1;
+  deviceConfiguration.noOfContactrons =
+      CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-  deviceConfiguration.noOfGates = 1;
+  deviceConfiguration.noOfGates = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -1643,7 +1543,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #endif
 
 #ifdef CONFIG_HARDWARE_RELAY
-#define AFE_CONFIG_FILE_BUFFER_RELAY 146
+#define AFE_CONFIG_FILE_BUFFER_RELAY 160
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   char fileName[17];
@@ -3097,20 +2997,26 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 
     String fileContent;
 
-    fileContent = "{\"state\":";
-    fileContent += state;
-    fileContent += "}";
-    configFile.print(configFile);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE_STATE> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["state"] = state;
+
+    root.printTo(configFile);
+
 #ifdef DEBUG
-    Serial << endl
-           << "Saving: " << fileContent << endl
-           << "Content size= " << fileContent.length() << endl
-           << "File size=" << configFile.size();
+    root.printTo(Serial);
 #endif
+
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl << "success";
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }

@@ -12,7 +12,7 @@ void DomoticzInit() {
   }
 }
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef CONFIG_HARDWARE_RELAY
 /* It publishes relay state to Domoticz */
 void DomoticzPublishRelayState(uint8_t id) {
   if (Device.configuration.api.domoticz) {

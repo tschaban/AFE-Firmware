@@ -20,7 +20,7 @@ void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   previousState = state;
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0 && _Device->configuration.isLED[systeLedID - 1]) {
+  if (systeLedID > 0 && _Device->configuration.noOfLEDs >= systeLedID) {
     Led.begin(systeLedID - 1);
   }
 #endif

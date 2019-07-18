@@ -92,17 +92,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</a></li>";
   }
 
-  uint8_t itemPresent = 0;
-
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    if (Device->configuration.isLED[i]) {
-      itemPresent++;
-    } else {
-      break;
-    }
-  }
-
-  if (itemPresent > 0) {
+  if (Device->configuration.noOfLEDs > 0) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_LED;
     page += "\">";
@@ -131,21 +121,13 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
   /* Relay */
-  itemPresent = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    if (Device->configuration.isRelay[i]) {
-      itemPresent++;
-    } else {
-      break;
-    }
-  }
 
-  if (itemPresent > 0) {
+  if (Device->configuration.noOfRelays > 0) {
     page += "<li  class=\"itm\"><a><i>";
     page += L_RELAYS_CONFIGURATION;
     page += "</i></a></li>";
 
-    for (uint8_t i = 0; i < itemPresent; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
       page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_RELAY;
       page += "&i=";
@@ -173,22 +155,12 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     }
   }
 
-  /* Switch */
-  itemPresent = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    if (Device->configuration.isSwitch[i]) {
-      itemPresent++;
-    } else {
-      break;
-    }
-  }
-
-  if (itemPresent > 0) {
+  if (Device->configuration.noOfSwitches > 0) {
     page += "<li  class=\"itm\"><a><i>";
     page += L_BUTTONS_SWITCHES;
     page += "</i></a></li>";
 
-    for (uint8_t i = 0; i < itemPresent; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
       page += "<li class=\"itm\"><a href=\"\\?o=";
       page += AFE_CONFIG_SITE_SWITCH;
       page += "&i=";
@@ -238,7 +210,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += AFE_CONFIG_SITE_CONTACTRON;
       page += "&i=";
       page += i;
-      page += "\"> - ";
+      page += "\">&#8227; ";
       page += L_SENSOR;
       page += ": ";
       page += i + 1;
@@ -340,7 +312,6 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 String AFESitesGenerator::addDeviceConfiguration() {
   DEVICE configuration = Device->configuration;
-  uint8_t itemsNumber = 0;
 
   String body = "<fieldset>";
   body += addItem("text", "n", L_DEVICE_NAME, configuration.name, "16");
@@ -351,16 +322,10 @@ String AFESitesGenerator::addDeviceConfiguration() {
 /* LED */
 #if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
     CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    if (Device->configuration.isLED[i]) {
-      itemsNumber++;
-    } else {
-      break;
-    }
-  }
 
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_LEDS, itemsNumber,
-                                    "l", L_NUMBER_OF_LEDS);
+  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_LEDS,
+                                    Device->configuration.noOfLEDs, "l",
+                                    L_NUMBER_OF_LEDS);
 
 #endif
 
@@ -375,31 +340,16 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
 #ifdef CONFIG_HARDWARE_RELAY
   /* Relay */
-  itemsNumber = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    if (Device->configuration.isRelay[i]) {
-      itemsNumber++;
-    } else {
-      break;
-    }
-  }
-
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_RELAYS,
-                                    itemsNumber, "r", L_NUMBER_OF_RELAYS);
+                                    Device->configuration.noOfRelays, "r",
+                                    L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
-  itemsNumber = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    if (Device->configuration.isSwitch[i]) {
-      itemsNumber++;
-    } else {
-      break;
-    }
-  }
 
   body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
-                                    itemsNumber, "s", L_NUMBER_OF_SWITCHES);
+                                    Device->configuration.noOfSwitches, "s",
+                                    L_NUMBER_OF_SWITCHES);
 
 #ifdef CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
@@ -765,18 +715,14 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    if (Device->configuration.isLED[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
-    }
+  for (uint8_t i = 1; i <= Device->configuration.noOfLEDs; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\"";
+    body += configuration == i ? " selected=\"selected\"" : "";
+    body += ">";
+    body += i;
+    body += "</option>";
   }
 
   body += "</select></div></fieldset>";
@@ -800,10 +746,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
   String body = "<fieldset>";
-  char field[13];
-  sprintf(field, "g%d", id);
 
-  body += generateConfigParameter_GPIO(field, configuration.gpio);
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
 
 #ifdef CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not shown
@@ -811,14 +755,13 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-    sprintf(field, "n%d", id);
-    body += addItem("text", field, L_NAME, configuration.name, "16");
+    body += addItem("text", "n", L_NAME, configuration.name, "16");
 
     body += "<p class=\"cm\">";
     body += L_DEFAULT_VALUES;
     body += "</p><div class=\"cf\"><label>";
     body += L_DEFAULT_POWER_RESTORED;
-    body += "</label><select name=\"pr" + String(id) + "\"><option value=\"0\"";
+    body += "</label><select name=\"pr\"><option value=\"0\"";
     body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
     body += ">";
     body += L_NO_ACTION;
@@ -846,7 +789,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += "<label>";
       body += L_DEFAULT_MQTT_CONNECTED;
       body += "</label>";
-      body += "<select  name=\"mc" + String(id) + "\">";
+      body += "<select  name=\"mc\">";
       body += "<option value=\"0\"";
       body += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
                                                       : "");
@@ -903,55 +846,21 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   }
 #endif
 
-  body += "<div class=\"cf\"><label>";
+  char _number[9];
+  dtostrf(configuration.timeToOff, 1, 1, _number);
 
 #ifdef CONFIG_HARDWARE_GATE
   if (isGateRelay) {
-    body += L_IMPULSE_DURATION;
+    body += addItem("number", "ot", L_IMPULSE_DURATION, _number, "?", "1",
+                    "99999", "1", L_MILISECONDS);
   } else {
-    body += L_SWITCH_OFF_AFTER;
+    body += addItem("number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0",
+                    "86400", "0.1", L_SECONDS);
   }
-#else
-  body += L_SWITCH_OFF_AFTER;
+#else // Not a GATE
+  body += addItem("number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0",
+                  "86400", "0.1", L_SECONDS);
 #endif
-
-  body += "</label>";
-
-#ifdef CONFIG_HARDWARE_GATE
-  if (isGateRelay) {
-    body += "<input name=\"ot" + String(id) +
-            "\" type=\"number\" step=\"1\" max=\"9999\" min=\"1\" value=\"";
-  } else {
-    body +=
-        "<input name=\"ot" + String(id) +
-        "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
-  }
-#else
-  body += "<input name=\"ot" + String(id) +
-          "\" type=\"number\" step=\"0.01\" min=\"0\" max=\"86400\"  value=\"";
-#endif
-
-  body += configuration.timeToOff;
-  body += "\">";
-
-#ifdef CONFIG_HARDWARE_GATE
-  if (isGateRelay) {
-    body += "<span class=\"hint\">1 - 9999 ";
-    body += L_MILISECONDS;
-  } else {
-    body += "<span class=\"hint\">0.01 - 86400 ";
-    body += L_SECONDS;
-    body += ". ";
-    body += L_NO_ACTION_IF_0;
-  }
-#else
-  body += "<span class=\"hint\">0.01 - 86400 ";
-  body += L_SECONDS;
-  body += ". ";
-  body += L_NO_ACTION_IF_0;
-#endif
-
-  body += "</span></div>";
 
 #ifdef CONFIG_HARDWARE_DS18B20
   if (Device->isDS18B20)
@@ -997,24 +906,21 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += L_SELECT_LED_4_RELAY;
     body += "</p>";
 
-    body += "<div class=\"cf\"><label>LED</label><select  name=\"l" +
-            String(id) + "\"><option value=\"0\"";
+    body += "<div class=\"cf\"><label>LED</label><select  name=\"l\"><option "
+            "value=\"0\"";
     body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+    body += ">";
     body += L_NONE;
     body += "</option>";
 
-    for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-      if (Device->configuration.isLED[i - 1]) {
-        body += "<option value=\"";
-        body += i;
-        body += "\"";
-        body += configuration.ledID == i ? " selected=\"selected\"" : "";
-        body += ">";
-        body += i;
-        body += "</option>";
-      } else {
-        break;
-      }
+    for (uint8_t i = 1; i <= Device->configuration.noOfLEDs; i++) {
+      body += "<option value=\"";
+      body += i;
+      body += "\"";
+      body += configuration.ledID == i ? " selected=\"selected\"" : "";
+      body += ">";
+      body += i;
+      body += "</option>";
     }
 
     body += "</select></div>";
@@ -1041,11 +947,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     if (Device->configuration.api.domoticz) {
 
       body = "<fieldset>";
-
-      sprintf(field, "x%d", id);
       char _idx[7];
       sprintf(_idx, "%d", configuration.domoticz.idx);
-      body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
+      body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
 
       body += "</fieldset>";
 
@@ -1053,11 +957,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
 
     if (Device->configuration.api.mqtt) {
-
       body = "<fieldset>";
-      sprintf(field, "t%d", id);
       body +=
-          addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+          addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
       body += "</fieldset>";
       page +=
           addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
@@ -1112,13 +1014,11 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   configuration = Data.getSwitchConfiguration(id);
 
   String body = "<fieldset>";
-  char field[13];
-  sprintf(field, "g%d", id);
   body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(field, configuration.gpio);
+  body += generateConfigParameter_GPIO("g", configuration.gpio);
   body += "</div><div class=\"cf\"><label>";
   body += L_FUNCTIONALITY;
-  body += "</label><select name=\"f" + String(id) + "\"><option value=\"";
+  body += "</label><select name=\"f\"><option value=\"";
   body += SWITCH_FUNCTIONALITY_NONE;
   body += "\"";
   body += (configuration.functionality == SWITCH_FUNCTIONALITY_NONE
@@ -1134,43 +1034,39 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
                : "");
   body += ">";
   body += L_SYSTEM_BUTTON;
-  body += "</option><option value=\"";
+  body += "</option>";
+
+#ifdef CONFIG_HARDWARE_RELAY
+  body += "<option value=\"";
   body += SWITCH_FUNCTIONALITY_RELAY;
   body += "\"";
   body += (configuration.functionality == SWITCH_FUNCTIONALITY_RELAY
                ? " selected=\"selected\""
                : "");
   body += ">";
-#ifdef CONFIG_FUNCTIONALITY_GATE
-  body += L_CONTROL_GATE;
-#endif
-#ifdef CONFIG_FUNCTIONALITY_RELAY
   body += L_CONTROL_RELAY;
-#endif
   body += "</option></select></div><div class=\"cf\"><label>";
   body += L_RELAY_CONTROLLED_BY_SWITCH;
-  body += "</label><select  name=\"r" + String(id) + "\"><option value=\"0\"";
+  body += "</label><select  name=\"r\"><option value=\"0\"";
   body += configuration.relayID == 0 ? " selected=\"selected\"" : "";
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    if (Device->configuration.isRelay[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.relayID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
-    }
+  for (uint8_t i = 1; i <= Device->configuration.noOfRelays; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\"";
+    body += configuration.relayID == i ? " selected=\"selected\"" : "";
+    body += ">";
+    body += i;
+    body += "</option>";
   }
+  body += "</select></div>";
+#endif
 
-  body += "</select></div><div class=\"cf\"><label>";
+  body += "<div class=\"cf\"><label>";
   body += L_TYPE;
-  body += "</label><select name=\"m" + String(id) + "\"><option value=\"0\"";
+  body += "</label><select name=\"m\"><option value=\"0\"";
   body += (configuration.type == 0 ? " selected=\"selected\"" : "");
   body += ">";
   body += L_MONOSTABLE;
@@ -1182,12 +1078,11 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L__SENSITIVENESS_HINT;
   body += "</p>";
 
-  sprintf(field, "s%d", id);
   char _number[4];
   sprintf(_number, "%d", configuration.sensitiveness);
 
-  body += addItem("number", field, L_SENSITIVENESS, _number, "?", "0", "999",
-                  "1", L_MILISECONDS);
+  body += addItem("number", "s", L_SENSITIVENESS, _number, "?", "0", "999", "1",
+                  L_MILISECONDS);
   body += "</fieldset>";
 
   char title[23];
@@ -1198,10 +1093,9 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
-    sprintf(field, "x%d", id);
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
-    body += addItem("number", field, "IDX", _idx, "?", "0", "999999", "1");
+    body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
 
     body += "</fieldset>";
 
@@ -1210,9 +1104,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
-    sprintf(field, "t%d", id);
-    body +=
-        addItem("text", field, L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page +=
         addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
@@ -1635,21 +1527,18 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   body += L_LED_ASSIGNED_TO_SENSOR;
   body += "</label><select  name=\"l" + String(id) + "\"><option value=\"0\"";
   body += configuration.ledID == 0 ? " selected=\"selected\"" : "";
+  body += ">";
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    if (Device->configuration.isLED[i - 1]) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.ledID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i;
-      body += "</option>";
-    } else {
-      break;
-    }
+  for (uint8_t i = 1; i <= Device->configuration.noOfLEDs; i++) {
+    body += "<option value=\"";
+    body += i;
+    body += "\"";
+    body += configuration.ledID == i ? " selected=\"selected\"" : "";
+    body += ">";
+    body += i;
+    body += "</option>";
   }
 
   body += "</select></div><br><p class=\"cm\">";
@@ -1706,15 +1595,9 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
   String body = "<fieldset>";
   body += addItem("text", "n", L_NAME, gateConfiguration.name, "16");
 
-  uint8_t numberOfItems = 0;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    if (Device->configuration.isRelay[i]) {
-      numberOfItems++;
-    }
-  }
-
-  body += generateHardwareItemsList(numberOfItems, gateConfiguration.relayId,
-                                    "r", L_RELAY_ID_CONTROLLING_GATE);
+  body += generateHardwareItemsList(Device->configuration.noOfRelays,
+                                    gateConfiguration.relayId, "r",
+                                    L_RELAY_ID_CONTROLLING_GATE);
 
   if (Device->configuration.noOfContactrons > 0) {
     body += generateHardwareItemsList(Device->configuration.noOfContactrons,
@@ -1846,7 +1729,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
 
     char _idx[7];
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
-    body += addItem("number", "x0", "IDX", _idx, "?", "0", "999999", "1");
+    body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
 
     body += "</fieldset>";
 
@@ -1856,7 +1739,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body +=
-        addItem("text", "t0", L_MQTT_TOPIC, gateConfiguration.mqtt.topic, "64");
+        addItem("text", "t", L_MQTT_TOPIC, gateConfiguration.mqtt.topic, "64");
     body += "</fieldset>";
     page +=
         addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
@@ -2488,8 +2371,6 @@ const String AFESitesGenerator::generateHardwareItemsList(
     body += ">";
     body += i;
     body += "</option>";
-    /* @TODO IS IT NEEDED */
-    delay(0);
   }
 
   body += "</select>";

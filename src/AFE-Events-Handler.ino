@@ -27,13 +27,9 @@ void eventsListener() {
       }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-        if (Device.configuration.isRelay[i]) {
-          DomoticzPublishRelayState(i);
-        } else {
-          break;
-        }
+#ifdef CONFIG_HARDWARE_RELAY
+      for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
+        DomoticzPublishRelayState(i);
       }
 #endif
 
@@ -79,32 +75,26 @@ void eventsListener() {
 #endif
 
 /* Setting Relay state after connection to MQTT */
-#ifdef CONFIG_FUNCTIONALITY_RELAY
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-        if (Device.configuration.isRelay[i]) {
+#ifdef CONFIG_HARDWARE_RELAY
+      for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 
-          /* Subscribing to MQTT Topic for Relay*/
-          Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
+        /* Subscribing to MQTT Topic for Relay*/
+        Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
 
-          if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
-            /* Requesting state from MQTT Broker / service */
-            Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
-          } else {
-            /* Updating relay state after setting default value after MQTT
-             * connected */
-            MQTTPublishRelayState(i);
-          }
+        if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
+          /* Requesting state from MQTT Broker / service */
+          Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
         } else {
-          break;
+          /* Updating relay state after setting default value after MQTT
+           * connected */
+          MQTTPublishRelayState(i);
         }
       }
 #endif
 
       /* Publishing state of Switch to MQTT */
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-        if (Device.configuration.isSwitch[i]) {
-          MQTTPublishSwitchState(i);
-        }
+      for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
+        MQTTPublishSwitchState(i);
       }
 
 /* Subscribing to MQTT ADC commands */

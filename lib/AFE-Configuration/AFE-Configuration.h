@@ -33,6 +33,18 @@
 #define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
 #define AFE_KEY_FREQUENCY_VALIDATION 1440
 
+/* Switches, types */
+#define SWITCH_TYPE_MONO 0 // Mono stable switch
+#define SWITCH_TYPE_BI 1   // Bistable switch
+
+/* Switches functionalities */
+#define SWITCH_FUNCTIONALITY_NONE 0
+#define SWITCH_FUNCTIONALITY_MULTI 1
+#define SWITCH_FUNCTIONALITY_RELAY 2
+
+/* Switche bouncing */
+#define SWITCH_SENSITIVENESS 50
+
 /* Types of the devices */
 
 #if defined(DEVICE_SONOFF_BASIC_V1)
@@ -81,11 +93,12 @@
 /* Enables API On/Off via APIs */
 //#define CONFIG_FUNCTIONALITY_API_CONTROL
 
-/* Max number of hardware items */
+/* Max number of hardware items, per AFE version */
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 
+/* Max number of hardware items per specyfic hardware device */
 #if defined(DEVICE_SONOFF_BASIC_V1)
 #define CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
 #define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 4
@@ -159,20 +172,28 @@
 #define CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #define CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 #define CONFIG_FUNCTIONALITY_GATE
-//#define CONFIG_FUNCTIONALITY_ADC
+#define CONFIG_FUNCTIONALITY_ADC
 
-/* Max number of hardware items */
+/* Max number of hardware items per AFE version */
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 2
-#define CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
+#define CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 3
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 3
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS 4
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
 
+/* Max number of hardware items per specyfic hardware device */
 #define CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
-#define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 5
+#define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define CONFIG_HARDWARE_NUMBER_OF_LEDS 3
 #define CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 4
 #define CONFIG_HARDWARE_NUMBER_OF_GATES 2
+
+/* Default values for hardware items per specyfic hardware device */
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 1
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 0
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 1
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 1
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)

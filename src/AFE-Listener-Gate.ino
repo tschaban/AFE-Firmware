@@ -2,7 +2,7 @@
   LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
   DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
 
-#if defined(T5_CONFIG)
+#ifdef CONFIG_HARDWARE_GATE
 
 /* Method processes gate related events */
 void mainGate() {
