@@ -14,10 +14,14 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-MQTT-Structure.h>
 
+struct GATE_CONTACTRONS {
+  uint8_t id[2];
+};
+
 struct GATE {
   uint8_t relayId;  // Relay ID - controlling the gate
   uint8_t switchId; // Switch ID - triggering the gate
-  uint8_t contactronId[2];
+  GATE_CONTACTRONS contactron;
   uint8_t state[4];
   char name[17];
   DOMOTICZ_BASIC_CONFIG domoticz;

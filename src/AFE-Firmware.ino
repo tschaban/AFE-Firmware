@@ -229,8 +229,9 @@ void setup() {
   Serial << endl << "System LED ID: " << systemLedID;
 #endif
 
-  if (systemLedID > 0 && Device.configuration.noOfLEDs >= systemLedID) {
-    Led.begin(systemLedID - 1);
+  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+      Device.configuration.noOfLEDs >= systemLedID + 1) {
+    Led.begin(systemLedID);
   }
 
   /* If device in configuration mode then it starts LED blinking */
@@ -274,7 +275,7 @@ void setup() {
 /* Initializing Gate */
 #ifdef CONFIG_HARDWARE_GATE
     for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
-      Gate[i].begin(i);
+      Gate[i].begin(i, &Device, &Data);
       GateState[i] = Data.getGateConfiguration(i);
 #ifdef DEBUG
       Serial << endl << "Gate: " << i << " initialized";
@@ -284,12 +285,7 @@ void setup() {
 
 /* Initializing Contactrons */
 #ifdef CONFIG_HARDWARE_CONTACTRON
-    for (uint8_t i = 1; i <= Device.configuration.noOfContactrons; i++) {
-      Contactron[i].begin(i);
-#ifdef DEBUG
-      Serial << endl << "Contactron: " << i << " initialized";
-#endif
-    }
+    initializeContractons();
 #endif
 
     /* Initializing DS18B20 or DHTxx sensor */
@@ -391,14 +387,16 @@ void loop() {
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
 
-#ifdef CONFIG_HARDWARE_GATE
-        /* Gate related events */
-        mainGate();
+#ifdef CONFIG_HARDWARE_CONTACTRON
+        contractonEventsListener();
 #endif
 
-#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
-        /* Relay related events */
-        mainRelay();
+#ifdef CONFIG_HARDWARE_GATE
+        gateEventsListener();
+#endif
+
+#ifdef CONFIG_HARDWARE_RELAY
+        relayEventsListener();
 #endif
 
 #if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
@@ -420,7 +418,7 @@ void loop() {
 #endif
 
 #ifdef CONFIG_HARDWARE_ADC_VCC
-        analogInputListner();
+        analogInputEventsListener();
 #endif
 
 #if defined(T3_CONFIG)

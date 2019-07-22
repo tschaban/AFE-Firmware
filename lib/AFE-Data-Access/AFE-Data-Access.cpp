@@ -1558,8 +1558,6 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  Serial << endl << "FILE OPENED";
-
   if (configFile) {
 #ifdef DEBUG
     Serial << "success" << endl << "Reading JSON : ";
@@ -1933,7 +1931,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   RelayConfiguration.state.powerOn = 3;
   RelayConfiguration.state.MQTTConnected = 0;
-  RelayConfiguration.ledID = 0;
+  RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
   RelayConfiguration.domoticz.idx = 0;
   RelayConfiguration.name[0] = '\0';
   RelayConfiguration.mqtt.topic[0] = '\0';
@@ -2256,7 +2254,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   uint8_t index = 0;
 
   SwitchConfiguration.sensitiveness = SWITCH_SENSITIVENESS;
-  SwitchConfiguration.relayID = 1;
+  SwitchConfiguration.relayID = 0;
   SwitchConfiguration.mqtt.topic[0] = '\0';
   SwitchConfiguration.domoticz.idx = 0;
 
@@ -2281,13 +2279,13 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(0, SwitchConfiguration);
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
-  SwitchConfiguration.relayID = 2;
+  SwitchConfiguration.relayID = 1;
   saveConfiguration(1, SwitchConfiguration);
   SwitchConfiguration.gpio = 10;
-  SwitchConfiguration.relayID = 3;
+  SwitchConfiguration.relayID = 2;
   saveConfiguration(2, SwitchConfiguration);
   SwitchConfiguration.gpio = 14;
-  SwitchConfiguration.relayID = 4;
+  SwitchConfiguration.relayID = 3;
   saveConfiguration(3, SwitchConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_1G)
@@ -2303,7 +2301,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(0, SwitchConfiguration);
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
-  SwitchConfiguration.relayID = 2;
+  SwitchConfiguration.relayID = 1;
   saveConfiguration(1, SwitchConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SONOFF_TOUCH_3G)
@@ -2313,10 +2311,10 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(0, SwitchConfiguration);
   SwitchConfiguration.gpio = 9;
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
-  SwitchConfiguration.relayID = 2;
+  SwitchConfiguration.relayID = 1;
   saveConfiguration(1, SwitchConfiguration);
   SwitchConfiguration.gpio = 10;
-  SwitchConfiguration.relayID = 3;
+  SwitchConfiguration.relayID = 2;
   saveConfiguration(2, SwitchConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(DEVICE_SHELLY_1)
@@ -2338,7 +2336,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
     SwitchConfiguration.type = SWITCH_TYPE_BI;
     SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
     for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
-      SwitchConfiguration.relayID = i + 1;
+      SwitchConfiguration.relayID = i;
       saveConfiguration(i, SwitchConfiguration);
     }
   }
@@ -2464,10 +2462,11 @@ void AFEDataAccess::createADCInputConfigurationFile() {
   Serial << endl << "Creating file: cfg-analog-input.json";
 #endif
   ADCINPUT AnalogInputConfiguration;
-  AnalogInputConfiguration.gpio = 17;
-  AnalogInputConfiguration.interval = 60;
-  AnalogInputConfiguration.numberOfSamples = 1;
-  AnalogInputConfiguration.maxVCC = 1;
+  AnalogInputConfiguration.gpio = CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO;
+  AnalogInputConfiguration.interval = CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL;
+  AnalogInputConfiguration.numberOfSamples =
+      CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
+  AnalogInputConfiguration.maxVCC = CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
   sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
@@ -2580,7 +2579,7 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   configuration.howLongKeepRelayOn = Eeprom.read(526 + id * nextPIR, 5).toInt();
   configuration.invertRelayState = Eeprom.read(531 + id * nextPIR);
 
-  configuration.outputDefaultState = Eeprom.readUInt8(613 + id);
+  configuration.type = Eeprom.readUInt8(613 + id);
   configuration.idx = Eeprom.read(954 + id * 6, 6).toInt();
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
@@ -2600,7 +2599,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
   Eeprom.write(526 + id * nextPIR, 5, (long)configuration.howLongKeepRelayOn);
   Eeprom.write(531 + id * nextPIR, configuration.invertRelayState);
 
-  Eeprom.writeUInt8(613 + id, configuration.outputDefaultState);
+  Eeprom.writeUInt8(613 + id, configuration.type);
   Eeprom.write(954 + id, 6, (long)configuration.idx);
 }
 #endif
@@ -2639,7 +2638,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
 
       configuration.gpio = root["gpio"];
       sprintf(configuration.name, root["name"]);
-      configuration.outputDefaultState = root["outputDefaultState"];
+      configuration.type = root["type"];
       configuration.bouncing = root["bouncing"];
       configuration.ledID = root["ledID"];
       configuration.domoticz.idx = root["idx"];
@@ -2695,7 +2694,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
     JsonObject &root = jsonBuffer.createObject();
     root["gpio"] = configuration.gpio;
     root["name"] = configuration.name;
-    root["outputDefaultState"] = configuration.outputDefaultState;
+    root["type"] = configuration.type;
     root["bouncing"] = configuration.bouncing;
     root["ledID"] = configuration.ledID;
     root["idx"] = configuration.domoticz.idx;
@@ -2710,7 +2709,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size()
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
            << (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
@@ -2729,12 +2728,13 @@ void AFEDataAccess::createContractonConfigurationFile() {
   Serial << endl << "Creating file: cfg-contactron-xx.json";
 #endif
   CONTACTRON ContactronConfiguration;
-  // ContactronConfiguration.bouncing = 200;
-  // ContactronConfiguration.outputDefaultState;
+  ContactronConfiguration.bouncing =
+      CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
+  ContactronConfiguration.type = CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
   ContactronConfiguration.domoticz.idx = 0;
   ContactronConfiguration.mqtt.topic[0] = '\0';
   ContactronConfiguration.gpio = 0;
-  ContactronConfiguration.ledID = 0;
+  ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
   for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
     saveConfiguration(i, ContactronConfiguration);
@@ -2782,8 +2782,8 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
 
       configuration.relayId = root["relayId"];
       sprintf(configuration.name, root["name"]);
-      configuration.contactronId[0] = root["contactrons"][0];
-      configuration.contactronId[1] = root["contactrons"][1];
+      configuration.contactron.id[0] = root["contactrons"][0];
+      configuration.contactron.id[1] = root["contactrons"][1];
 
       for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
         configuration.state[i] = root["states"][i];
@@ -2852,16 +2852,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     root["name"] = configuration.name;
 
     /* Contractors selection validaton */
-    if ((configuration.contactronId[0] == 0 &&
-         configuration.contactronId[1] > 0) ||
-        (configuration.contactronId[0] > 0 &&
-         configuration.contactronId[0] == configuration.contactronId[1])) {
-      configuration.contactronId[0] = configuration.contactronId[1];
-      configuration.contactronId[1] = 0;
+    if ((configuration.contactron.id[0] == AFE_HARDWARE_ITEM_NOT_EXIST &&
+         configuration.contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) ||
+        (configuration.contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST &&
+         configuration.contactron.id[0] == configuration.contactron.id[1])) {
+      configuration.contactron.id[0] = configuration.contactron.id[1];
+      configuration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
     }
 
-    jsonContactron.add(configuration.contactronId[0]);
-    jsonContactron.add(configuration.contactronId[1]);
+    jsonContactron.add(configuration.contactron.id[0]);
+    jsonContactron.add(configuration.contactron.id[1]);
 
     for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
       jsonStates.add(configuration.state[i]);
@@ -2900,9 +2900,9 @@ void AFEDataAccess::createGateConfigurationFile() {
   GATE GateConfiguration;
   // dodact stact
 
-  GateConfiguration.contactronId[0] = 0;
-  GateConfiguration.contactronId[1] = 0;
-  GateConfiguration.relayId = 0;
+  GateConfiguration.contactron.id[0] = AFE_HARDWARE_ITEM_NOT_EXIST;
+  GateConfiguration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
+  GateConfiguration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
   GateConfiguration.domoticz.idx = 0;
   GateConfiguration.mqtt.topic[0] = '\0';
 

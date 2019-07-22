@@ -975,7 +975,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 
-  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   return data;
 }
@@ -994,7 +995,8 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
 
   data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
-  data.relayID = server.arg("r").length() > 0 ? server.arg("r").toInt() : 0;
+  data.relayID = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
@@ -1065,35 +1067,30 @@ REGULATOR AFEWebServer::getRegulatorData() {
 CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
   CONTACTRON data;
 
-  if (server.arg("o" + String(id)).length() > 0) {
-    data.outputDefaultState = server.arg("o" + String(id)).toInt();
-  }
+  data.type = server.arg("y").length() > 0
+                  ? server.arg("y").toInt()
+                  : CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
 
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.ledID = server.arg("l" + String(id)).toInt();
-  }
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  if (server.arg("b" + String(id)).length() > 0) {
-    data.bouncing = server.arg("b" + String(id)).toInt();
-  }
+  data.bouncing = server.arg("b").length() > 0
+                      ? server.arg("b").toInt()
+                      : CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
     data.name[0] = '\0';
   }
 
-  if (server.arg("x" + String(id)).length() > 0) {
-    data.domoticz.idx = server.arg("x" + String(id)).toInt();
-  }
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 
-  if (server.arg("t" + String(id)).length() > 0) {
-    server.arg("t" + String(id))
-        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
@@ -1112,13 +1109,16 @@ GATE AFEWebServer::getGateData() {
     data.name[0] = '\0';
   }
 
-  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt() : 0;
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.contactronId[0] =
-      server.arg("c1").length() > 0 ? server.arg("c1").toInt() : 0;
+  data.contactron.id[0] = server.arg("c1").length() > 0
+                              ? server.arg("c1").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.contactronId[1] =
-      server.arg("c2").length() > 0 ? server.arg("c2").toInt() : 0;
+  data.contactron.id[1] = server.arg("c2").length() > 0
+                              ? server.arg("c2").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   for (uint8_t i = 0; i < sizeof(data.state); i++) {
     data.state[i] = server.arg("s" + String(i)).length() > 0
@@ -1167,7 +1167,7 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
                                             : data.invertRelayState = false;
 
   if (server.arg("o" + String(id)).length() > 0) {
-    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+    data.type = server.arg("o" + String(id)).toInt();
   }
 
   if (server.arg("x" + String(id)).length() > 0) {
@@ -1181,19 +1181,19 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g" + String(id)).length() > 0
+                  ? server.arg("g" + String(id)).toInt()
+                  : 0;
 
-  server.arg("o" + String(id)).length() > 0
-      ? data.changeToOppositeValue = true
-      : data.changeToOppositeValue = false;
+  data.changeToOppositeValue =
+      server.arg("o" + String(id)).length() > 0 ? true : false;
 
   return data;
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
-  return server.arg("i").length() > 0 ? server.arg("i").toInt() : 0;
+  return server.arg("s").length() > 0 ? server.arg("s").toInt()
+                                      : AFE_HARDWARE_ITEM_NOT_EXIST;
 }
 #endif
 
@@ -1378,32 +1378,32 @@ BH1750 AFEWebServer::getBH1750SensorData() {
 #ifdef CONFIG_HARDWARE_ADC_VCC
 ADCINPUT AFEWebServer::getAnalogInputData() {
   ADCINPUT data;
-  if (server.arg("g").length() > 0) {
-    data.gpio = server.arg("g").toInt();
-  }
 
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
-  }
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO;
 
-  if (server.arg("n").length() > 0) {
-    data.numberOfSamples = server.arg("n").toInt();
-  }
+  data.interval = server.arg("i").length() > 0
+                      ? server.arg("i").toInt()
+                      : CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL;
 
-  if (server.arg("m").length() > 0) {
-    data.maxVCC = server.arg("m").toFloat();
-  }
+  data.numberOfSamples =
+      server.arg("n").length() > 0
+          ? server.arg("n").toInt()
+          : CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
 
-  if (server.arg("ra").length() > 0) {
-    data.divider.Ra = server.arg("ra").toFloat();
-  }
+  data.maxVCC = server.arg("m").length() > 0
+                    ? server.arg("m").toFloat()
+                    : CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
 
-  if (server.arg("rb").length() > 0) {
-    data.divider.Rb = server.arg("rb").toFloat();
-  }
+  data.divider.Ra =
+      server.arg("ra").length() > 0 ? server.arg("ra").toFloat() : 0;
 
-  if (server.arg("t0").length() > 0) {
-    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  data.divider.Rb =
+      server.arg("rb").length() > 0 ? server.arg("rb").toFloat() : 0;
+
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }

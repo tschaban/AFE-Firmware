@@ -65,6 +65,10 @@ private:
   String addConfigurationBlock(const String title, const String description,
                                const String body);
 
+  const String generateHardwareList(uint8_t noOfItems, uint8_t noOffConnected,
+                                    const char *field, const char *label,
+                                    uint8_t index, uint8_t noneValue);
+
   const String generateHardwareItemsList(uint8_t noOfItems,
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);

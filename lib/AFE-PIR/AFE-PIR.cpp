@@ -31,7 +31,7 @@ boolean AFEPIR::stateChanged() {
 }
 
 boolean AFEPIR::motionDetected() {
-  return configuration.outputDefaultState == PIR_NO
+  return configuration.type == PIR_NO
              ? (get() == PIR_CLOSE ? true : false)
              : (get() == PIR_OPEN ? true : false);
 }

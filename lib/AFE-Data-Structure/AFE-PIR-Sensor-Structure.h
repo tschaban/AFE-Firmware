@@ -27,7 +27,7 @@ struct PIR {
   uint8_t relayId;
   uint16_t howLongKeepRelayOn;
   boolean invertRelayState;
-  byte outputDefaultState;
+  byte type;
   uint16_t bouncing;
   unsigned long idx;
 };

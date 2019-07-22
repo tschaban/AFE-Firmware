@@ -45,6 +45,9 @@
 /* Switche bouncing */
 #define SWITCH_SENSITIVENESS 50
 
+/* Not existing hardware item. Used as a default value */
+#define AFE_HARDWARE_ITEM_NOT_EXIST 255
+
 /* Types of the devices */
 
 #if defined(DEVICE_SONOFF_BASIC_V1)
@@ -340,6 +343,12 @@
 #ifndef CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #define CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #endif
+
+#define CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO 17
+#define CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL 60
+#define CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES 1
+#define CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC 1
+
 #endif
 
 #ifdef CONFIG_HARDWARE_PIR
@@ -354,6 +363,22 @@
 #define GATE_CLOSED 1         // Closed
 #define GATE_PARTIALLY_OPEN 2 // Being opened
 #define GATE_UNKNOWN 9        // Unknown state
+#endif
+
+#ifdef CONFIG_HARDWARE_CONTACTRON
+/* Contracton types */
+#define CONTACTRON_NO 0 // Normally open
+#define CONTACTRON_NC 1 // Normally closed
+
+/* Contracton states */
+#define CONTACTRON_OPEN 0   // Open
+#define CONTACTRON_CLOSED 1 // Closed
+
+/* Contracton defaults */
+#define AFE_DEFAULT_CONTACTRON_BOUNCING 200
+#define CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING 200
+#define CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE CONTACTRON_NO
+
 #endif
 
 /* Config sites IDs */

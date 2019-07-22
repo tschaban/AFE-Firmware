@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Gate_h
 #define _AFE_Gate_h
@@ -31,7 +29,7 @@ public:
   AFEGate();
 
   /* Initializing gate */
-  void begin(uint8_t id);
+  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Triggering gate state changed and saving it's new value if there is not
    * contactrons */
@@ -61,8 +59,8 @@ public:
   unsigned long getDomoticzIDX();
 
 private:
-  AFEDevice Device;
-  AFEDataAccess Data;
+  AFEDevice *Device;
+  AFEDataAccess *Data;
 
   uint8_t gateId; // ID of the gate
   uint8_t numberOfContractons = 0;

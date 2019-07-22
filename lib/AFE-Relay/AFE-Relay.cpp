@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Relay.h"
 
@@ -29,8 +27,8 @@ void AFERelay::begin(uint8_t id) {
 #endif
 
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  if (RelayConfiguration.ledID > 0) {
-    Led.begin(RelayConfiguration.ledID - 1);
+  if (RelayConfiguration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Led.begin(RelayConfiguration.ledID);
   }
 #endif
 }

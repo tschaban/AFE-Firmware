@@ -156,7 +156,7 @@ void AFEDefaults::set() {
     PIRConfiguration.invertRelayState = false;
     PIRConfiguration.bouncing = 0;
     PIRConfiguration.idx = 0;
-    PIRConfiguration.outputDefaultState = PIR_NO;
+    PIRConfiguration.type = PIR_NO;
     PIRConfiguration.ledId = 0;
     for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
       sprintf(PIRConfiguration.name, "pir%d", i + 1);

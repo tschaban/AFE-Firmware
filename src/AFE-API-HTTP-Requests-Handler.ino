@@ -134,8 +134,12 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #ifdef CONFIG_HARDWARE_CONTACTRON
   /* Request related to contactron */
   if (strcmp(request.device, "contactron") == 0) {
+    Serial << endl << "contactron";
     for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-
+      Serial << endl
+             << i << "request.name=" << request.name
+             << "  Contactron[i].configuration.name = "
+             << Contactron[i].configuration.name;
       if (strcmp(request.name, Contactron[i].configuration.name) == 0) {
         deviceNotExist = false;
         if (strcmp(request.command, "get") == 0) {

@@ -1718,7 +1718,7 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   configuration.howLongKeepRelayOn = Eeprom.read(526 + id * nextPIR, 5).toInt();
   configuration.invertRelayState = Eeprom.read(531 + id * nextPIR);
 
-  configuration.outputDefaultState = Eeprom.readUInt8(613 + id);
+  configuration.type = Eeprom.readUInt8(613 + id);
   configuration.idx = Eeprom.read(954 + id * 6, 6).toInt();
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
@@ -1738,7 +1738,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
   Eeprom.write(526 + id * nextPIR, 5, (long)configuration.howLongKeepRelayOn);
   Eeprom.write(531 + id * nextPIR, configuration.invertRelayState);
 
-  Eeprom.writeUInt8(613 + id, configuration.outputDefaultState);
+  Eeprom.writeUInt8(613 + id, configuration.type);
   Eeprom.write(954 + id, 6, (long)configuration.idx);
 }
 #endif
@@ -1750,7 +1750,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   MQTT configurationMQTT;
 
   configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
-  configuration.outputDefaultState =
+  configuration.type =
       Eeprom.readUInt8(416 + id * nextContactron);
   configuration.ledID = Eeprom.readUInt8(417 + id * nextContactron);
   configuration.bouncing = Eeprom.read(418 + id * nextContactron, 4).toInt();
@@ -1772,7 +1772,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
   uint8_t nextContactron = 24;
   Eeprom.writeUInt8(415 + id * nextContactron, configuration.gpio);
   Eeprom.writeUInt8(416 + id * nextContactron,
-                    configuration.outputDefaultState);
+                    configuration.type);
   Eeprom.writeUInt8(417 + id * nextContactron, configuration.ledID);
   Eeprom.write(418 + id * nextContactron, 4, (long)configuration.bouncing);
   Eeprom.write(422 + id * nextContactron, 16, configuration.name);

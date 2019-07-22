@@ -1,4 +1,4 @@
-
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 void initRelay() {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
@@ -12,7 +12,7 @@ void initRelay() {
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Method checks if any relay should be automatically turned off */
-void mainRelay() {
+void relayEventsListener() {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
     if (Relay[i].autoTurnOff()) {
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0

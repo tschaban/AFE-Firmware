@@ -1,28 +1,46 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Contactron.h"
 
 AFEContactron::AFEContactron(){};
 
-AFEContactron::AFEContactron(uint8_t id) { begin(id); }
-
-void AFEContactron::begin(uint8_t id) {
-  AFEDataAccess Data;
-  configuration = Data.getContactronConfiguration(id);
+void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
+                          AFEDataAccess *_Data) {
+  Data = _Data;
+  Device = _Device;
+  configuration = Data->getContactronConfiguration(id);
   pinMode(configuration.gpio, INPUT_PULLUP);
   state = digitalRead(configuration.gpio);
   state = state;
-  if (configuration.ledID > 0) {
-    ContactronLed.begin(configuration.ledID - 1);
+  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    ContactronLed.begin(configuration.ledID);
   }
+
+  // Getting gateID to which Contactron is assigned
+  GATE gateConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
+    gateConfiguration = Data->getGateConfiguration(i);
+    for (uint8_t j = 0; j < sizeof(gateConfiguration.contactron.id); j++) {
+      if (gateConfiguration.contactron.id[j] == id) {
+        gateId = i;
+        break; // no need to process furhter if found a gate ID
+      }
+    }
+    if (gateId != 255) {
+      break; // no need to process furhter if found a gate ID
+    }
+  }
+
+#ifdef DEBUG
+  Serial << endl << "Contactron: " << id << ", assigned to a Gate: " << gateId;
+#endif
+
   _initialized = true;
   convert();
 }
 
 void AFEContactron::convert() {
-  if (configuration.outputDefaultState == CONTACTRON_NO) {
+  if (configuration.type == CONTACTRON_NO) {
     if (state) {
       ContactronLed.on();
       _state = CONTACTRON_OPEN;
@@ -43,23 +61,7 @@ void AFEContactron::convert() {
 
 byte AFEContactron::get() { return _state; }
 
-const char *AFEContactron::getMQTTCommandTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-
-const char *AFEContactron::getMQTTStateTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
-}
+uint8_t AFEContactron::getGateId() { return gateId; }
 
 boolean AFEContactron::changed() {
   if (_changed) {
@@ -91,6 +93,24 @@ void AFEContactron::listener() {
       startTime = 0;
     }
   }
+}
+
+const char *AFEContactron::getMQTTCommandTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFEContactron::getMQTTStateTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
 }
 
 unsigned long AFEContactron::getDomoticzIDX() {

@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Contactron_h
 #define _AFE_Contactron_h
@@ -23,12 +21,14 @@ public:
 
   /* Constructors */
   AFEContactron();
-  AFEContactron(uint8_t id);
 
-  void begin(uint8_t id);
+  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Method returns contactorn state */
   byte get();
+
+  /* Method returns GateID to which contracton is assigned to */
+  uint8_t getGateId();
 
   /* Method returns MQTT topic for this contactron */
   const char *getMQTTCommandTopic();
@@ -54,10 +54,16 @@ private:
 
   AFELED ContactronLed;
 
+  uint8_t gateId =
+      255; // ID of the GATE the contracton is assigned to. 255 None.
+
   void convert();
 
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+
+  AFEDevice *Device;
+  AFEDataAccess *Data;
 };
 
 #endif
