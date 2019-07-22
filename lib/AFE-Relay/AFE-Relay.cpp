@@ -2,7 +2,7 @@
 
 #include "AFE-Relay.h"
 
-AFERelay::AFERelay(){};
+AFERelay::AFERelay() {}
 
 AFERelay::AFERelay(uint8_t id) { begin(id); }
 
@@ -68,7 +68,13 @@ void AFERelay::on(boolean invert) {
       turnOffCounter = millis();
     }
   }
-#if !defined(T5_CONFIG) // Not required for T5
+
+#ifdef CONFIG_HARDWARE_GATE
+  /* For the Relay assigned to a gate state is saved conditionally */
+  if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Data.saveRelayState(_id, RELAY_ON);
+  };
+#else
   Data.saveRelayState(_id, RELAY_ON);
 #endif
 }
@@ -86,8 +92,13 @@ void AFERelay::off(boolean invert) {
       turnOffCounter = millis();
     }
   }
-#if !defined(T5_CONFIG) // Not required for T5
-  Data.saveRelayState(_id, RELAY_OFF);
+#ifdef CONFIG_HARDWARE_GATE
+  /* For the Relay assigned to a gate state is saved conditionally */
+  if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Data.saveRelayState(_id, RELAY_ON);
+  };
+#else
+  Data.saveRelayState(_id, RELAY_ON);
 #endif
 }
 
@@ -100,7 +111,6 @@ void AFERelay::toggle() {
   }
 }
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
 void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(RelayConfiguration.state.powerOn);
 }
@@ -127,16 +137,13 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
     Data.getRelayState(_id) == RELAY_ON ? off() : on();
   }
 }
-#endif
 
 #ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
-
   if (RelayConfiguration.timeToOff > 0 &&
       ((invert && get() == RELAY_OFF) || (!invert && get() == RELAY_ON)) &&
       millis() - turnOffCounter >=
           RelayConfiguration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
-
     invert ? on(invert) : off(invert);
     return true;
   } else {
@@ -145,9 +152,7 @@ boolean AFERelay::autoTurnOff(boolean invert) {
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
 const char *AFERelay::getName() { return RelayConfiguration.name; }
-#endif
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
@@ -167,14 +172,12 @@ void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_GATE
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
 unsigned long AFERelay::getDomoticzIDX() {
   return RelayConfiguration.domoticz.idx;
 }
-#endif

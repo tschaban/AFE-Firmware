@@ -47,10 +47,6 @@ public:
   /* Returns true if gate state has changed */
   boolean event();
 
-  /* It should be added to main loop to listen for gate state changes and
-   * request to be processed by the class */
-  void listener();
-
   /* Get MQTT Topics */
   const char *getMQTTCommandTopic();
   const char *getMQTTStateTopic();
@@ -65,7 +61,7 @@ private:
   uint8_t gateId; // ID of the gate
   uint8_t numberOfContractons = 0;
   boolean _event = false;
-  AFERelay Relay;
+  AFERelay GateRelay;
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

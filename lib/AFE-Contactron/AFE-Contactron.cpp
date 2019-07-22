@@ -16,25 +16,6 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
     ContactronLed.begin(configuration.ledID);
   }
 
-  // Getting gateID to which Contactron is assigned
-  GATE gateConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
-    gateConfiguration = Data->getGateConfiguration(i);
-    for (uint8_t j = 0; j < sizeof(gateConfiguration.contactron.id); j++) {
-      if (gateConfiguration.contactron.id[j] == id) {
-        gateId = i;
-        break; // no need to process furhter if found a gate ID
-      }
-    }
-    if (gateId != 255) {
-      break; // no need to process furhter if found a gate ID
-    }
-  }
-
-#ifdef DEBUG
-  Serial << endl << "Contactron: " << id << ", assigned to a Gate: " << gateId;
-#endif
-
   _initialized = true;
   convert();
 }
@@ -60,8 +41,6 @@ void AFEContactron::convert() {
 }
 
 byte AFEContactron::get() { return _state; }
-
-uint8_t AFEContactron::getGateId() { return gateId; }
 
 boolean AFEContactron::changed() {
   if (_changed) {

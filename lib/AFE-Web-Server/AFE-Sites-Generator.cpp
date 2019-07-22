@@ -1633,7 +1633,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
       body += " ";
       body += L_THEN;
       body += ":</p>";
-      body += generateGateStatesList(0, gateConfiguration.state[0]);
+      body += generateGateStatesList(0, gateConfiguration.states.state[0]);
       if (numberOfContractons == 2) {
         body += "<br><br><p class=\"cm\">";
         body += L_IF_MAGNETIC_SENSOR;
@@ -1651,7 +1651,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
         body += L_THEN;
         body += ":";
         body += "</p>";
-        body += generateGateStatesList(1, gateConfiguration.state[1]);
+        body += generateGateStatesList(1, gateConfiguration.states.state[1]);
 
         body += "<br><br><p class=\"cm\">";
         body += L_IF_MAGNETIC_SENSOR;
@@ -1670,7 +1670,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
         body += ":";
         body += "</p>";
 
-        body += generateGateStatesList(2, gateConfiguration.state[2]);
+        body += generateGateStatesList(2, gateConfiguration.states.state[2]);
       }
 
       body += "<br><br><p class=\"cm\">";
@@ -1692,7 +1692,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
       body += " ";
       body += L_THEN;
       body += ":</p>";
-      body += generateGateStatesList(3, gateConfiguration.state[3]);
+      body += generateGateStatesList(3, gateConfiguration.states.state[3]);
 
       page += addConfigurationBlock(L_GATES_STATES_CONFIGURATION, "", body);
     }

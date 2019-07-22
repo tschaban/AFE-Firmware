@@ -122,6 +122,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         } else {
           sendHTTPAPIRequestStatus(request, false);
         }
+        break;
       }
     }
     if (deviceNotExist) {
@@ -134,12 +135,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #ifdef CONFIG_HARDWARE_CONTACTRON
   /* Request related to contactron */
   if (strcmp(request.device, "contactron") == 0) {
-    Serial << endl << "contactron";
     for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-      Serial << endl
-             << i << "request.name=" << request.name
-             << "  Contactron[i].configuration.name = "
-             << Contactron[i].configuration.name;
       if (strcmp(request.name, Contactron[i].configuration.name) == 0) {
         deviceNotExist = false;
         if (strcmp(request.command, "get") == 0) {
@@ -148,6 +144,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         } else {
           sendHTTPAPIRequestStatus(request, false);
         }
+        break;
       }
     }
     if (deviceNotExist) {
@@ -164,81 +161,99 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
     for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-      if (strcmp(request.name, Relay[i].getName()) == 0) {
-        deviceNotExist = false;
-        if (strcmp(request.command, "on") == 0) {
-          Relay[i].on();
-          MQTTPublishRelayState(i); // MQTT Listener library
-          if (strcmp(request.source, "domoticz") != 0) {
-            DomoticzPublishRelayState(i);
-          }
-          sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
-                                        Relay[i].get());
+#ifdef CONFIG_HARDWARE_GATE
+      /* For the Relay assigned to a gate code below is not needed for execution
+       */
+      if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
+        if (strcmp(request.name, Relay[i].getName()) == 0) {
+          deviceNotExist = false;
+          if (strcmp(request.command, "on") == 0) {
+            Relay[i].on();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            }
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
+                                          Relay[i].get());
 
-        } else if (strcmp(request.command, "off") == 0) { // Off
-          Relay[i].off();
-          MQTTPublishRelayState(i); // MQTT Listener library
-          if (strcmp(request.source, "domoticz") != 0) {
-            DomoticzPublishRelayState(i);
-          }
-          sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
-                                        Relay[i].get());
-        } else if (strcmp(request.command, "toggle") == 0) { // toggle
-          state = Relay[i].get();
-          Relay[i].toggle();
-          sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
-                                        Relay[i].get());
-          MQTTPublishRelayState(i); // MQTT Listener library
-          if (strcmp(request.source, "domoticz") != 0) {
-            DomoticzPublishRelayState(i);
-          };
-        } else if (strcmp(request.command, "get") == 0) {
-          sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
+          } else if (strcmp(request.command, "off") == 0) { // Off
+            Relay[i].off();
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            }
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
+                                          Relay[i].get());
+          } else if (strcmp(request.command, "toggle") == 0) { // toggle
+            state = Relay[i].get();
+            Relay[i].toggle();
+            sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
+                                          Relay[i].get());
+            MQTTPublishRelayState(i); // MQTT Listener library
+            if (strcmp(request.source, "domoticz") != 0) {
+              DomoticzPublishRelayState(i);
+            };
+          } else if (strcmp(request.command, "get") == 0) {
+            sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
 /* Command not implemented.Info */
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
-        } else if (strcmp(request.command, "enableThermostat") == 0) {
-          Relay[i].Thermostat.on();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "disableThermostat") == 0) {
-          Relay[i].Thermostat.off();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "toggleThermostat") == 0) {
-          Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
-                                        : Relay[i].Thermostat.on();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "getThermostat") == 0) {
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "enableThermostat") == 0) {
+            Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "disableThermostat") == 0) {
+            Relay[i].Thermostat.off();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "toggleThermostat") == 0) {
+            Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
+                                          : Relay[i].Thermostat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "getThermostat") == 0) {
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Thermostat.enabled() ? "on" : "off");
 
 #endif
 
 #ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
-        } else if (strcmp(request.command, "enableHumidistat") == 0) {
-          Relay[i].Humidistat.on();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "disableHumidistat") == 0) {
-          Relay[i].Humidistat.off();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "toggleHumidistat") == 0) {
-          Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
-                                        : Relay[i].Humidistat.on();
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
-        } else if (strcmp(request.command, "getHumidistat") == 0) {
-          sendHTTPAPIRequestStatus(
-              request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "enableHumidistat") == 0) {
+            Relay[i].Humidistat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "disableHumidistat") == 0) {
+            Relay[i].Humidistat.off();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "toggleHumidistat") == 0) {
+            Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
+                                          : Relay[i].Humidistat.on();
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
+          } else if (strcmp(request.command, "getHumidistat") == 0) {
+            sendHTTPAPIRequestStatus(
+                request, true, Relay[i].Humidistat.enabled() ? "on" : "off");
 
 #endif
 
-        } else {
-          sendHTTPAPIRequestStatus(request, false);
+          } else {
+            sendHTTPAPIRequestStatus(request, false);
+          }
+          break;
         }
+
+#ifdef CONFIG_HARDWARE_GATE
+        /* Closing the condition for skipping relay if assigned to a gate */
       }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << "Excluding relay: " << i
+               << " as it's assigned to a Gate: " << Relay[i].gateId;
+      }
+#endif
+#endif
     }
     if (deviceNotExist) {
       sendHTTPAPIRequestStatus(request, false);

@@ -19,6 +19,9 @@ class AFEContactron {
 public:
   CONTACTRON configuration;
 
+  // ID of the GATE the contactron is assigned to. 255 None.
+  uint8_t gateId = 255;
+
   /* Constructors */
   AFEContactron();
 
@@ -26,9 +29,6 @@ public:
 
   /* Method returns contactorn state */
   byte get();
-
-  /* Method returns GateID to which contracton is assigned to */
-  uint8_t getGateId();
 
   /* Method returns MQTT topic for this contactron */
   const char *getMQTTCommandTopic();
@@ -53,9 +53,6 @@ private:
   unsigned long startTime = 0;
 
   AFELED ContactronLed;
-
-  uint8_t gateId =
-      255; // ID of the GATE the contracton is assigned to. 255 None.
 
   void convert();
 

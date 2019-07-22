@@ -52,9 +52,8 @@ private:
 
   /* Method set relay state after power restore or connection to MQTT is
    * established */
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+
   void setRelayAfterRestore(uint8_t option);
-#endif
 
 public:
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -69,6 +68,10 @@ public:
   AFEHumidistat Humidistat;
 #endif
 
+#ifdef CONFIG_HARDWARE_GATE
+  uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
@@ -76,11 +79,6 @@ public:
   /* Method: initiates relay */
   void begin(uint8_t id);
 
-  /* Method returns MQTT topic for this relay */
-  const char *getMQTTCommandTopic();
-  const char *getMQTTStateTopic();
-
-#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
   void setRelayAfterRestoringPower();
@@ -89,7 +87,6 @@ public:
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
-#endif
 
   /* Method: Returns RELAY_OFF if relay is OFF, RELAY_ON if relay is ON */
   byte get();
@@ -108,10 +105,8 @@ public:
   boolean autoTurnOff(boolean invert = false);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
   /* Methods returns relay name */
   const char *getName();
-#endif
 
 #ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
@@ -128,16 +123,18 @@ public:
   uint8_t getControlledLedID();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef CONFIG_HARDWARE_GATE
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+  /* Method returns MQTT topic for this relay */
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
+
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
-#endif
 };
 
 #endif

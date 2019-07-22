@@ -1538,7 +1538,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #ifdef DEBUG
   Serial << endl << "Creating file: cfg-system-led.json";
 #endif
-  saveSystemLedID(1);
+  saveSystemLedID(0);
 }
 #endif
 
@@ -2786,7 +2786,7 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       configuration.contactron.id[1] = root["contactrons"][1];
 
       for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
-        configuration.state[i] = root["states"][i];
+        configuration.states.state[i] = root["states"][i];
       }
 
       configuration.domoticz.idx = root["idx"];
@@ -2864,7 +2864,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     jsonContactron.add(configuration.contactron.id[1]);
 
     for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
-      jsonStates.add(configuration.state[i]);
+      jsonStates.add(configuration.states.state[i]);
     }
 
     root["idx"] = configuration.domoticz.idx;
@@ -2907,7 +2907,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.mqtt.topic[0] = '\0';
 
   for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
-    GateConfiguration.state[i] = GATE_UNKNOWN;
+    GateConfiguration.states.state[i] = GATE_UNKNOWN;
   }
 
   for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {

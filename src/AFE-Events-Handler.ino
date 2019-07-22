@@ -29,7 +29,24 @@ void eventsListener() {
 
 #ifdef CONFIG_HARDWARE_RELAY
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-        DomoticzPublishRelayState(i);
+#ifdef CONFIG_HARDWARE_GATE
+        /* For the Relay assigned to a gate code below is not needed for
+         * execution
+         */
+        if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
+          DomoticzPublishRelayState(i);
+#ifdef CONFIG_HARDWARE_GATE
+          /* Closing the condition for skipping relay if assigned to a gate */
+        }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << "Excluding relay: " << i
+                 << " as it's assigned to a Gate: " << Relay[i].gateId;
+        }
+#endif
+#endif
       }
 #endif
 
@@ -78,17 +95,35 @@ void eventsListener() {
 #ifdef CONFIG_HARDWARE_RELAY
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 
-        /* Subscribing to MQTT Topic for Relay*/
-        Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
+#ifdef CONFIG_HARDWARE_GATE
+        /* For the Relay assigned to a gate code below is not needed for
+         * execution
+         */
+        if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
 
-        if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
-          /* Requesting state from MQTT Broker / service */
-          Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
-        } else {
-          /* Updating relay state after setting default value after MQTT
-           * connected */
-          MQTTPublishRelayState(i);
+          /* Subscribing to MQTT Topic for Relay*/
+          Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
+
+          if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
+            /* Requesting state from MQTT Broker / service */
+            Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
+          } else {
+            /* Updating relay state after setting default value after MQTT
+             * connected */
+            MQTTPublishRelayState(i);
+          }
+#ifdef CONFIG_HARDWARE_GATE
+          /* Closing the condition for skipping relay if assigned to a gate */
         }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << "Excluding relay: " << i
+                 << " as it's assigned to a Gate: " << Relay[i].gateId;
+        }
+#endif
+#endif
       }
 #endif
 

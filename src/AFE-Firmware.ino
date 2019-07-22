@@ -69,7 +69,9 @@ AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
 AFESwitch Switch[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+#ifdef CONFIG_HARDWARE_RELAY
 AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
+#endif
 MQTT MQTTConfiguration;
 
 #if defined(T3_CONFIG)
@@ -79,7 +81,7 @@ AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 
 #ifdef CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
-GATE GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
+GATE_STATES GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
 AFEGate Gate[CONFIG_HARDWARE_NUMBER_OF_GATES];
 uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
 #endif
@@ -276,7 +278,29 @@ void setup() {
 #ifdef CONFIG_HARDWARE_GATE
     for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
       Gate[i].begin(i, &Device, &Data);
-      GateState[i] = Data.getGateConfiguration(i);
+      GateState[i] = Gate[i].configuration.states;
+
+      /* Assigning Gate ID to a relay */
+      if (Gate[i].configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          Device.configuration.noOfRelays >= Gate[i].configuration.relayId) {
+        Relay[Gate[i].configuration.relayId].gateId = i;
+#ifdef DEBUG
+        Serial << endl
+               << "- For a RelayID: " << Gate[i].configuration.relayId
+               << " setting GateID: " << i;
+#endif
+      }
+
+      /* Assigning Gate ID to a contactron */
+      for (uint8_t j = 0; j < Gate[i].getNoOfContactrons(); j++) {
+        Contactron[Gate[i].getContactronId(j)].gateId = i;
+#ifdef DEBUG
+        Serial << endl
+               << "- For a ContactronID: " << Gate[i].getContactronId(j)
+               << " setting GateID: " << i;
+#endif
+      }
+
 #ifdef DEBUG
       Serial << endl << "Gate: " << i << " initialized";
 #endif
@@ -377,13 +401,6 @@ void loop() {
          * requests or HTTP API requests if it's turned on */
         WebServer.listener();
 
-#ifdef CONFIG_HARDWARE_GATE
-        /* Listening for gate events */
-        for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
-          Gate[i].listener();
-        }
-#endif
-
         /* Checking if there was received HTTP API Command */
         mainHTTPRequestsHandler();
 
@@ -396,7 +413,7 @@ void loop() {
 #endif
 
 #ifdef CONFIG_HARDWARE_RELAY
-        relayEventsListener();
+        //  relayEventsListener();
 #endif
 
 #if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)

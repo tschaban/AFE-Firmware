@@ -29,83 +29,97 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #ifdef CONFIG_FUNCTIONALITY_RELAY /* Relay processing */
     for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 
-#ifdef DEBUG
-      Serial << endl << " - Checking if Relay[" << i << "] request ";
+#ifdef CONFIG_HARDWARE_GATE
+      /* For the Relay assigned to a gate code below is not needed for execution
+       */
+      if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
 
-      if (strcmp(topic, Relay[i].getMQTTCommandTopic()) == 0) {
+        if (strcmp(topic, Relay[i].getMQTTCommandTopic()) == 0) {
 #ifdef DEBUG
-        Serial << "YES";
+          Serial << "YES";
 #endif
 
-        if ((char)payload[1] == 'n' && length == 2) { // on
-          Relay[i].on();
-          MQTTPublishRelayState(i);
-          DomoticzPublishRelayState(i);
-        } else if ((char)payload[1] == 'f' && length == 3) { // off
-          Relay[i].off();
-          MQTTPublishRelayState(i);
-          DomoticzPublishRelayState(i);
-        } else if ((char)payload[1] == 'e' && length == 3) { // get
-          MQTTPublishRelayState(i);
-        } else if ((char)payload[1] == 'o' && length == 6) { // toggle
-          Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
-          MQTTPublishRelayState(i);
-          DomoticzPublishRelayState(i);
+          if ((char)payload[1] == 'n' && length == 2) { // on
+            Relay[i].on();
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          } else if ((char)payload[1] == 'f' && length == 3) { // off
+            Relay[i].off();
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          } else if ((char)payload[1] == 'e' && length == 3) { // get
+            MQTTPublishRelayState(i);
+          } else if ((char)payload[1] == 'o' && length == 6) { // toggle
+            Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          }
+          return;
         }
-        return;
-      }
 
 #ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
-      else {
+        else {
 
-        sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
-
-        if (strcmp(topic, _mqttTopic) == 0) {
-          if ((char)payload[0] == 'o' && length == 2) { // on
-            Relay[i].Thermostat.on();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                         Relay[i].Thermostat.enabled() ? "on" : "off");
-          } else if ((char)payload[0] == 'o' && length == 3) { // off
-            Relay[i].Thermostat.off();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                         Relay[i].Thermostat.enabled() ? "on" : "off");
-          } else if ((char)payload[0] == 't' && length == 6) { // toggle
-            Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
-                                          : Relay[i].Thermostat.on();
-            Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                         Relay[i].Thermostat.enabled() ? "on" : "off");
-          } else if ((char)payload[0] == 'g' && length == 3) { // get
-            Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
-                         Relay[i].Thermostat.enabled() ? "on" : "off");
-          }
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
-        } else {
-          /* Checking if Hunidistat related message has been received  */
-          sprintf(_mqttTopic, "%shumidistat/cmd", Relay[i].getMQTTTopic());
+          sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
 
           if (strcmp(topic, _mqttTopic) == 0) {
             if ((char)payload[0] == 'o' && length == 2) { // on
-              Relay[i].Humidistat.on();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
-                           Relay[i].Humidistat.enabled() ? "on" : "off");
+              Relay[i].Thermostat.on();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
             } else if ((char)payload[0] == 'o' && length == 3) { // off
-              Relay[i].Humidistat.off();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
-                           Relay[i].Humidistat.enabled() ? "on" : "off");
+              Relay[i].Thermostat.off();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
             } else if ((char)payload[0] == 't' && length == 6) { // toggle
-              Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
-                                            : Relay[i].Humidistat.on();
-              Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
-                           Relay[i].Humidistat.enabled() ? "on" : "off");
+              Relay[i].Thermostat.enabled() ? Relay[i].Thermostat.off()
+                                            : Relay[i].Thermostat.on();
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
             } else if ((char)payload[0] == 'g' && length == 3) { // get
-              Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
-                           Relay[i].Humidistat.enabled() ? "on" : "off");
+              Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
+                           Relay[i].Thermostat.enabled() ? "on" : "off");
             }
-          }
+#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+          } else {
+            /* Checking if Hunidistat related message has been received  */
+            sprintf(_mqttTopic, "%shumidistat/cmd", Relay[i].getMQTTTopic());
+
+            if (strcmp(topic, _mqttTopic) == 0) {
+              if ((char)payload[0] == 'o' && length == 2) { // on
+                Relay[i].Humidistat.on();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 'o' && length == 3) { // off
+                Relay[i].Humidistat.off();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 't' && length == 6) { // toggle
+                Relay[i].Humidistat.enabled() ? Relay[i].Humidistat.off()
+                                              : Relay[i].Humidistat.on();
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              } else if ((char)payload[0] == 'g' && length == 3) { // get
+                Mqtt.publish(Relay[i].getMQTTTopic(), "humidistat/state",
+                             Relay[i].Humidistat.enabled() ? "on" : "off");
+              }
+            }
 #endif
+          }
         }
+#endif
+
+#ifdef CONFIG_HARDWARE_GATE
+        /* Closing the condition for skipping relay if assigned to a gate */
       }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << "Excluding relay: " << i
+               << " as it's assigned to a Gate: " << Relay[i].gateId;
+      }
+#endif
 #endif
     }
 #endif

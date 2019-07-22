@@ -14,16 +14,25 @@ void initRelay() {
 /* Method checks if any relay should be automatically turned off */
 void relayEventsListener() {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-    if (Relay[i].autoTurnOff()) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.on();
+#ifdef CONFIG_HARDWARE_GATE
+    /* For the Relay assigned to a gate listener is not needed. Skipping such
+     * relays */
+    if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-      MQTTPublishRelayState(i);
-      DomoticzPublishRelayState(i);
+      if (Relay[i].autoTurnOff()) {
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.off();
+        Led.on();
 #endif
+        MQTTPublishRelayState(i);
+        DomoticzPublishRelayState(i);
+#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+        Led.off();
+#endif
+      }
+#ifdef CONFIG_HARDWARE_GATE
+      /* Closing the condition for skipping relay if assigned to a gate */
     }
+#endif
   }
 }
 #endif
