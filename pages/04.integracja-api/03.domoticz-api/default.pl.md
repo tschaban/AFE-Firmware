@@ -1,6 +1,8 @@
 ---
 title: 'Domoticz API'
 media_order: 'domoticz-dodawanie-urzadzenia.png,domoticz-dodawanie-wirtualnego-czujnika.png,domoticz-dodawanie-wirtualnego-czujnika-formularz.png,domoticz-dodawanie-wirtualnego-przycisku-formularz.png,domoticz-przelaczniki.png,domoticz-urzadzenia.png,domoticz-edytowane-przycisku.png,domoticz-ustawianie-akcji-przekaznika.png,domoticz-zmiana-typu-przelacznika.png,afe-firmware-konfiguracja-przekaznik-domoticz.png'
+recaptchacontact:
+    enabled: false
 ---
 
 * Domoticz API umożliwia dwukierunkową integrację między urządzeniem z AFE Firmware, a Domoticz
@@ -72,6 +74,8 @@ media_order: 'domoticz-dodawanie-urzadzenia.png,domoticz-dodawanie-wirtualnego-c
 * _NAZWA-PRZEKAZNIKA_, definiowany jest w AFE Firmware w [konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
 
 ! Z doświadczenia wiem, że wielu użytkowników AFE Firmware zapomina dodawać ten fragment **&source=domoticz** do komendy sterującej. Jeśli ten fragment nie zostanie dodany do komendy sterującej, może to spowodować, że Domoticz + Urządzenie z AFE Firmware wpadnie w pętlę włączania / wyłączania się
+
+! Kolejną częstą pomyłką jest wpisanie w adres URL nazwę urządzenia zamiast nazwę przekaźnika. Konieczne jest wpisanie **nazwę przekaźnika**, którą wprowadza się w [konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
 
 ![](domoticz-ustawianie-akcji-przekaznika.png)
 
