@@ -69,20 +69,20 @@ private:
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   DS18B20 getDS18B20Data();
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   DH getDHTData();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   REGULATOR getRegulatorData();
 #endif
 
@@ -95,23 +95,23 @@ private:
   GATE getGateData();
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortData();
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorData();
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   BMx80 getBMx80SensorData();
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorData();
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
 #endif
 

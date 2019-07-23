@@ -14,9 +14,9 @@
 
 struct CONTACTRON {
   uint8_t gpio;
-  byte type = CONTACTRON_NO;
+  byte type = AFE_CONTACTRON_NO;
   uint8_t ledID;
-  uint16_t bouncing = CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
+  uint16_t bouncing = AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
   char name[17];
   DOMOTICZ_BASIC_CONFIG domoticz;
   MQTT_BASIC_CONFIG mqtt;

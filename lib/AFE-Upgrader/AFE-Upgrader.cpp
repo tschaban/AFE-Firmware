@@ -9,8 +9,8 @@ AFEUpgrader::AFEUpgrader() {
 }
 
 boolean AFEUpgrader::upgraded() {
-  if (strcmp(FirmwareConfiguration.version, FIRMWARE_VERSION) == 0 &&
-      FirmwareConfiguration.type == FIRMWARE_TYPE) {
+  if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) == 0 &&
+      FirmwareConfiguration.type == AFE_FIRMWARE_TYPE) {
     return false;
   } else {
     return true;
@@ -18,8 +18,8 @@ boolean AFEUpgrader::upgraded() {
 }
 
 void AFEUpgrader::upgrade() {
-  sprintf(FirmwareConfiguration.version, FIRMWARE_VERSION);
-  FirmwareConfiguration.type = FIRMWARE_TYPE;
+  sprintf(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION);
+  FirmwareConfiguration.type = AFE_FIRMWARE_TYPE;
   Data.saveConfiguration(&FirmwareConfiguration);
 }
 

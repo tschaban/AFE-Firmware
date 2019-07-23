@@ -8,9 +8,9 @@
 
 /* Firmware names */
 
-#if defined(DEVICE_SHELLY_1)
+#if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "for Shelly-1"
-#elif defined(DEVICE_SONOFF_BASIC_V1)
+#elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "for Sonoff Basic"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "WIFI SWITCH"
@@ -79,7 +79,7 @@
   "hotspot name used for configuration mode"
 #define L_HARDWARE_CONFIGURATION "Hardware configuration"
 #define L_HARDWARE_CONFIGURATION_INFO "Select connected items to your device"
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #define L_NUMBER_OF_LEDS "Number of LEDs"
 #endif
 #define L_NUMBER_OF_RELAYS "Number of relays"
@@ -87,7 +87,7 @@
 #define L_DO_MEASURE_ADC "Measurements from Analog Input"
 #define L_DEVICE_CONTROLLING "Device controlling mechanism"
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_CONTROLLED_GATES "Gates/Doors controlled"
 #endif
 
@@ -130,7 +130,7 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"
 
@@ -164,10 +164,10 @@
 /* Form: Switch */
 #define L_FUNCTIONALITY "Functionality"
 #define L_SYSTEM_BUTTON "System button"
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #define L_CONTROL_RELAY "Controlling only the relay"
 #endif
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Controlling only the gate"
 #endif
 #define L_RELAY_CONTROLLED_BY_SWITCH "Controlling"
@@ -238,7 +238,7 @@
   "Version PRO can be configured once the device is connected to the Internet"
 
 /* Form: Contactron */
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define L_LED_ASSIGNED_TO_SENSOR "LED assigned to the sensor"
 #define L_SET_CONTACTRON_SENSITIVENESS                                         \
   "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
@@ -251,7 +251,7 @@
 #endif
 
 /* Form: Gate */
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_GATE "Gate/Door"
 #define L_IF_MAGNETIC_SENSOR "If magnetic sensor"
 #define L_AND_SENSOR "and sensor"

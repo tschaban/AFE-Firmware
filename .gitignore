@@ -4,6 +4,7 @@
 .clang_complete
 .gcc-flags.json
 .idea
+.vscode
 lib-external
 sandpit
 webservice/docs

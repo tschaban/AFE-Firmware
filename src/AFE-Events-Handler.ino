@@ -11,33 +11,33 @@ void eventsListener() {
 #endif
     /* Update relay status to Domoticz */
     if (Device.configuration.api.domoticz) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         DomoticzPublishGateState(i);
       }
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
         DomoticzPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
 
-#ifdef CONFIG_HARDWARE_RELAY
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
         /* For the Relay assigned to a gate code below is not needed for
          * execution
          */
         if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
           DomoticzPublishRelayState(i);
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
           /* Closing the condition for skipping relay if assigned to a gate */
         }
 #ifdef DEBUG
@@ -61,7 +61,7 @@ void eventsListener() {
       }
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
@@ -79,13 +79,13 @@ void eventsListener() {
       Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
 
 /* Publishing mesages after connection to MQTT Broker has been established */
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         MQTTPublishGateState(i);
       }
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
         MQTTPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
@@ -93,10 +93,10 @@ void eventsListener() {
 #endif
 
 /* Setting Relay state after connection to MQTT */
-#ifdef CONFIG_HARDWARE_RELAY
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
         /* For the Relay assigned to a gate code below is not needed for
          * execution
          */
@@ -114,7 +114,7 @@ void eventsListener() {
              * connected */
             MQTTPublishRelayState(i);
           }
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
           /* Closing the condition for skipping relay if assigned to a gate */
         }
 #ifdef DEBUG
@@ -134,7 +134,7 @@ void eventsListener() {
       }
 
 /* Subscribing to MQTT ADC commands */
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       if (Device.configuration.isAnalogInput) {
         Mqtt.subscribe(AnalogInput.getMQTTCommandTopic());
       }

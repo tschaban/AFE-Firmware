@@ -16,15 +16,15 @@
 #include <AFE-Firmware.h>
 #include <ESP8266WiFi.h>
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-I2C-Scanner.h>
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 #include <AFE-Sensor-BMx80.h>
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 #endif
 
@@ -53,7 +53,7 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
                                             const String title = "GPIO");
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
                                           uint8_t type);
@@ -81,11 +81,11 @@ private:
   const String generateGateStatesList(uint8_t id, byte state);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
   String addThermostateMenuItem();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
   String addHumidistatMenuItem();
 #endif
 
@@ -114,20 +114,20 @@ public:
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   String addDS18B20Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   String addDHTConfiguration();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   String addRegulatorConfiguration(uint8_t type);
 #endif
 
@@ -135,35 +135,35 @@ public:
   String addPIRConfiguration(uint8_t id);
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   String addGateConfiguration(uint8_t id);
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   String addContactronConfiguration(uint8_t id);
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   String addHPMA115S0Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   String addBMx80Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   String addBH1750Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   String addAnalogInputConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   String addSerialPortConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 

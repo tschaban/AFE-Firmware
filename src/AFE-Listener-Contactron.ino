@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Method initialize contactrons */
 void initializeContractons() {
@@ -24,7 +24,7 @@ void contractonEventsListener() {
       Serial << endl << " - Contactron: " << i << " has changed the state";
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 
 #ifdef DEBUG
       Serial << ", it's assigned to a Gate= " << Contactron[i].gateId;

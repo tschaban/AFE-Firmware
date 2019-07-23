@@ -7,9 +7,9 @@
 #define L_LANGUAGE_SHORT "pl"
 
 /* Firmware names */
-#if defined(DEVICE_SHELLY_1)
+#if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "dla Shelly-1"
-#elif defined(DEVICE_SONOFF_BASIC_V1)
+#elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "dla Sonoff Basic"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
@@ -87,7 +87,7 @@
 #define L_DEVICE_CONTROLLING_INFO                                              \
   "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
 #endif
 
@@ -136,7 +136,7 @@
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Zmień świecenie diody LED na odwrotne"
 
@@ -172,10 +172,10 @@
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"
 #define L_SYSTEM_BUTTON "Przycisk systemowy"
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #define L_CONTROL_RELAY "Tylko sterowanie przekaźnikiem"
 #endif
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Tylko sterowanie bramą"
 #endif
 #define L_RELAY_CONTROLLED_BY_SWITCH "Sterowanie"
@@ -248,7 +248,7 @@
   "Konieczne jest podłączenie do Internetu, aby skonfigurować wersję PRO"
 
 /* Form: Contactron */
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define L_LED_ASSIGNED_TO_SENSOR "LED przypisany do czujnika"
 #define L_SET_CONTACTRON_SENSITIVENESS                                                   \
   "Czułość należy ustawić eksperymentalnie, aż uzyska się pożądane działanie " \
@@ -259,7 +259,7 @@
 #define L_CONTACTRON_MQTT_TOPIC "Temat MQTT do monitorowania kontaktronu"
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_GATE "Brama/Drzwi"
 #define L_IF_MAGNETIC_SENSOR "Jeśli czujnik magnetyczny"
 #define L_AND_SENSOR "oraz czujnik"

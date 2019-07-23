@@ -59,7 +59,7 @@ public:
   void saveConfiguration(uint8_t id, RELAY configuration);
   void createRelayConfigurationFile();
 
-#ifdef CONFIG_HARDWARE_RELAY
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -85,13 +85,13 @@ public:
   void createPasswordConfigurationFile();
 
   /* ADC Inout create/read/write methods */
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getADCInputConfiguration();
   void saveConfiguration(ADCINPUT configuration);
   void createADCInputConfigurationFile();
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
   void createLEDConfigurationFile();
@@ -101,17 +101,17 @@ public:
   void createSystemLedIDConfigurationFile();
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   DS18B20 getSensorConfiguration();
   void saveConfiguration(DS18B20 configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   DH getSensorConfiguration();
   void saveConfiguration(DH configuration);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* Method saves regulator configuration */
   void saveConfiguration(REGULATOR configuration,
                          uint8_t type = THERMOSTAT_REGULATOR);
@@ -126,13 +126,13 @@ public:
   void saveConfiguration(uint8_t id, PIR configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   CONTACTRON getContactronConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, CONTACTRON configuration);
   void createContractonConfigurationFile();
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   GATE getGateConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, GATE configuration);
   void createGateConfigurationFile();
@@ -140,28 +140,28 @@ public:
   void saveGateState(uint8_t id, uint8_t state);
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortConfiguration();
   void saveConfiguration(SERIALPORT configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorConfiguration();
   void saveConfiguration(HPMA115S0 configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   BMx80 getBMx80SensorConfiguration();
   void saveConfiguration(BMx80 configuration);
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration();
   void saveConfiguration(BH1750 configuration);
 #endif
 
 /* Methods turns on / off APIs */
-#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+#ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);
 #endif
 };

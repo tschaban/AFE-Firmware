@@ -12,11 +12,11 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   Device = _Device;
   WiFiMode = mode;
 
-  if (WiFiMode == MODE_NORMAL || WiFiMode == MODE_CONFIGURATION) {
+  if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
     networkConfiguration = Data.getNetworkConfiguration();
   }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   // Init LED
 
   uint8_t systeLedID = Data.getSystemLedID();
@@ -33,7 +33,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
-  if (WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET) {
+  if (WiFiMode == AFE_MODE_ACCESS_POINT || WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << "Starting HotSpot: ";
 #endif
@@ -84,7 +84,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 }
 
 void AFEWiFi::listener() {
-  if (!(WiFiMode == MODE_ACCESS_POINT || WiFiMode == MODE_NETWORK_NOT_SET)) {
+  if (!(WiFiMode == AFE_MODE_ACCESS_POINT || WiFiMode == AFE_MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
       if (sleepMode) {
         if (millis() - sleepStartTime >=
@@ -103,7 +103,7 @@ void AFEWiFi::listener() {
               Serial << endl
                      << "WiFI is not configured. Going to configuration mode";
 #endif
-              Device->reboot(MODE_NETWORK_NOT_SET);
+              Device->reboot(AFE_MODE_NETWORK_NOT_SET);
             }
 
             WiFi.begin(networkConfiguration.ssid,
@@ -117,7 +117,7 @@ void AFEWiFi::listener() {
           }
         }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         if (ledStartTime == 0) {
           ledStartTime = millis();
         }
@@ -147,7 +147,7 @@ void AFEWiFi::listener() {
           sleepStartTime = millis();
           delayStartTime = 0;
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           ledStartTime = 0;
           Led.off();
 #endif
@@ -165,7 +165,7 @@ void AFEWiFi::listener() {
         connections = 0;
         delayStartTime = 0;
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         ledStartTime = 0;
         Led.off();
 #endif

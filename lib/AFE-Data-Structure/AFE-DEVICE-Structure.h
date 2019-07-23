@@ -11,7 +11,7 @@
 
 #include <AFE-Configuration.h>
 
-struct DEVICE_API {
+struct AFE_DEVICE_API {
   boolean mqtt;
   boolean http;
   boolean domoticz;
@@ -20,12 +20,12 @@ struct DEVICE_API {
 /* Custom DEVICE structure definition */
 struct DEVICE {
   char name[33];
-  DEVICE_API api;
+  AFE_DEVICE_API api;
 #if defined(T0_CONFIG)
-  boolean isLED[CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
-  boolean isSwitch[CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
-  boolean isRelay[CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
-#ifdef CONFIG_HARDWARE_ADC_VCC
+  boolean isLED[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
+  boolean isSwitch[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
+  boolean isRelay[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T1_CONFIG)
@@ -33,7 +33,7 @@ struct DEVICE {
   boolean isRelay[1];
   boolean isSwitch[2];
   boolean isDS18B20;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T2_CONFIG)
@@ -41,7 +41,7 @@ struct DEVICE {
   boolean isRelay[1];
   boolean isSwitch[2];
   boolean isDHT;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T3_CONFIG)
@@ -49,14 +49,14 @@ struct DEVICE {
   boolean isRelay[4];
   boolean isSwitch[5];
   boolean isPIR[4];
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T4_CONFIG)
   boolean isLED[5];
   boolean isSwitch[5];
   boolean isRelay[4];
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T5_CONFIG)
@@ -66,7 +66,7 @@ struct DEVICE {
   uint8_t noOfRelays;
   uint8_t noOfLEDs;
   boolean isDHT;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #elif defined(T6_CONFIG)
@@ -76,7 +76,7 @@ struct DEVICE {
   boolean isHPMA115S0;
   uint8_t isBMx80;
   boolean isBH1750;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
 #endif

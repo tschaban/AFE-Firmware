@@ -1,14 +1,14 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 /* Method listens for HTTP Requests */
-void mainHTTPRequestsHandler() {
+void HTTPRequestListener() {
   if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
@@ -50,12 +50,12 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
   sendHTTPAPIRequestStatus(request, status, valueString);
 }
 
-#ifdef CONFIG_HARDWARE_RELAY // Not required for T5
+#ifdef AFE_CONFIG_HARDWARE_RELAY // Not required for T5
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
-  sendHTTPAPIRequestStatus(request, status, value == RELAY_ON ? "on" : "off");
+  sendHTTPAPIRequestStatus(request, status, value == AFE_RELAY_ON ? "on" : "off");
 }
 #endif
 
@@ -68,26 +68,26 @@ void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
 #endif
 
 /* Gate and Contactron responses */
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 /* It constructs HTTP response related to gate and calls HTTP push */
 void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
   sendHTTPAPIRequestStatus(
       request, status,
-      value == GATE_OPEN
+      value == AFE_GATE_OPEN
           ? "open"
-          : value == GATE_CLOSED
+          : value == AFE_GATE_CLOSED
                 ? "closed"
-                : value == GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
+                : value == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 /* It constructs HTTP response related to contactron and calls HTTP push */
 void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                                         byte value) {
   sendHTTPAPIRequestStatus(request, status,
-                           value == CONTACTRON_OPEN ? "open" : "closed");
+                           value == AFE_CONTACTRON_OPEN ? "open" : "closed");
 }
 #endif
 
@@ -105,7 +105,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 
   /* Request related to gate */
   if (strcmp(request.device, "gate") == 0) {
@@ -130,7 +130,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   /* Request related to contactron */
   if (strcmp(request.device, "contactron") == 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
@@ -153,13 +153,13 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_RELAY
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   // @TODO should it be included for T5????
   /* Request related to relay */
   if (strcmp(request.device, "relay") == 0) {
     uint8_t state;
     for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
       /* For the Relay assigned to a gate code below is not needed for execution
        */
       if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -172,7 +172,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_ON,
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_ON,
                                           Relay[i].get());
 
           } else if (strcmp(request.command, "off") == 0) { // Off
@@ -181,7 +181,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == RELAY_OFF,
+            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_OFF,
                                           Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
             state = Relay[i].get();
@@ -195,7 +195,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           } else if (strcmp(request.command, "get") == 0) {
             sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
 /* Command not implemented.Info */
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
           } else if (strcmp(request.command, "enableThermostat") == 0) {
             Relay[i].Thermostat.on();
             sendHTTPAPIRequestStatus(
@@ -215,7 +215,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
           } else if (strcmp(request.command, "enableHumidistat") == 0) {
             Relay[i].Humidistat.on();
             sendHTTPAPIRequestStatus(
@@ -241,7 +241,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           break;
         }
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
         /* Closing the condition for skipping relay if assigned to a gate */
       }
 #ifdef DEBUG
@@ -260,7 +260,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   /* Request related to ds18b20 */
   if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
@@ -269,7 +269,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   /* Request related to DHT Sensor */
   if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
@@ -294,7 +294,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_PIR
+#ifdef AFE_CONFIG_HARDWARE_PIR
   if (strcmp(request.device, "pir") == 0) {
     boolean pirSendFailure = true;
     for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
@@ -313,7 +313,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
   if (strcmp(request.device, "HPMA115S0") == 0) {
     HPMA115S0_DATA sensorData;
@@ -330,7 +330,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   /* BMx80 */
   if (strcmp(request.device, "BMx80") == 0) {
     if (strcmp(request.command, "get") == 0) {
@@ -355,7 +355,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   /* BH1750 */
   if (strcmp(request.device, "BH1750") == 0) {
     if (strcmp(request.name, "lux") == 0) {
@@ -369,7 +369,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Analog Input */
   if (strcmp(request.device, "ADC") == 0) {
     if (strcmp(request.command, "get") == 0) {
@@ -391,7 +391,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+#ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   /* Requests related to APIs */
   if (strcmp(request.device, "api") == 0) {
     uint8_t _api =
@@ -435,7 +435,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     PASSWORD password = Data.getPasswordConfiguration();
     if (!password.protect) {
       sendHTTPAPIRequestStatus(request, true);
-      Device.reboot(MODE_CONFIGURATION);
+      Device.reboot(AFE_MODE_CONFIGURATION);
     } else {
       sendHTTPAPIRequestStatus(request, false);
     }

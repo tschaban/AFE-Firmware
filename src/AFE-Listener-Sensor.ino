@@ -1,14 +1,14 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
-#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
 
 /* Initializing sensor */
-void initSensor() {
-#ifdef CONFIG_HARDWARE_DS18B20
+void initalizeSensor() {
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   if (Device.configuration.isDS18B20) {
     Sensor.begin();
   }
 #endif
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   if (Device.configuration.isDHT) {
     AFEDataAccess Data;
     DH configuration = Data.getSensorConfiguration();
@@ -24,9 +24,9 @@ void initSensor() {
 
 /* Main code for processing sesnor */
 void mainSensor() {
-#if defined(CONFIG_HARDWARE_DS18B20)
+#if defined(AFE_CONFIG_HARDWARE_DS18B20)
   if (Device.configuration.isDS18B20)
-#elif defined(CONFIG_HARDWARE_DHXX)
+#elif defined(AFE_CONFIG_HARDWARE_DHXX)
   if (Device.configuration.isDHT)
 #endif
   {
@@ -35,14 +35,14 @@ void mainSensor() {
     if (Sensor.isReady()) {
       unsigned long idx = 0;
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
       temperature = Sensor.getTemperature();
 
 /* Thermostat */
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Thermostat listener */
@@ -50,7 +50,7 @@ void mainSensor() {
 
           /* Relay control by thermostat code */
           if (Relay[i].Thermostat.isReady()) {
-            if (Relay[i].Thermostat.getRelayState() == RELAY_ON) {
+            if (Relay[i].Thermostat.getRelayState() == AFE_RELAY_ON) {
               Relay[i].on();
             } else {
               Relay[i].off();
@@ -62,8 +62,8 @@ void mainSensor() {
       }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Thermal Protection listener */
@@ -71,7 +71,7 @@ void mainSensor() {
 
           /* Checking if relay should be switched off based on device
            * thermal protection */
-          if (Relay[i].get() == RELAY_ON &&
+          if (Relay[i].get() == AFE_RELAY_ON &&
               Relay[i].ThermalProtection.protectionOn()) {
             Relay[i].off();
             MQTTPublishRelayState(i);
@@ -92,12 +92,12 @@ void mainSensor() {
 
       DomoticzPublishTemperature(idx, temperature);
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
       humidity = Sensor.getHumidity();
 
 /* Humidistat */
 #if !defined(T5_CONFIG)
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Humiditstat listener */
@@ -105,7 +105,7 @@ void mainSensor() {
 
           /* Relay control by thermostat code */
           if (Relay[i].Humidistat.isReady()) {
-            if (Relay[i].Humidistat.getRelayState() == RELAY_ON) {
+            if (Relay[i].Humidistat.getRelayState() == AFE_RELAY_ON) {
               Relay[i].on();
             } else {
               Relay[i].off();
@@ -117,14 +117,14 @@ void mainSensor() {
       }
 #endif
 
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MQTTPublishHumidity(humidity);
       idx = Sensor.getDomoticzIDX(IDX_TYPE_HUMIDITY);
       DomoticzPublishHumidity(idx, humidity);
 #endif
 
-#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
+#if (defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY))
       idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY);
       DomoticzPublishTemperatureAndHumidity(idx, temperature, humidity);
       if (Sensor.publishHeatIndex()) {
@@ -137,14 +137,14 @@ void mainSensor() {
 
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
   }
 }
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
 void dht_wrapper() { dht.isrCallback(); }
 #endif
 

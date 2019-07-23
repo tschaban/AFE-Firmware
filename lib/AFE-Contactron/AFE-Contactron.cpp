@@ -19,21 +19,21 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
 boolean AFEContactron::get() {
   boolean currentState = digitalRead(configuration.gpio);
   boolean _return;
-  if (configuration.type == CONTACTRON_NO) {
+  if (configuration.type == AFE_CONTACTRON_NO) {
     if (currentState) {
       ContactronLed.on();
-      _return = CONTACTRON_OPEN;
+      _return = AFE_CONTACTRON_OPEN;
     } else {
       ContactronLed.off();
-      _return = CONTACTRON_CLOSED;
+      _return = AFE_CONTACTRON_CLOSED;
     }
   } else {
     if (currentState) {
       ContactronLed.off();
-      _return = CONTACTRON_CLOSED;
+      _return = AFE_CONTACTRON_CLOSED;
     } else {
       ContactronLed.on();
-      _return = CONTACTRON_OPEN;
+      _return = AFE_CONTACTRON_OPEN;
     }
   }
 

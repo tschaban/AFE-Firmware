@@ -12,14 +12,7 @@
 void handleFavicon() {}
 
 /* Method handles all HTTP request */
-void handleHTTPRequests() {
-
-#ifdef DEBUG
-  Serial << ".";
-#endif
-
-  WebServer.generate();
-}
+void handleHTTPRequests() { WebServer.generate(); }
 void handleUpload() { WebServer.generate(true); }
 
 void handleOnNotFound() {

@@ -23,19 +23,19 @@ void AFEHumidistat::listener(float currentTemperature) {
   if (configuration.enabled) {
     if (configuration.turnOnAbove &&
         currentTemperature > configuration.turnOn) {
-      relayState = RELAY_ON;
+      relayState = AFE_RELAY_ON;
       ready = true;
     } else if (!configuration.turnOnAbove &&
                currentTemperature < configuration.turnOn) {
-      relayState = RELAY_ON;
+      relayState = AFE_RELAY_ON;
       ready = true;
     } else if (configuration.turnOffAbove &&
                currentTemperature > configuration.turnOff) {
-      relayState = RELAY_OFF;
+      relayState = AFE_RELAY_OFF;
       ready = true;
     } else if (!configuration.turnOffAbove &&
                currentTemperature < configuration.turnOff) {
-      relayState = RELAY_OFF;
+      relayState = AFE_RELAY_OFF;
       ready = true;
     }
   }

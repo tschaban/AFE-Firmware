@@ -34,7 +34,7 @@ public:
   void begin();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
-  void reboot(uint8_t mode = MODE_NORMAL);
+  void reboot(uint8_t mode = AFE_MODE_NORMAL);
 
   /* Method returns current device mode */
   uint8_t getMode();

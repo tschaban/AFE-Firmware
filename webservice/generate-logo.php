@@ -34,7 +34,7 @@ function firmwareInstalled($t, $v, $d)
 {
     global $db;
     $location = getLocation();
-    $q = "INSERT INTO " . C_TABLE_PREFIX . "logs (device_id, user_ip,firmware_type, firmware_version,firmware_installed_on,
+    $q = "INSERT INTO " . C_TABLE_PREFIX . "logs (device_id, user_ip,AFE_FIRMWARE_TYPE, AFE_FIRMWARE_VERSION,firmware_installed_on,
     last_seen_on, geo_country_code,geo_country_name,geo_region_code,geo_region_name,geo_zipcode,geo_latitude,geo_longitude,geo_city )
      VALUES ('" . $d . "','" . C_USER_IP . "','" . $t . "','" . $v . "',CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),'" .
       $location->country_code . "','" . $location->country_name . "','" . $location->region_code . "','" . $location->region_name . "','"
@@ -50,7 +50,7 @@ function firmwareUpgraded($t, $v, $d, $oldt, $oldv)
 {
     global $db;
     $location = getLocation();
-    $q = "UPDATE " . C_TABLE_PREFIX . "logs SET firmware_type = '" . $t . "', firmware_version = '" . $v . "', firmware_upgraded_on = CURRENT_TIMESTAMP(), user_ip = '" . C_USER_IP . "', last_seen_on = CURRENT_TIMESTAMP(), geo_country_code='".$location->country_code."',geo_country_name='".$location->country_name."',geo_region_code='".$location->region_code."',geo_region_name='".$location->region_name."',geo_zipcode='".$location->zipcode."',geo_latitude='".$location->latitude."',geo_longitude='".$location->longitude."',geo_city='".$location->city."' WHERE device_id = '" . $d . "'";
+    $q = "UPDATE " . C_TABLE_PREFIX . "logs SET AFE_FIRMWARE_TYPE = '" . $t . "', AFE_FIRMWARE_VERSION = '" . $v . "', firmware_upgraded_on = CURRENT_TIMESTAMP(), user_ip = '" . C_USER_IP . "', last_seen_on = CURRENT_TIMESTAMP(), geo_country_code='".$location->country_code."',geo_country_name='".$location->country_name."',geo_region_code='".$location->region_code."',geo_region_name='".$location->region_name."',geo_zipcode='".$location->zipcode."',geo_latitude='".$location->latitude."',geo_longitude='".$location->longitude."',geo_city='".$location->city."' WHERE device_id = '" . $d . "'";
     $db->executeQuery($q);
 
     $notification = new pushover();
@@ -70,16 +70,16 @@ function lastSeenUpdateUnknownDevice($l, $f, $t)
 {
     global $db;
     $location = getLocation();
-    $q = "UPDATE " . C_TABLE_PREFIX . "logs SET user_ip = '" . C_USER_IP . "', last_seen_on = CURRENT_TIMESTAMP(),geo_country_code='".$location->country_code."',geo_country_name='".$location->country_name."',geo_region_code='".$location->region_code."',geo_region_name='".$location->region_name."',geo_zipcode='".$location->zipcode."',geo_latitude='".$location->latitude."',geo_longitude='".$location->longitude."',geo_city='".$location->city."' WHERE user_ip = '" . C_USER_IP . "' AND firmware_version = '" . $f . "' AND firmware_type='" . $t . "' AND device_id = 'Null'";
+    $q = "UPDATE " . C_TABLE_PREFIX . "logs SET user_ip = '" . C_USER_IP . "', last_seen_on = CURRENT_TIMESTAMP(),geo_country_code='".$location->country_code."',geo_country_name='".$location->country_name."',geo_region_code='".$location->region_code."',geo_region_name='".$location->region_name."',geo_zipcode='".$location->zipcode."',geo_latitude='".$location->latitude."',geo_longitude='".$location->longitude."',geo_city='".$location->city."' WHERE user_ip = '" . C_USER_IP . "' AND AFE_FIRMWARE_VERSION = '" . $f . "' AND AFE_FIRMWARE_TYPE='" . $t . "' AND device_id = 'Null'";
     $db->executeQuery($q);
 }
 
 if ($_device_id != $_empty) {
     $_res = $db->executeQuery("SELECT * FROM " . C_TABLE_PREFIX . "logs WHERE device_id = '" . $_device_id . "'");
     if ($data = $db->fetchRecord($_res)) {
-        if ($data["firmware_version"] <> $_version || $data["firmware_type"] <> $_type) {
+        if ($data["AFE_FIRMWARE_VERSION"] <> $_version || $data["AFE_FIRMWARE_TYPE"] <> $_type) {
 
-            firmwareUpgraded($_type, $_version, $_device_id,$data["firmware_type"],$data["firmware_version"]);
+            firmwareUpgraded($_type, $_version, $_device_id,$data["AFE_FIRMWARE_TYPE"],$data["AFE_FIRMWARE_VERSION"]);
 
         } else {
             lastSeenUpdate($_device_id);
@@ -88,7 +88,7 @@ if ($_device_id != $_empty) {
         firmwareInstalled($_type, $_version, $_device_id);
     }
 } else {
-    $_res = $db->executeQuery("SELECT log_id FROM " . C_TABLE_PREFIX . "logs WHERE user_ip = '" . C_USER_IP . "' AND firmware_version = '" . $_version . "' AND firmware_type='" . $_type . "' AND device_id = '" . $_empty . "'");
+    $_res = $db->executeQuery("SELECT log_id FROM " . C_TABLE_PREFIX . "logs WHERE user_ip = '" . C_USER_IP . "' AND AFE_FIRMWARE_VERSION = '" . $_version . "' AND AFE_FIRMWARE_TYPE='" . $_type . "' AND device_id = '" . $_empty . "'");
     if ($data = $db->fetchRecord($_res)) {
         lastSeenUpdateUnknownDevice($_version,$_type);
     } else {

@@ -11,19 +11,19 @@
 
 #include <AFE-Data-Access.h>
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED.h>
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 #include <AFE-Thermal-Protection.h>
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 #include <AFE-Thermostat.h>
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 #include <AFE-Humidistat.h>
 #endif
 
@@ -41,12 +41,12 @@ private:
   char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   AFELED Led;
 #endif
 
   unsigned long turnOffCounter = 0;
-#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
   boolean timerUnitInSeconds = true;
 #endif
 
@@ -56,19 +56,19 @@ private:
   void setRelayAfterRestore(uint8_t option);
 
 public:
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
   AFEThermostat Thermostat;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   AFEThermalProtection ThermalProtection;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
   AFEHumidistat Humidistat;
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
@@ -88,7 +88,7 @@ public:
    * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
 
-  /* Method: Returns RELAY_OFF if relay is OFF, RELAY_ON if relay is ON */
+  /* Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay is ON */
   byte get();
 
   /* Turns on relay */
@@ -100,7 +100,7 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-#ifdef CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
   /* Methods automatically turns off/on relay */
   boolean autoTurnOff(boolean invert = false);
 #endif
@@ -108,22 +108,22 @@ public:
   /* Methods returns relay name */
   const char *getName();
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
 #endif
 
-#ifdef CONFIG_HARDWARE_PIR
+#ifdef AFE_CONFIG_HARDWARE_PIR
   /* It removed timer for auto-switch of the relay */
   void clearTimer();
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);

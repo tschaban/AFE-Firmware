@@ -31,8 +31,8 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   page += AFE_CSS;
   page += "</style></head><body>";
 
-  if (Device->getMode() == MODE_CONFIGURATION ||
-      Device->getMode() == MODE_NORMAL) {
+  if (Device->getMode() == AFE_MODE_CONFIGURATION ||
+      Device->getMode() == AFE_MODE_NORMAL) {
     page += "<img src=\"http://api.smartnydom.pl/logo/T";
     page += firmware.type;
     page += "/";
@@ -62,7 +62,7 @@ const String AFESitesGenerator::generateOneColumnLayout(uint8_t redirect) {
 const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   String page = generateHeader(redirect);
   page += "<div id=\"l\">";
-  if (Device->getMode() == MODE_ACCESS_POINT) {
+  if (Device->getMode() == AFE_MODE_ACCESS_POINT) {
     page += "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
   }
   page += "<h4>";
@@ -102,7 +102,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</a></li>";
   }
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     page += "<li  class=\"itm\"><a><i>";
     page += L_GATE_CONFIGURATION;
@@ -141,14 +141,14 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "</a></li>";
 
 /* Thermostat */
-#if defined(CONFIG_HARDWARE_DS18B20) && defined(CONFIG_FUNCTIONALITY_THERMOSTAT)
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) && defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
       if (Device->configuration.isDS18B20) {
         page += addThermostateMenuItem();
       }
 #endif
 
 /* Humidistat */
-#if defined(CONFIG_HARDWARE_DHXX) && defined(CONFIG_FUNCTIONALITY_HUMIDISTAT)
+#if defined(AFE_CONFIG_HARDWARE_DHXX) && defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
       if (Device->configuration.isDHT) {
         page += addThermostateMenuItem();
         page += addHumidistatMenuItem();
@@ -201,7 +201,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 /* Contactrons and Gate */
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 
   if (Device->configuration.noOfContactrons > 0) {
     page += "<li class=\"itm\"><a><i>";
@@ -223,7 +223,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 /* Sensor DS18B20 */
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   if (Device->configuration.isDS18B20) {
     page += "<li class=\"itm\"><a href=\"\\?o=ds18b20\">";
     page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
@@ -232,7 +232,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 /* Sensor DHxx */
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   if (Device->configuration.isDHT) {
     page += "<li class=\"itm\"><a href=\"\\?o=DHT\">";
     page += language == 0 ? "Czujnik DHT" : "DHT sensor";
@@ -241,11 +241,11 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 /* UART */
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   page += "<li class=\"itm\"><a href=\"\\?o=HPMA115S0\">";
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   if (Device->configuration.isHPMA115S0) {
     page += "<li class=\"itm\"><a href=\"\\?o=UART\">UART</a></li>";
 
@@ -255,7 +255,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   if (Device->configuration.isBMx80 != 0) {
     page += "<li class=\"itm\"><a href=\"\\?o=BMx80\">";
     page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
@@ -263,7 +263,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   if (Device->configuration.isBH1750) {
     page += "<li class=\"itm\"><a href=\"\\?o=BH1750\">";
     page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
@@ -272,7 +272,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 /* Sensor DS18B20 */
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput && Firmware->Pro.valid) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_ANALOG_INPUT;
@@ -322,38 +322,38 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body = "<fieldset>";
 
 /* LED */
-#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
-    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_LEDS,
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                                     Device->configuration.noOfLEDs, "l",
                                     L_NUMBER_OF_LEDS);
 
 #endif
 
 /* Contactrons */
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
                                     Device->configuration.noOfContactrons, "co",
                                     L_NUMBER_OF_MAGNETIC_SENSORS);
 
 #endif
 
-#ifdef CONFIG_HARDWARE_RELAY
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   /* Relay */
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_RELAYS,
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
                                     Device->configuration.noOfRelays, "r",
                                     L_NUMBER_OF_RELAYS);
 #endif
 
   /* Switch */
 
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
                                     Device->configuration.noOfSwitches, "s",
                                     L_NUMBER_OF_SWITCHES);
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
@@ -361,7 +361,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</label></div>";
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   body += "<div class=\"cc\"><label><input name =\"dh\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isDHT ? " checked=\"checked\">" : ">";
@@ -370,7 +370,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</label></div>";
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   body += "<div class=\"cc\"><label><input name =\"hp\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
@@ -379,7 +379,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</label></div>";
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   body += "<div class=\"cc\"><label><input name =\"bh\" type=\"checkbox\" "
           "value=\"1\"";
   body += configuration.isBH1750 ? " checked=\"checked\">" : ">";
@@ -388,7 +388,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</label></div>";
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Czujnik" : " Sensor";
   body += " BMx80";
@@ -434,7 +434,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</div>";
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Firmware->Pro.valid) {
     body += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
             "value=\"1\"";
@@ -465,7 +465,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body = "<fieldset>";
 
-  body += generateHardwareItemsList(CONFIG_HARDWARE_NUMBER_OF_GATES,
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_GATES,
                                     Device->configuration.noOfGates, "g",
                                     L_NUMBER_OF_CONTROLLED_GATES);
 
@@ -684,8 +684,8 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
-#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
-    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -723,10 +723,10 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   RELAY configuration = Data.getRelayConfiguration(id);
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
   boolean isGateRelay = false;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
     gateConfiguration = Data.getGateConfiguration(i);
 
     if (gateConfiguration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
@@ -741,7 +741,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   body += generateConfigParameter_GPIO("g", configuration.gpio);
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not shown
    * if the relay is assigned to the Gate */
   if (!isGateRelay) {
@@ -822,11 +822,11 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += "</div>";
     }
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not shown
    * if the relay is assigned to the Gate */
   if (!isGateRelay) {
@@ -834,14 +834,14 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += "<br><p class=\"cm\">";
     body += L_AUTOMATIC_SWITCHING_OFF;
     body += "</p>";
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
 
   char _number[9];
   dtostrf(configuration.timeToOff, 1, 1, _number);
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   if (isGateRelay) {
     body += addItem("number", "ot", L_IMPULSE_DURATION, _number, "?", "1",
                     "99999", "1", L_MILISECONDS);
@@ -854,15 +854,15 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
                   "86400", "0.1", L_SECONDS);
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   if (Device->isDS18B20)
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
     if (Device->isDHT)
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
     {
 
       body += "<br><p class=\"cm\">";
@@ -885,14 +885,14 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   /* Excluded code below for Gate functionality and the relay assigned to the
    * gate */
   if (!isGateRelay) {
 #endif
 
-#if defined(CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
-    CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
     body += "<br><p class=\"cm\">";
     body += L_SELECT_LED_4_RELAY;
@@ -904,7 +904,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
     /* LED Exclusion for a relay assigned to ta gate */
   }
 #endif
@@ -916,7 +916,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   /* Excluded code below for Gate functionality and the relay assigned to the
    * gate */
   if (!isGateRelay) {
@@ -942,18 +942,18 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       page +=
           addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
     }
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
   return page;
 }
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
   RELAY configuration = Data.getRelayConfiguration(0);
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
   if (type == THERMOSTAT_REGULATOR)
 #endif
   {
@@ -969,7 +969,7 @@ String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
                                  body);
 
   }
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
   else {
     String body = generateTwoValueController(configuration.humidistat,
                                              HUMIDISTAT_REGULATOR);
@@ -991,7 +991,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
   configuration = Data.getSwitchConfiguration(id);
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
 #endif
 
@@ -1001,28 +1001,28 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += "</div><div class=\"cf\"><label>";
   body += L_FUNCTIONALITY;
   body += "</label><select name=\"f\"><option value=\"";
-  body += SWITCH_FUNCTIONALITY_NONE;
+  body += AFE_SWITCH_FUNCTIONALITY_NONE;
   body += "\"";
-  body += (configuration.functionality == SWITCH_FUNCTIONALITY_NONE
+  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_NONE
                ? " selected=\"selected\""
                : "");
   body += ">";
   body += L_NONE;
   body += "</option><option value=\"";
-  body += SWITCH_FUNCTIONALITY_MULTI;
+  body += AFE_SWITCH_FUNCTIONALITY_MULTI;
   body += "\"";
-  body += (configuration.functionality == SWITCH_FUNCTIONALITY_MULTI
+  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI
                ? " selected=\"selected\""
                : "");
   body += ">";
   body += L_SYSTEM_BUTTON;
   body += "</option>";
 
-#if defined(CONFIG_HARDWARE_RELAY) || defined(CONFIG_HARDWARE_GATE)
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
   body += "<option value=\"";
-  body += SWITCH_FUNCTIONALITY_RELAY;
+  body += AFE_SWITCH_FUNCTIONALITY_RELAY;
   body += "\"";
-  body += (configuration.functionality == SWITCH_FUNCTIONALITY_RELAY
+  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_RELAY
                ? " selected=\"selected\""
                : "");
   body += ">";
@@ -1039,7 +1039,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L_NONE;
   body += "</option>";
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t relayIsForGate;
 #endif
 
@@ -1050,7 +1050,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
     body += configuration.relayID == i ? " selected=\"selected\"" : "";
     body += ">";
     relayIsForGate = false;
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
     for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
       gateConfiguration = Data.getGateConfiguration(j);
       if (i == gateConfiguration.relayId) {
@@ -1126,7 +1126,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   return page;
 }
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 String AFESitesGenerator::addDS18B20Configuration() {
 
   DS18B20 configuration = Data.getSensorConfiguration();
@@ -1208,7 +1208,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
 String AFESitesGenerator::addDHTConfiguration() {
 
   DH configuration = Data.getSensorConfiguration();
@@ -1348,7 +1348,7 @@ String AFESitesGenerator::addDHTConfiguration() {
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 String AFESitesGenerator::addThermostateMenuItem() {
   String page = "<li class=\"itm\"><a href=\"\\?o=thermostat\">&#8227; ";
   page += language == 0 ? "Termostat" : "Thermostat";
@@ -1357,7 +1357,7 @@ String AFESitesGenerator::addThermostateMenuItem() {
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 String AFESitesGenerator::addHumidistatMenuItem() {
   String page = "<li class=\"itm\"><a href=\"\\?o=humidistat\">&#8227; ";
   page += language == 0 ? "Regulator wilgotności" : "Humidistat";
@@ -1509,7 +1509,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_CONTACTRON
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
   CONTACTRON configuration = Data.getContactronConfiguration(id);
   // DEVICE deviceConfiguration = Device->configuration;
@@ -1574,7 +1574,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 String AFESitesGenerator::addGateConfiguration(uint8_t id) {
   GATE gateConfiguration = Data.getGateConfiguration(id);
   CONTACTRON contactronConfiguration[2];
@@ -1750,23 +1750,23 @@ const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
   body += "</label>";
   body += "<select name=\"s" + String(id) + "\">";
   body += "<option value=\"";
-  body += GATE_OPEN;
+  body += AFE_GATE_OPEN;
   body += "\"";
-  body += (state == GATE_OPEN ? " selected=\"selected\"" : "");
+  body += (state == AFE_GATE_OPEN ? " selected=\"selected\"" : "");
   body += ">";
   body += L_OPENED;
   body += "</option>";
   body += "<option value=\"";
-  body += GATE_PARTIALLY_OPEN;
+  body += AFE_GATE_PARTIALLY_OPEN;
   body += "\"";
-  body += (state == GATE_PARTIALLY_OPEN ? " selected=\"selected\"" : "");
+  body += (state == AFE_GATE_PARTIALLY_OPEN ? " selected=\"selected\"" : "");
   body += ">";
   body += L_PARTIALLY_OPENED;
   body += "</option>";
   body += "<option value=\"";
-  body += GATE_CLOSED;
+  body += AFE_GATE_CLOSED;
   body += "\"";
-  body += (state == GATE_CLOSED ? " selected=\"selected\"" : "");
+  body += (state == AFE_GATE_CLOSED ? " selected=\"selected\"" : "");
   body += ">";
   body += L_CLOSED;
   body += "</option>";
@@ -1777,7 +1777,7 @@ const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 String AFESitesGenerator::addHPMA115S0Configuration() {
 
   HPMA115S0 configuration = Data.getHPMA115S0SensorConfiguration();
@@ -1865,7 +1865,7 @@ String AFESitesGenerator::addHPMA115S0Configuration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 String AFESitesGenerator::addBMx80Configuration() {
 
   BMx80 configuration = Data.getBMx80SensorConfiguration();
@@ -1965,7 +1965,7 @@ String AFESitesGenerator::addBMx80Configuration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 String AFESitesGenerator::addBH1750Configuration() {
 
   BH1750 configuration = Data.getBH1750SensorConfiguration();
@@ -2021,7 +2021,7 @@ String AFESitesGenerator::addBH1750Configuration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();
   DEVICE device = Data.getDeviceConfiguration();
@@ -2093,7 +2093,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
 String AFESitesGenerator::addSerialPortConfiguration() {
   SERIALPORT configuration = Data.getSerialPortConfiguration();
 
@@ -2108,7 +2108,7 @@ String AFESitesGenerator::addSerialPortConfiguration() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_I2C
+#ifdef AFE_CONFIG_HARDWARE_I2C
 String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
   AFEI2CScanner I2CScanner;
   String body = "<div class=\"cf\"><label>I2C Ad";
@@ -2196,7 +2196,7 @@ String AFESitesGenerator::addExitSection(uint8_t command) {
   String body = "<fieldset><div class=\"cf\"><ul><li>";
   body += L_REBOOT_IN_PROGRESS;
   body += "</li><li>";
-  if (command != MODE_ACCESS_POINT) {
+  if (command != AFE_MODE_ACCESS_POINT) {
     body += L_SITE_WILL_BE_RELOADED;
   } else {
     body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
@@ -2224,11 +2224,11 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
           "value=\"";
   body += L_NORMAL_MODE;
   body += "\" formaction=\"/?o=0&i=";
-  body += MODE_CONFIGURATION;
+  body += AFE_MODE_CONFIGURATION;
   body += "\" /> <input type=\"submit\" class=\"b be\" value=\"";
   body += L_HOTSPOT_MODE;
   body += "\" formaction=\"/?o=0&i=";
-  body += MODE_ACCESS_POINT;
+  body += AFE_MODE_ACCESS_POINT;
   body += "\" /></div></form>";
 
   String page = addConfigurationBlock(L_LAUNCH_CONFIGURATION_PANEL, "", body);
@@ -2238,7 +2238,7 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
 String AFESitesGenerator::addProVersionSite() {
   PRO_VERSION configuration = Data.getProVersionConfiguration();
   String body;
-  if (Device->getMode() == MODE_CONFIGURATION) {
+  if (Device->getMode() == AFE_MODE_CONFIGURATION) {
     body = "<fieldset>";
     body += addItem("text", "k", L_KEY, configuration.serial, "18");
     body += "<div class=\"cf\"><label>";
@@ -2281,13 +2281,13 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
             "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
     body += L_VERSION;
     body += "%20-%20";
-    body += FIRMWARE_VERSION;
+    body += AFE_FIRMWARE_VERSION;
     body += "[T";
-    body += FIRMWARE_TYPE;
+    body += AFE_FIRMWARE_TYPE;
     body += "]-blue.svg\" alt=\"T";
-    body += FIRMWARE_TYPE;
+    body += AFE_FIRMWARE_TYPE;
     body += "-";
-    body += FIRMWARE_VERSION;
+    body += AFE_FIRMWARE_VERSION;
     body += "\" /></a> <img src=\"https://img.shields.io/badge/Device-";
     body += AFE_DEVICE_TYPE_NAME;
     body += "-lightgrey.svg\" alt=\"DeviceID ";
@@ -2368,7 +2368,7 @@ const String AFESitesGenerator::generateHardwareItemsList(
   return generateHardwareList(noOfItems, noOffConnected, field, label, 1, 0);
 }
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 const String
 AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
                                               uint8_t type) {

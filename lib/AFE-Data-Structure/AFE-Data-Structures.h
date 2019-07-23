@@ -21,11 +21,11 @@
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED-Structure.h>
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-GATE-Structure.h>
 #endif

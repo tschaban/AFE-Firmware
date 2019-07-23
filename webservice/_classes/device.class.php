@@ -34,7 +34,7 @@ class device
 
     public function add($type, $version, $deviceType)
     {
-        $query = "INSERT INTO " . C_TABLE_PREFIX . "devices (id, firmware_type, firmware_version, firmware_installed_on,
+        $query = "INSERT INTO " . C_TABLE_PREFIX . "devices (id, AFE_FIRMWARE_TYPE, AFE_FIRMWARE_VERSION, firmware_installed_on,
         last_seen_on, device_type_id)  VALUES ('" . $this->_id . "','" . $type . "','" . $version . "',CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP(),".$deviceType.")";
         $this->_deviceInDB = $this->_db->executeQuery($query);
         return $this->_deviceInDB;
@@ -48,9 +48,9 @@ class device
 
     public function updateVersion($type,$version, $deviceType) {
       $this->_debug->push("Updating device version");
-      $q = "UPDATE " . C_TABLE_PREFIX . "devices SET firmware_type='".$type.
+      $q = "UPDATE " . C_TABLE_PREFIX . "devices SET AFE_FIRMWARE_TYPE='".$type.
       "',device_type_id = ".$deviceType.
-      ",firmware_version = '".$version.
+      ",AFE_FIRMWARE_VERSION = '".$version.
       "', last_seen_on = CURRENT_TIMESTAMP(), firmware_upgraded_on = CURRENT_TIMESTAMP() WHERE id = '" .  $this->_id . "'";
       return $this->_db->executeQuery($q);
     }
@@ -64,7 +64,7 @@ class device
 
     public function checkIfUpgraded($type,$version,$deviceType) {
         $this->_debug->push("Checking if firmware has been upgraded: ");
-        if ($this->_data["firmware_version"] <> $version || $this->_data["firmware_type"] <> $type || $this->_data["device_type_id"] <> $deviceType) {
+        if ($this->_data["AFE_FIRMWARE_VERSION"] <> $version || $this->_data["AFE_FIRMWARE_TYPE"] <> $type || $this->_data["device_type_id"] <> $deviceType) {
           $this->_debug->push("YES",false);
           return true;
         } else {

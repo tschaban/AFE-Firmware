@@ -54,29 +54,29 @@ void AFEGate::toggle() {
   GateRelay.on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractons == 0) {
-    Data->saveGateState(gateId, get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
+    Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN : AFE_GATE_CLOSED);
     _event = true;
   }
 }
 
 uint8_t AFEGate::getGateStateBasedOnContractons() {
-  uint8_t gateState = GATE_UNKNOWN;
+  uint8_t gateState = AFE_GATE_UNKNOWN;
   if (numberOfContractons > 0) {
     uint8_t _state[numberOfContractons];
     for (uint8_t i = 0; i < numberOfContractons; i++) {
       _state[i] = Contactron[i].get();
     }
-    if (_state[0] == CONTACTRON_OPEN) {
+    if (_state[0] == AFE_CONTACTRON_OPEN) {
       if (numberOfContractons == 2) {
-        gateState = _state[1] == CONTACTRON_OPEN
+        gateState = _state[1] == AFE_CONTACTRON_OPEN
                         ? configuration.states.state[0]
                         : configuration.states.state[1];
       } else {
         gateState = configuration.states.state[0];
       }
-    } else if (_state[0] == CONTACTRON_CLOSED) {
+    } else if (_state[0] == AFE_CONTACTRON_CLOSED) {
       if (numberOfContractons == 2) {
-        gateState = _state[1] == CONTACTRON_OPEN
+        gateState = _state[1] == AFE_CONTACTRON_OPEN
                         ? configuration.states.state[2]
                         : configuration.states.state[3];
       } else {

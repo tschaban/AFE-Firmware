@@ -1,19 +1,19 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 /* Initializing Switches */
-void initSwitch() {
+void initializeSwitch() {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
     Switch[i].begin(i, &Device);
   }
 }
 
 /* Method processes Switch related events */
-void mainSwitch() {
-  if (Device.getMode() == MODE_NORMAL) {
+void processSwitchEvents() {
+  if (Device.getMode() == AFE_MODE_NORMAL) {
     for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() &&
-          Switch[i].getFunctionality() != SWITCH_FUNCTIONALITY_NONE &&
+          Switch[i].getFunctionality() != AFE_SWITCH_FUNCTIONALITY_NONE &&
           Switch[i].getControlledRelayID() != AFE_HARDWARE_ITEM_NOT_EXIST &&
           Switch[i].getControlledRelayID() <= Device.configuration.noOfRelays) {
 
@@ -23,11 +23,11 @@ void mainSwitch() {
                << Switch[i].getControlledRelayID();
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
         /* The code here is only appilcable for a Switch that controlls a Gate
          */
         if (Relay[Switch[i].getControlledRelayID()].gateId !=
@@ -50,13 +50,13 @@ void mainSwitch() {
           MQTTPublishRelayState(Switch[i].getControlledRelayID());
           DomoticzPublishRelayState(Switch[i].getControlledRelayID());
 
-#ifdef CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
           /* The code here is only appilcable for a Switch that controlls a Gate
            */
         }
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }
@@ -78,29 +78,31 @@ void mainSwitch() {
   }
 }
 
-void mainSwitchListener() {
+void switchEventsListener() {
 
   /* Listens for switch events */
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
     Switch[i].listener();
 
     /* One of the Multifunction switches pressed for 10 seconds */
-    if (Switch[i].getFunctionality() == SWITCH_FUNCTIONALITY_MULTI) {
+    if (Switch[i].getFunctionality() == AFE_SWITCH_FUNCTIONALITY_MULTI) {
       if (Switch[i].is10s()) {
-        Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_ACCESS_POINT)
-                                        : Device.reboot(MODE_NORMAL);
+        Device.getMode() == AFE_MODE_NORMAL
+            ? Device.reboot(AFE_MODE_ACCESS_POINT)
+            : Device.reboot(AFE_MODE_NORMAL);
       } else if (Switch[i].is5s()) {
-        Device.getMode() == MODE_NORMAL ? Device.reboot(MODE_CONFIGURATION)
-                                        : Device.reboot(MODE_NORMAL);
+        Device.getMode() == AFE_MODE_NORMAL
+            ? Device.reboot(AFE_MODE_CONFIGURATION)
+            : Device.reboot(AFE_MODE_NORMAL);
       } else if (Switch[i].is30s()) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
         Device.setDevice();
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
-        Device.reboot(MODE_ACCESS_POINT);
+        Device.reboot(AFE_MODE_ACCESS_POINT);
       }
     }
   }

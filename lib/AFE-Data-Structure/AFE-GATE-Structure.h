@@ -13,7 +13,7 @@
 #include <AFE-MQTT-Structure.h>
 
 struct GATES_CURRENT_STATE {
-  uint8_t state[CONFIG_HARDWARE_NUMBER_OF_GATES];
+  uint8_t state[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
 };
 
 struct GATE_CONTACTRONS {
