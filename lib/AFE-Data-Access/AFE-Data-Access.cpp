@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Data-Access.h"
 
@@ -1415,6 +1413,7 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LED LEDConfiguration;
   uint8_t index = 0;
   LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio = 2;
 #if defined(DEVICE_SONOFF_BASIC_V1)
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
@@ -1437,8 +1436,13 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.gpio = 13;
   saveConfiguration(0, LEDConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_LEDS;
+#elif defined(DEVICE_iECSv20)
+  LEDConfiguration.changeToOppositeValue = true;
+  saveConfiguration(0, LEDConfiguration);
+  LEDConfiguration.changeToOppositeValue = false;
+  index = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
-  LEDConfiguration.gpio = 13;
+
   for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
     saveConfiguration(i, LEDConfiguration);
   }
@@ -1920,23 +1924,13 @@ void AFEDataAccess::createRelayConfigurationFile() {
   uint8_t index = 0;
   /* Relay config */
 
-#ifdef CONFIG_FUNCTIONALITY_GATE
-  RelayConfiguration.timeToOff = 200;
-#endif
-
-#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   RelayConfiguration.timeToOff = 0;
-#endif
-
-#ifdef CONFIG_FUNCTIONALITY_RELAY
   RelayConfiguration.state.powerOn = 3;
   RelayConfiguration.state.MQTTConnected = 0;
   RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
   RelayConfiguration.domoticz.idx = 0;
-  RelayConfiguration.name[0] = '\0';
   RelayConfiguration.mqtt.topic[0] = '\0';
-#endif
-
+  sprintf(RelayConfiguration.name, "R1");
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
   RelayConfiguration.thermalProtection = 0;
 #endif
@@ -1958,17 +1952,20 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveConfiguration(0, RelayConfiguration);
 
   RelayConfiguration.gpio = 5;
+  sprintf(RelayConfiguration.name, "R2");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
   saveConfiguration(1, RelayConfiguration);
   RelayConfiguration.gpio = 4;
+  sprintf(RelayConfiguration.name, "R3");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(2, false);
 #endif
   saveConfiguration(2, RelayConfiguration);
 
   RelayConfiguration.gpio = 15;
+  sprintf(RelayConfiguration.name, "R4");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(3, false);
 #endif
@@ -1991,6 +1988,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveConfiguration(0, RelayConfiguration);
 
   RelayConfiguration.gpio = 5;
+  sprintf(RelayConfiguration.name, "R2");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
@@ -2005,11 +2003,13 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveConfiguration(0, RelayConfiguration);
 
   RelayConfiguration.gpio = 5;
+  sprintf(RelayConfiguration.name, "R2");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
   saveConfiguration(1, RelayConfiguration);
   RelayConfiguration.gpio = 4;
+  sprintf(RelayConfiguration.name, "R3");
 #ifdef CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(2, false);
 #endif
@@ -2024,6 +2024,18 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(0, RelayConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
+#elif defined(DEVICE_iECSv20)
+  RelayConfiguration.gpio = 15;
+  sprintf(RelayConfiguration.name, "R2");
+  saveRelayState(1, false);
+  saveConfiguration(1, RelayConfiguration);
+  RelayConfiguration.gpio = 12;
+  sprintf(RelayConfiguration.name, "R1");
+  RelayConfiguration.timeToOff = 200;
+  RelayConfiguration.state.powerOn = 0;
+  saveRelayState(0, false);
+  saveConfiguration(0, RelayConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* Clean */
 #endif
   RelayConfiguration.gpio = 12;
@@ -2031,6 +2043,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef CONFIG_FUNCTIONALITY_RELAY
     saveRelayState(i, false);
 #endif
+    sprintf(RelayConfiguration.name, "R%d", i + 1);
     saveConfiguration(i, RelayConfiguration);
   }
 }
@@ -2323,6 +2336,16 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
   saveConfiguration(0, SwitchConfiguration);
   index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
+#elif defined(DEVICE_iECSv20)
+  SwitchConfiguration.gpio = 0;
+  SwitchConfiguration.type = SWITCH_TYPE_MONO;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_MULTI;
+  SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
+  saveConfiguration(0, SwitchConfiguration);
+  SwitchConfiguration.gpio = 1;
+  SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_NONE;
+  saveConfiguration(1, SwitchConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #endif
   if (index == 0) {
     SwitchConfiguration.gpio = 0;
@@ -2332,11 +2355,11 @@ void AFEDataAccess::createSwitchConfigurationFile() {
     index = 1;
   }
   if (index < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
-    SwitchConfiguration.gpio = 14;
+    SwitchConfiguration.gpio = 0;
     SwitchConfiguration.type = SWITCH_TYPE_BI;
-    SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_RELAY;
+    SwitchConfiguration.functionality = SWITCH_FUNCTIONALITY_NONE;
     for (uint8_t i = index; i < CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
-      SwitchConfiguration.relayID = i;
+      SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
       saveConfiguration(i, SwitchConfiguration);
     }
   }
@@ -2733,9 +2756,22 @@ void AFEDataAccess::createContractonConfigurationFile() {
   ContactronConfiguration.type = CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
   ContactronConfiguration.domoticz.idx = 0;
   ContactronConfiguration.mqtt.topic[0] = '\0';
-  ContactronConfiguration.gpio = 0;
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
+#if defined(DEVICE_iECSv20)
+  ContactronConfiguration.gpio = 14;
+  sprintf(ContactronConfiguration.name, "C1");
+  saveConfiguration(0, ContactronConfiguration);
+  ContactronConfiguration.gpio = 13;
+  printf(ContactronConfiguration.name, "C2");
+  saveConfiguration(1, ContactronConfiguration);
+  ContactronConfiguration.gpio = 3;
+  printf(ContactronConfiguration.name, "C3");
+  saveConfiguration(2, ContactronConfiguration);
+  index = CONFIG_HARDWARE_NUMBER_OF_CONTACTRON;
+#endif
+  ContactronConfiguration.gpio = 0;
+  for (uint8_t i = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
+       i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
     saveConfiguration(i, ContactronConfiguration);
   }
@@ -2898,19 +2934,30 @@ void AFEDataAccess::createGateConfigurationFile() {
   Serial << endl << "Creating file: cfg-gate-XX.json";
 #endif
   GATE GateConfiguration;
-  // dodact stact
 
-  GateConfiguration.contactron.id[0] = AFE_HARDWARE_ITEM_NOT_EXIST;
-  GateConfiguration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
-  GateConfiguration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
   GateConfiguration.domoticz.idx = 0;
   GateConfiguration.mqtt.topic[0] = '\0';
+  GateConfiguration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS; i++) {
-    GateConfiguration.states.state[i] = GATE_UNKNOWN;
-  }
+#if defined(DEVICE_iECSv20)
+  GateConfiguration.contactron.id[0] = 0;
+  GateConfiguration.relayId = 0;
+  GateConfiguration.states.state[0] = GATE_OPEN;
+  GateConfiguration.states.state[1] = GATE_UNKNOWN;
+  GateConfiguration.states.state[2] = GATE_UNKNOWN;
+  GateConfiguration.states.state[3] = GATE_CLOSED;
+  sprintf(GateConfiguration.name, "G1");
+  saveConfiguration(0, GateConfiguration);
+  saveGateState(0, GATE_UNKNOWN);
+#endif
 
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
+  GateConfiguration.contactron.id[0] = AFE_HARDWARE_ITEM_NOT_EXIST;
+  GateConfiguration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  GateConfiguration.states.state[0] = GATE_UNKNOWN;
+  GateConfiguration.states.state[3] = GATE_UNKNOWN;
+
+  for (uint8_t i = CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
+       i < CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
     sprintf(GateConfiguration.name, "G%d", i + 1);
     saveConfiguration(i, GateConfiguration);
     saveGateState(i, GATE_UNKNOWN);

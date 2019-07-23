@@ -33,24 +33,6 @@ void AFERelay::begin(uint8_t id) {
 #endif
 }
 
-const char *AFERelay::getMQTTCommandTopic() {
-  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-
-const char *AFERelay::getMQTTStateTopic() {
-  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", RelayConfiguration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
-}
-
 byte AFERelay::get() {
   return digitalRead(RelayConfiguration.gpio) == HIGH ? RELAY_ON : RELAY_OFF;
 }
@@ -95,10 +77,10 @@ void AFERelay::off(boolean invert) {
 #ifdef CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data.saveRelayState(_id, RELAY_ON);
+    Data.saveRelayState(_id, RELAY_OFF);
   };
 #else
-  Data.saveRelayState(_id, RELAY_ON);
+  Data.saveRelayState(_id, RELAY_OFF);
 #endif
 }
 
@@ -180,4 +162,22 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
 
 unsigned long AFERelay::getDomoticzIDX() {
   return RelayConfiguration.domoticz.idx;
+}
+
+const char *AFERelay::getMQTTCommandTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFERelay::getMQTTStateTopic() {
+  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", RelayConfiguration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
 }

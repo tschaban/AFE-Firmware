@@ -1,6 +1,5 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #include "AFE-API-Domoticz.h"
 
 AFEDomoticz::AFEDomoticz() {}
@@ -168,15 +167,15 @@ void AFEDomoticz::sendPirCommand(unsigned int idx, const char *value) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_GATE /* @TODO it could be removed and replaced by \                                                                             \
-                               switch */
+#ifdef CONFIG_HARDWARE_GATE /* @TODO it could be removed and replaced by \ \ \ \
+                               \ switch */
 void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
 }
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON /* @TODO it could be removed and replaced by \
-                                     \ switch */
+                                     \ \ \ \ switch */
 void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
 }

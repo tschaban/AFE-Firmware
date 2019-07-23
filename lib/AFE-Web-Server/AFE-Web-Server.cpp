@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Web-Server.h"
 
@@ -693,35 +691,30 @@ void AFEWebServer::publishHTML(String page) {
 
 #ifdef DEBUG
   Serial << endl << "Site streaming started";
-  Serial << endl << "RAM Free: " << system_get_free_heap_size();
 #endif
 
   server.send(200, "text/html", page);
-  return;
 
+/* Sending in chunks
   uint16_t pageSize = page.length();
   uint16_t size = 512;
   server.setContentLength(pageSize);
   if (pageSize > size) {
     Serial << page.substring(0, size);
-    delay(100);
     server.send(200, "text/html", page.substring(0, size));
-    delay(100);
     uint16_t transfered = size;
     uint16_t nextChunk;
     while (transfered < pageSize) {
       nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-      Serial << endl << endl << page.substring(transfered, nextChunk);
-      delay(100);
       server.sendContent(page.substring(transfered, nextChunk));
-      delay(100);
       transfered = nextChunk;
     }
   } else {
     server.send(200, "text/html", page);
   }
+  */
 #ifdef DEBUG
-  Serial << endl << "Site streaming completed";
+  Serial << endl << " - Completed";
 #endif
 }
 

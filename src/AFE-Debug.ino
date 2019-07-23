@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #if defined(DEBUG)
 
 #define DEBUG_INTERVAL 60

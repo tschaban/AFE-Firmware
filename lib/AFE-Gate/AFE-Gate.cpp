@@ -114,6 +114,14 @@ boolean AFEGate::event() {
   }
 }
 
+void AFEGate ::triggerEvent() {
+#ifdef DEBUG
+  Serial << endl << "Gate event triggered externally";
+#endif
+
+  _event = true;
+}
+
 const char *AFEGate::getMQTTCommandTopic() {
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);

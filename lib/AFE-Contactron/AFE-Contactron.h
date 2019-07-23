@@ -28,7 +28,7 @@ public:
   void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Method returns contactorn state */
-  byte get();
+  boolean get();
 
   /* Method returns MQTT topic for this contactron */
   const char *getMQTTCommandTopic();
@@ -47,14 +47,11 @@ protected:
 private:
   boolean _initialized = false;
   boolean state;            // It stores actual contactron state
-  byte _state;              // This contains contactron state to return
   boolean _changed = false; // True if contractor changed state
 
   unsigned long startTime = 0;
 
   AFELED ContactronLed;
-
-  void convert();
 
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];

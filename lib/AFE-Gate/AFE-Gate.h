@@ -47,6 +47,9 @@ public:
   /* Returns true if gate state has changed */
   boolean event();
 
+  /* It triggers event - used eg when contactron state is changed */
+  void triggerEvent();
+
   /* Get MQTT Topics */
   const char *getMQTTCommandTopic();
   const char *getMQTTStateTopic();

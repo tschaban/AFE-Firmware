@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_GATE_Structure_h
 #define _AFE_GATE_Structure_h
@@ -13,6 +11,10 @@
 
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-MQTT-Structure.h>
+
+struct GATES_CURRENT_STATE {
+  uint8_t state[CONFIG_HARDWARE_NUMBER_OF_GATES];
+};
 
 struct GATE_CONTACTRONS {
   uint8_t id[2];

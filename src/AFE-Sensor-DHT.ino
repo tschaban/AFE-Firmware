@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifdef CONFIG_HARDWARE_DHXX
 

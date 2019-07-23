@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 /* Initializing Switches */
 void initSwitch() {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
@@ -12,20 +14,46 @@ void mainSwitch() {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() &&
           Switch[i].getFunctionality() != SWITCH_FUNCTIONALITY_NONE &&
-          Switch[i].getControlledRelayID() > 0) {
+          Switch[i].getControlledRelayID() != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          Switch[i].getControlledRelayID() <= Device.configuration.noOfRelays) {
+
+#ifdef DEBUG
+        Serial << endl
+               << "Switch pressed with assigned Relay: "
+               << Switch[i].getControlledRelayID();
+#endif
+
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-        // @TODO HARDCODED
-        Gate[1].toggle();
+        /* The code here is only appilcable for a Switch that controlls a Gate
+         */
+        if (Relay[Switch[i].getControlledRelayID()].gateId !=
+            AFE_HARDWARE_ITEM_NOT_EXIST) {
+          if (Relay[Switch[i].getControlledRelayID()].gateId <=
+              Device.configuration.noOfGates) {
+
+#ifdef DEBUG
+            Serial << endl
+                   << "- Relay is assigned to a gate: "
+                   << Relay[Switch[i].getControlledRelayID()].gateId;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
-        Relay[Switch[i].getControlledRelayID() - 1].toggle();
-        MQTTPublishRelayState(Switch[i].getControlledRelayID() - 1);
-        DomoticzPublishRelayState(Switch[i].getControlledRelayID() - 1);
+            Gate[Relay[Switch[i].getControlledRelayID()].gateId].toggle();
+          }
+        } else {
+#endif
+
+          Relay[Switch[i].getControlledRelayID()].toggle();
+          MQTTPublishRelayState(Switch[i].getControlledRelayID());
+          DomoticzPublishRelayState(Switch[i].getControlledRelayID());
+
+#ifdef CONFIG_HARDWARE_GATE
+          /* The code here is only appilcable for a Switch that controlls a Gate
+           */
+        }
 #endif
 
 #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0

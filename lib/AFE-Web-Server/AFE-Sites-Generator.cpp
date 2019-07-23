@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #include "AFE-Sites-Generator.h"
 
 AFESitesGenerator::AFESitesGenerator() {}
@@ -896,28 +898,10 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += L_SELECT_LED_4_RELAY;
     body += "</p>";
 
-    body += "<div class=\"cf\"><label>LED</label><select name=\"l\"><option "
-            "value=\"";
-    body += AFE_HARDWARE_ITEM_NOT_EXIST;
-    body += "\"";
-    body += configuration.ledID == AFE_HARDWARE_ITEM_NOT_EXIST
-                ? " selected=\"selected\""
-                : "";
-    body += ">";
-    body += L_NONE;
-    body += "</option>";
+    body += generateHardwareList(Device->configuration.noOfLEDs,
+                                 configuration.ledID, "l", "LED", 0,
+                                 AFE_HARDWARE_ITEM_NOT_EXIST);
 
-    for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-      body += "<option value=\"";
-      body += i;
-      body += "\"";
-      body += configuration.ledID == i ? " selected=\"selected\"" : "";
-      body += ">";
-      body += i + 1;
-      body += "</option>";
-    }
-
-    body += "</select></div>";
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
@@ -1007,6 +991,10 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
   configuration = Data.getSwitchConfiguration(id);
 
+#ifdef CONFIG_HARDWARE_GATE
+  GATE gateConfiguration;
+#endif
+
   String body = "<fieldset>";
   body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO("g", configuration.gpio);
@@ -1030,7 +1018,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L_SYSTEM_BUTTON;
   body += "</option>";
 
-#ifdef CONFIG_HARDWARE_RELAY
+#if defined(CONFIG_HARDWARE_RELAY) || defined(CONFIG_HARDWARE_GATE)
   body += "<option value=\"";
   body += SWITCH_FUNCTIONALITY_RELAY;
   body += "\"";
@@ -1041,21 +1029,52 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   body += L_CONTROL_RELAY;
   body += "</option></select></div><div class=\"cf\"><label>";
   body += L_RELAY_CONTROLLED_BY_SWITCH;
-  body += "</label><select  name=\"r\"><option value=\"0\"";
-  body += configuration.relayID == 0 ? " selected=\"selected\"" : "";
+  body += "</label><select name=\"r\"><option value=\"";
+  body += AFE_HARDWARE_ITEM_NOT_EXIST;
+  body += "\"";
+  body += configuration.relayID == AFE_HARDWARE_ITEM_NOT_EXIST
+              ? " selected=\"selected\""
+              : "";
+  body += ">";
   body += L_NONE;
   body += "</option>";
 
-  for (uint8_t i = 1; i <= Device->configuration.noOfRelays; i++) {
+#ifdef CONFIG_HARDWARE_GATE
+  uint8_t relayIsForGate;
+#endif
+
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
     body += "<option value=\"";
     body += i;
     body += "\"";
     body += configuration.relayID == i ? " selected=\"selected\"" : "";
     body += ">";
-    body += i;
+    relayIsForGate = false;
+#ifdef CONFIG_HARDWARE_GATE
+    for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
+      gateConfiguration = Data.getGateConfiguration(j);
+      if (i == gateConfiguration.relayId) {
+        body += L_GATE;
+        body += ": ";
+        body += gateConfiguration.name;
+        relayIsForGate = true;
+        break;
+      }
+    }
+    if (!relayIsForGate) {
+      body += L_RELAY;
+      body += ": ";
+      body += i + 1;
+    }
+#else
+    body += L_RELAY;
+    body += ": ";
+    body += i + 1;
+#endif
     body += "</option>";
   }
   body += "</select></div>";
+
 #endif
 
   body += "<div class=\"cf\"><label>";
@@ -1545,8 +1564,8 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    page += addConfigurationBlock(L_CONTACTRON_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY,
+                                  body);
   }
 
   body += "</fieldset>";
@@ -1608,8 +1627,8 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     if (numberOfContractons > 0) {
 
       for (uint8_t i = 0; i < numberOfContractons; i++) {
-        contactronConfiguration[i] = Data.getContactronConfiguration(
-            gateConfiguration.contactron.id[i] - 1);
+        contactronConfiguration[i] =
+            Data.getContactronConfiguration(gateConfiguration.contactron.id[i]);
       }
 
       body = "<fieldset>";
@@ -1715,8 +1734,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     body +=
         addItem("text", "t", L_MQTT_TOPIC, gateConfiguration.mqtt.topic, "64");
     body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    page += addConfigurationBlock(L_GATE_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
 
   page += "</fieldset>";
@@ -2214,18 +2232,6 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
   body += "\" /></div></form>";
 
   String page = addConfigurationBlock(L_LAUNCH_CONFIGURATION_PANEL, "", body);
-  /*
-    body = "<p class=\"cm\">Oprogramowanie dostępne jest za darmo. Jeśli
-    spełnia " "Twoje oczekiwania to postaw <a "
-           "href=\"https://www.smartnydom.pl/o-stronie/\" target=\"_blank\"
-    " "style=\"color:#00e\">autorowi</a> browarka ;)</p><a "
-           "href=\"https://pl.donate.afe-firmware.smartnydom.pl\" "
-           "target=\"_blank\"><img "
-           "src=\"http://adrian.czabanowski.com/afe/donation/T2/1.4.0/1rTA706u/"
-           "\" border=\"0\" alt=\"PayPal\"></a>";
-
-    page += addConfigurationBlock("Wsparcie", "", body);
-  */
   return page;
 }
 

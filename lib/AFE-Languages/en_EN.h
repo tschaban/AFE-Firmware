@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #ifndef _LANG_EN_h
 #define _LANG_EN_h
 
@@ -168,7 +170,7 @@
 #ifdef CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Controlling only the gate"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Select relay controlled by this switch"
+#define L_RELAY_CONTROLLED_BY_SWITCH "Controlling"
 #define L_TYPE "Type"
 #define L_MONOSTABLE "Monostable"
 #define L_BISTABLE "Bistable"
@@ -244,6 +246,7 @@
 #define L_MAGNETIC_SENSOR "Magnetic's sensor"
 #define L_MAGNETIC_SENSORS "Magnetic's sensors"
 #define L_NUMBER_OF_MAGNETIC_SENSORS "Number of magnetic's sensors"
+#define L_CONTACTRON_MQTT_TOPIC "MQTT Topic to monitor the contactron"
 
 #endif
 
@@ -265,6 +268,7 @@
 #define L_GATE_CONFIGURATION "Gate/Door configuration"
 #define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
 #define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
+#define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
 #endif
 
 #endif

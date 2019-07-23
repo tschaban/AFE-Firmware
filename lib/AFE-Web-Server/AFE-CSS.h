@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #ifndef _AFE_CSS_h
 #define _AFE_CSS_h
 

@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #if defined(T3_CONFIG)
 /* Method initialize PIR Sensor */
 void initPIR() {

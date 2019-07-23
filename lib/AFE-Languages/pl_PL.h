@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #ifndef _LANG_PL_h
 #define _LANG_PL_h
 
@@ -176,7 +178,7 @@
 #ifdef CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Tylko sterowanie bramą"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Przekaźnik sterowany tym przyciskiem"
+#define L_RELAY_CONTROLLED_BY_SWITCH "Sterowanie"
 #define L_TYPE "Typ"
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
@@ -254,6 +256,7 @@
 #define L_MAGNETIC_SENSOR "Czujnik magnetyczny"
 #define L_MAGNETIC_SENSORS "Czujniki magnetyczne"
 #define L_NUMBER_OF_MAGNETIC_SENSORS "Ilość czujników magnetycznych"
+#define L_CONTACTRON_MQTT_TOPIC "Temat MQTT do monitorowania kontaktronu"
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
@@ -273,6 +276,7 @@
 #define L_GATE_CONFIGURATION "Konfiguracja bramy/drzwi"
 #define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
 #define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
+#define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
 #endif
 
 #endif

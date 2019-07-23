@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #ifdef CONFIG_HARDWARE_BMX80
 
 void mainBMx80Sensor() {

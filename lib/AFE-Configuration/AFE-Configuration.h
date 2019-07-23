@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
@@ -77,6 +75,9 @@
 #elif defined(DEVICE_SHELLY_1)
 #define AFE_DEVICE_TYPE_NAME "Shelly-1"
 #define AFE_DEVICE_TYPE_ID 20
+#elif defined(DEVICE_iECSv20)
+#define AFE_DEVICE_TYPE_NAME "iECS Gate Controller v2.0"
+#define AFE_DEVICE_TYPE_ID 21
 #else
 #define AFE_DEVICE_TYPE_NAME "ESP Generic"
 #define AFE_DEVICE_TYPE_ID 0
@@ -167,7 +168,7 @@
 #define CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Gate */
 #elif defined(T5_CONFIG)
-#define FIRMWARE_VERSION "2.0.0.B1"
+#define FIRMWARE_VERSION "2.0.0.B2"
 #define FIRMWARE_TYPE 5
 
 /* Functionalities */
@@ -185,18 +186,34 @@
 #define CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
 
 /* Max number of hardware items per specyfic hardware device */
+#if defined(DEVICE_iECSv20)
+#define CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
+#define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 2
+#define CONFIG_HARDWARE_NUMBER_OF_LEDS 1
+#define CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 3
+#define CONFIG_HARDWARE_NUMBER_OF_GATES 2
+#else
 #define CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
 #define CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define CONFIG_HARDWARE_NUMBER_OF_LEDS 3
 #define CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 4
 #define CONFIG_HARDWARE_NUMBER_OF_GATES 2
+#endif
 
 /* Default values for hardware items per specyfic hardware device */
+#if defined(DEVICE_iECSv20)
 #define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 1
-#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 0
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
 #define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
 #define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 1
 #define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 1
+#else
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 0
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 0
+#define CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 0
+#endif
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)

@@ -10,37 +10,35 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
   Device = _Device;
   configuration = Data->getContactronConfiguration(id);
   pinMode(configuration.gpio, INPUT_PULLUP);
-  state = digitalRead(configuration.gpio);
-  state = state;
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     ContactronLed.begin(configuration.ledID);
   }
-
   _initialized = true;
-  convert();
 }
 
-void AFEContactron::convert() {
+boolean AFEContactron::get() {
+  boolean currentState = digitalRead(configuration.gpio);
+  boolean _return;
   if (configuration.type == CONTACTRON_NO) {
-    if (state) {
+    if (currentState) {
       ContactronLed.on();
-      _state = CONTACTRON_OPEN;
+      _return = CONTACTRON_OPEN;
     } else {
       ContactronLed.off();
-      _state = CONTACTRON_CLOSED;
+      _return = CONTACTRON_CLOSED;
     }
   } else {
-    if (state) {
+    if (currentState) {
       ContactronLed.off();
-      _state = CONTACTRON_CLOSED;
+      _return = CONTACTRON_CLOSED;
     } else {
       ContactronLed.on();
-      _state = CONTACTRON_OPEN;
+      _return = CONTACTRON_OPEN;
     }
   }
-}
 
-byte AFEContactron::get() { return _state; }
+  return _return;
+}
 
 boolean AFEContactron::changed() {
   if (_changed) {
@@ -64,7 +62,6 @@ void AFEContactron::listener() {
 
       if (time - startTime >= configuration.bouncing) {
         state = currentState;
-        convert();
         _changed = true;
       }
 

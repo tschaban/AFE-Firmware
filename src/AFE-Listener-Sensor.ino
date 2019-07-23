@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
 
 /* Initializing sensor */

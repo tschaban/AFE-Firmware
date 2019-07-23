@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #ifdef CONFIG_HARDWARE_BH1750
 
 /* Main code for processing sesnor */

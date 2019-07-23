@@ -81,9 +81,10 @@ AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 
 #ifdef CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
-GATE_STATES GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
+// GATE_STATES GateState[CONFIG_HARDWARE_NUMBER_OF_GATES];
 AFEGate Gate[CONFIG_HARDWARE_NUMBER_OF_GATES];
-uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
+GATES_CURRENT_STATE GatesCurrentStates;
+
 #endif
 
 #ifdef CONFIG_HARDWARE_CONTACTRON
@@ -274,12 +275,16 @@ void setup() {
 
   if (Device.getMode() == MODE_NORMAL) {
 
+/* Initializing Contactrons */
+#ifdef CONFIG_HARDWARE_CONTACTRON
+    initializeContractons();
+#endif
+
 /* Initializing Gate */
 #ifdef CONFIG_HARDWARE_GATE
     for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
       Gate[i].begin(i, &Device, &Data);
-      GateState[i] = Gate[i].configuration.states;
-
+      GatesCurrentStates.state[i] = GATE_UNKNOWN;
       /* Assigning Gate ID to a relay */
       if (Gate[i].configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
           Device.configuration.noOfRelays >= Gate[i].configuration.relayId) {
@@ -305,11 +310,6 @@ void setup() {
       Serial << endl << "Gate: " << i << " initialized";
 #endif
     }
-#endif
-
-/* Initializing Contactrons */
-#ifdef CONFIG_HARDWARE_CONTACTRON
-    initializeContractons();
 #endif
 
     /* Initializing DS18B20 or DHTxx sensor */

@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 void eventsListener() {
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
@@ -15,7 +16,7 @@ void eventsListener() {
 #endif
 
 #ifdef CONFIG_HARDWARE_GATE
-      for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+      for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         DomoticzPublishGateState(i);
       }
 #endif
@@ -79,7 +80,7 @@ void eventsListener() {
 
 /* Publishing mesages after connection to MQTT Broker has been established */
 #ifdef CONFIG_HARDWARE_GATE
-      for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+      for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         MQTTPublishGateState(i);
       }
 #endif
