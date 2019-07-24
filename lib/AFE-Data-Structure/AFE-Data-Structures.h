@@ -25,8 +25,11 @@
 #include <AFE-LED-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #include <AFE-CONTACTRON-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-GATE-Structure.h>
 #endif
 
@@ -34,7 +37,7 @@
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG)
 #include <AFE-DHT-Sensor-Structure.h>
 #endif
 

@@ -23,7 +23,7 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Firmware.h>
+#include <AFE-Firmware-Pro.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
@@ -60,7 +60,7 @@ float humidity;
 #endif
 
 AFEDataAccess Data;
-AFEFirmware Firmware;
+AFEFirmwarePro Firmware;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
@@ -181,7 +181,7 @@ void setup() {
 #ifdef DEBUG
     Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
 #endif
-    AFEUpgrader *Upgrader = new AFEUpgrader();
+    AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG

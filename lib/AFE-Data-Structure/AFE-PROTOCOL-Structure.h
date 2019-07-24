@@ -9,7 +9,4 @@
 #include "WProgram.h"
 #endif
 
-#define PROTOCOL_HTTP 0;
-#define PROTOCOL_HTTPS 0;
-
 #endif

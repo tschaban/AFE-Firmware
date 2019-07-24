@@ -6,8 +6,14 @@
 #define L_LANGUAGE "en-EN"
 #define L_LANGUAGE_SHORT "en"
 
-/* Firmware names */
+/* Upgrades */
+#define L_UPGRADED_TO_NEW_VERSION                                              \
+  "Firmware has been upgraded to a newer version"
+#define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
+  "Firmware has been upgraded to a new type. Device reconfiguration is "       \
+  "required."
 
+/* Firmware names */
 #if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "for Shelly-1"
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -264,6 +270,7 @@
 #define L_SET_GATE_STATE "Set gate's state to"
 #define L_OPENED "Opened"
 #define L_CLOSED "Closed"
+#define L_UNKNOWN_STATE "Unknown state"
 #define L_PARTIALLY_OPENED "Partially opened"
 #define L_GATE_CONFIGURATION "Gate/Door configuration"
 #define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"

@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
 
@@ -12,6 +10,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -19,13 +18,14 @@ class AFEUpgrader {
 
 private:
   FIRMWARE FirmwareConfiguration;
-  AFEDataAccess Data;
-  /* Method erase eeprom but restores WiFi and Language configuration */
-  void upgradeTypeOfFirmware();
+  AFEDataAccess *Data;
+  AFEDevice *Device;
+  void upgradeFirmwarType();
+  void updateFirmwareVersion();
 
 public:
   /* Constructor */
-  AFEUpgrader();
+  AFEUpgrader(AFEDataAccess *, AFEDevice *);
 
   /* Checks if firmware has been upgraded */
   boolean upgraded();

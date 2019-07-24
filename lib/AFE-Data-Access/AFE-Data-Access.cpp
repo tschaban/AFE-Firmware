@@ -2341,10 +2341,10 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.gpio = 0;
   SwitchConfiguration.type = AFE_SWITCH_TYPE_MONO;
   SwitchConfiguration.functionality = AFE_SWITCH_FUNCTIONALITY_MULTI;
-  SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
   saveConfiguration(0, SwitchConfiguration);
   SwitchConfiguration.gpio = 1;
   SwitchConfiguration.functionality = AFE_SWITCH_FUNCTIONALITY_NONE;
+  SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
   saveConfiguration(1, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #endif
@@ -2767,10 +2767,10 @@ void AFEDataAccess::createContractonConfigurationFile() {
   sprintf(ContactronConfiguration.name, "C1");
   saveConfiguration(0, ContactronConfiguration);
   ContactronConfiguration.gpio = 13;
-  printf(ContactronConfiguration.name, "C2");
+  sprintf(ContactronConfiguration.name, "C2");
   saveConfiguration(1, ContactronConfiguration);
   ContactronConfiguration.gpio = 3;
-  printf(ContactronConfiguration.name, "C3");
+  sprintf(ContactronConfiguration.name, "C3");
   saveConfiguration(2, ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
 #endif

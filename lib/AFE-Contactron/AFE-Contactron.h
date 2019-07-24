@@ -10,6 +10,7 @@
 #endif
 
 #include <AFE-CONTACTRON-Structure.h>
+#include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-LED.h>
 //#include <Streaming.h>
@@ -20,11 +21,12 @@ public:
   CONTACTRON configuration;
 
   // ID of the GATE the contactron is assigned to. 255 None.
-  uint8_t gateId = 255;
+  uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 
   /* Constructors */
   AFEContactron();
 
+  /* Initialize. Must be run per each Gate object */
   void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Method returns contactorn state */
@@ -45,6 +47,9 @@ public:
 
 protected:
 private:
+  AFEDevice *Device;
+  AFEDataAccess *Data;
+
   boolean _initialized = false;
   boolean state;            // It stores actual contactron state
   boolean _changed = false; // True if contractor changed state
@@ -55,9 +60,6 @@ private:
 
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-
-  AFEDevice *Device;
-  AFEDataAccess *Data;
 };
 
 #endif

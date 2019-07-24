@@ -9,8 +9,6 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Configuration.h>
-
 struct MQTT_BASIC_CONFIG {
   char topic[65];
 };

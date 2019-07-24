@@ -21,7 +21,7 @@
 #include <Streaming.h>
 #endif
 
-class AFEFirmware {
+class AFEFirmwarePro {
 
 private:
   AFEDataAccess Data;
@@ -32,7 +32,7 @@ public:
   PRO_VERSION Pro;
 
   /* Constructor */
-  AFEFirmware();
+  AFEFirmwarePro();
 
   void begin();
 

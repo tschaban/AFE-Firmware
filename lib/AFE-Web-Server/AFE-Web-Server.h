@@ -11,7 +11,7 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Firmware.h>
+#include <AFE-Firmware-Pro.h>
 #include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
@@ -36,7 +36,7 @@ class AFEWebServer {
 private:
   ESP8266WebServer server;
   AFEDevice *Device;
-  AFEFirmware *Firmware;
+  AFEFirmwarePro *Firmware;
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -57,6 +57,7 @@ private:
   uint8_t getSiteID();
   uint8_t getID();
 
+  /* Generates HTML response (site) */
   String generateSite(AFE_SITE_PARAMETERS *siteConfig);
 
   /* Methods get POST data (for saveing) */
@@ -122,7 +123,7 @@ public:
   void publishHTML(String page);
 
   /* Method initialize WebServer and Updater server */
-  void begin(AFEDevice *, AFEFirmware *);
+  void begin(AFEDevice *, AFEFirmwarePro *);
 
   /* Method listens for HTTP requests */
   void listener();

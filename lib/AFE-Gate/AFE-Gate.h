@@ -9,6 +9,7 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -61,16 +62,16 @@ private:
   AFEDevice *Device;
   AFEDataAccess *Data;
 
-  uint8_t gateId; // ID of the gate
-  uint8_t numberOfContractons = 0;
+  uint8_t gateId;                  // ID of the gate
+  uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
   boolean _event = false;
   AFERelay GateRelay;
 
-  /* Returns gate state based on contactron state */
-  uint8_t getGateStateBasedOnContractons();
-
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+
+  /* Returns gate state based on contactron state */
+  uint8_t getGateStateBasedOnContractons();
 };
 
 #endif

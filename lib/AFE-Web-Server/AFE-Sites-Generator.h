@@ -12,8 +12,7 @@
 #include <AFE-CSS.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-EEPROM.h>
-#include <AFE-Firmware.h>
+#include <AFE-Firmware-Pro.h>
 #include <ESP8266WiFi.h>
 
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -41,11 +40,10 @@
 class AFESitesGenerator {
 
 private:
-  AFEEEPROM Eeprom;
   AFEDataAccess Data;
   AFEDevice *Device;
   FIRMWARE firmware;
-  AFEFirmware *Firmware;
+  AFEFirmwarePro *Firmware;
   char deviceID[17];
 
   const String generateHeader(uint8_t redirect);
@@ -67,6 +65,7 @@ private:
                                     const char *field, const char *label,
                                     uint8_t index, uint8_t noneValue);
 
+  /* It uses generateHardwareItemsList() */
   const String generateHardwareItemsList(uint8_t noOfItems,
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
@@ -93,7 +92,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDevice *, AFEFirmware *);
+  void begin(AFEDevice *, AFEFirmwarePro *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
@@ -113,6 +112,7 @@ public:
   String addPasswordConfigurationSite();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+  String addProVersionSite();
 
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   String addLEDConfiguration(uint8_t id);
@@ -181,8 +181,6 @@ public:
 
   /* Method generates section shown when device is in norma mode */
   String addIndexSection(boolean authorized);
-
-  String addProVersionSite();
 };
 
 #endif

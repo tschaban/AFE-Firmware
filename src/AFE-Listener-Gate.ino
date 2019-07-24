@@ -9,7 +9,7 @@ void initializeGate() {
     GatesCurrentStates.state[i] = AFE_GATE_UNKNOWN;
     /* Assigning Gate ID to a relay */
     if (Gate[i].configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        Device.configuration.noOfRelays >= Gate[i].configuration.relayId) {
+        Device.configuration.noOfRelays >= Gate[i].configuration.relayId + 1) {
       Relay[Gate[i].configuration.relayId].gateId = i;
 #ifdef DEBUG
       Serial << endl

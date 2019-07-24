@@ -4,7 +4,7 @@
 
 AFEWebServer::AFEWebServer() {}
 
-void AFEWebServer::begin(AFEDevice *_Device, AFEFirmware *_Firmware) {
+void AFEWebServer::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   // httpUpdater.setup(&server);
   server.begin();
   Device = _Device;
@@ -492,7 +492,7 @@ void AFEWebServer::generate(boolean upload) {
       }
     }
     publishHTML(ConfigurationPanel.getIndexSite(authorize));
-    AFEFirmware Firmware;
+    AFEFirmwarePro Firmware;
     Firmware.begin();
     Firmware.callService(AFE_WEBSERVICE_VALIDATE_KEY);
 

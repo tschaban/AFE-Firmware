@@ -15,7 +15,8 @@ void processSwitchEvents() {
       if (Switch[i].isPressed() &&
           Switch[i].getFunctionality() != AFE_SWITCH_FUNCTIONALITY_NONE &&
           Switch[i].getControlledRelayID() != AFE_HARDWARE_ITEM_NOT_EXIST &&
-          Switch[i].getControlledRelayID() <= Device.configuration.noOfRelays) {
+          Switch[i].getControlledRelayID() + 1 <=
+              Device.configuration.noOfRelays) {
 
 #ifdef DEBUG
         Serial << endl

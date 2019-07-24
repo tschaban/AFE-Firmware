@@ -11,8 +11,6 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
-#include <ESP8266WiFi.h>
-#include <FS.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -24,6 +22,8 @@ private:
 
 public:
   AFEDefaults();
+
+  /* Set's the default values for a device, creates configuration files */
   void set();
 };
 #endif

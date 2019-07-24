@@ -9,10 +9,13 @@
 #include "WProgram.h"
 #endif
 
+/* Serial port speed */
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
-#define AFE_SERVER_CMD_SAVE 1
-#define AFE_SERVER_CMD_NONE 0
+/* Upgrade types */
+#define AFE_UPGRADE_NONE 0
+#define AFE_UPGRADE_VERSION 1
+#define AFE_UPGRADE_VERSION_TYPE 2
 
 /* Device operating modes */
 #define AFE_MODE_NORMAL 0
@@ -32,6 +35,10 @@
 #define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
 #define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
 #define AFE_KEY_FREQUENCY_VALIDATION 1440
+
+/* Types of URL requests */
+#define AFE_SERVER_CMD_SAVE 1
+#define AFE_SERVER_CMD_NONE 0
 
 /* Switches, types */
 #define AFE_SWITCH_TYPE_MONO 0 // Mono stable switch
@@ -131,6 +138,7 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 0
 #define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
                                                     // to INPUT
+/* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 4
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 5
@@ -171,7 +179,7 @@
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Gate */
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.0.B2"
+#define AFE_FIRMWARE_VERSION "2.0.0.B3"
 #define AFE_FIRMWARE_TYPE 5
 
 /* Functionalities */
@@ -196,6 +204,7 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_GATES 2
 #else
+/* Generic version */
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 3
@@ -211,6 +220,7 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 1
 #else
+/* Generic version */
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
@@ -226,42 +236,37 @@
 #define AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
-
 #endif
 
-/* Configs related to functionalities */
+/* Configs related to a relay functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
-
 #ifndef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY
 #endif
-
 #endif
 
+/* Configs related to thermostat functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-
 #ifndef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #define AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #endif
-
 #endif
 
+/* Configs related to humidistat functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-
 #ifndef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #define AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #endif
-
 #endif
 
+/* Configs related to analog input functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_ADC
-/* Harware set up for ADC functionality */
 #ifndef AFE_CONFIG_HARDWARE_ADC_VCC
 #define AFE_CONFIG_HARDWARE_ADC_VCC
 #endif
-
 #endif
 
+/* Configs related to automatic relay switch off functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Below three enables Relay.autoTurnOff */
 #ifndef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
@@ -269,76 +274,64 @@
 #endif
 #endif
 
+/* Configs related to a gate functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_GATE
-/* Enabling hardware for Gate functionality: Gate and Contactron */
 #ifndef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
 #define AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
 #endif
-
 #ifndef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY
 #endif
-
 #ifndef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_HARDWARE_GATE
 #endif
-
 #ifndef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_HARDWARE_CONTACTRON
 #endif
-
 #endif
 
 /* Configs related to specyfic hardware */
 
+/* Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-/* Relay states */
 #define AFE_RELAY_ON 1
 #define AFE_RELAY_OFF 0
-
 #endif
 
+/* DS18B20 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-
 #ifndef AFE_CONFIG_TEMPERATURE
 #define AFE_CONFIG_TEMPERATURE
 #endif
-
 #endif
 
+/* DHxx sesnors like DHT21,DHT22 */
 #ifdef AFE_CONFIG_HARDWARE_DHXX
-
 #ifndef AFE_CONFIG_TEMPERATURE
 #define AFE_CONFIG_TEMPERATURE
 #endif
-
 #ifndef AFE_CONFIG_HUMIDITY
 #define AFE_CONFIG_HUMIDITY
 #endif
-
 #endif
 
+/* BMx80 Sensors */
 #ifdef AFE_CONFIG_HARDWARE_BMX80
 #ifndef AFE_CONFIG_TEMPERATURE
 #define AFE_CONFIG_TEMPERATURE
 #endif
-
 #ifndef AFE_CONFIG_HUMIDITY
 #define AFE_CONFIG_HUMIDITY
 #endif
-
 #ifndef AFE_CONFIG_PRESSURE
 #define AFE_CONFIG_PRESSURE
 #endif
-
 #ifndef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C
 #endif
-
 #ifndef AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #define AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #endif
-
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -379,26 +372,31 @@
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 /* Gate's states */
-#define AFE_GATE_OPEN 0       // Open
-#define AFE_GATE_CLOSED 1     // Closed
+#define AFE_GATE_OPEN 0           // Open
+#define AFE_GATE_CLOSED 1         // Closed
 #define AFE_GATE_PARTIALLY_OPEN 2 // Being opened
 #define AFE_GATE_UNKNOWN 9        // Unknown state
+
+/* Gate MQTT messages */
+#define AFE_MQTT_GATE_OPEN "open"
+#define AFE_MQTT_GATE_CLOSED "closed"
+#define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
+#define AFE_MQTT_GATE_UNKNOWN "unknown"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-/* Contracton types */
+/* Contactron types */
 #define AFE_CONTACTRON_NO 0 // Normally open
 #define AFE_CONTACTRON_NC 1 // Normally closed
-
-/* Contracton states */
-#define AFE_CONTACTRON_OPEN 0 // Open
+/* Contactron states */
+#define AFE_CONTACTRON_OPEN 0   // Open
 #define AFE_CONTACTRON_CLOSED 1 // Closed
-
-/* Contracton defaults */
-#define AFE_DEFAULT_CONTACTRON_BOUNCING 200
+/* Contactron defaults */
 #define AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING 200
 #define AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE AFE_CONTACTRON_NO
-
+/* Contactron MQTT messages */
+#define AFE_MQTT_CONTACTRON_OPEN "open"
+#define AFE_MQTT_CONTACTRON_CLOSED "closed"
 #endif
 
 /* Config sites IDs */
@@ -413,19 +411,15 @@
 #define AFE_CONFIG_SITE_SWITCH 8
 #define AFE_CONFIG_SITE_PASSWORD 9
 #define AFE_CONFIG_SITE_PRO_VERSION 10
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #define AFE_CONFIG_SITE_ANALOG_INPUT 11
 #endif
-
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_SITE_CONTACTRON 12
 #endif
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_SITE_GATE 13
 #endif
-
 #define AFE_CONFIG_SITE_EXIT 14
 #define AFE_CONFIG_SITE_RESET 15
 #define AFE_CONFIG_SITE_POST_RESET 16

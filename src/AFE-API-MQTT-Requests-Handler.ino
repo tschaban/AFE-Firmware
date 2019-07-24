@@ -2,7 +2,8 @@
 
 /* Initializing MQTT */
 void MQTTInit() {
-  if (Device.getMode() != AFE_MODE_ACCESS_POINT && Device.configuration.api.mqtt) {
+  if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
+      Device.configuration.api.mqtt) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
 #ifdef DEBUG
@@ -203,6 +204,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
       }
     }
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
     for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
       if (strcmp(topic, Gate[i].getMQTTCommandTopic()) == 0) {
@@ -408,8 +410,9 @@ void MQTTPublishPIRState(uint8_t id) {
 void MQTTPublishContactronState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
     Mqtt.publishTopic(Contactron[id].getMQTTStateTopic(),
-                      Contactron[id].get() == AFE_CONTACTRON_OPEN ? "open"
-                                                              : "closed");
+                      Contactron[id].get() == AFE_CONTACTRON_OPEN
+                          ? AFE_MQTT_CONTACTRON_OPEN
+                          : AFE_MQTT_CONTACTRON_CLOSED);
   }
 }
 #endif
@@ -420,12 +423,12 @@ void MQTTPublishGateState(uint8_t id) {
     uint8_t gateState = Gate[id].get();
     Mqtt.publishTopic(Gate[id].getMQTTStateTopic(),
                       gateState == AFE_GATE_OPEN
-                          ? "open"
+                          ? AFE_MQTT_GATE_OPEN
                           : gateState == AFE_GATE_CLOSED
-                                ? "closed"
+                                ? AFE_MQTT_GATE_CLOSED
                                 : gateState == AFE_GATE_PARTIALLY_OPEN
-                                      ? "partiallyOpen"
-                                      : "unknown");
+                                      ? AFE_MQTT_GATE_PARTIALLY_OPEN
+                                      : AFE_MQTT_GATE_UNKNOWN);
   }
 }
 #endif

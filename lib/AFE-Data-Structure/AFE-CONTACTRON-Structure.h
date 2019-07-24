@@ -9,6 +9,7 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-MQTT-Structure.h>
 

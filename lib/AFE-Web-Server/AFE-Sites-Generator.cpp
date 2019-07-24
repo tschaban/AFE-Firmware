@@ -4,7 +4,7 @@
 
 AFESitesGenerator::AFESitesGenerator() {}
 
-void AFESitesGenerator::begin(AFEDevice *_Device, AFEFirmware *_Firmware) {
+void AFESitesGenerator::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   firmware = Data.getFirmwareConfiguration();
   Device = _Device;
   Firmware = _Firmware;
@@ -141,14 +141,16 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "</a></li>";
 
 /* Thermostat */
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) && defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) &&                                    \
+    defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
       if (Device->configuration.isDS18B20) {
         page += addThermostateMenuItem();
       }
 #endif
 
 /* Humidistat */
-#if defined(AFE_CONFIG_HARDWARE_DHXX) && defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
+#if defined(AFE_CONFIG_HARDWARE_DHXX) &&                                       \
+    defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
       if (Device->configuration.isDHT) {
         page += addThermostateMenuItem();
         page += addHumidistatMenuItem();
@@ -314,15 +316,30 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 String AFESitesGenerator::addDeviceConfiguration() {
   DEVICE configuration = Device->configuration;
+  String page = "";
+
+  if (Device->upgraded != AFE_UPGRADE_NONE) {
+    page += "<h4 class=\"bc\" style=\"padding:5px;\">";
+    switch (Device->upgraded) {
+    case AFE_UPGRADE_VERSION:
+      page += L_UPGRADED_TO_NEW_VERSION;
+      break;
+    case AFE_UPGRADE_VERSION_TYPE:
+      page += L_UPGRADED_TO_NEW_VERSION_TYPE;
+      break;
+    }
+    page += "</h4>";
+    Device->upgraded = AFE_UPGRADE_NONE;
+  }
 
   String body = "<fieldset>";
   body += addItem("text", "n", L_DEVICE_NAME, configuration.name, "16");
   body += "</fieldset>";
-  String page = addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
+  page += addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
   body = "<fieldset>";
 
 /* LED */
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
     AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
@@ -684,7 +701,7 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
     AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
@@ -742,8 +759,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   body += generateConfigParameter_GPIO("g", configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  /* Below code is conditioned for the Gate functionality only. It's not shown
-   * if the relay is assigned to the Gate */
+  /* Below code is conditioned for the Gate functionality only. It's not
+   * shown if the relay is assigned to the Gate */
   if (!isGateRelay) {
 #endif
 
@@ -827,8 +844,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  /* Below code is conditioned for the Gate functionality only. It's not shown
-   * if the relay is assigned to the Gate */
+  /* Below code is conditioned for the Gate functionality only. It's not
+   * shown if the relay is assigned to the Gate */
   if (!isGateRelay) {
 #endif
     body += "<br><p class=\"cm\">";
@@ -886,12 +903,12 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  /* Excluded code below for Gate functionality and the relay assigned to the
-   * gate */
+  /* Excluded code below for Gate functionality and the relay assigned to
+   * the gate */
   if (!isGateRelay) {
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
     AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
     body += "<br><p class=\"cm\">";
@@ -917,8 +934,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   String page = addConfigurationBlock(title, "", body);
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  /* Excluded code below for Gate functionality and the relay assigned to the
-   * gate */
+  /* Excluded code below for Gate functionality and the relay assigned to
+   * the gate */
   if (!isGateRelay) {
 #endif
 
@@ -1744,34 +1761,33 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
 
 const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
 
-  String body = "<div class=\"cf\">";
-  body += "<label>";
+  String body = "<div class=\"cf\"><label>";
   body += L_SET_GATE_STATE;
-  body += "</label>";
-  body += "<select name=\"s" + String(id) + "\">";
-  body += "<option value=\"";
+  body += "</label><select name=\"s" + String(id) + "\"><option value=\"";
   body += AFE_GATE_OPEN;
   body += "\"";
   body += (state == AFE_GATE_OPEN ? " selected=\"selected\"" : "");
   body += ">";
   body += L_OPENED;
-  body += "</option>";
-  body += "<option value=\"";
+  body += "</option><option value=\"";
   body += AFE_GATE_PARTIALLY_OPEN;
   body += "\"";
   body += (state == AFE_GATE_PARTIALLY_OPEN ? " selected=\"selected\"" : "");
   body += ">";
   body += L_PARTIALLY_OPENED;
-  body += "</option>";
-  body += "<option value=\"";
+  body += "</option><option value=\"";
   body += AFE_GATE_CLOSED;
   body += "\"";
   body += (state == AFE_GATE_CLOSED ? " selected=\"selected\"" : "");
   body += ">";
   body += L_CLOSED;
-  body += "</option>";
-  body += "</select>";
-  body += "</div>";
+  body += "</option><option value=\"";
+  body += AFE_GATE_UNKNOWN;
+  body += "\"";
+  body += (state == AFE_GATE_UNKNOWN ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_UNKNOWN_STATE;
+  body += "</option></select></div>";
 
   return body;
 }
@@ -2344,8 +2360,8 @@ const String AFESitesGenerator::generateHardwareList(
   body += ">";
   body += L_NONE;
   body += "</option>";
-  /* @TODO not a nice code with this index. It can't be different than 0 or 1.
-   * So far only 0,1 are planned */
+  /* @TODO not a nice code with this index. It can't be different than 0
+   * or 1. So far only 0,1 are planned */
   for (uint8_t i = index; i < noOfItems + index; i++) {
     body += "<option value=\"";
     body += i;

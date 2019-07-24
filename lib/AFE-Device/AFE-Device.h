@@ -28,6 +28,10 @@ private:
 public:
   DEVICE configuration;
 
+  /* This param is set by Upgrade class, if the frmware has been upgraded. It's
+   * used to show a message in the config panel */
+  uint8_t upgraded = AFE_UPGRADE_NONE;
+
   AFEDevice();
 
   /* Method reads device configuration data. It used in config panel */

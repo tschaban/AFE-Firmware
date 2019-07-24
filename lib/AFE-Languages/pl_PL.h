@@ -27,6 +27,13 @@
 #define L_FIRMWARE_NAME "Stacja Pogody"
 #endif
 
+/* Upgrades */
+#define L_UPGRADED_TO_NEW_VERSION                                              \
+  "Została zainstalowana nowa wersja AFE Firmware"
+#define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
+  "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna "        \
+  "konfiguracja urządzenia."
+
 /* Menu */
 #define L_DEVICE "Urządzenie"
 #define L_NETWORK "Sieć WiFi"
@@ -273,6 +280,7 @@
 #define L_OPENED "Otwarta"
 #define L_CLOSED "Zamknięta"
 #define L_PARTIALLY_OPENED "Częściowo otwarta"
+#define L_UNKNOWN_STATE "Nieznany stan"
 #define L_GATE_CONFIGURATION "Konfiguracja bramy/drzwi"
 #define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
 #define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
