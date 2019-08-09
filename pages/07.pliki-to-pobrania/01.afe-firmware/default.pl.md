@@ -1,5 +1,7 @@
 ---
 title: 'AFE Firmware'
+recaptchacontact:
+    enabled: false
 ---
 
 ### AFE Firmware T0: Włącznik WiFi
@@ -12,6 +14,17 @@ title: 'AFE Firmware'
 **Poprzednie wersje**
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t0-esp8266-1mb/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t0-esp8285-1mb/?target=_blank)
 
+---
+
+### AFE Firmware T5: Sterowanie kontrolerem bramy/drzwi/furtki
+* Sterowanie max dwoma bramami, furtkami oraz monitorowanie stanu otwarcia bramy z wykorzystaniem czujników magnetycznych
+* Idealnie pasuje do urządzeń jak [Sterowniki Furtki iECS](https://www.smartnydom.pl/sterownik-bramy-wersja-v2/)
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi) dotyczące AFE Firmware T5
+* Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
+
+##### [Pobierz najnowszą wersję 2.0.0 Beta4](https://www.smartnydom.pl/download/afe-firmware-t5-2-0-0-beta-4/?target=_blank)
+**Poprzednie wersje**
+* Wersja Stabilna 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
+
 ! Jeśli znajdziesz jakiś błąd / problem z oprogramowaniem, zgłoś go [tutaj](https://www.smartnydom.pl/forum/zglaszanie-problemow/?target=_blank). Bez tego ciężko będzie zrobić firmware lepszym. Dzięki.
 
----

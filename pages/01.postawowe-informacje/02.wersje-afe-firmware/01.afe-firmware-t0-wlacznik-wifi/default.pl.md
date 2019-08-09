@@ -1,6 +1,12 @@
 ---
 title: 'T0 - włącznik WiFi'
+recaptchacontact:
+    enabled: false
 ---
+
+Firmware umożliwia
+
+* sterowanie bezprzewodowo do czterech urządzeń / układów elektrycznych
 
 **Sprzęt:**
 * ESP8286/8285
