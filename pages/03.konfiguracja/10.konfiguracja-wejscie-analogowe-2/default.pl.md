@@ -1,11 +1,11 @@
 ---
 title: 'Konfiguracja funkcji brama'
-media_order: 'afe-firmware-konfiguracja-adc.png,afe-firmware-konfiguracja-adc-domoticz.png,afe-firmware-konfiguracja-adc-dzielnik.png,afe-firmware-konfiguracja-adc-mqtt.png,afe-firmware-konfiguracja-adc-wejscie.png'
 recaptchacontact:
     enabled: false
 ---
 
 Funkcja bramy/drzwi dostępna jest w [AFE Firmware T5](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi).
 
-Poniżej przedstwiony jest przykład konfiguracji bram, która dodatkow posiada dwa czujniki magnetyczne, które monitoruja stan otwarcia/zamknięcia bramy.
+Poniżej przedstwiony jest przykład konfiguracji bramy, która posiada dwa czujniki magnetyczne, które monitorują stan otwarcia/zamknięcia bramy.
 
+Po zainstalowaniu [AFE Firmware T5](/pliki-to-pobrania/afe-firmware) oraz [skonfigurowaniu połączenia do routera WiFi](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie) uruchamiamy Panel Konfiguracyjny AFE Firmware
