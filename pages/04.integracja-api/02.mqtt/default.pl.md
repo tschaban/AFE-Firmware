@@ -1,5 +1,10 @@
 ---
 title: MQTT
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Urządzeniem można sterować wiadomościami MQTT. Jest to zalecana przeze mnie metoda sterowaniem urządzeniem z AFE Firmware.
@@ -13,6 +18,15 @@ Do prawidłowego działania MQTT API konieczne jest [skonfigurowanie połaczenie
 ---
 
 #### Tematy oraz wiadomości MQTT
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 5,1) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
 
 ##### Temat LWT (Last Will and Testament)
 
