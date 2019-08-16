@@ -5,7 +5,7 @@ recaptchacontact:
     subject: 'Wiadomość ze strony AFE-Firmware'
 ---
 
-**Uwaga** ze względu na ograniczone moce przerobowe :-) 
+**Uwaga** ze względu na ograniczone moce przerobowe i aby uzyskać szybką odpowiedź 
 
 * Jeśli masz pytanie dotyczące AFE Firmware,[ zadaj je tutaj](https://www.smartnydom.pl/forum/firmware-do-przelacznika-sonoff/?target=_blank)
 * Jeśli masz problem z AFE Firmware, [zgłoś go tutaj](https://www.smartnydom.pl/forum/zglaszanie-problemow/?target=_blank)
