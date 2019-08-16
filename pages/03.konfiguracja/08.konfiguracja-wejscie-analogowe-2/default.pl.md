@@ -1,6 +1,9 @@
 ---
 title: 'Konfiguracja funkcji brama'
 media_order: 'afe-firmware-brama-urzadzenie.png,afe-firmware-brama-ilosc-bram.png,afe-firmware-brama-przekaznik.png,afe-firmware-brama-kontaktron.png,afe-firmware-brama-sprzet.png,afe-firmware-brama-stany.png'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
@@ -9,9 +12,22 @@ Funkcja sterowania bramą/drzwiami dostępna jest w [AFE Firmware T5](/postawowe
 
 Poniżej przedstwiony jest przykład konfiguracji bramy, która posiada dwa czujniki magnetyczne, które monitorują stan otwarcia/zamknięcia bramy.
 
-Po zainstalowaniu [AFE Firmware T5](/pliki-to-pobrania/afe-firmware) oraz [skonfigurowaniu połączenia do routera WiFi](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie) uruchamiamy Panel Konfiguracyjny AFE Firmware. 
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 3,3) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 ### Konfiguracja urządzenia
+
+Po zainstalowaniu [AFE Firmware T5](/pliki-to-pobrania/afe-firmware) oraz [skonfigurowaniu połączenia do routera WiFi](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie) uruchamiamy Panel Konfiguracyjny AFE Firmware. 
 
 W formularzu konfiguracji Urządzenia wprowadzamy liczbę podłączonych elementów
 
@@ -118,7 +134,7 @@ Ostatnim etapem konfiguracji jest konfiguracja przekaźnika przpisanego do bramy
 * Zakres od 0 do 16
 * Wartość musi zostać wybrana
 
-##### Długość impuslu
+##### Długość impulsu
 
-* Czas, na jak długo przekaźnik ma zostać załączony (długość impuslu)
+* Czas, na jak długo przekaźnik ma zostać załączony (długość impulsu)
 * Wartość ustawiana jest w milisekundach od 1msek do 99999msek - co daje prawie ;-) 100sek

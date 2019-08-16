@@ -22,9 +22,9 @@ recaptchacontact:
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi) dotyczące AFE Firmware T5
 * Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 
-##### [Pobierz najnowszą wersję 2.0.0 Beta4](https://www.smartnydom.pl/download/afe-firmware-t5-2-0-0-beta-4/?target=_blank)
+##### [Pobierz najnowszą wersję 2.0.0](https://www.smartnydom.pl/download/afe-firmware-t5-v2/?target=_blank)
 **Poprzednie wersje**
-* Wersja Stabilna 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
+* Wersja 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
 
 ! Jeśli znajdziesz jakiś błąd / problem z oprogramowaniem, zgłoś go [tutaj](https://www.smartnydom.pl/forum/zglaszanie-problemow/?target=_blank). Bez tego ciężko będzie zrobić firmware lepszym. Dzięki.
 
