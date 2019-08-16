@@ -1,6 +1,6 @@
 ---
 title: 'O autorze AFE Firmware'
-media_order: IMG_2805.JPG
+media_order: IMG_2805.jpg
 process:
     markdown: true
     twig: true
@@ -8,7 +8,8 @@ recaptchacontact:
     enabled: false
 ---
 
-<img src="/user/pages/01.postawowe-informacje/05.o-autorze/IMG_2805.JPG" style="float:right; display: block; padding-right: 10px; margin: 0;"  />
+<img src="/user/pages/01.postawowe-informacje/05.o-autorze/IMG_2805.jpg" style="float:right; display: block; padding-right: 10px; margin: 0;"  />
+
 
     
 Adrian Czabanowski, zawodowo związany z IT, w przeszłości programista, aktualnie kodujący jedynie hobbistycznie.
