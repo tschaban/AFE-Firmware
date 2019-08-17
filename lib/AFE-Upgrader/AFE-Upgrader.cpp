@@ -56,5 +56,5 @@ void AFEUpgrader::upgradeFirmwarType() {
 }
 
 void AFEUpgrader::updateFirmwareVersion() {
-  Data->saveVersion(FirmwareConfiguration.version);
+  Data->saveVersion(AFE_FIRMWARE_VERSION);
 }

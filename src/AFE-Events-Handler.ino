@@ -81,12 +81,14 @@ void eventsListener() {
 /* Publishing mesages after connection to MQTT Broker has been established */
 #ifdef AFE_CONFIG_HARDWARE_GATE
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+        Mqtt.subscribe(Gate[i].getMQTTCommandTopic());
         MQTTPublishGateState(i);
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        Mqtt.subscribe(Contactron[i].getMQTTCommandTopic());
         MQTTPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }

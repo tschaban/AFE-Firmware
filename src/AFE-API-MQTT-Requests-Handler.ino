@@ -198,7 +198,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     /* Contactrons */
     for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-      if (strcmp(topic, Gate[1].Contactron[i].getMQTTCommandTopic()) == 0 &&
+      if (strcmp(topic, Contactron[i].getMQTTCommandTopic()) == 0 &&
           (char)payload[1] == 'e') { // get
         MQTTPublishContactronState(i);
       }
@@ -206,7 +206,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    for (uint8_t i = 1; i <= Device.configuration.noOfGates; i++) {
+    for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
       if (strcmp(topic, Gate[i].getMQTTCommandTopic()) == 0) {
         if ((char)payload[0] == 't' && length == 6) { // toggle
           Gate[i].toggle();
