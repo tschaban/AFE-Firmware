@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_MQTT_h
 #define _AFE_MQTT_h
@@ -35,7 +33,7 @@ private:
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
   boolean eventConnectionEstablished = false;
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   unsigned long ledStartTime = 0;
 #endif
 

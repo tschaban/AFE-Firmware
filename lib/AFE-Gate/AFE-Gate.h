@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Gate_h
 #define _AFE_Gate_h
@@ -11,33 +9,28 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
 #include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
 #include <AFE-Relay.h>
-//#include <Streaming.h>
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
 
 class AFEGate {
-  AFEDevice Device;
-  AFEDataAccess Data;
-  GATE gateConfiguration;
-  uint8_t numberOfContractors = 0;
-  boolean _event = false;
-  AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
-
-  /* Returns gate state based on contactron state */
-  uint8_t getGateStateBasedOnContractons();
 
 public:
   /* Via this class there is access to contactrons */
-  AFEContactron Contactron[sizeof(Device.configuration.isContactron)];
+  AFEContactron Contactron[2];
+  GATE configuration;
 
   /* Constructors */
   AFEGate();
 
   /* Initializing gate */
-  void begin();
+  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Triggering gate state changed and saving it's new value if there is not
    * contactrons */
@@ -46,15 +39,39 @@ public:
   /* Returns gate state*/
   uint8_t get();
 
+  /* Returns number of contactrons for a gate */
+  uint8_t getNoOfContactrons();
+
+  /* Returns contactron ID for selected contactron index (1,2) */
+  uint8_t getContactronId(uint8_t index);
+
   /* Returns true if gate state has changed */
   boolean event();
 
-  /* It should be added to main loop to listen for gate state changes and
-   * request to be processed by the class */
-  void listener();
+  /* It triggers event - used eg when contactron state is changed */
+  void triggerEvent();
+
+  /* Get MQTT Topics */
+  const char *getMQTTCommandTopic();
+  const char *getMQTTStateTopic();
 
   /* Return IDX in Domoticz */
   unsigned long getDomoticzIDX();
+
+private:
+  AFEDevice *Device;
+  AFEDataAccess *Data;
+
+  uint8_t gateId;                  // ID of the gate
+  uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
+  boolean _event = false;
+  AFERelay GateRelay;
+
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+
+  /* Returns gate state based on contactron state */
+  uint8_t getGateStateBasedOnContractons();
 };
 
 #endif

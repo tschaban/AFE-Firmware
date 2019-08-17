@@ -1,16 +1,15 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
-#include "AFE-Firmware.h"
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-AFEFirmware::AFEFirmware(){};
+#include "AFE-Firmware-Pro.h"
 
-void AFEFirmware::begin() {
+AFEFirmwarePro::AFEFirmwarePro(){};
+
+void AFEFirmwarePro::begin() {
   Pro = Data.getProVersionConfiguration();
   miliseconds = millis();
 }
 
-boolean AFEFirmware::callService(uint8_t method) {
+boolean AFEFirmwarePro::callService(uint8_t method) {
   HTTPClient http;
   WiFiClient client;
 
@@ -86,7 +85,7 @@ boolean AFEFirmware::callService(uint8_t method) {
   return Pro.valid;
 }
 
-void AFEFirmware::reValidateKey() {
+void AFEFirmwarePro::reValidateKey() {
 
 #ifdef DEBUG
   Serial << endl
@@ -119,7 +118,7 @@ void AFEFirmware::reValidateKey() {
 #endif
 }
 
-void AFEFirmware::listener() {
+void AFEFirmwarePro::listener() {
   if (millis() - miliseconds > 59999) {
     minutes++;
     miliseconds = millis();

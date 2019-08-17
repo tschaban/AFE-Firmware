@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
@@ -14,10 +12,8 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Defaults.h>
 
-#ifdef CONFIG_HARDWARE_SPIFFS
 #include <AFE-Defaults.h>
 #include <FS.h>
-#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -32,13 +28,17 @@ private:
 public:
   DEVICE configuration;
 
+  /* This param is set by Upgrade class, if the frmware has been upgraded. It's
+   * used to show a message in the config panel */
+  uint8_t upgraded = AFE_UPGRADE_NONE;
+
   AFEDevice();
 
   /* Method reads device configuration data. It used in config panel */
   void begin();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
-  void reboot(uint8_t mode = MODE_NORMAL);
+  void reboot(uint8_t mode = AFE_MODE_NORMAL);
 
   /* Method returns current device mode */
   uint8_t getMode();

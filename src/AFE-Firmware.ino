@@ -6,17 +6,16 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 (Up to 4 relays)
+   - T4 - decommissioned
    - T5 Gate
    - T6 Wheater station
 
-More about the versions (PL): https://www.smartnydom.pl/afe-firmware-pl/wersje/
+More info: https://afe.smartnydom.pl
 LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 */
 
 /* Includes libraries for debugging in development compilation only */
-#if defined(DEBUG)
+#ifdef DEBUG
 #include <Streaming.h>
 #endif
 
@@ -24,28 +23,27 @@ DOC (PL): https://www.smartnydom.pl/afe-firmware-pl/
 #include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-
-/* Shelly-1 device does not have LED. Excluding LED related code */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-#include <AFE-LED.h>
-AFELED Led;
-#endif
-
-#include <AFE-Firmware.h>
+#include <AFE-Firmware-Pro.h>
 #include <AFE-Relay.h>
 #include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 
+/* Shelly-1 device does not have LED. Excluding LED related code */
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#include <AFE-LED.h>
+AFELED Led;
+#endif
+
 /* T1 Set up, DS18B20 sensor */
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
 AFESensorDS18B20 Sensor;
 #endif
 
 /* T2 Setup, DHxx sensor */
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
 #include <AFE-Sensor-DHT.h>
 #include <PietteTech_DHT.h>
 void dht_wrapper();
@@ -53,23 +51,25 @@ PietteTech_DHT dht;
 AFESensorDHT Sensor;
 #endif
 
-#ifdef CONFIG_TEMPERATURE
+#ifdef AFE_CONFIG_TEMPERATURE
 float temperature;
 #endif
 
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
 float humidity;
 #endif
 
 AFEDataAccess Data;
-AFEFirmware Firmware;
+AFEFirmwarePro Firmware;
 AFEDevice Device;
 AFEWiFi Network;
 AFEMQTT Mqtt;
 AFEDomoticz Domoticz;
 AFEWebServer WebServer;
-AFESwitch Switch[CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
-AFERelay Relay[CONFIG_HARDWARE_NUMBER_OF_RELAYS];
+AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
+#endif
 MQTT MQTTConfiguration;
 
 #if defined(T3_CONFIG)
@@ -77,47 +77,49 @@ MQTT MQTTConfiguration;
 AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
-GATE GateState;
-AFEGate Gate;
-uint8_t lastPublishedGateStatus = GATE_UNKNOWN;
-byte lastPublishedContactronState[sizeof(Device.configuration.isContactron)];
+AFEGate Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
+GATES_CURRENT_STATE GatesCurrentStates;
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#include <AFE-Contactron.h>
+AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 #include <AFE-Sensor-BH1750.h>
 AFESensorBH1750 BH1750Sensor;
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-BMx80.h>
 AFESensorBMx80 BMx80Sensor;
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-HPMA115S0.h>
 AFESensorHPMA115S0 ParticleSensor;
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #include <AFE-Analog-Input.h>
 AFEAnalogInput AnalogInput;
 #endif
 
-#include <FS.h>
-
 void setup() {
 
-  Serial.begin(9600);
+  Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
 
-/* Turn off publishing information to Serial for production compilation */
+/* Turn off publishing information to Serial if production release */
 #if !defined(DEBUG)
   Serial.swap();
 #endif
@@ -128,32 +130,33 @@ void setup() {
          << "################################ BOOTING "
             "################################"
          << endl
-         << "All classes and global variables initialized";
+         << "All classes and global variables initialized" << endl
+         << "Initializing device" << endl
+         << "File system: ";
 #endif
 
+  /* Initializing SPIFFS file system */
   if (SPIFFS.begin()) {
 #ifdef DEBUG
-    Serial << endl << "File system mounted";
+    Serial << "mounted";
   } else {
-    Serial << endl << "Failed to mount file system";
+    Serial << "ERROR: not mounted";
+#else
+    yield();
 #endif
   }
-
-#ifdef DEBUG
-  Serial << endl << "Initializing device";
-#endif
 
   Device.begin();
 
   /* Checking if the device is launched for a first time. If so it loades
-   * default configuration to EEPROM */
+   * default configuration */
 #ifdef DEBUG
   Serial << endl
          << "Checking if first time launch: Device.getMode()= "
          << Device.getMode() << " : ";
 #endif
 
-  if (Device.getMode() == MODE_FIRST_TIME_LAUNCH) {
+  if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
 #ifdef DEBUG
     Serial << "YES";
 #endif
@@ -167,22 +170,18 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "Checking, if WiFi should be configured: ";
+  Serial << endl << "Checking, if WiFi hasn't been configured: ";
 #endif
-
-  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
+  if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << "YES";
 #endif
   } else {
-
-    /* Checking if the firmware has been upgraded. Potentially runs post upgrade
-     * code */
+    /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
     Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
 #endif
-
-    AFEUpgrader *Upgrader = new AFEUpgrader();
+    AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
@@ -201,40 +200,38 @@ void setup() {
     delete Upgrader;
     Upgrader = NULL;
 
-    /* Initializing relay */
-    initRelay();
-
+/* Initializing relay */
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+    initializeRelay();
 #ifdef DEBUG
     Serial << endl << "Relay(s) initialized";
+#endif
 #endif
   }
 
   /* Initialzing network */
-
   Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
   Serial << endl << "Network initialized";
 #endif
 
-  /* Initializing LED, checking if LED exists is made on Class level  */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  uint8_t systeLedID = Data.getSystemLedID();
+  /* Initializing system LED (if exists)  */
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  uint8_t systemLedID = Data.getSystemLedID();
   delay(0);
 
 #ifdef DEBUG
-  Serial << endl << "System LED ID: " << systeLedID;
-  Serial << endl
-         << "Is system LED enabld : "
-         << (Device.configuration.isLED[systeLedID - 1] ? "YES" : "NO");
+  Serial << endl << "System LED ID: " << systemLedID;
 #endif
 
-  if (systeLedID > 0 && Device.configuration.isLED[systeLedID - 1]) {
-    Led.begin(systeLedID - 1);
+  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+      Device.configuration.noOfLEDs >= systemLedID + 1) {
+    Led.begin(systemLedID);
   }
 
   /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == MODE_ACCESS_POINT ||
-      Device.getMode() == MODE_NETWORK_NOT_SET) {
+  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
+      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
 #ifdef DEBUG
@@ -243,14 +240,15 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "Connecting to the network";
+  Serial << endl << "Starting network";
 #endif
   Network.listener();
+
   /* Initializing HTTP WebServer */
   WebServer.handle("/", handleHTTPRequests);
   WebServer.handle("/favicon.ico", handleFavicon);
   WebServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
-  if (Device.getMode() == MODE_NETWORK_NOT_SET) {
+  if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     WebServer.onNotFound(handleOnNotFound);
   }
 
@@ -263,42 +261,43 @@ void setup() {
 #endif
 
   /* Initializing switches */
-  initSwitch();
+  initializeSwitch();
 #ifdef DEBUG
   Serial << endl << "Switch(es) initialized";
 #endif
 
-  if (Device.getMode() == MODE_NORMAL) {
+  if (Device.getMode() == AFE_MODE_NORMAL) {
+
+/* Initializing Contactrons */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    initializeContractons();
+#endif
 
 /* Initializing Gate */
-#if defined(T5_CONFIG)
-    Gate.begin();
-    GateState = Data.getGateConfiguration();
-#ifdef DEBUG
-    Serial << endl << "Gate initialized";
-#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    initializeGate();
 #endif
 
     /* Initializing DS18B20 or DHTxx sensor */
-#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
-    initSensor();
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
+    initalizeSensor();
 #ifdef DEBUG
     Serial << endl << "Sensors initialized";
 #endif
 #endif
 
 /* Initializing T6 sensor */
-#ifdef CONFIG_HARDWARE_I2C
+#ifdef AFE_CONFIG_HARDWARE_I2C
     Wire.begin();
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
       initHPMA115S0Sensor();
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
     if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
       BMx80Sensor.begin(TYPE_BME680_SENSOR);
     } else if (Device.configuration.isBMx80 == TYPE_BME280_SENSOR) {
@@ -308,7 +307,7 @@ void setup() {
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
     if (Device.configuration.isBH1750) {
       BH1750Sensor.begin();
     }
@@ -322,20 +321,20 @@ void setup() {
 #endif
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     if (Device.configuration.isAnalogInput && Firmware.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
+
+    /* Initializing APIs */
+    MQTTInit();
+    DomoticzInit();
   }
 
-  /* Initializing APIs */
-  MQTTInit();
-  DomoticzInit();
-
-#if defined(DEBUG) && defined(CONFIG_HARDWARE_I2C)
+#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
-  if (Device.getMode() == MODE_NORMAL) {
+  if (Device.getMode() == AFE_MODE_NORMAL) {
     I2CScanner.scanAll();
   }
 #endif
@@ -344,16 +343,19 @@ void setup() {
   Serial << endl
          << "########################### BOOTING COMPLETED "
             "###########################"
-         << endl;
+         << endl
+         << endl
+         << "###########################  STARTING DEVICE  "
+            "###########################";
 #endif
 }
 
 void loop() {
 
-  if (Device.getMode() == MODE_NORMAL ||
-      Device.getMode() == MODE_CONFIGURATION) {
+  if (Device.getMode() == AFE_MODE_NORMAL ||
+      Device.getMode() == AFE_MODE_CONFIGURATION) {
     if (Network.connected()) {
-      if (Device.getMode() == MODE_NORMAL) {
+      if (Device.getMode() == AFE_MODE_NORMAL) {
 
         /* Triggerd when connectes/reconnects to WiFi */
         eventsListener();
@@ -368,44 +370,41 @@ void loop() {
          * requests or HTTP API requests if it's turned on */
         WebServer.listener();
 
-#if defined(T5_CONFIG)
-        /* Listening for gate events */
-        Gate.listener();
-#endif
-
         /* Checking if there was received HTTP API Command */
-        mainHTTPRequestsHandler();
+        HTTPRequestListener();
 
-#if defined(T5_CONFIG)
-        /* Gate related events */
-        mainGate();
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+        contractonEventsListener();
 #endif
 
-#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
-        /* Relay related events */
-        mainRelay();
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        gateEventsListener();
 #endif
 
-#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+        relayEventsListener();
+#endif
+
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
         /* Sensor: DS18B20 or DHT related code */
         mainSensor();
 #endif
 
 /* Sensor: HPMA115S0 related code  */
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
         mainHPMA115S0Sensor();
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
         mainBMx80Sensor();
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
         mainBH1750Sensor();
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-        analogInputListner();
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+        analogInputEventsListener();
 #endif
 
 #if defined(T3_CONFIG)
@@ -416,7 +415,7 @@ void loop() {
         Firmware.listener();
 
       } else { /* Device runs in configuration mode over WiFi */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -425,9 +424,9 @@ void loop() {
       }
     }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     else {
-      if (Device.getMode() == MODE_CONFIGURATION && Led.isBlinking()) {
+      if (Device.getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
       }
     }
@@ -437,18 +436,18 @@ void loop() {
     WebServer.listener();
   }
 
-  /* Listens for switch events */
-  mainSwitchListener();
-  mainSwitch();
+  /* Listens and processes switch events */
+  switchEventsListener();
+  processSwitchEvents();
 
   /* Led listener */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   Led.loop();
 #endif
 
 /* Debug information */
 #if defined(DEBUG)
-  if (Device.getMode() == MODE_NORMAL) {
+  if (Device.getMode() == AFE_MODE_NORMAL) {
     debugListener();
   }
 #endif

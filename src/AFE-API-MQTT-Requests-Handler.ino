@@ -1,10 +1,9 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 /* Initializing MQTT */
 void MQTTInit() {
-  if (Device.getMode() != MODE_ACCESS_POINT && Device.configuration.api.mqtt) {
+  if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
+      Device.configuration.api.mqtt) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
 #ifdef DEBUG
@@ -26,12 +25,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     Serial << endl << "Processing: ";
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY /* Relay processing */
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-      if (Device.configuration.isRelay[i]) {
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY /* Relay processing */
+    for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 
-#ifdef DEBUG
-        Serial << endl << " - Checking if Relay[" << i << "] request ";
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      /* For the Relay assigned to a gate code below is not needed for execution
+       */
+      if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
 
         if (strcmp(topic, Relay[i].getMQTTCommandTopic()) == 0) {
@@ -50,14 +50,14 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           } else if ((char)payload[1] == 'e' && length == 3) { // get
             MQTTPublishRelayState(i);
           } else if ((char)payload[1] == 'o' && length == 6) { // toggle
-            Relay[i].get() == RELAY_ON ? Relay[i].off() : Relay[i].on();
+            Relay[i].get() == AFE_RELAY_ON ? Relay[i].off() : Relay[i].on();
             MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);
           }
           return;
         }
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
         else {
 
           sprintf(_mqttTopic, "%sthermostat/cmd", Relay[i].getMQTTTopic());
@@ -80,7 +80,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
               Mqtt.publish(Relay[i].getMQTTTopic(), "thermostat/state",
                            Relay[i].Thermostat.enabled() ? "on" : "off");
             }
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
           } else {
             /* Checking if Hunidistat related message has been received  */
             sprintf(_mqttTopic, "%shumidistat/cmd", Relay[i].getMQTTTopic());
@@ -108,13 +108,22 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           }
         }
 #endif
-      } else {
-        break;
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        /* Closing the condition for skipping relay if assigned to a gate */
       }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << "Excluding relay: " << i
+               << " as it's assigned to a Gate: " << Relay[i].gateId;
+      }
+#endif
+#endif
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_PIR
+#ifdef AFE_CONFIG_HARDWARE_PIR
     for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
       if (Device.configuration.isPIR[i]) {
 #ifdef DEBUG
@@ -134,7 +143,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     if (Device.configuration.isHPMA115S0) {
 #ifdef DEBUG
       Serial << endl << " - Checking if HPMA115S0 request ";
@@ -154,7 +163,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
     if (Device.configuration.isBMx80) {
       sprintf(_mqttTopic, "%sBMx80/cmd", MQTTConfiguration.mqtt.topic);
       if (strcmp(topic, _mqttTopic) == 0) {
@@ -167,7 +176,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     if (Device.configuration.isAnalogInput) {
 #ifdef DEBUG
       Serial << endl << " - Checking if Analog Input request ";
@@ -186,33 +195,30 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_GATE /* Gate */
-
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     /* Contactrons */
-    for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-      if (Device.configuration.isContactron[i]) {
-        sprintf(_mqttTopic, "%scmd", Gate.Contactron[i].getMQTTTopic());
-        if (strcmp(topic, _mqttTopic) == 0 && (char)payload[1] == 'e') { // get
-          MQTTPublishContactronState(i);
-        }
-      } else {
-        break;
+    for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+      if (strcmp(topic, Contactron[i].getMQTTCommandTopic()) == 0 &&
+          (char)payload[1] == 'e') { // get
+        MQTTPublishContactronState(i);
       }
     }
+#endif
 
-    /* Gate */
-    sprintf(_mqttTopic, "%sgate/cmd", MQTTConfiguration.mqtt.topic);
-    if (strcmp(topic, _mqttTopic) == 0) {
-      if ((char)payload[0] == 't' && length == 6) { // toggle
-        Gate.toggle();
-      } else if ((char)payload[0] == 'g' && length == 3) { // get
-        MQTTPublishGateState();
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+      if (strcmp(topic, Gate[i].getMQTTCommandTopic()) == 0) {
+        if ((char)payload[0] == 't' && length == 6) { // toggle
+          Gate[i].toggle();
+        } else if ((char)payload[0] == 'g' && length == 3) { // get
+          MQTTPublishGateState(i);
+        }
       }
     }
 #endif
 
     /* Control over APIs Turning On/Off them
-    #ifdef CONFIG_FUNCTIONALITY_API_CONTROL
+    #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 
     #ifdef DEBUG
         Serial << endl << " - Checking if API control request ";
@@ -281,7 +287,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     #ifdef DEBUG
             Serial << "Yes: reboot";
     #endif
-            Device.reboot(MODE_NORMAL);
+            Device.reboot(AFE_MODE_NORMAL);
           }
           else if ((char)payload[2] == 'n' && length == 17) {
     #ifdef DEBUG
@@ -289,11 +295,11 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     #endif
             PASSWORD password = Data.getPasswordConfiguration();
             if (!password.protect) {
-              Device.reboot(MODE_CONFIGURATION);
+              Device.reboot(AFE_MODE_CONFIGURATION);
             }
           }
         }
-    #ifdef CONFIG_TEMPERATURE
+    #ifdef AFE_CONFIG_TEMPERATURE
         else if ((char)payload[2] == 't' && length == 14) {
     #ifdef DEBUG
           Serial << "Yes: temperature";
@@ -304,7 +310,7 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
         }
     #endif
 
-    #ifdef CONFIG_HARDWARE_DHXX
+    #ifdef AFE_CONFIG_HARDWARE_DHXX
 
         else if ((char)payload[2] == 't' && length == 11) {
     #ifdef DEBUG
@@ -341,13 +347,15 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 } /* End of topics listener */
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishRelayState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
     Mqtt.publishTopic(Relay[id].getMQTTStateTopic(),
-                      Relay[id].get() == RELAY_ON ? "on" : "off");
+                      Relay[id].get() == AFE_RELAY_ON ? "on" : "off");
   }
 }
+#endif
 
 /* Metod publishes Relay state (used eg by HTTP API) */
 void MQTTPublishSwitchState(uint8_t id) {
@@ -357,7 +365,7 @@ void MQTTPublishSwitchState(uint8_t id) {
   }
 }
 
-#ifdef CONFIG_TEMPERATURE
+#ifdef AFE_CONFIG_TEMPERATURE
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.api.mqtt) {
@@ -367,7 +375,7 @@ void MQTTPublishTemperature(float temperature) {
 #endif
 
 /* Humidity, HeatIndex, DewPoint */
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
 /* Metod publishes humidity */
 void MQTTPublishHumidity(float humidity) {
   if (Device.configuration.api.mqtt) {
@@ -398,29 +406,34 @@ void MQTTPublishPIRState(uint8_t id) {
 }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void MQTTPublishContactronState(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish(Gate.Contactron[id].getMQTTTopic(), "state",
-                 Gate.Contactron[id].get() == CONTACTRON_OPEN ? "open"
-                                                              : "closed");
-  }
-}
-void MQTTPublishGateState() {
-  if (Device.configuration.api.mqtt) {
-    uint8_t gateState = Gate.get();
-    Mqtt.publish("gate/state", gateState == GATE_OPEN
-                                   ? "open"
-                                   : gateState == GATE_CLOSED
-                                         ? "closed"
-                                         : gateState == GATE_PARTIALLY_OPEN
-                                               ? "partiallyOpen"
-                                               : "unknown");
+    Mqtt.publishTopic(Contactron[id].getMQTTStateTopic(),
+                      Contactron[id].get() == AFE_CONTACTRON_OPEN
+                          ? AFE_MQTT_CONTACTRON_OPEN
+                          : AFE_MQTT_CONTACTRON_CLOSED);
   }
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void MQTTPublishGateState(uint8_t id) {
+  if (Device.configuration.api.mqtt) {
+    uint8_t gateState = Gate[id].get();
+    Mqtt.publishTopic(Gate[id].getMQTTStateTopic(),
+                      gateState == AFE_GATE_OPEN
+                          ? AFE_MQTT_GATE_OPEN
+                          : gateState == AFE_GATE_CLOSED
+                                ? AFE_MQTT_GATE_CLOSED
+                                : gateState == AFE_GATE_PARTIALLY_OPEN
+                                      ? AFE_MQTT_GATE_PARTIALLY_OPEN
+                                      : AFE_MQTT_GATE_UNKNOWN);
+  }
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.api.mqtt) {
     String messageString = "{\"PM25\":";
@@ -435,7 +448,7 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 void MQTTPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.api.mqtt) {
     String messageString = "{\"temperature\":";
@@ -458,7 +471,7 @@ void MQTTPublishBMx80SensorData(BMx80_DATA data) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 void MQTTPublishLightLevel(float lux) {
   if (Device.configuration.api.mqtt) {
     Mqtt.publish("BH1750/lux", lux);
@@ -466,7 +479,7 @@ void MQTTPublishLightLevel(float lux) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
   char valueString[10];
 

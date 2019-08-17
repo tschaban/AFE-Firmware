@@ -7,8 +7,8 @@
 -- limiting to functionalities that could be easily implemented within automation software
 
 ## Documentation
-- [PL] [tutaj](https://www.smartnydom.pl/afe-firmware-pl/)
-- [EN] [here](https://www.smartnydom.pl/afe-firmware-en/) *Not finished yet*
+- [PL] [tutaj](https://afe.smartnydom.pl/pl)
+- [EN] [here](https://afe.smartnydom.pl/en) *Not finished yet*
 
 ## Download firmware
-- [PL] [here](https://www.smartnydom.pl/afe-firmware-pl/wersje/)
+- [PL] [here](https://afe.smartnydom.pl/pliki-to-pobrania/afe-firmware)

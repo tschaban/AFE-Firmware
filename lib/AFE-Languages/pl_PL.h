@@ -1,3 +1,5 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #ifndef _LANG_PL_h
 #define _LANG_PL_h
 
@@ -5,9 +7,9 @@
 #define L_LANGUAGE_SHORT "pl"
 
 /* Firmware names */
-#if defined(DEVICE_SHELLY_1)
+#if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "dla Shelly-1"
-#elif defined(DEVICE_SONOFF_BASIC_V1)
+#elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "dla Sonoff Basic"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
@@ -24,6 +26,13 @@
 #elif defined(T6_CONFIG)
 #define L_FIRMWARE_NAME "Stacja Pogody"
 #endif
+
+/* Upgrades */
+#define L_UPGRADED_TO_NEW_VERSION                                              \
+  "Została zainstalowana nowa wersja AFE Firmware"
+#define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
+  "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna "        \
+  "konfiguracja urządzenia."
 
 /* Menu */
 #define L_DEVICE "Urządzenie"
@@ -60,6 +69,7 @@
 #define L_VERSION "Wersja"
 #define L_YES "Tak"
 #define L_NO "Nie"
+#define L_SENSOR "Czujnik"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -83,6 +93,10 @@
 #define L_DEVICE_CONTROLLING "Sterowanie urządzeniem"
 #define L_DEVICE_CONTROLLING_INFO                                              \
   "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define L_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
+#endif
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
@@ -129,7 +143,7 @@
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Zmień świecenie diody LED na odwrotne"
 
@@ -165,13 +179,13 @@
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"
 #define L_SYSTEM_BUTTON "Przycisk systemowy"
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #define L_CONTROL_RELAY "Tylko sterowanie przekaźnikiem"
 #endif
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Tylko sterowanie bramą"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Przekaźnik sterowany tym przyciskiem"
+#define L_RELAY_CONTROLLED_BY_SWITCH "Sterowanie"
 #define L_TYPE "Typ"
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
@@ -239,5 +253,38 @@
 #define L_VALID "Aktualny"
 #define L_PRO_CANNOT_BE_COFIGURED                                              \
   "Konieczne jest podłączenie do Internetu, aby skonfigurować wersję PRO"
+
+/* Form: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#define L_LED_ASSIGNED_TO_SENSOR "LED przypisany do czujnika"
+#define L_SET_CONTACTRON_SENSITIVENESS                                                   \
+  "Czułość należy ustawić eksperymentalnie, aż uzyska się pożądane działanie " \
+  "czujnika magnetycznego"
+#define L_MAGNETIC_SENSOR "Czujnik magnetyczny"
+#define L_MAGNETIC_SENSORS "Czujniki magnetyczne"
+#define L_NUMBER_OF_MAGNETIC_SENSORS "Ilość czujników magnetycznych"
+#define L_CONTACTRON_MQTT_TOPIC "Temat MQTT do monitorowania kontaktronu"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define L_GATE "Brama/Drzwi"
+#define L_IF_MAGNETIC_SENSOR "Jeśli czujnik magnetyczny"
+#define L_AND_SENSOR "oraz czujnik"
+#define L_IS_OPEN "jest otwarty"
+#define L_ARE_OPEN "są otwarte"
+#define L_THEN "to"
+#define L_IS_CLOSED "jest zamknięty"
+#define L_ARE_CLOSED "są zamknięte"
+#define L_GATES_STATES_CONFIGURATION "Konfiguracja stanów bramy"
+#define L_SET_GATE_STATE "Ustaw stan bramy na"
+#define L_OPENED "Otwarta"
+#define L_CLOSED "Zamknięta"
+#define L_PARTIALLY_OPENED "Częściowo otwarta"
+#define L_UNKNOWN_STATE "Nieznany stan"
+#define L_GATE_CONFIGURATION "Konfiguracja bramy/drzwi"
+#define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
+#define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
+#define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
+#endif
 
 #endif

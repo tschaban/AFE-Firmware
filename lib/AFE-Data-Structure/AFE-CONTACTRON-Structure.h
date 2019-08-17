@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_CONTACTRON_Structure_h
 #define _AFE_CONTACTRON_Structure_h
@@ -11,20 +9,18 @@
 #include "WProgram.h"
 #endif
 
-#define CONTACTRON_NO 0 // Normally open
-#define CONTACTRON_NC 1 // Normally closed
-
-#define CONTACTRON_OPEN 0   // Open
-#define CONTACTRON_CLOSED 1 // Closed
+#include <AFE-Configuration.h>
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
 
 struct CONTACTRON {
   uint8_t gpio;
-  byte outputDefaultState;
+  byte type = AFE_CONTACTRON_NO;
   uint8_t ledID;
-  uint16_t bouncing;
+  uint16_t bouncing = AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
   char name[17];
-  char mqttTopic[50];
-  unsigned long idx;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

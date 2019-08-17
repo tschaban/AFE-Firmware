@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_GATE_Structure_h
 #define _AFE_GATE_Structure_h
@@ -11,14 +9,29 @@
 #include "WProgram.h"
 #endif
 
-#define GATE_OPEN 0           // Open
-#define GATE_CLOSED 1         // Closed
-#define GATE_PARTIALLY_OPEN 2 // Being opened
-#define GATE_UNKNOWN 9        // Unknown state
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
+struct GATES_CURRENT_STATE {
+  uint8_t state[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
+};
+
+struct GATE_CONTACTRONS {
+  uint8_t id[2];
+};
+
+struct GATE_STATES {
+  uint8_t state[4];
+};
 
 struct GATE {
-  uint8_t state[4];
-  unsigned long idx;
+  uint8_t relayId;  // Relay ID - controlling the gate
+  uint8_t switchId; // Switch ID - triggering the gate
+  GATE_CONTACTRONS contactron;
+  GATE_STATES states;
+  char name[17];
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

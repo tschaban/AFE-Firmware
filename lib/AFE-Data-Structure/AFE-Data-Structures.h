@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
@@ -23,25 +21,28 @@
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #include <AFE-LED-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#include <AFE-CONTACTRON-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <AFE-GATE-Structure.h>
 #endif
 
 #ifdef T1_CONFIG
 #include <AFE-DS18B20-Sensor-Structure.h>
 #endif
 
-#if defined(T2_CONFIG) || defined(T5_CONFIG)
+#if defined(T2_CONFIG)
 #include <AFE-DHT-Sensor-Structure.h>
 #endif
 
 #ifdef T3_CONFIG
 #include <AFE-PIR-Sensor-Structure.h>
-#endif
-
-#ifdef T5_CONFIG
-#include <AFE-CONTACTRON-Structure.h>
-#include <AFE-GATE-Structure.h>
 #endif
 
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are

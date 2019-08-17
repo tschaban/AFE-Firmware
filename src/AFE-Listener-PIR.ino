@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #if defined(T3_CONFIG)
 /* Method initialize PIR Sensor */
 void initPIR() {
@@ -20,7 +21,7 @@ void mainPIR() {
       /* Code related to detecting motion */
       if (Pir[i].stateChanged()) {
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
 
@@ -36,14 +37,14 @@ void mainPIR() {
           Relay[Pir[i].configuration.relayId].setTimer(
               Pir[i].configuration.howLongKeepRelayOn);
           if (Pir[i].configuration.invertRelayState) {
-            if (Relay[Pir[i].configuration.relayId].get() == RELAY_ON) {
+            if (Relay[Pir[i].configuration.relayId].get() == AFE_RELAY_ON) {
               Relay[Pir[i].configuration.relayId].off(
                   Pir[i].configuration.invertRelayState);
               MQTTPublishRelayState(Pir[i].configuration.relayId);
               DomoticzPublishRelayState(Pir[i].configuration.relayId);
             }
           } else {
-            if (Relay[Pir[i].configuration.relayId].get() == RELAY_OFF) {
+            if (Relay[Pir[i].configuration.relayId].get() == AFE_RELAY_OFF) {
               Relay[Pir[i].configuration.relayId].on(
                   Pir[i].configuration.invertRelayState);
               MQTTPublishRelayState(Pir[i].configuration.relayId);
@@ -52,7 +53,7 @@ void mainPIR() {
           }
         }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }
@@ -60,13 +61,13 @@ void mainPIR() {
       /* Relay autoTurnOff code */
       if (Relay[Pir[i].configuration.relayId].autoTurnOff(
               Pir[i].configuration.invertRelayState)) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.on();
 #endif
         MQTTPublishRelayState(i);
         DomoticzPublishRelayState(Pir[i].configuration.relayId);
         Relay[Pir[i].configuration.relayId].clearTimer();
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         Led.off();
 #endif
       }

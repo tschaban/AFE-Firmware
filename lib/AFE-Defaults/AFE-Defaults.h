@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Defaults_h
 #define _AFE_Defaults_h
@@ -13,8 +11,6 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
-#include <ESP8266WiFi.h>
-#include <FS.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -26,6 +22,8 @@ private:
 
 public:
   AFEDefaults();
+
+  /* Set's the default values for a device, creates configuration files */
   void set();
 };
 #endif

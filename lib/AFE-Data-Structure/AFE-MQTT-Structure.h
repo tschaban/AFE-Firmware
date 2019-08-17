@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_MQTT_Structure_h
 #define _AFE_MQTT_Structure_h
@@ -10,8 +8,6 @@
 #else
 #include "WProgram.h"
 #endif
-
-#include <AFE-Configuration.h>
 
 struct MQTT_BASIC_CONFIG {
   char topic[65];

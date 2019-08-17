@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_SWITCH_Structure_h
 #define _AFE_SWITCH_Structure_h
@@ -10,15 +8,6 @@
 #else
 #include "WProgram.h"
 #endif
-
-#define SWITCH_TYPE_MONO 0 // Mono stable switch
-#define SWITCH_TYPE_BI 1   // Bistable switch
-
-#define SWITCH_FUNCTIONALITY_NONE 0
-#define SWITCH_FUNCTIONALITY_MULTI 1
-#define SWITCH_FUNCTIONALITY_RELAY 2
-
-#define SWITCH_SENSITIVENESS 50
 
 struct SWITCH {
   uint8_t gpio;

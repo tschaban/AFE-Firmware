@@ -1,14 +1,22 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #ifndef _LANG_EN_h
 #define _LANG_EN_h
 
 #define L_LANGUAGE "en-EN"
 #define L_LANGUAGE_SHORT "en"
 
-/* Firmware names */
+/* Upgrades */
+#define L_UPGRADED_TO_NEW_VERSION                                              \
+  "Firmware has been upgraded to a newer version"
+#define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
+  "Firmware has been upgraded to a new type. Device reconfiguration is "       \
+  "required."
 
-#if defined(DEVICE_SHELLY_1)
+/* Firmware names */
+#if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "for Shelly-1"
-#elif defined(DEVICE_SONOFF_BASIC_V1)
+#elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "for Sonoff Basic"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "WIFI SWITCH"
@@ -61,6 +69,7 @@
 #define L_VERSION "Version"
 #define L_YES "Yes"
 #define L_NO "No"
+#define L_SENSOR "Sensor"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Incorrect password"
@@ -76,7 +85,7 @@
   "hotspot name used for configuration mode"
 #define L_HARDWARE_CONFIGURATION "Hardware configuration"
 #define L_HARDWARE_CONFIGURATION_INFO "Select connected items to your device"
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 #define L_NUMBER_OF_LEDS "Number of LEDs"
 #endif
 #define L_NUMBER_OF_RELAYS "Number of relays"
@@ -84,6 +93,9 @@
 #define L_DO_MEASURE_ADC "Measurements from Analog Input"
 #define L_DEVICE_CONTROLLING "Device controlling mechanism"
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define L_CONTROLLED_GATES "Gates/Doors controlled"
+#endif
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "WiFi Configuration"
@@ -124,7 +136,7 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"
 
@@ -158,13 +170,13 @@
 /* Form: Switch */
 #define L_FUNCTIONALITY "Functionality"
 #define L_SYSTEM_BUTTON "System button"
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #define L_CONTROL_RELAY "Controlling only the relay"
 #endif
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Controlling only the gate"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Select relay controlled by this switch"
+#define L_RELAY_CONTROLLED_BY_SWITCH "Controlling"
 #define L_TYPE "Type"
 #define L_MONOSTABLE "Monostable"
 #define L_BISTABLE "Bistable"
@@ -230,5 +242,40 @@
 #define L_VALID "Valid"
 #define L_PRO_CANNOT_BE_COFIGURED                                              \
   "Version PRO can be configured once the device is connected to the Internet"
+
+/* Form: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#define L_LED_ASSIGNED_TO_SENSOR "LED assigned to the sensor"
+#define L_SET_CONTACTRON_SENSITIVENESS                                         \
+  "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
+  "expected"
+#define L_MAGNETIC_SENSOR "Magnetic's sensor"
+#define L_MAGNETIC_SENSORS "Magnetic's sensors"
+#define L_NUMBER_OF_MAGNETIC_SENSORS "Number of magnetic's sensors"
+#define L_CONTACTRON_MQTT_TOPIC "MQTT Topic to monitor the contactron"
+
+#endif
+
+/* Form: Gate */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define L_GATE "Gate/Door"
+#define L_IF_MAGNETIC_SENSOR "If magnetic sensor"
+#define L_AND_SENSOR "and sensor"
+#define L_IS_OPEN "is open"
+#define L_ARE_OPEN "are open"
+#define L_THEN "then"
+#define L_IS_CLOSED "is closed"
+#define L_ARE_CLOSED "są zamknięte"
+#define L_GATES_STATES_CONFIGURATION "Gate states configuration"
+#define L_SET_GATE_STATE "Set gate's state to"
+#define L_OPENED "Opened"
+#define L_CLOSED "Closed"
+#define L_UNKNOWN_STATE "Unknown state"
+#define L_PARTIALLY_OPENED "Partially opened"
+#define L_GATE_CONFIGURATION "Gate/Door configuration"
+#define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
+#define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
+#define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
+#endif
 
 #endif

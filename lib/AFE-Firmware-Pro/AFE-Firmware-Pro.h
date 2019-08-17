@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Firmware_h
 #define _AFE_Firmware_h
@@ -23,7 +21,7 @@
 #include <Streaming.h>
 #endif
 
-class AFEFirmware {
+class AFEFirmwarePro {
 
 private:
   AFEDataAccess Data;
@@ -34,7 +32,7 @@ public:
   PRO_VERSION Pro;
 
   /* Constructor */
-  AFEFirmware();
+  AFEFirmwarePro();
 
   void begin();
 

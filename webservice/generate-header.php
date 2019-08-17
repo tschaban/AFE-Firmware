@@ -58,7 +58,7 @@ if ($Device->found()) { /* Device has been found */
     $Device->updateLastSeenDate();
   }
 } else { /* Adding new device to DB */
-  $Device->add($_type,$_version);
+  $Device->add($_type,$_version,$_device_type_id);
   $Location = new localization(C_USER_IP);
   $Location->add($_device_id);
   $Notification = new pushover();

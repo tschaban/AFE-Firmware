@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Switch.h"
 
@@ -11,16 +9,16 @@ AFESwitch::AFESwitch(){};
 void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
-#ifdef HARDWARE_SWITCH_GPIO_DIGIT_INPUT
+#ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
   pinMode(SwitchConfiguration.gpio, INPUT);
 #else
   pinMode(SwitchConfiguration.gpio, INPUT_PULLUP);
 #endif
   state = digitalRead(SwitchConfiguration.gpio);
   previousState = state;
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0 && _Device->configuration.isLED[systeLedID - 1]) {
+  if (systeLedID > 0 && _Device->configuration.noOfLEDs >= systeLedID) {
     Led.begin(systeLedID - 1);
   }
 #endif
@@ -91,7 +89,7 @@ void AFESwitch::listener() {
           SwitchConfiguration.sensitiveness) { // switch prssed, sensitiveness
                                                // taken into account, processing
                                                // event
-        if (SwitchConfiguration.type == SWITCH_TYPE_MONO) {
+        if (SwitchConfiguration.type == AFE_SWITCH_TYPE_MONO) {
 
           if (!_pressed) { // This is set only once when switch is pressed
             state = !state;
@@ -103,16 +101,16 @@ void AFESwitch::listener() {
 
           /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds
            */
-          if (SwitchConfiguration.functionality == SWITCH_FUNCTIONALITY_MULTI) {
+          if (SwitchConfiguration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
             if (time - startTime >= 35000) {
               Led.blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 3; i++) {
                 Led.blink(200);
                 delay(200);
@@ -122,7 +120,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               for (uint8_t i = 0; i < 2; i++) {
                 Led.blink(200);
                 delay(200);
@@ -132,7 +130,7 @@ void AFESwitch::listener() {
             }
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
               Led.blink(200);
 #endif
               _pressed4fiveSeconds = true;
@@ -150,9 +148,9 @@ void AFESwitch::listener() {
       //  Serial << endl << "press=" << pressed << " _press=" << _pressed;
 
     } else if (currentState == previousState && startTime > 0 &&
-               SwitchConfiguration.type == SWITCH_TYPE_MONO) {
+               SwitchConfiguration.type == AFE_SWITCH_TYPE_MONO) {
       /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds */
-      if (SwitchConfiguration.functionality == SWITCH_FUNCTIONALITY_MULTI) {
+      if (SwitchConfiguration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
 
         if (time - startTime >= 5000 && time - startTime < 10000) {
           pressed4fiveSeconds = true;

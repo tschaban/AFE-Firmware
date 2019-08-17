@@ -1,5 +1,5 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
   DOC: http://smart-house.adrian.czabanowski.com/afe-firmware-pl/ */
 
 #include "AFE-Data-Access.h"
@@ -316,7 +316,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
         configuration.isRelay[i] = doc["relay"][i].as<bool>();
       }
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       configuration.isAnalogInput = doc["isAnalogInput"].as<bool>();
 #endif
 
@@ -522,7 +522,7 @@ void AFEDataAccess::saveConfiguration(DEVICE configuration) {
       jsonRelay.add(configuration.isRelay[i]);
     }
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     doc["isAnalogInput"] = configuration.isAnalogInput;
 #endif
 
@@ -592,7 +592,7 @@ defined(T4_CONFIG)
   #endif
     }
 
-  #if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 
   #if defined(T0_CONFIG)
     index = 52;
@@ -1049,7 +1049,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
 #endif
 }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
 
@@ -1617,7 +1617,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #endif
 }
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 DS18B20 AFEDataAccess::getSensorConfiguration() {
   DS18B20 configuration;
   configuration.gpio = Eeprom.readUInt8(370);
@@ -1638,7 +1638,7 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
 DH AFEDataAccess::getSensorConfiguration() {
   DH configuration;
 #if defined(T2_CONFIG)
@@ -1718,7 +1718,7 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
   configuration.howLongKeepRelayOn = Eeprom.read(526 + id * nextPIR, 5).toInt();
   configuration.invertRelayState = Eeprom.read(531 + id * nextPIR);
 
-  configuration.outputDefaultState = Eeprom.readUInt8(613 + id);
+  configuration.type = Eeprom.readUInt8(613 + id);
   configuration.idx = Eeprom.read(954 + id * 6, 6).toInt();
 
   Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
@@ -1738,7 +1738,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
   Eeprom.write(526 + id * nextPIR, 5, (long)configuration.howLongKeepRelayOn);
   Eeprom.write(531 + id * nextPIR, configuration.invertRelayState);
 
-  Eeprom.writeUInt8(613 + id, configuration.outputDefaultState);
+  Eeprom.writeUInt8(613 + id, configuration.type);
   Eeprom.write(954 + id, 6, (long)configuration.idx);
 }
 #endif
@@ -1750,7 +1750,7 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   MQTT configurationMQTT;
 
   configuration.gpio = Eeprom.readUInt8(415 + id * nextContactron);
-  configuration.outputDefaultState =
+  configuration.type =
       Eeprom.readUInt8(416 + id * nextContactron);
   configuration.ledID = Eeprom.readUInt8(417 + id * nextContactron);
   configuration.bouncing = Eeprom.read(418 + id * nextContactron, 4).toInt();
@@ -1772,7 +1772,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
   uint8_t nextContactron = 24;
   Eeprom.writeUInt8(415 + id * nextContactron, configuration.gpio);
   Eeprom.writeUInt8(416 + id * nextContactron,
-                    configuration.outputDefaultState);
+                    configuration.type);
   Eeprom.writeUInt8(417 + id * nextContactron, configuration.ledID);
   Eeprom.write(418 + id * nextContactron, 4, (long)configuration.bouncing);
   Eeprom.write(422 + id * nextContactron, 16, configuration.name);
@@ -1801,7 +1801,7 @@ void AFEDataAccess::saveGateState(uint8_t state) {
 }
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
 
   if (type == THERMOSTAT_REGULATOR) {
@@ -1953,7 +1953,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif /* End: Relay */
 
 uint8_t AFEDataAccess::getDeviceMode() {
-  boolean mode = MODE_FIRST_TIME_LAUNCH;
+  boolean mode = AFE_MODE_FIRST_TIME_LAUNCH;
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -2048,7 +2048,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #endif
 }
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 uint8_t AFEDataAccess::getSystemLedID() {
   uint8_t id = 0;
 
@@ -2153,7 +2153,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
   saveConfiguration(configuration);
 }
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
   HPMA115S0 configuration;
   configuration.interval = Eeprom.read(414, 5).toInt();
@@ -2170,7 +2170,7 @@ void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   SERIALPORT configuration;
   configuration.RXD = Eeprom.readUInt8(411);
@@ -2183,7 +2183,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
   BMx80 configuration;
   configuration.interval = Eeprom.read(423, 5).toInt();
@@ -2206,7 +2206,7 @@ void AFEDataAccess::saveConfiguration(BMx80 configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
   BH1750 configuration;
   configuration.interval = Eeprom.read(430, 5).toInt();
@@ -2223,7 +2223,7 @@ void AFEDataAccess::saveConfiguration(BH1750 configuration) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
 ADCINPUT AFEDataAccess::getADCInputConfiguration() {
   ADCINPUT configuration;

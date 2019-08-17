@@ -1,3 +1,4 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 void eventsListener() {
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
@@ -10,28 +11,45 @@ void eventsListener() {
 #endif
     /* Update relay status to Domoticz */
     if (Device.configuration.api.domoticz) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.on();
 #endif
 
-#if defined(T5_CONFIG)
-      DomoticzPublishGateState();
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-        if (Device.configuration.isContactron[i]) {
-          DomoticzPublishContactronState(i);
-          lastPublishedContactronState[i] = Gate.Contactron[i].get();
-        } else {
-          break;
-        }
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+        DomoticzPublishGateState(i);
       }
-#else
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-        if (Device.configuration.isRelay[i]) {
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+      for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        DomoticzPublishContactronState(i);
+        lastPublishedContactronState[i] = Contactron[i].get();
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+      for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        /* For the Relay assigned to a gate code below is not needed for
+         * execution
+         */
+        if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
           DomoticzPublishRelayState(i);
-        } else {
-          break;
+#ifdef AFE_CONFIG_HARDWARE_GATE
+          /* Closing the condition for skipping relay if assigned to a gate */
         }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << "Excluding relay: " << i
+                 << " as it's assigned to a Gate: " << Relay[i].gateId;
+        }
+#endif
+#endif
       }
+#endif
 
 #if defined(T3_CONFIG)
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
@@ -43,13 +61,13 @@ void eventsListener() {
       }
 #endif
 
-#endif
-
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       Led.off();
 #endif
     }
   } /* End of Network.eventConnected() */
+
+  /* ## MQTT ## */
 
   if (Device.configuration.api.mqtt) {
     if (Mqtt.eventConnected()) {
@@ -58,26 +76,34 @@ void eventsListener() {
              << "Connected to MQTT Server: triggering post connection updates";
 #endif
 
-/* Subsribing to MQTT Topics */
-
-/* Publishing mesages after connection to MQTT Broker has been established */
-#if defined(T5_CONFIG)
-      MQTTPublishGateState();
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-        if (Device.configuration.isContactron[i]) {
-          MQTTPublishContactronState(i);
-          lastPublishedContactronState[i] = Gate.Contactron[i].get();
-        } else {
-          break;
-        }
-      }
-#else
-
       Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
 
-      /* Setting Relay state after connection to MQTT */
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-        if (Device.configuration.isRelay[i]) {
+/* Publishing mesages after connection to MQTT Broker has been established */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+        Mqtt.subscribe(Gate[i].getMQTTCommandTopic());
+        MQTTPublishGateState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+      for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        Mqtt.subscribe(Contactron[i].getMQTTCommandTopic());
+        MQTTPublishContactronState(i);
+        lastPublishedContactronState[i] = Contactron[i].get();
+      }
+#endif
+
+/* Setting Relay state after connection to MQTT */
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+      for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        /* For the Relay assigned to a gate code below is not needed for
+         * execution
+         */
+        if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
 
           /* Subscribing to MQTT Topic for Relay*/
           Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
@@ -90,20 +116,27 @@ void eventsListener() {
              * connected */
             MQTTPublishRelayState(i);
           }
-        } else {
-          break;
+#ifdef AFE_CONFIG_HARDWARE_GATE
+          /* Closing the condition for skipping relay if assigned to a gate */
         }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << "Excluding relay: " << i
+                 << " as it's assigned to a Gate: " << Relay[i].gateId;
+        }
+#endif
+#endif
       }
+#endif
 
       /* Publishing state of Switch to MQTT */
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-        if (Device.configuration.isSwitch[i]) {
-          MQTTPublishSwitchState(i);
-        }
+      for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
+        MQTTPublishSwitchState(i);
       }
 
 /* Subscribing to MQTT ADC commands */
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       if (Device.configuration.isAnalogInput) {
         Mqtt.subscribe(AnalogInput.getMQTTCommandTopic());
       }
@@ -117,8 +150,6 @@ void eventsListener() {
           break;
         }
       }
-#endif
-
 #endif
     }
   }

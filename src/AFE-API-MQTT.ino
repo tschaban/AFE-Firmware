@@ -1,6 +1,6 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
+  
 #include "AFE-API-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
@@ -75,7 +75,7 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -96,7 +96,7 @@ void AFEMQTT::connect() {
         if (_connected) {
           eventConnectionEstablished = true;
           delayStartTime = 0;
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           ledStartTime = 0;
           Led.off();
 #endif
@@ -105,7 +105,7 @@ void AFEMQTT::connect() {
           return;
         }
       }
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
@@ -131,7 +131,7 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
         ledStartTime = 0;
         Led.off();
 #endif
@@ -161,7 +161,7 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.on();
 #endif
 #ifdef DEBUG
@@ -180,7 +180,7 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
       Serial << endl << "Status: failure, not MQTT Topic";
     }
 #endif
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Led.off();
 #endif
 #ifdef DEBUG
@@ -191,7 +191,7 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *type,
                            const char *message) {
-  char _mqttTopic[MAX_MQTT_TOPIC_LENGTH];
+  char _mqttTopic[AFE_MAX_MQTT_TOPIC_LENGTH];
   sprintf(_mqttTopic, "%s/%s", subTopic, type);
   publishTopic(_mqttTopic, message);
 }

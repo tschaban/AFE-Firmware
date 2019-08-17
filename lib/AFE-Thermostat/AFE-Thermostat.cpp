@@ -1,6 +1,6 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
+  
 
 #include "AFE-Thermostat.h"
 
@@ -23,19 +23,19 @@ void AFEThermostat::listener(float currentTemperature) {
   if (configuration.enabled) {
     if (configuration.turnOnAbove &&
         currentTemperature > configuration.turnOn) {
-      relayState = RELAY_ON;
+      relayState = AFE_RELAY_ON;
       ready = true;
     } else if (!configuration.turnOnAbove &&
                currentTemperature < configuration.turnOn) {
-      relayState = RELAY_ON;
+      relayState = AFE_RELAY_ON;
       ready = true;
     } else if (configuration.turnOffAbove &&
                currentTemperature > configuration.turnOff) {
-      relayState = RELAY_OFF;
+      relayState = AFE_RELAY_OFF;
       ready = true;
     } else if (!configuration.turnOffAbove &&
                currentTemperature < configuration.turnOff) {
-      relayState = RELAY_OFF;
+      relayState = AFE_RELAY_OFF;
       ready = true;
     }
   }

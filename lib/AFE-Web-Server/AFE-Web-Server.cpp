@@ -1,12 +1,10 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Web-Server.h"
 
 AFEWebServer::AFEWebServer() {}
 
-void AFEWebServer::begin(AFEDevice *_Device, AFEFirmware *_Firmware) {
+void AFEWebServer::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   // httpUpdater.setup(&server);
   server.begin();
   Device = _Device;
@@ -25,7 +23,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 
   if (siteConfig->form) {
     page += "<form  method=\"post\" action=\"/?c=";
-    page += SERVER_CMD_SAVE;
+    page += AFE_SERVER_CMD_SAVE;
     page += "&o=";
     page += siteConfig->ID;
     if (siteConfig->deviceID >= 0) {
@@ -84,19 +82,25 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   case AFE_CONFIG_SITE_SWITCH:
     page += Site.addSwitchConfiguration(siteConfig->deviceID);
     break;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   case AFE_CONFIG_SITE_ANALOG_INPUT:
     page += Site.addAnalogInputConfiguration();
     break;
 #endif
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  case AFE_CONFIG_SITE_CONTACTRON:
+    page += Site.addContactronConfiguration(siteConfig->deviceID);
+    break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  case AFE_CONFIG_SITE_GATE:
+    page += Site.addGateConfiguration(siteConfig->deviceID);
+    break;
+#endif
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   case AFE_CONFIG_SITE_LED:
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-      if (Device->configuration.isLED[i]) {
-        page += Site.addLEDConfiguration(i);
-      } else {
-        break;
-      }
+    for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
+      page += Site.addLEDConfiguration(i);
     }
     page += Site.addSystemLEDConfiguration();
     break;
@@ -112,8 +116,8 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += "</form>";
   }
 
-  page += Site.generateFooter((Device->getMode() == MODE_NORMAL ||
-                               Device->getMode() == MODE_CONFIGURATION)
+  page += Site.generateFooter((Device->getMode() == AFE_MODE_NORMAL ||
+                               Device->getMode() == AFE_MODE_CONFIGURATION)
                                   ? true
                                   : false);
 
@@ -199,18 +203,21 @@ void AFEWebServer::generate(boolean upload) {
   uint8_t command = getCommand();
   siteConfig.deviceID = getID();
 
-  if (command == SERVER_CMD_SAVE) {
+  if (command == AFE_SERVER_CMD_SAVE) {
     switch (siteConfig.ID) {
     case AFE_CONFIG_SITE_FIRST_TIME:
       Data.saveConfiguration(getNetworkData());
       siteConfig.twoColumns = false;
       siteConfig.reboot = true;
-      siteConfig.rebootMode = MODE_CONFIGURATION;
+      siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
       siteConfig.form = false;
       siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
       break;
     case AFE_CONFIG_SITE_DEVICE:
-      Data.saveConfiguration(getDeviceData());
+      DEVICE configuration;
+      configuration = getDeviceData();
+      Data.saveConfiguration(&configuration);
+      configuration = {0};
       break;
     case AFE_CONFIG_SITE_NETWORK:
       Data.saveConfiguration(getNetworkData());
@@ -224,17 +231,15 @@ void AFEWebServer::generate(boolean upload) {
     case AFE_CONFIG_SITE_PASSWORD:
       Data.saveConfiguration(getPasswordData());
       break;
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     case AFE_CONFIG_SITE_ANALOG_INPUT:
       Data.saveConfiguration(getAnalogInputData());
       break;
 #endif
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     case AFE_CONFIG_SITE_LED:
-      for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-        if (Device->configuration.isLED[i]) {
-          Data.saveConfiguration(i, getLEDData(i));
-        }
+      for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
+        Data.saveConfiguration(i, getLEDData(i));
       }
       Data.saveSystemLedID(getSystemLEDData());
       break;
@@ -250,7 +255,7 @@ void AFEWebServer::generate(boolean upload) {
     case AFE_CONFIG_SITE_RESET:
       siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
       siteConfig.reboot = true;
-      siteConfig.rebootMode = MODE_FIRST_TIME_LAUNCH;
+      siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
       siteConfig.rebootTime = 15;
       siteConfig.form = false;
       siteConfig.twoColumns = false;
@@ -260,13 +265,25 @@ void AFEWebServer::generate(boolean upload) {
       Firmware->begin();
       Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
       break;
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    case AFE_CONFIG_SITE_CONTACTRON:
+      Data.saveConfiguration(siteConfig.deviceID,
+                             getContactronData(siteConfig.deviceID));
+      break;
+
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    case AFE_CONFIG_SITE_GATE:
+      Data.saveConfiguration(siteConfig.deviceID, getGateData());
+      break;
+#endif
     }
-  } else if (command == SERVER_CMD_NONE) {
+  } else if (command == AFE_SERVER_CMD_NONE) {
     switch (siteConfig.ID) {
     case AFE_CONFIG_SITE_INDEX:
       siteConfig.form = false;
       siteConfig.twoColumns = false;
-      if (siteConfig.deviceID > MODE_NORMAL) {
+      if (siteConfig.deviceID > AFE_MODE_NORMAL) {
         boolean authorize = true;
         PASSWORD accessControl = Data.getPasswordConfiguration();
         if (accessControl.protect) {
@@ -285,7 +302,7 @@ void AFEWebServer::generate(boolean upload) {
       break;
     case AFE_CONFIG_SITE_EXIT:
       siteConfig.reboot = true;
-      siteConfig.rebootMode = MODE_NORMAL;
+      siteConfig.rebootMode = AFE_MODE_NORMAL;
       siteConfig.rebootTime = 10;
       siteConfig.form = false;
       siteConfig.twoColumns = false;
@@ -409,38 +426,38 @@ void AFEWebServer::generate(boolean upload) {
   }
 
   /*
-  #ifdef CONFIG_HARDWARE_UART
+  #ifdef AFE_CONFIG_HARDWARE_UART
   }
   else if (optionName == "UART") {
     SERIALPORT data;
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getSerialPortData();
     }
     publishHTML(ConfigurationPanel.getSerialPortConfigurationSite(command,
-  data)); #endif #ifdef CONFIG_HARDWARE_HPMA115S0
+  data)); #endif #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   }
   else if (optionName == "HPMA115S0") {
     HPMA115S0 data;
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getHPMA115S0SensorData();
     }
     publishHTML(
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command,
-  data)); #endif #ifdef CONFIG_HARDWARE_BMX80
+  data)); #endif #ifdef AFE_CONFIG_HARDWARE_BMX80
   }
   else if (optionName == "BMx80") {
     BMx80 data;
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getBMx80SensorData();
     }
     publishHTML(
         ConfigurationPanel.getBMx80SensorConfigurationSite(command, data));
   #endif
-  #ifdef CONFIG_HARDWARE_BH1750
+  #ifdef AFE_CONFIG_HARDWARE_BH1750
   }
   else if (optionName == "BH1750") {
     BH1750 data;
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getBH1750SensorData();
     }
     publishHTML(
@@ -452,7 +469,7 @@ void AFEWebServer::generate(boolean upload) {
   else if (optionName == "index") {
     PASSWORD data;
     boolean authorize = true;
-    if (command != MODE_NORMAL) {
+    if (command != AFE_MODE_NORMAL) {
       AFEDataAccess Data;
       PASSWORD accessControl = Data.getPasswordConfiguration();
       if (accessControl.protect) {
@@ -464,43 +481,43 @@ void AFEWebServer::generate(boolean upload) {
 
       if (authorize) {
         if (command == 1) {
-          publishHTML(ConfigurationPanel.getSite("exit", MODE_CONFIGURATION));
+          publishHTML(ConfigurationPanel.getSite("exit", AFE_MODE_CONFIGURATION));
           server.client().stop();
-          Device->reboot(MODE_CONFIGURATION);
+          Device->reboot(AFE_MODE_CONFIGURATION);
         } else {
-          publishHTML(ConfigurationPanel.getSite("exit", MODE_ACCESS_POINT));
+          publishHTML(ConfigurationPanel.getSite("exit", AFE_MODE_ACCESS_POINT));
           server.client().stop();
-          Device->reboot(MODE_ACCESS_POINT);
+          Device->reboot(AFE_MODE_ACCESS_POINT);
         }
       }
     }
     publishHTML(ConfigurationPanel.getIndexSite(authorize));
-    AFEFirmware Firmware;
+    AFEFirmwarePro Firmware;
     Firmware.begin();
     Firmware.callService(AFE_WEBSERVICE_VALIDATE_KEY);
 
-  #ifdef CONFIG_HARDWARE_DS18B20
+  #ifdef AFE_CONFIG_HARDWARE_DS18B20
   }
   else if (optionName == "ds18b20") {
     DS18B20 data = {};
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getDS18B20Data();
     }
     publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command,
-  data)); #endif #ifdef CONFIG_HARDWARE_DHXX
+  data)); #endif #ifdef AFE_CONFIG_HARDWARE_DHXX
   }
   else if (optionName == "DHT") {
     DH data = {};
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getDHTData();
     }
     publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
   #endif
 
-  #ifdef CONFIG_FUNCTIONALITY_REGULATOR
+  #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   }
   else if (optionName == "thermostat" || optionName == "humidistat") {
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
         Data.saveConfiguration(getRegulatorData(optionName == "thermostat" ?
   THERMOSTAT_REGULATOR : HUMIDISTAT_REGULATOR);
     }
@@ -510,22 +527,22 @@ void AFEWebServer::generate(boolean upload) {
   else if (optionName == "start") {
     NETWORK data;
 
-    if (command == SERVER_CMD_SAVE) {
+    if (command == AFE_SERVER_CMD_SAVE) {
       data = getNetworkData();
       AFEDataAccess Data;
       Data.saveConfiguration(data);
       publishHTML(ConfigurationPanel.getConnectingSite());
-      Device->reboot(MODE_CONFIGURATION);
+      Device->reboot(AFE_MODE_CONFIGURATION);
     } else {
       publishHTML(
           ConfigurationPanel.getFirstLaunchConfigurationSite(command, data));
     }
   }
   else {
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
       if (Device->configuration.isRelay[i]) {
         if (optionName == "relay" + String(i)) {
-          if (command == SERVER_CMD_SAVE) {
+          if (command == AFE_SERVER_CMD_SAVE) {
             Data.saveConfiguration(i, getRelayData(i));
           }
           publishHTML(ConfigurationPanel.getRelayConfigurationSite(i));
@@ -535,11 +552,11 @@ void AFEWebServer::generate(boolean upload) {
       }
     }
 
-    for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
+    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
       if (Device->configuration.isSwitch[i]) {
         if (optionName == "switch" + String(i)) {
           SWITCH data = {};
-          if (command == SERVER_CMD_SAVE) {
+          if (command == AFE_SERVER_CMD_SAVE) {
             Data.saveConfiguration(i, getSwitchData(i));
           }
           publishHTML(ConfigurationPanel.getSwitchConfigurationSite(i));
@@ -554,7 +571,7 @@ void AFEWebServer::generate(boolean upload) {
       if (Device->configuration.isPIR[i]) {
         if (getOptionName() == "pir" + String(i)) {
           PIR data = {};
-          if (getCommand() == SERVER_CMD_SAVE) {
+          if (getCommand() == AFE_SERVER_CMD_SAVE) {
             data = getPIRData(i);
           }
           publishHTML(ConfigurationPanel.getPIRConfigurationSite(
@@ -571,7 +588,7 @@ void AFEWebServer::generate(boolean upload) {
       if (Device->configuration.isContactron[i]) {
         if (optionName == "contactron" + String(i)) {
           CONTACTRON data = {};
-          if (command == SERVER_CMD_SAVE) {
+          if (command == AFE_SERVER_CMD_SAVE) {
             data = getContactronData(i);
           }
           publishHTML(ConfigurationPanel.getContactronConfigurationSite(
@@ -584,7 +601,7 @@ void AFEWebServer::generate(boolean upload) {
 
     if (optionName == "gate") {
       GATE data = {};
-      if (command == SERVER_CMD_SAVE) {
+      if (command == AFE_SERVER_CMD_SAVE) {
         data = getGateData();
       }
       publishHTML(
@@ -630,9 +647,9 @@ boolean AFEWebServer::getOptionName() {
 
 uint8_t AFEWebServer::getSiteID() {
 
-  if (Device->getMode() == MODE_NETWORK_NOT_SET) {
+  if (Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
     return AFE_CONFIG_SITE_FIRST_TIME;
-  } else if (Device->getMode() == MODE_NORMAL) {
+  } else if (Device->getMode() == AFE_MODE_NORMAL) {
     return AFE_CONFIG_SITE_INDEX;
   } else {
     if (server.hasArg("o")) {
@@ -647,7 +664,7 @@ uint8_t AFEWebServer::getCommand() {
   if (server.hasArg("c")) {
     return server.arg("c").toInt();
   } else {
-    return SERVER_CMD_NONE;
+    return AFE_SERVER_CMD_NONE;
   }
 }
 
@@ -671,10 +688,19 @@ void AFEWebServer::listener() { server.handleClient(); }
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(String page) {
+
+#ifdef DEBUG
+  Serial << endl << "Site streaming started";
+#endif
+
+  server.send(200, "text/html", page);
+
+/* Sending in chunks
   uint16_t pageSize = page.length();
-  uint16_t size = 1024;
+  uint16_t size = 512;
   server.setContentLength(pageSize);
   if (pageSize > size) {
+    Serial << page.substring(0, size);
     server.send(200, "text/html", page.substring(0, size));
     uint16_t transfered = size;
     uint16_t nextChunk;
@@ -686,6 +712,10 @@ void AFEWebServer::publishHTML(String page) {
   } else {
     server.send(200, "text/html", page);
   }
+  */
+#ifdef DEBUG
+  Serial << endl << " - Completed";
+#endif
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -714,73 +744,64 @@ DEVICE AFEWebServer::getDeviceData() {
   _refreshConfiguration =
       true; // it will cause that device configuration will be refeshed
 
-  if (server.arg("dn").length() > 0) {
-    server.arg("dn").toCharArray(data.name, sizeof(data.name));
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
     data.name[0] = '\0';
   }
 
-  server.arg("h").length() > 0 ? data.api.http = true : data.api.http = false;
+  data.api.http = server.arg("h").length() > 0 ? true : false;
+  data.api.mqtt = server.arg("m").length() > 0 ? true : false;
+  data.api.domoticz = server.arg("d").length() > 0 ? true : false;
 
-  server.arg("m").length() > 0 ? data.api.mqtt = true : data.api.mqtt = false;
-
-  server.arg("d").length() > 0 ? data.api.domoticz = true
-                               : data.api.domoticz = false;
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_LEDS; i++) {
-    server.arg("hl").toInt() > i ? data.isLED[i] = true : data.isLED[i] = false;
-  }
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  data.noOfLEDs = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;
 #endif
 
-#if defined(T5_CONFIG)
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
-    server.arg("hc").toInt() > i ? data.isContactron[i] = true
-                                 : data.isContactron[i] = false;
-  }
-#else
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
-    server.arg("hr").toInt() > i ? data.isRelay[i] = true
-                                 : data.isRelay[i] = false;
-  }
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  data.noOfContactrons =
+      server.arg("co").length() > 0 ? server.arg("co").toInt() : 0;
 #endif
 
-  for (uint8_t i = 0; i < CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
-    server.arg("hs").toInt() > i ? data.isSwitch[i] = true
-                                 : data.isSwitch[i] = false;
-  }
-#ifdef CONFIG_HARDWARE_DS18B20
-  server.arg("ds").length() > 0 ? data.isDS18B20 = true
-                                : data.isDS18B20 = false;
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  data.noOfGates = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
-  server.arg("ds").length() > 0 ? data.isDHT = true : data.isDHT = false;
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  data.noOfRelays = server.arg("r").length() > 0 ? server.arg("r").toInt() : 0;
+#endif
+
+  data.noOfSwitches =
+      server.arg("s").length() > 0 ? server.arg("s").toInt() : 0;
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  data.isDS18B20 = server.arg("ds").length() > 0 ? true : false;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHXX
+  data.isDHT = server.arg("dh").length() > 0 ? true : false;
 #endif
 
 #if defined(T3_CONFIG)
   for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
-    server.arg("hp").toInt() > i ? data.isPIR[i] = true : data.isPIR[i] = false;
+    data.isPIR[i] = server.arg("p").toInt() > i ? true : false;
   }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
-  server.arg("ds").length() > 0 ? data.isHPMA115S0 = true
-                                : data.isHPMA115S0 = false;
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  data.isHPMA115S0 = server.arg("hp").length() > 0 ? true : false;
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
-  if (server.arg("b6").length() > 0) {
-    data.isBMx80 = server.arg("b6").toInt();
-  }
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+  data.isBMx80 = server.arg("b6").length() > 0 ? server.arg("b6").toInt() : 0;
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
-  server.arg("bh").length() > 0 ? data.isBH1750 = true : data.isBH1750 = false;
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  data.isBH1750 = server.arg("bh").length() > 0 ? true : false;
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
-  server.arg("ai").length() > 0 ? data.isAnalogInput = true
-                                : data.isAnalogInput = false;
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
 
   return data;
@@ -913,52 +934,42 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
 RELAY AFEWebServer::getRelayData(uint8_t id) {
   RELAY data;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g").length() ? server.arg("g").toInt() : 0;
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-  if (server.arg("ot" + String(id)).length() > 0) {
-    data.timeToOff = server.arg("ot" + String(id)).toFloat();
-  }
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+  data.timeToOff =
+      server.arg("ot").length() > 0 ? server.arg("ot").toFloat() : 0;
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY
+  data.state.powerOn =
+      server.arg("pr").length() > 0 ? server.arg("pr").toInt() : 0;
 
-  if (server.arg("pr" + String(id)).length() > 0) {
-    data.state.powerOn = server.arg("pr" + String(id)).toInt();
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
-  }
-
-  if (server.arg("t" + String(id)).length() > 0) {
-    server.arg("t" + String(id))
-        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
 
-  data.state.MQTTConnected = server.arg("mc" + String(id)).length() > 0
-                                 ? server.arg("mc" + String(id)).toInt()
-                                 : 0;
-
-#ifdef CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  if (server.arg("tp" + String(id)).length() > 0) {
-    data.thermalProtection = server.arg("tp" + String(id)).toInt();
-  }
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  data.thermalProtection = server.arg("tp" + String(id)).length() > 0
+                               ? server.arg("tp" + String(id)).toInt()
+                               : 0;
 #endif
 
-  data.domoticz.idx = server.arg("x" + String(id)).length() > 0
-                          ? server.arg("x" + String(id)).toInt()
-                          : 0;
+  data.state.MQTTConnected =
+      server.arg("mc").length() > 0 ? server.arg("mc").toInt() : 0;
 
-#endif
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.ledID = server.arg("l" + String(id)).toInt();
-  }
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   return data;
 }
@@ -966,33 +977,25 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   SWITCH data;
 
-  if (server.arg("m" + String(id)).length() > 0) {
-    data.type = server.arg("m" + String(id)).toInt();
-  }
+  data.type =
+      server.arg("m").length() > 0 ? server.arg("m").toInt() : AFE_SWITCH_TYPE_MONO;
 
-  if (server.arg("s" + String(id)).length() > 0) {
-    data.sensitiveness = server.arg("s" + String(id)).toInt();
-  }
+  data.sensitiveness = server.arg("s").length() > 0 ? server.arg("s").toInt()
+                                                    : AFE_SWITCH_BOUNCING;
 
-  if (server.arg("f" + String(id)).length() > 0) {
-    data.functionality = server.arg("f" + String(id)).toInt();
-  }
+  data.functionality = server.arg("f").length() > 0 ? server.arg("f").toInt()
+                                                    : AFE_SWITCH_FUNCTIONALITY_NONE;
 
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
-  if (server.arg("r" + String(id)).length() > 0) {
-    data.relayID = server.arg("r" + String(id)).toInt();
-  }
+  data.relayID = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.domoticz.idx = server.arg("x" + String(id)).length() > 0
-                          ? server.arg("x" + String(id)).toInt()
-                          : 0;
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 
-  if (server.arg("t" + String(id)).length() > 0) {
-    server.arg("t" + String(id))
-        .toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
@@ -1028,7 +1031,7 @@ PRO_VERSION AFEWebServer::getSerialNumberData() {
   return data;
 }
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 REGULATOR AFEWebServer::getRegulatorData() {
   REGULATOR data;
   server.arg("te").length() > 0 ? data.enabled = true : data.enabled = false;
@@ -1053,47 +1056,76 @@ REGULATOR AFEWebServer::getRegulatorData() {
 }
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
   CONTACTRON data;
 
-  if (server.arg("o" + String(id)).length() > 0) {
-    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+  data.type = server.arg("y").length() > 0
+                  ? server.arg("y").toInt()
+                  : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
+
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.bouncing = server.arg("b").length() > 0
+                      ? server.arg("b").toInt()
+                      : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
+
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("l" + String(id)).length() > 0) {
-    data.ledID = server.arg("l" + String(id)).toInt();
-  }
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 
-  if (server.arg("b" + String(id)).length() > 0) {
-    data.bouncing = server.arg("b" + String(id)).toInt();
-  }
-
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
-
-  if (server.arg("n" + String(id)).length() > 0) {
-    server.arg("n" + String(id)).toCharArray(data.name, sizeof(data.name));
-  }
-
-  if (server.arg("x" + String(id)).length() > 0) {
-    data.idx = server.arg("x" + String(id)).toInt();
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
   return data;
 }
+#endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
 GATE AFEWebServer::getGateData() {
   GATE data;
-  for (uint8_t i = 0; i < sizeof(data.state); i++) {
-    if (server.arg("s" + String(i)).length() > 0) {
-      data.state[i] = server.arg("s" + String(i)).toInt();
-    }
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("x").length() > 0) {
-    data.idx = server.arg("x").toInt();
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.contactron.id[0] = server.arg("c1").length() > 0
+                              ? server.arg("c1").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.contactron.id[1] = server.arg("c2").length() > 0
+                              ? server.arg("c2").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  for (uint8_t i = 0; i < sizeof(data.states.state); i++) {
+    data.states.state[i] = server.arg("s" + String(i)).length() > 0
+                               ? server.arg("s" + String(i)).toInt()
+                               : AFE_GATE_UNKNOWN;
+  }
+
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
   return data;
@@ -1128,7 +1160,7 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
                                             : data.invertRelayState = false;
 
   if (server.arg("o" + String(id)).length() > 0) {
-    data.outputDefaultState = server.arg("o" + String(id)).toInt();
+    data.type = server.arg("o" + String(id)).toInt();
   }
 
   if (server.arg("x" + String(id)).length() > 0) {
@@ -1139,32 +1171,26 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
 }
 #endif
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
-  if (server.arg("g" + String(id)).length() > 0) {
-    data.gpio = server.arg("g" + String(id)).toInt();
-  }
+  data.gpio = server.arg("g" + String(id)).length() > 0
+                  ? server.arg("g" + String(id)).toInt()
+                  : 0;
 
-  server.arg("o" + String(id)).length() > 0
-      ? data.changeToOppositeValue = true
-      : data.changeToOppositeValue = false;
+  data.changeToOppositeValue =
+      server.arg("o" + String(id)).length() > 0 ? true : false;
 
   return data;
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
-  uint8_t data;
-
-  if (server.arg("i").length() > 0) {
-    data = server.arg("i").toInt();
-  }
-
-  return data;
+  return server.arg("s").length() > 0 ? server.arg("s").toInt()
+                                      : AFE_HARDWARE_ITEM_NOT_EXIST;
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 DS18B20 AFEWebServer::getDS18B20Data() {
   DS18B20 data;
 
@@ -1196,7 +1222,7 @@ DS18B20 AFEWebServer::getDS18B20Data() {
 
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
 DH AFEWebServer::getDHTData() {
   DH data;
 
@@ -1249,7 +1275,7 @@ DH AFEWebServer::getDHTData() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
 SERIALPORT AFEWebServer::getSerialPortData() {
   SERIALPORT data;
   if (server.arg("r").length() > 0) {
@@ -1262,7 +1288,7 @@ SERIALPORT AFEWebServer::getSerialPortData() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   HPMA115S0 data;
   if (server.arg("i").length() > 0) {
@@ -1284,7 +1310,7 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
 };
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 BMx80 AFEWebServer::getBMx80SensorData() {
   BMx80 data;
 
@@ -1320,7 +1346,7 @@ BMx80 AFEWebServer::getBMx80SensorData() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
   if (server.arg("a").length() > 0) {
@@ -1342,35 +1368,35 @@ BH1750 AFEWebServer::getBH1750SensorData() {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 ADCINPUT AFEWebServer::getAnalogInputData() {
   ADCINPUT data;
-  if (server.arg("g").length() > 0) {
-    data.gpio = server.arg("g").toInt();
-  }
 
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
-  }
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO;
 
-  if (server.arg("n").length() > 0) {
-    data.numberOfSamples = server.arg("n").toInt();
-  }
+  data.interval = server.arg("i").length() > 0
+                      ? server.arg("i").toInt()
+                      : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL;
 
-  if (server.arg("m").length() > 0) {
-    data.maxVCC = server.arg("m").toFloat();
-  }
+  data.numberOfSamples =
+      server.arg("n").length() > 0
+          ? server.arg("n").toInt()
+          : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
 
-  if (server.arg("ra").length() > 0) {
-    data.divider.Ra = server.arg("ra").toFloat();
-  }
+  data.maxVCC = server.arg("m").length() > 0
+                    ? server.arg("m").toFloat()
+                    : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
 
-  if (server.arg("rb").length() > 0) {
-    data.divider.Rb = server.arg("rb").toFloat();
-  }
+  data.divider.Ra =
+      server.arg("ra").length() > 0 ? server.arg("ra").toFloat() : 0;
 
-  if (server.arg("t0").length() > 0) {
-    server.arg("t0").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  data.divider.Rb =
+      server.arg("rb").length() > 0 ? server.arg("rb").toFloat() : 0;
+
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }

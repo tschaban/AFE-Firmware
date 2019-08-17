@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_RELAY_Structure_h
 #define _AFE_RELAY_Structure_h
@@ -12,10 +10,6 @@
 #endif
 
 #include <AFE-REGULATOR-Structure.h>
-
-/* Relay states */
-#define RELAY_ON 1
-#define RELAY_OFF 0
 
 struct RELAY_DEFAULTS {
   uint8_t powerOn;

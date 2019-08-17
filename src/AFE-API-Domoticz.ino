@@ -1,6 +1,5 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
 #include "AFE-API-Domoticz.h"
 
 AFEDomoticz::AFEDomoticz() {}
@@ -62,7 +61,7 @@ void AFEDomoticz::callURL(const String url) {
   http.end();
 }
 
-#ifdef CONFIG_TEMPERATURE
+#ifdef AFE_CONFIG_TEMPERATURE
 void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -73,7 +72,7 @@ void AFEDomoticz::sendTemperatureCommand(unsigned int idx, float value) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -84,7 +83,7 @@ void AFEDomoticz::sendSValueCommand(unsigned int idx, float value) {
 }
 #endif
 
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
 void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -97,7 +96,7 @@ void AFEDomoticz::sendHumidityCommand(unsigned int idx, float value) {
 }
 #endif
 
-#if defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY)
+#if defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY)
 void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
                                                     float temperatureValue,
                                                     float humidityValue) {
@@ -114,7 +113,7 @@ void AFEDomoticz::sendTemperatureAndHumidityCommand(unsigned int idx,
 }
 #endif
 
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
 uint8_t AFEDomoticz::getHumidityState(float value) {
   if (value < 40) {
     return HUMIDITY_DRY;
@@ -128,8 +127,8 @@ uint8_t AFEDomoticz::getHumidityState(float value) {
 }
 #endif
 
-#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
-#if defined(CONFIG_PRESSURE)
+#if (defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY))
+#if defined(AFE_CONFIG_PRESSURE)
 void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
     unsigned int idx, float temperatureValue, float humidityValue,
     float pressureValue) {
@@ -150,7 +149,7 @@ void AFEDomoticz::sendTemperatureAndHumidityAndPressureCommand(
 #endif
 #endif
 
-#ifdef CONFIG_PRESSURE
+#ifdef AFE_CONFIG_PRESSURE
 void AFEDomoticz::sendPressureCommand(unsigned int idx, float pressureValue) {
   if (initialized) {
     String call = getApiCall("udevice", idx);
@@ -168,17 +167,21 @@ void AFEDomoticz::sendPirCommand(unsigned int idx, const char *value) {
 }
 #endif
 
-#if defined(T5_CONFIG) /* @TODO it could be removed and replaced by switch */
+#ifdef AFE_CONFIG_HARDWARE_GATE /* @TODO it could be removed and replaced by \ \ \ \
+                               \ switch */
 void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
 }
+#endif
 
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON /* @TODO it could be removed and replaced by \
+                                     \ \ \ \ switch */
 void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
 }
 #endif
 
-#ifdef CONFIG_DOMOTICZ_CUSTOME_SENSOR
+#ifdef AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 void AFEDomoticz::sendCustomSensorCommand(unsigned int idx, double value,
                                           uint8_t precision) {
   if (initialized) {

@@ -1,59 +1,86 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Gate.h"
 
 AFEGate::AFEGate(){};
 
-void AFEGate::begin() {
-  gateConfiguration = Data.getGateConfiguration();
+void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
-  Relay[0].begin(0);
+#ifdef DEBUG
+  Serial << endl << "Initializing the Gate: " << id;
+#endif
 
-  // Relay[0].setRelayAfterRestoringPower(); I think it's not required
+  Device = _Device;
+  Data = _Data;
 
-  Relay[0].setTimerUnitToSeconds(false);
-
-  for (uint8_t i = 0; i < sizeof(Device.configuration.isContactron); i++) {
-    if (Device.configuration.isContactron[i]) {
-      Contactron[i].begin(i);
-      numberOfContractors++;
-    } else {
-      break;
-    }
+  gateId = id;
+  configuration = Data->getGateConfiguration(gateId);
+#ifdef DEBUG
+  Serial << endl << "Initializing the gate's relay: " << configuration.relayId;
+#endif
+  if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    GateRelay.begin(configuration.relayId);
+    GateRelay.setTimerUnitToSeconds(false);
+    GateRelay.gateId = id;
   }
+#ifdef DEBUG
+  Serial << endl << "Initializing the gate's " << id << ", contactrons";
+#endif
+
+  /* How many contactrons monitors the gate. Default 0 set in class init
+   */
+
+  if (configuration.contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    numberOfContractons = 2;
+  } else if (configuration.contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    numberOfContractons = 1;
+  }
+
+#ifdef DEBUG
+  Serial << endl
+         << "Number of contactrons to initialize: " << numberOfContractons;
+#endif
+
+  for (uint8_t i = 0; i < numberOfContractons; i++) {
+    Contactron[i].begin(configuration.contactron.id[i], _Device, _Data);
+  }
+
+#ifdef DEBUG
+  Serial << endl << "Gate Initialization completed";
+#endif
 }
 
 void AFEGate::toggle() {
-  Relay[0].on();
+  GateRelay.on();
   // Setting Gate state manually is possible only if there is no contactrons
-  if (numberOfContractors == 0) {
-    Data.saveGateState(get() == GATE_CLOSED ? GATE_OPEN : GATE_CLOSED);
+  if (numberOfContractons == 0) {
+    Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN : AFE_GATE_CLOSED);
     _event = true;
   }
 }
 
 uint8_t AFEGate::getGateStateBasedOnContractons() {
-  uint8_t gateState = GATE_UNKNOWN;
-  if (numberOfContractors > 0) {
-    uint8_t _state[numberOfContractors];
-    for (uint8_t i = 0; i < numberOfContractors; i++) {
+  uint8_t gateState = AFE_GATE_UNKNOWN;
+  if (numberOfContractons > 0) {
+    uint8_t _state[numberOfContractons];
+    for (uint8_t i = 0; i < numberOfContractons; i++) {
       _state[i] = Contactron[i].get();
     }
-    if (_state[0] == CONTACTRON_OPEN) {
-      if (numberOfContractors == 2) {
-        gateState = _state[1] == CONTACTRON_OPEN ? gateConfiguration.state[0]
-                                                 : gateConfiguration.state[1];
+    if (_state[0] == AFE_CONTACTRON_OPEN) {
+      if (numberOfContractons == 2) {
+        gateState = _state[1] == AFE_CONTACTRON_OPEN
+                        ? configuration.states.state[0]
+                        : configuration.states.state[1];
       } else {
-        gateState = gateConfiguration.state[0];
+        gateState = configuration.states.state[0];
       }
-    } else if (_state[0] == CONTACTRON_CLOSED) {
-      if (numberOfContractors == 2) {
-        gateState = _state[1] == CONTACTRON_OPEN ? gateConfiguration.state[2]
-                                                 : gateConfiguration.state[3];
+    } else if (_state[0] == AFE_CONTACTRON_CLOSED) {
+      if (numberOfContractons == 2) {
+        gateState = _state[1] == AFE_CONTACTRON_OPEN
+                        ? configuration.states.state[2]
+                        : configuration.states.state[3];
       } else {
-        gateState = gateConfiguration.state[3];
+        gateState = configuration.states.state[3];
       }
     }
   }
@@ -61,27 +88,24 @@ uint8_t AFEGate::getGateStateBasedOnContractons() {
 }
 
 uint8_t AFEGate::get() {
-  if (numberOfContractors ==
+  if (numberOfContractons ==
       0) { // If there is not contactorns then get gate state from EEPROM
-    return Data.getGateState();
+    return Data->getGateState(gateId);
   } else { // Get gate state based on contactrons
     return getGateStateBasedOnContractons();
   }
 }
 
-void AFEGate::listener() {
+uint8_t AFEGate::getNoOfContactrons() { return numberOfContractons; }
 
-  Relay[0].autoTurnOff();
-
-  for (uint8_t i = 0; i < numberOfContractors; i++) {
-    Contactron[i].listener();
-    if (Contactron[i].changed()) {
-      _event = true; // Gate changed the state as contractons changed the state
-    }
-  }
+uint8_t AFEGate::getContactronId(uint8_t index) {
+  return configuration.contactron.id[index];
 }
 
 boolean AFEGate::event() {
+
+  GateRelay.autoTurnOff();
+
   if (_event) {
     _event = false;
     return true;
@@ -90,4 +114,30 @@ boolean AFEGate::event() {
   }
 }
 
-unsigned long AFEGate::getDomoticzIDX() { return gateConfiguration.idx; }
+void AFEGate ::triggerEvent() {
+#ifdef DEBUG
+  Serial << endl << "Gate event triggered externally";
+#endif
+
+  _event = true;
+}
+
+const char *AFEGate::getMQTTCommandTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+  return mqttCommandTopic;
+}
+
+const char *AFEGate::getMQTTStateTopic() {
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+  return mqttStateTopic;
+}
+
+unsigned long AFEGate::getDomoticzIDX() { return configuration.domoticz.idx; }

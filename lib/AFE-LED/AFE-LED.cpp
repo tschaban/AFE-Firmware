@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-LED.h"
 
@@ -10,16 +8,14 @@ AFELED::AFELED(uint8_t id) { begin(id); }
 
 void AFELED::begin(uint8_t id) {
   AFEDevice Device;
-  if (Device.configuration.isLED[id]) {
-    AFEDataAccess Data;
-    LEDConfiguration = Data.getLEDConfiguration(id);
-    Data = {};
-    pinMode(LEDConfiguration.gpio, OUTPUT);
-    LEDConfiguration.changeToOppositeValue
-        ? digitalWrite(LEDConfiguration.gpio, LOW)
-        : digitalWrite(LEDConfiguration.gpio, HIGH);
-    _initialized = true;
-  }
+  AFEDataAccess Data;
+  LEDConfiguration = Data.getLEDConfiguration(id);
+  Data = {};
+  pinMode(LEDConfiguration.gpio, OUTPUT);
+  LEDConfiguration.changeToOppositeValue
+      ? digitalWrite(LEDConfiguration.gpio, LOW)
+      : digitalWrite(LEDConfiguration.gpio, HIGH);
+  _initialized = true;
 }
 
 void AFELED::on() {

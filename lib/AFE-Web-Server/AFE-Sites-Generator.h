@@ -1,6 +1,4 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
@@ -14,16 +12,19 @@
 #include <AFE-CSS.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-EEPROM.h>
-#include <AFE-Firmware.h>
+#include <AFE-Firmware-Pro.h>
 #include <ESP8266WiFi.h>
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-I2C-Scanner.h>
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 #include <AFE-Sensor-BMx80.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <AFE-Gate.h>
 #endif
 
 #ifdef DEBUG
@@ -39,11 +40,10 @@
 class AFESitesGenerator {
 
 private:
-  AFEEEPROM Eeprom;
   AFEDataAccess Data;
   AFEDevice *Device;
   FIRMWARE firmware;
-  AFEFirmware *Firmware;
+  AFEFirmwarePro *Firmware;
   char deviceID[17];
 
   const String generateHeader(uint8_t redirect);
@@ -51,7 +51,7 @@ private:
   /* Method generates GPIO selecton list */
   const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
                                             const String title = "GPIO");
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
                                           uint8_t type);
@@ -61,6 +61,11 @@ private:
   String addConfigurationBlock(const String title, const String description,
                                const String body);
 
+  const String generateHardwareList(uint8_t noOfItems, uint8_t noOffConnected,
+                                    const char *field, const char *label,
+                                    uint8_t index, uint8_t noneValue);
+
+  /* It uses generateHardwareItemsList() */
   const String generateHardwareItemsList(uint8_t noOfItems,
                                          uint8_t noOffConnected,
                                          const char *field, const char *label);
@@ -75,11 +80,11 @@ private:
   const String generateGateStatesList(uint8_t id, byte state);
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
   String addThermostateMenuItem();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_HUMIDISTAT
+#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
   String addHumidistatMenuItem();
 #endif
 
@@ -87,7 +92,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDevice *, AFEFirmware *);
+  void begin(AFEDevice *, AFEFirmwarePro *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
@@ -107,21 +112,22 @@ public:
   String addPasswordConfigurationSite();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);
+  String addProVersionSite();
 
-#if CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_DS18B20
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   String addDS18B20Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHXX
   String addDHTConfiguration();
 #endif
 
-#ifdef CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   String addRegulatorConfiguration(uint8_t type);
 #endif
 
@@ -129,32 +135,35 @@ public:
   String addPIRConfiguration(uint8_t id);
 #endif
 
-#if defined(T5_CONFIG)
-  String addGateConfiguration();
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  String addGateConfiguration(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   String addContactronConfiguration(uint8_t id);
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   String addHPMA115S0Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
   String addBMx80Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   String addBH1750Configuration();
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   String addAnalogInputConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   String addSerialPortConfiguration();
 #endif
 
-#ifdef CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_UART
   String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 
@@ -172,8 +181,6 @@ public:
 
   /* Method generates section shown when device is in norma mode */
   String addIndexSection(boolean authorized);
-
-  String addProVersionSite();
 };
 
 #endif

@@ -1,6 +1,6 @@
-/* AFE Firmware for smart home devices
-  LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-  DOC: https://www.smartnydom.pl/afe-firmware-pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
+  
 
 /* Initializing Domoticz API */
 void DomoticzInit() {
@@ -12,22 +12,21 @@ void DomoticzInit() {
   }
 }
 
-#ifdef CONFIG_FUNCTIONALITY_RELAY // Not required for T5
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 /* It publishes relay state to Domoticz */
 void DomoticzPublishRelayState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
     unsigned long idx = Relay[id].getDomoticzIDX();
     if (idx > 0) {
       Domoticz.sendSwitchCommand(idx,
-                                 Relay[id].get() == RELAY_ON ? "On" : "Off");
+                                 Relay[id].get() == AFE_RELAY_ON ? "On" : "Off");
     }
   }
 }
 #endif
 
 /* Temperature and Humiditity sensors */
-#ifdef CONFIG_TEMPERATURE
-
+#ifdef AFE_CONFIG_TEMPERATURE
 /* It publishes temperature to Domoticz */
 void DomoticzPublishTemperature(unsigned long idx, float temperature) {
   if (Device.configuration.api.domoticz && idx > 0) {
@@ -36,7 +35,7 @@ void DomoticzPublishTemperature(unsigned long idx, float temperature) {
 }
 #endif
 
-#ifdef CONFIG_HUMIDITY
+#ifdef AFE_CONFIG_HUMIDITY
 /* It publishes humidity to Domoticz */
 void DomoticzPublishHumidity(unsigned long idx, float humidity) {
   if (Device.configuration.api.domoticz && idx > 0) {
@@ -45,7 +44,7 @@ void DomoticzPublishHumidity(unsigned long idx, float humidity) {
 }
 #endif
 
-#if (defined(CONFIG_TEMPERATURE) && defined(CONFIG_HUMIDITY))
+#if (defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY))
 /* It publishes temperature and humidity to Domoticz */
 void DomoticzPublishTemperatureAndHumidity(unsigned long idx, float temperature,
                                            float humidity) {
@@ -57,7 +56,7 @@ void DomoticzPublishTemperatureAndHumidity(unsigned long idx, float temperature,
 #endif
 
 /* Pir */
-#ifdef CONFIG_HARDWARE_PIR
+#ifdef AFE_CONFIG_HARDWARE_PIR
 /* It publishes gate state to Domoticz */
 void DomoticzPublishPirState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
@@ -70,30 +69,32 @@ void DomoticzPublishPirState(uint8_t id) {
 #endif
 
 /* Gate and Contactron */
-#ifdef CONFIG_FUNCTIONALITY_GATE
+#ifdef AFE_CONFIG_HARDWARE_GATE
 /* It publishes gate state to Domoticz */
-void DomoticzPublishGateState() {
+void DomoticzPublishGateState(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    unsigned long idx = Gate.getDomoticzIDX();
+    unsigned long idx = Gate[id].getDomoticzIDX();
     if (idx > 0) {
-      Domoticz.sendGateCommand(idx, Gate.get() == GATE_OPEN ? "On" : "Off");
-    }
-  }
-}
-
-/* It publishes contactron state to Domoticz */
-void DomoticzPublishContactronState(uint8_t id) {
-  if (Device.configuration.api.domoticz) {
-    unsigned long idx = Gate.Contactron[id].getDomoticzIDX();
-    if (idx > 0) {
-      Domoticz.sendContactronCommand(
-          idx, Gate.Contactron[id].get() == CONTACTRON_OPEN ? "On" : "Off");
+      Domoticz.sendGateCommand(idx, Gate[id].get() == AFE_GATE_OPEN ? "On" : "Off");
     }
   }
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+/* It publishes contactron state to Domoticz */
+void DomoticzPublishContactronState(uint8_t id) {
+  if (Device.configuration.api.domoticz) {
+    unsigned long idx = Contactron[id].getDomoticzIDX();
+    if (idx > 0) {
+      Domoticz.sendContactronCommand(
+          idx, Contactron[id].get() == AFE_CONTACTRON_OPEN ? "On" : "Off");
+    }
+  }
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
   if (Device.configuration.api.domoticz) {
     HPMA115S0_DOMOTICZ idx;
@@ -110,7 +111,7 @@ void DomoticzPublishParticleSensorData(HPMA115S0_DATA data) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BMX80
+#ifdef AFE_CONFIG_HARDWARE_BMX80
 void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
   if (Device.configuration.api.domoticz) {
     BMx80_DOMOTICZ idx;
@@ -141,7 +142,7 @@ void DomoticzPublishBMx80SensorData(BMx80_DATA data) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 void DomoticzPublishLightLevel(float lux) {
   if (Device.configuration.api.domoticz) {
     unsigned long idx = BH1750Sensor.getDomoticzIDX();
@@ -153,7 +154,7 @@ void DomoticzPublishLightLevel(float lux) {
 }
 #endif
 
-#ifdef CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
   if (Device.configuration.api.domoticz) {
     ADCINPUT_DOMOTICZ idx;
