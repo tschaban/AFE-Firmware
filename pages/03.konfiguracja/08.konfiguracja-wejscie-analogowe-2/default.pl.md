@@ -15,6 +15,7 @@ Poniżej przedstwiony jest przykład konfiguracji bramy, która posiada dwa czuj
 ---
 
 {% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
 <div class="page-toc">
     {% set table_of_contents = toc(page.content, 3,3) %}
     {% if table_of_contents is not empty %}

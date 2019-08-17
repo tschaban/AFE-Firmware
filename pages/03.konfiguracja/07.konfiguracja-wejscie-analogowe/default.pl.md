@@ -1,6 +1,11 @@
 ---
 title: 'Konfiguracja wejścia analogowego'
 media_order: 'afe-firmware-konfiguracja-adc.png,afe-firmware-konfiguracja-adc-domoticz.png,afe-firmware-konfiguracja-adc-dzielnik.png,afe-firmware-konfiguracja-adc-mqtt.png,afe-firmware-konfiguracja-adc-wejscie.png'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Układ ESP8266/8285 posiada wbudowany przetwornik analogowo-cyfrowy (ADC), który umożliwia odczytanie napięcia stałego. AFE Firmware daje możliwość przetwarzania tych informacji oraz wysyłania ich do systemu automatyki.
@@ -14,6 +19,22 @@ Funkcja daje możliwość przesyłania do systemu automatyki następujących war
 > 100% jeśli osiągnięte zostanie maksymalne napięcie na wejściu analogowym
 
 !!!! Przetwarzanie wartości z wejścia nalogowego dostępne jest w [wersji PRO AFE Firmware](/postawowe-informacje/wersja-pro).
+
+
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
 
 Ekran do konfiguracji wejścia analogowego otwiera się wybierając opcję **Wejście Analogowe** w menu Panelu Konfiguracyjnego AFE Firmware.
 

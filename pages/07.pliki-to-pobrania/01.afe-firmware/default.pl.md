@@ -1,8 +1,23 @@
 ---
 title: 'AFE Firmware'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 3,1) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
 
 ### AFE Firmware T0: Włącznik WiFi
 * Podstawowa wersja z opcją automatycznego wyłączania do 4 przekaźników

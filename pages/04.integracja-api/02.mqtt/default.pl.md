@@ -21,7 +21,7 @@ Do prawidłowego działania MQTT API konieczne jest [skonfigurowanie połaczenie
 
 {% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
 <div class="page-toc">
-    {% set table_of_contents = toc(page.content, 5,1) %}
+    {% set table_of_contents = toc(page.content, 5,2) %}
     {% if table_of_contents is not empty %}
     {{ table_of_contents }}
     {% endif %}
@@ -38,7 +38,7 @@ Przykład definicji tematu LWT
 
 `dom/kuchnia/lampa/lwt`
 
-Informacja na wyjściu
+Informacja na wyjściu, jedna z poniższych
 
 * connected
 * disconnected
@@ -68,7 +68,7 @@ AFE Firmware wysła następujący temat przy każdej zmianie stanu przekaźnika 
 
 `dom/kuchnia/lampa/state`
 
-z wiadomością
+z jedną z wiadomości
 
 * on
 * off
@@ -77,18 +77,85 @@ z wiadomością
 
 ##### Tematy do monitorowania stanu przycisku
 
-* Teamt definiowany jest osobno da każdego przycisku w[ konfiguracji przycisku/włącznika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przycisku-wlacznika)
+* Temat definiowany jest osobno da każdego przycisku w [konfiguracji przycisku/włącznika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przycisku-wlacznika)
 
 Przykład:
 `dom/kuchnia/przycisk/lampa`
 
-! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **state**
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **state** lub **cmd**
 
-Używając przykładu tematu powyżej, przy każdej zmianie stany przycisku, do MQTT Brokera urządzenie wysyła MQTT temat 
+Używając przykładu tematu powyżej, aby odczytać aktualny stan przycisku, do MQTT Brokera należy wysłać następujący temat
+
+`dom/kuchnia/przycisk/lampa/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat przy każdej zmianie stanu przycisku lub po otrzymaniu żądania odczytania stanu przycisku
 
 `dom/kuchnia/przycisk/lampa/state`
 
-z wiadomością
+z jedną z wiadomości
 
 * open
 * closed
+
+---
+
+##### Tematy do monitorowania stanu otwarcia/zamknięcia bramy/drzwi (AFE T5)
+
+* Teamt definiowany jest osobno dla każdej bramy w formularzu do [konfiguracji bramy](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-wejscie-analogowe-2#sekcja-konfiguracja-bramy-drzwi)
+
+Przykład:
+`dom/brama/wjazdowa`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **state** lub **cmd**
+
+Używając przykładu tematu powyżej, aby odczytać aktualny stan otwarcia/zamknięcia bramy, do MQTT Brokera należy wysłać następujący temat
+
+`dom/brama/wiazdowa/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat przy każdej zmianie stanu otwarcia/zamknięcia bramy lub po otrzymaniu żądania odczytania stanu bramy
+
+`dom/brama/wjazdowa/state`
+
+z jedną z wiadomości
+
+* open
+* closed
+* partiallyOpen
+* unknown
+
+---
+
+##### Tematy do monitorowania czujnika magnetycznego (AFE T5)
+
+* Temat definiowany jest osobno da każdego czujnika magnetycznego w formularzu do [konfiguracji czujnika magnetycznego](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-wejscie-analogowe-2#konfiguracja-czujnika-magnetycznego)
+
+Przykład:
+`dom/brama/wiazdowa/czujnik/C1`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **state** lub **cmd**
+
+Używając przykładu tematu powyżej, aby odczytać aktualny stan czujnika magnetycznego, do MQTT Brokera należy wysłać następujący temat
+
+`dom/brama/wiazdowa/czujnik/C1/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat przy każdej zmianie stanu czujnika magnetycznego lub po otrzymaniu żądania odczytania stanu czujnika
+
+`dom/brama/wiazdowa/czujnik/C1/state`
+
+z jedną z wiadomości
+
+* open
+* closed
+

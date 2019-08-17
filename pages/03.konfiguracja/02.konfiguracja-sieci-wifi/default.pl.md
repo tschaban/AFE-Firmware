@@ -1,6 +1,11 @@
 ---
 title: 'Konfiguracja sieci WiFi'
 media_order: 'afe-firmware-konfiguracja-wifi.png,afe-firmware-konfiguracja-wifi-ssid.png,afe-firmware-konfiguracja-wifi-staly-ip.png,afe-firmware-konfiguracja-wifi-zaawansowane.png'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Aby w pełni wykorzystać możliwości urządzenia, musi ono być podłączone do sieci WiFi. Nie ma konieczności, aby urządzenie z AFE Firmware musiało mieć dostęp do sieci Internet.
@@ -12,6 +17,21 @@ Forumularz konfiguracji WiFi umożliwia
 * ustawienie parametrów sieci WiFi, z która urządzenie będzie podłączone
 * przydzielenie stałego adresu IP lub dynamicznie przyznawanego przez Serwer DHCP router'a WiFi
 * ustawienie parametrów związanych z łączeniem się z routerem WiFi
+
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
 
 Ekran do konfiguracji WiFi uruchamia się zaznaczając element Sieć WiFi w menu Panelu Konfiguracyjnego AFE Firmware.
 

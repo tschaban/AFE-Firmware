@@ -1,8 +1,24 @@
 ---
 title: 'Polityka prywatności'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Na tej stronie znajdziesz informacje dotyczące gromadzenia, przetwarzania i wykorzystywania informacji o użytkownikach oprogramowania AFE Fimware
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 5,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 ##### Czy gromadzone są jakiekolwiek dane osobowe użytkowników oprogramowania AFE Firmware?
 
