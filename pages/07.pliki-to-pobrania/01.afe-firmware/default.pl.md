@@ -37,6 +37,8 @@ recaptchacontact:
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi) dotyczące AFE Firmware T5
 * Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 
+!!! Wersja 2.x nie obsługuje czujnika temperatury oraz wilgotności DHTxx. Jeśli potrzebujesz obsługę tego czujnika pobierz wersję 1.x
+
 ##### [Pobierz najnowszą wersję 2.0.0](https://www.smartnydom.pl/download/afe-firmware-t5-v2/?target=_blank)
 **Poprzednie wersje**
 * Wersja 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
