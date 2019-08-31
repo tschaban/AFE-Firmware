@@ -43,6 +43,8 @@ Firmware umożliwia
 * Możliwość nadania stałego adresu IP dla urządzenia
 * Aktualizacja oprogramowania przez przeglądarkę
 
+!!! Wersja 2.x nie obsługuje czujnika temperatury oraz wilgotności DHTxx. Jeśli potrzebujesz obsługę tego czujnika pobierz wersję 1.x. W wersji 2.0.1 zostanie dodana obsługa szyny I2C  (najprawdopodobniej z czujnikami serii BMEx)
+
 ** Gotowe moduły **
 * Idealnie pasuje do [iECS Sterownik Bramą v2](https://www.smartnydom.pl/sterownik-bramy-wersja-v2/?target=_blank), [iECS Sterownik bramą v1](https://www.smartnydom.pl/forum/uklady-esp8266-i-inne-zrob-to-sam/sterownik-bramy-dla-afe-firmware-t5/?target=_blank), własnych konstrukcji opartych na ESP8266/8285
 
