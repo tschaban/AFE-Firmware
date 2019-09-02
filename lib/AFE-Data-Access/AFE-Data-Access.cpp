@@ -3150,32 +3150,226 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration() {
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 50
+HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   HPMA115S0 configuration;
-  configuration.interval = Eeprom.read(414, 5).toInt();
-  configuration.timeToMeasure = Eeprom.read(419, 3).toInt();
-  configuration.idx.pm25 = Eeprom.read(926, 6).toInt();
-  configuration.idx.pm10 = Eeprom.read(932, 6).toInt();
+
+  char fileName[21];
+  sprintf(fileName, "cfg-HPMA115S0-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.interval = root["interval"];
+      configuration.timeToMeasure = root["timeToMeasure"];
+      configuration.domoticz.pm25.idx = root["idx"]["pm25"];
+      configuration.domoticz.pm10.idx = root["idx"]["pm10"];
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_HPMA115S0 < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(HPMA115S0 configuration) {
-  Eeprom.write(414, 5, (long)configuration.interval);
-  Eeprom.write(419, 3, (long)configuration.timeToMeasure);
-  Eeprom.write(926, 6, (long)configuration.idx.pm25);
-  Eeprom.write(932, 6, (long)configuration.idx.pm10);
+void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
+  char fileName[21];
+  sprintf(fileName, "cfg-HPMA115S0-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &idx = root.createNestedObject("idx");
+
+    root["interval"] = configuration.interval;
+    root["timeToMeasure"] = configuration.timeToMeasure;
+
+    root["mqttTopic"] = configuration.mqtt.topic;
+    idx["pm25"] = configuration.domoticz.pm25.idx;
+    idx["pm10"] = configuration.domoticz.pm10.idx;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_HPMA115S0 < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
+#define AFE_CONFIG_FILE_BUFFER_UART 10
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   SERIALPORT configuration;
-  configuration.RXD = Eeprom.readUInt8(411);
-  configuration.TXD = Eeprom.readUInt8(412);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-uart.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-uart.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.RXD = root["interval"];
+      configuration.TXD = root["timeToMeasure"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_UART < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
 void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
-  Eeprom.writeUInt8(411, configuration.RXD);
-  Eeprom.writeUInt8(412, configuration.TXD);
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: cfg-uart.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-uart.json", "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["RXD"] = configuration.RXD;
+    root["TXD"] = configuration.TXD;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_UART < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
 }
 #endif
 

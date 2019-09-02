@@ -146,18 +146,18 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HPMA115S0 getHPMA115S0SensorConfiguration();
-  void saveConfiguration(HPMA115S0 configuration);
+  HPMA115S0 getHPMA115S0SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, HPMA115S0 configuration);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-  BMx80 getBMx80SensorConfiguration();
-  void saveConfiguration(BMx80 configuration);
+  BMx80 getBMx80SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, BMx80 configuration);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  BH1750 getBH1750SensorConfiguration();
-  void saveConfiguration(BH1750 configuration);
+  BH1750 getBH1750SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, BH1750 configuration);
 #endif
 
 /* Methods turns on / off APIs */

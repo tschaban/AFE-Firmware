@@ -10,18 +10,19 @@
 #endif
 
 struct BMx80_DOMOTICZ {
-  unsigned long temperatureHumidityPressure;
-  unsigned long gasResistance;
-  unsigned long temperature;
-  unsigned long pressure;
-  unsigned long humidity;
+  DOMOTICZ_BASIC_CONFIG temperatureHumidityPressure;
+  DOMOTICZ_BASIC_CONFIG gasResistance;
+  DOMOTICZ_BASIC_CONFIG temperature;
+  DOMOTICZ_BASIC_CONFIG pressure;
+  DOMOTICZ_BASIC_CONFIG humidity;
 };
 
 struct BMx80 {
   uint8_t type;
   uint16_t interval;
   uint8_t i2cAddress;
-  BMx80_DOMOTICZ idx;
+  BMx80_DOMOTICZ domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 struct BMx80_DATA {

@@ -9,18 +9,16 @@
 #include "WProgram.h"
 #endif
 
-#define HPMA115S0_TYPE_PM25 0
-#define HPMA115S0_TYPE_PM10 1
-
 struct HPMA115S0_DOMOTICZ {
-  unsigned long pm25;
-  unsigned long pm10;
+  DOMOTICZ_BASIC_CONFIG pm25;
+  DOMOTICZ_BASIC_CONFIG pm10;
 };
 
 struct HPMA115S0 {
   uint16_t interval;
   uint16_t timeToMeasure;
-  HPMA115S0_DOMOTICZ idx;
+  HPMA115S0_DOMOTICZ domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 struct HPMA115S0_DATA {

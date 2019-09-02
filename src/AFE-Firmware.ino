@@ -96,17 +96,17 @@ AFEI2CScanner I2CScanner;
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #include <AFE-Sensor-BH1750.h>
-AFESensorBH1750 BH1750Sensor;
+AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-BMx80.h>
-AFESensorBMx80 BMx80Sensor;
+AFESensorBMx80 BMx80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMX80];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-HPMA115S0.h>
-AFESensorHPMA115S0 ParticleSensor;
+AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -292,25 +292,15 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    if (Device.configuration.isHPMA115S0) {
-      initHPMA115S0Sensor();
-    }
+    initializeHPMA115S0Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
-      BMx80Sensor.begin(TYPE_BME680_SENSOR);
-    } else if (Device.configuration.isBMx80 == TYPE_BME280_SENSOR) {
-      BMx80Sensor.begin(TYPE_BME280_SENSOR);
-    } else if (Device.configuration.isBMx80 == TYPE_BMP180_SENSOR) {
-      BMx80Sensor.begin(TYPE_BMP180_SENSOR);
-    }
+    initializeBMx80Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    if (Device.configuration.isBH1750) {
-      BH1750Sensor.begin();
-    }
+    initializeBH1750Sensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -392,15 +382,15 @@ void loop() {
 
 /* Sensor: HPMA115S0 related code  */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-        mainHPMA115S0Sensor();
+        HPMA115S0SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-        mainBMx80Sensor();
+        BMx80SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-        mainBH1750Sensor();
+        BH1750SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
