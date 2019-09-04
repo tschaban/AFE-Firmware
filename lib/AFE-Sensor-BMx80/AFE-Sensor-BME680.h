@@ -1,6 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
 #ifndef _AFE_Sensor_BME680_h
 #define _AFE_Sensor_BME680_h
 
@@ -10,7 +9,7 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Data-Access.h>
+#include <AFE-BMx80-Sensor-Structure.h>
 #include <Adafruit_BME680.h>
 #ifdef DEBUG
 #include <Streaming.h>
@@ -22,13 +21,13 @@ private:
   Adafruit_BME680 bme;
 
 public:
-  BMx80 configuration;
+  BMx80 *configuration;
   BMx80_DATA data;
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
-  boolean begin();
+  boolean begin(BMx80 *);
 
   boolean read();
 

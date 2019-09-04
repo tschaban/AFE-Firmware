@@ -1,24 +1,30 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-Sensor-BMx80.h"
 
 AFESensorBMx80::AFESensorBMx80(){};
 
-void AFESensorBMx80::begin(uint8_t type) {
-  sensorType = type;
+void AFESensorBMx80::begin(uint8_t id) {
+  AFEDataAccess Data;
+  configuration = Data.getBMx80SensorConfiguration(id);
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
 
 #if defined(DEBUG)
   Serial << endl << endl << "-------- BMx80: Initializing --------";
 #endif
 
-  _initialized =
-      sensorType == TYPE_BME680_SENSOR
-          ? s6.begin()
-          : sensorType == TYPE_BME280_SENSOR ? s2.begin() : s1.begin();
+  _initialized = configuration.type == TYPE_BME680_SENSOR
+                     ? s6.begin(&configuration)
+                     : sensorType == TYPE_BME280_SENSOR
+                           ? s2.begin(&configuration)
+                           : s1.begin(&configuration);
 
-#if defined(DEBUG)
+#ifdef DEBUG
   Serial << endl
          << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
   Serial << endl << "--------------------------------------" << endl;
@@ -47,12 +53,7 @@ void AFESensorBMx80::listener() {
       startTime = time;
     }
 
-    if (time - startTime >= (sensorType == TYPE_BME680_SENSOR
-                                 ? s6.configuration.interval
-                                 : sensorType == TYPE_BME280_SENSOR
-                                       ? s2.configuration.interval
-                                       : s1.configuration.interval) *
-                                1000) {
+    if (time - startTime >= configuration.interval * 1000) {
 
 #if defined(DEBUG)
       Serial << endl
@@ -95,11 +96,4 @@ void AFESensorBMx80::listener() {
 #endif
     }
   }
-}
-
-void AFESensorBMx80::getDomoticzIDX(BMx80_DOMOTICZ *idx) {
-  *idx = sensorType == TYPE_BME680_SENSOR
-             ? s6.configuration.idx
-             : sensorType == TYPE_BME280_SENSOR ? s2.configuration.idx
-                                                : s1.configuration.idx;
 }

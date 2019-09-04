@@ -371,6 +371,18 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.noOfGates = root["noOfGates"];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+      configuration.noOfBMx80s = root["noOfBMx80s"];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+      configuration.noOfHPMA115S0s = root["noOfHPMA115S0s"];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+      configuration.noOfBH1750s = root["noOfBH1750s"];
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
@@ -565,6 +577,18 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfGates"] = configuration->noOfGates;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+    root["noOfHPMA115S0s"] = configuration->noOfHPMA115S0s;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+    root["noOfBMx80s"] = configuration->noOfBMx80s;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    root["noOfBH1750s"] = configuration->noOfBH1750s;
+#endif
+
     root.printTo(configFile);
 
 #ifdef DEBUG
@@ -726,6 +750,20 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   deviceConfiguration.noOfGates = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  deviceConfiguration.noOfHPMA115S0s =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+  deviceConfiguration.noOfBMx80s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMX80;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  deviceConfiguration.noOfBH1750s =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -3155,7 +3193,7 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   HPMA115S0 configuration;
 
   char fileName[21];
-  sprintf(fileName, "cfg-HPMA115S0-%d.json", id);
+  sprintf(fileName, "cfg-hpma115s0-%d.json", id);
 
 #ifdef DEBUG
   Serial << endl
@@ -3186,6 +3224,7 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
       configuration.domoticz.pm25.idx = root["idx"]["pm25"];
       configuration.domoticz.pm10.idx = root["idx"]["pm10"];
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      sprintf(configuration.name, root["name"]);
 
 #ifdef DEBUG
       Serial << endl
@@ -3217,7 +3256,7 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
   char fileName[21];
-  sprintf(fileName, "cfg-HPMA115S0-%d.json", id);
+  sprintf(fileName, "cfg-hpma115s0-%d.json", id);
 
 #ifdef DEBUG
   Serial << endl
@@ -3239,7 +3278,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
 
     root["interval"] = configuration.interval;
     root["timeToMeasure"] = configuration.timeToMeasure;
-
+    root["name"] = configuration.name;
     root["mqttTopic"] = configuration.mqtt.topic;
     idx["pm25"] = configuration.domoticz.pm25.idx;
     idx["pm10"] = configuration.domoticz.pm10.idx;
@@ -3266,6 +3305,21 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
   }
   Serial << endl << "--------------------------------------------------";
 #endif
+}
+void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-hpma115s0-XX.json";
+#endif
+  HPMA115S0 configuration;
+  configuration.interval = 300;
+  configuration.timeToMeasure = 0;
+  configuration.domoticz.pm25.idx = 0;
+  configuration.domoticz.pm10.idx = 0;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
+    sprintf(configuration.mqtt.topic, "HPMA115S0/%d", i + 1);
+    sprintf(configuration.name, "HPMA115S0-%d", i + 1);
+    saveConfiguration(i, configuration);
+  }
 }
 #endif
 
@@ -3298,8 +3352,8 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
       root.printTo(Serial);
 #endif
 
-      configuration.RXD = root["interval"];
-      configuration.TXD = root["timeToMeasure"];
+      configuration.RXD = root["RXD"];
+      configuration.TXD = root["TXD"];
 
 #ifdef DEBUG
       Serial << endl
@@ -3371,45 +3425,291 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
   Serial << endl << "--------------------------------------------------";
 #endif
 }
+void AFEDataAccess::createSerialConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-uart.json";
+#endif
+  SERIALPORT configuration;
+  configuration.RXD = 12;
+  configuration.TXD = 14;
+  saveConfiguration(configuration);
+}
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
+#define AFE_CONFIG_FILE_BUFFER_BMX80 50
+BMx80 AFEDataAccess::getBMx80SensorConfiguration(uint8_t id) {
   BMx80 configuration;
-  configuration.interval = Eeprom.read(423, 5).toInt();
-  configuration.i2cAddress = Eeprom.readUInt8(428);
-  configuration.idx.temperatureHumidityPressure = Eeprom.read(938, 6).toInt();
-  configuration.idx.gasResistance = Eeprom.read(944, 6).toInt();
-  configuration.idx.temperature = Eeprom.read(950, 6).toInt();
-  configuration.idx.humidity = Eeprom.read(956, 6).toInt();
-  configuration.idx.pressure = Eeprom.read(962, 6).toInt();
+
+  char fileName[17];
+  sprintf(fileName, "cfg-bmx80-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMX80> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.interval = root["interval"];
+      configuration.i2cAddress = root["i2cAddress"];
+      configuration.domoticz.temperatureHumidityPressure.idx =
+          root["idx"]["temperatureHumidityPressure"];
+      configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
+      configuration.domoticz.temperature.idx = root["idx"]["temperature"];
+      configuration.domoticz.humidity.idx = root["idx"]["humidity"];
+      configuration.domoticz.pressure.idx = root["idx"]["pressure"];
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_BMX80 < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(BMx80 configuration) {
-  Eeprom.write(423, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(428, configuration.i2cAddress);
-  Eeprom.write(938, 6, (long)configuration.idx.temperatureHumidityPressure);
-  Eeprom.write(944, 6, (long)configuration.idx.gasResistance);
-  Eeprom.write(950, 6, (long)configuration.idx.temperature);
-  Eeprom.write(956, 6, (long)configuration.idx.humidity);
-  Eeprom.write(962, 6, (long)configuration.idx.pressure);
+void AFEDataAccess::saveConfiguration(uint8_t id, BMx80 configuration) {
+  char fileName[17];
+  sprintf(fileName, "cfg-bmx80-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMX80> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &idx = root.createNestedObject("idx");
+
+    root["interval"] = configuration.interval;
+    root["i2cAddress"] = configuration.i2cAddress;
+    root["mqttTopic"] = configuration.mqtt.topic;
+    idx["temperatureHumidityPressure"] =
+        configuration.domoticz.temperatureHumidityPressure.idx;
+    idx["gasResistance"] = configuration.domoticz.gasResistance.idx;
+    idx["temperature"] = configuration.domoticz.temperature.idx;
+    idx["humidity"] = configuration.domoticz.humidity.idx;
+    idx["pressure"] = configuration.domoticz.pressure.idx;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_BMX80 < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createBMx80SensorConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-bmx80-XX.json";
+#endif
+  BMx80 configuration;
+  configuration.interval = 60;
+  configuration.i2cAddress = 0;
+  configuration.domoticz.temperatureHumidityPressure.idx = 0;
+  configuration.domoticz.gasResistance.idx = 0;
+  configuration.domoticz.temperature.idx = 0;
+  configuration.domoticz.humidity.idx = 0;
+  configuration.domoticz.pressure.idx = 0;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMX80; i++) {
+    sprintf(configuration.mqtt.topic, "BMx80/%d", i + 1);
+    sprintf(configuration.name, "BMx80-%d", i + 1);
+    saveConfiguration(i, configuration);
+  }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-BH1750 AFEDataAccess::getBH1750SensorConfiguration() {
+#define AFE_CONFIG_FILE_BUFFER_BH1750 20
+BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
   BH1750 configuration;
-  configuration.interval = Eeprom.read(430, 5).toInt();
-  configuration.i2cAddress = Eeprom.readUInt8(435);
-  configuration.mode = Eeprom.readUInt8(436);
-  configuration.idx = Eeprom.read(968, 6).toInt();
+  char fileName[18];
+  sprintf(fileName, "cfg-bh1750-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.interval = root["interval"];
+      configuration.i2cAddress = root["i2cAddress"];
+      configuration.domoticz.idx = root["idx"];
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      configuration.mode = root["mode"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_BH1750 < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(BH1750 configuration) {
-  Eeprom.write(430, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(435, configuration.i2cAddress);
-  Eeprom.writeUInt8(436, configuration.mode);
-  Eeprom.write(968, 6, (long)configuration.idx);
+void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
+  char fileName[18];
+  sprintf(fileName, "cfg-bh1750-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl << "Opening file: " << fileName << " : ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["interval"] = configuration.interval;
+    root["i2cAddress"] = configuration.i2cAddress;
+    root["mqttTopic"] = configuration.mqtt.topic;
+    root["idx"] = configuration.domoticz.idx;
+    root["mode"] = configuration.mode;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_BH1750 < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "failed to open file for writing";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createBH1750SensorConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << "Creating file: cfg-bh1750-XX.json";
+#endif
+  BH1750 configuration;
+  configuration.interval = 60;
+  configuration.i2cAddress = 0;
+  configuration.domoticz.idx = 0;
+  configuration.mode = 0;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
+    sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
+    sprintf(configuration.name, "BH1750-%d", i + 1);
+    saveConfiguration(i, configuration);
+  }
 }
 #endif
 

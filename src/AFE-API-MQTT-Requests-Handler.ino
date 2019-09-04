@@ -144,34 +144,29 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    if (Device.configuration.isHPMA115S0) {
-#ifdef DEBUG
-      Serial << endl << " - Checking if HPMA115S0 request ";
+    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+      if (strcmp(topic, ParticleSensor[i].mqttCommandTopic) == 0 &&
+          (char)payload[1] == 'e' && length == 3) { // get
+        MQTTPublishParticleSensorData(i);
+      }
+    }
+
 #endif
-      sprintf(_mqttTopic, "%HPMA115S0/cmd", MQTTConfiguration.mqtt.topic);
-      if (strcmp(topic, _mqttTopic) == 0) {
-#ifdef DEBUG
-        Serial << "YES";
-#endif
-        if ((char)payload[1] == 'e' && length == 3) { // get
-          HPMA115S0_DATA sensorData;
-          sensorData = ParticleSensor.get();
-          MQTTPublishParticleSensorData(sensorData);
-        }
-        return;
+
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+    for (uint8_t i = 0; i < Device.configuration.noOfBMx80s; i++) {
+      if (strcmp(topic, BMx80Sensor[i].mqttCommandTopic) == 0 &&
+          (char)payload[1] == 'e' && length == 3) { // get
+        MQTTPublishBMx80SensorData(i);
       }
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    if (Device.configuration.isBMx80) {
-      sprintf(_mqttTopic, "%sBMx80/cmd", MQTTConfiguration.mqtt.topic);
-      if (strcmp(topic, _mqttTopic) == 0) {
-        if ((char)payload[1] == 'e' && length == 3) { // get
-          BMx80_DATA sensorData;
-          sensorData = BMx80Sensor.get();
-          MQTTPublishBMx80SensorData(sensorData);
-        }
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
+      if (strcmp(topic, BH1750Sensor[i].mqttCommandTopic) == 0 &&
+          (char)payload[1] == 'e' && length == 3) { // get
+        MQTTPublishBH1750SensorData(i);
       }
     }
 #endif
@@ -199,9 +194,9 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
     /* Contactrons */
     for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
       if (strcmp(topic, Contactron[i].getMQTTCommandTopic()) == 0 &&
-          (char)payload[1] == 'e') { // get
-        MQTTPublishContactronState(i);
-      }
+          (char)payload[1] == 'e' && length == 3)) { // get
+          MQTTPublishContactronState(i);
+        }
     }
 #endif
 
@@ -369,7 +364,7 @@ void MQTTPublishSwitchState(uint8_t id) {
 /* Metod publishes temperature */
 void MQTTPublishTemperature(float temperature) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish("temperature", temperature);
+    // Mqtt.publish("temperature", temperature);
   }
 }
 #endif
@@ -379,19 +374,19 @@ void MQTTPublishTemperature(float temperature) {
 /* Metod publishes humidity */
 void MQTTPublishHumidity(float humidity) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish("humidity", humidity);
+    //  Mqtt.publish("humidity", humidity);
   }
 }
 /* Metod publishes HeatIndex */
 void MQTTPublishHeatIndex(float heatIndex) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish("heatIndex", heatIndex);
+    //    Mqtt.publish("heatIndex", heatIndex);
   }
 }
 /* Metod publishes Dew point */
 void MQTTPublishDewPoint(float dewPoint) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish("dewPoint", dewPoint);
+    // Mqtt.publish("dewPoint", dewPoint);
   }
 }
 #endif
@@ -434,8 +429,9 @@ void MQTTPublishGateState(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
+void MQTTPublishParticleSensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
+    HPMA115S0_DATA data = ParticleSensor[id].get();
     String messageString = "{\"PM25\":";
     messageString += data.pm25;
     messageString += ",\"PM10\":";
@@ -443,21 +439,22 @@ void MQTTPublishParticleSensorData(HPMA115S0_DATA data) {
     messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("HPMA115S0/all", message);
+    Mqtt.publishTopic(ParticleSensor[id].configuration.mqtt.topic, message);
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-void MQTTPublishBMx80SensorData(BMx80_DATA data) {
+void MQTTPublishBMx80SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
+    BMx80_DATA data = BMx80Sensor[id].get();
     String messageString = "{\"temperature\":";
     messageString += data.temperature;
-    if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR) {
+    if (BMx80Sensor[id].configuration.type != TYPE_BMP180_SENSOR) {
       messageString += ",\"humidity\":";
       messageString += data.humidity;
     }
-    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
+    if (BMx80Sensor[id].configuration.type == TYPE_BME680_SENSOR) {
       messageString += ",\"gasResistance\":";
       messageString += data.gasResistance;
     }
@@ -466,15 +463,18 @@ void MQTTPublishBMx80SensorData(BMx80_DATA data) {
     messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publish("BMx80/all", message);
+    Mqtt.publishTopic(BMx80Sensor[id].configuration.mqtt.topic, message);
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void MQTTPublishLightLevel(float lux) {
+void MQTTPublishBH1750SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    Mqtt.publish("BH1750/lux", lux);
+    char message[10];
+    // @TODO what is the range
+    dtostrf(BH1750Sensor[id].get(), 10, 3, message);
+    Mqtt.publishTopic(BH1750Sensor[id].configuration.mqtt.topic, message);
   }
 }
 #endif

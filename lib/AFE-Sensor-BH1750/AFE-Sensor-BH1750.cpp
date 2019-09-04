@@ -1,13 +1,18 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
 #include "AFE-Sensor-BH1750.h"
 
 AFESensorBH1750::AFESensorBH1750(){};
 
-void AFESensorBH1750::begin() {
+void AFESensorBH1750::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getBH1750SensorConfiguration();
+  configuration = Data.getBH1750SensorConfiguration(id);
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
 
 #ifdef DEBUG
   Serial << endl << endl << "----- BH1750: Initializing -----";
@@ -29,7 +34,7 @@ void AFESensorBH1750::begin() {
   if (_initialized) {
     Serial << endl << "Mode: " << configuration.mode;
     Serial << endl << "Interval: " << configuration.interval;
-    Serial << endl << "IDX: " << configuration.idx;
+    Serial << endl << "IDX: " << configuration.domoticz.idx;
   }
   Serial << endl
          << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
@@ -72,5 +77,3 @@ void AFESensorBH1750::listener() {
     }
   }
 }
-
-unsigned long AFESensorBH1750::getDomoticzIDX() { return configuration.idx; }

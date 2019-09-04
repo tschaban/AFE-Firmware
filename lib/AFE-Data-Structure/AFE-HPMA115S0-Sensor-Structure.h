@@ -9,12 +9,16 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
 struct HPMA115S0_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG pm25;
   DOMOTICZ_BASIC_CONFIG pm10;
 };
 
 struct HPMA115S0 {
+  char name[17];
   uint16_t interval;
   uint16_t timeToMeasure;
   HPMA115S0_DOMOTICZ domoticz;

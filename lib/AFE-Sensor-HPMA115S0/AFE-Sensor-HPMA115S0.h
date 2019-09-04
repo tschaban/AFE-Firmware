@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_Sensor_HPMA115S0_h
 #define _AFE_Sensor_HPMA115S0_h
 
@@ -33,7 +31,6 @@ private:
 
   */
 
-  HPMA115S0 configuration;
   HPMA115S0_DATA current;
   HPMA115S0_DATA buffer;
 
@@ -50,11 +47,14 @@ private:
   boolean read(boolean expectingACK = false);
 
 public:
+  HPMA115S0 configuration;
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+
   /* Constructor */
   AFESensorHPMA115S0();
 
   /* Turns On sensor */
-  void begin();
+  void begin(uint8_t id);
 
   /* returns PM2.5 and PM10 */
   HPMA115S0_DATA get();
@@ -68,9 +68,6 @@ public:
 
   boolean sendCommand(const uint8_t *command,
                       uint8_t howManyTimesRetry = HPMA115S0_RETRY);
-
-  /* Return relay IDX in Domoticz */
-  void getDomoticzIDX(HPMA115S0_DOMOTICZ *idx);
 };
 
 #endif

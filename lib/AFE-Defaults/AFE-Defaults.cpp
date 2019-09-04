@@ -16,7 +16,7 @@ void AFEDefaults::set() {
     Data->createRelayConfigurationFile();
     Data->createSwitchConfigurationFile();
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                                 \
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
     AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Data->createLEDConfigurationFile();
     Data->createSystemLedIDConfigurationFile();
@@ -57,19 +57,19 @@ void AFEDefaults::set() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HPMA115S0 SensorHPMA115S0Configuration;
+    Data->createHPMA115S0SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-    SERIALPORT SerialPortConfiguration;
+    Data->createSerialConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-    BMx80 SensorBMx80Configuration;
+    Data->createBMx80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    BH1750 SensorBH1750Configuration;
+    Data->createBH1750SensorConfigurationFile();
 #endif
 
 /* DS18B20 presence */
@@ -89,19 +89,6 @@ void AFEDefaults::set() {
     }
 #endif
 
-/* HPMA115S0 Sesnor */
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    deviceConfiguration.isHPMA115S0 = false;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    deviceConfiguration.isBMx80 = false;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-    deviceConfiguration.isBH1750 = false;
-#endif
-
 /* Regulator config */
 #if defined(T1_CONFIG) || defined(T2_CONFIG)
     RegulatorConfiguration.enabled = false;
@@ -112,13 +99,13 @@ void AFEDefaults::set() {
 #endif
 
 /* Thermostat configuration */
-#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                                 \
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                             \
     defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
     Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
 #endif
 
 /* Hunidistat confiuration */
-#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                                 \
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                             \
     defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
     Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
 #endif
@@ -162,40 +149,6 @@ void AFEDefaults::set() {
 
       Data->saveConfiguration(i, PIRConfiguration);
     }
-#endif
-
-/* T6 HPMA115S0 Sensor */
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    SensorHPMA115S0Configuration.interval = 60;
-    SensorHPMA115S0Configuration.timeToMeasure = 0;
-    SensorHPMA115S0Configuration.idx.pm10 = 0;
-    SensorHPMA115S0Configuration.idx.pm25 = 0;
-    Data->saveConfiguration(SensorHPMA115S0Configuration);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_UART
-    SerialPortConfiguration.RXD = 12;
-    SerialPortConfiguration.TXD = 14;
-    Data->saveConfiguration(SerialPortConfiguration);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    SensorBMx80Configuration.interval = 60;
-    SensorBMx80Configuration.i2cAddress = 0;
-    SensorBMx80Configuration.idx.temperatureHumidityPressure = 0;
-    SensorBMx80Configuration.idx.gasResistance = 0;
-    SensorBMx80Configuration.idx.temperature = 0;
-    SensorBMx80Configuration.idx.humidity = 0;
-    SensorBMx80Configuration.idx.pressure = 0;
-    Data->saveConfiguration(SensorBMx80Configuration);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-    SensorBH1750Configuration.interval = 60;
-    SensorBH1750Configuration.i2cAddress = 0;
-    SensorBH1750Configuration.idx = 0;
-    SensorBH1750Configuration.mode = 0;
-    Data->saveConfiguration(SensorBH1750Configuration);
 #endif
 
   }

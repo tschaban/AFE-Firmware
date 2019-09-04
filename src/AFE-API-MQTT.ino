@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
+
 #include "AFE-API-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
@@ -177,7 +177,7 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Status: failure, not MQTT Topic";
+      Serial << endl << "Status: WARNING, missing MQTT Topic";
     }
 #endif
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0

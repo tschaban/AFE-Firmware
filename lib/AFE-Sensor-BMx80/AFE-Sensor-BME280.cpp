@@ -1,23 +1,21 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
 #include "AFE-Sensor-BME280.h"
 
 AFESensorBME280::AFESensorBME280(){};
 
-boolean AFESensorBME280::begin() {
-  AFEDataAccess Data;
-  configuration = Data.getBMx80SensorConfiguration();
+boolean AFESensorBME280::begin(BMx80 *_configuration) {
+  configuration = _configuration;
 
 #if defined(DEBUG)
   Serial << endl << "Sensor type: BME280";
 #endif
 
-  if (configuration.i2cAddress != 0) {
+  if (configuration->i2cAddress != 0) {
 #ifdef DEBUG
-    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+    Serial << endl << "Address: 0x" << _HEX(configuration->i2cAddress);
 #endif
-    if (!bme.begin(configuration.i2cAddress)) {
+    if (!bme.begin(configuration->i2cAddress)) {
       return false;
     } else {
       bme.setSampling(

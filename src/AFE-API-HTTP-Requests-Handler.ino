@@ -55,7 +55,8 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
  * method which creates JSON respons and pushes it */
 void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
                                    byte value) {
-  sendHTTPAPIRequestStatus(request, status, value == AFE_RELAY_ON ? "on" : "off");
+  sendHTTPAPIRequestStatus(request, status,
+                           value == AFE_RELAY_ON ? "on" : "off");
 }
 #endif
 
@@ -72,13 +73,14 @@ void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
 /* It constructs HTTP response related to gate and calls HTTP push */
 void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
-  sendHTTPAPIRequestStatus(
-      request, status,
-      value == AFE_GATE_OPEN
-          ? "open"
-          : value == AFE_GATE_CLOSED
-                ? "closed"
-                : value == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
+  sendHTTPAPIRequestStatus(request, status,
+                           value == AFE_GATE_OPEN
+                               ? "open"
+                               : value == AFE_GATE_CLOSED
+                                     ? "closed"
+                                     : value == AFE_GATE_PARTIALLY_OPEN
+                                           ? "partiallyOpen"
+                                           : "unknown");
 }
 #endif
 
@@ -172,8 +174,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_ON,
-                                          Relay[i].get());
+            sendHTTPAPIRelayRequestStatus(
+                request, Relay[i].get() == AFE_RELAY_ON, Relay[i].get());
 
           } else if (strcmp(request.command, "off") == 0) { // Off
             Relay[i].off();
@@ -181,8 +183,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_OFF,
-                                          Relay[i].get());
+            sendHTTPAPIRelayRequestStatus(
+                request, Relay[i].get() == AFE_RELAY_OFF, Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
             state = Relay[i].get();
             Relay[i].toggle();
@@ -315,16 +317,20 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
-  if (strcmp(request.device, "HPMA115S0") == 0) {
-    HPMA115S0_DATA sensorData;
-    sensorData = ParticleSensor.get();
-    if (strcmp(request.name, "PM2.5") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
-      }
-    } else if (strcmp(request.name, "PM10") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
+  if (strcmp(request.device, "HPMA115S0") == 0 &&
+      strcmp(request.command, "get") == 0 &&
+      (strcmp(request.name, "PM2.5") == 0 ||
+       strcmp(request.name, "PM10") == 0)) {
+    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+      if (strcmp(request.name, ParticleSensor[i].configuration.name) == 0) {
+        HPMA115S0_DATA sensorData = ParticleSensor[i].get();
+        if (strcmp(request.name, "PM2.5") == 0) {
+          sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
+        } else {
+          sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
+        }
+        deviceNotExist = false;
+        break;
       }
     }
   }
@@ -332,38 +338,43 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
   /* BMx80 */
-  if (strcmp(request.device, "BMx80") == 0) {
-    if (strcmp(request.command, "get") == 0) {
-      BMx80_DATA sensorData;
-      sensorData = BMx80Sensor.get();
-      if (strcmp(request.name, "temperature") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      } else if (strcmp(request.name, "pressure") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-      } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-                 strcmp(request.name, "humidity") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-      } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
-                 strcmp(request.name, "gasResistance") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
+  if (strcmp(request.device, "BMx80") == 0 &&
+      strcmp(request.command, "get") == 0 &&
+      (strcmp(request.name, "temperature") == 0 ||
+       strcmp(request.name, "pressure") == 0 ||
+       strcmp(request.name, "humidity") == 0 ||
+       strcmp(request.name, "gasResistance") == 0)) {
+
+    for (uint8_t i = 0; i < Device.configuration.noOfBMx80s; i++) {
+      if (strcmp(request.name, BMx80Sensor[i].configuration.name) == 0) {
+        BMx80_DATA sensorData = BMx80Sensor[i].get();
+        if (strcmp(request.name, "temperature") == 0) {
+          sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
+        } else if (strcmp(request.name, "pressure") == 0) {
+          sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
+        } else if (BMx80Sensor[i].configuration.type != TYPE_BMP180_SENSOR &&
+                   strcmp(request.name, "humidity") == 0) {
+          sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
+        } else if (BMx80Sensor[i].configuration.type != TYPE_BME680_SENSOR &&
+                   strcmp(request.name, "gasResistance") == 0) {
+          sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
+        }
+        deviceNotExist = false;
+        break;
       }
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
     }
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   /* BH1750 */
-  if (strcmp(request.device, "BH1750") == 0) {
-    if (strcmp(request.name, "lux") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        float lux = BH1750Sensor.get();
-        sendHTTPAPIRequestStatus(request, true, lux);
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
+  if (strcmp(request.device, "BH1750") == 0 &&
+      strcmp(request.name, "lux") == 0 && strcmp(request.command, "get") == 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
+      if (strcmp(request.name, BH1750Sensor[i].configuration.name) == 0) {
+        sendHTTPAPIRequestStatus(request, true, BH1750Sensor[i].get());
+        deviceNotExist = false;
+        break;
       }
     }
   }

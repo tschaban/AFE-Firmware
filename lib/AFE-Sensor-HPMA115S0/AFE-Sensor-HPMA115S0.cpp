@@ -1,14 +1,18 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-Sensor-HPMA115S0.h"
 
 AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
-void AFESensorHPMA115S0::begin() {
+void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getHPMA115S0SensorConfiguration();
+  configuration = Data.getHPMA115S0SensorConfiguration(id);
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
 
   /* Opening Serial port */
   UART.begin();
@@ -309,8 +313,4 @@ void AFESensorHPMA115S0::listener() {
 #endif
     }
   }
-}
-
-void AFESensorHPMA115S0::getDomoticzIDX(HPMA115S0_DOMOTICZ *idx) {
-  *idx = configuration.idx;
 }

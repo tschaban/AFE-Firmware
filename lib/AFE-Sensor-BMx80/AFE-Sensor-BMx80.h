@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_Sensor_BMx80_h
 #define _AFE_Sensor_BMx80_h
 
@@ -10,6 +8,8 @@
 #else
 #include "WProgram.h"
 #endif
+
+#include <AFE-Data-Access.h>
 
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
@@ -34,10 +34,13 @@ private:
   AFESensorBME680 s6;
 
 public:
+  BMx80 configuration;
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMx80();
 
-  void begin(uint8_t type);
+  void begin(uint8_t id);
 
   BMx80_DATA get();
 
@@ -46,9 +49,6 @@ public:
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
-
-  /* Return relay IDX in Domoticz */
-  void getDomoticzIDX(BMx80_DOMOTICZ *idx);
 };
 
 #endif

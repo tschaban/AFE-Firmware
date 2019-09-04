@@ -143,21 +143,25 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortConfiguration();
   void saveConfiguration(SERIALPORT configuration);
+  void createSerialConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, HPMA115S0 configuration);
+  void createHPMA115S0SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
   BMx80 getBMx80SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, BMx80 configuration);
+  void createBMx80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, BH1750 configuration);
+  void createBH1750SensorConfigurationFile();
 #endif
 
 /* Methods turns on / off APIs */

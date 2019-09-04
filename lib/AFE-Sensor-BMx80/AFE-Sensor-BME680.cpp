@@ -1,23 +1,21 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
 #include "AFE-Sensor-BME680.h"
 
 AFESensorBME680::AFESensorBME680(){};
 
-boolean AFESensorBME680::begin() {
-  AFEDataAccess Data;
-  configuration = Data.getBMx80SensorConfiguration();
+boolean AFESensorBME680::begin(BMx80 *_configuration) {
+  configuration = _configuration;
 
 #ifdef DEBUG
   Serial << endl << "Sensor type: BME680";
 #endif
 
-  if (configuration.i2cAddress != 0) {
+  if (configuration->i2cAddress != 0) {
 #ifdef DEBUG
-    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+    Serial << endl << "Address: 0x" << _HEX(configuration->i2cAddress);
 #endif
-    if (!bme.begin(configuration.i2cAddress)) {
+    if (!bme.begin(configuration->i2cAddress)) {
       return false;
     } else {
       bme.setTemperatureOversampling(BME680_OS_8X);

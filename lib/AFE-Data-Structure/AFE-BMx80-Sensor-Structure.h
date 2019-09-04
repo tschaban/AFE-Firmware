@@ -9,6 +9,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
 struct BMx80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG temperatureHumidityPressure;
   DOMOTICZ_BASIC_CONFIG gasResistance;
@@ -18,6 +21,7 @@ struct BMx80_DOMOTICZ {
 };
 
 struct BMx80 {
+  char name[17];
   uint8_t type;
   uint16_t interval;
   uint8_t i2cAddress;

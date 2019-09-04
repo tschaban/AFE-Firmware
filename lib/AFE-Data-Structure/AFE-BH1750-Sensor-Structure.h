@@ -9,7 +9,11 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
 struct BH1750 {
+  char name[17];
   uint16_t interval;
   uint8_t i2cAddress;
   uint8_t mode;
