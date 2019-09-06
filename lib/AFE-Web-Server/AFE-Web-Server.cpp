@@ -97,6 +97,26 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addGateConfiguration(siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_UART
+  case AFE_CONFIG_SITE_UART:
+    page += Site.addSerialPortConfiguration();
+    break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+  case AFE_CONFIG_SITE_BMX80:
+    page += Site.addBMx80Configuration(siteConfig->deviceID);
+    break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  case AFE_CONFIG_SITE_HPMA115S0:
+    page += Site.addHPMA115S0Configuration(siteConfig->deviceID);
+    break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  case AFE_CONFIG_SITE_BH1750:
+    page += Site.addBH1750Configuration(siteConfig->deviceID);
+    break;
+#endif
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
@@ -481,12 +501,12 @@ void AFEWebServer::generate(boolean upload) {
 
       if (authorize) {
         if (command == 1) {
-          publishHTML(ConfigurationPanel.getSite("exit", AFE_MODE_CONFIGURATION));
-          server.client().stop();
+          publishHTML(ConfigurationPanel.getSite("exit",
+  AFE_MODE_CONFIGURATION)); server.client().stop();
           Device->reboot(AFE_MODE_CONFIGURATION);
         } else {
-          publishHTML(ConfigurationPanel.getSite("exit", AFE_MODE_ACCESS_POINT));
-          server.client().stop();
+          publishHTML(ConfigurationPanel.getSite("exit",
+  AFE_MODE_ACCESS_POINT)); server.client().stop();
           Device->reboot(AFE_MODE_ACCESS_POINT);
         }
       }
@@ -692,27 +712,7 @@ void AFEWebServer::publishHTML(String page) {
 #ifdef DEBUG
   Serial << endl << "Site streaming started";
 #endif
-
   server.send(200, "text/html", page);
-
-/* Sending in chunks
-  uint16_t pageSize = page.length();
-  uint16_t size = 512;
-  server.setContentLength(pageSize);
-  if (pageSize > size) {
-    Serial << page.substring(0, size);
-    server.send(200, "text/html", page.substring(0, size));
-    uint16_t transfered = size;
-    uint16_t nextChunk;
-    while (transfered < pageSize) {
-      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-      server.sendContent(page.substring(transfered, nextChunk));
-      transfered = nextChunk;
-    }
-  } else {
-    server.send(200, "text/html", page);
-  }
-  */
 #ifdef DEBUG
   Serial << endl << " - Completed";
 #endif
@@ -789,15 +789,18 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  data.isHPMA115S0 = server.arg("hp").length() > 0 ? true : false;
+  data.noOfHPMA115S0s =
+      server.arg("hp").length() > 0 ? server.arg("hp").toInt() : 0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-  data.isBMx80 = server.arg("b6").length() > 0 ? server.arg("b6").toInt() : 0;
+  data.noOfBMx80s =
+      server.arg("b6").length() > 0 ? server.arg("b6").toInt() : 0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  data.isBH1750 = server.arg("bh").length() > 0 ? true : false;
+  data.noOfBH1750s =
+      server.arg("bh").length() > 0 ? server.arg("bh").toInt() : 0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -977,14 +980,15 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
 SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   SWITCH data;
 
-  data.type =
-      server.arg("m").length() > 0 ? server.arg("m").toInt() : AFE_SWITCH_TYPE_MONO;
+  data.type = server.arg("m").length() > 0 ? server.arg("m").toInt()
+                                           : AFE_SWITCH_TYPE_MONO;
 
   data.sensitiveness = server.arg("s").length() > 0 ? server.arg("s").toInt()
                                                     : AFE_SWITCH_BOUNCING;
 
-  data.functionality = server.arg("f").length() > 0 ? server.arg("f").toInt()
-                                                    : AFE_SWITCH_FUNCTIONALITY_NONE;
+  data.functionality = server.arg("f").length() > 0
+                           ? server.arg("f").toInt()
+                           : AFE_SWITCH_FUNCTIONALITY_NONE;
 
   data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
@@ -1278,12 +1282,12 @@ DH AFEWebServer::getDHTData() {
 #ifdef AFE_CONFIG_HARDWARE_UART
 SERIALPORT AFEWebServer::getSerialPortData() {
   SERIALPORT data;
-  if (server.arg("r").length() > 0) {
-    data.RXD = server.arg("r").toInt();
-  }
-  if (server.arg("t").length() > 0) {
-    data.TXD = server.arg("t").toInt();
-  }
+  data.RXD = server.arg("r").length() > 0
+                 ? server.arg("r").toInt()
+                 : AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
+  data.TXD = server.arg("t").length() > 0
+                 ? server.arg("t").toInt()
+                 : AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
   return data;
 }
 #endif
@@ -1291,21 +1295,32 @@ SERIALPORT AFEWebServer::getSerialPortData() {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   HPMA115S0 data;
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
-  }
+  data.interval = server.arg("i").length() > 0
+                      ? server.arg("i").toInt()
+                      : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
+
+  data.timeToMeasure =
+      server.arg("t").length() > 0
+          ? server.arg("t").toInt()
+          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
+
+  data.domoticz.pm25.idx =
+      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
+  data.domoticz.pm10.idx =
+      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : 0;
 
   if (server.arg("t").length() > 0) {
-    data.timeToMeasure = server.arg("t").toInt();
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("x2").length() > 0) {
-    data.idx.pm25 = server.arg("x2").toInt();
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("x1").length() > 0) {
-    data.idx.pm10 = server.arg("x1").toInt();
-  }
   return data;
 };
 #endif
@@ -1313,33 +1328,37 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
 #ifdef AFE_CONFIG_HARDWARE_BMX80
 BMx80 AFEWebServer::getBMx80SensorData() {
   BMx80 data;
+  data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
-  if (server.arg("a").length() > 0) {
-    data.i2cAddress = server.arg("a").toInt();
-  }
+  data.interval = server.arg("i").length() > 0
+                      ? server.arg("i").toInt()
+                      : AFE_CONFIG_HARDWARE_BMX80_DEFAULT_INTERVAL;
 
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
-  }
+  data.domoticz.temperatureHumidityPressure.idx =
+      server.arg("t").length() > 0 ? server.arg("t").toInt() : 0;
+
+  data.domoticz.gasResistance.idx =
+      server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+
+  data.domoticz.temperature.idx =
+      server.arg("e").length() > 0 ? server.arg("e").toInt() : 0;
+
+  data.domoticz.humidity.idx =
+      server.arg("h").length() > 0 ? server.arg("h").toInt() : 0;
+
+  data.domoticz.pressure.idx =
+      server.arg("p").length() > 0 ? server.arg("p").toInt() : 0;
 
   if (server.arg("t").length() > 0) {
-    data.idx.temperatureHumidityPressure = server.arg("t").toInt();
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("g").length() > 0) {
-    data.idx.gasResistance = server.arg("g").toInt();
-  }
-
-  if (server.arg("e").length() > 0) {
-    data.idx.temperature = server.arg("e").toInt();
-  }
-
-  if (server.arg("h").length() > 0) {
-    data.idx.humidity = server.arg("h").toInt();
-  }
-
-  if (server.arg("p").length() > 0) {
-    data.idx.pressure = server.arg("p").toInt();
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
   return data;
@@ -1349,21 +1368,30 @@ BMx80 AFEWebServer::getBMx80SensorData() {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
-  if (server.arg("a").length() > 0) {
-    data.i2cAddress = server.arg("a").toInt();
+  data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+
+  data.interval = server.arg("i").length() > 0
+                      ? server.arg("i").toInt()
+                      : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
+
+  data.mode = server.arg("m").length() > 0
+                  ? server.arg("m").toInt()
+                  : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
+  data.domoticz.idx =
+      server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
+
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
 
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("m").length() > 0) {
-    data.mode = server.arg("m").toInt();
-  }
-
-  if (server.arg("d").length() > 0) {
-    data.idx = server.arg("d").toInt();
-  }
   return data;
 }
 #endif

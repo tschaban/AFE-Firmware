@@ -278,4 +278,36 @@
 #define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#define L_PARTICLE_SENSOR "PM2.5/PM10 Particle Sensor"
+#define L_NUMBER_OF_HPMA115S0_SENSORS "HPMA115S0 Sensor"
+#define L_SENSOR_POST_SLEEP_INTERVAL                                           \
+  "If the parameter below is different than 0, the sensor will go to sleep "   \
+  "mode between measurements. The setting below defined how many seconds "     \
+  "before a measurement the sensor should wake up. It should be lower than "   \
+  "measurement's interval"
+#define L_MEASURE_AFTER "Measure after"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+#define L_BMX80_SENSOR "BMx80 Sensor"
+#define L_BMX80_SENSORS "BMx80 Sensors"
+#define L_NUMBER_OF_BMX80_SENSORS "Number of BMx80 Sensors"
+#define L_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
+#define L_IDX_TEMPERATURE "IDX Temperature"
+#define L_IDX_HUMIDITY "IDX Humidity"
+#define L_IDX_PRESSURE "IDX Pressure"
+#define L_IDX_GAS_SENSOR "IDX Gas sensor"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#define L_BH1750_SENSOR "BH1750 Sensor"
+#define L_BH1750_SENSORS "BH1750 Sensors"
+#define L_NUMBER_OF_BH1750_SENSORS "Number of BH1750 Sensors"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define L_ADDRESS "Address"
+#endif
+
 #endif

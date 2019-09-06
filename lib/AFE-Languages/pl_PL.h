@@ -287,4 +287,36 @@
 #define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#define L_PARTICLE_SENSOR "Czujnik cząstek PM2.5/PM10"
+#define L_NUMBER_OF_HPMA115S0_SENSORS "Czujnik HPMA115S0"
+#define L_SENSOR_POST_SLEEP_INTERVAL                                              \
+  "Jeśli poniższa wartość jest większa od 0 to czujnik będzie usypiany "    \
+  "między odczytami. Wartość poniżej definiuje na ile sekund przed odczytem " \
+  "czujnik ma zostać uruchomiony. Wartość musi być mniejsza niż interwał "  \
+  "pomiarów"
+#define L_MEASURE_AFTER "Pomiar po czasie"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMX80
+#define L_BMX80_SENSOR "Czujnik BMx80"
+#define L_BMX80_SENSORS "Czujniki BMx80"
+#define L_NUMBER_OF_BMX80_SENSORS "Ilość czujników BMx80"
+#define L_IDX_TEMP_HUM_BAR "IDX Temp/Wilg/Bar"
+#define L_IDX_TEMPERATURE "IDX Temperatura"
+#define L_IDX_HUMIDITY "IDX Wilgotność"
+#define L_IDX_PRESSURE "IDX Ciśnienie"
+#define L_IDX_GAS_SENSOR "IDX Czujnik gazu"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#define L_BH1750_SENSOR "Czujnik BH1750"
+#define L_BH1750_SENSORS "Czujniki BH1750"
+#define L_NUMBER_OF_BH1750_SENSORS "Ilość czujników BH1750"
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define L_ADDRESS "Adres"
+#endif
+
 #endif

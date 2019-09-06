@@ -144,15 +144,15 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  String addHPMA115S0Configuration();
+  String addHPMA115S0Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMX80
-  String addBMx80Configuration();
+  String addBMx80Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  String addBH1750Configuration();
+  String addBH1750Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

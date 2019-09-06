@@ -26,9 +26,9 @@ public:
   BMx80_DATA data;
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
-  AFESensorBMP180(BMx80 *);
+  AFESensorBMP180();
 
-  boolean begin();
+  boolean begin(BMx80 *);
 
   boolean read();
 

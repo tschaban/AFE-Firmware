@@ -3311,8 +3311,9 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   Serial << endl << "Creating file: cfg-hpma115s0-XX.json";
 #endif
   HPMA115S0 configuration;
-  configuration.interval = 300;
-  configuration.timeToMeasure = 0;
+  configuration.interval = AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
+  configuration.timeToMeasure =
+      AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
   configuration.domoticz.pm25.idx = 0;
   configuration.domoticz.pm10.idx = 0;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
@@ -3430,8 +3431,8 @@ void AFEDataAccess::createSerialConfigurationFile() {
   Serial << endl << "Creating file: cfg-uart.json";
 #endif
   SERIALPORT configuration;
-  configuration.RXD = 12;
-  configuration.TXD = 14;
+  configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
+  configuration.TXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
   saveConfiguration(configuration);
 }
 #endif
@@ -3566,7 +3567,7 @@ void AFEDataAccess::createBMx80SensorConfigurationFile() {
   Serial << endl << "Creating file: cfg-bmx80-XX.json";
 #endif
   BMx80 configuration;
-  configuration.interval = 60;
+  configuration.interval = AFE_CONFIG_HARDWARE_BMX80_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
   configuration.domoticz.temperatureHumidityPressure.idx = 0;
   configuration.domoticz.gasResistance.idx = 0;
@@ -3701,10 +3702,10 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
   Serial << endl << "Creating file: cfg-bh1750-XX.json";
 #endif
   BH1750 configuration;
-  configuration.interval = 60;
+  configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
   configuration.domoticz.idx = 0;
-  configuration.mode = 0;
+  configuration.mode = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
     sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
     sprintf(configuration.name, "BH1750-%d", i + 1);
