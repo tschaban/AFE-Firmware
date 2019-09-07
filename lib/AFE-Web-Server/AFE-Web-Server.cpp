@@ -102,9 +102,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addSerialPortConfiguration();
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  case AFE_CONFIG_SITE_BMX80:
-    page += Site.addBMx80Configuration(siteConfig->deviceID);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  case AFE_CONFIG_SITE_BMEX80:
+    page += Site.addBMEX80Configuration(siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -290,11 +290,30 @@ void AFEWebServer::generate(boolean upload) {
       Data.saveConfiguration(siteConfig.deviceID,
                              getContactronData(siteConfig.deviceID));
       break;
-
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
     case AFE_CONFIG_SITE_GATE:
       Data.saveConfiguration(siteConfig.deviceID, getGateData());
+      break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+    case AFE_CONFIG_SITE_HPMA115S0:
+      Data.saveConfiguration(siteConfig.deviceID, getHPMA115S0SensorData());
+      break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    case AFE_CONFIG_SITE_BMEX80:
+      Data.saveConfiguration(siteConfig.deviceID, getBMEX80SensorData());
+      break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    case AFE_CONFIG_SITE_BH1750:
+      Data.saveConfiguration(siteConfig.deviceID, getBH1750SensorData());
+      break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_UART
+    case AFE_CONFIG_SITE_UART:
+      Data.saveConfiguration(getSerialPortData());
       break;
 #endif
     }
@@ -463,15 +482,15 @@ void AFEWebServer::generate(boolean upload) {
     }
     publishHTML(
         ConfigurationPanel.getHPMA115S0SensorConfigurationSite(command,
-  data)); #endif #ifdef AFE_CONFIG_HARDWARE_BMX80
+  data)); #endif #ifdef AFE_CONFIG_HARDWARE_BMEX80
   }
-  else if (optionName == "BMx80") {
-    BMx80 data;
+  else if (optionName == "BMEX80") {
+    BMEX80 data;
     if (command == AFE_SERVER_CMD_SAVE) {
-      data = getBMx80SensorData();
+      data = getBMEX80SensorData();
     }
     publishHTML(
-        ConfigurationPanel.getBMx80SensorConfigurationSite(command, data));
+        ConfigurationPanel.getBMEX80SensorConfigurationSite(command, data));
   #endif
   #ifdef AFE_CONFIG_HARDWARE_BH1750
   }
@@ -793,8 +812,8 @@ DEVICE AFEWebServer::getDeviceData() {
       server.arg("hp").length() > 0 ? server.arg("hp").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  data.noOfBMx80s =
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  data.noOfBMEX80s =
       server.arg("b6").length() > 0 ? server.arg("b6").toInt() : 0;
 #endif
 
@@ -1282,6 +1301,9 @@ DH AFEWebServer::getDHTData() {
 #ifdef AFE_CONFIG_HARDWARE_UART
 SERIALPORT AFEWebServer::getSerialPortData() {
   SERIALPORT data;
+
+  Serial << endl << "SERIAL R=" << server.arg("r").toInt();
+
   data.RXD = server.arg("r").length() > 0
                  ? server.arg("r").toInt()
                  : AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
@@ -1295,13 +1317,13 @@ SERIALPORT AFEWebServer::getSerialPortData() {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
   HPMA115S0 data;
-  data.interval = server.arg("i").length() > 0
-                      ? server.arg("i").toInt()
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
                       : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
 
   data.timeToMeasure =
-      server.arg("t").length() > 0
-          ? server.arg("t").toInt()
+      server.arg("m").length() > 0
+          ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
 
   data.domoticz.pm25.idx =
@@ -1325,17 +1347,19 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
 };
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-BMx80 AFEWebServer::getBMx80SensorData() {
-  BMx80 data;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+BMEX80 AFEWebServer::getBMEX80SensorData() {
+  BMEX80 data;
+  data.type = server.arg("y").length() > 0 ? server.arg("y").toInt()
+                                           : AFE_BMX_UNKNOWN_SENSOR;
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
-  data.interval = server.arg("i").length() > 0
-                      ? server.arg("i").toInt()
-                      : AFE_CONFIG_HARDWARE_BMX80_DEFAULT_INTERVAL;
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
 
   data.domoticz.temperatureHumidityPressure.idx =
-      server.arg("t").length() > 0 ? server.arg("t").toInt() : 0;
+      server.arg("m").length() > 0 ? server.arg("m").toInt() : 0;
 
   data.domoticz.gasResistance.idx =
       server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
@@ -1370,8 +1394,8 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   BH1750 data;
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
-  data.interval = server.arg("i").length() > 0
-                      ? server.arg("i").toInt()
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
                       : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
 
   data.mode = server.arg("m").length() > 0

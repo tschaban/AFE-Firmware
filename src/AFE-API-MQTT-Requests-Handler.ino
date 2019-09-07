@@ -153,11 +153,11 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    for (uint8_t i = 0; i < Device.configuration.noOfBMx80s; i++) {
-      if (strcmp(topic, BMx80Sensor[i].mqttCommandTopic) == 0 &&
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
+      if (strcmp(topic, BMEX80Sensor[i].mqttCommandTopic) == 0 &&
           (char)payload[1] == 'e' && length == 3) { // get
-        MQTTPublishBMx80SensorData(i);
+        MQTTPublishBMEX80SensorData(i);
       }
     }
 #endif
@@ -444,17 +444,17 @@ void MQTTPublishParticleSensorData(uint8_t id) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-void MQTTPublishBMx80SensorData(uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void MQTTPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    BMx80_DATA data = BMx80Sensor[id].get();
+    BMEX80_DATA data = BMEX80Sensor[id].get();
     String messageString = "{\"temperature\":";
     messageString += data.temperature;
-    if (BMx80Sensor[id].configuration.type != TYPE_BMP180_SENSOR) {
+    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
       messageString += ",\"humidity\":";
       messageString += data.humidity;
     }
-    if (BMx80Sensor[id].configuration.type == TYPE_BME680_SENSOR) {
+    if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR) {
       messageString += ",\"gasResistance\":";
       messageString += data.gasResistance;
     }
@@ -463,7 +463,7 @@ void MQTTPublishBMx80SensorData(uint8_t id) {
     messageString += "}";
     char message[messageString.length() + 1];
     messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publishTopic(BMx80Sensor[id].configuration.mqtt.topic, message);
+    Mqtt.publishTopic(BMEX80Sensor[id].configuration.mqtt.topic, message);
   }
 }
 #endif

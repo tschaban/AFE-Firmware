@@ -19,7 +19,7 @@ struct HPMA115S0_DOMOTICZ {
 
 struct HPMA115S0 {
   char name[17];
-  uint16_t interval;
+  uint32_t interval;
   uint16_t timeToMeasure;
   HPMA115S0_DOMOTICZ domoticz;
   MQTT_BASIC_CONFIG mqtt;

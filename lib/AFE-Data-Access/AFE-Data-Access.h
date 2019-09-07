@@ -152,10 +152,10 @@ public:
   void createHPMA115S0SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  BMx80 getBMx80SensorConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, BMx80 configuration);
-  void createBMx80SensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  BMEX80 getBMEX80SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, BMEX80 configuration);
+  void createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

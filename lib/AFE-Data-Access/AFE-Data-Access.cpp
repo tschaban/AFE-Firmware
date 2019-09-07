@@ -371,8 +371,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.noOfGates = root["noOfGates"];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-      configuration.noOfBMx80s = root["noOfBMx80s"];
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+      configuration.noOfBMEX80s = root["noOfBMEX80s"];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -516,7 +516,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
    }
 
    configuration.isHPMA115S0 = Eeprom.read(413);
-   configuration.isBMx80 = Eeprom.readUInt8(422);
+   configuration.isBMEX80 = Eeprom.readUInt8(422);
    configuration.isBH1750 = Eeprom.read(429);
 
  #endif
@@ -581,8 +581,8 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfHPMA115S0s"] = configuration->noOfHPMA115S0s;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    root["noOfBMx80s"] = configuration->noOfBMx80s;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    root["noOfBMEX80s"] = configuration->noOfBMEX80s;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -707,7 +707,7 @@ defined(T4_CONFIG)
 
   #if defined(T6_CONFIG)
     Eeprom.write(413, configuration.isHPMA115S0);
-    Eeprom.writeUInt8(422, configuration.isBMx80);
+    Eeprom.writeUInt8(422, configuration.isBMEX80);
     Eeprom.write(429, configuration.isBH1750);
   #endif
 
@@ -757,8 +757,9 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  deviceConfiguration.noOfBMx80s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMX80;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  deviceConfiguration.noOfBMEX80s =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -1586,7 +1587,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-#define AFE_CONFIG_FILE_BUFFER_RELAY 160
+#define AFE_CONFIG_FILE_BUFFER_RELAY 240
 RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   RELAY configuration;
   char fileName[17];
@@ -2187,6 +2188,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 }
 #endif /* End: Relay */
 
+#define AFE_CONFIG_FILE_BUFFER_SWITCH 210
 SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   SWITCH configuration;
 
@@ -2210,7 +2212,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<130> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SWITCH> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -2228,7 +2230,10 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_SWITCH < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -2268,7 +2273,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<163> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SWITCH> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["gpio"] = configuration.gpio;
     root["type"] = configuration.type;
@@ -2287,7 +2292,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_SWITCH < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
 
   }
@@ -3188,7 +3196,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 50
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 240
 HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   HPMA115S0 configuration;
 
@@ -3311,6 +3319,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   Serial << endl << "Creating file: cfg-hpma115s0-XX.json";
 #endif
   HPMA115S0 configuration;
+
   configuration.interval = AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
   configuration.timeToMeasure =
       AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
@@ -3325,7 +3334,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-#define AFE_CONFIG_FILE_BUFFER_UART 10
+#define AFE_CONFIG_FILE_BUFFER_UART 50
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   SERIALPORT configuration;
 
@@ -3437,13 +3446,13 @@ void AFEDataAccess::createSerialConfigurationFile() {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-#define AFE_CONFIG_FILE_BUFFER_BMX80 50
-BMx80 AFEDataAccess::getBMx80SensorConfiguration(uint8_t id) {
-  BMx80 configuration;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 320
+BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
+  BMEX80 configuration;
 
   char fileName[17];
-  sprintf(fileName, "cfg-bmx80-%d.json", id);
+  sprintf(fileName, "cfg-BMEX80-%d.json", id);
 
 #ifdef DEBUG
   Serial << endl
@@ -3462,15 +3471,16 @@ BMx80 AFEDataAccess::getBMx80SensorConfiguration(uint8_t id) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMX80> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
-      configuration.interval = root["interval"];
+      configuration.type = root["type"];
       configuration.i2cAddress = root["i2cAddress"];
+      sprintf(configuration.name, root["name"]);
+      configuration.interval = root["interval"];
       configuration.domoticz.temperatureHumidityPressure.idx =
           root["idx"]["temperatureHumidityPressure"];
       configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
@@ -3483,7 +3493,7 @@ BMx80 AFEDataAccess::getBMx80SensorConfiguration(uint8_t id) {
       Serial << endl
              << "success" << endl
              << "JSON Buffer size: " << jsonBuffer.size() << endl
-             << (AFE_CONFIG_FILE_BUFFER_BMX80 < jsonBuffer.size() + 10
+             << (AFE_CONFIG_FILE_BUFFER_BMEX80 < jsonBuffer.size() + 10
                      ? "WARNING: Buffor size might be to small"
                      : "Buffor size: OK");
 #endif
@@ -3507,9 +3517,9 @@ BMx80 AFEDataAccess::getBMx80SensorConfiguration(uint8_t id) {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BMx80 configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
   char fileName[17];
-  sprintf(fileName, "cfg-bmx80-%d.json", id);
+  sprintf(fileName, "cfg-BMEX80-%d.json", id);
 
 #ifdef DEBUG
   Serial << endl
@@ -3525,11 +3535,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMx80 configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMX80> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &idx = root.createNestedObject("idx");
 
+    root["type"] = configuration.type;
     root["interval"] = configuration.interval;
+    root["name"] = configuration.name;
     root["i2cAddress"] = configuration.i2cAddress;
     root["mqttTopic"] = configuration.mqtt.topic;
     idx["temperatureHumidityPressure"] =
@@ -3549,7 +3561,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMx80 configuration) {
     Serial << endl
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size() << endl
-           << (AFE_CONFIG_FILE_BUFFER_BMX80 < jsonBuffer.size() + 10
+           << (AFE_CONFIG_FILE_BUFFER_BMEX80 < jsonBuffer.size() + 10
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
@@ -3562,28 +3574,29 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMx80 configuration) {
   Serial << endl << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createBMx80SensorConfigurationFile() {
+void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-bmx80-XX.json";
+  Serial << endl << "Creating file: cfg-BMEX80-XX.json";
 #endif
-  BMx80 configuration;
-  configuration.interval = AFE_CONFIG_HARDWARE_BMX80_DEFAULT_INTERVAL;
+  BMEX80 configuration;
+  configuration.type = AFE_BMX_UNKNOWN_SENSOR;
+  configuration.interval = AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
   configuration.domoticz.temperatureHumidityPressure.idx = 0;
   configuration.domoticz.gasResistance.idx = 0;
   configuration.domoticz.temperature.idx = 0;
   configuration.domoticz.humidity.idx = 0;
   configuration.domoticz.pressure.idx = 0;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMX80; i++) {
-    sprintf(configuration.mqtt.topic, "BMx80/%d", i + 1);
-    sprintf(configuration.name, "BMx80-%d", i + 1);
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
+    sprintf(configuration.mqtt.topic, "BMEX80/%d", i + 1);
+    sprintf(configuration.name, "BMEX80-%d", i + 1);
     saveConfiguration(i, configuration);
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-#define AFE_CONFIG_FILE_BUFFER_BH1750 20
+#define AFE_CONFIG_FILE_BUFFER_BH1750 230
 BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
   BH1750 configuration;
   char fileName[18];
@@ -3597,7 +3610,6 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
-
   if (configFile) {
 #ifdef DEBUG
     Serial << "success" << endl << "Reading JSON : ";
@@ -3608,16 +3620,18 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
+
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
 
+      sprintf(configuration.name, root["name"]);
+      configuration.mode = root["mode"];
       configuration.interval = root["interval"];
       configuration.i2cAddress = root["i2cAddress"];
       configuration.domoticz.idx = root["idx"];
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
-      configuration.mode = root["mode"];
 
 #ifdef DEBUG
       Serial << endl
@@ -3668,11 +3682,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
 
+    root["name"] = configuration.name;
+    root["mode"] = configuration.mode;
     root["interval"] = configuration.interval;
     root["i2cAddress"] = configuration.i2cAddress;
     root["mqttTopic"] = configuration.mqtt.topic;
     root["idx"] = configuration.domoticz.idx;
-    root["mode"] = configuration.mode;
 
     root.printTo(configFile);
 #ifdef DEBUG

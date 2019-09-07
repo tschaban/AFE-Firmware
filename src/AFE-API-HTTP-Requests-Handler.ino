@@ -336,26 +336,26 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  /* BMx80 */
-  if (strcmp(request.device, "BMx80") == 0 &&
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  /* BMEX80 */
+  if (strcmp(request.device, "BMEX80") == 0 &&
       strcmp(request.command, "get") == 0 &&
       (strcmp(request.name, "temperature") == 0 ||
        strcmp(request.name, "pressure") == 0 ||
        strcmp(request.name, "humidity") == 0 ||
        strcmp(request.name, "gasResistance") == 0)) {
 
-    for (uint8_t i = 0; i < Device.configuration.noOfBMx80s; i++) {
-      if (strcmp(request.name, BMx80Sensor[i].configuration.name) == 0) {
-        BMx80_DATA sensorData = BMx80Sensor[i].get();
+    for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
+      if (strcmp(request.name, BMEX80Sensor[i].configuration.name) == 0) {
+        BMEX80_DATA sensorData = BMEX80Sensor[i].get();
         if (strcmp(request.name, "temperature") == 0) {
           sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
         } else if (strcmp(request.name, "pressure") == 0) {
           sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-        } else if (BMx80Sensor[i].configuration.type != TYPE_BMP180_SENSOR &&
+        } else if (BMEX80Sensor[i].configuration.type != AFE_BMP180_SENSOR &&
                    strcmp(request.name, "humidity") == 0) {
           sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-        } else if (BMx80Sensor[i].configuration.type != TYPE_BME680_SENSOR &&
+        } else if (BMEX80Sensor[i].configuration.type != AFE_BME680_SENSOR &&
                    strcmp(request.name, "gasResistance") == 0) {
           sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
         }

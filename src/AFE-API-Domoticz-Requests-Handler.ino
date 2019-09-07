@@ -111,40 +111,40 @@ void DomoticzPublishParticleSensorData(uint8_t id) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-void DomoticzPublishBMx80SensorData(uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void DomoticzPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    BMx80_DATA data;
-    data = BMx80Sensor[id].get();
-    if (BMx80Sensor[id].configuration.type != TYPE_BMP180_SENSOR &&
-        BMx80Sensor[id].configuration.domoticz.temperatureHumidityPressure.idx >
+    BMEX80_DATA data;
+    data = BMEX80Sensor[id].get();
+    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR &&
+        BMEX80Sensor[id].configuration.domoticz.temperatureHumidityPressure.idx >
             0) {
       Domoticz.sendTemperatureAndHumidityAndPressureCommand(
-          BMx80Sensor[id]
+          BMEX80Sensor[id]
               .configuration.domoticz.temperatureHumidityPressure.idx,
           data.temperature, data.humidity, data.pressure);
     }
-    if (BMx80Sensor[id].configuration.type == TYPE_BME680_SENSOR &&
-        BMx80Sensor[id].configuration.domoticz.gasResistance.idx > 0) {
+    if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR &&
+        BMEX80Sensor[id].configuration.domoticz.gasResistance.idx > 0) {
       delay(10);
       Domoticz.sendCustomSensorCommand(
-          BMx80Sensor[id].configuration.domoticz.gasResistance.idx,
+          BMEX80Sensor[id].configuration.domoticz.gasResistance.idx,
           data.gasResistance);
     }
 
     DomoticzPublishTemperature(
-        BMx80Sensor[id].configuration.domoticz.temperature.idx,
+        BMEX80Sensor[id].configuration.domoticz.temperature.idx,
         data.temperature);
 
-    if (BMx80Sensor[id].configuration.type != TYPE_BMP180_SENSOR) {
+    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
       DomoticzPublishHumidity(
-          BMx80Sensor[id].configuration.domoticz.humidity.idx, data.humidity);
+          BMEX80Sensor[id].configuration.domoticz.humidity.idx, data.humidity);
     }
 
-    if (BMx80Sensor[id].configuration.domoticz.pressure.idx > 0) {
+    if (BMEX80Sensor[id].configuration.domoticz.pressure.idx > 0) {
       delay(10);
       Domoticz.sendPressureCommand(
-          BMx80Sensor[id].configuration.domoticz.pressure.idx, data.pressure);
+          BMEX80Sensor[id].configuration.domoticz.pressure.idx, data.pressure);
     }
   }
 }

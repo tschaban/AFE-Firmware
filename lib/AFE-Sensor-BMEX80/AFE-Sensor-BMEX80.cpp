@@ -1,12 +1,12 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#include "AFE-Sensor-BMx80.h"
+#include "AFE-Sensor-BMEX80.h"
 
-AFESensorBMx80::AFESensorBMx80(){};
+AFESensorBMEX80::AFESensorBMEX80(){};
 
-void AFESensorBMx80::begin(uint8_t id) {
+void AFESensorBMEX80::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getBMx80SensorConfiguration(id);
+  configuration = Data.getBMEX80SensorConfiguration(id);
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
@@ -15,12 +15,12 @@ void AFESensorBMx80::begin(uint8_t id) {
   }
 
 #if defined(DEBUG)
-  Serial << endl << endl << "-------- BMx80: Initializing --------";
+  Serial << endl << endl << "-------- BMEX80: Initializing --------";
 #endif
 
-  _initialized = configuration.type == TYPE_BME680_SENSOR
+  _initialized = configuration.type == AFE_BME680_SENSOR
                      ? s6.begin(&configuration)
-                     : sensorType == TYPE_BME280_SENSOR
+                     : sensorType == AFE_BME280_SENSOR
                            ? s2.begin(&configuration)
                            : s1.begin(&configuration);
 
@@ -31,12 +31,12 @@ void AFESensorBMx80::begin(uint8_t id) {
 #endif
 }
 
-BMx80_DATA AFESensorBMx80::get() {
+BMEX80_DATA AFESensorBMEX80::get() {
   ready = false;
   return sensorData;
 }
 
-boolean AFESensorBMx80::isReady() {
+boolean AFESensorBMEX80::isReady() {
   if (ready) {
     ready = false;
     return true;
@@ -45,7 +45,7 @@ boolean AFESensorBMx80::isReady() {
   }
 }
 
-void AFESensorBMx80::listener() {
+void AFESensorBMEX80::listener() {
   if (_initialized) {
     unsigned long time = millis();
 
@@ -64,14 +64,14 @@ void AFESensorBMx80::listener() {
 #endif
 
       boolean readStatus =
-          sensorType == TYPE_BME680_SENSOR
+          sensorType == AFE_BME680_SENSOR
               ? s6.read()
-              : sensorType == TYPE_BME280_SENSOR ? s2.read() : s1.read();
+              : sensorType == AFE_BME280_SENSOR ? s2.read() : s1.read();
 
       if (readStatus) {
-        sensorData = sensorType == TYPE_BME680_SENSOR
+        sensorData = sensorType == AFE_BME680_SENSOR
                          ? s6.data
-                         : sensorType == TYPE_BME280_SENSOR ? s2.data : s1.data;
+                         : sensorType == AFE_BME280_SENSOR ? s2.data : s1.data;
 
         ready = true;
 
@@ -79,10 +79,10 @@ void AFESensorBMx80::listener() {
         Serial << endl
                << "Temperature = " << sensorData.temperature << endl
                << "Pressure = " << sensorData.pressure;
-        if (sensorType != TYPE_BMP180_SENSOR) {
+        if (sensorType != AFE_BMP180_SENSOR) {
           Serial << endl << "Humidity = " << sensorData.humidity;
         }
-        if (sensorType == TYPE_BME680_SENSOR) {
+        if (sensorType == AFE_BME680_SENSOR) {
           Serial << endl << "Gas level = " << sensorData.gasResistance;
         }
 

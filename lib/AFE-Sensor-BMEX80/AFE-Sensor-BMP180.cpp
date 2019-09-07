@@ -4,7 +4,7 @@
 
 AFESensorBMP180::AFESensorBMP180(){};
 
-boolean AFESensorBMP180::begin(BMx80 *_configuration) {
+boolean AFESensorBMP180::begin(BMEX80 *_configuration) {
 
   configuration = _configuration;
 

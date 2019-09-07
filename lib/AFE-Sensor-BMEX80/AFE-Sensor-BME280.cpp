@@ -4,7 +4,7 @@
 
 AFESensorBME280::AFESensorBME280(){};
 
-boolean AFESensorBME280::begin(BMx80 *_configuration) {
+boolean AFESensorBME280::begin(BMEX80 *_configuration) {
   configuration = _configuration;
 
 #if defined(DEBUG)

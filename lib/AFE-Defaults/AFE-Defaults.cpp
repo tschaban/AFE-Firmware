@@ -64,8 +64,8 @@ void AFEDefaults::set() {
     Data->createSerialConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    Data->createBMx80SensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    Data->createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

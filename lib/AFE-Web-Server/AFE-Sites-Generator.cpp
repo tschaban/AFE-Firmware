@@ -250,8 +250,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
-    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
     page += AFE_CONFIG_SITE_HPMA115S0;
     page += "\">";
     page += L_PARTICLE_SENSOR;
@@ -259,15 +260,15 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  if (Device->configuration.noOfBMx80s > 0) {
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  if (Device->configuration.noOfBMEX80s > 0) {
     page += "<li  class=\"itm\"><a><i>";
-    page += L_BMX80_SENSORS;
+    page += L_BMEX80_SENSORS;
     page += "</i></a></li>";
 
-    for (uint8_t i = 0; i < Device->configuration.noOfBMx80s; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfBMEX80s; i++) {
       page += "<li class=\"itm\"><a href=\"\\?o=";
-      page += AFE_CONFIG_SITE_BMX80;
+      page += AFE_CONFIG_SITE_BMEX80;
       page += "&i=";
       page += i;
       page += "\">&#8227; ";
@@ -424,10 +425,10 @@ String AFESitesGenerator::addDeviceConfiguration() {
                                     L_NUMBER_OF_BH1750_SENSORS);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BMX80,
-                                    Device->configuration.noOfBMx80s, "b6",
-                                    L_NUMBER_OF_BMX80_SENSORS);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
+                                    Device->configuration.noOfBMEX80s, "b6",
+                                    L_NUMBER_OF_BMEX80_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -1780,10 +1781,12 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
   String body = "<fieldset>";
 
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "5",
-                  "86400", "1", L_SECONDS);
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+                  "86400", "f", L_SECONDS);
 
   body += "<br><br>";
   body += "<p class=\"cm\">";
@@ -1791,7 +1794,7 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
   body += "</p>";
 
   sprintf(_number, "%d", configuration.timeToMeasure);
-  body += addItem("number", "t", L_MEASURE_AFTER, _number, "?", "0", "999", "1",
+  body += addItem("number", "m", L_MEASURE_AFTER, _number, "?", "0", "999", "1",
                   L_SECONDS);
 
   body += "</fieldset>";
@@ -1803,69 +1806,88 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
     body +=
-        addItem("number", "x2", "IDX PM2.5", _number, "?", "1", "999999", "1");
+        addItem("number", "x2", "IDX PM2.5", _number, "?", "0", "999999", "1");
 
     sprintf(_number, "%d", configuration.domoticz.pm10.idx);
     body +=
-        addItem("number", "x1", "IDX PM10", _number, "?", "1", "999999", "1");
+        addItem("number", "x1", "IDX PM10", _number, "?", "0", "999999", "1");
 
     body += "</fieldset>";
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
 
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY, body);
+  }
+
   return page;
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-String AFESitesGenerator::addBMx80Configuration(uint8_t id) {
-  BMx80 Sensor = Data.getBMx80SensorConfiguration(id);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
+  BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
 
   String body = "<fieldset>";
 
-  body += addDeviceI2CAddressSelection(Sensor.i2cAddress);
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
 
   char _number[7];
-  sprintf(_number, "%d", Sensor.interval);
-  body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+  sprintf(_number, "%d", configuration.interval);
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
                   "86400", "1", L_SECONDS);
 
   body += "<br><br>";
   body += "</fieldset>";
 
-  String page = addConfigurationBlock(L_BMX80_SENSOR, "", body);
+  String page = addConfigurationBlock(L_BMEX80_SENSOR, "", body);
 
   if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
-    if (Sensor.type != TYPE_BMP180_SENSOR) {
+    if (configuration.type != AFE_BMP180_SENSOR) {
 
-      sprintf(_number, "%d", Sensor.domoticz.temperatureHumidityPressure.idx);
-      body += addItem("number", "t", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
+      sprintf(_number, "%d",
+              configuration.domoticz.temperatureHumidityPressure.idx);
+      body += addItem("number", "m", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
                       "999999", "1");
     }
 
-    sprintf(_number, "%d", Sensor.domoticz.temperature.idx);
+    sprintf(_number, "%d", configuration.domoticz.temperature.idx);
     body += addItem("number", "e", L_IDX_TEMPERATURE, _number, "?", "0",
                     "999999", "1");
 
-    if (Sensor.type != TYPE_BMP180_SENSOR) {
-      sprintf(_number, "%d", Sensor.domoticz.humidity.idx);
+    if (configuration.type != AFE_BMP180_SENSOR) {
+      sprintf(_number, "%d", configuration.domoticz.humidity.idx);
       body += addItem("number", "h", L_IDX_HUMIDITY, _number, "?", "0",
                       "999999", "1");
     }
 
-    sprintf(_number, "%d", Sensor.domoticz.pressure.idx);
+    sprintf(_number, "%d", configuration.domoticz.pressure.idx);
     body += addItem("number", "p", L_IDX_PRESSURE, _number, "?", "0", "999999",
                     "1");
 
-    if (Sensor.type == TYPE_BME680_SENSOR) {
-      sprintf(_number, "%d", Sensor.domoticz.gasResistance.idx);
+    if (configuration.type == AFE_BME680_SENSOR) {
+      sprintf(_number, "%d", configuration.domoticz.gasResistance.idx);
       body += addItem("number", "g", L_IDX_GAS_SENSOR, _number, "?", "0",
                       "999999", "1");
     }
     body += "</fieldset>";
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;
@@ -1874,15 +1896,18 @@ String AFESitesGenerator::addBMx80Configuration(uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
+
   BH1750 configuration = Data.getBH1750SensorConfiguration(id);
 
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
 
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
                   "86400", "1", L_SECONDS);
 
   sprintf(_number, "%d", configuration.mode);
@@ -1901,6 +1926,14 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 
     body += "</fieldset>";
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;

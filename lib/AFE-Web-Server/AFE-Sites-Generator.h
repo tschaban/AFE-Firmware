@@ -19,8 +19,8 @@
 #include <AFE-I2C-Scanner.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-#include <AFE-Sensor-BMx80.h>
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <AFE-Sensor-BMEX80.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -147,8 +147,8 @@ public:
   String addHPMA115S0Configuration(uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  String addBMx80Configuration(uint8_t id);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  String addBMEX80Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

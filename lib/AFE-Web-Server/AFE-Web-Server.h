@@ -104,8 +104,8 @@ private:
   HPMA115S0 getHPMA115S0SensorData();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  BMx80 getBMx80SensorData();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  BMEX80 getBMEX80SensorData();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

@@ -465,7 +465,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
    }
 
    configuration.isHPMA115S0 = Eeprom.read(413);
-   configuration.isBMx80 = Eeprom.readUInt8(422);
+   configuration.isBMEX80 = Eeprom.readUInt8(422);
    configuration.isBH1750 = Eeprom.read(429);
 
  #endif
@@ -639,7 +639,7 @@ defined(T4_CONFIG)
 
   #if defined(T6_CONFIG)
     Eeprom.write(413, configuration.isHPMA115S0);
-    Eeprom.writeUInt8(422, configuration.isBMx80);
+    Eeprom.writeUInt8(422, configuration.isBMEX80);
     Eeprom.write(429, configuration.isBH1750);
   #endif
 
@@ -2183,9 +2183,9 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
-  BMx80 configuration;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+BMEX80 AFEDataAccess::getBMEX80SensorConfiguration() {
+  BMEX80 configuration;
   configuration.interval = Eeprom.read(423, 5).toInt();
   configuration.i2cAddress = Eeprom.readUInt8(428);
   configuration.idx.temperatureHumidityPressure = Eeprom.read(938, 6).toInt();
@@ -2195,7 +2195,7 @@ BMx80 AFEDataAccess::getBMx80SensorConfiguration() {
   configuration.idx.pressure = Eeprom.read(962, 6).toInt();
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(BMx80 configuration) {
+void AFEDataAccess::saveConfiguration(BMEX80 configuration) {
   Eeprom.write(423, 5, (long)configuration.interval);
   Eeprom.writeUInt8(428, configuration.i2cAddress);
   Eeprom.write(938, 6, (long)configuration.idx.temperatureHumidityPressure);

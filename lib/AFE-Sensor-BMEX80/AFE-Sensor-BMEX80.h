@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Sensor_BMx80_h
-#define _AFE_Sensor_BMx80_h
+#ifndef _AFE_Sensor_BMEX80_h
+#define _AFE_Sensor_BMEX80_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -15,14 +15,10 @@
 #include <AFE-Sensor-BME680.h>
 #include <AFE-Sensor-BMP180.h>
 
-#define TYPE_BMP180_SENSOR 1
-#define TYPE_BME280_SENSOR 2
-#define TYPE_BME680_SENSOR 6
-
-class AFESensorBMx80 {
+class AFESensorBMEX80 {
 
 private:
-  BMx80_DATA sensorData;
+  BMEX80_DATA sensorData;
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
@@ -34,15 +30,15 @@ private:
   AFESensorBME680 s6;
 
 public:
-  BMx80 configuration;
+  BMEX80 configuration;
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
-  AFESensorBMx80();
+  AFESensorBMEX80();
 
   void begin(uint8_t id);
 
-  BMx80_DATA get();
+  BMEX80_DATA get();
 
   boolean isReady();
 

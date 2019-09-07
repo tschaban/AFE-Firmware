@@ -100,8 +100,8 @@ AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-BMx80.h>
-AFESensorBMx80 BMx80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMX80];
+#include <AFE-Sensor-BMEX80.h>
+AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -295,8 +295,8 @@ void setup() {
     initializeHPMA115S0Sensor();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    initializeBMx80Sensor();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    initializeBMEX80Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -385,8 +385,8 @@ void loop() {
         HPMA115S0SensorEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-        BMx80SensorEventsListener();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+        BMEX80SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

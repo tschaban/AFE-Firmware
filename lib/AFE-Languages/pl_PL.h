@@ -296,23 +296,26 @@
   "czujnik ma zostać uruchomiony. Wartość musi być mniejsza niż interwał "  \
   "pomiarów"
 #define L_MEASURE_AFTER "Pomiar po czasie"
+#define L_MQTT_TOPIC_HPMA115S0 "Temat MQTT czujnika HPMA115S0"
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-#define L_BMX80_SENSOR "Czujnik BMx80"
-#define L_BMX80_SENSORS "Czujniki BMx80"
-#define L_NUMBER_OF_BMX80_SENSORS "Ilość czujników BMx80"
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#define L_BMEX80_SENSOR "Czujnik BMEx80"
+#define L_BMEX80_SENSORS "Czujniki BMEx80"
+#define L_NUMBER_OF_BMEX80_SENSORS "Ilość czujników BMEx80"
 #define L_IDX_TEMP_HUM_BAR "IDX Temp/Wilg/Bar"
 #define L_IDX_TEMPERATURE "IDX Temperatura"
 #define L_IDX_HUMIDITY "IDX Wilgotność"
 #define L_IDX_PRESSURE "IDX Ciśnienie"
 #define L_IDX_GAS_SENSOR "IDX Czujnik gazu"
+#define L_MQTT_TOPIC_BMEX80 "Temat MQTT czujnika BMEx80"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define L_BH1750_SENSOR "Czujnik BH1750"
 #define L_BH1750_SENSORS "Czujniki BH1750"
 #define L_NUMBER_OF_BH1750_SENSORS "Ilość czujników BH1750"
+#define L_MQTT_TOPIC_BH1750 "Temat MQTT czujnika BH1750"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C

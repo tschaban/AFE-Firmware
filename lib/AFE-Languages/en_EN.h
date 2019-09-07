@@ -287,23 +287,26 @@
   "before a measurement the sensor should wake up. It should be lower than "   \
   "measurement's interval"
 #define L_MEASURE_AFTER "Measure after"
+#define L_MQTT_TOPIC_HPMA115S0 "HPMA115S0 Sensor's MQTT Topic"
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-#define L_BMX80_SENSOR "BMx80 Sensor"
-#define L_BMX80_SENSORS "BMx80 Sensors"
-#define L_NUMBER_OF_BMX80_SENSORS "Number of BMx80 Sensors"
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#define L_BMEX80_SENSOR "BMEx80 Sensor"
+#define L_BMEX80_SENSORS "BMEx80 Sensors"
+#define L_NUMBER_OF_BMEX80_SENSORS "Number of BMEx80 Sensors"
 #define L_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
 #define L_IDX_TEMPERATURE "IDX Temperature"
 #define L_IDX_HUMIDITY "IDX Humidity"
 #define L_IDX_PRESSURE "IDX Pressure"
 #define L_IDX_GAS_SENSOR "IDX Gas sensor"
+#define L_MQTT_TOPIC_BMEX80 "BMEx80 Sensor's MQTT Topic"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define L_BH1750_SENSOR "BH1750 Sensor"
 #define L_BH1750_SENSORS "BH1750 Sensors"
 #define L_NUMBER_OF_BH1750_SENSORS "Number of BH1750 Sensors"
+#define L_MQTT_TOPIC_BH1750 "BH1750 Sensor's MQTT Topic"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C

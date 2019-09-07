@@ -49,7 +49,7 @@
  * excluded */
 #include <AFE-ADC-INPUT-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
-#include <AFE-BMx80-Sensor-Structure.h>
+#include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
 
 #ifdef T6_CONFIG

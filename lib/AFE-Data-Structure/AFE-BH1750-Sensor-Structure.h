@@ -14,7 +14,7 @@
 
 struct BH1750 {
   char name[17];
-  uint16_t interval;
+  uint32_t interval;
   uint8_t i2cAddress;
   uint8_t mode;
   DOMOTICZ_BASIC_CONFIG domoticz;
