@@ -1837,6 +1837,33 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
 
+  body += "<div class=\"cf\"><label>";
+  body += L_BMEX80_SENSOR_TYPE;
+  body += "</label><select name=\"b\"><option value=\"";
+  body += AFE_BMX_UNKNOWN_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BMX_UNKNOWN_SENSOR ? " selected=\"selected\""
+                                                    : "");
+  body += ">";
+  body += L_NONE;
+  body += "</option><option value=\"";
+  body += AFE_BMP180_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BMP180_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BMP180/BME180</option><option value=\"";
+  body += AFE_BME280_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BME280_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BME280</option><option value=\"";
+  body += AFE_BME680_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BME680_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BME680</option></select></div>";
+
   body += addItem("text", "n", L_NAME, configuration.name, "16");
 
   char _number[7];

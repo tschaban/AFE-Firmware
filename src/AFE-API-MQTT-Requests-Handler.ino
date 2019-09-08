@@ -472,8 +472,7 @@ void MQTTPublishBMEX80SensorData(uint8_t id) {
 void MQTTPublishBH1750SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
     char message[10];
-    // @TODO what is the range
-    dtostrf(BH1750Sensor[id].get(), 10, 3, message);
+    sprintf(message, "%.3f", BH1750Sensor[id].get());
     Mqtt.publishTopic(BH1750Sensor[id].configuration.mqtt.topic, message);
   }
 }

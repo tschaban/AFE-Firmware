@@ -18,11 +18,19 @@ void AFESensorBMEX80::begin(uint8_t id) {
   Serial << endl << endl << "-------- BMEX80: Initializing --------";
 #endif
 
-  _initialized = configuration.type == AFE_BME680_SENSOR
-                     ? s6.begin(&configuration)
-                     : sensorType == AFE_BME280_SENSOR
-                           ? s2.begin(&configuration)
-                           : s1.begin(&configuration);
+  switch (configuration.type) {
+  case AFE_BME680_SENSOR:
+    _initialized = s6.begin(&configuration);
+    break;
+  case AFE_BME280_SENSOR:
+    _initialized = s2.begin(&configuration);
+    break;
+  case AFE_BMP180_SENSOR:
+    _initialized = s1.begin(&configuration);
+  default:
+    _initialized = false;
+    break;
+  }
 
 #ifdef DEBUG
   Serial << endl
@@ -64,14 +72,14 @@ void AFESensorBMEX80::listener() {
 #endif
 
       boolean readStatus =
-          sensorType == AFE_BME680_SENSOR
+          configuration.type == AFE_BME680_SENSOR
               ? s6.read()
-              : sensorType == AFE_BME280_SENSOR ? s2.read() : s1.read();
+              : configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
 
       if (readStatus) {
-        sensorData = sensorType == AFE_BME680_SENSOR
+        sensorData = configuration.type == AFE_BME680_SENSOR
                          ? s6.data
-                         : sensorType == AFE_BME280_SENSOR ? s2.data : s1.data;
+                         : configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
 
         ready = true;
 
@@ -79,10 +87,10 @@ void AFESensorBMEX80::listener() {
         Serial << endl
                << "Temperature = " << sensorData.temperature << endl
                << "Pressure = " << sensorData.pressure;
-        if (sensorType != AFE_BMP180_SENSOR) {
+        if (configuration.type != AFE_BMP180_SENSOR) {
           Serial << endl << "Humidity = " << sensorData.humidity;
         }
-        if (sensorType == AFE_BME680_SENSOR) {
+        if (configuration.type == AFE_BME680_SENSOR) {
           Serial << endl << "Gas level = " << sensorData.gasResistance;
         }
 

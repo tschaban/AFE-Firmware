@@ -309,6 +309,7 @@
 #define L_IDX_PRESSURE "IDX Ciśnienie"
 #define L_IDX_GAS_SENSOR "IDX Czujnik gazu"
 #define L_MQTT_TOPIC_BMEX80 "Temat MQTT czujnika BMEx80"
+#define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

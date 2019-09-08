@@ -23,8 +23,6 @@ private:
   unsigned long startTime = 0;
   boolean _initialized = false;
 
-  uint8_t sensorType;
-
   AFESensorBMP180 s1;
   AFESensorBME280 s2;
   AFESensorBME680 s6;

@@ -300,6 +300,7 @@
 #define L_IDX_PRESSURE "IDX Pressure"
 #define L_IDX_GAS_SENSOR "IDX Gas sensor"
 #define L_MQTT_TOPIC_BMEX80 "BMEx80 Sensor's MQTT Topic"
+#define L_BMEX80_SENSOR_TYPE "BMEx80 Sensor type"
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

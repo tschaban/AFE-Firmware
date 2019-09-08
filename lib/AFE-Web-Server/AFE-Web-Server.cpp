@@ -382,8 +382,11 @@ void AFEWebServer::generate(boolean upload) {
 
       uint32_t maxSketchSpace =
           (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+
 #ifdef DEBUG
-      Serial << endl << "Max sketch space: " << maxSketchSpace << endl;
+      Serial << endl << "Sketch size: " << ESP.getSketchSize();
+      Serial << endl << "Free sketch size: " << ESP.getFreeSketchSpace();
+      Serial << endl << "Max sketch space: " << maxSketchSpace;
 #endif
 
       if (!Update.begin(maxSketchSpace)) { // start with max available size
@@ -1350,8 +1353,9 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 BMEX80 AFEWebServer::getBMEX80SensorData() {
   BMEX80 data;
-  data.type = server.arg("y").length() > 0 ? server.arg("y").toInt()
+  data.type = server.arg("b").length() > 0 ? server.arg("b").toInt()
                                            : AFE_BMX_UNKNOWN_SENSOR;
+
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
   data.interval = server.arg("f").length() > 0
