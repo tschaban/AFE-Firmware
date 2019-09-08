@@ -1,5 +1,5 @@
 ---
-title: 'O autorze AFE Firmware'
+title: 'O autorze'
 media_order: IMG_2805.jpg
 process:
     markdown: true
@@ -17,7 +17,6 @@ Pasjonata nowych technologii szczególnie tych, które ułatwiają życie lub ws
 Prowadzi bloga [Smart'ny Dom](https://www.smartnydom.pl?target=_blank)
 
 ##### Kontakt
-* [SMS'owy](http://adrian.czabanowski.com?target=_blank)
 * [Formularz kontaktowy](/kontakt)
 
 ##### Kontakt przez media społecznościowe
