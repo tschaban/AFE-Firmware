@@ -20,6 +20,13 @@ struct BMEX80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG humidity;
 };
 
+struct BMEX80_DATA_CORRECTIONS {
+  float temperature;
+  float humidity;
+  float pressure;
+  float gasResistance;
+};
+
 struct BMEX80 {
   char name[17];
   uint8_t type;
@@ -27,13 +34,16 @@ struct BMEX80 {
   uint8_t i2cAddress;
   BMEX80_DOMOTICZ domoticz;
   MQTT_BASIC_CONFIG mqtt;
+  BMEX80_DATA_CORRECTIONS corrections;
 };
 
 struct BMEX80_DATA {
   float temperature;
   float humidity;
   float pressure;
+  float relativePressure;
   float gasResistance;
 };
+
 
 #endif
