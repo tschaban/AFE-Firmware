@@ -77,21 +77,32 @@ void AFESensorBMEX80::listener() {
               : configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
 
       if (readStatus) {
-        sensorData = configuration.type == AFE_BME680_SENSOR
-                         ? s6.data
-                         : configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
+        sensorData =
+            configuration.type == AFE_BME680_SENSOR
+                ? s6.data
+                : configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
 
         ready = true;
 
 #if defined(DEBUG)
         Serial << endl
-               << "Temperature = " << sensorData.temperature << endl
-               << "Pressure = " << sensorData.pressure;
+               << "Temperature = " << sensorData.temperature.value << endl
+               << "Pressure = " << sensorData.pressure.value 
+               << ", Relative = " << sensorData.pressure.relative;
         if (configuration.type != AFE_BMP180_SENSOR) {
-          Serial << endl << "Humidity = " << sensorData.humidity;
+          Serial << endl << "Humidity = " << sensorData.humidity.value;
+          Serial << endl << "Dew Point = " << sensorData.dewPoint.value;
         }
         if (configuration.type == AFE_BME680_SENSOR) {
-          Serial << endl << "Gas level = " << sensorData.gasResistance;
+          Serial << endl << "Gas Resistance = " << sensorData.airQuality.gasResistance.value;
+          Serial << endl << "IAQ = " << sensorData.airQuality.iaq.value;
+          Serial << endl << "IAQ Accuracy = " << sensorData.airQuality.iaq.accuracy;
+          Serial << endl << "Static IAQ = " << sensorData.airQuality.staticIaq.value;
+          Serial << endl << "Static IAQ Accuracy = " << sensorData.airQuality.staticIaq.accuracy;
+          Serial << endl << "Breath VOC = " << sensorData.airQuality.breathVocEquivalent.value;
+          Serial << endl << "Breath VOC Accuracy = " << sensorData.airQuality.breathVocEquivalent.accuracy;
+          Serial << endl << "CO2" << sensorData.airQuality.co2Equivalent.value;
+          Serial << endl << "CO2 Accuracy" << sensorData.airQuality.co2Equivalent.accuracy;
         }
 
       } else {

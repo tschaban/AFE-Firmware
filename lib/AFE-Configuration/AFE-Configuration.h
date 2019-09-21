@@ -230,7 +230,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.0.B1"
+#define AFE_FIRMWARE_VERSION "2.0.0.B2"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -430,6 +430,10 @@
 #endif
 
 /* UART Defaults */
+#ifdef AFE_CONFIG_PRESSURE
+#define AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE 1013.25
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_UART
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD 3
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD 1

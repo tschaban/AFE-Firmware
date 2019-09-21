@@ -9,10 +9,9 @@
 #include "WProgram.h"
 #endif
 
-#define UNIT_CELCIUS 0
-#define UNIT_FAHRENHEIT 1
 
 struct TEMPERATURE {
+  float value;
   float correction;
   uint8_t unit;
 };

@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_HUMIDITY_Structure_h
-#define _AFE_HUMIDITY_Structure_h
+#ifndef _AFE_PRESSURE_Structure_h
+#define _AFE_PRESSURE_Structure_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -9,10 +9,11 @@
 #include "WProgram.h"
 #endif
 
-struct HUMIDITY {
+struct PRESSURE {
   float value;
+  float relative;
   float correction;
-  uint8_t rating;
+  uint8_t unit;
 };
 
 #endif

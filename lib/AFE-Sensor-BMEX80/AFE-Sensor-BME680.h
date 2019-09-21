@@ -10,7 +10,8 @@
 #endif
 
 #include <AFE-BMEX80-Sensor-Structure.h>
-#include <Adafruit_BME680.h>
+#include <Bsec.h>
+//#include <bsec_serialized_configurations_iaq.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -18,7 +19,7 @@
 class AFESensorBME680 {
 
 private:
-  Adafruit_BME680 bme;
+  Bsec Bme;
 
 public:
   BMEX80 *configuration;
@@ -32,6 +33,11 @@ public:
   boolean read();
 
   BMEX80_DATA get();
+
+#ifdef DEBUG
+  void checkBmeStatus();
+#endif
+
 };
 
 #endif
