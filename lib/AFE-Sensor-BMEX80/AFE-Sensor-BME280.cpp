@@ -41,9 +41,9 @@ boolean AFESensorBME280::read() {
 
   bme.takeForcedMeasurement();
 
-  data.temperature = bme.readTemperature();
-  data.pressure = bme.readPressure() / 100.0;
-  data.humidity = bme.readHumidity();
+  data.temperature.value = bme.readTemperature();
+  data.pressure.value = bme.readPressure() / 100.0;
+  data.humidity.value = bme.readHumidity();
 
   return true;
 }

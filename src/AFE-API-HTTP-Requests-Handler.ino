@@ -51,9 +51,9 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND *request, boolean status,
   respond += "},\"command\":\"" + String(request->command) + "\",";
 
   if (!strlen(value) == 0) {
-    respond += "\"data\":{";
+    respond += "\"data\":";
     respond += value;
-    respond += "},";
+    respond += ",";
   }
   respond += "\"status\":\"";
   respond += status ? "success" : "error";
@@ -399,20 +399,10 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       strcmp(request.command, "get") == 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
       if (strcmp(request.name, BMEX80Sensor[i].configuration.name) == 0) {
-        BMEX80_DATA sensorData = BMEX80Sensor[i].get();
-
-        char _response[100];
-        sprintf(_response, "\"temperature\":%.3f,\"presssure\":%.3f",
-                sensorData.temperature, sensorData.pressure);
-        if (BMEX80Sensor[i].configuration.type != AFE_BMP180_SENSOR) {
-          sprintf(_response, "%s,\"humidity\":%.3f", _response,
-                  sensorData.humidity);
-        }
-        if (BMEX80Sensor[i].configuration.type == AFE_BME680_SENSOR) {
-          sprintf(_response, "%s,\"gasResistance\":%.3f", _response,
-                  sensorData.gasResistance);
-        }
-        sendHTTPAPIRequestStatus(&request, true, _response);
+      // @TODO optimize the char size
+         char json[1000];
+         BMEX80Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
         deviceNotExist = false;
         break;
       }

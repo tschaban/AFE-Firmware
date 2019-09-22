@@ -14,6 +14,8 @@ More info: https://afe.smartnydom.pl
 LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 */
 
+#include <AFE-Configuration.h>
+
 /* Includes libraries for debugging in development compilation only */
 #ifdef DEBUG
 #include <Streaming.h>

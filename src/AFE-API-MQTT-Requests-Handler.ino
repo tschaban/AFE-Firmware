@@ -447,22 +447,8 @@ void MQTTPublishParticleSensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void MQTTPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    BMEX80_DATA data = BMEX80Sensor[id].get();
-    String messageString = "{\"temperature\":";
-    messageString += data.temperature;
-    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
-      messageString += ",\"humidity\":";
-      messageString += data.humidity;
-    }
-    if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR) {
-      messageString += ",\"gasResistance\":";
-      messageString += data.gasResistance;
-    }
-    messageString += ",\"pressure\":";
-    messageString += data.pressure;
-    messageString += "}";
-    char message[messageString.length() + 1];
-    messageString.toCharArray(message, messageString.length() + 1);
+    char message[1000];
+    BMEX80Sensor[id].getJSON(message);
     Mqtt.publishTopic(BMEX80Sensor[id].configuration.mqtt.topic, message);
   }
 }

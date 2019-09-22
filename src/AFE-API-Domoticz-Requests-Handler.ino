@@ -114,37 +114,35 @@ void DomoticzPublishParticleSensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void DomoticzPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    BMEX80_DATA data;
-    data = BMEX80Sensor[id].get();
     if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR &&
         BMEX80Sensor[id].configuration.domoticz.temperatureHumidityPressure.idx >
             0) {
       Domoticz.sendTemperatureAndHumidityAndPressureCommand(
           BMEX80Sensor[id]
               .configuration.domoticz.temperatureHumidityPressure.idx,
-          data.temperature, data.humidity, data.pressure);
+          BMEX80Sensor[id].sensorData.temperature.value, BMEX80Sensor[id].sensorData.humidity.value, BMEX80Sensor[id].sensorData.pressure.value);
     }
     if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR &&
         BMEX80Sensor[id].configuration.domoticz.gasResistance.idx > 0) {
       delay(10);
       Domoticz.sendCustomSensorCommand(
           BMEX80Sensor[id].configuration.domoticz.gasResistance.idx,
-          data.gasResistance);
+          BMEX80Sensor[id].sensorData.gasResistance.value);
     }
 
     DomoticzPublishTemperature(
         BMEX80Sensor[id].configuration.domoticz.temperature.idx,
-        data.temperature);
+        BMEX80Sensor[id].sensorData.temperature.value);
 
     if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
       DomoticzPublishHumidity(
-          BMEX80Sensor[id].configuration.domoticz.humidity.idx, data.humidity);
+          BMEX80Sensor[id].configuration.domoticz.humidity.idx, BMEX80Sensor[id].sensorData.humidity.value);
     }
 
     if (BMEX80Sensor[id].configuration.domoticz.pressure.idx > 0) {
       delay(10);
       Domoticz.sendPressureCommand(
-          BMEX80Sensor[id].configuration.domoticz.pressure.idx, data.pressure);
+          BMEX80Sensor[id].configuration.domoticz.pressure.idx, BMEX80Sensor[id].sensorData.pressure.value);
     }
   }
 }

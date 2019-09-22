@@ -32,8 +32,6 @@ public:
 
   boolean read();
 
-  BMEX80_DATA get();
-
 #ifdef DEBUG
   void checkBmeStatus();
 #endif

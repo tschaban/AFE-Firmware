@@ -31,7 +31,5 @@ public:
   boolean begin(BMEX80 *);
 
   boolean read();
-
-  BMEX80_DATA get();
 };
 #endif

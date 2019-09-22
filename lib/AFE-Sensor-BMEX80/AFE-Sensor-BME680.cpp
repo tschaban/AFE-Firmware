@@ -27,7 +27,7 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration) {
     checkBmeStatus();
 #endif
 
-    bsec_virtual_sensor_t sensorList[8] = {
+    bsec_virtual_sensor_t sensorList[10] = {
         BSEC_OUTPUT_RAW_TEMPERATURE,
         BSEC_OUTPUT_RAW_PRESSURE,
         BSEC_OUTPUT_RAW_HUMIDITY,
@@ -36,9 +36,11 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration) {
         BSEC_OUTPUT_STATIC_IAQ,
         BSEC_OUTPUT_CO2_EQUIVALENT,
         BSEC_OUTPUT_BREATH_VOC_EQUIVALENT,
+        BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
+        BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY,
     };
 
-    Bme.updateSubscription(sensorList, 8, BSEC_SAMPLE_RATE_LP);
+    Bme.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
 
     /*
         if (!bme.begin(configuration->i2cAddress)) {
@@ -61,6 +63,9 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration) {
       }
     */
   }
+
+
+
   return true;
 }
 
@@ -73,15 +78,15 @@ boolean AFESensorBME680::read() {
     data.temperature.value = Bme.temperature;
     data.pressure.value = Bme.pressure / 100;
     data.humidity.value = Bme.humidity;
-    data.airQuality.gasResistance.value = Bme.gasResistance / 1000;
-    data.airQuality.iaq.value = Bme.iaq;
-    data.airQuality.iaq.accuracy = Bme.iaqAccuracy;
-    data.airQuality.staticIaq.value = Bme.staticIaq;
-    data.airQuality.staticIaq.accuracy = Bme.staticIaqAccuracy;
-    data.airQuality.co2Equivalent.value = Bme.co2Equivalent;
-    data.airQuality.co2Equivalent.accuracy = Bme.co2Accuracy;
-    data.airQuality.breathVocEquivalent.value = Bme.breathVocEquivalent;
-    data.airQuality.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
+    data.gasResistance.value = Bme.gasResistance / 1000;
+    data.iaq.value = Bme.iaq;
+    data.iaq.accuracy = Bme.iaqAccuracy;
+    data.staticIaq.value = Bme.staticIaq;
+    data.staticIaq.accuracy = Bme.staticIaqAccuracy;
+    data.co2Equivalent.value = Bme.co2Equivalent;
+    data.co2Equivalent.accuracy = Bme.co2Accuracy;
+    data.breathVocEquivalent.value = Bme.breathVocEquivalent;
+    data.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
     return true;
   } else {
   #ifdef DEBUG
@@ -103,6 +108,8 @@ boolean AFESensorBME680::read() {
     }
     */
 }
+
+
 
 #ifdef DEBUG
 void AFESensorBME680::checkBmeStatus() {
@@ -127,4 +134,5 @@ void AFESensorBME680::checkBmeStatus() {
     Serial << endl << "BME680 stauts: OK";
   }
 }
+
 #endif

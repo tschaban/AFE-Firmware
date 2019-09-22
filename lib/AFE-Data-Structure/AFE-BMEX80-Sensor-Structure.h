@@ -11,16 +11,19 @@
 
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-MQTT-Structure.h>
-#include <AFE-TEMPERATURE-Structure.h>
-#include <AFE-HUMIDITY-Structure.h>
-#include <AFE-PRESSURE-Structure.h>
+#include <AFE-Air-Item-Structure.h>
 
 struct BMEX80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG temperatureHumidityPressure;
   DOMOTICZ_BASIC_CONFIG gasResistance;
   DOMOTICZ_BASIC_CONFIG temperature;
   DOMOTICZ_BASIC_CONFIG pressure;
+  DOMOTICZ_BASIC_CONFIG relativePressure;
   DOMOTICZ_BASIC_CONFIG humidity;
+  DOMOTICZ_BASIC_CONFIG iaq;
+  DOMOTICZ_BASIC_CONFIG staticIaq;
+  DOMOTICZ_BASIC_CONFIG co2Equivalent;
+  DOMOTICZ_BASIC_CONFIG breathVocEquivalent;
 };
 
 
@@ -31,55 +34,36 @@ struct BMEX80_OVERSAMPLING_SETTINGS {
   uint8_t pressure;
 };
 
-struct BME680_GAS_SETTINGS {
-  uint16_t temperature;
-  uint16_t duration;
-};
-
-struct BMEX80_DATA_CORRECTIONS {
-  float temperature;
-  float humidity;
-  float pressure;
-  float gasResistance;
-};
-
-struct BMEX80_IAQ_ITEM {
-  float value;
-  uint8_t accuracy;
-  uint8_t rating;
-  uint8_t unit;
-};
-
-struct BMEX80_IAQ {
-  BMEX80_IAQ_ITEM iaq;
-  BMEX80_IAQ_ITEM staticIaq;
-  BMEX80_IAQ_ITEM co2Equivalent;
-  BMEX80_IAQ_ITEM breathVocEquivalent;
-  BMEX80_IAQ_ITEM gasResistance;
-};
-
 struct BMEX80 {
   char name[17];
   uint8_t type;
   uint32_t interval;
   uint8_t i2cAddress;
-  float altitude;
-  float seaLevelPressure;
-  uint8_t temperatureUnit;
+
   uint8_t powerMode;
   uint8_t resolution; // for BMP180 only
+  AIR_ITEM_SETTING temperature;
+  AIR_ITEM_SETTING humidity;
+  AIR_ITEM_SETTING pressure;
+  float altitude;
+  float seaLevelPressure;
+
   BMEX80_DOMOTICZ domoticz;
   MQTT_BASIC_CONFIG mqtt;
-  BMEX80_DATA_CORRECTIONS corrections;
-  BME680_GAS_SETTINGS heater; // for BME680 only
+
 };
 
 struct BMEX80_DATA {
-  TEMPERATURE temperature;
-  HUMIDITY humidity;
-  TEMPERATURE dewPoint;
-  PRESSURE pressure;
-  BMEX80_IAQ airQuality;
+  AIR_ITEM temperature;
+  AIR_ITEM humidity;
+  AIR_ITEM dewPoint;
+  AIR_ITEM pressure;
+  AIR_ITEM relativePressure;
+  AIR_ITEM iaq;
+  AIR_ITEM staticIaq;
+  AIR_ITEM co2Equivalent;
+  AIR_ITEM breathVocEquivalent;
+  AIR_ITEM gasResistance;
 };
 
 #endif

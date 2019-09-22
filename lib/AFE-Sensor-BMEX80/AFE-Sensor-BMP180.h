@@ -32,7 +32,6 @@ public:
 
   boolean read();
 
-  BMEX80_DATA get();
 };
 
 #endif

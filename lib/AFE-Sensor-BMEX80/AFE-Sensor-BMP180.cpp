@@ -28,8 +28,8 @@ boolean AFESensorBMP180::read() {
 #ifdef DEBUG
   Serial << endl << "Sensor: BMP180";
 #endif
-  data.temperature = bme.readTemperature();
-  data.pressure = bme.readPressure() / 100.0;
+  data.temperature.value = bme.readTemperature();
+  data.pressure.value = bme.readPressure() / 100.0;
 
   return true;
 }
