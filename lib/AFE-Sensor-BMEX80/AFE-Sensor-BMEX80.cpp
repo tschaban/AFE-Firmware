@@ -230,6 +230,7 @@ void AFESensorBMEX80::applyCorrections() {
     sensorData.iaq.rating = calculation.iaqRating(sensorData.iaq.value);
     sensorData.staticIaq.rating =
         calculation.iaqRating(sensorData.staticIaq.value);
+    sensorData.co2Equivalent.rating = calculation.co2Rating(sensorData.co2Equivalent.value);
   }
 #endif
 }

@@ -230,7 +230,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.0.B2"
+#define AFE_FIRMWARE_VERSION "2.0.0.B3"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -481,6 +481,15 @@ typedef enum
     AFE_IAQ_UNKNOWN = 255
 } afe_iaq_ratings_t;
 
+
+typedef enum
+{
+    AFE_CO2_EXCELLENT = 1,
+    AFE_CO2_GOOD = 2,
+    AFE_CO2_FAIR = 3,
+    AFE_CO2_POOR = 4,
+    AFE_CO2_INADEQUATE = 5
+} afe_co2_ratings_t;
 
 #endif
 

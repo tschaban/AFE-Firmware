@@ -50,6 +50,21 @@ afe_iaq_ratings_t AFESensorsCommon::iaqRating(uint16_t iaq) {
     return AFE_IAQ_UNKNOWN;
   }
 }
+
+afe_co2_ratings_t AFESensorsCommon::co2Rating(uint16_t co2) {
+  if (co2 > 1801) {
+    return AFE_CO2_INADEQUATE;
+  } else if (co2 > 1501) {
+    return AFE_CO2_POOR;
+  } else if (co2 > 801) {
+    return AFE_CO2_FAIR;
+  } else if (co2 > 601) {
+    return AFE_CO2_GOOD;
+  } else {
+    return AFE_CO2_EXCELLENT;
+  }
+}
+
 #endif
 
 #ifdef AFE_CONFIG_HUMIDITY

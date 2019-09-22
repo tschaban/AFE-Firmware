@@ -39,15 +39,13 @@ struct BMEX80 {
   uint8_t type;
   uint32_t interval;
   uint8_t i2cAddress;
-
   uint8_t powerMode;
   uint8_t resolution; // for BMP180 only
   AIR_ITEM_SETTING temperature;
   AIR_ITEM_SETTING humidity;
   AIR_ITEM_SETTING pressure;
-  float altitude;
+  float altitude = 211;
   float seaLevelPressure;
-
   BMEX80_DOMOTICZ domoticz;
   MQTT_BASIC_CONFIG mqtt;
 

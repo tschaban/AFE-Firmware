@@ -170,10 +170,13 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
     Serial << endl << "Message: " << message;
 #endif
     if (strlen(subTopic) > 0) {
-      Broker.publish(subTopic, message);
+      if (Broker.publish(subTopic, message)) {
 #ifdef DEBUG
-      Serial << endl << "Status: published";
+        Serial << endl << "Status: published";
+      } else {
+        Serial << endl << "Status: failed";
 #endif
+      }
     }
 #ifdef DEBUG
     else {

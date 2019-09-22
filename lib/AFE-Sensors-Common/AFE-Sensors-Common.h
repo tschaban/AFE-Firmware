@@ -28,6 +28,7 @@ public:
   
   #ifdef AFE_CONFIG_HARDWARE_BMEX80
   afe_iaq_ratings_t iaqRating(uint16_t iaq);
+  afe_co2_ratings_t co2Rating(uint16_t co2);
   #endif
 
   #ifdef AFE_CONFIG_HUMIDITY
