@@ -121,6 +121,7 @@ void AFESensorBMEX80::listener() {
 
 void AFESensorBMEX80::getJSON(char *json) {
 
+  //@TODO Estimate max size of JSON
   StaticJsonBuffer<1000> jsonBuffer;
   JsonObject &root = jsonBuffer.createObject();
 
@@ -135,23 +136,28 @@ void AFESensorBMEX80::getJSON(char *json) {
   temperature["correction"] = configuration.temperature.correction;
 
   pressure["value"] = sensorData.pressure.value;
-  pressure["unit"] = "hPa";
+  pressure["unit"] =
+      configuration.pressure.unit == AFE_PRESSURE_UNIT_HPA ? "hPa" : "?";
   pressure["correction"] = configuration.pressure.correction;
 
   relativePressure["value"] = sensorData.relativePressure.value;
-  relativePressure["unit"] = "hPa";
+  relativePressure["unit"] = pressure["unit"];
 
   /* Not applicable for BMP180 Sensor */
   if (configuration.type != AFE_BMP180_SENSOR) {
     JsonObject &dewPoint = root.createNestedObject("dewPoint");
     JsonObject &humidity = root.createNestedObject("humidity");
+    JsonObject &heatIndex = root.createNestedObject("heatIndex");
+
     dewPoint["value"] = sensorData.dewPoint.value;
-    dewPoint["unit"] = configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
-                                                                     : "F";
+    dewPoint["unit"] = temperature["unit"];
     humidity["value"] = sensorData.humidity.value;
     humidity["unit"] = "%";
     humidity["correction"] = configuration.humidity.correction;
     humidity["rating"] = sensorData.humidity.rating;
+
+    heatIndex["value"] = sensorData.heatIndex.value;
+    heatIndex["unit"] = temperature["unit"];
   }
 
   /* Only for BME680 Sensor */
@@ -183,7 +189,7 @@ void AFESensorBMEX80::getJSON(char *json) {
     gasResistance["value"] = sensorData.gasResistance.value;
     gasResistance["unit"] = "kOm";
   }
-
+  //@TODO Estimate max size of JSON
   root.printTo(json, 1000);
 }
 
@@ -212,6 +218,10 @@ void AFESensorBMEX80::applyCorrections() {
     sensorData.dewPoint.value = calculation.dewPoint(
         sensorData.temperature.value, sensorData.humidity.value);
 
+    sensorData.heatIndex.value =
+        calculation.heatIndex((double)sensorData.temperature.value,
+                              (double)sensorData.humidity.value);
+
 #ifdef AFE_CONFIG_HUMIDITY
     sensorData.humidity.rating =
         calculation.humidityRating(sensorData.humidity.value);
@@ -230,7 +240,8 @@ void AFESensorBMEX80::applyCorrections() {
     sensorData.iaq.rating = calculation.iaqRating(sensorData.iaq.value);
     sensorData.staticIaq.rating =
         calculation.iaqRating(sensorData.staticIaq.value);
-    sensorData.co2Equivalent.rating = calculation.co2Rating(sensorData.co2Equivalent.value);
+    sensorData.co2Equivalent.rating =
+        calculation.co2Rating(sensorData.co2Equivalent.value);
   }
 #endif
 }

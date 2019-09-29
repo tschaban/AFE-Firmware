@@ -118,13 +118,15 @@ AFEAnalogInput AnalogInput;
 
 void setup() {
 
+#ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
+#endif
 
 /* Turn off publishing information to Serial if production release */
-#if !defined(DEBUG)
-  Serial.swap();
-#endif
+//#ifndef DEBUG
+//  Serial.swap();
+//#endif
 
 #ifdef DEBUG
   Serial << endl

@@ -17,6 +17,10 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <Adafruit_BMP085.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif

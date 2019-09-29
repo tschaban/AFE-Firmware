@@ -1305,8 +1305,6 @@ DH AFEWebServer::getDHTData() {
 SERIALPORT AFEWebServer::getSerialPortData() {
   SERIALPORT data;
 
-  Serial << endl << "SERIAL R=" << server.arg("r").toInt();
-
   data.RXD = server.arg("r").length() > 0
                  ? server.arg("r").toInt()
                  : AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
@@ -1362,20 +1360,67 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
                       ? server.arg("f").toInt()
                       : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
 
-  data.domoticz.temperatureHumidityPressure.idx =
-      server.arg("m").length() > 0 ? server.arg("m").toInt() : 0;
+  data.resolution = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                                 : BMP085_ULTRAHIGHRES;
 
-  data.domoticz.gasResistance.idx =
-      server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+  data.seaLevelPressure = server.arg("s").length() > 0
+                              ? server.arg("s").toInt()
+                              : AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
+
+  data.altitude = server.arg("hi").length() > 0 ? server.arg("hi").toInt() : 0;
+
+  data.temperature.unit = server.arg("tu").length() > 0
+                              ? server.arg("tu").toInt()
+                              : AFE_TEMPERATURE_UNIT_CELSIUS;
+  data.temperature.correction =
+      server.arg("tc").length() > 0 ? server.arg("tc").toFloat() : 0;
+  
+  data.humidity.correction =
+      server.arg("hc").length() > 0 ? server.arg("hc").toFloat() : 0;
+  
+  data.pressure.unit = server.arg("pu").length() > 0 ? server.arg("pu").toInt()
+                                                    : AFE_PRESSURE_UNIT_HPA;
+  data.pressure.correction =
+      server.arg("pc").length() > 0 ? server.arg("pc").toFloat() : 0;
+
+  data.domoticz.temperatureHumidityPressure.idx =
+      server.arg("i0").length() > 0 ? server.arg("i0").toInt() : 0;
 
   data.domoticz.temperature.idx =
-      server.arg("e").length() > 0 ? server.arg("e").toInt() : 0;
+      server.arg("i1").length() > 0 ? server.arg("i1").toInt() : 0;
 
   data.domoticz.humidity.idx =
-      server.arg("h").length() > 0 ? server.arg("h").toInt() : 0;
+      server.arg("i2").length() > 0 ? server.arg("i2").toInt() : 0;
+
+  data.domoticz.dewPoint.idx =
+      server.arg("i3").length() > 0 ? server.arg("i3").toInt() : 0;
+
+  data.domoticz.heatIndex.idx =
+      server.arg("i4").length() > 0 ? server.arg("i4").toInt() : 0;
 
   data.domoticz.pressure.idx =
-      server.arg("p").length() > 0 ? server.arg("p").toInt() : 0;
+      server.arg("i5").length() > 0 ? server.arg("i5").toInt() : 0;
+
+  data.domoticz.relativePressure.idx =
+      server.arg("i6").length() > 0 ? server.arg("i6").toInt() : 0;
+
+  data.domoticz.iaq.idx =
+      server.arg("i7").length() > 0 ? server.arg("i7").toInt() : 0;
+
+  data.domoticz.staticIaq.idx =
+      server.arg("i8").length() > 0 ? server.arg("i8").toInt() : 0;
+
+  data.domoticz.co2Equivalent.idx =
+      server.arg("i9").length() > 0 ? server.arg("i9").toInt() : 0;
+
+  data.domoticz.breathVocEquivalent.idx =
+      server.arg("i10").length() > 0 ? server.arg("i10").toInt() : 0;
+
+  data.domoticz.gasResistance.idx =
+      server.arg("i11").length() > 0 ? server.arg("i11").toInt() : 0;
+
+  data.domoticz.temperatureHumidity.idx =
+      server.arg("i12").length() > 0 ? server.arg("i12").toInt() : 0;      
 
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));

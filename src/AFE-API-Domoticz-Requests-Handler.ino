@@ -96,16 +96,15 @@ void DomoticzPublishContactronState(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void DomoticzPublishParticleSensorData(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    HPMA115S0_DATA data = ParticleSensor[id].get();
+
     if (ParticleSensor[id].configuration.domoticz.pm25.idx > 0) {
       Domoticz.sendCustomSensorCommand(
-          ParticleSensor[id].configuration.domoticz.pm25.idx, data.pm25);
+          ParticleSensor[id].configuration.domoticz.pm25.idx, ParticleSensor[id].data.pm25);
     }
 
     if (ParticleSensor[id].configuration.domoticz.pm10.idx > 0) {
-      delay(10);
       Domoticz.sendCustomSensorCommand(
-          ParticleSensor[id].configuration.domoticz.pm10.idx, data.pm10);
+          ParticleSensor[id].configuration.domoticz.pm10.idx, ParticleSensor[id].data.pm10);
     }
   }
 }
@@ -114,35 +113,94 @@ void DomoticzPublishParticleSensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void DomoticzPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.domoticz) {
-    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR &&
-        BMEX80Sensor[id].configuration.domoticz.temperatureHumidityPressure.idx >
-            0) {
-      Domoticz.sendTemperatureAndHumidityAndPressureCommand(
-          BMEX80Sensor[id]
-              .configuration.domoticz.temperatureHumidityPressure.idx,
-          BMEX80Sensor[id].sensorData.temperature.value, BMEX80Sensor[id].sensorData.humidity.value, BMEX80Sensor[id].sensorData.pressure.value);
-    }
-    if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR &&
-        BMEX80Sensor[id].configuration.domoticz.gasResistance.idx > 0) {
-      delay(10);
-      Domoticz.sendCustomSensorCommand(
-          BMEX80Sensor[id].configuration.domoticz.gasResistance.idx,
-          BMEX80Sensor[id].sensorData.gasResistance.value);
-    }
+    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
+      if (BMEX80Sensor[id]
+              .configuration.domoticz.temperatureHumidityPressure.idx > 0) {
+        /* Temperature, Humidity, Pressure */
+        Domoticz.sendTemperatureAndHumidityAndPressureCommand(
+            BMEX80Sensor[id]
+                .configuration.domoticz.temperatureHumidityPressure.idx,
+            BMEX80Sensor[id].sensorData.temperature.value,
+            BMEX80Sensor[id].sensorData.humidity.value,
+            BMEX80Sensor[id].sensorData.pressure.value);
+      }
 
+      /* Temperature and Humidity */
+      DomoticzPublishTemperatureAndHumidity(
+          BMEX80Sensor[id].configuration.domoticz.temperatureHumidity.idx,
+          BMEX80Sensor[id].sensorData.temperature.value,
+          BMEX80Sensor[id].sensorData.humidity.value);
+
+      /* Humidity */
+      DomoticzPublishHumidity(
+          BMEX80Sensor[id].configuration.domoticz.humidity.idx,
+          BMEX80Sensor[id].sensorData.humidity.value);
+
+      /* DewPoint */
+      DomoticzPublishTemperature(
+          BMEX80Sensor[id].configuration.domoticz.dewPoint.idx,
+          BMEX80Sensor[id].sensorData.dewPoint.value);
+
+      /* HeatIndex */
+      DomoticzPublishTemperature(
+          BMEX80Sensor[id].configuration.domoticz.heatIndex.idx,
+          BMEX80Sensor[id].sensorData.heatIndex.value);
+    } // end of excuded for BMP180
+
+    /* Temperature */
     DomoticzPublishTemperature(
         BMEX80Sensor[id].configuration.domoticz.temperature.idx,
         BMEX80Sensor[id].sensorData.temperature.value);
 
-    if (BMEX80Sensor[id].configuration.type != AFE_BMP180_SENSOR) {
-      DomoticzPublishHumidity(
-          BMEX80Sensor[id].configuration.domoticz.humidity.idx, BMEX80Sensor[id].sensorData.humidity.value);
+    /* Pressure */
+    if (BMEX80Sensor[id].configuration.domoticz.pressure.idx > 0) {
+      Domoticz.sendPressureCommand(
+          BMEX80Sensor[id].configuration.domoticz.pressure.idx,
+          BMEX80Sensor[id].sensorData.pressure.value);
     }
 
-    if (BMEX80Sensor[id].configuration.domoticz.pressure.idx > 0) {
-      delay(10);
+    /* Relative pressure */
+    if (BMEX80Sensor[id].configuration.domoticz.relativePressure.idx > 0) {
       Domoticz.sendPressureCommand(
-          BMEX80Sensor[id].configuration.domoticz.pressure.idx, BMEX80Sensor[id].sensorData.pressure.value);
+          BMEX80Sensor[id].configuration.domoticz.relativePressure.idx,
+          BMEX80Sensor[id].sensorData.relativePressure.value);
+    }
+
+    if (BMEX80Sensor[id].configuration.type == AFE_BME680_SENSOR) {
+      /* Gas Resistance */
+      if (BMEX80Sensor[id].configuration.domoticz.gasResistance.idx > 0) {
+        Domoticz.sendCustomSensorCommand(
+            BMEX80Sensor[id].configuration.domoticz.gasResistance.idx,
+            BMEX80Sensor[id].sensorData.gasResistance.value);
+      }
+
+      /* IAQ */
+      if (BMEX80Sensor[id].configuration.domoticz.iaq.idx > 0) {
+        Domoticz.sendCustomSensorCommand(
+            BMEX80Sensor[id].configuration.domoticz.iaq.idx,
+            BMEX80Sensor[id].sensorData.iaq.value);
+      }
+
+      /* Static IAQ */
+      if (BMEX80Sensor[id].configuration.domoticz.staticIaq.idx > 0) {
+        Domoticz.sendCustomSensorCommand(
+            BMEX80Sensor[id].configuration.domoticz.staticIaq.idx,
+            BMEX80Sensor[id].sensorData.staticIaq.value);
+      }
+
+      /* CO2 */
+      if (BMEX80Sensor[id].configuration.domoticz.co2Equivalent.idx > 0) {
+        Domoticz.sendCustomSensorCommand(
+            BMEX80Sensor[id].configuration.domoticz.co2Equivalent.idx,
+            BMEX80Sensor[id].sensorData.co2Equivalent.value);
+      }
+
+      /* BVOC */
+      if (BMEX80Sensor[id].configuration.domoticz.breathVocEquivalent.idx > 0) {
+        Domoticz.sendCustomSensorCommand(
+            BMEX80Sensor[id].configuration.domoticz.breathVocEquivalent.idx,
+            BMEX80Sensor[id].sensorData.breathVocEquivalent.value);
+      }
     }
   }
 }
@@ -153,7 +211,7 @@ void DomoticzPublishLightLevel(uint8_t id) {
   if (Device.configuration.api.domoticz) {
     if (BH1750Sensor[id].configuration.domoticz.idx > 0) {
       Domoticz.sendSValueCommand(BH1750Sensor[id].configuration.domoticz.idx,
-                                 BH1750Sensor[id].get());
+                                 BH1750Sensor[id].currentLightLevel);
     }
   }
 }
@@ -169,16 +227,13 @@ void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
       Domoticz.sendCustomSensorCommand(domoticz.raw, data.raw);
     }
     if (domoticz.percent > 0) {
-      delay(10);
       Domoticz.sendCustomSensorCommand(domoticz.percent, data.percent);
     }
     if (domoticz.voltage > 0) {
-      delay(10);
       Domoticz.sendCustomSensorCommand(domoticz.voltage,
                                        data.voltageCalculated);
     }
     if (domoticz.voltageCalculated > 0) {
-      delay(10);
       Domoticz.sendCustomSensorCommand(domoticz.voltageCalculated,
                                        data.voltageCalculated);
     }

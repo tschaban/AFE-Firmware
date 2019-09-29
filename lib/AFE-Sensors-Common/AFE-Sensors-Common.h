@@ -25,6 +25,7 @@ public:
   float celsiusToFerenheit(float input);
   float dewPoint(float temperature, float humidity);
   float relativePressure(float pressure, float alt, float temperature);
+  float heatIndex(double temperature,double humidity);
   
   #ifdef AFE_CONFIG_HARDWARE_BMEX80
   afe_iaq_ratings_t iaqRating(uint16_t iaq);

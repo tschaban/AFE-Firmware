@@ -42,8 +42,6 @@ void AFESensorBH1750::begin(uint8_t id) {
 #endif
 }
 
-float AFESensorBH1750::get() { return currentLightLevel; }
-
 boolean AFESensorBH1750::isReady() {
   if (ready) {
     ready = false;
@@ -76,4 +74,8 @@ void AFESensorBH1750::listener() {
       startTime = millis();
     }
   }
+}
+
+void AFESensorBH1750::getJSON(char *json) {
+  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}",currentLightLevel);
 }

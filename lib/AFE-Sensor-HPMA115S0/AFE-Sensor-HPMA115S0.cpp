@@ -19,7 +19,7 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   //  UART.SerialBus.flush();
   _initialized = true;
 
-  current.pm10 = current.pm25 = buffer.pm10 = buffer.pm25 = 0;
+  data.pm10 = data.pm25 = buffer.pm10 = buffer.pm25 = 0;
 
 #if defined(DEBUG)
   Serial << endl << endl << "----- HPMA115S0: Initializing -----";
@@ -66,6 +66,10 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
          << "UART: Size of a data in the buffer ="
          << UART.SerialBus.available();
 #endif
+  
+  UART.SerialBus.print("UART: Size of a data in the buffer =");
+  UART.SerialBus.println(UART.SerialBus.available());
+
 
   /* Wait for a data from UART. Max 1 sec */
   while (UART.SerialBus.available() == 0 && millis() - start < 1000) {
@@ -247,8 +251,6 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   return _ret;
 }
 
-HPMA115S0_DATA AFESensorHPMA115S0::get() { return current; }
-
 boolean AFESensorHPMA115S0::isReady() {
   if (ready) {
     ready = false;
@@ -268,8 +270,8 @@ void AFESensorHPMA115S0::listener() {
 #endif
       startTime = millis();
 
-      //      UART.send(commandTurnON);
-      //      read() ? _measuremntsON = true : _measuremntsON = false;
+//      UART.send(commandTurnON);
+//      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
       Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
@@ -277,9 +279,9 @@ void AFESensorHPMA115S0::listener() {
 
       UART.send(commandRead);
       if (read()) {
-        current.pm25 = buffer.pm25;
-        current.pm10 = buffer.pm10;
-        if (current.pm25 != 0 && current.pm10 != 0) {
+        data.pm25 = buffer.pm25;
+        data.pm10 = buffer.pm10;
+        if (data.pm25 != 0 || data.pm10 != 0) {
           ready = true;
         }
       }
@@ -313,4 +315,11 @@ void AFESensorHPMA115S0::listener() {
 #endif
     }
   }
+}
+
+void AFESensorHPMA115S0::getJSON(char *json) {
+
+  sprintf(json, "{\"PM25\":{\"value\":%d,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
+                "%d,\"unit\":\"µg/m3\"}}",
+          data.pm25, data.pm10);
 }

@@ -26,10 +26,11 @@ private:
 
   unsigned long startTime = 0;
 
-  float currentLightLevel = -1;
+  
 
 public:
   BH1750 configuration;
+  float currentLightLevel = -1;
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 
   /* Constructor */
@@ -38,15 +39,14 @@ public:
   /* Turns On sensor */
   void begin(uint8_t id);
 
-  /* returns PM2.5 and PM10 */
-  float get();
-
   /* Is true when data has been read from the sensor */
   boolean isReady();
 
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
+
+  void getJSON(char *json);
 };
 
 #endif

@@ -381,11 +381,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       strcmp(request.command, "get") == 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
       if (strcmp(request.name, ParticleSensor[i].configuration.name) == 0) {
-        HPMA115S0_DATA sensorData = ParticleSensor[i].get();
-        char _response[25];
-        sprintf(_response, "\"PM2.5\":%d,\"PM10\":%d", sensorData.pm25,
-                sensorData.pm10);
-        sendHTTPAPIRequestStatus(&request, true, _response);
+        char json[80];
+        ParticleSensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
         deviceNotExist = false;
         break;
       }
@@ -399,9 +397,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       strcmp(request.command, "get") == 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
       if (strcmp(request.name, BMEX80Sensor[i].configuration.name) == 0) {
-      // @TODO optimize the char size
-         char json[1000];
-         BMEX80Sensor[i].getJSON(json);
+        // @TODO optimize the char size
+        char json[1000];
+        BMEX80Sensor[i].getJSON(json);
         sendHTTPAPIRequestStatus(&request, true, json);
         deviceNotExist = false;
         break;
@@ -416,9 +414,9 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       strcmp(request.command, "get") == 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
       if (strcmp(request.name, BH1750Sensor[i].configuration.name) == 0) {
-        char _response[13];
-        sprintf(_response, "\"lux\":%.3f", BH1750Sensor[i].get());
-        sendHTTPAPIRequestStatus(&request, true, _response);
+        char json[60];
+        BH1750Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
         deviceNotExist = false;
         break;
       }

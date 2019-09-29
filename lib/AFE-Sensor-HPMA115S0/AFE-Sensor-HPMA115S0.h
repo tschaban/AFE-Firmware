@@ -31,7 +31,6 @@ private:
 
   */
 
-  HPMA115S0_DATA current;
   HPMA115S0_DATA buffer;
 
   boolean ready = false;
@@ -48,6 +47,7 @@ private:
 
 public:
   HPMA115S0 configuration;
+  HPMA115S0_DATA data;
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 
   /* Constructor */
@@ -55,9 +55,6 @@ public:
 
   /* Turns On sensor */
   void begin(uint8_t id);
-
-  /* returns PM2.5 and PM10 */
-  HPMA115S0_DATA get();
 
   /* Is true when data has been read from the sensor */
   boolean isReady();
@@ -68,6 +65,8 @@ public:
 
   boolean sendCommand(const uint8_t *command,
                       uint8_t howManyTimesRetry = HPMA115S0_RETRY);
+
+  void getJSON(char *json);
 };
 
 #endif

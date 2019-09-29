@@ -431,15 +431,9 @@ void MQTTPublishGateState(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void MQTTPublishParticleSensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    HPMA115S0_DATA data = ParticleSensor[id].get();
-    String messageString = "{\"PM25\":";
-    messageString += data.pm25;
-    messageString += ",\"PM10\":";
-    messageString += data.pm10;
-    messageString += "}";
-    char message[messageString.length() + 1];
-    messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publishTopic(ParticleSensor[id].configuration.mqtt.topic, message);
+    char json[80];
+    ParticleSensor[id].getJSON(json);
+    Mqtt.publishTopic(ParticleSensor[id].configuration.mqtt.topic, json);
   }
 }
 #endif
@@ -447,6 +441,7 @@ void MQTTPublishParticleSensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void MQTTPublishBMEX80SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
+    // @TODO Estiamte the max JSON size
     char message[1000];
     BMEX80Sensor[id].getJSON(message);
     Mqtt.publishTopic(BMEX80Sensor[id].configuration.mqtt.topic, message);
@@ -457,8 +452,8 @@ void MQTTPublishBMEX80SensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void MQTTPublishBH1750SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
-    char message[10];
-    sprintf(message, "%.3f", BH1750Sensor[id].get());
+    char message[60];
+    BH1750Sensor[id].getJSON(message);
     Mqtt.publishTopic(BH1750Sensor[id].configuration.mqtt.topic, message);
   }
 }

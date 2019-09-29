@@ -32,6 +32,18 @@ float AFESensorsCommon::relativePressure(float pressure, float alt,
               2)))));
 }
 
+float AFESensorsCommon::heatIndex(double temperature, double humidity) {
+  /* Based on formula: https://en.wikipedia.org/wiki/Heat_index */
+
+  return -8.78469475556 + (1.61139411 * temperature) +
+         (2.33854883889 * humidity) + (-0.14611605 * temperature * humidity) +
+         (-0.012308094 * temperature * temperature) +
+         (-0.0164248277778 * humidity * humidity) +
+         (0.002211732 * temperature * temperature * humidity) +
+         (0.00072546 * temperature * humidity * humidity) +
+         (-0.000003582 * temperature * temperature * humidity * humidity);
+}
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 afe_iaq_ratings_t AFESensorsCommon::iaqRating(uint16_t iaq) {
   if (iaq <= 50) {

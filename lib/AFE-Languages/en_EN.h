@@ -278,6 +278,7 @@
 #define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
 #endif
 
+/* HPMA11BS0 */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #define L_PARTICLE_SENSOR "PM2.5/PM10 Particle Sensor"
 #define L_NUMBER_OF_HPMA115S0_SENSORS "HPMA115S0 Sensor"
@@ -290,19 +291,24 @@
 #define L_MQTT_TOPIC_HPMA115S0 "HPMA115S0 Sensor's MQTT Topic"
 #endif
 
+/* BMX080 */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define L_BMEX80_SENSOR "BMEx80 Sensor"
 #define L_BMEX80_SENSORS "BMEx80 Sensors"
 #define L_NUMBER_OF_BMEX80_SENSORS "Number of BMEx80 Sensors"
-#define L_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
-#define L_IDX_TEMPERATURE "IDX Temperature"
-#define L_IDX_HUMIDITY "IDX Humidity"
-#define L_IDX_PRESSURE "IDX Pressure"
 #define L_IDX_GAS_SENSOR "IDX Gas sensor"
+#define L_IDX_IQA "IDX IQA"
+#define L_IDX_STATIC_IAQ "IDX Static IQA"
+#define L_IDX_CO2_EQUVALENT "IDX CO2 Equivalent"
+#define L_IDX_BVOC_EQUIVALENT "IDX BVOC Equivalent"
 #define L_MQTT_TOPIC_BMEX80 "BMEx80 Sensor's MQTT Topic"
 #define L_BMEX80_SENSOR_TYPE "BMEx80 Sensor type"
+#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Show/Refresh configuration settings after sensor type change"
+#define L_ALTITIDE "Above sea level"
+#define L_METERS "Meters"
 #endif
 
+/* BH1750 */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define L_BH1750_SENSOR "BH1750 Sensor"
 #define L_BH1750_SENSORS "BH1750 Sensors"
@@ -310,8 +316,55 @@
 #define L_MQTT_TOPIC_BH1750 "BH1750 Sensor's MQTT Topic"
 #endif
 
+/* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define L_ADDRESS "Address"
+#endif
+
+/* Generic Sensors */
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_TEMPERATURE "Temperature"
+#define L_IDX_TEMPERATURE "IDX Temperature"
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_HUMIDITY
+#define L_HUMIDITY "Humidity"
+#define L_IDX_HUMIDITY "IDX Humidity"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_DEW_POINT "IDX Dew Point"
+#define L_IDX_HEAT_INDEX "IDX Heat Index"
+#define L_IDX_TEMP_HUM "IDX Temp/Humidity"
+#ifdef AFE_CONFIG_PRESSURE
+#define L_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
+#endif
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_PRESSURE
+#define L_PRESSURE "Pressure"
+#define L_IDX_PRESSURE "IDX Pressure"
+#define L_IDX_ALT "Sensor: altitude"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_RELATIVE_PRESSURE "IDX Relative pressure"
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
 #endif
 
 #endif

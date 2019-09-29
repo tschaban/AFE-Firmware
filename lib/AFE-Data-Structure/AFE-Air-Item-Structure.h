@@ -10,8 +10,8 @@
 #endif
 
 struct AIR_ITEM_SETTING {
-  float correction = 0;
-  uint8_t unit = 1;
+  float correction;
+  uint8_t unit;
 };
 
 struct AIR_ITEM {

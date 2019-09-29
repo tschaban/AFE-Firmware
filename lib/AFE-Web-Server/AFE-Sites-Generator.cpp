@@ -1832,7 +1832,8 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
   BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
-
+  char _number[7];
+  String page;
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
@@ -1864,57 +1865,144 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
       (configuration.type == AFE_BME680_SENSOR ? " selected=\"selected\"" : "");
   body += ">BME680</option></select></div>";
 
+  body += "<input type=\"submit\" class=\"b bw\" value=\"";
+  body += L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR;
+  body += "\"><br><br>";
+
   body += addItem("text", "n", L_NAME, configuration.name, "16");
 
-  char _number[7];
   sprintf(_number, "%d", configuration.interval);
   body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
                   "86400", "1", L_SECONDS);
 
-  body += "<br><br>";
   body += "</fieldset>";
 
-  String page = addConfigurationBlock(L_BMEX80_SENSOR, "", body);
+  page = addConfigurationBlock(L_BMEX80_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (configuration.type != AFE_BMX_UNKNOWN_SENSOR) {
+
+    /* Sensor's units */
     body = "<fieldset>";
-    if (configuration.type != AFE_BMP180_SENSOR) {
 
-      sprintf(_number, "%d",
-              configuration.domoticz.temperatureHumidityPressure.idx);
-      body += addItem("number", "m", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
-                      "999999", "1");
-    }
+    body += "<div class=\"cf\"><label>";
+    body += L_TEMPERATURE;
+    body += "</label><select name=\"tu\"><option value=\"";
+    body += AFE_TEMPERATURE_UNIT_CELSIUS;
+    body += "\"";
+    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                 ? " selected=\"selected\""
+                 : "");
+    body += ">C</option><option value=\"";
+    body += AFE_TEMPERATURE_UNIT_FAHRENHEIT;
+    body += "\"";
+    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+                 ? " selected=\"selected\""
+                 : "");
+    body += ">F</option></select></div>";
 
-    sprintf(_number, "%d", configuration.domoticz.temperature.idx);
-    body += addItem("number", "e", L_IDX_TEMPERATURE, _number, "?", "0",
-                    "999999", "1");
-
-    if (configuration.type != AFE_BMP180_SENSOR) {
-      sprintf(_number, "%d", configuration.domoticz.humidity.idx);
-      body += addItem("number", "h", L_IDX_HUMIDITY, _number, "?", "0",
-                      "999999", "1");
-    }
-
-    sprintf(_number, "%d", configuration.domoticz.pressure.idx);
-    body += addItem("number", "p", L_IDX_PRESSURE, _number, "?", "0", "999999",
-                    "1");
-
-    if (configuration.type == AFE_BME680_SENSOR) {
-      sprintf(_number, "%d", configuration.domoticz.gasResistance.idx);
-      body += addItem("number", "g", L_IDX_GAS_SENSOR, _number, "?", "0",
-                      "999999", "1");
-    }
     body += "</fieldset>";
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
-  }
+    page += addConfigurationBlock(L_UNITS, "", body);
 
-  if (Device->configuration.api.mqtt) {
+    /* Corrections of sensor values */
     body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    sprintf(_number, "%.3f", configuration.temperature.correction);
+    body += addItem("number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
+                    "99.999", "0.001");
+
+    if (configuration.type != AFE_BMP180_SENSOR) {
+      sprintf(_number, "%.3f", configuration.humidity.correction);
+      body += addItem("number", "hc", L_HUMIDITY, _number, "?", "-99.999",
+                      "99.999", "0.001");
+    }
+
+    sprintf(_number, "%.3f", configuration.pressure.correction);
+    body += addItem("number", "pc", L_PRESSURE, _number, "?", "-999.999",
+                    "999.999", "0.001");
+
+
+    sprintf(_number, "%d", configuration.altitude);
+    body += addItem("number", "hi", L_ALTITIDE, _number, "?", "-431",
+                    "8850", "1", L_METERS);
+
+
     body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
+    page += addConfigurationBlock(L_CORRECTIONS, "", body);
+
+    if (Device->configuration.api.domoticz) {
+      body = "<fieldset>";
+
+      sprintf(_number, "%d", configuration.domoticz.temperature.idx);
+      body += addItem("number", "i1", L_IDX_TEMPERATURE, _number, "?", "0",
+                      "999999", "1");
+
+      if (configuration.type != AFE_BMP180_SENSOR) {
+        sprintf(_number, "%d", configuration.domoticz.humidity.idx);
+        body += addItem("number", "i2", L_IDX_HUMIDITY, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
+        body += addItem("number", "i3", L_IDX_DEW_POINT, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
+        body += addItem("number", "i4", L_IDX_HEAT_INDEX, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d",
+                configuration.domoticz.temperatureHumidityPressure.idx);
+        body += addItem("number", "i0", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
+                        "999999", "1");
+
+
+        sprintf(_number, "%d",
+                configuration.domoticz.temperatureHumidity.idx);
+        body += addItem("number", "i12", L_IDX_TEMP_HUM, _number, "?", "0",
+                        "999999", "1");                        
+
+
+      }
+
+      sprintf(_number, "%d", configuration.domoticz.pressure.idx);
+      body += addItem("number", "i5", L_IDX_PRESSURE, _number, "?", "0",
+                      "999999", "1");
+
+      sprintf(_number, "%d", configuration.domoticz.relativePressure.idx);
+      body += addItem("number", "i6", L_IDX_RELATIVE_PRESSURE, _number, "?",
+                      "0", "999999", "1");
+
+      if (configuration.type == AFE_BME680_SENSOR) {
+        sprintf(_number, "%d", configuration.domoticz.iaq.idx);
+        body += addItem("number", "i7", L_IDX_IQA, _number, "?", "0", "999999",
+                        "1");
+
+        sprintf(_number, "%d", configuration.domoticz.staticIaq.idx);
+        body += addItem("number", "i8", L_IDX_STATIC_IAQ, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.co2Equivalent.idx);
+        body += addItem("number", "i9", L_IDX_CO2_EQUVALENT, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.breathVocEquivalent.idx);
+        body += addItem("number", "i10", L_IDX_BVOC_EQUIVALENT, _number, "?",
+                        "0", "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.gasResistance.idx);
+        body += addItem("number", "i11", L_IDX_GAS_SENSOR, _number, "?", "0",
+                        "999999", "1");
+      }
+      body += "</fieldset>";
+      page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    }
+
+    if (Device->configuration.api.mqtt) {
+      body = "<fieldset>";
+      body +=
+          addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+      body += "</fieldset>";
+      page +=
+          addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
+    }
   }
 
   return page;

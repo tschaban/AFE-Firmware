@@ -2055,7 +2055,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(2, RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-  /* Shelly-1 */
+/* Shelly-1 */
 
 #elif defined(AFE_DEVICE_SHELLY_1)
   RelayConfiguration.gpio = 4;
@@ -3447,7 +3447,7 @@ void AFEDataAccess::createSerialConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 320
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 548
 BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
   BMEX80 configuration;
 
@@ -3477,16 +3477,36 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
+
       configuration.type = root["type"];
       configuration.i2cAddress = root["i2cAddress"];
       sprintf(configuration.name, root["name"]);
       configuration.interval = root["interval"];
+      configuration.resolution = root["resolution"];
       configuration.domoticz.temperatureHumidityPressure.idx =
           root["idx"]["temperatureHumidityPressure"];
+      configuration.domoticz.temperatureHumidity.idx =
+          root["idx"]["temperatureHumidity"];          
       configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
       configuration.domoticz.temperature.idx = root["idx"]["temperature"];
       configuration.domoticz.humidity.idx = root["idx"]["humidity"];
       configuration.domoticz.pressure.idx = root["idx"]["pressure"];
+      configuration.domoticz.relativePressure.idx =
+          root["idx"]["relativePressure"];
+      configuration.domoticz.dewPoint.idx = root["idx"]["dewPoint"];
+      configuration.domoticz.heatIndex.idx = root["idx"]["heatIndex"];
+      configuration.domoticz.iaq.idx = root["idx"]["iaq"];
+      configuration.domoticz.staticIaq.idx = root["idx"]["staticIaq"];
+      configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"];
+      configuration.domoticz.breathVocEquivalent.idx =
+          root["idx"]["breathVocEquivalent"];
+      configuration.temperature.unit = root["temperature"]["unit"];
+      configuration.temperature.correction = root["temperature"]["correction"];
+      configuration.humidity.correction = root["humidity"]["correction"];
+      configuration.pressure.unit = root["pressure"]["unit"];
+      configuration.pressure.correction = root["pressure"]["correction"];
+      configuration.seaLevelPressure = root["pressure"]["seaLevelPressure"];
+      configuration.altitude = root["pressure"]["altitude"];
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
 
 #ifdef DEBUG
@@ -3538,18 +3558,39 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &idx = root.createNestedObject("idx");
+    JsonObject &temperature = root.createNestedObject("temperature");
+    JsonObject &humidity = root.createNestedObject("humidity");
+    JsonObject &pressure = root.createNestedObject("pressure");
 
     root["type"] = configuration.type;
     root["interval"] = configuration.interval;
     root["name"] = configuration.name;
     root["i2cAddress"] = configuration.i2cAddress;
     root["mqttTopic"] = configuration.mqtt.topic;
+    root["resolution"] = configuration.resolution;
+    idx["temperatureHumidity"] =
+        configuration.domoticz.temperatureHumidity.idx;
     idx["temperatureHumidityPressure"] =
         configuration.domoticz.temperatureHumidityPressure.idx;
     idx["gasResistance"] = configuration.domoticz.gasResistance.idx;
     idx["temperature"] = configuration.domoticz.temperature.idx;
     idx["humidity"] = configuration.domoticz.humidity.idx;
     idx["pressure"] = configuration.domoticz.pressure.idx;
+    idx["relativePressure"] = configuration.domoticz.relativePressure.idx;
+    idx["dewPoint"] = configuration.domoticz.dewPoint.idx;
+    idx["heatIndex"] = configuration.domoticz.heatIndex.idx;
+    idx["iaq"] = configuration.domoticz.iaq.idx;
+    idx["staticIaq"] = configuration.domoticz.staticIaq.idx;
+    idx["co2Equivalent"] = configuration.domoticz.co2Equivalent.idx;
+    idx["breathVocEquivalent"] = configuration.domoticz.breathVocEquivalent.idx;
+
+    temperature["unit"] = configuration.temperature.unit;
+    temperature["correction"] = configuration.temperature.correction;
+    humidity["correction"] = configuration.humidity.correction;
+    pressure["unit"] = configuration.pressure.unit;
+    pressure["correction"] = configuration.pressure.correction;
+    pressure["seaLevelPressure"] = configuration.seaLevelPressure;
+    pressure["altitude"] = configuration.altitude;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -3582,11 +3623,29 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
   configuration.interval = AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
+  configuration.resolution = BMP085_ULTRAHIGHRES;
+  configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
+  configuration.temperature.correction = 0;
+  configuration.humidity.correction = 0;
+  configuration.pressure.unit = AFE_PRESSURE_UNIT_HPA;
+  configuration.pressure.correction = 0;
+  configuration.altitude = 0;
+  configuration.seaLevelPressure = AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
+
   configuration.domoticz.temperatureHumidityPressure.idx = 0;
+  configuration.domoticz.temperatureHumidity.idx = 0;
   configuration.domoticz.gasResistance.idx = 0;
   configuration.domoticz.temperature.idx = 0;
   configuration.domoticz.humidity.idx = 0;
   configuration.domoticz.pressure.idx = 0;
+  configuration.domoticz.relativePressure.idx = 0;
+  configuration.domoticz.dewPoint.idx = 0;
+  configuration.domoticz.heatIndex.idx = 0;
+  configuration.domoticz.iaq.idx = 0;
+  configuration.domoticz.staticIaq.idx = 0;
+  configuration.domoticz.co2Equivalent.idx = 0;
+  configuration.domoticz.breathVocEquivalent.idx = 0;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
     sprintf(configuration.mqtt.topic, "BMEX80/%d", i + 1);
     sprintf(configuration.name, "BMEX80-%d", i + 1);

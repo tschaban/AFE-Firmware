@@ -10,7 +10,7 @@ void AFEDomoticz::begin() {
   char _pass[45] = {0};
   char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
-  if (configuration.user && configuration.password) {
+  if (configuration.user[0] != '\0' && configuration.password[0] != '\0') {
     rbase64.encode(configuration.user);
     sprintf(_user, rbase64.result());
     rbase64.encode(configuration.password);
@@ -52,13 +52,8 @@ void AFEDomoticz::callURL(const String url) {
 
   http.begin(client, url);
   http.GET();
-
-  //#ifdef DEBUG
-  //  String payload = http.getString();
-  //  Serial << endl << payload;
-  //#endif
-
   http.end();
+  delay(10);
 }
 
 #ifdef AFE_CONFIG_TEMPERATURE
@@ -167,14 +162,16 @@ void AFEDomoticz::sendPirCommand(unsigned int idx, const char *value) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_GATE /* @TODO it could be removed and replaced by \ \ \ \
+#ifdef AFE_CONFIG_HARDWARE_GATE /* @TODO it could be removed and replaced by \ \
+                               \ \ \                                           \
                                \ switch */
 void AFEDomoticz::sendGateCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON /* @TODO it could be removed and replaced by \
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON /* @TODO it could be removed and         \
+                                     replaced by \                             \
                                      \ \ \ \ switch */
 void AFEDomoticz::sendContactronCommand(unsigned int idx, const char *value) {
   sendSwitchCommand(idx, value);

@@ -10,6 +10,7 @@
 #endif
 
 /* Serial port speed */
+//#define AFE_CONFIG_SERIAL_SPEED 9600
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Upgrade types */
@@ -137,7 +138,7 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 0
 #define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
-                                                    // to INPUT
+// to INPUT
 /* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 4
@@ -429,27 +430,25 @@
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
 #endif
 
-
 #ifdef AFE_CONFIG_TEMPERATURE
 #define AFE_TEMPERATURE_UNIT_CELSIUS 1
-#define AFE_TEMPERATURE_UNIT_FAHRENHEIT  2
+#define AFE_TEMPERATURE_UNIT_FAHRENHEIT 2
 #endif
 
 #ifdef AFE_CONFIG_HUMIDITY
-typedef enum
-{
-    AFE_HUMIDITY_EXCELLENT = 1,
-    AFE_HUMIDITY_GOOD = 2,
-    AFE_HUMIDITY_FAIR = 3,
-    AFE_HUMIDITY_POOR = 4,
-    AFE_HUMIDITY_INADEQUATE = 5
+typedef enum {
+  AFE_HUMIDITY_EXCELLENT = 1,
+  AFE_HUMIDITY_GOOD = 2,
+  AFE_HUMIDITY_FAIR = 3,
+  AFE_HUMIDITY_POOR = 4,
+  AFE_HUMIDITY_INADEQUATE = 5
 } afe_humidity_ratings_t;
 #endif
-
 
 /* UART Defaults */
 #ifdef AFE_CONFIG_PRESSURE
 #define AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE 1013.25
+#define AFE_PRESSURE_UNIT_HPA 1
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -465,30 +464,28 @@ typedef enum
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL 60
+
 #define AFE_BMX_UNKNOWN_SENSOR 255
 #define AFE_BMP180_SENSOR 1
 #define AFE_BME280_SENSOR 2
 #define AFE_BME680_SENSOR 6
 
-typedef enum
-{
-    AFE_IAQ_GOOD = 1,
-    AFE_IAQ_AVARAGE = 2,
-    AFE_IAQ_LITTLE_BAD = 3,
-    AFE_IAQ_BAD = 4,
-    AFE_IAQ_WORSE = 5,
-    AFE_IAQ_VERY_BAD = 5,
-    AFE_IAQ_UNKNOWN = 255
+typedef enum {
+  AFE_IAQ_GOOD = 1,
+  AFE_IAQ_AVARAGE = 2,
+  AFE_IAQ_LITTLE_BAD = 3,
+  AFE_IAQ_BAD = 4,
+  AFE_IAQ_WORSE = 5,
+  AFE_IAQ_VERY_BAD = 5,
+  AFE_IAQ_UNKNOWN = 255
 } afe_iaq_ratings_t;
 
-
-typedef enum
-{
-    AFE_CO2_EXCELLENT = 1,
-    AFE_CO2_GOOD = 2,
-    AFE_CO2_FAIR = 3,
-    AFE_CO2_POOR = 4,
-    AFE_CO2_INADEQUATE = 5
+typedef enum {
+  AFE_CO2_EXCELLENT = 1,
+  AFE_CO2_GOOD = 2,
+  AFE_CO2_FAIR = 3,
+  AFE_CO2_POOR = 4,
+  AFE_CO2_INADEQUATE = 5
 } afe_co2_ratings_t;
 
 #endif
