@@ -4,28 +4,35 @@
 
 AFEDataAccess::AFEDataAccess() {}
 
-boolean AFEDataAccess::formatFileSystem() {
+boolean AFEDataAccess::formatFileSystem()
+{
 #ifdef DEBUG
-  Serial << endl << endl << "Formatig File System";
+  Serial << endl
+         << endl
+         << "Formatig File System";
 #endif
   return SPIFFS.format();
 }
 
-const String AFEDataAccess::getDeviceUID() {
+const String AFEDataAccess::getDeviceUID()
+{
   String uid;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-device-uid.json : ";
+  Serial << endl
+         << "Opening file: cfg-device-uid.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device-uid.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -35,7 +42,8 @@ const String AFEDataAccess::getDeviceUID() {
     StaticJsonBuffer<30> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -48,7 +56,8 @@ const String AFEDataAccess::getDeviceUID() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -57,26 +66,32 @@ const String AFEDataAccess::getDeviceUID() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return uid;
 }
-void AFEDataAccess::saveDeviceUID(const char *uid) {
+void AFEDataAccess::saveDeviceUID(const char *uid)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-device-uid.json : ";
+  Serial << endl
+         << "Opening file: cfg-device-uid.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device-uid.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<30> jsonBuffer;
@@ -96,15 +111,20 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
 #endif
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createDeviceUIDFile() {
+void AFEDataAccess::createDeviceUIDFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-device-uid.json";
+  Serial << endl
+         << "Creating file: cfg-device-uid.json";
 #endif
 
   byte m[6];
@@ -115,21 +135,25 @@ void AFEDataAccess::createDeviceUIDFile() {
   saveDeviceUID(uid);
 }
 
-PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
+PRO_VERSION AFEDataAccess::getProVersionConfiguration()
+{
   PRO_VERSION configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-pro-version.json : ";
+  Serial << endl
+         << "Opening file: cfg-pro-version.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-pro-version.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -137,7 +161,8 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<50> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -151,7 +176,8 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -160,26 +186,32 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
+void AFEDataAccess::saveConfiguration(PRO_VERSION configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-pro-version.json : ";
+  Serial << endl
+         << "Opening file: cfg-pro-version.json : ";
 #endif
   File configFile = SPIFFS.open("cfg-pro-version.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<69> jsonBuffer;
@@ -198,18 +230,22 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createProVersionConfigurationFile() {
+void AFEDataAccess::createProVersionConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-pro-version.json";
+  Serial << endl
+         << "Creating file: cfg-pro-version.json";
 #endif
   PRO_VERSION ProConfiguration;
   ProConfiguration.serial[0] = '\0';
@@ -217,21 +253,25 @@ void AFEDataAccess::createProVersionConfigurationFile() {
   saveConfiguration(ProConfiguration);
 }
 
-PASSWORD AFEDataAccess::getPasswordConfiguration() {
+PASSWORD AFEDataAccess::getPasswordConfiguration()
+{
   PASSWORD configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-password.json : ";
+  Serial << endl
+         << "Opening file: cfg-password.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-password.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -239,7 +279,8 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<50> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -254,7 +295,8 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -263,26 +305,32 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
+void AFEDataAccess::saveConfiguration(PASSWORD configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-password.json : ";
+  Serial << endl
+         << "Opening file: cfg-password.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-password.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<59> jsonBuffer;
@@ -301,18 +349,22 @@ void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createPasswordConfigurationFile() {
+void AFEDataAccess::createPasswordConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-password.json";
+  Serial << endl
+         << "Creating file: cfg-password.json";
 #endif
   PASSWORD PasswordConfiguration;
   PasswordConfiguration.protect = false;
@@ -321,20 +373,24 @@ void AFEDataAccess::createPasswordConfigurationFile() {
 }
 
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 240
-DEVICE AFEDataAccess::getDeviceConfiguration() {
+DEVICE AFEDataAccess::getDeviceConfiguration()
+{
   DEVICE configuration;
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-device.json : ";
+  Serial << endl
+         << "Opening file: cfg-device.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -342,7 +398,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -351,7 +408,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.api.mqtt = root["api"]["mqtt"];
       configuration.api.domoticz = root["api"]["domoticz"];
       /* HTTP API must be ON when Domoticz is ON */
-      if (configuration.api.domoticz && !configuration.api.http) {
+      if (configuration.api.domoticz && !configuration.api.http)
+      {
         configuration.api.http = true;
       }
 
@@ -394,7 +452,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -403,10 +462,12 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
@@ -533,20 +594,24 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
  #endif
  */
 }
-void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
+void AFEDataAccess::saveConfiguration(DEVICE *configuration)
+{
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-device.json : ";
+  Serial << endl
+         << "Opening file: cfg-device.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
@@ -604,13 +669,15 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   /*
@@ -714,9 +781,11 @@ defined(T4_CONFIG)
 
   */
 }
-void AFEDataAccess::createDeviceConfigurationFile() {
+void AFEDataAccess::createDeviceConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-device.json";
+  Serial << endl
+         << "Creating file: cfg-device.json";
 #endif
   DEVICE deviceConfiguration;
   sprintf(deviceConfiguration.name, "AFE-Device");
@@ -770,21 +839,25 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   saveConfiguration(&deviceConfiguration);
 }
 
-FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
+FIRMWARE AFEDataAccess::getFirmwareConfiguration()
+{
   FIRMWARE configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-firmware.json : ";
+  Serial << endl
+         << "Opening file: cfg-firmware.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-firmware.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -792,7 +865,8 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<100> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -809,7 +883,8 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -818,27 +893,33 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
+void AFEDataAccess::saveConfiguration(FIRMWARE *configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-firmware.json : ";
+  Serial << endl
+         << "Opening file: cfg-firmware.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-firmware.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<100> jsonBuffer;
@@ -858,18 +939,22 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createFirmwareConfigurationFile() {
+void AFEDataAccess::createFirmwareConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-firmware.json";
+  Serial << endl
+         << "Creating file: cfg-firmware.json";
 #endif
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
@@ -879,26 +964,31 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   saveConfiguration(&firmwareConfiguration);
 }
 
-void AFEDataAccess::saveVersion(const char *version) {
+void AFEDataAccess::saveVersion(const char *version)
+{
   FIRMWARE configuration = getFirmwareConfiguration();
   sprintf(configuration.version, version);
   saveConfiguration(&configuration);
 }
 
-uint8_t AFEDataAccess::getDeviceMode() {
+uint8_t AFEDataAccess::getDeviceMode()
+{
   uint8_t mode = AFE_MODE_FIRST_TIME_LAUNCH;
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-device-mode.json : ";
+  Serial << endl
+         << "Opening file: cfg-device-mode.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device-mode.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -906,7 +996,8 @@ uint8_t AFEDataAccess::getDeviceMode() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<34> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
       Serial << endl;
@@ -917,7 +1008,8 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << endl
              << "success" << endl
              << "JSON Buffer size: " << jsonBuffer.size();
@@ -925,31 +1017,36 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #endif
 
     configFile.close();
-
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return mode;
 }
-void AFEDataAccess::saveDeviceMode(uint8_t mode) {
+void AFEDataAccess::saveDeviceMode(uint8_t mode)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-device-mode.json : ";
+  Serial << endl
+         << "Opening file: cfg-device-mode.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-device-mode.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<50> jsonBuffer;
@@ -976,31 +1073,37 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
 
-NETWORK AFEDataAccess::getNetworkConfiguration() {
+NETWORK AFEDataAccess::getNetworkConfiguration()
+{
   NETWORK configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-network.json : ";
+  Serial << endl
+         << "Opening file: cfg-network.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-network.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1008,7 +1111,8 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<162> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1034,7 +1138,8 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1043,27 +1148,33 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(NETWORK configuration) {
+void AFEDataAccess::saveConfiguration(NETWORK configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-network.json : ";
+  Serial << endl
+         << "Opening file: cfg-network.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-network.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<282> jsonBuffer;
@@ -1090,18 +1201,22 @@ void AFEDataAccess::saveConfiguration(NETWORK configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createNetworkConfigurationFile() {
+void AFEDataAccess::createNetworkConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-network.json";
+  Serial << endl
+         << "Creating file: cfg-network.json";
 #endif
   NETWORK networkConfiguration;
   /* Network default config */
@@ -1117,21 +1232,25 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   saveConfiguration(networkConfiguration);
 }
 
-MQTT AFEDataAccess::getMQTTConfiguration() {
+MQTT AFEDataAccess::getMQTTConfiguration()
+{
   MQTT configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-mqtt-broker.json : ";
+  Serial << endl
+         << "Opening file: cfg-mqtt-broker.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-mqtt-broker.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1139,7 +1258,8 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<114> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1159,7 +1279,8 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1168,27 +1289,33 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(MQTT configuration) {
+void AFEDataAccess::saveConfiguration(MQTT configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-mqtt-broker.json : ";
+  Serial << endl
+         << "Opening file: cfg-mqtt-broker.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-mqtt-broker.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<271> jsonBuffer;
@@ -1211,18 +1338,22 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createMQTTConfigurationFile() {
+void AFEDataAccess::createMQTTConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-mqtt-broker.json";
+  Serial << endl
+         << "Creating file: cfg-mqtt-broker.json";
 #endif
   MQTT MQTTConfiguration;
   /* MQTT Default config */
@@ -1235,20 +1366,24 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   saveConfiguration(MQTTConfiguration);
 }
 
-DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
+DOMOTICZ AFEDataAccess::getDomoticzConfiguration()
+{
   DOMOTICZ configuration;
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+  Serial << endl
+         << "Opening file: cfg-domoticz-server.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-domoticz-server.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1256,7 +1391,8 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<98> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1275,7 +1411,8 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1284,26 +1421,32 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
+void AFEDataAccess::saveConfiguration(DOMOTICZ configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+  Serial << endl
+         << "Opening file: cfg-domoticz-server.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-domoticz-server.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<211> jsonBuffer;
@@ -1324,18 +1467,22 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createDomoticzConfigurationFile() {
+void AFEDataAccess::createDomoticzConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-domoticz-server.json";
+  Serial << endl
+         << "Creating file: cfg-domoticz-server.json";
 #endif
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration.protocol = 0;
@@ -1347,7 +1494,8 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
 }
 
 #if (AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0)
-LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
+LED AFEDataAccess::getLEDConfiguration(uint8_t id)
+{
   LED configuration;
 
   char fileName[15];
@@ -1357,14 +1505,17 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1372,7 +1523,8 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<50> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1388,7 +1540,8 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1397,14 +1550,17 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration)
+{
   char fileName[15];
   sprintf(fileName, "cfg-led-%d.json", id);
 
@@ -1412,14 +1568,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<50> jsonBuffer;
@@ -1437,18 +1596,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createLEDConfigurationFile() {
+void AFEDataAccess::createLEDConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-led.json";
+  Serial << endl
+         << "Creating file: cfg-led.json";
 #endif
   LED LEDConfiguration;
   uint8_t index = 0;
@@ -1483,25 +1646,30 @@ void AFEDataAccess::createLEDConfigurationFile() {
   index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
-  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
+  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++)
+  {
     saveConfiguration(i, LEDConfiguration);
   }
 }
-uint8_t AFEDataAccess::getSystemLedID() {
+uint8_t AFEDataAccess::getSystemLedID()
+{
   uint8_t id = 0;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-system-led.json : ";
+  Serial << endl
+         << "Opening file: cfg-system-led.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-system-led.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1509,7 +1677,8 @@ uint8_t AFEDataAccess::getSystemLedID() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<34> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1523,7 +1692,8 @@ uint8_t AFEDataAccess::getSystemLedID() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1532,26 +1702,32 @@ uint8_t AFEDataAccess::getSystemLedID() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return id;
 }
-void AFEDataAccess::saveSystemLedID(uint8_t id) {
+void AFEDataAccess::saveSystemLedID(uint8_t id)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-system-led.json : ";
+  Serial << endl
+         << "Opening file: cfg-system-led.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-system-led.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<34> jsonBuffer;
@@ -1569,18 +1745,22 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createSystemLedIDConfigurationFile() {
+void AFEDataAccess::createSystemLedIDConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-system-led.json";
+  Serial << endl
+         << "Creating file: cfg-system-led.json";
 #endif
   saveSystemLedID(0);
 }
@@ -1588,7 +1768,8 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_FILE_BUFFER_RELAY 240
-RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
+RELAY AFEDataAccess::getRelayConfiguration(uint8_t id)
+{
   RELAY configuration;
   char fileName[17];
   sprintf(fileName, "cfg-relay-%d.json", id);
@@ -1597,14 +1778,17 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -1612,7 +1796,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1637,7 +1822,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -1646,10 +1832,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   /*
   #if defined(T3_CONFIG)
@@ -1797,7 +1985,8 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration)
+{
   char fileName[17];
   sprintf(fileName, "cfg-relay-%d.json", id);
 
@@ -1805,14 +1994,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
@@ -1840,13 +2032,15 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   /*
   #if defined(T3_CONFIG)
@@ -1956,9 +2150,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   #endif
   */
 }
-void AFEDataAccess::createRelayConfigurationFile() {
+void AFEDataAccess::createRelayConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-relay-xx.json";
+  Serial << endl
+         << "Creating file: cfg-relay-xx.json";
 #endif
   RELAY RelayConfiguration;
   uint8_t index = 0;
@@ -2055,7 +2251,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(2, RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-/* Shelly-1 */
+  /* Shelly-1 */
 
 #elif defined(AFE_DEVICE_SHELLY_1)
   RelayConfiguration.gpio = 4;
@@ -2079,7 +2275,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 /* Clean */
 #endif
   RelayConfiguration.gpio = 12;
-  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
+  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++)
+  {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
     saveRelayState(i, false);
 #endif
@@ -2089,7 +2286,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 }
 
 /* Relay state methods*/
-boolean AFEDataAccess::getRelayState(uint8_t id) {
+boolean AFEDataAccess::getRelayState(uint8_t id)
+{
   boolean state = false;
   char fileName[23];
   sprintf(fileName, "cfg-relay-state-%d.json", id);
@@ -2098,14 +2296,17 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -2113,7 +2314,8 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<34> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2127,7 +2329,8 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -2136,14 +2339,17 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return state;
 }
-void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
+void AFEDataAccess::saveRelayState(uint8_t id, boolean state)
+{
   char fileName[23];
   sprintf(fileName, "cfg-relay-state-%d.json", id);
 
@@ -2151,14 +2357,17 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<50> jsonBuffer;
@@ -2177,19 +2386,22 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
 #endif /* End: Relay */
 
 #define AFE_CONFIG_FILE_BUFFER_SWITCH 210
-SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
+SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id)
+{
   SWITCH configuration;
 
   char fileName[18];
@@ -2199,14 +2411,17 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -2214,7 +2429,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SWITCH> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2238,7 +2454,8 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -2247,15 +2464,18 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration)
+{
   char fileName[18];
   sprintf(fileName, "cfg-switch-%d.json", id);
 
@@ -2263,14 +2483,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SWITCH> jsonBuffer;
@@ -2297,18 +2520,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createSwitchConfigurationFile() {
+void AFEDataAccess::createSwitchConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-switch.json";
+  Serial << endl
+         << "Creating file: cfg-switch.json";
 #endif
   SWITCH SwitchConfiguration;
   uint8_t index = 0;
@@ -2394,19 +2621,22 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(1, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #endif
-  if (index == 0) {
+  if (index == 0)
+  {
     SwitchConfiguration.gpio = 0;
     SwitchConfiguration.type = AFE_SWITCH_TYPE_MONO;
     SwitchConfiguration.functionality = AFE_SWITCH_FUNCTIONALITY_MULTI;
     saveConfiguration(0, SwitchConfiguration);
     index = 1;
   }
-  if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
+  if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES)
+  {
     SwitchConfiguration.gpio = 0;
     SwitchConfiguration.type = AFE_SWITCH_TYPE_BI;
     SwitchConfiguration.functionality = AFE_SWITCH_FUNCTIONALITY_NONE;
     for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
-         i++) {
+         i++)
+    {
       SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
       saveConfiguration(i, SwitchConfiguration);
     }
@@ -2414,21 +2644,25 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-ADCINPUT AFEDataAccess::getADCInputConfiguration() {
+ADCINPUT AFEDataAccess::getADCInputConfiguration()
+{
   ADCINPUT configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-analog-input.json : ";
+  Serial << endl
+         << "Opening file: cfg-analog-input.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-analog-input.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -2436,7 +2670,8 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<300> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2460,7 +2695,8 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -2469,27 +2705,33 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
+void AFEDataAccess::saveConfiguration(ADCINPUT configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-analog-input.json : ";
+  Serial << endl
+         << "Opening file: cfg-analog-input.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-analog-input.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<350> jsonBuffer;
@@ -2519,18 +2761,22 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
            << "success" << endl
            << "JSON Buffer size: " << jsonBuffer.size();
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 };
-void AFEDataAccess::createADCInputConfigurationFile() {
+void AFEDataAccess::createADCInputConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-analog-input.json";
+  Serial << endl
+         << "Creating file: cfg-analog-input.json";
 #endif
   ADCINPUT AnalogInputConfiguration;
   AnalogInputConfiguration.gpio = AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO;
@@ -2551,7 +2797,8 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-DS18B20 AFEDataAccess::getSensorConfiguration() {
+DS18B20 AFEDataAccess::getSensorConfiguration()
+{
   DS18B20 configuration;
   configuration.gpio = Eeprom.readUInt8(370);
   configuration.correction = Eeprom.read(371, 5).toFloat();
@@ -2561,7 +2808,8 @@ DS18B20 AFEDataAccess::getSensorConfiguration() {
   configuration.idx = Eeprom.read(936, 6).toInt();
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
+void AFEDataAccess::saveConfiguration(DS18B20 configuration)
+{
   Eeprom.writeUInt8(370, configuration.gpio);
   Eeprom.write(371, 5, (float)configuration.correction);
   Eeprom.write(376, 5, (long)configuration.interval);
@@ -2572,7 +2820,8 @@ void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
-DH AFEDataAccess::getSensorConfiguration() {
+DH AFEDataAccess::getSensorConfiguration()
+{
   DH configuration;
 #if defined(T2_CONFIG)
   configuration.gpio = Eeprom.readUInt8(370);
@@ -2604,7 +2853,8 @@ DH AFEDataAccess::getSensorConfiguration() {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(DH configuration) {
+void AFEDataAccess::saveConfiguration(DH configuration)
+{
 #if defined(T2_CONFIG)
   Eeprom.writeUInt8(370, configuration.gpio);
   Eeprom.writeUInt8(371, configuration.type);
@@ -2637,7 +2887,8 @@ void AFEDataAccess::saveConfiguration(DH configuration) {
 
 /* T3: PIR */
 #if defined(T3_CONFIG)
-PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
+PIR AFEDataAccess::getPIRConfiguration(uint8_t id)
+{
   PIR configuration;
   MQTT configurationMQTT;
   uint8_t nextPIR = 27;
@@ -2662,7 +2913,8 @@ PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration)
+{
   uint8_t nextPIR = 27;
   Eeprom.writeUInt8(506 + id * nextPIR, configuration.gpio);
   Eeprom.write(507 + id * nextPIR, 16, configuration.name);
@@ -2678,7 +2930,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_FILE_BUFFER_CONTACTRON 200
-CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
+CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id)
+{
   CONTACTRON configuration;
 
   char fileName[22];
@@ -2688,14 +2941,17 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -2703,7 +2959,8 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CONTACTRON> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2727,7 +2984,8 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -2736,15 +2994,18 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration)
+{
   char fileName[22];
   sprintf(fileName, "cfg-contactron-%d.json", id);
 
@@ -2752,14 +3013,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CONTACTRON> jsonBuffer;
@@ -2786,18 +3050,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createContractonConfigurationFile() {
+void AFEDataAccess::createContractonConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-contactron-xx.json";
+  Serial << endl
+         << "Creating file: cfg-contactron-xx.json";
 #endif
   CONTACTRON ContactronConfiguration;
   uint8 index = 0;
@@ -2822,7 +3090,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
   ContactronConfiguration.gpio = 0;
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-       i++) {
+       i++)
+  {
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
     saveConfiguration(i, ContactronConfiguration);
   }
@@ -2831,7 +3100,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_FILE_BUFFER_GATE 210
-GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
+GATE AFEDataAccess::getGateConfiguration(uint8_t id)
+{
   GATE configuration;
 
   char fileName[16];
@@ -2841,14 +3111,17 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -2856,7 +3129,8 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2873,7 +3147,8 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       configuration.contactron.id[1] = root["contactrons"][1];
 
       for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-           i++) {
+           i++)
+      {
         configuration.states.state[i] = root["states"][i];
       }
 
@@ -2891,7 +3166,8 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -2900,15 +3176,18 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration)
+{
 
   char fileName[16];
   sprintf(fileName, "cfg-gate-%d.json", id);
@@ -2917,14 +3196,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
@@ -2943,7 +3225,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     if ((configuration.contactron.id[0] == AFE_HARDWARE_ITEM_NOT_EXIST &&
          configuration.contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) ||
         (configuration.contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST &&
-         configuration.contactron.id[0] == configuration.contactron.id[1])) {
+         configuration.contactron.id[0] == configuration.contactron.id[1]))
+    {
       configuration.contactron.id[0] = configuration.contactron.id[1];
       configuration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
     }
@@ -2952,7 +3235,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
     jsonContactron.add(configuration.contactron.id[1]);
 
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-         i++) {
+         i++)
+    {
       jsonStates.add(configuration.states.state[i]);
     }
 
@@ -2973,18 +3257,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createGateConfigurationFile() {
+void AFEDataAccess::createGateConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-gate-XX.json";
+  Serial << endl
+         << "Creating file: cfg-gate-XX.json";
 #endif
   GATE GateConfiguration;
 
@@ -3010,7 +3298,8 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.states.state[3] = AFE_GATE_UNKNOWN;
 
   for (uint8_t i = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
-       i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
+       i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++)
+  {
     sprintf(GateConfiguration.name, "G%d", i + 1);
     saveConfiguration(i, GateConfiguration);
     saveGateState(i, AFE_GATE_UNKNOWN);
@@ -3018,7 +3307,8 @@ void AFEDataAccess::createGateConfigurationFile() {
 }
 
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 34
-uint8_t AFEDataAccess::getGateState(uint8_t id) {
+uint8_t AFEDataAccess::getGateState(uint8_t id)
+{
   uint8_t state = AFE_GATE_CLOSED;
 
   char fileName[22];
@@ -3028,14 +3318,17 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -3043,7 +3336,8 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE_STATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3060,7 +3354,8 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -3069,14 +3364,17 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
   return state;
 }
-void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
+void AFEDataAccess::saveGateState(uint8_t id, uint8_t state)
+{
 
   char fileName[22];
   sprintf(fileName, "cfg-gate-state-%d.json", id);
@@ -3085,14 +3383,17 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     String fileContent;
@@ -3118,23 +3419,29 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
+void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type)
+{
 
-  if (type == THERMOSTAT_REGULATOR) {
+  if (type == THERMOSTAT_REGULATOR)
+  {
     saveRegulatorState(configuration.enabled, THERMOSTAT_REGULATOR);
-  } else {
+  }
+  else
+  {
     saveRegulatorState(configuration.enabled, HUMIDISTAT_REGULATOR);
   }
 
@@ -3153,41 +3460,56 @@ void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
 #endif
 }
 
-boolean AFEDataAccess::isRegulatorEnabled(uint8_t type) {
-  if (type == THERMOSTAT_REGULATOR) {
+boolean AFEDataAccess::isRegulatorEnabled(uint8_t type)
+{
+  if (type == THERMOSTAT_REGULATOR)
+  {
 #if defined(T1_CONFIG)
     return Eeprom.read(435);
 #else
     return Eeprom.read(443);
 #endif
-  } else {
+  }
+  else
+  {
     return Eeprom.read(456);
   }
 }
 
-void AFEDataAccess::saveRegulatorState(boolean state, uint8_t type) {
-  if (type == THERMOSTAT_REGULATOR) {
+void AFEDataAccess::saveRegulatorState(boolean state, uint8_t type)
+{
+  if (type == THERMOSTAT_REGULATOR)
+  {
 #if defined(T1_CONFIG)
     Eeprom.write(435, state);
 #else
     Eeprom.write(443, state);
 #endif
-  } else {
+  }
+  else
+  {
     Eeprom.write(456, state);
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
-void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state)
+{
   DEVICE configuration = getDeviceConfiguration();
-  if (apiID == API_HTTP) {
+  if (apiID == API_HTTP)
+  {
     configuration.api.http = state;
-  } else if (apiID == API_MQTT) {
+  }
+  else if (apiID == API_MQTT)
+  {
     configuration.api.mqtt = state;
-  } else if (apiID == API_DOMOTICZ) {
+  }
+  else if (apiID == API_DOMOTICZ)
+  {
     configuration.api.domoticz = state;
-    if (state) {
+    if (state)
+    {
       configuration.api.http = true;
     }
   }
@@ -3197,7 +3519,8 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_FILE_BUFFER_HPMA115S0 240
-HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
+HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id)
+{
   HPMA115S0 configuration;
 
   char fileName[21];
@@ -3207,14 +3530,17 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -3222,7 +3548,8 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3245,7 +3572,8 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -3254,15 +3582,18 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration)
+{
   char fileName[21];
   sprintf(fileName, "cfg-hpma115s0-%d.json", id);
 
@@ -3270,14 +3601,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
@@ -3305,18 +3639,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
+void AFEDataAccess::createHPMA115S0SensorConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-hpma115s0-XX.json";
+  Serial << endl
+         << "Creating file: cfg-hpma115s0-XX.json";
 #endif
   HPMA115S0 configuration;
 
@@ -3325,7 +3663,8 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
       AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
   configuration.domoticz.pm25.idx = 0;
   configuration.domoticz.pm10.idx = 0;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++)
+  {
     sprintf(configuration.mqtt.topic, "HPMA115S0/%d", i + 1);
     sprintf(configuration.name, "HPMA115S0-%d", i + 1);
     saveConfiguration(i, configuration);
@@ -3335,21 +3674,25 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_UART
 #define AFE_CONFIG_FILE_BUFFER_UART 50
-SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
+SERIALPORT AFEDataAccess::getSerialPortConfiguration()
+{
   SERIALPORT configuration;
 
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-uart.json : ";
+  Serial << endl
+         << "Opening file: cfg-uart.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-uart.json", "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -3357,7 +3700,8 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3376,7 +3720,8 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -3385,27 +3730,33 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
+void AFEDataAccess::saveConfiguration(SERIALPORT configuration)
+{
 #ifdef DEBUG
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-uart.json : ";
+  Serial << endl
+         << "Opening file: cfg-uart.json : ";
 #endif
 
   File configFile = SPIFFS.open("cfg-uart.json", "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
@@ -3426,18 +3777,22 @@ void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createSerialConfigurationFile() {
+void AFEDataAccess::createSerialConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-uart.json";
+  Serial << endl
+         << "Creating file: cfg-uart.json";
 #endif
   SERIALPORT configuration;
   configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
@@ -3448,7 +3803,8 @@ void AFEDataAccess::createSerialConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 548
-BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
+BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id)
+{
   BMEX80 configuration;
 
   char fileName[17];
@@ -3458,14 +3814,17 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -3473,7 +3832,8 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3486,7 +3846,7 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.domoticz.temperatureHumidityPressure.idx =
           root["idx"]["temperatureHumidityPressure"];
       configuration.domoticz.temperatureHumidity.idx =
-          root["idx"]["temperatureHumidity"];          
+          root["idx"]["temperatureHumidity"];
       configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
       configuration.domoticz.temperature.idx = root["idx"]["temperature"];
       configuration.domoticz.humidity.idx = root["idx"]["humidity"];
@@ -3520,7 +3880,8 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -3529,15 +3890,18 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration)
+{
   char fileName[17];
   sprintf(fileName, "cfg-BMEX80-%d.json", id);
 
@@ -3545,14 +3909,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
@@ -3606,18 +3973,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createBMEX80SensorConfigurationFile() {
+void AFEDataAccess::createBMEX80SensorConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-BMEX80-XX.json";
+  Serial << endl
+         << "Creating file: cfg-BMEX80-XX.json";
 #endif
   BMEX80 configuration;
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
@@ -3646,7 +4017,8 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.domoticz.co2Equivalent.idx = 0;
   configuration.domoticz.breathVocEquivalent.idx = 0;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++)
+  {
     sprintf(configuration.mqtt.topic, "BMEX80/%d", i + 1);
     sprintf(configuration.name, "BMEX80-%d", i + 1);
     saveConfiguration(i, configuration);
@@ -3656,7 +4028,8 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_FILE_BUFFER_BH1750 230
-BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
+BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id)
+{
   BH1750 configuration;
   char fileName[18];
   sprintf(fileName, "cfg-bh1750-%d.json", id);
@@ -3665,13 +4038,16 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Reading JSON : ";
+    Serial << "success" << endl
+           << "Reading JSON : ";
 #endif
 
     size_t size = configFile.size();
@@ -3680,7 +4056,8 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3703,7 +4080,8 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       Serial << "failure";
     }
 #endif
@@ -3712,15 +4090,18 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
   }
 
 #ifdef DEBUG
-  else {
+  else
+  {
     Serial << "failure";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration)
+{
   char fileName[18];
   sprintf(fileName, "cfg-bh1750-%d.json", id);
 
@@ -3728,14 +4109,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: " << fileName << " : ";
+  Serial << endl
+         << "Opening file: " << fileName << " : ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
 
-  if (configFile) {
+  if (configFile)
+  {
 #ifdef DEBUG
-    Serial << "success" << endl << "Writing JSON : ";
+    Serial << "success" << endl
+           << "Writing JSON : ";
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
@@ -3762,25 +4146,31 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
                    ? "WARNING: Buffor size might be to small"
                    : "Buffor size: OK");
 #endif
-
   }
 #ifdef DEBUG
-  else {
-    Serial << endl << "failed to open file for writing";
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
   }
-  Serial << endl << "--------------------------------------------------";
+  Serial << endl
+         << "--------------------------------------------------";
 #endif
 }
-void AFEDataAccess::createBH1750SensorConfigurationFile() {
+
+void AFEDataAccess::createBH1750SensorConfigurationFile()
+{
 #ifdef DEBUG
-  Serial << endl << "Creating file: cfg-bh1750-XX.json";
+  Serial << endl
+         << "Creating file: cfg-bh1750-XX.json";
 #endif
   BH1750 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
   configuration.domoticz.idx = 0;
   configuration.mode = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++)
+  {
     sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
     sprintf(configuration.name, "BH1750-%d", i + 1);
     saveConfiguration(i, configuration);
@@ -3788,9 +4178,159 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 }
 #endif
 
-IPAddress AFEDataAccess::IPfromString(const char *address) {
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#define AFE_CONFIG_FILE_BUFFER_AS3935 200
+AS3935 AFEDataAccess::getAS3935SensorConfiguration()
+{
+  AS3935 configuration;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl
+         << "Opening file: cfg-as3935.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-as3935.json", "r");
+  if (configFile)
+  {
+#ifdef DEBUG
+    Serial << "success" << endl
+           << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_AS3935> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success())
+    {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.i2cAddress = root["i2cAddress"];
+      configuration.irqGPIO = root["irqGPIO"];
+      configuration.setNoiseFloorAutomatically = root["setNoiseFloorAutomatically"];
+      configuration.noiseFloor = root["noiseFloor"];
+      configuration.indoor = root["indoor"];
+      configuration.unit = root["unit"];
+      configuration.domoticz.idx = root["idx"];
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_AS3935 < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else
+    {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else
+  {
+    Serial << "failure";
+  }
+  Serial << endl
+         << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+
+void AFEDataAccess::saveConfiguration(AS3935 configuration)
+{
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl
+         << "Opening file: cfg-as3935.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-as3935.json", "w");
+
+  if (configFile)
+  {
+#ifdef DEBUG
+    Serial << "success" << endl
+           << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_AS3935> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["i2cAddress"] = configuration.i2cAddress;
+    root["irqGPIO"] = configuration.irqGPIO;
+    root["setNoiseFloorAutomatically"] = configuration.setNoiseFloorAutomatically;
+    root["noiseFloor"] = configuration.noiseFloor;
+    root["indoor"] = configuration.indoor;
+    root["unit"] = configuration.unit;
+    root["mqttTopic"] = configuration.mqtt.topic;
+    root["idx"] = configuration.domoticz.idx;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_AS3935 < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+  }
+#ifdef DEBUG
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
+  }
+  Serial << endl
+         << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createAS3935SensorConfigurationFile()
+{
+#ifdef DEBUG
+  Serial << endl
+         << "Creating file: cfg-as3935.json";
+#endif
+  AS3935 configuration;
+  configuration.irqGPIO = 0;
+  configuration.setNoiseFloorAutomatically = true;
+  configuration.noiseFloor = 0;
+  configuration.indoor = true;
+  configuration.domoticz.idx = 0;
+  configuration.unit = AFE_DISTANCE_KM;
+  sprintf(configuration.mqtt.topic, "AS3935");
+  saveConfiguration(configuration);
+}
+#endif
+
+IPAddress AFEDataAccess::IPfromString(const char *address)
+{
   IPAddress ip;
-  if (!ip.fromString(address)) {
+  if (!ip.fromString(address))
+  {
 #ifdef DEBUG
     Serial << endl
            << "ERROR: converting from IP String (" << address

@@ -155,6 +155,10 @@ public:
   String addBH1750Configuration(uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  String addAS3935Configuration();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   String addAnalogInputConfiguration();
 #endif

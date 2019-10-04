@@ -326,6 +326,21 @@
 #define L_MQTT_TOPIC_BH1750 "Temat MQTT czujnika BH1750"
 #endif
 
+/* AS3935 */
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#define L_AS3935_SENSOR "Czujnik AS3935"
+#define L_NOISE_FLOOR "Poziom szumów"
+#define L_NOISE_FLOOR_HINT "0 - najmniejszy, 7 - największy"
+#define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu szumów"
+#define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom redukcji szumów w przypadku wyłączonej opcji Inteligentnej kontroli poziomów szumów"
+#define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
+#define L_INDOOR "Wewnątrz budynku"
+#define L_OUTDOOR "Na zewnątrz"
+#define L_DISTANCE_UNIT "Jednostka odległości"
+#define L_KM "Kilometry"
+#define L_MILES "Mile"
+#endif
+
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define L_ADDRESS "Adres"

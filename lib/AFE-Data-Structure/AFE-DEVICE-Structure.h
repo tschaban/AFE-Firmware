@@ -75,6 +75,7 @@ struct DEVICE {
   uint8_t noOfHPMA115S0s;
   uint8_t noOfBMEX80s;
   uint8_t noOfBH1750s;
+  uint8_t noOfAS3935;
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif

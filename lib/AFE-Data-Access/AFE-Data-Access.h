@@ -27,7 +27,6 @@
 
 class AFEDataAccess {
 private:
-  // AFEEEPROM Eeprom;
   IPAddress IPfromString(const char *address);
 
 public:
@@ -166,6 +165,12 @@ public:
   BH1750 getBH1750SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, BH1750 configuration);
   void createBH1750SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AS3935 getAS3935SensorConfiguration();
+  void saveConfiguration(AS3935 configuration);
+  void createAS3935SensorConfigurationFile();
 #endif
 
 /* Methods turns on / off APIs */

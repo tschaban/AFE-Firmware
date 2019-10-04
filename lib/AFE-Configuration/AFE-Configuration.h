@@ -231,7 +231,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.0.B3"
+#define AFE_FIRMWARE_VERSION "2.0.0.B4"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -242,6 +242,7 @@
 #define AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_BH1750
+#define AFE_CONFIG_HARDWARE_AS3935
 
 /* Max number of hardware items, per AFE version */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 1
@@ -372,6 +373,17 @@
 #endif
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+
+#define  AFE_DISTANCE_KM 1
+#define  AFE_DISTANCE_MIL 2
+
+#ifndef AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_HARDWARE_I2C
+#endif
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #define HPMA115S0_TYPE_PM25 0
 #define HPMA115S0_TYPE_PM10 1
@@ -495,6 +507,8 @@ typedef enum {
 #define AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE 0
 #endif
 
+
+
 /* Config sites IDs */
 #define AFE_CONFIG_SITE_INDEX 0
 #define AFE_CONFIG_SITE_DEVICE 1
@@ -534,6 +548,9 @@ typedef enum {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_SITE_BH1750 24
+#endif
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#define AFE_CONFIG_SITE_AS3935 25
 #endif
 
 #endif

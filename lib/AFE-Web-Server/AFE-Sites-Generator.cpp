@@ -2055,6 +2055,93 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  String AFESitesGenerator::addAS3935Configuration() 
+  {
+  AS3935 configuration = Data.getAS3935SensorConfiguration();
+  char _number[7];
+  
+  String body = "<fieldset>";
+
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
+  body += "<div class=\"cf\">";
+  body += generateConfigParameter_GPIO("g", configuration.irqGPIO);
+  body += "</div>";
+
+
+  body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
+            "value=\"1\"";
+body += configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">";
+    body += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
+    body += "</label></div><p class=\"cm\">";
+
+  body += L_SET_LEVEL_OF_NOISE_FLOOR;
+  sprintf(_number, "%d", configuration.noiseFloor);
+  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "0",
+                  "7", "1", L_NOISE_FLOOR_HINT);
+
+  body += "</p><div class=\"cf\"><label>";
+  body += L_SENSOR_INDOOR_OUTDOOR;
+  body += "</label><select name=\"w\"><option value=\"1\"";
+  body +=
+      (configuration.indoor == true ? " selected=\"selected\""
+                                                    : "");
+  body += ">";
+  body += L_INDOOR;
+  body += "</option><option value=\"0\"";
+  body +=
+      (configuration.indoor == false ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_OUTDOOR;
+  body += "</option></select></div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += L_DISTANCE_UNIT;
+  body += "</label><select name=\"u\"><option value=\"";
+  body += AFE_DISTANCE_KM;
+  body += "\"";
+  body +=
+      (configuration.unit == AFE_DISTANCE_KM ? " selected=\"selected\""
+                                                    : "");
+  body += ">";
+  body += L_KM;
+  body += "</option><option value=\"";
+  body += AFE_DISTANCE_MIL;
+  body += "\"";
+  body +=
+      (configuration.unit == AFE_DISTANCE_MIL ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_MILES;
+  body += "</option></select></div>";
+
+  body += "</fieldset>";
+
+  String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
+
+  if (Device->configuration.api.domoticz) {
+    body = "<fieldset>";
+
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    body += addItem("number", "d", "IDX", _number, "?", "0", "999999", "1");
+
+    body += "</fieldset>";
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
+  }
+
+  return page;
+}
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();

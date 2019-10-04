@@ -51,6 +51,8 @@
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
+#include <AFE-AS3935-Sensor-Structure.h>
+
 
 #ifdef T6_CONFIG
 #include <AFE-SERIALPORT-Structure.h>

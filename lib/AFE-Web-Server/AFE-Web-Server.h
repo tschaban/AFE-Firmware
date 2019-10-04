@@ -112,6 +112,11 @@ private:
   BH1750 getBH1750SensorData();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AS3935 getAS3935SensorData();
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
 #endif

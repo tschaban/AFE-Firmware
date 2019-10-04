@@ -124,6 +124,7 @@ void setup() {
 #endif
 
 /* Turn off publishing information to Serial if production release */
+/* @TODO is this still required if I'm not turning on Serial */
 //#ifndef DEBUG
 //  Serial.swap();
 //#endif
