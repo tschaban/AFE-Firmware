@@ -330,7 +330,7 @@
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #define L_AS3935_SENSOR "Czujnik AS3935"
 #define L_NOISE_FLOOR "Poziom szumów"
-#define L_NOISE_FLOOR_HINT "0 - najmniejszy, 7 - największy"
+#define L_NOISE_FLOOR_HINT "(0-najmniejszy, 7-największy)"
 #define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu szumów"
 #define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom redukcji szumów w przypadku wyłączonej opcji Inteligentnej kontroli poziomów szumów"
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"

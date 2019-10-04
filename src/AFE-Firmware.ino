@@ -111,6 +111,11 @@ AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#include <AFE-Sensor-AS3935.h>
+AFESensorAS3935 AS3935Sensor;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #include <AFE-Analog-Input.h>
 AFEAnalogInput AnalogInput;
@@ -153,8 +158,8 @@ void setup() {
 
   Device.begin();
 
-  /* Checking if the device is launched for a first time. If so it loades
-   * default configuration */
+/* Checking if the device is launched for a first time. If so it loades
+ * default configuration */
 #ifdef DEBUG
   Serial << endl
          << "Checking if first time launch: Device.getMode()= "
@@ -182,7 +187,7 @@ void setup() {
     Serial << "YES";
 #endif
   } else {
-    /* Checking if the firmware has been upgraded */
+/* Checking if the firmware has been upgraded */
 #ifdef DEBUG
     Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
 #endif
@@ -220,7 +225,7 @@ void setup() {
   Serial << endl << "Network initialized";
 #endif
 
-  /* Initializing system LED (if exists)  */
+/* Initializing system LED (if exists)  */
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   uint8_t systemLedID = Data.getSystemLedID();
   delay(0);
@@ -283,7 +288,7 @@ void setup() {
     initializeGate();
 #endif
 
-    /* Initializing DS18B20 or DHTxx sensor */
+/* Initializing DS18B20 or DHTxx sensor */
 #if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
     initalizeSensor();
 #ifdef DEBUG
@@ -306,6 +311,10 @@ void setup() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
     initializeBH1750Sensor();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+    initializeAS3935Sensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -398,8 +407,12 @@ void loop() {
         BH1750SensorEventsListener();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+        AS3935SensorEventsListener();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-        analogInputEventsListener();
+            analogInputEventsListener();
 #endif
 
 #if defined(T3_CONFIG)
@@ -435,7 +448,7 @@ void loop() {
   switchEventsListener();
   processSwitchEvents();
 
-  /* Led listener */
+/* Led listener */
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
   Led.loop();
 #endif

@@ -300,6 +300,14 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  page += "<li class=\"itm\"><a href=\"\\?o=";
+  page += AFE_CONFIG_SITE_AS3935;
+  page += "\">";
+  page += L_AS3935_SENSOR;
+  page += "</a></li>";
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput && Firmware->Pro.valid) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
@@ -1919,11 +1927,9 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
     body += addItem("number", "pc", L_PRESSURE, _number, "?", "-999.999",
                     "999.999", "0.001");
 
-
     sprintf(_number, "%d", configuration.altitude);
-    body += addItem("number", "hi", L_ALTITIDE, _number, "?", "-431",
-                    "8850", "1", L_METERS);
-
+    body += addItem("number", "hi", L_ALTITIDE, _number, "?", "-431", "8850",
+                    "1", L_METERS);
 
     body += "</fieldset>";
     page += addConfigurationBlock(L_CORRECTIONS, "", body);
@@ -1953,13 +1959,9 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
         body += addItem("number", "i0", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
                         "999999", "1");
 
-
-        sprintf(_number, "%d",
-                configuration.domoticz.temperatureHumidity.idx);
+        sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
         body += addItem("number", "i12", L_IDX_TEMP_HUM, _number, "?", "0",
-                        "999999", "1");                        
-
-
+                        "999999", "1");
       }
 
       sprintf(_number, "%d", configuration.domoticz.pressure.idx);
@@ -2056,11 +2058,10 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  String AFESitesGenerator::addAS3935Configuration() 
-  {
+String AFESitesGenerator::addAS3935Configuration() {
   AS3935 configuration = Data.getAS3935SensorConfiguration();
-  char _number[7];
-  
+  char _number[2];
+
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
@@ -2069,41 +2070,13 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
   body += generateConfigParameter_GPIO("g", configuration.irqGPIO);
   body += "</div>";
 
-
-  body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
-            "value=\"1\"";
-body += configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">";
-    body += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
-    body += "</label></div><p class=\"cm\">";
-
-  body += L_SET_LEVEL_OF_NOISE_FLOOR;
-  sprintf(_number, "%d", configuration.noiseFloor);
-  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "0",
-                  "7", "1", L_NOISE_FLOOR_HINT);
-
-  body += "</p><div class=\"cf\"><label>";
-  body += L_SENSOR_INDOOR_OUTDOOR;
-  body += "</label><select name=\"w\"><option value=\"1\"";
-  body +=
-      (configuration.indoor == true ? " selected=\"selected\""
-                                                    : "");
-  body += ">";
-  body += L_INDOOR;
-  body += "</option><option value=\"0\"";
-  body +=
-      (configuration.indoor == false ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_OUTDOOR;
-  body += "</option></select></div>";
-
   body += "<div class=\"cf\"><label>";
   body += L_DISTANCE_UNIT;
   body += "</label><select name=\"u\"><option value=\"";
   body += AFE_DISTANCE_KM;
   body += "\"";
   body +=
-      (configuration.unit == AFE_DISTANCE_KM ? " selected=\"selected\""
-                                                    : "");
+      (configuration.unit == AFE_DISTANCE_KM ? " selected=\"selected\"" : "");
   body += ">";
   body += L_KM;
   body += "</option><option value=\"";
@@ -2113,6 +2086,30 @@ body += configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">"
       (configuration.unit == AFE_DISTANCE_MIL ? " selected=\"selected\"" : "");
   body += ">";
   body += L_MILES;
+  body += "</option></select></div>";
+
+  body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
+          "value=\"1\"";
+  body +=
+      configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">";
+  body += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
+  body += "</label></div><p class=\"cm\">";
+
+  body += L_SET_LEVEL_OF_NOISE_FLOOR;
+  sprintf(_number, "%d", configuration.noiseFloor);
+  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "0", "7", "1",
+                  L_NOISE_FLOOR_HINT);
+
+  body += "</p><div class=\"cf\"><label>";
+  body += L_SENSOR_INDOOR_OUTDOOR;
+  body += "</label><select name=\"w\"><option value=\"1\"";
+  body += (configuration.indoor == true ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_INDOOR;
+  body += "</option><option value=\"0\"";
+  body += (configuration.indoor == false ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_OUTDOOR;
   body += "</option></select></div>";
 
   body += "</fieldset>";
@@ -2140,7 +2137,6 @@ body += configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">"
   return page;
 }
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
