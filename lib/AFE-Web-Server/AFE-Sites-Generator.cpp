@@ -301,11 +301,13 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  page += "<li class=\"itm\"><a href=\"\\?o=";
-  page += AFE_CONFIG_SITE_AS3935;
-  page += "\">";
-  page += L_AS3935_SENSOR;
-  page += "</a></li>";
+  if (Device->configuration.noOfAS3935s > 0) {
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_AS3935;
+    page += "\">";
+    page += L_AS3935_SENSOR;
+    page += "</a></li>";
+  }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -437,6 +439,12 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
                                     Device->configuration.noOfBMEX80s, "b6",
                                     L_NUMBER_OF_BMEX80_SENSORS);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+                                    Device->configuration.noOfAS3935s, "a3",
+                                    L_NUMBER_OF_AS3935_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

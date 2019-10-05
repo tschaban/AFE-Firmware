@@ -424,6 +424,18 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  /* AS3935 */
+  if (strcmp(request.device, "AS3935") == 0 &&
+      strcmp(request.command, "get") == 0) {
+    char json[60];
+    AS3935Sensor.getJSON(json);
+    sendHTTPAPIRequestStatus(&request, true, json);
+    deviceNotExist = false;
+    break;
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Analog Input */
   if (strcmp(request.device, "ADC") == 0) {

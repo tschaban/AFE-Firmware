@@ -459,6 +459,16 @@ void MQTTPublishBH1750SensorData(uint8_t id) {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+void MQTTPublishAS3935SensorData() {
+  if (Device.configuration.api.mqtt) {
+    char message[60];
+    AS3935Sensor.getJSON(message);
+    Mqtt.publishTopic(AS3935Sensor.configuration.mqtt.topic, message);
+  }
+}
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
   char valueString[10];

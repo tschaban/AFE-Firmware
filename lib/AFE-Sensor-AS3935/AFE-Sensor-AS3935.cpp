@@ -8,18 +8,16 @@ void AFESensorAS3935::begin() {
   AFEDataAccess Data;
   configuration = Data.getAS3935SensorConfiguration();
 
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-
 #ifdef DEBUG
   Serial << endl << endl << "----- AS3935: Initializing -----";
 #endif
   if (configuration.i2cAddress != 0) {
 #ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+#endif
+
+#ifdef DEBUG
+    Serial << endl << "Attaching interruption handler";
 #endif
 
     pinMode(configuration.irqGPIO, INPUT);
@@ -35,7 +33,6 @@ void AFESensorAS3935::begin() {
 #ifdef DEBUG
       Serial << endl << "AS3935 is not initialized";
 #endif
-      _initialized = true;
       AS3935Sensor.maskDisturber(true);
 
 #ifdef DEBUG
@@ -105,21 +102,43 @@ void AFESensorAS3935::begin() {
 #endif
 
 #ifdef DEBUG
-  if (_initialized) {
-    Serial << endl << "IRQ GPIO : " << configuration.irqGPIO;
-    Serial << endl
-           << "Auto Noise: " << configuration.setNoiseFloorAutomatically;
-    Serial << endl << "Noise Level : " << configuration.noiseFloor;
-    Serial << endl << "Indoor? : " << configuration.indoor;
-    Serial << endl << "IDX: " << configuration.domoticz.idx;
-  }
-  Serial << endl
-         << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
+  Serial << endl << "IRQ GPIO : " << configuration.irqGPIO;
+  Serial << endl << "Auto Noise: " << configuration.setNoiseFloorAutomatically;
+  Serial << endl << "Noise Level : " << configuration.noiseFloor;
+  Serial << endl << "Indoor? : " << configuration.indoor;
+  Serial << endl << "IDX: " << configuration.domoticz.idx;
   Serial << endl << "---------------------------------";
 #endif
 }
 
-boolean AFESensorAS3935::isReady() {
+void AFESensorAS3935::interruptionReported() {
+  switch (AS3935Sensor.readInterruptReg()) {
+  case NOISE_TO_HIGH:
+#ifdef DEBUG
+    Serial << endl << "AS3935: Interuption detected: NOISE";
+#endif
+    break;
+  case DISTURBER_DETECT:
+#ifdef DEBUG
+    Serial << endl << "AS3935: Interuption detected: DISTURBER";
+#endif
+    break;
+  case LIGHTNING:
+    distance = AS3935Sensor.distanceToStorm();
+#ifdef DEBUG
+    Serial << endl << "AS3935: Interuption detected: STRIKE";
+    Serial << endl << "AS3935: Distance: " << distance;
+#endif
+    ready = true;
+    break;
+  default:
+#ifdef DEBUG
+    Serial << endl << "AS3935: Warning: Unknown interruption!";
+#endif
+  }
+}
+
+boolean AFESensorAS3935::strikeDetected() {
   if (ready) {
     ready = false;
     return true;
@@ -128,35 +147,7 @@ boolean AFESensorAS3935::isReady() {
   }
 }
 
-void AFESensorAS3935::listener() {
-
-  if (_initialized && digitalRead(configuration.irqGPIO) == HIGH) {
-
-    switch (AS3935Sensor.readInterruptReg()) {
-    case NOISE_TO_HIGH:
-#ifdef DEBUG
-      Serial << endl << "AS3935: Interuption detected: NOISE";
-#endif
-      break;
-    case DISTURBER_DETECT:
-#ifdef DEBUG
-      Serial << endl << "AS3935: Interuption detected: DISTURBER";
-#endif
-      break;
-    case LIGHTNING:
-      byte distance = AS3935Sensor.distanceToStorm();
-#ifdef DEBUG
-      Serial << endl << "AS3935: Interuption detected: STRIKE";
-      Serial << endl << "AS3935: Distance: " << distance;
-#endif
-
-      break;
-    }
-
-    ready = true;
-  }
-}
-
 void AFESensorAS3935::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"}}", 0);
+  sprintf(json, "{\"lightningStrike\":{\"distance\":%d,\"unit\":\"%s\"}}",
+          distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
 }

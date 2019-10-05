@@ -328,6 +328,7 @@
 
 /* AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
+#define L_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
 #define L_AS3935_SENSOR "Czujnik AS3935"
 #define L_NOISE_FLOOR "Poziom szumów"
 #define L_NOISE_FLOOR_HINT "(0-najmniejszy, 7-największy)"

@@ -217,6 +217,17 @@ void DomoticzPublishLightLevel(uint8_t id) {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+void DomoticzPublishAS3935SesnorData() {
+  if (Device.configuration.api.domoticz) {
+    if (AS3935Sensor.configuration.domoticz.idx > 0) {
+      Domoticz.sendSValueCommand(AS3935Sensor.configuration.domoticz.idx,
+                                 AS3935Sensor.distance);
+    }
+  }
+}
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
   if (Device.configuration.api.domoticz) {

@@ -21,18 +21,13 @@ class AFESensorAS3935 {
 
 private:
   SparkFun_AS3935 AS3935Sensor;
-
+ 
   boolean ready = false;
-  boolean _initialized = false;
-
-  unsigned long startTime = 0;
-
-  
 
 public:
   AS3935 configuration;
-  float currentLightLevel = -1;
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+  uint8_t distance ;
+
 
   /* Constructor */
   AFESensorAS3935();
@@ -40,12 +35,9 @@ public:
   /* Turns On sensor */
   void begin();
 
-  /* Is true when data has been read from the sensor */
-  boolean isReady();
+  void interruptionReported();
 
-  /* Method has to be added to the loop in order to listen for sensor value
-   * changes */
-  void listener();
+  boolean strikeDetected();
 
   void getJSON(char *json);
 };

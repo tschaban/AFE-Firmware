@@ -441,6 +441,10 @@ DEVICE AFEDataAccess::getDeviceConfiguration()
       configuration.noOfBH1750s = root["noOfBH1750s"];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+      configuration.noOfAS3935s = root["noOfAS3935s"];
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
@@ -471,128 +475,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration()
 #endif
 
   return configuration;
-  /*
-   Eeprom.read(9, 16).toCharArray(configuration.name,
-                                  sizeof(configuration.name));
-
-
-   configuration.api.http = Eeprom.read(25);
-   configuration.api.mqtt = Eeprom.read(228);
-   configuration.api.domoticz = Eeprom.read(800);
-
-
- #if defined(T0_CONFIG)
-   configuration.isLED[0] = Eeprom.read(366);
-   configuration.isLED[1] = Eeprom.read(418);
-   configuration.isSwitch[1] = Eeprom.read(402);
- #endif
-
-
- #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-   configuration.isRelay[0] = Eeprom.read(369);
-   configuration.isSwitch[0] = Eeprom.read(395);
- #endif
-
-
- #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T3_CONFIG) || \
-     defined(T4_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG)
-
- #if defined(T1_CONFIG)
-   uint8_t index = 77;
- #elif defined(T2_CONFIG)
-   uint8_t index = 98;
- #elif defined(T3_CONFIG) || defined(T4_CONFIG) || defined(T5_CONFIG) || \
-     defined(T6_CONFIG)
-   uint8_t index = 3;
- #endif
-
-   for (uint8_t i = 0; i < sizeof(configuration.isLED); i++) {
-     configuration.isLED[i] = Eeprom.read(366 + i * index);
-   }
- #endif
-
-
- #if defined(T1_CONFIG)
-   index = 40;
-   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-     configuration.isRelay[i] = Eeprom.read(396 + i * index);
-   }
-
-   index = 7;
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(382 + i * index);
-   }
- #endif
-
-
- #if defined(T2_CONFIG)
-   index = 0;
-   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-     configuration.isRelay[i] = Eeprom.read(404 + i * index);
-   }
-
-   index = 7;
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(390 + i * index);
-   }
- #endif
-
-
- #if defined(T3_CONFIG)
-   index = 21;
-   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-     configuration.isRelay[i] = Eeprom.read(381 + i * index);
-   }
-
-   index = 7;
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(470 + i * index);
-   }
-
-   index = 27;
-   for (uint8_t i = 0; i < sizeof(configuration.isPIR); i++) {
-     configuration.isPIR[i] = Eeprom.read(505 + i * index);
-   }
- #endif
-
-
- #if defined(T4_CONFIG)
-   index = 27;
-   for (uint8_t i = 0; i < sizeof(configuration.isRelay); i++) {
-     configuration.isRelay[i] = Eeprom.read(382 + i * index);
-   }
-
-   index = 8;
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(490 + i * index);
-   }
- #endif
-
- #if defined(T6_CONFIG)
-   configuration.isRelay[0] = Eeprom.read(373);
-
-   index = 8;
-   for (uint8_t i = 0; i < sizeof(configuration.isSwitch); i++) {
-     configuration.isSwitch[i] = Eeprom.read(395 + i * index);
-   }
-
-   configuration.isHPMA115S0 = Eeprom.read(413);
-   configuration.isBMEX80 = Eeprom.readUInt8(422);
-   configuration.isBH1750 = Eeprom.read(429);
-
- #endif
-
-
- #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
- #if defined(T1_CONFIG)
-   configuration.isDS18B20 = Eeprom.read(369);
- #elif defined(T2_CONFIG)
-   configuration.isDHT = Eeprom.read(369);
- #else
-   configuration.isDHT = Eeprom.read(376);
- #endif
- #endif
- */
+  
 }
 void AFEDataAccess::saveConfiguration(DEVICE *configuration)
 {
@@ -652,6 +535,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration)
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
     root["noOfBH1750s"] = configuration->noOfBH1750s;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    root["noOfAS3935s"] = configuration->noOfAS3935s;
 #endif
 
     root.printTo(configFile);
@@ -834,6 +721,11 @@ void AFEDataAccess::createDeviceConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   deviceConfiguration.noOfBH1750s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  deviceConfiguration.noOfAS3935s =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
   saveConfiguration(&deviceConfiguration);

@@ -318,6 +318,7 @@
 
 /* AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
+#define L_NUMBER_OF_AS3935_SENSORS "Number of AS3935 Sensors"
 #define L_AS3935_SENSOR "AS3935 Sensor"
 #define L_NOISE_FLOOR "Floor noise level"
 #define L_NOISE_FLOOR_HINT "(0-low, 7-high)"

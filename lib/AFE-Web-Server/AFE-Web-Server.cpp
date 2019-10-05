@@ -654,6 +654,12 @@ DEVICE AFEWebServer::getDeviceData() {
       server.arg("bh").length() > 0 ? server.arg("bh").toInt() : 0;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  data.noOfAS3935s =
+      server.arg("a3").length() > 0 ? server.arg("a3").toInt() : 0;
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
