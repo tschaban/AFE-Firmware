@@ -1314,7 +1314,13 @@ AS3935 AFEWebServer::getAS3935SensorData() {
 
   data.setNoiseFloorAutomatically = server.arg("f").length() > 0 ? true : false;
 
-  data.noiseFloor = server.arg("n").length() > 0 ? server.arg("n").toInt() : 0;
+  data.noiseFloor = server.arg("n").length() > 0 ? server.arg("n").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+
+  data.minimumNumberOfLightningSpikes = server.arg("m").length() > 0 ? server.arg("m").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
+
+  data.watchdogThreshold = server.arg("e").length() > 0 ? server.arg("e").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_WATCHDOG_THRESHOLD;
+
+  data.spikesRejectionLevel = server.arg("s").length() > 0 ? server.arg("s").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
 
   data.indoor = server.arg("w").length() > 0 && server.arg("w").toInt() == 1
                     ? true

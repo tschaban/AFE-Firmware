@@ -3,9 +3,11 @@
 
 void initializeBMEX80Sensor() {
   if (Device.configuration.noOfBMEX80s > 0) {
+    Led.on();
     for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
       BMEX80Sensor[i].begin(i);
     }
+    Led.off();
   }
 }
 

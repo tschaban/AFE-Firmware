@@ -330,16 +330,22 @@
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #define L_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
 #define L_AS3935_SENSOR "Czujnik AS3935"
-#define L_NOISE_FLOOR "Poziom szumów"
+#define L_NOISE_FLOOR "Poziom hałasu"
 #define L_NOISE_FLOOR_HINT "(0-najmniejszy, 7-największy)"
-#define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu szumów"
-#define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom redukcji szumów w przypadku wyłączonej opcji Inteligentnej kontroli poziomów szumów"
+#define L_WATCHDOG_THRESHOLD "Jakość detekcji"
+#define L_WATCHDOG_THRESHOLD_HINT "(1-najmniejsza, 10-największa)"
+#define L_SPIKES_REJECTION "Poziom odrzucenia detekcji piorunów"
+#define L_SPIKES_REJECTION_HINT "(1-najmniejsza, 11-największa)"
+#define L_MIN_SPIKES "Minimalna ilość piorunów, aby zaraportować detekcję burzy"
+#define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu hałasu"
+#define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom hałasu, w przypadku wyłączonej opcji Inteligentnej kontroli hałasu"
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
 #define L_INDOOR "Wewnątrz budynku"
 #define L_OUTDOOR "Na zewnątrz"
 #define L_DISTANCE_UNIT "Jednostka odległości"
 #define L_KM "Kilometry"
 #define L_MILES "Mile"
+#define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif
 
 /* I2C */

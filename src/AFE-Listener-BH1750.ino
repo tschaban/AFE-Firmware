@@ -3,9 +3,11 @@
 
 void initializeBH1750Sensor() {
   if (Device.configuration.noOfBH1750s > 0) {
+    Led.on();
     for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
       BH1750Sensor[i].begin(i);
     }
+    Led.off();
   }
 }
 

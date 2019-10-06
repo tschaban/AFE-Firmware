@@ -432,7 +432,6 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
     AS3935Sensor.getJSON(json);
     sendHTTPAPIRequestStatus(&request, true, json);
     deviceNotExist = false;
-    break;
   }
 #endif
 

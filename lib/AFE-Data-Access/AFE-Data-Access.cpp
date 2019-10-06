@@ -4071,7 +4071,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile()
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-#define AFE_CONFIG_FILE_BUFFER_AS3935 200
+#define AFE_CONFIG_FILE_BUFFER_AS3935 212
 AS3935 AFEDataAccess::getAS3935SensorConfiguration()
 {
   AS3935 configuration;
@@ -4107,6 +4107,9 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration()
       configuration.irqGPIO = root["irqGPIO"];
       configuration.setNoiseFloorAutomatically = root["setNoiseFloorAutomatically"];
       configuration.noiseFloor = root["noiseFloor"];
+      configuration.watchdogThreshold = root["watchdogThreshold"];
+      configuration.minimumNumberOfLightningSpikes = root["minimumNumberOfLightningSpikes"];
+      configuration.spikesRejectionLevel = root["spikesRejectionLevel"];      
       configuration.indoor = root["indoor"];
       configuration.unit = root["unit"];
       configuration.domoticz.idx = root["idx"];
@@ -4170,6 +4173,9 @@ void AFEDataAccess::saveConfiguration(AS3935 configuration)
     root["irqGPIO"] = configuration.irqGPIO;
     root["setNoiseFloorAutomatically"] = configuration.setNoiseFloorAutomatically;
     root["noiseFloor"] = configuration.noiseFloor;
+    root["watchdogThreshold"] = configuration.watchdogThreshold;
+    root["minimumNumberOfLightningSpikes"] = configuration.minimumNumberOfLightningSpikes;
+    root["spikesRejectionLevel"] = configuration.spikesRejectionLevel;
     root["indoor"] = configuration.indoor;
     root["unit"] = configuration.unit;
     root["mqttTopic"] = configuration.mqtt.topic;
@@ -4209,7 +4215,10 @@ void AFEDataAccess::createAS3935SensorConfigurationFile()
   AS3935 configuration;
   configuration.irqGPIO = 0;
   configuration.setNoiseFloorAutomatically = true;
-  configuration.noiseFloor = 0;
+  configuration.noiseFloor = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+  configuration.minimumNumberOfLightningSpikes = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
+  configuration.watchdogThreshold = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_WATCHDOG_THRESHOLD;
+  configuration.spikesRejectionLevel = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
   configuration.indoor = true;
   configuration.domoticz.idx = 0;
   configuration.unit = AFE_DISTANCE_KM;

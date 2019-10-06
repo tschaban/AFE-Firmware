@@ -17,7 +17,10 @@ struct AS3935 {
   uint8_t i2cAddress;
   uint8_t irqGPIO;
   boolean setNoiseFloorAutomatically;
-  int8_t noiseFloor;
+  uint8_t noiseFloor; // 0 - 7
+  uint8_t watchdogThreshold;  // 0 - 10
+  uint8_t minimumNumberOfLightningSpikes; // Range: [0-3], where 0 - 1 spike, 1 - 5 spikes, 2 - 9 spikes, 3 - 16spikes
+  uint8_t spikesRejectionLevel; // 0 - 11
   bool indoor;
   uint8_t unit; // Distance
   DOMOTICZ_BASIC_CONFIG domoticz;

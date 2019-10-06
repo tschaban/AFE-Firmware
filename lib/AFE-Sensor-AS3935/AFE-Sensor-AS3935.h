@@ -10,8 +10,9 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <Wire.h>
 #include <SparkFun_AS3935.h>
+#include <Wire.h>
+
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -21,24 +22,22 @@ class AFESensorAS3935 {
 
 private:
   SparkFun_AS3935 AS3935Sensor;
- 
+
   boolean ready = false;
+  void increaseNoiseLevel();
 
 public:
   AS3935 configuration;
-  uint8_t distance ;
-
+  uint8_t distance;
+  uint8_t eventType;
 
   /* Constructor */
   AFESensorAS3935();
 
   /* Turns On sensor */
   void begin();
-
   void interruptionReported();
-
   boolean strikeDetected();
-
   void getJSON(char *json);
 };
 

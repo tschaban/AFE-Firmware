@@ -10,10 +10,19 @@ void AFESensorAS3935::begin() {
 
 #ifdef DEBUG
   Serial << endl << endl << "----- AS3935: Initializing -----";
+  Serial << endl << "IRQ GPIO : " << configuration.irqGPIO;
+  Serial << endl << "Auto Noise: " << configuration.setNoiseFloorAutomatically;
+  Serial << endl << "Noise Level : " << configuration.noiseFloor;
+  Serial << endl << "Watchdog Threshold : " << configuration.watchdogThreshold;
+  Serial << endl << "Strike Rejection : " << configuration.spikesRejectionLevel;
+  Serial << endl << "Min.strikes level : " << configuration.minimumNumberOfLightningSpikes;
+  Serial << endl << "Indoor? : " << configuration.indoor;
+  Serial << endl << "IDX: " << configuration.domoticz.idx;
 #endif
   if (configuration.i2cAddress != 0) {
 #ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+
 #endif
 
 #ifdef DEBUG
@@ -31,7 +40,7 @@ void AFESensorAS3935::begin() {
         ;
     } else {
 #ifdef DEBUG
-      Serial << endl << "AS3935 is not initialized";
+      Serial << endl << "AS3935 is initialized";
 #endif
       AS3935Sensor.maskDisturber(true);
 
@@ -44,24 +53,40 @@ void AFESensorAS3935::begin() {
         Serial << "NO";
 #endif
 
-      AS3935Sensor.setIndoorOutdoor(configuration.indoor);
-
 #ifdef DEBUG
       int enviVal = AS3935Sensor.readIndoorOutdoor();
-      Serial << endl << "Sensor localisation: ";
+      Serial << endl << "Default: Sensor localisation: ";
       if (enviVal == INDOOR)
         Serial << "Indoor";
       else if (enviVal == OUTDOOR)
         Serial << "Outdoor";
       else
-        Serial.println(enviVal, BIN);
+        Serial.print(enviVal, BIN);
+#endif
+
+      AS3935Sensor.setIndoorOutdoor(configuration.indoor?INDOOR:OUTDOOR);
+
+#ifdef DEBUG
+      enviVal = AS3935Sensor.readIndoorOutdoor();
+      Serial << endl << " - New value set to: ";
+      if (enviVal == INDOOR)
+        Serial << "Indoor";
+      else if (enviVal == OUTDOOR)
+        Serial << "Outdoor";
+      else
+        Serial.print(enviVal, BIN);
 #endif
 
       if (!configuration.setNoiseFloorAutomatically) {
+#ifdef DEBUG
+        Serial << endl
+               << "Default: Noise Level: " << AS3935Sensor.readNoiseLevel();
+#endif
+
         AS3935Sensor.setNoiseLevel(configuration.noiseFloor);
 #ifdef DEBUG
         Serial << endl
-               << "Noise Level is set at: " << AS3935Sensor.readNoiseLevel();
+               << " - New value set to: " << AS3935Sensor.readNoiseLevel();
 
 #endif
       }
@@ -72,24 +97,38 @@ void AFESensorAS3935::begin() {
 #endif
 
 #ifdef DEBUG
-      // AS3935Sensor.watchdogThreshold(watchDogVal);
       Serial << endl
-             << "Watchdog Threshold is set to: "
+             << "Default: Watchdog Threshold: "
              << AS3935Sensor.readWatchdogThreshold();
+#endif
 
+      AS3935Sensor.watchdogThreshold(configuration.watchdogThreshold);
+#ifdef DEBUG
+      Serial << endl
+             << " - New value set to: " << AS3935Sensor.readWatchdogThreshold();
 #endif
 
 #ifdef DEBUG
-      //      AS3935Sensor.spikeRejection(spike);
       Serial << endl
-             << "Spike Rejection is set to: "
+             << "Default: Spike Rejection: "
              << AS3935Sensor.readSpikeRejection();
 #endif
+      AS3935Sensor.spikeRejection(configuration.spikesRejectionLevel);
+#ifdef DEBUG
+      Serial << endl
+             << " - New value set to: " << AS3935Sensor.readSpikeRejection();
+#endif
 
 #ifdef DEBUG
-      //  AS3935Sensor.lightningThreshold(lightningThresh);
       Serial << endl
-             << "The number of strikes before interrupt is triggerd: "
+             << "Default number of strikes before interrupt is triggerd: "
+             << AS3935Sensor.readLightningThreshold();
+#endif
+      AS3935Sensor.lightningThreshold(
+          configuration.minimumNumberOfLightningSpikes);
+#ifdef DEBUG
+      Serial << endl
+             << " - New value set to: "
              << AS3935Sensor.readLightningThreshold();
 #endif
     }
@@ -102,21 +141,22 @@ void AFESensorAS3935::begin() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "IRQ GPIO : " << configuration.irqGPIO;
-  Serial << endl << "Auto Noise: " << configuration.setNoiseFloorAutomatically;
-  Serial << endl << "Noise Level : " << configuration.noiseFloor;
-  Serial << endl << "Indoor? : " << configuration.indoor;
-  Serial << endl << "IDX: " << configuration.domoticz.idx;
   Serial << endl << "---------------------------------";
 #endif
 }
 
 void AFESensorAS3935::interruptionReported() {
-  switch (AS3935Sensor.readInterruptReg()) {
+  ready = true;
+  distance = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE;
+  eventType = AS3935Sensor.readInterruptReg();
+  switch (eventType) {
   case NOISE_TO_HIGH:
 #ifdef DEBUG
     Serial << endl << "AS3935: Interuption detected: NOISE";
 #endif
+    if (configuration.setNoiseFloorAutomatically) {
+      increaseNoiseLevel();
+    }
     break;
   case DISTURBER_DETECT:
 #ifdef DEBUG
@@ -129,9 +169,9 @@ void AFESensorAS3935::interruptionReported() {
     Serial << endl << "AS3935: Interuption detected: STRIKE";
     Serial << endl << "AS3935: Distance: " << distance;
 #endif
-    ready = true;
     break;
   default:
+    ready = false;
 #ifdef DEBUG
     Serial << endl << "AS3935: Warning: Unknown interruption!";
 #endif
@@ -148,6 +188,29 @@ boolean AFESensorAS3935::strikeDetected() {
 }
 
 void AFESensorAS3935::getJSON(char *json) {
-  sprintf(json, "{\"lightningStrike\":{\"distance\":%d,\"unit\":\"%s\"}}",
-          distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
+  if (eventType == LIGHTNING) {
+    sprintf(json, "{\"event\":{\"type\":\"lightning "
+                  "strike\",\"distance\":%d,\"unit\":\"%s\"}}",
+            distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
+  } else if (eventType == NOISE_TO_HIGH) {
+    sprintf(json, "{\"event\":{\"type\":\"noise\"}}");
+  } else if (eventType == NOISE_TO_HIGH) {
+    sprintf(json, "{\"event\":{\"type\":\"disruption\"}}");
+  } else {
+    sprintf(json, "{\"event\":{\"type\":\"unknown\"}}");
+  }
+}
+
+void AFESensorAS3935::increaseNoiseLevel() {
+  int level = AS3935Sensor.readNoiseLevel() + 1;
+  if (level <= AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MAX_NOISE_FLOOR) {
+    AS3935Sensor.setNoiseLevel(level);
+#ifdef DEBUG
+    Serial << endl << "AS3935: Noise level has been increased to: " << level;
+  } else {
+    Serial << endl
+           << "AS3935: Warning: Noise level has NOT been increased. It's "
+              "already at its MAX";
+#endif
+  }
 }

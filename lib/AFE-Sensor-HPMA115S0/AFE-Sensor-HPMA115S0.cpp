@@ -67,8 +67,8 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
          << UART.SerialBus.available();
 #endif
   
-  UART.SerialBus.print("UART: Size of a data in the buffer =");
-  UART.SerialBus.println(UART.SerialBus.available());
+  //UART.SerialBus.print("UART: Size of a data in the buffer =");
+  //UART.SerialBus.println(UART.SerialBus.available());
 
 
   /* Wait for a data from UART. Max 1 sec */

@@ -2096,6 +2096,26 @@ String AFESitesGenerator::addAS3935Configuration() {
   body += L_MILES;
   body += "</option></select></div>";
 
+  sprintf(_number, "%d", configuration.watchdogThreshold);
+  body += addItem("number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10", "1",
+                  L_WATCHDOG_THRESHOLD_HINT);  
+
+  sprintf(_number, "%d", configuration.spikesRejectionLevel);
+  body += addItem("number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11", "1",
+                  L_SPIKES_REJECTION_HINT);                          
+
+  body += "<div class=\"cf\"><label>";
+  body += L_MIN_SPIKES;
+  body += "</label><select name=\"m\"><option value=\"1\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 1 ? " selected=\"selected\"" : "");
+  body += ">1</option><option value=\"5\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 5 ? " selected=\"selected\"" : "");
+  body += ">5</option><option value=\"9\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 9 ? " selected=\"selected\"" : "");
+  body += ">9</option><option value=\"16\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 16 ? " selected=\"selected\"" : "");
+  body += ">16</option></select></div>";                  
+
   body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
           "value=\"1\"";
   body +=
@@ -2105,8 +2125,9 @@ String AFESitesGenerator::addAS3935Configuration() {
 
   body += L_SET_LEVEL_OF_NOISE_FLOOR;
   sprintf(_number, "%d", configuration.noiseFloor);
-  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "0", "7", "1",
+  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
                   L_NOISE_FLOOR_HINT);
+          
 
   body += "</p><div class=\"cf\"><label>";
   body += L_SENSOR_INDOOR_OUTDOOR;
@@ -2139,7 +2160,7 @@ String AFESitesGenerator::addAS3935Configuration() {
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page +=
-        addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
+        addConfigurationBlock(L_MQTT_TOPIC_AS3935, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;

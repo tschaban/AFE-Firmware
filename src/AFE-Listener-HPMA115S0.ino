@@ -5,9 +5,11 @@
 /* Initializing sensor */
 void initializeHPMA115S0Sensor() {
   if (Device.configuration.noOfHPMA115S0s > 0) {
+    Led.on();
     for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
       ParticleSensor[i].begin(i);
     }
+    Led.off();
   }
 }
 

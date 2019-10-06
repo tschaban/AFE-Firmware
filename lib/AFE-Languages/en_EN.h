@@ -320,8 +320,13 @@
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #define L_NUMBER_OF_AS3935_SENSORS "Number of AS3935 Sensors"
 #define L_AS3935_SENSOR "AS3935 Sensor"
-#define L_NOISE_FLOOR "Floor noise level"
+#define L_NOISE_FLOOR "Noise floor level"
 #define L_NOISE_FLOOR_HINT "(0-low, 7-high)"
+#define L_WATCHDOG_THRESHOLD "Detection quality"
+#define L_WATCHDOG_THRESHOLD_HINT "(1-low, 10-high)"
+#define L_SPIKES_REJECTION "Spikes rejections level"
+#define L_SPIKES_REJECTION_HINT "(1-low, 11-high)"
+#define L_MIN_SPIKES "Min. number of spikes to report the lightning"
 #define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligent noise control"
 #define L_SET_LEVEL_OF_NOISE_FLOOR "Set the level of noise if Intelignet noise control option is turned off"
 #define L_SENSOR_INDOOR_OUTDOOR "Sensor localisation"
@@ -330,6 +335,7 @@
 #define L_DISTANCE_UNIT "Distance unit"
 #define L_KM "Kilometers"
 #define L_MILES "Miles"
+#define L_MQTT_TOPIC_AS3935 "AS3935 Sensor's MQTT Topic"
 #endif
 
 /* I2C */
