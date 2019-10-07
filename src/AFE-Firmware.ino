@@ -298,16 +298,6 @@ void loop() {
         mainGate();
 #endif
 
-#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
-        /* Relay related events */
-        mainRelay();
-#endif
-
-#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
-        /* Sensor: DS18B20 or DHT related code */
-        mainSensor();
-#endif
-
 /* Sensor: HPMA115S0 related code  */
 #ifdef CONFIG_HARDWARE_HPMA115S0
         mainHPMA115S0Sensor();
@@ -347,6 +337,16 @@ void loop() {
     Network.APListener();
     WebServer.listener();
   }
+
+#if !(defined(T3_CONFIG) || defined(T5_CONFIG) || defined(T6_CONFIG))
+  /* Relay related events */
+  mainRelay();
+#endif
+
+#if defined(CONFIG_HARDWARE_DS18B20) || defined(CONFIG_HARDWARE_DHXX)
+  /* Sensor: DS18B20 or DHT related code */
+  mainSensor();
+#endif
 
   /* Listens for switch events */
   mainSwitchListener();

@@ -22,7 +22,7 @@
 #define HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin to INPUT
 
 #elif defined(T1_CONFIG)
-#define FIRMWARE_VERSION "1.4.0"
+#define FIRMWARE_VERSION "1.4.1b1"
 #define FIRMWARE_TYPE 1
 #define CONFIG_HARDWARE_DS18B20
 #define CONFIG_HARDWARE_LED
