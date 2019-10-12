@@ -100,6 +100,10 @@ private:
   SERIALPORT getSerialPortData();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  I2CPORT getI2CPortData();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorData();
 #endif

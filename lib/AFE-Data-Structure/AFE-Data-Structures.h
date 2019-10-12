@@ -54,8 +54,12 @@
 #include <AFE-AS3935-Sensor-Structure.h>
 
 
-#ifdef T6_CONFIG
+#ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-SERIALPORT-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <AFE-I2I-Structure.h>
 #endif
 
 #endif

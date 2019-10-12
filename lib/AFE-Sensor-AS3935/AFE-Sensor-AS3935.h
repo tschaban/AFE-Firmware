@@ -28,6 +28,7 @@ private:
 
 public:
   AS3935 configuration;
+  boolean initialize = false; 
   uint8_t distance;
   uint8_t eventType;
 

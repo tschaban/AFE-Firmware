@@ -460,15 +460,22 @@ typedef enum {
 } afe_humidity_ratings_t;
 #endif
 
-/* UART Defaults */
+
 #ifdef AFE_CONFIG_PRESSURE
 #define AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE 1013.25
 #define AFE_PRESSURE_UNIT_HPA 1
 #endif
 
+/* UART Defaults */
 #ifdef AFE_CONFIG_HARDWARE_UART
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD 3
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD 1
+#endif
+
+/* I2C Defaults */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA 4
+#define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL 5
 #endif
 
 /* HPMA115S0 Defaults */
@@ -563,6 +570,9 @@ typedef enum {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #define AFE_CONFIG_SITE_AS3935 25
+#endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_SITE_I2C 26
 #endif
 
 #endif

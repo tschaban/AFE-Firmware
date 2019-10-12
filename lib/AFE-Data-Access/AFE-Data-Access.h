@@ -143,6 +143,13 @@ public:
   void saveGateState(uint8_t id, uint8_t state);
 #endif
 
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  I2CPORT getI2CPortConfiguration();
+  void saveConfiguration(I2CPORT configuration);
+  void createI2CConfigurationFile();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortConfiguration();
   void saveConfiguration(SERIALPORT configuration);

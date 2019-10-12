@@ -15,7 +15,7 @@
 #include <AFE-Firmware-Pro.h>
 #include <ESP8266WiFi.h>
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #endif
 
@@ -167,7 +167,8 @@ public:
   String addSerialPortConfiguration();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  String addI2CPortConfiguration();
   String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 

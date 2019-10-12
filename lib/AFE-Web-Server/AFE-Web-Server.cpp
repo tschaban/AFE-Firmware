@@ -102,6 +102,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addSerialPortConfiguration();
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  case AFE_CONFIG_SITE_I2C:
+    page += Site.addI2CPortConfiguration();
+    break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   case AFE_CONFIG_SITE_BMEX80:
     page += Site.addBMEX80Configuration(siteConfig->deviceID);
@@ -262,6 +267,11 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_UART
     case AFE_CONFIG_SITE_UART:
       Data.saveConfiguration(getSerialPortData());
+      break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+    case AFE_CONFIG_SITE_I2C:
+      Data.saveConfiguration(getI2CPortData());
       break;
 #endif
     }
@@ -1149,6 +1159,21 @@ SERIALPORT AFEWebServer::getSerialPortData() {
   return data;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+I2CPORT AFEWebServer::getI2CPortData() {
+  I2CPORT data;
+
+  data.SDA = server.arg("a").length() > 0
+                 ? server.arg("a").toInt()
+                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
+  data.SCL = server.arg("l").length() > 0
+                 ? server.arg("l").toInt()
+                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+  return data;
+}
+#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {

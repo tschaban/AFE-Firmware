@@ -18,6 +18,7 @@ void initializeAS3935Sensor() {
 /* Main code for processing sesnor */
 void AS3935SensorEventsListener() {
   if (Device.configuration.noOfAS3935s > 0) {
+  //  AS3935Sensor.interruptionReported();
     if (AS3935Sensor.strikeDetected()) {
       Led.on();
       MQTTPublishAS3935SensorData();

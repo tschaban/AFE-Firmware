@@ -249,6 +249,13 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += "\">UART</a></li>";
 #endif
 
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  page += "<li class=\"itm\"><a href=\"\\?o=";
+  page += AFE_CONFIG_SITE_I2C;
+  page += "\">I2C</a></li>";
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
@@ -2254,7 +2261,21 @@ String AFESitesGenerator::addSerialPortConfiguration() {
 }
 #endif
 
+
 #ifdef AFE_CONFIG_HARDWARE_I2C
+String AFESitesGenerator::addI2CPortConfiguration() {
+  I2CPORT configuration = Data.getI2CPortConfiguration();
+
+  String body = "<fieldset>";
+
+  body += generateConfigParameter_GPIO("a", configuration.SDA, "GPIO SDA");
+  body += generateConfigParameter_GPIO("l", configuration.SCL, "GPIO SCL");
+
+  body += "</fieldset>";
+  return addConfigurationBlock("I2C", "", body);
+  ;
+}
+
 String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
   AFEI2CScanner I2CScanner;
   String body = "<div class=\"cf\"><label>I2C ";

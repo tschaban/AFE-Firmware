@@ -15,7 +15,9 @@ void AFESensorAS3935::begin() {
   Serial << endl << "Noise Level : " << configuration.noiseFloor;
   Serial << endl << "Watchdog Threshold : " << configuration.watchdogThreshold;
   Serial << endl << "Strike Rejection : " << configuration.spikesRejectionLevel;
-  Serial << endl << "Min.strikes level : " << configuration.minimumNumberOfLightningSpikes;
+  Serial << endl
+         << "Min.strikes level : "
+         << configuration.minimumNumberOfLightningSpikes;
   Serial << endl << "Indoor? : " << configuration.indoor;
   Serial << endl << "IDX: " << configuration.domoticz.idx;
 #endif
@@ -55,7 +57,7 @@ void AFESensorAS3935::begin() {
 
 #ifdef DEBUG
       int enviVal = AS3935Sensor.readIndoorOutdoor();
-      Serial << endl << "Default: Sensor localisation: ";
+      Serial << endl << endl << "Default: Sensor localisation: ";
       if (enviVal == INDOOR)
         Serial << "Indoor";
       else if (enviVal == OUTDOOR)
@@ -64,7 +66,7 @@ void AFESensorAS3935::begin() {
         Serial.print(enviVal, BIN);
 #endif
 
-      AS3935Sensor.setIndoorOutdoor(configuration.indoor?INDOOR:OUTDOOR);
+      AS3935Sensor.setIndoorOutdoor(configuration.indoor ? INDOOR : OUTDOOR);
 
 #ifdef DEBUG
       enviVal = AS3935Sensor.readIndoorOutdoor();
@@ -80,6 +82,7 @@ void AFESensorAS3935::begin() {
       if (!configuration.setNoiseFloorAutomatically) {
 #ifdef DEBUG
         Serial << endl
+               << endl
                << "Default: Noise Level: " << AS3935Sensor.readNoiseLevel();
 #endif
 
@@ -92,12 +95,13 @@ void AFESensorAS3935::begin() {
       }
 #ifdef DEBUG
       else {
-        Serial << endl << "Noise Level automatically managed";
+        Serial << endl << endl << "Noise Level automatically managed";
       }
 #endif
 
 #ifdef DEBUG
       Serial << endl
+             << endl
              << "Default: Watchdog Threshold: "
              << AS3935Sensor.readWatchdogThreshold();
 #endif
@@ -110,6 +114,7 @@ void AFESensorAS3935::begin() {
 
 #ifdef DEBUG
       Serial << endl
+             << endl
              << "Default: Spike Rejection: "
              << AS3935Sensor.readSpikeRejection();
 #endif
@@ -121,6 +126,7 @@ void AFESensorAS3935::begin() {
 
 #ifdef DEBUG
       Serial << endl
+             << endl
              << "Default number of strikes before interrupt is triggerd: "
              << AS3935Sensor.readLightningThreshold();
 #endif
@@ -131,6 +137,8 @@ void AFESensorAS3935::begin() {
              << " - New value set to: "
              << AS3935Sensor.readLightningThreshold();
 #endif
+
+      initialize = true;
     }
 
   }

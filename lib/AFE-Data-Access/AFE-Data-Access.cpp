@@ -3693,6 +3693,136 @@ void AFEDataAccess::createSerialConfigurationFile()
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_FILE_BUFFER_I2C 50
+I2CPORT AFEDataAccess::getI2CPortConfiguration()
+{
+  I2CPORT configuration;
+
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl
+         << "Opening file: cfg-i2c.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-i2c.json", "r");
+
+  if (configFile)
+  {
+#ifdef DEBUG
+    Serial << "success" << endl
+           << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success())
+    {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.SDA = root["SDA"];
+      configuration.SCL = root["SCL"];
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
+#endif
+    }
+
+#ifdef DEBUG
+    else
+    {
+      Serial << "failure";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else
+  {
+    Serial << "failure";
+  }
+  Serial << endl
+         << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+void AFEDataAccess::saveConfiguration(I2CPORT configuration)
+{
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Writing File -------------------";
+  Serial << endl
+         << "Opening file: cfg-i2c.json : ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-i2c.json", "w");
+
+  if (configFile)
+  {
+#ifdef DEBUG
+    Serial << "success" << endl
+           << "Writing JSON : ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["SDA"] = configuration.SDA;
+    root["SCL"] = configuration.SCL;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "success" << endl
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
+#endif
+  }
+#ifdef DEBUG
+  else
+  {
+    Serial << endl
+           << "failed to open file for writing";
+  }
+  Serial << endl
+         << "--------------------------------------------------";
+#endif
+}
+void AFEDataAccess::createI2CConfigurationFile()
+{
+#ifdef DEBUG
+  Serial << endl
+         << "Creating file: cfg-uart.json";
+#endif
+  I2CPORT configuration;
+  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
+  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+  saveConfiguration(configuration);
+}
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 548
 BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id)
