@@ -64,12 +64,20 @@ void AFEDefaults::set() {
     Data->createSerialConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+    Data->createI2CConfigurationFile();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     Data->createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
     Data->createBH1750SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+    Data->createAS3935SensorConfigurationFile();
 #endif
 
 /* DS18B20 presence */

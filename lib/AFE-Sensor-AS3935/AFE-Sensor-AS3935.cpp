@@ -7,6 +7,7 @@ AFESensorAS3935::AFESensorAS3935(){};
 void AFESensorAS3935::begin() {
   AFEDataAccess Data;
   configuration = Data.getAS3935SensorConfiguration();
+  I2CPORT I2C = Data.getI2CPortConfiguration();
 
 #ifdef DEBUG
   Serial << endl << endl << "----- AS3935: Initializing -----";
@@ -33,7 +34,7 @@ void AFESensorAS3935::begin() {
 
     pinMode(configuration.irqGPIO, INPUT);
 
-    Wire.begin();
+    Wire.begin(I2C.SDA,I2C.SCL);
     if (!AS3935Sensor.begin(configuration.i2cAddress, Wire)) {
 #ifdef DEBUG
       Serial << endl << "ERROR: AS3935 is not initialized";

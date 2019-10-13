@@ -7,6 +7,7 @@ AFESensorBMEX80::AFESensorBMEX80(){};
 void AFESensorBMEX80::begin(uint8_t id) {
   AFEDataAccess Data;
   configuration = Data.getBMEX80SensorConfiguration(id);
+  I2CPORT I2C = Data.getI2CPortConfiguration();
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
@@ -20,13 +21,13 @@ void AFESensorBMEX80::begin(uint8_t id) {
 
   switch (configuration.type) {
   case AFE_BME680_SENSOR:
-    _initialized = s6.begin(&configuration);
+    _initialized = s6.begin(&configuration,&I2C);
     break;
   case AFE_BME280_SENSOR:
-    _initialized = s2.begin(&configuration);
+    _initialized = s2.begin(&configuration,&I2C);
     break;
   case AFE_BMP180_SENSOR:
-    _initialized = s1.begin(&configuration);
+    _initialized = s1.begin(&configuration,&I2C);
   default:
     _initialized = false;
     break;

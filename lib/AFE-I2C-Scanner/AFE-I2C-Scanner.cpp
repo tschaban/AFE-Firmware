@@ -1,10 +1,12 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-I2C-Scanner.h"
 
-AFEI2CScanner::AFEI2CScanner() { Wire.begin(); };
+AFEI2CScanner::AFEI2CScanner() {
+  AFEDataAccess Data;
+  I2CPORT I2C = Data.getI2CPortConfiguration();
+  Wire.begin(I2C.SDA, I2C.SCL);
+};
 
 #ifdef DEBUG
 void AFEI2CScanner::scanAll() {

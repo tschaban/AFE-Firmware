@@ -7,6 +7,7 @@ AFESensorBH1750::AFESensorBH1750(){};
 void AFESensorBH1750::begin(uint8_t id) {
   AFEDataAccess Data;
   configuration = Data.getBH1750SensorConfiguration(id);
+  I2CPORT I2C = Data.getI2CPortConfiguration();
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
@@ -19,10 +20,15 @@ void AFESensorBH1750::begin(uint8_t id) {
 #endif
   if (configuration.i2cAddress != 0) {
 #ifdef DEBUG
-    Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+    Serial << endl << "Setting I2C: SDA:" << I2C.SDA << ", SCL:" << I2C.SCL;
 #endif
+    bh1750.setI2C(I2C.SDA, I2C.SCL);
+#ifdef DEBUG
+    Serial << endl << "Sesnor address: 0x" << _HEX(configuration.i2cAddress);
+#endif    
     _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
                                 configuration.i2cAddress);
+
   }
 #ifdef DEBUG
   else {
@@ -77,5 +83,6 @@ void AFESensorBH1750::listener() {
 }
 
 void AFESensorBH1750::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}",currentLightLevel);
+  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}",
+          currentLightLevel);
 }

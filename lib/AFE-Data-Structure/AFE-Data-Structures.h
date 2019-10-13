@@ -59,7 +59,7 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#include <AFE-I2I-Structure.h>
+#include <AFE-I2C-Structure.h>
 #endif
 
 #endif

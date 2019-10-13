@@ -22,6 +22,7 @@ void BH1750SensorEventsListener() {
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
           Led.on();
 #endif
+MQTTPublishAS3935SensorData();
           MQTTPublishBH1750SensorData(i);
           DomoticzPublishLightLevel(i);
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0

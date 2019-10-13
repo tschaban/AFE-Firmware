@@ -12,6 +12,7 @@
 #endif
 
 #include <Wire.h>
+#include <AFE-Data-Access.h>
 
 #ifdef DEBUG
 #include <Streaming.h>

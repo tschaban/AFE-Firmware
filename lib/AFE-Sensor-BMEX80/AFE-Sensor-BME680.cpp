@@ -4,18 +4,20 @@
 
 AFESensorBME680::AFESensorBME680(){};
 
-boolean AFESensorBME680::begin(BMEX80 *_configuration) {
-  configuration = _configuration;
-
+boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 #ifdef DEBUG
   Serial << endl << "Sensor type: BME680";
 #endif
 
+  configuration = _configuration;
   if (configuration->i2cAddress != 0) {
+#ifdef DEBUG
+    Serial << endl << "Setting I2C: SDA:" << I2C->SDA << ", SCL:" << I2C->SCL;
+#endif
+    Wire.begin(I2C->SDA, I2C->SCL);
 #ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration->i2cAddress);
 #endif
-    Wire.begin();
     Bme.begin(configuration->i2cAddress, Wire);
 
 #ifdef DEBUG
@@ -64,8 +66,6 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration) {
     */
   }
 
-
-
   return true;
 }
 
@@ -89,9 +89,9 @@ boolean AFESensorBME680::read() {
     data.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
     return true;
   } else {
-  #ifdef DEBUG
+#ifdef DEBUG
     checkBmeStatus();
-  #endif
+#endif
     return false;
   }
 
@@ -108,8 +108,6 @@ boolean AFESensorBME680::read() {
     }
     */
 }
-
-
 
 #ifdef DEBUG
 void AFESensorBME680::checkBmeStatus() {
