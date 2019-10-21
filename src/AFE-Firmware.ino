@@ -412,7 +412,7 @@ void loop() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-            analogInputEventsListener();
+        analogInputEventsListener();
 #endif
 
 #if defined(T3_CONFIG)
