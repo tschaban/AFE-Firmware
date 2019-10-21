@@ -8,6 +8,7 @@ void AFESensorAS3935::begin() {
   AFEDataAccess Data;
   configuration = Data.getAS3935SensorConfiguration();
   I2CPORT I2C = Data.getI2CPortConfiguration();
+  boolean _initialize = false;
 
 #ifdef DEBUG
   Serial << endl << endl << "----- AS3935: Initializing -----";
@@ -25,133 +26,144 @@ void AFESensorAS3935::begin() {
   if (configuration.i2cAddress != 0) {
 #ifdef DEBUG
     Serial << endl << "Address: 0x" << _HEX(configuration.i2cAddress);
+    Serial << endl << "Scanning I2C Port for a device";
+#endif
 
+    AFEI2CScanner I2CScanner;
+    if (I2CScanner.scan(configuration.i2cAddress)) {
+
+#ifdef DEBUG
+      Serial << endl << "Initializing IRQ GPIO";
+#endif
+
+      pinMode(configuration.irqGPIO, INPUT);
+
+      Wire.begin(I2C.SDA, I2C.SCL);
+      if (!AS3935Sensor.begin(configuration.i2cAddress, Wire)) {
+#ifdef DEBUG
+        Serial << endl << "ERROR: AS3935 is not initialized";
+#endif
+        while (1)
+          ;
+      } else {
+#ifdef DEBUG
+        Serial << endl << "AS3935 is initialized";
+#endif
+        AS3935Sensor.maskDisturber(true);
+
+#ifdef DEBUG
+        int maskVal = AS3935Sensor.readMaskDisturber();
+        Serial << endl << "Are disturbers being masked: ";
+        if (maskVal == 1)
+          Serial << "YES";
+        else if (maskVal == 0)
+          Serial << "NO";
 #endif
 
 #ifdef DEBUG
-    Serial << endl << "Attaching interruption handler";
+        int enviVal = AS3935Sensor.readIndoorOutdoor();
+        Serial << endl << endl << "Default: Sensor localisation: ";
+        if (enviVal == INDOOR)
+          Serial << "Indoor";
+        else if (enviVal == OUTDOOR)
+          Serial << "Outdoor";
+        else
+          Serial.print(enviVal, BIN);
 #endif
 
-    pinMode(configuration.irqGPIO, INPUT);
-
-    Wire.begin(I2C.SDA,I2C.SCL);
-    if (!AS3935Sensor.begin(configuration.i2cAddress, Wire)) {
-#ifdef DEBUG
-      Serial << endl << "ERROR: AS3935 is not initialized";
-#endif
-      while (1)
-        ;
-    } else {
-#ifdef DEBUG
-      Serial << endl << "AS3935 is initialized";
-#endif
-      AS3935Sensor.maskDisturber(true);
+        AS3935Sensor.setIndoorOutdoor(configuration.indoor ? INDOOR : OUTDOOR);
 
 #ifdef DEBUG
-      int maskVal = AS3935Sensor.readMaskDisturber();
-      Serial << endl << "Are disturbers being masked: ";
-      if (maskVal == 1)
-        Serial << "YES";
-      else if (maskVal == 0)
-        Serial << "NO";
+        enviVal = AS3935Sensor.readIndoorOutdoor();
+        Serial << endl << " - New value set to: ";
+        if (enviVal == INDOOR)
+          Serial << "Indoor";
+        else if (enviVal == OUTDOOR)
+          Serial << "Outdoor";
+        else
+          Serial.print(enviVal, BIN);
 #endif
 
+        if (!configuration.setNoiseFloorAutomatically) {
 #ifdef DEBUG
-      int enviVal = AS3935Sensor.readIndoorOutdoor();
-      Serial << endl << endl << "Default: Sensor localisation: ";
-      if (enviVal == INDOOR)
-        Serial << "Indoor";
-      else if (enviVal == OUTDOOR)
-        Serial << "Outdoor";
-      else
-        Serial.print(enviVal, BIN);
+          Serial << endl
+                 << endl
+                 << "Default: Noise Level: " << AS3935Sensor.readNoiseLevel();
 #endif
 
-      AS3935Sensor.setIndoorOutdoor(configuration.indoor ? INDOOR : OUTDOOR);
-
+          AS3935Sensor.setNoiseLevel(configuration.noiseFloor);
 #ifdef DEBUG
-      enviVal = AS3935Sensor.readIndoorOutdoor();
-      Serial << endl << " - New value set to: ";
-      if (enviVal == INDOOR)
-        Serial << "Indoor";
-      else if (enviVal == OUTDOOR)
-        Serial << "Outdoor";
-      else
-        Serial.print(enviVal, BIN);
+          Serial << endl
+                 << " - New value set to: " << AS3935Sensor.readNoiseLevel();
+
+#endif
+        }
+#ifdef DEBUG
+        else {
+          Serial << endl << endl << "Noise Level automatically managed";
+        }
 #endif
 
-      if (!configuration.setNoiseFloorAutomatically) {
 #ifdef DEBUG
         Serial << endl
                << endl
-               << "Default: Noise Level: " << AS3935Sensor.readNoiseLevel();
+               << "Default: Watchdog Threshold: "
+               << AS3935Sensor.readWatchdogThreshold();
 #endif
 
-        AS3935Sensor.setNoiseLevel(configuration.noiseFloor);
+        AS3935Sensor.watchdogThreshold(configuration.watchdogThreshold);
 #ifdef DEBUG
         Serial << endl
-               << " - New value set to: " << AS3935Sensor.readNoiseLevel();
-
+               << " - New value set to: "
+               << AS3935Sensor.readWatchdogThreshold();
 #endif
+
+#ifdef DEBUG
+        Serial << endl
+               << endl
+               << "Default: Spike Rejection: "
+               << AS3935Sensor.readSpikeRejection();
+#endif
+        AS3935Sensor.spikeRejection(configuration.spikesRejectionLevel);
+#ifdef DEBUG
+        Serial << endl
+               << " - New value set to: " << AS3935Sensor.readSpikeRejection();
+#endif
+
+#ifdef DEBUG
+        Serial << endl
+               << endl
+               << "Default number of strikes before interrupt is triggerd: "
+               << AS3935Sensor.readLightningThreshold();
+#endif
+        AS3935Sensor.lightningThreshold(
+            configuration.minimumNumberOfLightningSpikes);
+#ifdef DEBUG
+        Serial << endl
+               << " - New value set to: "
+               << AS3935Sensor.readLightningThreshold();
+#endif
+        _initialize = true;
       }
-#ifdef DEBUG
-      else {
-        Serial << endl << endl << "Noise Level automatically managed";
-      }
-#endif
-
-#ifdef DEBUG
-      Serial << endl
-             << endl
-             << "Default: Watchdog Threshold: "
-             << AS3935Sensor.readWatchdogThreshold();
-#endif
-
-      AS3935Sensor.watchdogThreshold(configuration.watchdogThreshold);
-#ifdef DEBUG
-      Serial << endl
-             << " - New value set to: " << AS3935Sensor.readWatchdogThreshold();
-#endif
-
-#ifdef DEBUG
-      Serial << endl
-             << endl
-             << "Default: Spike Rejection: "
-             << AS3935Sensor.readSpikeRejection();
-#endif
-      AS3935Sensor.spikeRejection(configuration.spikesRejectionLevel);
-#ifdef DEBUG
-      Serial << endl
-             << " - New value set to: " << AS3935Sensor.readSpikeRejection();
-#endif
-
-#ifdef DEBUG
-      Serial << endl
-             << endl
-             << "Default number of strikes before interrupt is triggerd: "
-             << AS3935Sensor.readLightningThreshold();
-#endif
-      AS3935Sensor.lightningThreshold(
-          configuration.minimumNumberOfLightningSpikes);
-#ifdef DEBUG
-      Serial << endl
-             << " - New value set to: "
-             << AS3935Sensor.readLightningThreshold();
-#endif
-
-      initialize = true;
     }
-
+#ifdef DEBUG
+    else {
+      Serial << endl << "Error: Address not set";
+    }
+#endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "Error: Address not set";
+    Serial << endl
+           << "Error: Device not found under I2C Address: 0x"
+           << _HEX(configuration.i2cAddress);
   }
 #endif
 
 #ifdef DEBUG
   Serial << endl << "---------------------------------";
 #endif
+return _initialize;
 }
 
 void AFESensorAS3935::interruptionReported() {

@@ -11,7 +11,7 @@
 
 #include <AFE-Data-Access.h>
 #include <BH1750.h>
-
+#include <AFE-I2C-Scanner.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
