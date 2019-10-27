@@ -43,7 +43,7 @@ boolean AFEI2CScanner::scan(byte address) {
   status = Wire.endTransmission();
   if (status == 0) {
 #ifdef DEBUG
-    Serial << endl << "Found [0x";
+    Serial << endl << "Sensor Found [0x";
     if (address < 16) {
       Serial << "0";
     }

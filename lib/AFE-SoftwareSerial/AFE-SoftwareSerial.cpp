@@ -71,7 +71,7 @@ AFESoftwareSerial::~AFESoftwareSerial() {
 }
 
 void AFESoftwareSerial::init(int receivePin, int transmitPin,
-                             bool inverse_logic, unsigned int buffSize) {
+                             bool inverse_logic, unsigned int buffSize, long speed) {
   // Serial.println("sw serial port created");
   m_rxValid = m_txValid = m_txEnableValid = false;
   m_buffer = NULL;
@@ -84,6 +84,7 @@ void AFESoftwareSerial::init(int receivePin, int transmitPin,
       m_rxValid = true;
       m_inPos = m_outPos = 0;
       pinMode(m_rxPin, INPUT);
+      digitalWrite(m_rxPin, !m_invert);
       ObjList[m_rxPin] = this;
       enableRx(true);
     }
@@ -94,18 +95,14 @@ void AFESoftwareSerial::init(int receivePin, int transmitPin,
     pinMode(m_txPin, OUTPUT);
     digitalWrite(m_txPin, !m_invert);
   }
-  // Default speed
-  begin(9600);
+
+  m_bitTime = ESP.getCpuFreqMHz() * 1000000 / speed;;
 }
 
 bool AFESoftwareSerial::isValidGPIOpin(int pin) {
   return (pin >= 0 && pin <= 5) || (pin >= 12 && pin <= MAX_PIN);
 }
 
-void AFESoftwareSerial::begin(long speed) {
-  // Use getCycleCount() loop to get as exact timing as possible
-  m_bitTime = ESP.getCpuFreqMHz() * 1000000 / speed;
-}
 
 void AFESoftwareSerial::setTransmitEnablePin(int transmitEnablePin) {
   if (isValidGPIOpin(transmitEnablePin)) {

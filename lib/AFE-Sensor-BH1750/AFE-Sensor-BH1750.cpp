@@ -32,7 +32,7 @@ void AFESensorBH1750::begin(uint8_t id) {
 
       bh1750.setI2C(I2C.SDA, I2C.SCL);
 #ifdef DEBUG
-      Serial << endl << "Sesnor address: 0x" << _HEX(configuration.i2cAddress);
+      Serial << endl << "Sensor address: 0x" << _HEX(configuration.i2cAddress);
 #endif
       _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
                                   configuration.i2cAddress);
@@ -40,15 +40,15 @@ void AFESensorBH1750::begin(uint8_t id) {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Error: Address not set";
+      Serial << endl
+             << "Error: Device not found under I2C Address: 0x"
+             << _HEX(configuration.i2cAddress);
     }
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl
-           << "Error: Device not found under I2C Address: 0x"
-           << _HEX(configuration.i2cAddress);
+    Serial << endl << "Error: Address not set";
   }
 #endif
 

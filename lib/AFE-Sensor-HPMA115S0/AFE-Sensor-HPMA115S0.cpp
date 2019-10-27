@@ -14,9 +14,17 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
     mqttCommandTopic[0] = '\0';
   }
 
+  // SerialBus.init(13, 14, false, 64);
+  // SerialBus.begin(9600);
+  // SerialBus.println();
+
+  // SerialBus.println("----- HPMA115S0: Initializing -----");
+
   /* Opening Serial port */
   UART.begin();
-  //  UART.SerialBus.flush();
+
+  /* Clean transmit buffer */
+  UART.SerialBus.flush();
   _initialized = true;
 
   data.pm10 = data.pm25 = buffer.pm10 = buffer.pm25 = 0;
@@ -66,10 +74,9 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
          << "UART: Size of a data in the buffer ="
          << UART.SerialBus.available();
 #endif
-  
-  //UART.SerialBus.print("UART: Size of a data in the buffer =");
-  //UART.SerialBus.println(UART.SerialBus.available());
 
+  // UART.SerialBus.print("UART: Size of a data in the buffer =");
+  // UART.SerialBus.println(UART.SerialBus.available());
 
   /* Wait for a data from UART. Max 1 sec */
   while (UART.SerialBus.available() == 0 && millis() - start < 1000) {
@@ -242,7 +249,8 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   if (!_ret) {
     if (howManyTimesRetry > 0) {
       while (!_ret && counter < howManyTimesRetry) {
-        UART.send(commandAutoOFF);
+        // UART.send(commandAutoOFF);
+        UART.send(command);
         _ret = read(true);
         counter++;
       }
@@ -302,7 +310,7 @@ void AFESensorHPMA115S0::listener() {
                   1000) &&
              !_measuremntsON) {
 
-#if defined(DEBUG)
+#ifdef DEBUG
       Serial << endl << endl << "----- HPMA115S0: Turning ON -----";
 #endif
       if (!_measuremntsON) {
@@ -319,7 +327,8 @@ void AFESensorHPMA115S0::listener() {
 
 void AFESensorHPMA115S0::getJSON(char *json) {
 
-  sprintf(json, "{\"PM25\":{\"value\":%d,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
-                "%d,\"unit\":\"µg/m3\"}}",
+  sprintf(json,
+          "{\"PM25\":{\"value\":%d,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
+          "%d,\"unit\":\"µg/m3\"}}",
           data.pm25, data.pm10);
 }

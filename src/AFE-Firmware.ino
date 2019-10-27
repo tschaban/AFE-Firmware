@@ -123,16 +123,12 @@ AFEAnalogInput AnalogInput;
 
 void setup() {
 
-#ifdef DEBUG
-  Serial.begin(AFE_CONFIG_SERIAL_SPEED);
-  delay(10);
-#endif
-
-/* Turn off publishing information to Serial if production release */
-/* @TODO is this still required if I'm not turning on Serial */
-//#ifndef DEBUG
-//  Serial.swap();
+//#ifdef DEBUG
+//Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+delay(10);
+//Serial.swap();
 //#endif
+
 
 #ifdef DEBUG
   Serial << endl
@@ -234,16 +230,10 @@ void setup() {
   Serial << endl << "System LED ID: " << systemLedID;
 #endif
 
-  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-      Device.configuration.noOfLEDs >= systemLedID + 1) {
+  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     Led.begin(systemLedID);
   }
-
-  /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
-      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    Led.blinkingOn(100);
-  }
+  Led.on();
 #ifdef DEBUG
   Serial << endl << "System LED initialized";
 #endif
@@ -340,6 +330,17 @@ void setup() {
   /* Scanning I2C for devices */
   if (Device.getMode() == AFE_MODE_NORMAL) {
     I2CScanner.scanAll();
+  }
+#endif
+
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+
+  Led.off();
+
+  /* If device in configuration mode then it starts LED blinking */
+  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
+      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
+    Led.blinkingOn(100);
   }
 #endif
 

@@ -4,7 +4,7 @@
 
 AFESensorAS3935::AFESensorAS3935(){};
 
-void AFESensorAS3935::begin() {
+boolean AFESensorAS3935::begin() {
   AFEDataAccess Data;
   configuration = Data.getAS3935SensorConfiguration();
   I2CPORT I2C = Data.getI2CPortConfiguration();
@@ -148,22 +148,22 @@ void AFESensorAS3935::begin() {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Error: Address not set";
+      Serial << endl
+             << "Error: Device not found under I2C Address: 0x"
+             << _HEX(configuration.i2cAddress);
     }
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl
-           << "Error: Device not found under I2C Address: 0x"
-           << _HEX(configuration.i2cAddress);
+    Serial << endl << "Error: Address not set";
   }
 #endif
 
 #ifdef DEBUG
   Serial << endl << "---------------------------------";
 #endif
-return _initialize;
+  return _initialize;
 }
 
 void AFESensorAS3935::interruptionReported() {
@@ -210,8 +210,9 @@ boolean AFESensorAS3935::strikeDetected() {
 
 void AFESensorAS3935::getJSON(char *json) {
   if (eventType == LIGHTNING) {
-    sprintf(json, "{\"event\":{\"type\":\"lightning "
-                  "strike\",\"distance\":%d,\"unit\":\"%s\"}}",
+    sprintf(json,
+            "{\"event\":{\"type\":\"lightning "
+            "strike\",\"distance\":%d,\"unit\":\"%s\"}}",
             distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
   } else if (eventType == NOISE_TO_HIGH) {
     sprintf(json, "{\"event\":{\"type\":\"noise\"}}");
