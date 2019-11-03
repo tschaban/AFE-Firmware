@@ -113,7 +113,7 @@ AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-Sensor-AS3935.h>
-AFESensorAS3935 AS3935Sensor;
+AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -123,11 +123,11 @@ AFEAnalogInput AnalogInput;
 
 void setup() {
 
-//#ifdef DEBUG
-//Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+#ifdef DEBUG
+Serial.begin(AFE_CONFIG_SERIAL_SPEED);
 delay(10);
 //Serial.swap();
-//#endif
+#endif
 
 
 #ifdef DEBUG

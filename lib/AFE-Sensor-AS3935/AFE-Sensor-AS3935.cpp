@@ -4,9 +4,9 @@
 
 AFESensorAS3935::AFESensorAS3935(){};
 
-boolean AFESensorAS3935::begin() {
+boolean AFESensorAS3935::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getAS3935SensorConfiguration();
+  configuration = Data.getAS3935SensorConfiguration(id);
   I2CPORT I2C = Data.getI2CPortConfiguration();
   boolean _initialize = false;
 

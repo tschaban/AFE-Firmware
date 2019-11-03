@@ -428,10 +428,14 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* AS3935 */
   if (strcmp(request.device, "AS3935") == 0 &&
       strcmp(request.command, "get") == 0) {
-    char json[60];
-    AS3935Sensor.getJSON(json);
-    sendHTTPAPIRequestStatus(&request, true, json);
-    deviceNotExist = false;
+    for (uint8_t i = 0; i < Device.configuration.noOfAS3935s; i++) {
+      if (strcmp(request.name, AS3935Sensor[i].configuration.name) == 0) {
+        char json[60];
+        AS3935Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
+      }
+    }
   }
 #endif
 

@@ -460,11 +460,11 @@ void MQTTPublishBH1750SensorData(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-void MQTTPublishAS3935SensorData() {
+void MQTTPublishAS3935SensorData(uint8_t id) {
   if (Device.configuration.api.mqtt) {
     char message[60];
-    AS3935Sensor.getJSON(message);
-    Mqtt.publishTopic(AS3935Sensor.configuration.mqtt.topic, message);
+    AS3935Sensor[id].getJSON(message);
+    Mqtt.publishTopic(AS3935Sensor[id].configuration.mqtt.topic, message);
   }
 }
 #endif

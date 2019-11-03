@@ -124,7 +124,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   case AFE_CONFIG_SITE_AS3935:
-    page += Site.addAS3935Configuration();
+    page += Site.addAS3935Configuration(siteConfig->deviceID);
     break;
 #endif
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
@@ -261,7 +261,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     case AFE_CONFIG_SITE_AS3935:
-      Data.saveConfiguration(getAS3935SensorData());
+      Data.saveConfiguration(siteConfig.deviceID,getAS3935SensorData());
       break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -1333,13 +1333,19 @@ BH1750 AFEWebServer::getBH1750SensorData() {
 AS3935 AFEWebServer::getAS3935SensorData() {
   AS3935 data;
 
+    if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
+  }
+
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
   data.irqGPIO = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
   data.setNoiseFloorAutomatically = server.arg("f").length() > 0 ? true : false;
 
-  data.noiseFloor = server.arg("n").length() > 0 ? server.arg("n").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+  data.noiseFloor = server.arg("nf").length() > 0 ? server.arg("nf").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
 
   data.minimumNumberOfLightningSpikes = server.arg("m").length() > 0 ? server.arg("m").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
 

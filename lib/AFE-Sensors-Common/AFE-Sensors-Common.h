@@ -18,14 +18,17 @@
 class AFESensorsCommon {
 
 private:
+
 public:
   /* Constructor */
   AFESensorsCommon();
 
   float celsiusToFerenheit(float input);
+  float ferenheitToCelsius(float input);
   float dewPoint(float temperature, float humidity);
   float relativePressure(float pressure, float alt, float temperature);
-  float heatIndex(double temperature,double humidity);
+  float heatIndexF(double temperature,double humidity);
+  float heatIndexC(double temperature,double humidity);
   
   #ifdef AFE_CONFIG_HARDWARE_BMEX80
   afe_iaq_ratings_t iaqRating(uint16_t iaq);

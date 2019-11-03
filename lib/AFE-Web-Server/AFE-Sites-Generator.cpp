@@ -2073,13 +2073,15 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-String AFESitesGenerator::addAS3935Configuration() {
-  AS3935 configuration = Data.getAS3935SensorConfiguration();
+String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
+  AS3935 configuration = Data.getAS3935SensorConfiguration(id);
   char _number[2];
 
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
 
   body += "<div class=\"cf\">";
   body += generateConfigParameter_GPIO("g", configuration.irqGPIO);
@@ -2132,7 +2134,7 @@ String AFESitesGenerator::addAS3935Configuration() {
 
   body += L_SET_LEVEL_OF_NOISE_FLOOR;
   sprintf(_number, "%d", configuration.noiseFloor);
-  body += addItem("number", "n", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
+  body += addItem("number", "nf", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
                   L_NOISE_FLOOR_HINT);
           
 

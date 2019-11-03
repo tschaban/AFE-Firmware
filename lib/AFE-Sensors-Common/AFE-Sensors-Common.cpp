@@ -8,6 +8,10 @@ float AFESensorsCommon::celsiusToFerenheit(float input) {
   return input * 1.8 + 32;
 }
 
+float AFESensorsCommon::ferenheitToCelsius(float input) {
+  return (input - 32)/1.8;
+}
+
 float AFESensorsCommon::dewPoint(float temperature, float humidity) {
   double a = 17.271;
   double b = 237.7;
@@ -32,16 +36,37 @@ float AFESensorsCommon::relativePressure(float pressure, float alt,
               2)))));
 }
 
-float AFESensorsCommon::heatIndex(double temperature, double humidity) {
-  /* Based on formula: https://en.wikipedia.org/wiki/Heat_index */
+float AFESensorsCommon::heatIndexF(double temperature, double humidity) {
+  /* Based on formula: https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml */
 
-  return -8.78469475556 + (1.61139411 * temperature) +
-         (2.33854883889 * humidity) + (-0.14611605 * temperature * humidity) +
-         (-0.012308094 * temperature * temperature) +
-         (-0.0164248277778 * humidity * humidity) +
-         (0.002211732 * temperature * temperature * humidity) +
-         (0.00072546 * temperature * humidity * humidity) +
-         (-0.000003582 * temperature * temperature * humidity * humidity);
+  double HI;
+
+  HI = 0.5 *
+       (temperature + 61.0 + ((temperature - 68.0) * 1.2) + (humidity * 0.094));
+
+  if (HI >= 80) {
+    // Full regression needed
+    HI = -42.379 + 2.04901523 * temperature + 10.14333127 * humidity -
+         0.22475541 * temperature * humidity -
+         0.00683783 * temperature * temperature -
+         0.05481717 * humidity * humidity +
+         0.00122874 * temperature * temperature * humidity +
+         0.00085282 * temperature * humidity * humidity -
+         0.00000199 * temperature * temperature * humidity * humidity;
+
+    if (humidity < 13 && temperature > 90 && temperature < 112) {
+      HI -= ((13 - humidity) / 4) * sqrt((17 - abs(temperature - 95)) / 17);
+    } else if (humidity >85 && temperature > 80 && temperature < 87) {
+      HI +=  ((humidity-85)/10) * ((87-temperature)/5);
+    }
+  }
+
+  return HI;
+
+}
+
+float AFESensorsCommon::heatIndexC(double temperature, double humidity) {
+  return ferenheitToCelsius(heatIndexF(celsiusToFerenheit(temperature),humidity));
 }
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

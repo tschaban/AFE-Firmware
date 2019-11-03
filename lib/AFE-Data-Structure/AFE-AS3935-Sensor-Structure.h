@@ -14,6 +14,7 @@
 #include <AFE-Configuration.h>
 
 struct AS3935 {
+  char name[17];
   uint8_t i2cAddress;
   uint8_t irqGPIO;
   boolean setNoiseFloorAutomatically;

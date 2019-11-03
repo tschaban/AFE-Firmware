@@ -37,7 +37,7 @@ public:
   AFESensorAS3935();
 
   /* Turns On sensor, true if OK, False if failure */
-  boolean begin();
+  boolean begin(uint8_t id);
 
   /* To call after strike has been detected. It reads information from the
    * sensor about the event. It's called by the interaption handler attached to

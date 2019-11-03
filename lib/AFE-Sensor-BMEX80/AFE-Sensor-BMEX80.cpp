@@ -21,13 +21,13 @@ void AFESensorBMEX80::begin(uint8_t id) {
 
   switch (configuration.type) {
   case AFE_BME680_SENSOR:
-    _initialized = s6.begin(&configuration,&I2C);
+    _initialized = s6.begin(&configuration, &I2C);
     break;
   case AFE_BME280_SENSOR:
-    _initialized = s2.begin(&configuration,&I2C);
+    _initialized = s2.begin(&configuration, &I2C);
     break;
   case AFE_BMP180_SENSOR:
-    _initialized = s1.begin(&configuration,&I2C);
+    _initialized = s1.begin(&configuration, &I2C);
   default:
     _initialized = false;
     break;
@@ -215,13 +215,20 @@ void AFESensorBMEX80::applyCorrections() {
       sensorData.humidity.value += configuration.humidity.correction;
     }
 
-    // @TODO in Ferenhiet
-    sensorData.dewPoint.value = calculation.dewPoint(
-        sensorData.temperature.value, sensorData.humidity.value);
-
     sensorData.heatIndex.value =
-        calculation.heatIndex((double)sensorData.temperature.value,
-                              (double)sensorData.humidity.value);
+        configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+            ? calculation.heatIndexF((double)sensorData.temperature.value,
+                                     (double)sensorData.humidity.value)
+            : calculation.heatIndexC((double)sensorData.temperature.value,
+                                     (double)sensorData.humidity.value);
+
+    sensorData.dewPoint.value =
+        configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+            ? calculation.celsiusToFerenheit(calculation.dewPoint(
+                  calculation.ferenheitToCelsius(sensorData.temperature.value),
+                  sensorData.humidity.value))
+            : calculation.dewPoint(sensorData.temperature.value,
+                                   sensorData.humidity.value);
 
 #ifdef AFE_CONFIG_HUMIDITY
     sensorData.humidity.rating =
