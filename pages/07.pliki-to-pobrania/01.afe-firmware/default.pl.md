@@ -43,5 +43,23 @@ recaptchacontact:
 **Poprzednie wersje**
 * Wersja 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
 
+---
+
+### AFE Firmware T6: Stacja pogody
+* Odczyt i przesyłanie do systemu automatyki szeregu parametrów atmosferycznych
+* Idealnie pasuje do urządzeń jak [Stacja Pogody](https://www.smartnydom.pl/weather-station-stacja-pogodowa-v2/)
+* [Informacje szczegółowe](https://www.smartnydom.pl/stacja-pogody-esp8266-afe-firmware/?target=_blank) dotyczące AFE Firmware T6 1.x
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t6-stacja-pogody) dotyczące AFE Firmware T6 2.x
+* Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
+
+##### [Pobierz najnowszą wersję 1.0.1](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
+
+**Wersja beta**
+* Wersja 2.0.0.B5 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
+
+**Poprzednie wersje**
+
+---
+
 ! Jeśli znajdziesz jakiś błąd / problem z oprogramowaniem, zgłoś go [tutaj](https://www.smartnydom.pl/forum/zglaszanie-problemow/?target=_blank). Bez tego ciężko będzie zrobić firmware lepszym. Dzięki.
 

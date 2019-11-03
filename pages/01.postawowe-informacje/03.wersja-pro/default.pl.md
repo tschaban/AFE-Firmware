@@ -1,6 +1,8 @@
 ---
 title: 'Wersja PRO'
 media_order: afe-firmware-wersja-pro.png
+recaptchacontact:
+    enabled: false
 ---
 
 * Wersja PRO AFE Firmware oferuje dodatkowe funkcje, które:
