@@ -55,7 +55,7 @@ recaptchacontact:
 ##### [Pobierz najnowszą wersję 1.0.1](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
 
 **Wersja beta**
-* Wersja 2.0.0.B5 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
+* Wersja 2.0.0.B6 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
 
 **Poprzednie wersje**
 
