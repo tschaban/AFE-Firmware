@@ -33,6 +33,7 @@ void AFEDomoticz::sendSwitchCommand(unsigned int idx, const char *value) {
     call += "&switchcmd=";
     call += value;
     callURL(call);
+ 
   }
 }
 
@@ -44,6 +45,10 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 
 void AFEDomoticz::callURL(const String url) {
 
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+    Led.on();
+#endif
+
 #ifdef DEBUG
   Serial << endl << endl << "--------------- Domoticz ---------------";
   Serial << endl << url;
@@ -54,6 +59,9 @@ void AFEDomoticz::callURL(const String url) {
   http.GET();
   http.end();
   delay(10);
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+    Led.off();
+#endif   
 }
 
 #ifdef AFE_CONFIG_TEMPERATURE

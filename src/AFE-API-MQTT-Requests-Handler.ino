@@ -176,16 +176,13 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
 #ifdef DEBUG
       Serial << endl << " - Checking if Analog Input request ";
 #endif
-
-      if (strcmp(topic, AnalogInput.getMQTTCommandTopic()) == 0) {
+      if (strcmp(topic, AnalogInput.mqttCommandTopic) == 0) {
 #ifdef DEBUG
         Serial << "YES";
 #endif
         if ((char)payload[1] == 'e' && length == 3) { // get
-          ADCINPUT_DATA data = AnalogInput.get();
-          MQTTPublishAnalogInputData(data);
+          MQTTPublishAnalogInputData();
         }
-        return;
       }
     }
 #endif
@@ -470,24 +467,12 @@ void MQTTPublishAS3935SensorData(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-void MQTTPublishAnalogInputData(ADCINPUT_DATA data) {
-  char valueString[10];
-
-  if (Device.configuration.api.mqtt) {
-    String messageString = "{\"raw\":";
-    messageString += data.raw;
-    messageString += ",\"percent\":";
-    messageString += data.percent;
-    messageString += ",\"voltage\":";
-    dtostrf(data.voltage, 10, 6, valueString);
-    messageString += valueString;
-    messageString += ",\"voltageCalculated\":";
-    dtostrf(data.voltageCalculated, 10, 6, valueString);
-    messageString += valueString;
-    messageString += "}";
-    char message[messageString.length() + 1];
-    messageString.toCharArray(message, messageString.length() + 1);
-    Mqtt.publishTopic(AnalogInput.getMQTTStateTopic(), message);
-  }
+void MQTTPublishAnalogInputData() {
+    if (Device.configuration.api.mqtt) {
+        // @TODO check the size of the JSON before release!
+        char message[60];
+        AnalogInput.getJSON(message);
+        Mqtt.publishTopic(AnalogInput.configuration.mqtt.topic, message);
+    }
 }
 #endif

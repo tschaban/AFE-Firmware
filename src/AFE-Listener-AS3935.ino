@@ -13,12 +13,10 @@ ICACHE_RAM_ATTR void handleAS3935Interraption() {
 /* Initializing the sensor */
 void initializeAS3935Sensor() {
   if (Device.configuration.noOfAS3935s > 0) {
-    Led.on();
     if (AS3935Sensor[0].begin(0)) {
       attachInterrupt(AS3935Sensor[0].configuration.irqGPIO,
                       handleAS3935Interraption, RISING);
     }
-    Led.off();
   }
 }
 
@@ -26,10 +24,8 @@ void initializeAS3935Sensor() {
 void AS3935SensorEventsListener() {
   if (Device.configuration.noOfAS3935s > 0) {
     if (AS3935Sensor[0].strikeDetected()) {
-      Led.on();
       MQTTPublishAS3935SensorData(0);
       DomoticzPublishAS3935SesnorData(0);
-      Led.off();
     }
   }
 }

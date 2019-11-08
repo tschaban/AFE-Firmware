@@ -6,7 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 - decommissioned
+   - T4 - decommissioned, T0 took over 100% of it's functionality 
    - T5 Gate
    - T6 Wheater station
 
@@ -175,6 +175,25 @@ delay(10);
   }
 #endif
 
+/* Initializing system LED (if exists) and turning it on */
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  uint8_t systemLedID = Data.getSystemLedID();
+  yield();
+
+#ifdef DEBUG
+  Serial << endl << "System LED ID: " << systemLedID;
+#endif
+
+  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Led.begin(systemLedID);
+  }
+  Led.on();
+#ifdef DEBUG
+  Serial << endl << "System LED initialized";
+#endif
+#endif
+
+
 #ifdef DEBUG
   Serial << endl << "Checking, if WiFi hasn't been configured: ";
 #endif
@@ -221,23 +240,6 @@ delay(10);
   Serial << endl << "Network initialized";
 #endif
 
-/* Initializing system LED (if exists)  */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  uint8_t systemLedID = Data.getSystemLedID();
-  delay(0);
-
-#ifdef DEBUG
-  Serial << endl << "System LED ID: " << systemLedID;
-#endif
-
-  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(systemLedID);
-  }
-  Led.on();
-#ifdef DEBUG
-  Serial << endl << "System LED initialized";
-#endif
-#endif
 
 #ifdef DEBUG
   Serial << endl << "Starting network";
@@ -334,9 +336,7 @@ delay(10);
 #endif
 
 #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-
   Led.off();
-
   /* If device in configuration mode then it starts LED blinking */
   if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
       Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {

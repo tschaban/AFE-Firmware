@@ -9,3 +9,4 @@ lib-external
 sandpit
 webservice/docs
 AFE-Firmware.code-workspace
+webservice/_config.php

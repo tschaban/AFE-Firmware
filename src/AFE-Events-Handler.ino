@@ -138,7 +138,7 @@ void eventsListener() {
 /* Subscribing to MQTT ADC commands */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       if (Device.configuration.isAnalogInput) {
-        Mqtt.subscribe(AnalogInput.getMQTTCommandTopic());
+        Mqtt.subscribe(AnalogInput.mqttCommandTopic);
       }
 #endif
 

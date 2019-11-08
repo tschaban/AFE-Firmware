@@ -1332,29 +1332,32 @@ void AFEDataAccess::createLEDConfigurationFile() {
   Serial << endl << "Creating file: cfg-led.json";
 #endif
   LED LEDConfiguration;
-  uint8_t index = 0;
-  LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = 2;
+  uint8_t index = 0;  
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   LEDConfiguration.gpio = 14;
   saveConfiguration(1, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_4CH)
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio =  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio =  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio =  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_3G)
-  LEDConfiguration.gpio = 13;
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio =  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_iECSv20)

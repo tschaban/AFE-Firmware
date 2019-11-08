@@ -443,20 +443,11 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Analog Input */
   if (strcmp(request.device, "ADC") == 0) {
     if (strcmp(request.command, "get") == 0) {
-      ADCINPUT_DATA data;
-      if (strcmp(request.name, "raw") == 0) {
-        sendHTTPAPIRequestStatus(&request, true, data.raw);
-      } else if (strcmp(request.name, "percent") == 0) {
-        sendHTTPAPIRequestStatus(&request, true, data.percent);
-      } else if (strcmp(request.name, "voltage") == 0) {
-        sendHTTPAPIRequestStatus(&request, true, data.voltage, 3, 6);
-      } else if (strcmp(request.name, "voltageCalculated") == 0) {
-        sendHTTPAPIRequestStatus(&request, true, data.voltageCalculated, 3, 6);
-      } else {
-        sendHTTPAPIRequestStatus(&request, false);
-      }
-    } else {
-      sendHTTPAPIRequestStatus(&request, false);
+        // @TODO check the size of the JSON before release!
+        char json[60];
+        AnalogInput.getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
     }
   }
 #endif

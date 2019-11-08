@@ -229,25 +229,23 @@ void DomoticzPublishAS3935SesnorData(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-void DomoticzPublishAnalogInputData(ADCINPUT_DATA data) {
+void DomoticzPublishAnalogInputData() {
   if (Device.configuration.api.domoticz) {
-    ADCINPUT_DOMOTICZ domoticz;
-    AnalogInput.getDomoticzIDX(&domoticz);
+    if (AnalogInput.configuration.domoticz.raw > 0) {
+      Domoticz.sendCustomSensorCommand(AnalogInput.configuration.domoticz.raw, AnalogInput.data.raw);
+    }
 
-    if (domoticz.raw > 0) {
-      Domoticz.sendCustomSensorCommand(domoticz.raw, data.raw);
+    if (AnalogInput.configuration.domoticz.voltage > 0) {
+      Domoticz.sendCustomSensorCommand(AnalogInput.configuration.domoticz.voltage, AnalogInput.data.voltage);
     }
-    if (domoticz.percent > 0) {
-      Domoticz.sendCustomSensorCommand(domoticz.percent, data.percent);
+
+    if (AnalogInput.configuration.domoticz.voltageCalculated > 0) {
+      Domoticz.sendCustomSensorCommand(AnalogInput.configuration.domoticz.voltageCalculated, AnalogInput.data.voltageCalculated);
     }
-    if (domoticz.voltage > 0) {
-      Domoticz.sendCustomSensorCommand(domoticz.voltage,
-                                       data.voltageCalculated);
-    }
-    if (domoticz.voltageCalculated > 0) {
-      Domoticz.sendCustomSensorCommand(domoticz.voltageCalculated,
-                                       data.voltageCalculated);
-    }
+
+    if (AnalogInput.configuration.domoticz.percent > 0) {
+      Domoticz.sendCustomSensorCommand(AnalogInput.configuration.domoticz.percent, AnalogInput.data.percent);
+    }    
   }
 }
 #endif

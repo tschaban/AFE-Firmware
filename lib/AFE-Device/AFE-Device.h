@@ -9,10 +9,8 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Defaults.h>
 #include <AFE-Data-Access.h>
-#include <AFE-Defaults.h>
-
-#include <AFE-Defaults.h>
 #include <FS.h>
 
 #ifdef DEBUG

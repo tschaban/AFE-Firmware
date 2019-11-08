@@ -71,6 +71,7 @@ public:
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
 
+  /* Method returns LWT topic, if configured */
   const char *getLWTTopic();
 };
 

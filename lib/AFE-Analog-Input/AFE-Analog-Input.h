@@ -18,17 +18,16 @@
 class AFEAnalogInput {
 
 private:
-  ADCINPUT configuration;
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
-  uint16_t analogData = 0;
-  uint16_t temporaryAnalogData = 0;
   uint8_t counterOfSamplings = 0;
 
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-
 public:
+  ADCINPUT configuration;
+  ADCINPUT_DATA data;
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+ 
   /* Constructor */
   AFEAnalogInput();
 
@@ -44,12 +43,8 @@ public:
   /* Main method that takes care for analog reads based on config parameters */
   void listener();
 
-  /* Returns IDX values for the integration with Domoticz */
-  void getDomoticzIDX(ADCINPUT_DOMOTICZ *idx);
-
-  /* Method returns MQTT topic for analog input */
-  const char *getMQTTCommandTopic();
-  const char *getMQTTStateTopic();
+    /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 };
 
 #endif

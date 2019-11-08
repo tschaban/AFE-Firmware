@@ -46,6 +46,7 @@ public:
    * changes */
   void listener();
 
+  /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 };
 

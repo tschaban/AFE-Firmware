@@ -6,6 +6,13 @@ AFEDefaults::AFEDefaults() {}
 
 void AFEDefaults::set() {
 
+/* Turning devicve LED on */
+#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
+    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+    pinMode(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, OUTPUT);
+    digitalWrite(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, HIGH);
+#endif
+
   if (Data->formatFileSystem()) {
     Data->createDeviceUIDFile();
     Data->createDeviceConfigurationFile();
