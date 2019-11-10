@@ -20,8 +20,15 @@
 
 class AFEI2CScanner {
 
+
+private:
+
+TwoWire WirePort;
+
 public:
   AFEI2CScanner();
+
+
 
 #ifdef DEBUG
   /* Method only call in the debug mode. It scans all adesses */

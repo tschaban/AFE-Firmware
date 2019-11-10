@@ -69,7 +69,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += L_FIRMWARE_NAME;
   page += "</h4><ul class=\"lst\">";
 
-  Device->begin(); // Reading configuration data
+  Device->begin();
   page += "<li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_DEVICE;
   page += "\">";
@@ -2179,7 +2179,7 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
+  DEVICE device = Device->configuration;
 
   String body = "<fieldset>";
 
@@ -2220,7 +2220,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   if (device.api.mqtt) {
     body = "<fieldset>";
-    body += addItem("text", "t0", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
@@ -2377,7 +2377,7 @@ String AFESitesGenerator::addExitSection(uint8_t command) {
 
 String AFESitesGenerator::addIndexSection(boolean authorized) {
   DEVICE configuration;
-  configuration = Data.getDeviceConfiguration();
+  configuration = Device->configuration;
   String body = "<fieldset>";
   if (!authorized) {
     body += "<h3>";

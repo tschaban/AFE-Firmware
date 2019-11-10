@@ -258,6 +258,10 @@ delay(10);
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
+  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  WebServer.initSystemLED(&Led);
+  #endif
+
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif

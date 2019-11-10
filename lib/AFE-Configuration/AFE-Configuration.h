@@ -10,8 +10,8 @@
 #endif
 
 /* Serial port speed */
-#define AFE_CONFIG_SERIAL_SPEED 9600
-//#define AFE_CONFIG_SERIAL_SPEED 115200
+//#define AFE_CONFIG_SERIAL_SPEED 9600
+#define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
@@ -100,7 +100,7 @@
 #else
 #define AFE_DEVICE_TYPE_NAME "ESP Generic"
 #define AFE_DEVICE_TYPE_ID 0
-#define  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO 2
+#define AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO 2
 #endif
 
 /* Basic Switch */

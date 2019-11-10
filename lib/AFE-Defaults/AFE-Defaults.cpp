@@ -7,10 +7,14 @@ AFEDefaults::AFEDefaults() {}
 void AFEDefaults::set() {
 
 /* Turning devicve LED on */
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-    pinMode(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, OUTPUT);
-    digitalWrite(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, HIGH);
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef DEBUG
+  Serial << endl
+         << "Turning on system LED on GPIO "
+         << AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
+#endif
+  pinMode(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, OUTPUT);
+  digitalWrite(AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO, LOW);
 #endif
 
   if (Data->formatFileSystem()) {
@@ -23,8 +27,7 @@ void AFEDefaults::set() {
     Data->createRelayConfigurationFile();
     Data->createSwitchConfigurationFile();
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
     Data->createLEDConfigurationFile();
     Data->createSystemLedIDConfigurationFile();
 #endif

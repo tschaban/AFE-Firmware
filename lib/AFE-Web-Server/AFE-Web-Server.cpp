@@ -12,6 +12,12 @@ void AFEWebServer::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   Site.begin(_Device, _Firmware);
 }
 
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  void AFEWebServer::initSystemLED(AFELED *_SystemLED) {
+    SystemLED = _SystemLED;
+  }
+#endif
+
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   String page;
 
@@ -354,6 +360,7 @@ void AFEWebServer::generate(boolean upload) {
         upgradeFailed = true;
       }
     } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+      SystemLED->toggle();
 #ifdef DEBUG
       Serial << ".";
 #endif
@@ -422,6 +429,9 @@ void AFEWebServer::generate(boolean upload) {
 
   /* Rebooting device */
   if (siteConfig.reboot) {
+    #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+    SystemLED->on();
+    #endif
     Device->reboot(siteConfig.rebootMode);
   }
 
@@ -571,8 +581,10 @@ boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 void AFEWebServer::publishHTML(String page) {
 
 #ifdef DEBUG
-  Serial << endl << "Site streaming started";
+  Serial << endl << endl << "Site streaming started";
+  Serial << endl << " - Page size: " << page.length();
 #endif
+
   server.send(200, "text/html", page);
 #ifdef DEBUG
   Serial << endl << " - Completed";
@@ -1232,6 +1244,7 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
   data.temperature.unit = server.arg("tu").length() > 0
                               ? server.arg("tu").toInt()
                               : AFE_TEMPERATURE_UNIT_CELSIUS;
+  
   data.temperature.correction =
       server.arg("tc").length() > 0 ? server.arg("tc").toFloat() : 0;
 
