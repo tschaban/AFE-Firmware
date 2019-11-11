@@ -1,6 +1,6 @@
 ---
 title: 'Bosch BMx085  / 180 / 280 / 680'
-media_order: BST-BME680-AN008-45x.pdf
+media_order: 'BST-BME680-AN008-45x.pdf,BST-BME280_DS001-11.pdf,bmp180_datasheet.pdf'
 recaptchacontact:
     enabled: false
 ---
@@ -12,7 +12,7 @@ recaptchacontact:
 * Dokładność pomiaru temperatury: ±1 ℃
 * Zakres pomiaru wilgotności powietrza: 0-100 %
 * Dokładność pomiaru wilgotności powietrza: ±3 %
-* Zakres pomiaru ciśnienia atmosferycznego: 300-1100 hPa
+* Zakres pomiaru ciśnienia: 300-1100 hPa
 * Dokładność pomiaru ciśnienia atmosferycznego: ±0,6 hPa
 * Zakres pomiaru jakości powietrza: 0-500
 * Interfejs: I2C, SPI
@@ -29,3 +29,13 @@ recaptchacontact:
 * Zakres pomiaru wilgotności: 0-100%
 * Napięcie zasilania: 1,71-3,6 V
 * [Specyfikacja BME280](BST-BME280_DS001-11.pdf)
+
+Czujnik **BMP180/085** to cyfrowym barometr z wbudowanym termometrem
+
+##### Specyfikacja
+* Napięcie zasilania: 1,8 V - 3,6 V
+* Zakres pomiaru ciśnienia: 300 - 1100 hPa
+* Dokładność: 0,02 hPa (w trybie zaawansowanym)
+* Interfejs komunikacyjny: I2C (TWI)
+* Wbudowany termometr
+* [Specyfikacja BMP180](bmp180_datasheet.pdf)
