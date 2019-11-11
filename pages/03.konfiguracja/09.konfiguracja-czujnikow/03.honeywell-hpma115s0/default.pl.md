@@ -1,6 +1,6 @@
 ---
 title: 'Honeywell HPMA115S0'
-media_order: 'Sensor HPMA115S0-XXX.pdf'
+media_order: 'Sensor HPMA115S0-XXX.pdf,afe-firmware-HPMA115S0-mqtt.png,afe-firmware-HPMA115S0-domoticz.png,afe-firmware-HPMA115S0-czujnik.png,afe-firmware-HPMA115S0.png'
 recaptchacontact:
     enabled: false
 ---
@@ -14,3 +14,13 @@ recaptchacontact:
 * Wyjście PM2.5 (wyjście PM10 opcjonalne wymaga dodatkowego programowania)
 * Zakres temperatury roboczej od -10°C do 50°C
 * [Specyfikacja HPMA115S0-XXX](Sensor%20HPMA115S0-XXX.pdf)
+
+===
+
+![](afe-firmware-HPMA115S0.png)
+
+![](afe-firmware-HPMA115S0-czujnik.png)
+
+![](afe-firmware-HPMA115S0-domoticz.png)
+
+![](afe-firmware-HPMA115S0-mqtt.png)
