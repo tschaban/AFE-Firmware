@@ -1,6 +1,6 @@
 ---
 title: BH1750
-media_order: 'Sensor BH1750.pdf,afe-firmware-bh1750.png'
+media_order: 'Sensor BH1750.pdf,afe-firmware-bh1750.png,afe-firmware-bh1750-mqtt.png,afe-firmware-bh1750-domoticz.png,afe-firmware-bh1750-czujnik.png'
 recaptchacontact:
     enabled: false
 ---
@@ -18,3 +18,9 @@ Czujnik BH1750 umożliwia pomiar oświetlenia otoczenia. Zakres pomiarów zawier
 ===
 
 ![](afe-firmware-bh1750.png)
+
+![](afe-firmware-bh1750-czujnik.png)
+
+![](afe-firmware-bh1750-domoticz.png)
+
+![](afe-firmware-bh1750-mqtt.png)
