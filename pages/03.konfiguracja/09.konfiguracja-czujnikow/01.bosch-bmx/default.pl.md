@@ -19,3 +19,13 @@ recaptchacontact:
 * Pobór prądu: 3,7 uA (max)
 * Napięcie zasilania: 1,7-3,6 V
 * [Specyfikacja BME680](BST-BME680-AN008-45x.pdf)
+
+**BME280** to czujnik warunków atmosferycznych: ciśnienia, wilgotności, temperatury
+
+##### Specyfikacja
+* Pobór prądu: średnio 3,6 μA 
+* Zakres pomiaru ciśnienia: 300-1100 hPa
+* Zakres pomiaru temperatury: -40-85°C
+* Zakres pomiaru wilgotności: 0-100%
+* Napięcie zasilania: 1,71-3,6 V
+* [Specyfikacja BME280](BST-BME280_DS001-11.pdf)
