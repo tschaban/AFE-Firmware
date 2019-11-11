@@ -1,5 +1,6 @@
 ---
 title: 'Honeywell HPMA115S0'
+media_order: 'Sensor HPMA115S0-XXX.pdf'
 recaptchacontact:
     enabled: false
 ---
@@ -12,3 +13,4 @@ recaptchacontact:
 * Sygnał wyjściowy, UART
 * Wyjście PM2.5 (wyjście PM10 opcjonalne wymaga dodatkowego programowania)
 * Zakres temperatury roboczej od -10°C do 50°C
+* [Specyfikacja HPMA115S0-XXX](Sensor%20HPMA115S0-XXX.pdf)
