@@ -1,5 +1,5 @@
 ---
-title: 'Konfiguracja diody LED'
+title: 'Dioda LED'
 media_order: 'afe-firmware-led.png,afe-firmware-led-gpio.png,afe-firmware-led-systemowy.png'
 process:
     markdown: true

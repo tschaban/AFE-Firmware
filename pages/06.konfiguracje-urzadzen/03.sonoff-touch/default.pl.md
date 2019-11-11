@@ -1,5 +1,7 @@
 ---
 title: 'Sonoff Touch'
+recaptchacontact:
+    enabled: false
 ---
 
 #### Sonoff Touch T1 1 Przycisk

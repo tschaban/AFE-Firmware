@@ -1,5 +1,7 @@
 ---
 title: 'Sonoff Basic'
+recaptchacontact:
+    enabled: false
 ---
 
 #### Sonoff Basic

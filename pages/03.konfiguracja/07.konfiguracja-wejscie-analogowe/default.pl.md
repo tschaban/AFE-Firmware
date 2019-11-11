@@ -1,5 +1,5 @@
 ---
-title: 'Konfiguracja wejścia analogowego'
+title: 'Wejście analogowe'
 media_order: 'afe-firmware-konfiguracja-adc.png,afe-firmware-konfiguracja-adc-domoticz.png,afe-firmware-konfiguracja-adc-dzielnik.png,afe-firmware-konfiguracja-adc-mqtt.png,afe-firmware-konfiguracja-adc-wejscie.png'
 process:
     markdown: true

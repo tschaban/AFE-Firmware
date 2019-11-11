@@ -1,5 +1,5 @@
 ---
-title: 'Konfiguracja funkcji brama'
+title: 'Funkcja brama / furtka / drzwi'
 media_order: 'afe-firmware-brama-urzadzenie.png,afe-firmware-brama-ilosc-bram.png,afe-firmware-brama-przekaznik.png,afe-firmware-brama-kontaktron.png,afe-firmware-brama-sprzet.png,afe-firmware-brama-stany.png'
 process:
     markdown: true

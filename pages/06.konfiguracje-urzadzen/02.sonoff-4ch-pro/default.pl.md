@@ -1,5 +1,7 @@
 ---
 title: 'Sonoff 4CH (Pro)'
+recaptchacontact:
+    enabled: false
 ---
 
 #### Sonoff 4CH oraz 4CH Pro

@@ -1,5 +1,5 @@
 ---
-title: 'Konfiguracja przycisku / włącznika'
+title: 'Przycisk / Włącznik'
 media_order: 'afe-firmware-konfiguracja-przycisk-czulosc.png,afe-firmware-konfiguracja-przycisk-domoticz.png,afe-firmware-konfiguracja-przycisk-menu.png,afe-firmware-konfiguracja-przycisk-przycisk.png,afe-firmware-konfiguracja-przycisk-mqtt.png'
 process:
     markdown: true

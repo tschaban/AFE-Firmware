@@ -1,6 +1,8 @@
 ---
-title: Pomoc
+title: Forum
 external_url: 'https://www.smartnydom.pl/forum/afe-firmware/'
+recaptchacontact:
+    enabled: false
 media_order: ''
 ---
 

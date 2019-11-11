@@ -1,5 +1,7 @@
 ---
-title: 'Konfiguracja API'
+title: 'Integracja / API'
+recaptchacontact:
+    enabled: false
 ---
 
 AFE Firmware wpiera integrację z systemami do sterowania automatyką za pomocą protokołów
