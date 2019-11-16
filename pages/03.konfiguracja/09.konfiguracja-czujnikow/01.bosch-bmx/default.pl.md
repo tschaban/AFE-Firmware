@@ -118,7 +118,7 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 
 #### Sekcja Temat MQTT Czujnika BMEx80
 
-Aby było możliwe przysłanie wartości do systemu automatyki z wykorzytaniem MQTT API, konieczne jest ustawienie Tematu MQTT dla wejścia analogowego
+Aby było możliwe przysłanie wartości do systemu automatyki z wykorzytaniem MQTT API, konieczne jest ustawienie Tematu MQTT dla czujnika
 
 > Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [MQTT API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
