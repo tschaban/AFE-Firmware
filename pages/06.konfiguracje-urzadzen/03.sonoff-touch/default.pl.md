@@ -1,8 +1,11 @@
 ---
 title: 'Sonoff Touch'
+media_order: SonoffTouch.jpg
 recaptchacontact:
     enabled: false
 ---
+
+![](SonoffTouch.jpg)
 
 #### Sonoff Touch T1 1 Przycisk
 
