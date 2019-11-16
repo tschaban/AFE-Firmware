@@ -1,8 +1,11 @@
 ---
 title: 'Sonoff Basic'
+media_order: SonoffBasic.jpg
 recaptchacontact:
     enabled: false
 ---
+
+![](SonoffBasic.jpg)
 
 #### Sonoff Basic
 
