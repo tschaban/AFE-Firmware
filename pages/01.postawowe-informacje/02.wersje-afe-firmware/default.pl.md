@@ -11,4 +11,4 @@ Dostępne wersje AFE Firmware
 * [T3: Bezprzewodowy włącznik WiFi z obsługą czujników ruchu](https://www.smartnydom.pl/afe-firmware-pl/wersje/?target=_blank)
 * T4: Firmware nie jest dalej rozwijany. T0 przejął wszystkie funkcje tej wersji AFE Firmware
 * [T5: Bezprzewodowy sterownik do sterowania kontrolerem bramy](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi)
-* [T6: Stacja pogody](https://www.smartnydom.pl/afe-firmware-pl/wersje/?target=_blank)
+* [T6: Stacja pogody](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t6-stacja-pogody)
