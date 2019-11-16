@@ -1,12 +1,14 @@
 ---
 title: 'Dioda LED'
-media_order: 'afe-firmware-led.png,afe-firmware-led-gpio.png,afe-firmware-led-systemowy.png'
+media_order: 'afe-firmware-led.png,afe-firmware-led-gpio.png,afe-firmware-led-systemowy.png,LED.jpg'
 process:
     markdown: true
     twig: true
 recaptchacontact:
     enabled: false
 ---
+
+![](LED.jpg)
 
 Do modułu z chip'em ESP8266/8295 można podłączyć od 1 do N diod LED, które mogę informować o zdarzeniach systemowych, bądź informować o stanie przekaźnika
 
