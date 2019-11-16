@@ -8,6 +8,8 @@ recaptchacontact:
     enabled: false
 ---
 
+!!! Odczytywanie wartości z wejścia analogowego dostępne jest w [wersji PRO AFE Firmware](/postawowe-informacje/wersja-pro).
+
 Układ ESP8266/8285 posiada wbudowany przetwornik analogowo-cyfrowy (ADC), który umożliwia odczytanie napięcia stałego. AFE Firmware daje możliwość przetwarzania tych informacji oraz wysyłania ich do systemu automatyki.
 
 Funkcja daje możliwość przesyłania do systemu automatyki następujących wartości:
@@ -17,8 +19,6 @@ Funkcja daje możliwość przesyłania do systemu automatyki następujących war
 * napięcie wejściowe na ADC przeliczone do napięcia rzeczywistego, gdy wykorzystany jest dzielnik napięcia
 * procent
 > 100% jeśli osiągnięte zostanie maksymalne napięcie na wejściu analogowym
-
-!!!! Przetwarzanie wartości z wejścia nalogowego dostępne jest w [wersji PRO AFE Firmware](/postawowe-informacje/wersja-pro).
 
 
 ---

@@ -127,6 +127,6 @@ Aby było możliwe przysłanie wartości do systemu automatyki z wykorzytaniem M
 #### Temat
 * Temat wiadomości w formacie MQTT
 * Maksymalnie 64 znaki
-* Jeśli temat nie zostanie wprowadzony, informacje z wejścia analogowego nie będa wysyłane do Brokera MQTT
+* Jeśli temat nie zostanie wprowadzony, informacje z czujnika nie będa wysyłane do Brokera MQTT
 
 > Tutaj znajdziejsz: [Najlepsze praktyki dotyczące formatów tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
