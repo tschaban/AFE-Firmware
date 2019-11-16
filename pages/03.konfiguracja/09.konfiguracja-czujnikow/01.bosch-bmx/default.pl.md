@@ -106,21 +106,21 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 * Wysokość, na której położony jest czujnik. Wykorzystywane do wyliczenia atmosferycznego ciśnienia bezwzględnego.
 * Zakres wartości od -431 do 8850 metrów
 
-#### Sekcja Domoticz
+#### Sekcja: Domoticz
 
-> Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [Domoticz API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
+! Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [Domoticz API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
 ![](afe-firmware-bmx80-domoticz.png)
 
-* Każdy pomiar odczytywany, przez czujnik może być wysyłąny do Domoticz
+* Każdy pomiar odczytywany, przez czujnik może być wysyłany do Domoticz
 * Wartość z zakresu 1 do 999999
 * W przypadku wprowadzenia 0, wartość danego pomiaru, nie będzie wysyłana do Domoticz
 
-#### Sekcja Temat MQTT Czujnika BMEx80
+#### Sekcja: Temat MQTT Czujnika BMEx80
 
 Aby było możliwe przysłanie wartości do systemu automatyki z wykorzytaniem MQTT API, konieczne jest ustawienie Tematu MQTT dla czujnika
 
-> Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [MQTT API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
+! Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [MQTT API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
 ![](afe-firmware-bmx80-mqtt.png)
 
