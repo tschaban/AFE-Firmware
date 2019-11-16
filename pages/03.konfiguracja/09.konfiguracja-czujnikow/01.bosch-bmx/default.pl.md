@@ -1,9 +1,11 @@
 ---
 title: 'Bosch BMx085  / 180 / 280 / 680'
-media_order: 'BST-BME680-AN008-45x.pdf,BST-BME280_DS001-11.pdf,bmp180_datasheet.pdf,afe-firmware-bmx80-mqtt.png,afe-firmware-bmx80-domoticz.png,afe-firmware-bmx80-korekty.png,afe-firmware-bmx80-jednostki.png,afe-firmware-bmx80-czujnik.png,afe-firmware-bmx80.png'
+media_order: 'BST-BME680-AN008-45x.pdf,BST-BME280_DS001-11.pdf,bmp180_datasheet.pdf,afe-firmware-bmx80-mqtt.png,afe-firmware-bmx80-domoticz.png,afe-firmware-bmx80-korekty.png,afe-firmware-bmx80-jednostki.png,afe-firmware-bmx80-czujnik.png,afe-firmware-bmx80.png,BME680Sensor.jpg'
 recaptchacontact:
     enabled: false
 ---
+
+![](BME680Sensor.jpg)
 
 **BME680** to zintegrowany czujnik gazu, ciśnienia, temperatury i wilgotności. Dodatkowo czujnik gazu w BME680 może wykrywać szeroki zakres gazów do pomiaru jakości powietrza. Gazy, które mogą być wykrywane przez BME680, obejmują lotne związki organiczne (VOC) z farb (takich jak formaldehyd), lakiery, produkty do usuwania farby, środki czyszczące, meble, sprzęt biurowy, kleje, kleje i alkohol
 
