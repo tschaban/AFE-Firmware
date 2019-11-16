@@ -1,12 +1,14 @@
 ---
 title: Przekaźnik
-media_order: 'afe-firmware-konfiguracja-przekaznik.png,afe-firmware-konfiguracja-przekaznik-auto.png,afe-firmware-konfiguracja-przekaznik-domoticz.png,afe-firmware-konfiguracja-przekaznik-gpio.png,afe-firmware-konfiguracja-przekaznik-led.png,afe-firmware-konfiguracja-przekaznik-mqtt.png,afe-firmware-konfiguracja-przekaznik-wartosci-domyslne.png'
+media_order: 'afe-firmware-konfiguracja-przekaznik.png,afe-firmware-konfiguracja-przekaznik-auto.png,afe-firmware-konfiguracja-przekaznik-domoticz.png,afe-firmware-konfiguracja-przekaznik-gpio.png,afe-firmware-konfiguracja-przekaznik-led.png,afe-firmware-konfiguracja-przekaznik-mqtt.png,afe-firmware-konfiguracja-przekaznik-wartosci-domyslne.png,RelayItem.jpg'
 process:
     markdown: true
     twig: true
 recaptchacontact:
     enabled: false
 ---
+
+![](RelayItem.jpg)
 
 Jednym z podstawowych komponentów podłaczanch do ESP8266/8285 i stosowanych w automatyce są przekaźniki / styczniki. Służą one do otwierania / zamykania obwodów. Najpopularniejsze zastosowanie do włączanie / wyłączanie podłączonych do modułu urządzeń elektrycznych np. oświetlenia
 
