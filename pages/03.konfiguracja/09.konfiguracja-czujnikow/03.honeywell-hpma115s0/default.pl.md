@@ -15,7 +15,7 @@ recaptchacontact:
 * Zakres temperatury roboczej od -10°C do 50°C
 * [Specyfikacja HPMA115S0-XXX](Sensor%20HPMA115S0-XXX.pdf)
 
-===
+---
 
 ![](afe-firmware-HPMA115S0.png)
 

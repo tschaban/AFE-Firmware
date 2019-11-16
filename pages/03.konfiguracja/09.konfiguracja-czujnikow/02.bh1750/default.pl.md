@@ -15,7 +15,7 @@ Czujnik BH1750 umożliwia pomiar oświetlenia otoczenia. Zakres pomiarów zawier
 * Szeroki zakres i wysoka rozdzielczość pomiaru (1 - 65535 lux)
 * [Specyfikacja Sensor BH1750](Sensor%20BH1750.pdf)
 
-===
+---
 
 ![](afe-firmware-bh1750.png)
 

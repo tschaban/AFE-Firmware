@@ -16,7 +16,7 @@ recaptchacontact:
 * Port SPI lub I²C
 * [Specyfikacja AS3935](Sensor%20AS3935.pdf)
 
-===
+---
 
 ![](afe-firmware-as3935.png)
 ![](afe-firmware-as3935-czujnik.png)
