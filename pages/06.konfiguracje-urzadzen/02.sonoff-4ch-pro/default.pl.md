@@ -1,8 +1,11 @@
 ---
 title: 'Sonoff 4CH (Pro)'
+media_order: Sonoff4CH.jpg
 recaptchacontact:
     enabled: false
 ---
+
+![](Sonoff4CH.jpg)
 
 #### Sonoff 4CH oraz 4CH Pro
 
