@@ -10,8 +10,8 @@
 #endif
 
 /* Serial port speed */
-//#define AFE_CONFIG_SERIAL_SPEED 9600
-#define AFE_CONFIG_SERIAL_SPEED 115200
+#define AFE_CONFIG_SERIAL_SPEED 9600
+//#define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0

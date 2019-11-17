@@ -308,7 +308,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  if (Device->configuration.noOfAS3935s > 0) {
+  if (Device->configuration.noOfAS3935s > 0 && Firmware->Pro.valid) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_AS3935;
     page += "\">";
@@ -449,9 +449,11 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
-                                    Device->configuration.noOfAS3935s, "a3",
-                                    L_NUMBER_OF_AS3935_SENSORS);
+  if (Firmware->Pro.valid) {
+    body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+                                      Device->configuration.noOfAS3935s, "a3",
+                                      L_NUMBER_OF_AS3935_SENSORS);
+  }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -1876,17 +1878,17 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
   body += "\"";
   body +=
       (configuration.type == AFE_BMP180_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BMP180/BME180</option><option value=\"";
+  body += ">BMx085/BMx180</option><option value=\"";
   body += AFE_BME280_SENSOR;
   body += "\"";
   body +=
       (configuration.type == AFE_BME280_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BME280</option><option value=\"";
+  body += ">BMx280</option><option value=\"";
   body += AFE_BME680_SENSOR;
   body += "\"";
   body +=
       (configuration.type == AFE_BME680_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BME680</option></select></div>";
+  body += ">BMx680</option></select></div>";
 
   body += "<input type=\"submit\" class=\"b bw\" value=\"";
   body += L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR;
@@ -2106,24 +2108,32 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
   body += "</option></select></div>";
 
   sprintf(_number, "%d", configuration.watchdogThreshold);
-  body += addItem("number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10", "1",
-                  L_WATCHDOG_THRESHOLD_HINT);  
+  body += addItem("number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10",
+                  "1", L_WATCHDOG_THRESHOLD_HINT);
 
   sprintf(_number, "%d", configuration.spikesRejectionLevel);
-  body += addItem("number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11", "1",
-                  L_SPIKES_REJECTION_HINT);                          
+  body += addItem("number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11",
+                  "1", L_SPIKES_REJECTION_HINT);
 
   body += "<div class=\"cf\"><label>";
   body += L_MIN_SPIKES;
   body += "</label><select name=\"m\"><option value=\"1\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 1 ? " selected=\"selected\"" : "");
+  body += (configuration.minimumNumberOfLightningSpikes == 1
+               ? " selected=\"selected\""
+               : "");
   body += ">1</option><option value=\"5\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 5 ? " selected=\"selected\"" : "");
+  body += (configuration.minimumNumberOfLightningSpikes == 5
+               ? " selected=\"selected\""
+               : "");
   body += ">5</option><option value=\"9\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 9 ? " selected=\"selected\"" : "");
+  body += (configuration.minimumNumberOfLightningSpikes == 9
+               ? " selected=\"selected\""
+               : "");
   body += ">9</option><option value=\"16\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 16 ? " selected=\"selected\"" : "");
-  body += ">16</option></select></div>";                  
+  body += (configuration.minimumNumberOfLightningSpikes == 16
+               ? " selected=\"selected\""
+               : "");
+  body += ">16</option></select></div>";
 
   body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
           "value=\"1\"";
@@ -2136,7 +2146,6 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
   sprintf(_number, "%d", configuration.noiseFloor);
   body += addItem("number", "nf", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
                   L_NOISE_FLOOR_HINT);
-          
 
   body += "</p><div class=\"cf\"><label>";
   body += L_SENSOR_INDOOR_OUTDOOR;
@@ -2263,7 +2272,6 @@ String AFESitesGenerator::addSerialPortConfiguration() {
 }
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
 String AFESitesGenerator::addI2CPortConfiguration() {
   I2CPORT configuration = Data.getI2CPortConfiguration();
@@ -2280,6 +2288,7 @@ String AFESitesGenerator::addI2CPortConfiguration() {
 
 String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
   AFEI2CScanner I2CScanner;
+  I2CScanner.begin();
   String body = "<div class=\"cf\"><label>I2C ";
   body += L_ADDRESS;
   body += ": </label><select name=\"a\">";

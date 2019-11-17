@@ -2,11 +2,13 @@
 
 #include "AFE-I2C-Scanner.h"
 
-AFEI2CScanner::AFEI2CScanner() {
+AFEI2CScanner::AFEI2CScanner() {};
+
+ void AFEI2CScanner::begin() {
   AFEDataAccess Data;
   I2CPORT I2C = Data.getI2CPortConfiguration();
   WirePort.begin(I2C.SDA, I2C.SCL);
-};
+ }
 
 #ifdef DEBUG
 void AFEI2CScanner::scanAll() {
@@ -95,7 +97,8 @@ const char *AFEI2CScanner::getName(byte deviceAddress) {
   else if (deviceAddress == 0x22)
     return "MCP23017,MCP23008,PCF8574";
   else if (deviceAddress == 0x23)
-    return "BH1750,MCP23017,MCP23008,PCF8574";
+    return "BH1750";
+    //return "BH1750,MCP23017,MCP23008,PCF8574";
   else if (deviceAddress == 0x24)
     return "MCP23017,MCP23008,PCF8574";
   else if (deviceAddress == 0x25)
@@ -204,9 +207,11 @@ const char *AFEI2CScanner::getName(byte deviceAddress) {
   else if (deviceAddress == 0x73)
     return "AdafruitLED";
   else if (deviceAddress == 0x76)
-    return "BMx280,MS5607,MS5611,MS5637";
+    return "BMx280";
+    //return "BMx280,MS5607,MS5611,MS5637";
   else if (deviceAddress == 0x77)
-    return "BMx085,BMx180,BMx280,BMx680,MS5611";
+    //return "BMx085,BMx180,BMx280,BMx680,MS5611";
+    return "BMx085,BMx180,BMx280,BMx680";
   else
     return "UNKNOWN";
 }

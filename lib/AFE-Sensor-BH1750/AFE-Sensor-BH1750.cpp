@@ -24,6 +24,7 @@ void AFESensorBH1750::begin(uint8_t id) {
     Serial << endl << "Checking if the sensor is connected";
 #endif
     AFEI2CScanner I2CScanner;
+    I2CScanner.begin();
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
 #ifdef DEBUG

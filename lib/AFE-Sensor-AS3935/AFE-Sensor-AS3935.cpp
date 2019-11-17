@@ -30,6 +30,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
 #endif
 
     AFEI2CScanner I2CScanner;
+    I2CScanner.begin();
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
 #ifdef DEBUG
