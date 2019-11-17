@@ -1,12 +1,14 @@
 ---
 title: 'Funkcja brama / furtka / drzwi'
-media_order: 'afe-firmware-brama-urzadzenie.png,afe-firmware-brama-ilosc-bram.png,afe-firmware-brama-przekaznik.png,afe-firmware-brama-kontaktron.png,afe-firmware-brama-sprzet.png,afe-firmware-brama-stany.png'
+media_order: 'afe-firmware-brama-urzadzenie.png,afe-firmware-brama-ilosc-bram.png,afe-firmware-brama-przekaznik.png,afe-firmware-brama-kontaktron.png,afe-firmware-brama-sprzet.png,afe-firmware-brama-stany.png,gate.jpg'
 process:
     markdown: true
     twig: true
 recaptchacontact:
     enabled: false
 ---
+
+![](gate.jpg)
 
 Funkcja sterowania bramą/drzwiami dostępna jest w [AFE Firmware T5](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi).
 
