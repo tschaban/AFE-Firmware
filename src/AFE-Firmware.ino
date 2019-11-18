@@ -91,7 +91,7 @@ AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
@@ -147,9 +147,8 @@ delay(10);
     Serial << "mounted";
   } else {
     Serial << "ERROR: not mounted";
-#else
-    yield();
 #endif
+    yield();
   }
 
   Device.begin();
@@ -258,6 +257,10 @@ delay(10);
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
+  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  WebServer.initSystemLED(&Led);
+  #endif
+
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif
@@ -331,6 +334,7 @@ delay(10);
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
   if (Device.getMode() == AFE_MODE_NORMAL) {
+    I2CScanner.begin();
     I2CScanner.scanAll();
   }
 #endif

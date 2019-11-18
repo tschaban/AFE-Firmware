@@ -318,7 +318,7 @@ void AFEDataAccess::createPasswordConfigurationFile() {
   saveConfiguration(PasswordConfiguration);
 }
 
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 240
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 270
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 #ifdef DEBUG
@@ -1365,6 +1365,9 @@ void AFEDataAccess::createLEDConfigurationFile() {
   saveConfiguration(0, LEDConfiguration);
   LEDConfiguration.changeToOppositeValue = false;
   index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
+#else
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio =  AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
 #endif
 
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
@@ -3433,7 +3436,7 @@ void AFEDataAccess::createI2CConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 548
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 570
 BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
   BMEX80 configuration;
 

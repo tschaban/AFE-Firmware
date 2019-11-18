@@ -16,6 +16,11 @@
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 
+#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#include <AFE-LED.h>
+#endif
+
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -37,6 +42,9 @@ private:
   ESP8266WebServer server;
   AFEDevice *Device;
   AFEFirmwarePro *Firmware;
+  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  AFELED *SystemLED;
+  #endif
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -133,6 +141,12 @@ public:
 
   /* Method initialize WebServer and Updater server */
   void begin(AFEDevice *, AFEFirmwarePro *);
+
+
+  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  /* Method inherits global system LED */
+  void initSystemLED(AFELED *);
+  #endif
 
   /* Method listens for HTTP requests */
   void listener();

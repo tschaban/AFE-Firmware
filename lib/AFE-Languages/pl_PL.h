@@ -313,7 +313,7 @@
 #define L_IDX_BVOC_EQUIVALENT "IDX BVOC"
 #define L_MQTT_TOPIC_BMEX80 "Temat MQTT czujnika BMEx80"
 #define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
-#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Pokaż/Odśwież parametery konfiguracyjne po ustwieniu/zmianie typu czujnika"
+#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu czujnika"
 #define L_ALTITIDE "Wysokość nad poziomem morza"
 #define L_METERS "Metrów"
 #endif
