@@ -103,7 +103,7 @@ z jedną z wiadomości
 
 ---
 
-##### Tematy do monitorowania stanu otwarcia/zamknięcia bramy/drzwi (AFE T5)
+##### Tematy do otwierania/zamykania oraz monitorowania stanu otwarcia/zamknięcia bramy/drzwi (AFE T5)
 
 * Teamt definiowany jest osobno dla każdej bramy w formularzu do [konfiguracji bramy](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-wejscie-analogowe-2#sekcja-konfiguracja-bramy-drzwi)
 
@@ -112,7 +112,15 @@ Przykład:
 
 ! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **state** lub **cmd**
 
-Używając przykładu tematu powyżej, aby odczytać aktualny stan otwarcia/zamknięcia bramy, do MQTT Brokera należy wysłać następujący temat
+Używając przykładu tematu powyżej, **aby otworzyć/zamknąć bramę**, do MQTT Brokera należy wysłać następujący temat
+
+`dom/brama/wiazdowa/cmd`
+
+z wiadomością:
+
+* toggle
+
+Używając przykładu tematu powyżej,** aby odczytać aktualny stan otwarcia/zamknięcia bramy**, do MQTT Brokera należy wysłać następujący temat
 
 `dom/brama/wiazdowa/cmd`
 
