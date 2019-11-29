@@ -33,7 +33,7 @@
 #define FIRMWARE_VERSION "1.3.3"
 #define FIRMWARE_TYPE 5
 #elif defined(T6_CONFIG)
-#define FIRMWARE_VERSION "1.0.1"
+#define FIRMWARE_VERSION "1.1.0"
 #define FIRMWARE_TYPE 6
 #endif
 #endif
