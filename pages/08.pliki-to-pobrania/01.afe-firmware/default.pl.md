@@ -48,16 +48,13 @@ recaptchacontact:
 ### AFE Firmware T6: Stacja pogody
 * Odczyt i przesyłanie do systemu automatyki szeregu parametrów atmosferycznych
 * Idealnie pasuje do urządzeń jak [Stacja Pogody](https://www.smartnydom.pl/weather-station-stacja-pogodowa-v2/)
-* [Informacje szczegółowe](https://www.smartnydom.pl/stacja-pogody-esp8266-afe-firmware/?target=_blank) dotyczące AFE Firmware T6 1.x
-* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t6-stacja-pogody) dotyczące AFE Firmware T6 2.x
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t6-stacja-pogody) dotyczące AFE Firmware T6
 * Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 
-##### [Pobierz najnowszą wersję 1.0.1](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
-
-**Wersja beta**
-* Wersja 2.0.0.B6 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
+##### [Pobierz najnowszą wersję 2.0.0](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja 1.0.1 [ESP8266/ESP8285](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
 
 ---
 
