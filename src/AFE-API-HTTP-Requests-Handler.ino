@@ -4,11 +4,11 @@
 void HTTPRequestListener() {
   if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.off();
 #endif
     }

@@ -45,7 +45,7 @@ const String AFEDomoticz::getApiCall(const char *param, unsigned int idx) {
 
 void AFEDomoticz::callURL(const String url) {
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.on();
 #endif
 
@@ -59,7 +59,7 @@ void AFEDomoticz::callURL(const String url) {
   http.GET();
   http.end();
   delay(10);
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.off();
 #endif   
 }

@@ -244,16 +244,39 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* UART */
 #ifdef AFE_CONFIG_HARDWARE_UART
-  page += "<li class=\"itm\"><a href=\"\\?o=";
-  page += AFE_CONFIG_SITE_UART;
-  page += "\">UART</a></li>";
+
+/* Don't show it if HPMA115SO sensor is not added to the device */
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+#endif
+
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_UART;
+    page += "\">UART</a></li>";
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  }
+#endif
+
 #endif
 
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  page += "<li class=\"itm\"><a href=\"\\?o=";
-  page += AFE_CONFIG_SITE_I2C;
-  page += "\">I2C</a></li>";
+/* Don't show it if I2C sensor is not added to the device, this is check for AFE T6 only*/
+#ifdef T6_CONFIG
+  if (Device->configuration.noOfBMEX80s > 0 ||
+      Device->configuration.noOfBH1750s > 0 ||
+      Device->configuration.noOfAS3935s > 0) {
+#endif
+
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_I2C;
+    page += "\">I2C</a></li>";
+
+#ifdef T6_CONFIG
+  }
+#endif
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -382,8 +405,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body = "<fieldset>";
 
 /* LED */
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                                     Device->configuration.noOfLEDs, "l",
@@ -708,8 +730,7 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -915,8 +936,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 
     body += "<br><p class=\"cm\">";
     body += L_SELECT_LED_4_RELAY;

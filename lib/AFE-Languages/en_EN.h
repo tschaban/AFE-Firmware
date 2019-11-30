@@ -85,7 +85,7 @@
   "hotspot name used for configuration mode"
 #define L_HARDWARE_CONFIGURATION "Hardware configuration"
 #define L_HARDWARE_CONFIGURATION_INFO "Select connected items to your device"
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #define L_NUMBER_OF_LEDS "Number of LEDs"
 #endif
 #define L_NUMBER_OF_RELAYS "Number of relays"
@@ -136,7 +136,7 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"
 

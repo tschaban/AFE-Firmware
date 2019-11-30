@@ -143,7 +143,7 @@
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Zmień świecenie diody LED na odwrotne"
 

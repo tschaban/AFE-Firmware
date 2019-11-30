@@ -94,7 +94,7 @@ public:
   void createADCInputConfigurationFile();
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
   void createLEDConfigurationFile();

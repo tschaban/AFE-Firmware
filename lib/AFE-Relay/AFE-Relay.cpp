@@ -26,7 +26,7 @@ void AFERelay::begin(uint8_t id) {
   Humidistat.begin(RelayConfiguration.humidistat);
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   if (RelayConfiguration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     Led.begin(RelayConfiguration.ledID);
   }
@@ -41,7 +41,7 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
   if (get() == AFE_RELAY_OFF) {
     digitalWrite(RelayConfiguration.gpio, HIGH);
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.on();
 #endif
     if (!invert &&
@@ -65,7 +65,7 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
   if (get() == AFE_RELAY_ON) {
     digitalWrite(RelayConfiguration.gpio, LOW);
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.off();
 #endif
     if (invert &&
@@ -150,7 +150,7 @@ void AFERelay::setTimer(float timer) {
 void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
 #endif
 

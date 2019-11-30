@@ -16,7 +16,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
     networkConfiguration = Data.getNetworkConfiguration();
   }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   // Init LED
 
   uint8_t systeLedID = Data.getSystemLedID();
@@ -117,7 +117,7 @@ void AFEWiFi::listener() {
           }
         }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
         if (ledStartTime == 0) {
           ledStartTime = millis();
         }
@@ -147,7 +147,7 @@ void AFEWiFi::listener() {
           sleepStartTime = millis();
           delayStartTime = 0;
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
           ledStartTime = 0;
           Led.off();
 #endif
@@ -165,7 +165,7 @@ void AFEWiFi::listener() {
         connections = 0;
         delayStartTime = 0;
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
         ledStartTime = 0;
         Led.off();
 #endif

@@ -592,7 +592,7 @@ defined(T4_CONFIG)
   #endif
     }
 
-  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  #ifdef AFE_CONFIG_HARDWARE_LED
 
   #if defined(T0_CONFIG)
     index = 52;
@@ -1049,7 +1049,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
 #endif
 }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   LED configuration;
 
@@ -2048,7 +2048,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #endif
 }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 uint8_t AFEDataAccess::getSystemLedID() {
   uint8_t id = 0;
 

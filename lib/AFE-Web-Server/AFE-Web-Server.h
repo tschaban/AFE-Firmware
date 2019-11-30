@@ -16,7 +16,7 @@
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 
@@ -42,7 +42,7 @@ private:
   ESP8266WebServer server;
   AFEDevice *Device;
   AFEFirmwarePro *Firmware;
-  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
   #endif
   // It stores last HTTP API request
@@ -78,7 +78,7 @@ private:
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
@@ -143,7 +143,7 @@ public:
   void begin(AFEDevice *, AFEFirmwarePro *);
 
 
-  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */
   void initSystemLED(AFELED *);
   #endif

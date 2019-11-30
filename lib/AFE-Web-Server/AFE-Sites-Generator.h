@@ -114,7 +114,7 @@ public:
   String addSwitchConfiguration(uint8_t id);
   String addProVersionSite();
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif

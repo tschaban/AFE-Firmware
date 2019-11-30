@@ -12,7 +12,7 @@ void AFEWebServer::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   Site.begin(_Device, _Firmware);
 }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   void AFEWebServer::initSystemLED(AFELED *_SystemLED) {
     SystemLED = _SystemLED;
   }
@@ -133,7 +133,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += Site.addAS3935Configuration(siteConfig->deviceID);
     break;
 #endif
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
       page += Site.addLEDConfiguration(i);
@@ -210,7 +210,7 @@ void AFEWebServer::generate(boolean upload) {
       Data.saveConfiguration(getAnalogInputData());
       break;
 #endif
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     case AFE_CONFIG_SITE_LED:
       for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
         Data.saveConfiguration(i, getLEDData(i));
@@ -429,7 +429,7 @@ void AFEWebServer::generate(boolean upload) {
 
   /* Rebooting device */
   if (siteConfig.reboot) {
-    #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+    #ifdef AFE_CONFIG_HARDWARE_LED
     SystemLED->on();
     #endif
     Device->reboot(siteConfig.rebootMode);
@@ -627,7 +627,7 @@ DEVICE AFEWebServer::getDeviceData() {
   data.api.mqtt = server.arg("m").length() > 0 ? true : false;
   data.api.domoticz = server.arg("d").length() > 0 ? true : false;
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   data.noOfLEDs = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;
 #endif
 
@@ -863,7 +863,7 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
                                            : AFE_SWITCH_TYPE_MONO;
 
   data.sensitiveness = server.arg("s").length() > 0 ? server.arg("s").toInt()
-                                                    : AFE_SWITCH_BOUNCING;
+                                                    : AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
 
   data.functionality = server.arg("f").length() > 0
                            ? server.arg("f").toInt()
@@ -1054,7 +1054,7 @@ PIR AFEWebServer::getPIRData(uint8_t id) {
 }
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 LED AFEWebServer::getLEDData(uint8_t id) {
   LED data;
   data.gpio = server.arg("g" + String(id)).length() > 0

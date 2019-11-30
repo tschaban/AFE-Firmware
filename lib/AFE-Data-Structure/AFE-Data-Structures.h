@@ -21,7 +21,7 @@
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>
 #endif
 

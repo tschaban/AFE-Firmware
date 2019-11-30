@@ -33,7 +33,7 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-WiFi.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 AFELED Led;
 #endif
@@ -175,7 +175,7 @@ delay(10);
 #endif
 
 /* Initializing system LED (if exists) and turning it on */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t systemLedID = Data.getSystemLedID();
   yield();
 
@@ -257,7 +257,7 @@ delay(10);
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
-  #if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+  #ifdef AFE_CONFIG_HARDWARE_LED
   WebServer.initSystemLED(&Led);
   #endif
 
@@ -339,7 +339,7 @@ delay(10);
   }
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   Led.off();
   /* If device in configuration mode then it starts LED blinking */
   if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
@@ -428,7 +428,7 @@ void loop() {
         Firmware.listener();
 
       } else { /* Device runs in configuration mode over WiFi */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -437,7 +437,7 @@ void loop() {
       }
     }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     else {
       if (Device.getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -454,7 +454,7 @@ void loop() {
   processSwitchEvents();
 
 /* Led listener */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   Led.loop();
 #endif
 

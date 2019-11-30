@@ -14,7 +14,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 
@@ -30,7 +30,7 @@ private:
   unsigned long delayStartTime = 0;
   uint8_t WiFiMode;
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
 #endif
 
@@ -38,7 +38,7 @@ private:
   unsigned long sleepStartTime = 0;
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 

@@ -11,7 +11,7 @@ void eventsListener() {
 #endif
     /* Update relay status to Domoticz */
     if (Device.configuration.api.domoticz) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif
 
@@ -61,7 +61,7 @@ void eventsListener() {
       }
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.off();
 #endif
     }

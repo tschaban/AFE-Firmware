@@ -11,7 +11,7 @@
 
 #include <AFE-Data-Access.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 
@@ -41,7 +41,7 @@ private:
   char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 
@@ -118,7 +118,7 @@ public:
   void clearTimer();
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   /* It returns ID of the LED that shoud indicated Relay status */
   uint8_t getControlledLedID();
 #endif
