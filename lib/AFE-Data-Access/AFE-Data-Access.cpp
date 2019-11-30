@@ -1373,7 +1373,7 @@ void AFEDataAccess::createLEDConfigurationFile() {
   index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;  
 #else
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
 
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {

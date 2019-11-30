@@ -82,7 +82,7 @@
 #define AFE_DEVICE_TYPE_NAME "iECS Gate Controller v2"
 #define AFE_DEVICE_TYPE_ID 21
 #elif defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
-#define AFE_DEVICE_TYPE_NAME "iECS Wheater Station v2"
+#define AFE_DEVICE_TYPE_NAME "iECS Weather Station v2"
 #define AFE_DEVICE_TYPE_ID 22
 #else
 #define AFE_DEVICE_TYPE_NAME "ESP Generic"

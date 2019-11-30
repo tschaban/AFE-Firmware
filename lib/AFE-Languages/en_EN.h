@@ -31,7 +31,7 @@
 #elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "to control gate controller"
 #elif defined(T6_CONFIG)
-#define L_FIRMWARE_NAME "Wheater Station"
+#define L_FIRMWARE_NAME "Weather Station"
 #endif
 
 /* Menu */

@@ -11,7 +11,7 @@ void AFEDefaults::set() {
 #ifdef DEBUG
   Serial << endl
          << "Turning on system LED on GPIO "
-         << AFE_CONFIG_HARDWARE_SYSTEM_LED_DEFAULT_GPIO;
+         << AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
   pinMode(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, OUTPUT);
   digitalWrite(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, LOW);
