@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_Sensor_HPMA115S0_h
 #define _AFE_Sensor_HPMA115S0_h
 
@@ -12,9 +10,11 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-SoftwareSerial.h>
 #include <AFE-UART.h>
 
 #ifdef DEBUG
+
 #include <Streaming.h>
 #endif
 
@@ -33,8 +33,6 @@ private:
 
   */
 
-  HPMA115S0 configuration;
-  HPMA115S0_DATA current;
   HPMA115S0_DATA buffer;
 
   boolean ready = false;
@@ -49,15 +47,18 @@ private:
   /* Method reads the data from the sensor */
   boolean read(boolean expectingACK = false);
 
+  AFESoftwareSerial SerialBus;
+
 public:
+  HPMA115S0 configuration;
+  HPMA115S0_DATA data;
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+
   /* Constructor */
   AFESensorHPMA115S0();
 
   /* Turns On sensor */
-  void begin();
-
-  /* returns PM2.5 and PM10 */
-  HPMA115S0_DATA get();
+  void begin(uint8_t id);
 
   /* Is true when data has been read from the sensor */
   boolean isReady();
@@ -69,8 +70,7 @@ public:
   boolean sendCommand(const uint8_t *command,
                       uint8_t howManyTimesRetry = HPMA115S0_RETRY);
 
-  /* Return relay IDX in Domoticz */
-  void getDomoticzIDX(HPMA115S0_DOMOTICZ *idx);
+  void getJSON(char *json);
 };
 
 #endif

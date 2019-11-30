@@ -1,21 +1,33 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-Sensor-HPMA115S0.h"
 
 AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
-void AFESensorHPMA115S0::begin() {
+void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getHPMA115S0SensorConfiguration();
+  configuration = Data.getHPMA115S0SensorConfiguration(id);
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+
+  // SerialBus.init(13, 14, false, 64);
+  // SerialBus.begin(9600);
+  // SerialBus.println();
+
+  // SerialBus.println("----- HPMA115S0: Initializing -----");
 
   /* Opening Serial port */
   UART.begin();
-  //  UART.SerialBus.flush();
+
+  /* Clean transmit buffer */
+  UART.SerialBus.flush();
   _initialized = true;
 
-  current.pm10 = current.pm25 = buffer.pm10 = buffer.pm25 = 0;
+  data.pm10 = data.pm25 = buffer.pm10 = buffer.pm25 = 0;
 
 #if defined(DEBUG)
   Serial << endl << endl << "----- HPMA115S0: Initializing -----";
@@ -62,6 +74,9 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
          << "UART: Size of a data in the buffer ="
          << UART.SerialBus.available();
 #endif
+
+  // UART.SerialBus.print("UART: Size of a data in the buffer =");
+  // UART.SerialBus.println(UART.SerialBus.available());
 
   /* Wait for a data from UART. Max 1 sec */
   while (UART.SerialBus.available() == 0 && millis() - start < 1000) {
@@ -234,7 +249,8 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   if (!_ret) {
     if (howManyTimesRetry > 0) {
       while (!_ret && counter < howManyTimesRetry) {
-        UART.send(commandAutoOFF);
+        // UART.send(commandAutoOFF);
+        UART.send(command);
         _ret = read(true);
         counter++;
       }
@@ -242,8 +258,6 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   }
   return _ret;
 }
-
-HPMA115S0_DATA AFESensorHPMA115S0::get() { return current; }
 
 boolean AFESensorHPMA115S0::isReady() {
   if (ready) {
@@ -264,8 +278,8 @@ void AFESensorHPMA115S0::listener() {
 #endif
       startTime = millis();
 
-      //      UART.send(commandTurnON);
-      //      read() ? _measuremntsON = true : _measuremntsON = false;
+//      UART.send(commandTurnON);
+//      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
       Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
@@ -273,9 +287,9 @@ void AFESensorHPMA115S0::listener() {
 
       UART.send(commandRead);
       if (read()) {
-        current.pm25 = buffer.pm25;
-        current.pm10 = buffer.pm10;
-        if (current.pm25 != 0 && current.pm10 != 0) {
+        data.pm25 = buffer.pm25;
+        data.pm10 = buffer.pm10;
+        if (data.pm25 != 0 || data.pm10 != 0) {
           ready = true;
         }
       }
@@ -296,7 +310,7 @@ void AFESensorHPMA115S0::listener() {
                   1000) &&
              !_measuremntsON) {
 
-#if defined(DEBUG)
+#ifdef DEBUG
       Serial << endl << endl << "----- HPMA115S0: Turning ON -----";
 #endif
       if (!_measuremntsON) {
@@ -311,6 +325,10 @@ void AFESensorHPMA115S0::listener() {
   }
 }
 
-void AFESensorHPMA115S0::getDomoticzIDX(HPMA115S0_DOMOTICZ *idx) {
-  *idx = configuration.idx;
+void AFESensorHPMA115S0::getJSON(char *json) {
+
+  sprintf(json,
+          "{\"PM25\":{\"value\":%d,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
+          "%d,\"unit\":\"µg/m3\"}}",
+          data.pm25, data.pm10);
 }

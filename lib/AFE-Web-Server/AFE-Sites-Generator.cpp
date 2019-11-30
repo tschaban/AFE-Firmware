@@ -69,7 +69,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += L_FIRMWARE_NAME;
   page += "</h4><ul class=\"lst\">";
 
-  Device->begin(); // Reading configuration data
+  Device->begin();
   page += "<li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_DEVICE;
   page += "\">";
@@ -244,36 +244,102 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* UART */
 #ifdef AFE_CONFIG_HARDWARE_UART
-  page += "<li class=\"itm\"><a href=\"\\?o=HPMA115S0\">";
+
+/* Don't show it if HPMA115SO sensor is not added to the device */
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+#endif
+
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_UART;
+    page += "\">UART</a></li>";
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  }
+#endif
+
+#endif
+
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+/* Don't show it if I2C sensor is not added to the device, this is check for AFE T6 only*/
+#ifdef T6_CONFIG
+  if (Device->configuration.noOfBMEX80s > 0 ||
+      Device->configuration.noOfBH1750s > 0 ||
+      Device->configuration.noOfAS3935s > 0) {
+#endif
+
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_I2C;
+    page += "\">I2C</a></li>";
+
+#ifdef T6_CONFIG
+  }
+#endif
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  if (Device->configuration.isHPMA115S0) {
-    page += "<li class=\"itm\"><a href=\"\\?o=UART\">UART</a></li>";
-
-    page += language == 0 ? "Czujnik cząstek PM2.5/PM10"
-                          : "PM2.5/PM10 Particle Sensor";
+  /* This is hardcoded for one sensor */
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+    page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
+    page += AFE_CONFIG_SITE_HPMA115S0;
+    page += "\">";
+    page += L_PARTICLE_SENSOR;
     page += "</a></li>";
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  if (Device->configuration.isBMx80 != 0) {
-    page += "<li class=\"itm\"><a href=\"\\?o=BMx80\">";
-    page += language == 0 ? "Czujnik BMx80" : "BMx80 Sensor";
-    page += "</a></li>";
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  if (Device->configuration.noOfBMEX80s > 0) {
+    page += "<li  class=\"itm\"><a><i>";
+    page += L_BMEX80_SENSORS;
+    page += "</i></a></li>";
+
+    for (uint8_t i = 0; i < Device->configuration.noOfBMEX80s; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?o=";
+      page += AFE_CONFIG_SITE_BMEX80;
+      page += "&i=";
+      page += i;
+      page += "\">&#8227; ";
+      page += L_SENSOR;
+      page += ": ";
+      page += i + 1;
+      page += "</a></li>";
+    }
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  if (Device->configuration.isBH1750) {
-    page += "<li class=\"itm\"><a href=\"\\?o=BH1750\">";
-    page += language == 0 ? "Czujnik BH1750" : "BH1750 Sensor";
+  if (Device->configuration.noOfBH1750s > 0) {
+    page += "<li  class=\"itm\"><a><i>";
+    page += L_BH1750_SENSORS;
+    page += "</i></a></li>";
+
+    for (uint8_t i = 0; i < Device->configuration.noOfBH1750s; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?o=";
+      page += AFE_CONFIG_SITE_BH1750;
+      page += "&i=";
+      page += i;
+      page += "\">&#8227; ";
+      page += L_SENSOR;
+      page += ": ";
+      page += i + 1;
+      page += "</a></li>";
+    }
+  }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  if (Device->configuration.noOfAS3935s > 0 && Firmware->Pro.valid) {
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_AS3935;
+    page += "\">";
+    page += L_AS3935_SENSOR;
     page += "</a></li>";
   }
 #endif
 
-/* Sensor DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput && Firmware->Pro.valid) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
@@ -339,8 +405,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body = "<fieldset>";
 
 /* LED */
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                                     Device->configuration.noOfLEDs, "l",
@@ -388,67 +453,29 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  body += "<div class=\"cc\"><label><input name =\"hp\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.isHPMA115S0 ? " checked=\"checked\">" : ">";
-  body += language == 0 ? "Czujnik" : " Sensor";
-  body += " HPMA115S0";
-  body += "</label></div>";
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
+                                    Device->configuration.noOfHPMA115S0s, "hp",
+                                    L_NUMBER_OF_HPMA115S0_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  body += "<div class=\"cc\"><label><input name =\"bh\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.isBH1750 ? " checked=\"checked\">" : ">";
-  body += language == 0 ? "Czujnik" : " Sensor";
-  body += " BH1750";
-  body += "</label></div>";
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
+                                    Device->configuration.noOfBH1750s, "bh",
+                                    L_NUMBER_OF_BH1750_SENSORS);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Czujnik" : " Sensor";
-  body += " BMx80";
-  body += "</label>";
-  body += "<select name=\"b6\">";
-  body += "<option value=\"0\"";
-  body += (configuration.isBMx80 == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "Brak" : "None";
-  body += "</option>";
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
+                                    Device->configuration.noOfBMEX80s, "b6",
+                                    L_NUMBER_OF_BMEX80_SENSORS);
+#endif
 
-  body += "<option value=\"";
-  body += TYPE_BMP180_SENSOR;
-  body += "\"";
-  body +=
-      (configuration.isBMx80 == TYPE_BMP180_SENSOR ? " selected=\"selected\""
-                                                   : "");
-  body += ">";
-  body += "BMP085/BMP180";
-  body += "</option>";
-
-  body += "<option value=\"";
-  body += TYPE_BME280_SENSOR;
-  body += "\"";
-  body +=
-      (configuration.isBMx80 == TYPE_BME280_SENSOR ? " selected=\"selected\""
-                                                   : "");
-  body += ">";
-  body += "BME280";
-  body += "</option>";
-
-  body += "<option value=\"";
-  body += TYPE_BME680_SENSOR;
-  body += "\"";
-  body +=
-      (configuration.isBMx80 == TYPE_BME680_SENSOR ? " selected=\"selected\""
-                                                   : "");
-  body += ">";
-  body += "BME680";
-  body += "</option>";
-
-  body += "</select>";
-  body += "</div>";
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  if (Firmware->Pro.valid) {
+    body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+                                      Device->configuration.noOfAS3935s, "a3",
+                                      L_NUMBER_OF_AS3935_SENSORS);
+  }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -480,6 +507,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   page += addConfigurationBlock(L_HARDWARE_CONFIGURATION,
                                 L_HARDWARE_CONFIGURATION_INFO, body);
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
   body = "<fieldset>";
 
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_GATES,
@@ -489,6 +517,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += "</fieldset>";
 
   page += addConfigurationBlock(L_CONTROLLED_GATES, "", body);
+#endif
 
   body = "<fieldset><div class=\"cc\"><label><input name=\"m\" "
          "type=\"checkbox\" value=\"1\"";
@@ -701,8 +730,7 @@ String AFESitesGenerator::addPasswordConfigurationSite() {
   return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
 }
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
@@ -908,8 +936,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS) &&                             \
-    AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 
     body += "<br><p class=\"cm\">";
     body += L_SELECT_LED_4_RELAY;
@@ -1066,8 +1093,8 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
     body += "\"";
     body += configuration.relayID == i ? " selected=\"selected\"" : "";
     body += ">";
-    relayIsForGate = false;
 #ifdef AFE_CONFIG_HARDWARE_GATE
+    relayIsForGate = false;
     for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
       gateConfiguration = Data.getGateConfiguration(j);
       if (i == gateConfiguration.relayId) {
@@ -1794,187 +1821,227 @@ const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-String AFESitesGenerator::addHPMA115S0Configuration() {
-
-  HPMA115S0 configuration = Data.getHPMA115S0SensorConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
+String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
+  HPMA115S0 configuration = Data.getHPMA115S0SensorConfiguration(id);
 
   String body = "<fieldset>";
 
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
-  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
-                        : "seconds. Range: 5 to 86400sec";
-  body += " (24h)</span></div><br><br>";
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+                  "86400", "f", L_SECONDS);
+
+  body += "<br><br>";
   body += "<p class=\"cm\">";
-  body += language == 0
-              ? "Jeśli poniższa wartość jest większa od 0 to czujnik będzie "
-                "usypiany między odczytami. Wartość poniżej definiuje na ile "
-                "sekund przed odczytem czujnik ma zostać uruchomiony. Wartość "
-                "musi "
-                "być mniejsza niż interwał pomiarów"
-              : "If the parameter below is different than 0, the sensor will "
-                "go "
-                "to "
-                "sleep mode between measurements. The setting below defined "
-                "how "
-                "many seconds before a measurement the sensor should wake up. "
-                "It "
-                "should be lower than measurement's interval";
+  body += L_SENSOR_POST_SLEEP_INTERVAL;
   body += "</p>";
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Pomiar po czasie" : "Measure after";
-  body += "</label><input name=\"t\" min=\"0\" max=\"999\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.timeToMeasure;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 1 do 999sek"
-                        : "seconds. Range: 1 to 999sec";
-  body += "</span></div>";
+
+  sprintf(_number, "%d", configuration.timeToMeasure);
+  body += addItem("number", "m", L_MEASURE_AFTER, _number, "?", "0", "999", "1",
+                  L_SECONDS);
 
   body += "</fieldset>";
 
-  String page =
-      addConfigurationBlock(language == 0 ? "Czujnik cząstek PM2.5/PM10"
-                                          : "PM2.5/PM10 Particle Sensor",
-                            "", body);
+  String page = addConfigurationBlock(L_PARTICLE_SENSOR, "", body);
 
   if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
-    body += "<div class=\"cf\"><label> ";
-    body += "IDX PM2.5 </label>";
-    body += "<input name=\"x2\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx.pm25;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
 
-    body += "<div class=\"cf\"><label>IDX PM10";
-    body += "</label><input name=\"x1\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx.pm10;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
+    sprintf(_number, "%d", configuration.domoticz.pm25.idx);
+    body +=
+        addItem("number", "x2", "IDX PM2.5", _number, "?", "0", "999999", "1");
+
+    sprintf(_number, "%d", configuration.domoticz.pm10.idx);
+    body +=
+        addItem("number", "x1", "IDX PM10", _number, "?", "0", "999999", "1");
 
     body += "</fieldset>";
-    page += addConfigurationBlock(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
+
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-String AFESitesGenerator::addBMx80Configuration() {
-
-  BMx80 configuration = Data.getBMx80SensorConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
-
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
+  BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
+  char _number[7];
+  String page;
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
 
   body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
-  body += "</label><input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
-                        : "seconds. Range: 5 to 86400sec";
-  body += " (24h)</span></div><br><br>";
+  body += L_BMEX80_SENSOR_TYPE;
+  body += "</label><select name=\"b\"><option value=\"";
+  body += AFE_BMX_UNKNOWN_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BMX_UNKNOWN_SENSOR ? " selected=\"selected\""
+                                                    : "");
+  body += ">";
+  body += L_NONE;
+  body += "</option><option value=\"";
+  body += AFE_BMP180_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BMP180_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BMx085/BMx180</option><option value=\"";
+  body += AFE_BME280_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BME280_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BMx280</option><option value=\"";
+  body += AFE_BME680_SENSOR;
+  body += "\"";
+  body +=
+      (configuration.type == AFE_BME680_SENSOR ? " selected=\"selected\"" : "");
+  body += ">BMx680</option></select></div>";
+
+  body += "<input type=\"submit\" class=\"b bw\" value=\"";
+  body += L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR;
+  body += "\"><br><br>";
+
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
+  sprintf(_number, "%d", configuration.interval);
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+                  "86400", "1", L_SECONDS);
+
   body += "</fieldset>";
 
-  String page = addConfigurationBlock(
-      language == 0 ? "Czujnik BMx80" : "BMx80 Sensor", "", body);
+  page = addConfigurationBlock(L_BMEX80_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (configuration.type != AFE_BMX_UNKNOWN_SENSOR) {
+
+    /* Sensor's units */
     body = "<fieldset>";
-    if (device.isBMx80 != TYPE_BMP180_SENSOR) {
-      body += "<div class=\"cf\"><label>IDX Temp/";
-      body += language == 0 ? "Wilg/Bar" : "Humi/Bar";
-      body += "</label><input name=\"t\" type=\"number\" step=\"1\" min=\"0\" "
-              "max=\"999999\"  value=\"";
-      body += configuration.idx.temperatureHumidityPressure;
-      body += "\">";
-      body += "<span class=\"hint\">";
-      body += language == 0 ? "Zakres: " : "Range: ";
-      body += "0 - 999999</span>";
-      body += "</div>";
-    }
 
-    body += "<div class=\"cf\"><label>IDX Temperatur";
-    body += language == 0 ? "a" : "e";
-    body += "</label><input name=\"e\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx.temperature;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
+    body += "<div class=\"cf\"><label>";
+    body += L_TEMPERATURE;
+    body += "</label><select name=\"tu\"><option value=\"";
+    body += AFE_TEMPERATURE_UNIT_CELSIUS;
+    body += "\"";
+    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                 ? " selected=\"selected\""
+                 : "");
+    body += ">C</option><option value=\"";
+    body += AFE_TEMPERATURE_UNIT_FAHRENHEIT;
+    body += "\"";
+    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+                 ? " selected=\"selected\""
+                 : "");
+    body += ">F</option></select></div>";
 
-    if (device.isBMx80 != TYPE_BMP180_SENSOR) {
-      body += "<div class=\"cf\"><label>IDX ";
-      body += language == 0 ? "Wilgotność" : "Humidity";
-      body += "</label><input name=\"h\" type=\"number\" step=\"1\" min=\"0\" "
-              "max=\"999999\"  value=\"";
-      body += configuration.idx.humidity;
-      body += "\">";
-      body += "<span class=\"hint\">";
-      body += language == 0 ? "Zakres: " : "Range: ";
-      body += "0 - 999999</span>";
-      body += "</div>";
-    }
-
-    body += "<div class=\"cf\"><label>IDX ";
-    body += language == 0 ? "Ciśnienie" : "Pressure";
-    body += "</label><input name=\"p\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx.pressure;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-
-    if (device.isBMx80 == TYPE_BME680_SENSOR) {
-      body += "<div class=\"cf\"><label>IDX ";
-      body += language == 0 ? "Czujnik gazu" : "Gas sensor";
-      body += "</label><input name=\"g\" type=\"number\" step=\"1\" min=\"0\" "
-              "max=\"999999\"  value=\"";
-      body += configuration.idx.gasResistance;
-      body += "\">";
-      body += "<span class=\"hint\">";
-      body += language == 0 ? "Zakres: " : "Range: ";
-      body += "0 - 999999</span>";
-      body += "</div>";
-    }
     body += "</fieldset>";
-    page += addConfigurationBlock(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
+    page += addConfigurationBlock(L_UNITS, "", body);
+
+    /* Corrections of sensor values */
+    body = "<fieldset>";
+    sprintf(_number, "%.3f", configuration.temperature.correction);
+    body += addItem("number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
+                    "99.999", "0.001");
+
+    if (configuration.type != AFE_BMP180_SENSOR) {
+      sprintf(_number, "%.3f", configuration.humidity.correction);
+      body += addItem("number", "hc", L_HUMIDITY, _number, "?", "-99.999",
+                      "99.999", "0.001");
+    }
+
+    sprintf(_number, "%.3f", configuration.pressure.correction);
+    body += addItem("number", "pc", L_PRESSURE, _number, "?", "-999.999",
+                    "999.999", "0.001");
+
+    sprintf(_number, "%d", configuration.altitude);
+    body += addItem("number", "hi", L_ALTITIDE, _number, "?", "-431", "8850",
+                    "1", L_METERS);
+
+    body += "</fieldset>";
+    page += addConfigurationBlock(L_CORRECTIONS, "", body);
+
+    if (Device->configuration.api.domoticz) {
+      body = "<fieldset>";
+
+      sprintf(_number, "%d", configuration.domoticz.temperature.idx);
+      body += addItem("number", "i1", L_IDX_TEMPERATURE, _number, "?", "0",
+                      "999999", "1");
+
+      if (configuration.type != AFE_BMP180_SENSOR) {
+        sprintf(_number, "%d", configuration.domoticz.humidity.idx);
+        body += addItem("number", "i2", L_IDX_HUMIDITY, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
+        body += addItem("number", "i3", L_IDX_DEW_POINT, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
+        body += addItem("number", "i4", L_IDX_HEAT_INDEX, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d",
+                configuration.domoticz.temperatureHumidityPressure.idx);
+        body += addItem("number", "i0", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
+        body += addItem("number", "i12", L_IDX_TEMP_HUM, _number, "?", "0",
+                        "999999", "1");
+      }
+
+      sprintf(_number, "%d", configuration.domoticz.pressure.idx);
+      body += addItem("number", "i5", L_IDX_PRESSURE, _number, "?", "0",
+                      "999999", "1");
+
+      sprintf(_number, "%d", configuration.domoticz.relativePressure.idx);
+      body += addItem("number", "i6", L_IDX_RELATIVE_PRESSURE, _number, "?",
+                      "0", "999999", "1");
+
+      if (configuration.type == AFE_BME680_SENSOR) {
+        sprintf(_number, "%d", configuration.domoticz.iaq.idx);
+        body += addItem("number", "i7", L_IDX_IQA, _number, "?", "0", "999999",
+                        "1");
+
+        sprintf(_number, "%d", configuration.domoticz.staticIaq.idx);
+        body += addItem("number", "i8", L_IDX_STATIC_IAQ, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.co2Equivalent.idx);
+        body += addItem("number", "i9", L_IDX_CO2_EQUVALENT, _number, "?", "0",
+                        "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.breathVocEquivalent.idx);
+        body += addItem("number", "i10", L_IDX_BVOC_EQUIVALENT, _number, "?",
+                        "0", "999999", "1");
+
+        sprintf(_number, "%d", configuration.domoticz.gasResistance.idx);
+        body += addItem("number", "i11", L_IDX_GAS_SENSOR, _number, "?", "0",
+                        "999999", "1");
+      }
+      body += "</fieldset>";
+      page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    }
+
+    if (Device->configuration.api.mqtt) {
+      body = "<fieldset>";
+      body +=
+          addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+      body += "</fieldset>";
+      page +=
+          addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
+    }
   }
 
   return page;
@@ -1982,55 +2049,156 @@ String AFESitesGenerator::addBMx80Configuration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-String AFESitesGenerator::addBH1750Configuration() {
+String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 
-  BH1750 configuration = Data.getBH1750SensorConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
+  BH1750 configuration = Data.getBH1750SensorConfiguration(id);
 
   String body = "<fieldset>";
 
   body += addDeviceI2CAddressSelection(configuration.i2cAddress);
 
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Interwał odczytów" : "Measurement's interval";
-  body += "</label><input name=\"i\" min=\"1\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 1 do 86400sek"
-                        : "seconds. Range: 1 to 86400sec";
-  body += " (24h)</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Czułość" : "Sensitiveness";
-  body += "</label><input name=\"m\" type=\"number\" value=\"";
-  body += configuration.mode;
-  body += "\" disabled><span class=\"hint\">";
-  body += language == 0 ? "(brak możliwości zmiany)" : "(can't be set)";
-  body += " </span></div>";
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+                  "86400", "1", L_SECONDS);
+
+  sprintf(_number, "%d", configuration.mode);
+  body += addItem("number", "m", L_SENSITIVENESS, _number, "?", "?", "?", "?",
+                  L_CANT_CHANGE, true);
 
   body += "</fieldset>";
 
-  String page = addConfigurationBlock(
-      language == 0 ? "Czujnik BH1750" : "BH1750 Sensor", "", body);
+  String page = addConfigurationBlock(L_BH1750_SENSOR, "", body);
 
   if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
-    body += "<div class=\"cf\"><label>IDX</label><input name=\"d\" "
-            "type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx;
-    body += "\"><span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
+
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    body += addItem("number", "d", "IDX", _number, "?", "0", "999999", "1");
 
     body += "</fieldset>";
-    page += addConfigurationBlock(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
+  }
+
+  return page;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
+  AS3935 configuration = Data.getAS3935SensorConfiguration(id);
+  char _number[2];
+
+  String body = "<fieldset>";
+
+  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+
+  body += addItem("text", "n", L_NAME, configuration.name, "16");
+
+  body += "<div class=\"cf\">";
+  body += generateConfigParameter_GPIO("g", configuration.irqGPIO);
+  body += "</div>";
+
+  body += "<div class=\"cf\"><label>";
+  body += L_DISTANCE_UNIT;
+  body += "</label><select name=\"u\"><option value=\"";
+  body += AFE_DISTANCE_KM;
+  body += "\"";
+  body +=
+      (configuration.unit == AFE_DISTANCE_KM ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_KM;
+  body += "</option><option value=\"";
+  body += AFE_DISTANCE_MIL;
+  body += "\"";
+  body +=
+      (configuration.unit == AFE_DISTANCE_MIL ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_MILES;
+  body += "</option></select></div>";
+
+  sprintf(_number, "%d", configuration.watchdogThreshold);
+  body += addItem("number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10",
+                  "1", L_WATCHDOG_THRESHOLD_HINT);
+
+  sprintf(_number, "%d", configuration.spikesRejectionLevel);
+  body += addItem("number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11",
+                  "1", L_SPIKES_REJECTION_HINT);
+
+  body += "<div class=\"cf\"><label>";
+  body += L_MIN_SPIKES;
+  body += "</label><select name=\"m\"><option value=\"1\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 1
+               ? " selected=\"selected\""
+               : "");
+  body += ">1</option><option value=\"5\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 5
+               ? " selected=\"selected\""
+               : "");
+  body += ">5</option><option value=\"9\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 9
+               ? " selected=\"selected\""
+               : "");
+  body += ">9</option><option value=\"16\"";
+  body += (configuration.minimumNumberOfLightningSpikes == 16
+               ? " selected=\"selected\""
+               : "");
+  body += ">16</option></select></div>";
+
+  body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
+          "value=\"1\"";
+  body +=
+      configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">";
+  body += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
+  body += "</label></div><p class=\"cm\">";
+
+  body += L_SET_LEVEL_OF_NOISE_FLOOR;
+  sprintf(_number, "%d", configuration.noiseFloor);
+  body += addItem("number", "nf", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
+                  L_NOISE_FLOOR_HINT);
+
+  body += "</p><div class=\"cf\"><label>";
+  body += L_SENSOR_INDOOR_OUTDOOR;
+  body += "</label><select name=\"w\"><option value=\"1\"";
+  body += (configuration.indoor == true ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_INDOOR;
+  body += "</option><option value=\"0\"";
+  body += (configuration.indoor == false ? " selected=\"selected\"" : "");
+  body += ">";
+  body += L_OUTDOOR;
+  body += "</option></select></div>";
+
+  body += "</fieldset>";
+
+  String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
+
+  if (Device->configuration.api.domoticz) {
+    body = "<fieldset>";
+
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    body += addItem("number", "d", "IDX", _number, "?", "0", "999999", "1");
+
+    body += "</fieldset>";
+    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page +=
+        addConfigurationBlock(L_MQTT_TOPIC_AS3935, L_MQTT_TOPIC_EMPTY, body);
   }
 
   return page;
@@ -2040,7 +2208,7 @@ String AFESitesGenerator::addBH1750Configuration() {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
+  DEVICE device = Device->configuration;
 
   String body = "<fieldset>";
 
@@ -2081,7 +2249,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   if (device.api.mqtt) {
     body = "<fieldset>";
-    body += addItem("text", "t0", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
@@ -2125,15 +2293,29 @@ String AFESitesGenerator::addSerialPortConfiguration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
+String AFESitesGenerator::addI2CPortConfiguration() {
+  I2CPORT configuration = Data.getI2CPortConfiguration();
+
+  String body = "<fieldset>";
+
+  body += generateConfigParameter_GPIO("a", configuration.SDA, "GPIO SDA");
+  body += generateConfigParameter_GPIO("l", configuration.SCL, "GPIO SCL");
+
+  body += "</fieldset>";
+  return addConfigurationBlock("I2C", "", body);
+  ;
+}
+
 String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
   AFEI2CScanner I2CScanner;
-  String body = "<div class=\"cf\"><label>I2C Ad";
-  body += language == 0 ? "res" : "ddress";
+  I2CScanner.begin();
+  String body = "<div class=\"cf\"><label>I2C ";
+  body += L_ADDRESS;
   body += ": </label><select name=\"a\">";
   body += "<option value=\"0\"";
   body += address == 0 ? " selected=\"selected\"" : "";
   body += ">";
-  body += language == 0 ? "Brak" : "Missing";
+  body += L_NONE;
   body += "</option>";
 
   for (byte addressToScan = 1; addressToScan < 127; addressToScan++) {
@@ -2224,7 +2406,7 @@ String AFESitesGenerator::addExitSection(uint8_t command) {
 
 String AFESitesGenerator::addIndexSection(boolean authorized) {
   DEVICE configuration;
-  configuration = Data.getDeviceConfiguration();
+  configuration = Device->configuration;
   String body = "<fieldset>";
   if (!authorized) {
     body += "<h3>";

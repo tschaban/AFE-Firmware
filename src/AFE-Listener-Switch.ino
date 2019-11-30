@@ -24,10 +24,6 @@ void processSwitchEvents() {
                << Switch[i].getControlledRelayID();
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.on();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* The code here is only appilcable for a Switch that controlls a Gate
          */
@@ -57,9 +53,6 @@ void processSwitchEvents() {
         }
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.off();
-#endif
       }
 
       if (Switch[i].isPressed(true)) {
@@ -96,13 +89,7 @@ void switchEventsListener() {
             ? Device.reboot(AFE_MODE_CONFIGURATION)
             : Device.reboot(AFE_MODE_NORMAL);
       } else if (Switch[i].is30s()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.on();
-#endif
         Device.setDevice();
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.off();
-#endif
         Device.reboot(AFE_MODE_ACCESS_POINT);
       }
     }

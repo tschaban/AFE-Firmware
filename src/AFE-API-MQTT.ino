@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
+
 #include "AFE-API-MQTT.h"
 
 AFEMQTT::AFEMQTT() {}
@@ -75,7 +75,7 @@ void AFEMQTT::connect() {
         sleepMode = false;
       }
     } else {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       if (ledStartTime == 0) {
         ledStartTime = millis();
       }
@@ -96,7 +96,7 @@ void AFEMQTT::connect() {
         if (_connected) {
           eventConnectionEstablished = true;
           delayStartTime = 0;
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
           ledStartTime = 0;
           Led.off();
 #endif
@@ -105,7 +105,7 @@ void AFEMQTT::connect() {
           return;
         }
       }
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       if (millis() > ledStartTime + 500) {
         Led.toggle();
         ledStartTime = 0;
@@ -131,7 +131,7 @@ void AFEMQTT::connect() {
         sleepStartTime = millis();
 
         delayStartTime = 0;
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
         ledStartTime = 0;
         Led.off();
 #endif
@@ -161,7 +161,7 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
   if (Broker.state() == MQTT_CONNECTED) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.on();
 #endif
 #ifdef DEBUG
@@ -170,17 +170,20 @@ void AFEMQTT::publishTopic(const char *subTopic, const char *message) {
     Serial << endl << "Message: " << message;
 #endif
     if (strlen(subTopic) > 0) {
-      Broker.publish(subTopic, message);
+      if (Broker.publish(subTopic, message)) {
 #ifdef DEBUG
-      Serial << endl << "Status: published";
+        Serial << endl << "Status: published";
+      } else {
+        Serial << endl << "Status: failed";
 #endif
+      }
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Status: failure, not MQTT Topic";
+      Serial << endl << "Status: WARNING, missing MQTT Topic";
     }
 #endif
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     Led.off();
 #endif
 #ifdef DEBUG

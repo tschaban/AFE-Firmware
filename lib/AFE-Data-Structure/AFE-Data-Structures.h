@@ -21,7 +21,7 @@
 #include <AFE-RELAY-Structure.h>
 #include <AFE-SWITCH-Structure.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>
 #endif
 
@@ -49,11 +49,17 @@
  * excluded */
 #include <AFE-ADC-INPUT-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
-#include <AFE-BMx80-Sensor-Structure.h>
+#include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
+#include <AFE-AS3935-Sensor-Structure.h>
 
-#ifdef T6_CONFIG
+
+#ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-SERIALPORT-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <AFE-I2C-Structure.h>
 #endif
 
 #endif

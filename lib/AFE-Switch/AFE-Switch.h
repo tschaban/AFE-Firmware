@@ -12,7 +12,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 //#include <Streaming.h>
@@ -45,7 +45,7 @@ private:
 
   char mqttStateTopic[sizeof(SwitchConfiguration.mqtt.topic) + 6];
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 

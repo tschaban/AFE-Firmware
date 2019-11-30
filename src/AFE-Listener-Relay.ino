@@ -20,14 +20,8 @@ void relayEventsListener() {
     if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
       if (Relay[i].autoTurnOff()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.on();
-#endif
         MQTTPublishRelayState(i);
         DomoticzPublishRelayState(i);
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.off();
-#endif
       }
 #ifdef AFE_CONFIG_HARDWARE_GATE
       /* Closing the condition for skipping relay if assigned to a gate */

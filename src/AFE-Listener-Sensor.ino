@@ -35,9 +35,6 @@ void mainSensor() {
     if (Sensor.isReady()) {
       unsigned long idx = 0;
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.on();
-#endif
       temperature = Sensor.getTemperature();
 
 /* Thermostat */
@@ -135,10 +132,6 @@ void mainSensor() {
       }
 #endif
 
-#endif
-
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.off();
 #endif
     }
   }

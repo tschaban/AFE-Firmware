@@ -34,9 +34,8 @@ public:
   ~AFESoftwareSerial();
 
   void init(int receivePin, int transmitPin, bool inverse_logic = false,
-            unsigned int buffSize = 64);
+            unsigned int buffSize = 64, long speed = 9600);
 
-  void begin(long speed);
   void setTransmitEnablePin(int transmitEnablePin);
 
   int peek();

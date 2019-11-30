@@ -9,6 +9,12 @@ void AFEAnalogInput::begin() {
   configuration = Data.getADCInputConfiguration();
   _initialized = true;
 
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+
 #ifdef DEBUG
   Serial << endl << endl << "------------ AC VCC Input ------------";
   Serial << endl
@@ -24,20 +30,6 @@ void AFEAnalogInput::begin() {
 #endif
 }
 
-ADCINPUT_DATA AFEAnalogInput::get() {
-  ADCINPUT_DATA data;
-  data.raw = analogData;
-  data.percent = (float)analogData * 100 / 1024;
-  data.voltage = (double)(configuration.maxVCC * analogData / 1024);
-  if (configuration.divider.Rb > 0) {
-    data.voltageCalculated =
-        (data.voltage * (configuration.divider.Ra + configuration.divider.Rb)) /
-        configuration.divider.Rb;
-  } else {
-    data.voltageCalculated = data.voltage;
-  }
-  return data;
-}
 
 boolean AFEAnalogInput::isReady() {
   if (ready) {
@@ -49,6 +41,7 @@ boolean AFEAnalogInput::isReady() {
 }
 
 void AFEAnalogInput::listener() {
+  uint16_t temporaryAnalogData = 0;
   if (_initialized) {
     unsigned long time = millis();
 
@@ -63,20 +56,31 @@ void AFEAnalogInput::listener() {
         counterOfSamplings++;
       } else {
 
-        analogData =
-            (uint16_t)(temporaryAnalogData / configuration.numberOfSamples);
+        data.raw = (uint16_t)(temporaryAnalogData / configuration.numberOfSamples);
+        data.percent = (float)data.raw  * 100 / 1024;
+        data.voltage = (double)(configuration.maxVCC * data.raw  / 1024);
+        if (configuration.divider.Rb > 0) {
+          data.voltageCalculated =
+            (data.voltage * (configuration.divider.Ra + configuration.divider.Rb)) /
+            configuration.divider.Rb;
+        } else {
+            data.voltageCalculated = data.voltage;
+        }
+            
 
 #ifdef DEBUG
         Serial << endl
                << " - Number of samples: " << counterOfSamplings << endl
-               << " - Analog value = " << analogData << endl
+               << " - Analog value = " << data.raw  << endl
+               << " - Percent = " << data.percent  << endl
+               << " - Voltage = " << data.voltage  << endl
+               << " - VoltageCalculated = " << data.voltageCalculated  << endl
                << " - Sampling time = "
                << millis() - startTime - configuration.interval * 1000
                << "msec.";
 #endif
 
         counterOfSamplings = 0;
-        temporaryAnalogData = 0;
         ready = true;
         startTime = 0;
 
@@ -88,19 +92,9 @@ void AFEAnalogInput::listener() {
   }
 }
 
-void AFEAnalogInput::getDomoticzIDX(ADCINPUT_DOMOTICZ *idx) {
-  *idx = configuration.domoticz;
-}
 
-/* Method returns MQTT topic for this relay */
-const char *AFEAnalogInput::getMQTTCommandTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-const char *AFEAnalogInput::getMQTTStateTopic() {
-  return configuration.mqtt.topic;
+void AFEAnalogInput::getJSON(char *json) {
+ sprintf(json,
+          "{\"raw\":%d,\"percent\":%d,\"voltage\":%f,\"voltageCalculated\":%f}",
+          data.raw, data.percent,data.voltage,data.voltageCalculated);
 }

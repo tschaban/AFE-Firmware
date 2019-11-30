@@ -9,11 +9,16 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-MQTT-Structure.h>
+
 struct BH1750 {
-  uint16_t interval;
+  char name[17];
+  uint32_t interval;
   uint8_t i2cAddress;
   uint8_t mode;
-  unsigned long idx;
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  MQTT_BASIC_CONFIG mqtt;
 };
 
 #endif

@@ -12,6 +12,7 @@
 #endif
 
 #include <Wire.h>
+#include <AFE-Data-Access.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -19,8 +20,15 @@
 
 class AFEI2CScanner {
 
+
+private:
+
+TwoWire WirePort;
+
 public:
   AFEI2CScanner();
+
+  void begin();
 
 #ifdef DEBUG
   /* Method only call in the debug mode. It scans all adesses */

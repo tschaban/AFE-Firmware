@@ -4,11 +4,11 @@
 void HTTPRequestListener() {
   if (Device.configuration.api.http) {
     if (WebServer.httpAPIlistener()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif
       processHTTPAPIRequest(WebServer.getHTTPCommand());
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
       Led.off();
 #endif
     }
@@ -17,34 +17,76 @@ void HTTPRequestListener() {
 
 /* Method creates JSON respons after processing HTTP API request, and pushes it.
  * The second one method converts float to charString before pushing response */
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIRequestStatus(HTTPCOMMAND *request, boolean status,
                               const char *value = "") {
+  /*
+    StaticJsonBuffer<200> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["device"] = request.device;
+    root["name"] = request.name;
+    root["command"] = request.command;
+
+    if (!strlen(value) == 0) {
+      root["value"] = value;
+    }
+
+    root["status"] = status ? "success" : "error";
+
+  #ifdef DEBUG
+    Serial << endl << "HTTP Request JSON Buffer size" << jsonBuffer.size();
+  #endif
+
+    String respond;
+    root.printTo(respond);
+    WebServer.sendJSON(respond);
+    */
+
   String respond;
-  respond = "{";
-  if (strlen(request.device) > 0) {
-    respond += "\"device\":\"" + String(request.device) + "\",";
+  respond = "{\"device\":{";
+  respond += "\"type\":\"" + String(request->device) + "\"";
+  if (strlen(request->name) > 0) {
+    respond += ",\"name\":\"" + String(request->name) + "\"";
   }
-  if (strlen(request.name) > 0) {
-    respond += "\"name\":\"" + String(request.name) + "\",";
-  }
-  if (strlen(request.command) > 0) {
-    respond += "\"command\":\"" + String(request.command) + "\",";
-  }
+  respond += "},\"command\":\"" + String(request->command) + "\",";
 
   if (!strlen(value) == 0) {
-    respond += "\"value\":\"";
+    respond += "\"data\":";
     respond += value;
-    respond += "\",";
+    respond += ",";
   }
-
   respond += "\"status\":\"";
   respond += status ? "success" : "error";
   respond += "\"}";
   WebServer.sendJSON(respond);
 }
+/*
+void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status,
+                              String value) {
 
-void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
-                              uint8_t width = 2, uint8_t precision = 2) {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject &root = jsonBuffer.createObject();
+
+  root["device"] = request.device;
+  root["name"] = request.name;
+  root["command"] = request.command;
+  root["value"] = value;
+
+  root["status"] = status ? "success" : "error";
+
+#ifdef DEBUG
+  Serial << endl << "HTTP Request JSON Buffer size" << jsonBuffer.size();
+#endif
+
+  String respond;
+  root.printTo(respond);
+  WebServer.sendJSON(respond);
+}
+*/
+
+void sendHTTPAPIRequestStatus(HTTPCOMMAND *request, boolean status,
+                              double value, uint8_t width = 2,
+                              uint8_t precision = 2) {
   char valueString[10];
   dtostrf(value, width, precision, valueString);
   sendHTTPAPIRequestStatus(request, status, valueString);
@@ -53,9 +95,10 @@ void sendHTTPAPIRequestStatus(HTTPCOMMAND request, boolean status, double value,
 #ifdef AFE_CONFIG_HARDWARE_RELAY // Not required for T5
 /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
  * method which creates JSON respons and pushes it */
-void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
+void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND *request, boolean status,
                                    byte value) {
-  sendHTTPAPIRequestStatus(request, status, value == AFE_RELAY_ON ? "on" : "off");
+  sendHTTPAPIRequestStatus(request, status,
+                           value == AFE_RELAY_ON ? "on" : "off");
 }
 #endif
 
@@ -63,7 +106,7 @@ void sendHTTPAPIRelayRequestStatus(HTTPCOMMAND request, boolean status,
 #if defined(T3_CONFIG)
 void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
                                  boolean value) {
-  sendHTTPAPIRequestStatus(request, status, value ? "open" : "closed");
+  sendHTTPAPIRequestStatus(&request, status, value ? "open" : "closed");
 }
 #endif
 
@@ -72,13 +115,14 @@ void sendHTTPAPIPirRequestStatus(HTTPCOMMAND request, boolean status,
 /* It constructs HTTP response related to gate and calls HTTP push */
 void sendHTTPAPIGateRequestStatus(HTTPCOMMAND request, boolean status,
                                   byte value) {
-  sendHTTPAPIRequestStatus(
-      request, status,
-      value == AFE_GATE_OPEN
-          ? "open"
-          : value == AFE_GATE_CLOSED
-                ? "closed"
-                : value == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen" : "unknown");
+  sendHTTPAPIRequestStatus(request, status,
+                           value == AFE_GATE_OPEN
+                               ? "open"
+                               : value == AFE_GATE_CLOSED
+                                     ? "closed"
+                                     : value == AFE_GATE_PARTIALLY_OPEN
+                                           ? "partiallyOpen"
+                                           : "unknown");
 }
 #endif
 
@@ -90,7 +134,25 @@ void sendHTTPAPIContactronRequestStatus(HTTPCOMMAND request, boolean status,
                            value == AFE_CONTACTRON_OPEN ? "open" : "closed");
 }
 #endif
+/*
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+void sendHTTPAPIBH1750RequestStatus(HTTPCOMMAND request, uint8_t id) {
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject &root = jsonBuffer.createObject();
 
+  root["lux"] = BH1750Sensor[id].get();
+
+#ifdef DEBUG
+  Serial << endl << "HTTP Request JSON Buffer size" << jsonBuffer.size();
+#endif
+
+  String respond;
+  root.printTo(respond);
+  sendHTTPAPIRequestStatus(&request, true, respond);
+}
+
+#endif
+*/
 /* Method processes HTTP API request */
 void processHTTPAPIRequest(HTTPCOMMAND request) {
 
@@ -118,13 +180,13 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
         } else if (strcmp(request.command, "get") == 0) { // get
           sendHTTPAPIGateRequestStatus(request, true, Gate[i].get());
         } else {
-          sendHTTPAPIRequestStatus(request, false);
+          sendHTTPAPIRequestStatus(&request, false);
         }
         break;
       }
     }
     if (deviceNotExist) {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
     return;
   }
@@ -140,13 +202,13 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           sendHTTPAPIContactronRequestStatus(request, true,
                                              Contactron[i].get());
         } else {
-          sendHTTPAPIRequestStatus(request, false);
+          sendHTTPAPIRequestStatus(&request, false);
         }
         break;
       }
     }
     if (deviceNotExist) {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
     return;
   }
@@ -172,8 +234,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_ON,
-                                          Relay[i].get());
+            sendHTTPAPIRelayRequestStatus(
+                &request, Relay[i].get() == AFE_RELAY_ON, Relay[i].get());
 
           } else if (strcmp(request.command, "off") == 0) { // Off
             Relay[i].off();
@@ -181,19 +243,19 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             }
-            sendHTTPAPIRelayRequestStatus(request, Relay[i].get() == AFE_RELAY_OFF,
-                                          Relay[i].get());
+            sendHTTPAPIRelayRequestStatus(
+                &request, Relay[i].get() == AFE_RELAY_OFF, Relay[i].get());
           } else if (strcmp(request.command, "toggle") == 0) { // toggle
             state = Relay[i].get();
             Relay[i].toggle();
-            sendHTTPAPIRelayRequestStatus(request, state != Relay[i].get(),
+            sendHTTPAPIRelayRequestStatus(&request, state != Relay[i].get(),
                                           Relay[i].get());
             MQTTPublishRelayState(i); // MQTT Listener library
             if (strcmp(request.source, "domoticz") != 0) {
               DomoticzPublishRelayState(i);
             };
           } else if (strcmp(request.command, "get") == 0) {
-            sendHTTPAPIRelayRequestStatus(request, true, Relay[i].get());
+            sendHTTPAPIRelayRequestStatus(&request, true, Relay[i].get());
 /* Command not implemented.Info */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
           } else if (strcmp(request.command, "enableThermostat") == 0) {
@@ -236,7 +298,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #endif
 
           } else {
-            sendHTTPAPIRequestStatus(request, false);
+            sendHTTPAPIRequestStatus(&request, false);
           }
           break;
         }
@@ -254,7 +316,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
 #endif
     }
     if (deviceNotExist) {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
     return;
   }
@@ -264,8 +326,8 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Request related to ds18b20 */
   if (strcmp(request.device, "ds18b20") == 0) {
     strcmp(request.command, "get") == 0
-        ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
-        : sendHTTPAPIRequestStatus(request, false);
+        ? sendHTTPAPIRequestStatus(&request, true, Sensor.getTemperature())
+        : sendHTTPAPIRequestStatus(&request, false);
   }
 #endif
 
@@ -274,22 +336,22 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   if (strcmp(request.device, "dht") == 0) {
     if (strcmp(request.name, "temperature") == 0) {
       strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, Sensor.getTemperature())
-          : sendHTTPAPIRequestStatus(request, false);
+          ? sendHTTPAPIRequestStatus(&request, true, Sensor.getTemperature())
+          : sendHTTPAPIRequestStatus(&request, false);
     } else if (strcmp(request.name, "humidity") == 0) {
       strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, Sensor.getHumidity())
-          : sendHTTPAPIRequestStatus(request, false);
+          ? sendHTTPAPIRequestStatus(&request, true, Sensor.getHumidity())
+          : sendHTTPAPIRequestStatus(&request, false);
     } else if (strcmp(request.name, "heatIndex") == 0) {
       strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, Sensor.getHeatIndex())
-          : sendHTTPAPIRequestStatus(request, false);
+          ? sendHTTPAPIRequestStatus(&request, true, Sensor.getHeatIndex())
+          : sendHTTPAPIRequestStatus(&request, false);
     } else if (strcmp(request.name, "dewPoint") == 0) {
       strcmp(request.command, "get") == 0
-          ? sendHTTPAPIRequestStatus(request, true, Sensor.getDewPoint())
-          : sendHTTPAPIRequestStatus(request, false);
+          ? sendHTTPAPIRequestStatus(&request, true, Sensor.getDewPoint())
+          : sendHTTPAPIRequestStatus(&request, false);
     } else {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
   }
 #endif
@@ -308,62 +370,70 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       }
     }
     if (pirSendFailure) {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* Request related to gate */
-  if (strcmp(request.device, "HPMA115S0") == 0) {
-    HPMA115S0_DATA sensorData;
-    sensorData = ParticleSensor.get();
-    if (strcmp(request.name, "PM2.5") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm25, 4, 0);
-      }
-    } else if (strcmp(request.name, "PM10") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        sendHTTPAPIRequestStatus(request, true, (float)sensorData.pm10, 4, 0);
+  if (strcmp(request.device, "HPMA115S0") == 0 &&
+      strcmp(request.command, "get") == 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+      if (strcmp(request.name, ParticleSensor[i].configuration.name) == 0) {
+        char json[80];
+        ParticleSensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
+        break;
       }
     }
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  /* BMx80 */
-  if (strcmp(request.device, "BMx80") == 0) {
-    if (strcmp(request.command, "get") == 0) {
-      BMx80_DATA sensorData;
-      sensorData = BMx80Sensor.get();
-      if (strcmp(request.name, "temperature") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.temperature);
-      } else if (strcmp(request.name, "pressure") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.pressure);
-      } else if (Device.configuration.isBMx80 != TYPE_BMP180_SENSOR &&
-                 strcmp(request.name, "humidity") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.humidity);
-      } else if (Device.configuration.isBMx80 != TYPE_BME680_SENSOR &&
-                 strcmp(request.name, "gasResistance") == 0) {
-        sendHTTPAPIRequestStatus(request, true, sensorData.gasResistance);
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  /* BMEX80 */
+  if (strcmp(request.device, "BMEX80") == 0 &&
+      strcmp(request.command, "get") == 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
+      if (strcmp(request.name, BMEX80Sensor[i].configuration.name) == 0) {
+        // @TODO optimize the char size
+        char json[1000];
+        BMEX80Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
+        break;
       }
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
     }
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   /* BH1750 */
-  if (strcmp(request.device, "BH1750") == 0) {
-    if (strcmp(request.name, "lux") == 0) {
-      if (strcmp(request.command, "get") == 0) {
-        float lux = BH1750Sensor.get();
-        sendHTTPAPIRequestStatus(request, true, lux);
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
+  if (strcmp(request.device, "BH1750") == 0 &&
+      strcmp(request.command, "get") == 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
+      if (strcmp(request.name, BH1750Sensor[i].configuration.name) == 0) {
+        char json[60];
+        BH1750Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
+        break;
+      }
+    }
+  }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  /* AS3935 */
+  if (strcmp(request.device, "AS3935") == 0 &&
+      strcmp(request.command, "get") == 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfAS3935s; i++) {
+      if (strcmp(request.name, AS3935Sensor[i].configuration.name) == 0) {
+        char json[60];
+        AS3935Sensor[i].getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
       }
     }
   }
@@ -373,20 +443,11 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
   /* Analog Input */
   if (strcmp(request.device, "ADC") == 0) {
     if (strcmp(request.command, "get") == 0) {
-      ADCINPUT_DATA data;
-      if (strcmp(request.name, "raw") == 0) {
-        sendHTTPAPIRequestStatus(request, true, data.raw);
-      } else if (strcmp(request.name, "percent") == 0) {
-        sendHTTPAPIRequestStatus(request, true, data.percent);
-      } else if (strcmp(request.name, "voltage") == 0) {
-        sendHTTPAPIRequestStatus(request, true, data.voltage, 3, 6);
-      } else if (strcmp(request.name, "voltageCalculated") == 0) {
-        sendHTTPAPIRequestStatus(request, true, data.voltageCalculated, 3, 6);
-      } else {
-        sendHTTPAPIRequestStatus(request, false);
-      }
-    } else {
-      sendHTTPAPIRequestStatus(request, false);
+        // @TODO check the size of the JSON before release!
+        char json[60];
+        AnalogInput.getJSON(json);
+        sendHTTPAPIRequestStatus(&request, true, json);
+        deviceNotExist = false;
     }
   }
 #endif
@@ -420,27 +481,27 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
           Domoticz.disconnect();
         }
       }
-      sendHTTPAPIRequestStatus(request, true);
+      sendHTTPAPIRequestStatus(&request, true);
     } else {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
   }
 #endif
 
   if (strcmp(request.command, "reboot") == 0) { // reboot
-    sendHTTPAPIRequestStatus(request, true);
+    sendHTTPAPIRequestStatus(&request, true);
     Device.reboot(Device.getMode());
   } else if (strcmp(request.command, "configurationMode") ==
              0) { // configurationMode
     PASSWORD password = Data.getPasswordConfiguration();
     if (!password.protect) {
-      sendHTTPAPIRequestStatus(request, true);
+      sendHTTPAPIRequestStatus(&request, true);
       Device.reboot(AFE_MODE_CONFIGURATION);
     } else {
-      sendHTTPAPIRequestStatus(request, false);
+      sendHTTPAPIRequestStatus(&request, false);
     }
     /* No such device or commend not implemented */
   } else {
-    sendHTTPAPIRequestStatus(request, false);
+    sendHTTPAPIRequestStatus(&request, false);
   }
 }

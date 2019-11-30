@@ -20,7 +20,7 @@ struct DH {
   uint8_t type;
   TEMPERATURE temperature;
   HUMIDITY humidity;
-  uint16_t interval;
+  uint32_t interval;
   boolean sendOnlyChanges;
   boolean publishHeatIndex;
   boolean publishDewPoint;
