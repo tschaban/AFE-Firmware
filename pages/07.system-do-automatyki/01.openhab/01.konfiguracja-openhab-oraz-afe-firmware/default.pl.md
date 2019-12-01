@@ -1,6 +1,6 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
-media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png'
+media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png,OH2AFE-Konfiguracja-3-2.png,OH2AFE-Konfiguracja-3-3.png,OH2AFE-Konfiguracja-3-1.png'
 process:
     markdown: true
     twig: true
@@ -82,29 +82,34 @@ Postępuj wg tej [instrukcji](l/instalacja/instalacja-zanim-zainstalujesz-firmwa
 
 * Uruchamiamy w urządzeniu Panel Konfiguracyjny
 * Włączamy **MQTT API**
-
-SCREENSHOT
-
+![](OH2AFE-Konfiguracja-3-1.png)
 * Zapisujemy zmiany
 
 ##### Konfigurujemy połączenie do MQTT Brokera
 * w konfiguracji wpisujemy albo nazwę hosta bądź adres IP, na którym zainstalowany jest MQTT Broker. Najczęściej będzie to ten sam host/adres IP, na którym zainstalowany jest openHAB
 * Jeśli nie ma autoryzacji do MQTT Brokera – nazwę użytkownika oraz hasło zostawiamy puste.
+![](OH2AFE-Konfiguracja-3-2.png)
+* Więcej na temat konfiguracji MQTT Brokera przeczytasz [tutaj](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/mqtt-broker)
+
+##### Konfigurujemy temat sterujący przekaźnikiem
+* Uruchamiamy formularz konfiguracyjny Przekaźnika
+* W tym miejscu konfigurujemy temat wiadomości MQTT sterujący przekaźnikiem
+* Więcej na temat konfiguracji przekaźnika przeczytasz [tutaj](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
+![](OH2AFE-Konfiguracja-3-3.png)
+
+> Na ekranie wpisałem temat wiadomość **t0/relay** i taki będę używał w dalszej części tej instrukcji
 
 **Ważne**:
-
-* W tym miejscu konfigurujemy temat wiadomości MQTT API.
-* Na ekranie wpisałem temat wiadomość t0/relay i taki będę używał w dalszej części tej instrukcji
 * Zalecam ustalić sobie jakiś spójne nazewnictwo i używać dla wszystkich urządzeń np:
 	* sonoff
 	* salon/lampa
 	* kuchnia/termometr
 * Temat musi być unikalny w ramach wszystkich urządzeń, które korzystają z MQTT Brokera – czyli w ramach naszego domu może występować tylko jedno urządzenie z takim tematem MQTT
-* Nie można używać znaku spacji w ramach tematu MQTT
 
-> Przeczytaj d[obre praktyki nazewnictwa tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
+> Przeczytaj [dobre praktyki nazewnictwa tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
 
 * Zapisujemy zmiany
+* Wychodzimy z konfiguracju AFE Firmware wciskając link **Zakończ konfigurację**
 
 #### Konfiguracja openHAB za pomocą Paper UI
 Jak napisałem we wstępie openHAB można konfigurować na wiele różnych sposobów. Poniższy sposób wykorzystuje interfejs Paper UI. Można konfigurację wykonać ręcznie w plikach konfiguracyjnych. Konfigurowanie w plikach konfiguracyjnych jest szybsze, ale trzeba już trochę poznać openHAB i wiedzieć jak diagnozować błędy, które możemy zrobić podczas ręcznej konfiguracji. Konfiguracja ręczna jest opisana w dalszej części tego tutorial’a
