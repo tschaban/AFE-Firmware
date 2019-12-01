@@ -1,6 +1,6 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
-media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png'
+media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-21-15.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png'
 process:
     markdown: true
     twig: true
@@ -118,11 +118,10 @@ Jak napisałem we wstępie openHAB można konfigurować na wiele różnych sposo
 ##### Konfiguracja połączenia do MQTT Brokera
 Teraz konfigurujemy połączenie do zainstalowanego MQTT Brokera. OpenHAB będzie nasłuchiwał wiadomości przychodzące do MQTT Brokera oraz będzie do niego wysyłał wiadomości, które będą sterowały naszymi urządzeniami
 
-Uruchamiamy ponownie openHAB PaperUI
-Wchodzimy do Inbox i wciskamy (+)
-
-
-##### Wybieramy MQTT Binding
+* Uruchamiamy ponownie openHAB PaperUI
+* Wchodzimy do Inbox i wciskamy (+)
+![](OH2AFE-Konfiguracja-6-1.png)
+* Wybieramy MQTT Binding
 
 
 Wciskamy Add Manually
