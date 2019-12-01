@@ -1,6 +1,6 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
-media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png,OH2AFE-Konfiguracja-3-2.png,OH2AFE-Konfiguracja-3-3.png,OH2AFE-Konfiguracja-3-1.png,OH2AFE-Konfiguracja-3-4.jpg'
+media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png,OH2AFE-Konfiguracja-3-2.png,OH2AFE-Konfiguracja-3-3.png,OH2AFE-Konfiguracja-3-1.png,OH2AFE-Konfiguracja-3-4.jpg'
 process:
     markdown: true
     twig: true
