@@ -1,5 +1,9 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
+media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
@@ -7,10 +11,24 @@ recaptchacontact:
 OpenHab’a (OH2) można skonfigurować na kilka różnych sposobów, aby funkcjonował z urządzeniami z AFE Firmware.
 
 Opisuję tutaj sposób z wykorzystaniem lekkiego protokołu wymiany widomości opartego o MQTT. Wg mnie jest to jeden z najlepszych mechanizmów integracji urządzeń w ramach automatyki.
+Poniższa instrukcja wykorzystuje MQTT Binding w wersji 2.x
 
-[Konfiguracja](https://www.smartnydom.pl/afe-firmware-pl/konfiguracja/openhab/) openHAB w starej wersji MQTT Binding 1.4
+> [Konfiguracja](https://www.smartnydom.pl/afe-firmware-pl/konfiguracja/openhab/) openHAB w starej wersji MQTT Binding 1.4
 
-### openHAB z wykorzystaniem MQTT API (MQTT Binding w wersji 2.x)
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,4) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
 #### Wymagania
 * Zainstalowany dodatek OH2: MQTT binding 2.x w openHAB
 * Zainstalowany MQTT Broker np. Mosquitto
@@ -47,8 +65,7 @@ np.:
 ##### Instalacja MQTT Binding 2.x
 ![](OH2AFE-Konfiguracja-1-1.png)
 ##### Instalacja JSONPath Transformation
-
-
+![](OH2AFE-Konfiguracja-2-2.png)
 #### Instalacja MQTT Brokera
 
 _Do napisania. Tymczasem poszukaj w internecie_
