@@ -1,6 +1,6 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
-media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png,OH2AFE-Konfiguracja-3-2.png,OH2AFE-Konfiguracja-3-3.png,OH2AFE-Konfiguracja-3-1.png'
+media_order: 'OH2AFE-Konfiguracja-1-1.png,OH2AFE-Konfiguracja-2-2.png,OH2AFE-Konfiguracja-22-16.png,OH2AFE-Konfiguracja-6-1.png,OH2AFE-Konfiguracja-7-2.png,OH2AFE-Konfiguracja-8-3.png,OH2AFE-Konfiguracja-9-4.png,OH2AFE-Konfiguracja-10-5.png,OH2AFE-Konfiguracja-11-6.png,OH2AFE-Konfiguracja-12-7.png,OH2AFE-Konfiguracja-13-8.png,OH2AFE-Konfiguracja-14-9.png,OH2AFE-Konfiguracja-15-10.png,OH2AFE-Konfiguracja-17-11.png,OH2AFE-Konfiguracja-18-12.png,OH2AFE-Konfiguracja-19-13.png,OH2AFE-Konfiguracja-20-14.png,OH2AFE-Konfiguracja-25-19.png,OH2AFE-Konfiguracja-23-17.png,OH2AFE-Konfiguracja-24-18.png,OH2AFE-Konfiguracja-3-2.png,OH2AFE-Konfiguracja-3-3.png,OH2AFE-Konfiguracja-3-1.png,OH2AFE-Konfiguracja-3-4.jpg'
 process:
     markdown: true
     twig: true
@@ -171,7 +171,7 @@ Teraz dodamy nasze urządzenie, jako Thing do do OpenHAB
 		* t0/relay – zdefiniowaliśmy w AFE Firmware w konfiguracji przekaźnika
 		* /cmd – trzeba wpisać, wymagane przez AFE Firmware
 
-SCREENSHOT
+![](OH2AFE-Konfiguracja-22-16.png)
 
 * wprowadzamy wartości
 	* On/Open: **on**
@@ -188,7 +188,7 @@ SCREENSHOT
 * Przełącznikiem powinniśmy móc sterować przekaźnikiem
 ![](OH2AFE-Konfiguracja-24-18.png)
 * Aby dodać inne elementy urządzenia (w zależności od funkcjonalności AFE Firmware) postępuj analogicznie powtarzając ten punkt instrukcji.
-* [Tutaj]() są wszystkie komendy MQTT do wykorzystania w dodatkowych Channels lub skorzystaj z gotowej tej [listy parameterów dla Channels ]()
+* [Tutaj](/integracja-api/mqtt) są wszystkie komendy MQTT do wykorzystania w dodatkowych Channels lub skorzystaj z gotowej tej [listy parameterów dla Channels](https://www.smartnydom.pl/afe-firmware-pl/konfiguracja/openhab-nowy-mqtt/channels/)
 
 ##### Dodawanie nowych Items (elementów urządzenia)
 * Aby móc sterować urządzeniem z aplikacji mobilnej openHAB lub innej lub za pomocą interfejsu ClassicUI, BasicUI, HabPanel itp. konieczene jest dodanie elementów (items)
