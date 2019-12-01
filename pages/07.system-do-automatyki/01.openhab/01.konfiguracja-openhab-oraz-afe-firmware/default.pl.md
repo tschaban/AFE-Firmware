@@ -1,5 +1,6 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
+media_order: OH2AFE-Konfiguracja-1-1.png
 recaptchacontact:
     enabled: false
 ---
@@ -45,8 +46,7 @@ np.:
 
 
 ##### Instalacja MQTT Binding 2.x
-
-
+![](OH2AFE-Konfiguracja-1-1.png)
 ##### Instalacja JSONPath Transformation
 
 
