@@ -15,6 +15,8 @@ Wymiana danych między urządzeniami odbywa się za pomocą MQTT Brokera. Broker
 
 Do prawidłowego działania MQTT API konieczne jest [skonfigurowanie połaczenie do MQTT Brokera](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/mqtt-broker).
 
+> Przeczytaj również o [dobrych praktykach dotyczących tematów MQTT](/integracja-api/mqtt/tematy-mqtt-najlepsze-praktyki)
+
 ---
 
 #### Tematy oraz wiadomości MQTT
@@ -27,6 +29,8 @@ Do prawidłowego działania MQTT API konieczne jest [skonfigurowanie połaczenie
     {% endif %}
 </div>
 {% endif %}
+
+---
 
 ##### Temat LWT (Last Will and Testament)
 
@@ -167,3 +171,118 @@ z jedną z wiadomości
 * open
 * closed
 
+---
+
+##### Tematy do odczytu danych z czujników [Bosch BME680,BME280,BMP180,BMP085](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx)
+
+* Temat definiowany jest osobno da każdego czujnika w formularzu do [konfiguracji czujnika Bosch](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx#sekcja-temat-mqtt-czujnika-bmex80)
+
+Przykład:
+`dom/salon/czujnik`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **cmd** dla komend sterujących
+
+Używając przykładu tematu powyżej, aby odczytać dane z czujnika, do MQTT Brokera należy wysłać następujący temat
+
+`dom/salon/czujnik/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat z z wiadomością w formacie JSON z danymi odczytanymi przez czujnik
+
+`dom/salon/czujnik`
+
+Przykładowy JSON dla czujnika BME680
+
+`
+{"temperature":{"value":0,"unit":"C","correction":0},"pressure":{"value":0,"unit":"hPa","correction":0},"relativePressure":{"value":0,"unit":"hPa"},"dewPoint":{"value":0,"unit":"C"},"humidity":{"value":0,"unit":"%","correction":0,"rating":0},"heatIndex":{"value":0,"unit":"C"},"iaq":{"value":0,"rating":0,"accuracy":0},"staticIaq":{"value":0,"rating":0,"accuracy":0},"co2Equivalent":{"value":0,"unit":"ppm","rating":0,"accuracy":0},"breathVocEquivalent":{"value":0,"unit":"?","accuracy":0},"gasResistance":{"value":0,"unit":"kOm"}}
+`
+
+!!!! W zależności, który czujnik BME680, BME280, BMP180, BMP085 mamy podłączony to zwracany JSON będzie się różnił co do ilości zwrcanych danych.
+
+> AFE Firmware wysyła automatycznie dane z czujnika, z wykorzystaniem MQTT, ze zdefiniowaym konfiguracji firmware [interwałem](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx#sekcja-czujnik-bmex80) 
+
+---
+
+##### Tematy do odczytu danych z czujnika [BH1750](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750)
+
+* Temat definiowany jest osobno da każdego czujnika w formularzu do [konfiguracji czujnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750#sekcja-temat-mqtt-czujnika-bh1750)
+
+Przykład:
+`podworko/czujnik/PoziomSwiatla`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **cmd** dla komend sterujących
+
+Używając przykładu tematu powyżej, aby odczytać dane z czujnika, do MQTT Brokera należy wysłać następujący temat
+
+`podworko/czujnik/PoziomSwiatlak/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat z z wiadomością w formacie JSON z danymi odczytanymi przez czujnik
+
+`podworko/czujnik/PoziomSwiatla`
+
+Przykładowy JSON dla czujnika BH1750
+
+`
+{"illuminance":{"value":200.25,"unit":"lux"}}
+`
+
+> AFE Firmware wysyła automatycznie dane z czujnika, z wykorzystaniem MQTT, ze zdefiniowaym konfiguracji firmware [interwałem](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750#sekcja-czujnik-bh1750) 
+
+---
+
+##### Tematy do odczytu danych z czujnika [Honeywell HPMA115S0](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/honeywell-hpma115s0)
+
+* Temat definiowany jest osobno da każdego czujnika w formularzu do [konfiguracji czujnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/honeywell-hpma115s0#sekcja-temat-mqtt-czujnika-hpma115s0)
+
+Przykład:
+`dom/czujnik/pylow`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **cmd** dla komend sterujących
+
+Używając przykładu tematu powyżej, aby odczytać dane z czujnika, do MQTT Brokera należy wysłać następujący temat
+
+`dom/czujnik/pylow/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat z z wiadomością w formacie JSON z danymi odczytanymi przez czujnik
+
+`dom/czujnik/pylow`
+
+Przykładowy JSON dla czujnika Honeywell HPMA115S0
+
+`
+{"PM25":{"value":10,"unit":"µg/m3"},"PM10":{"value":12,"unit":"µg/m3"}}
+`
+
+> AFE Firmware wysyła automatycznie dane z czujnika, z wykorzystaniem MQTT, ze zdefiniowaym konfiguracji firmware [interwałem](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/honeywell-hpma115s0#sekcja-czujnik-czastek-pm2-5-pm10)
+
+---
+
+##### Temat informujący o odległości do burzy z wykorzystaniem czujnika [AS3935](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935)
+
+* Temat definiowany jest osobno da każdego czujnika w formularzu do [konfiguracji czujnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935#sekcja-temat-mqtt-czujnika-as3935)
+
+Przykład:
+`burza/odleglosc`
+
+Dla przykładu powyżej AFE Firmware wysła następujący temat z wiadomością w formacie JSON po wykryciu piorunów
+`burza/odleglosc`
+
+Przykładowe JSON dla czujnika AS3935
+
+* Wykrycie pioruna: `{"event":{"type":"lightning strike","distance":10,"unit":"km"}}`
+* Wykrycie szumu: `{"event":{"type":"noise"}`
+* Wykrycie zakłócenia: `{"event":{"type":"disruption"}`
+
+
+> AFE Firmware wysyła automatycznie dane z czujnika, z wykorzystaniem MQTT, po wykryciu zdarzenia.

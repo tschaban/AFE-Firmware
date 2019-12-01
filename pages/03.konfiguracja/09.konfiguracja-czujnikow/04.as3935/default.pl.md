@@ -1,6 +1,9 @@
 ---
 title: AS3935
 media_order: 'Sensor AS3935.pdf,afe-firmware-as3935-mqtt.png,afe-firmware-as3935-domoticz.png,afe-firmware-as3935-czujnik.png,afe-firmware-as3935.png,SesnorAS3935.png'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
@@ -11,7 +14,21 @@ recaptchacontact:
 
 **AS3935** to czujnik wykrywający pioruny oraz potrafiący oszacować odległość od czoła burzy w promieniu do 40 km. 
 
-##### Specyfikacja:
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
+#### Specyfikacja:
 * Zasięg wykrywania burzy: promień do 40km
 * Dokładnością do 1km
 * Wbudowany algorytm odrzucający fałszywe zdarzenia

@@ -1,6 +1,9 @@
 ---
 title: 'Honeywell HPMA115S0'
 media_order: 'Sensor HPMA115S0-XXX.pdf,afe-firmware-HPMA115S0-mqtt.png,afe-firmware-HPMA115S0-domoticz.png,afe-firmware-HPMA115S0-czujnik.png,afe-firmware-HPMA115S0.png,SensorHoneywellHPMA115S0.jpg'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
@@ -9,8 +12,21 @@ recaptchacontact:
 
 **Honeywell HPMA115S0** to czujnik cząstek PM2.5 z wyjściem UART. Czujnik zbudowany jest na bazie laseru wykorzystującym metodę rozpraszania światła do wykrywania i zliczania cząstek w zakresie stężenia 0µg/m3 do 1000µg/m3. 
 
+---
 
-##### Specyfikacja
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
+#### Specyfikacja
 * Czas reakcji: <6s
 * Maksymalny prąd zasilania: 80mA, napięcia zasilania: 5V±0.2V
 * Sygnał wyjściowy, UART

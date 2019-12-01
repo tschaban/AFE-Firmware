@@ -1,6 +1,9 @@
 ---
 title: BH1750
 media_order: 'Sensor BH1750.pdf,afe-firmware-bh1750.png,afe-firmware-bh1750-mqtt.png,afe-firmware-bh1750-domoticz.png,afe-firmware-bh1750-czujnik.png,BH1750Sesnor.jpg'
+process:
+    markdown: true
+    twig: true
 recaptchacontact:
     enabled: false
 ---
@@ -9,7 +12,22 @@ recaptchacontact:
 
 **Czujnik BH1750** umożliwia pomiar natężnia oświetlenia otoczenia. Zakres pomiarów zawiera się w przedziale 1 - 65535 LUX
 
-##### Specyfikacja
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
+
+#### Specyfikacja
+
 * Napięcie zasilania: 3,6V - 6V
 * Interfejs I2C
 * Odpowiedź widmowa podobna do charakterystyki ludzkiego oka
