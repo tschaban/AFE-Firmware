@@ -1,6 +1,5 @@
 ---
 title: 'Konfiguracja OH i AFE Firmware'
-media_order: OH2AFE-Konfiguracja-1-1.png
 recaptchacontact:
     enabled: false
 ---
