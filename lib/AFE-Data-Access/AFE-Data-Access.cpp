@@ -2732,7 +2732,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-#define AFE_CONFIG_FILE_BUFFER_GATE 210
+#define AFE_CONFIG_FILE_BUFFER_GATE 300
 GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
   GATE configuration;
 
@@ -2763,11 +2763,6 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       root.printTo(Serial);
 #endif
 
-      /*
-      for (uint8_t i = 0; i < sizeof(configuration.state); i++) {
-        configuration.state[i] = Eeprom.readUInt8(467 + i);
-      }
-      */
 
       configuration.relayId = root["relayId"];
       sprintf(configuration.name, root["name"]);

@@ -188,7 +188,7 @@
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Gate */
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.0"
+#define AFE_FIRMWARE_VERSION "2.0.1"
 #define AFE_FIRMWARE_TYPE 5
 
 /* Functionalities */

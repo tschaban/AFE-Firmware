@@ -188,7 +188,7 @@ Teraz dodamy nasze urządzenie, jako Thing do do OpenHAB
 * Przełącznikiem powinniśmy móc sterować przekaźnikiem
 ![](OH2AFE-Konfiguracja-24-18.png)
 * Aby dodać inne elementy urządzenia (w zależności od funkcjonalności AFE Firmware) postępuj analogicznie powtarzając ten punkt instrukcji.
-* [Tutaj](/integracja-api/mqtt) są wszystkie komendy MQTT do wykorzystania w dodatkowych Channels lub skorzystaj z gotowej tej [listy parameterów dla Channels](https://www.smartnydom.pl/afe-firmware-pl/konfiguracja/openhab-nowy-mqtt/channels/)
+* [Tutaj](/integracja-api/mqtt) są wszystkie komendy MQTT do wykorzystania w dodatkowych Channels lub skorzystaj z gotowej tej [listy parameterów dla Channels](/system-do-automatyki/openhab/kanaly-channels)
 
 ##### Dodawanie nowych Items (elementów urządzenia)
 * Aby móc sterować urządzeniem z aplikacji mobilnej openHAB lub innej lub za pomocą interfejsu ClassicUI, BasicUI, HabPanel itp. konieczene jest dodanie elementów (items)
