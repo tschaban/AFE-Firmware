@@ -5,6 +5,8 @@
 .gcc-flags.json
 .idea
 .vscode
+webservice/_config.php
 lib-external
 sandpit
 webservice/docs
+AFE-Firmware.code-workspace

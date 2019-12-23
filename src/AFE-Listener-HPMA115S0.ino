@@ -3,31 +3,24 @@
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 
 /* Initializing sensor */
-void initHPMA115S0Sensor() {
-  if (Device.configuration.isHPMA115S0) {
-    ParticleSensor.begin();
+void initializeHPMA115S0Sensor() {
+  if (Device.configuration.noOfHPMA115S0s > 0) {
+    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+      ParticleSensor[i].begin(i);
+    }
   }
 }
 
 /* Main code for processing sesnor */
-void mainHPMA115S0Sensor() {
-  {
-    if (Device.configuration.isHPMA115S0) {
-      /* Sensor: listener */
-      ParticleSensor.listener();
-      if (ParticleSensor.isReady()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.on();
-#endif
-        HPMA115S0_DATA sensorData;
-        sensorData = ParticleSensor.get();
-        MQTTPublishParticleSensorData(sensorData);
-        DomoticzPublishParticleSensorData(sensorData);
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-        Led.off();
-#endif
+void HPMA115S0SensorEventsListener() {
+    if (Device.configuration.noOfHPMA115S0s > 0) {
+      for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+        ParticleSensor[i].listener();
+        if (ParticleSensor[i].isReady()) {
+          MQTTPublishParticleSensorData(i);
+          DomoticzPublishParticleSensorData(i);
+        }
       }
     }
-  }
 }
 #endif

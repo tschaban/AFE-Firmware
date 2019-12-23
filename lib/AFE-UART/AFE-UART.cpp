@@ -9,8 +9,7 @@ AFEUART::AFEUART() {}
 void AFEUART::begin() {
   AFEDataAccess Data;
   SERIALPORT configuration = Data.getSerialPortConfiguration();
-  SerialBus.init(configuration.RXD, configuration.TXD, false, 64);
-  SerialBus.begin(9600);
+  SerialBus.init(configuration.RXD, configuration.TXD, false, 64,9600);
   SerialBus.println();
 
 #ifdef DEBUG

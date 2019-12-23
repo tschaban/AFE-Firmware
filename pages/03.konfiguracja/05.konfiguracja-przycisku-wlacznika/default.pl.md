@@ -1,9 +1,28 @@
 ---
-title: 'Konfiguracja przycisku / włącznika'
+title: 'Przycisk / Włącznik'
 media_order: 'afe-firmware-konfiguracja-przycisk-czulosc.png,afe-firmware-konfiguracja-przycisk-domoticz.png,afe-firmware-konfiguracja-przycisk-menu.png,afe-firmware-konfiguracja-przycisk-przycisk.png,afe-firmware-konfiguracja-przycisk-mqtt.png'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Do ESP8266/8285 można w zależności od wersji AFE podłączyć od 1 do N przycisków, które moga pełnić różne funkcje.
+
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 Ekran do konfiguracji przycisku uruchamia się zaznaczając element Przycisk  w menu Panelu Konfiguracyjnego AFE Firmware.
 

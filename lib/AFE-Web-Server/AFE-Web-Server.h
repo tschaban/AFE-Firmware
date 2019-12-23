@@ -16,6 +16,11 @@
 #include <ESP8266WebServer.h>
 #include <WiFiUdp.h>
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
+
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -37,6 +42,9 @@ private:
   ESP8266WebServer server;
   AFEDevice *Device;
   AFEFirmwarePro *Firmware;
+  #ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED *SystemLED;
+  #endif
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -70,7 +78,7 @@ private:
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   LED getLEDData(uint8_t id);
   uint8_t getSystemLEDData();
 #endif
@@ -100,17 +108,26 @@ private:
   SERIALPORT getSerialPortData();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  I2CPORT getI2CPortData();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   HPMA115S0 getHPMA115S0SensorData();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  BMx80 getBMx80SensorData();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  BMEX80 getBMEX80SensorData();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorData();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AS3935 getAS3935SensorData();
+#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
@@ -124,6 +141,12 @@ public:
 
   /* Method initialize WebServer and Updater server */
   void begin(AFEDevice *, AFEFirmwarePro *);
+
+
+  #ifdef AFE_CONFIG_HARDWARE_LED
+  /* Method inherits global system LED */
+  void initSystemLED(AFELED *);
+  #endif
 
   /* Method listens for HTTP requests */
   void listener();

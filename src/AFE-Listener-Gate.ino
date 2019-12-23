@@ -40,18 +40,12 @@ void gateEventsListener() {
   uint8_t _gateState;
   for (uint8_t gateId = 0; gateId < Device.configuration.noOfGates; gateId++) {
     if (Gate[gateId].event()) {
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.on();
-#endif
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates.state[gateId] != _gateState) {
         MQTTPublishGateState(gateId);
         DomoticzPublishGateState(gateId);
         GatesCurrentStates.state[gateId] = _gateState;
       }
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-      Led.off();
-#endif
     }
   }
 }

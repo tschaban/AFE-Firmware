@@ -1,6 +1,11 @@
 ---
 title: 'MQTT Broker'
 media_order: 'afe-firmware-konfiguracja-mqtt-broker.png,afe-firmware-konfiguracja-mqtt-broker-formularz.png,afe-firmware-konfiguracja-mqtt-broker-lwt.png'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 MQTT Broker to oprogramowanie, które w dużym skrócie zajmuje się odbieraniem widomości od klientów publikujących wiadomości, a następnie rozsyłanie ich do klinetów, którzy te wiadomości subskrybują. 
@@ -11,6 +16,19 @@ Formularz ten służy do
 * konfiguracji połączenia do Brokera MQTT oraz 
 * ustawienia tematu LWT
 
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 3,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 Aby skonfigurować połaczenie do Brokera MQTT, należy wybrać **MQTT Broker** w menu konfiguracyjnym AFE Firmware
 

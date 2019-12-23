@@ -1,4 +1,4 @@
-``<?php
+<?php
 
 $DEBUG = false;
 
@@ -82,5 +82,11 @@ if (!$DEBUG) {
 }
 
 $debug->push("Completed");
+
+$debug->push("Sending Pushover");
+$Notification = new pushover();
+$Notification->send("New davice added\nKey", "D:".$_device_id."\nK:".$_key."\nStatus: ".$_result["error"]);
+$debug->push(" - done");
+
 
 ?>

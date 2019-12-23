@@ -1,12 +1,31 @@
 ---
-title: 'Konfiguracja urządzenia'
+title: Urządzenie
 media_order: 'afe-firmware-konfiguracja-urzadzenia-api.png,afe-firmware-konfiguracja-urzadzenia-nazwa.png,afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png,afe-firmware-konfiguracja-urzadzenia.png'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
 Forumularz konfiguracji urządzenia umożliwia 
 * nadanie unikalnej nazwy urządzeniu, 
 * określenie elementów, jak diody LED, przkaźniki, przyciski, czujniki podłączone do ESP8266/8285 oraz 
 * wybranie mechanizmów integracji (API) z systemami do automatyki.
+
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządzenie** w menu Panelu Konfiguracyjnego AFE Firmware.
 

@@ -17,13 +17,16 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <Adafruit_BMP085.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
 class AFEDataAccess {
 private:
-  // AFEEEPROM Eeprom;
   IPAddress IPfromString(const char *address);
 
 public:
@@ -91,7 +94,7 @@ public:
   void createADCInputConfigurationFile();
 #endif
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   LED getLEDConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, LED configuration);
   void createLEDConfigurationFile();
@@ -140,24 +143,41 @@ public:
   void saveGateState(uint8_t id, uint8_t state);
 #endif
 
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  I2CPORT getI2CPortConfiguration();
+  void saveConfiguration(I2CPORT configuration);
+  void createI2CConfigurationFile();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_UART
   SERIALPORT getSerialPortConfiguration();
   void saveConfiguration(SERIALPORT configuration);
+  void createSerialConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HPMA115S0 getHPMA115S0SensorConfiguration();
-  void saveConfiguration(HPMA115S0 configuration);
+  HPMA115S0 getHPMA115S0SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, HPMA115S0 configuration);
+  void createHPMA115S0SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  BMx80 getBMx80SensorConfiguration();
-  void saveConfiguration(BMx80 configuration);
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  BMEX80 getBMEX80SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, BMEX80 configuration);
+  void createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  BH1750 getBH1750SensorConfiguration();
-  void saveConfiguration(BH1750 configuration);
+  BH1750 getBH1750SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, BH1750 configuration);
+  void createBH1750SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AS3935 getAS3935SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, AS3935 configuration);
+  void createAS3935SensorConfigurationFile();
 #endif
 
 /* Methods turns on / off APIs */

@@ -33,7 +33,7 @@ private:
   uint8_t connections = 0;
   unsigned long delayStartTime = 0;
   boolean eventConnectionEstablished = false;
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
 #endif
 
@@ -71,6 +71,7 @@ public:
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
 
+  /* Method returns LWT topic, if configured */
   const char *getLWTTopic();
 };
 

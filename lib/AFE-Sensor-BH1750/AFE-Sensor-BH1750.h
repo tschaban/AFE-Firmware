@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_Sensor_BH1750_h
 #define _AFE_Sensor_BH1750_h
 
@@ -13,7 +11,7 @@
 
 #include <AFE-Data-Access.h>
 #include <BH1750.h>
-
+#include <AFE-I2C-Scanner.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -21,8 +19,6 @@
 class AFESensorBH1750 {
 
 private:
-  BH1750 configuration;
-
   BH1750LightSensor bh1750;
 
   boolean ready = false;
@@ -30,17 +26,18 @@ private:
 
   unsigned long startTime = 0;
 
-  float currentLightLevel = -1;
+  
 
 public:
+  BH1750 configuration;
+  float currentLightLevel = -1;
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+
   /* Constructor */
   AFESensorBH1750();
 
   /* Turns On sensor */
-  void begin();
-
-  /* returns PM2.5 and PM10 */
-  float get();
+  void begin(uint8_t id);
 
   /* Is true when data has been read from the sensor */
   boolean isReady();
@@ -49,8 +46,8 @@ public:
    * changes */
   void listener();
 
-  /* Return relay IDX in Domoticz */
-  unsigned long getDomoticzIDX();
+  /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 };
 
 #endif

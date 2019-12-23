@@ -143,7 +143,7 @@
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
 
 /* Form: Led configuration */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Zmień świecenie diody LED na odwrotne"
 
@@ -266,6 +266,7 @@
 #define L_CONTACTRON_MQTT_TOPIC "Temat MQTT do monitorowania kontaktronu"
 #endif
 
+/* Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_GATE "Brama/Drzwi"
 #define L_IF_MAGNETIC_SENSOR "Jeśli czujnik magnetyczny"
@@ -286,5 +287,117 @@
 #define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
 #define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
 #endif
+
+/* HPMA11BS0 */
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#define L_PARTICLE_SENSOR "Czujnik cząstek PM2.5/PM10"
+#define L_NUMBER_OF_HPMA115S0_SENSORS "Czujnik HPMA115S0"
+#define L_SENSOR_POST_SLEEP_INTERVAL                                              \
+  "Jeśli poniższa wartość jest większa od 0 to czujnik będzie usypiany "    \
+  "między odczytami. Wartość poniżej definiuje na ile sekund przed odczytem " \
+  "czujnik ma zostać uruchomiony. Wartość musi być mniejsza niż interwał "  \
+  "pomiarów"
+#define L_MEASURE_AFTER "Pomiar po czasie"
+#define L_MQTT_TOPIC_HPMA115S0 "Temat MQTT czujnika HPMA115S0"
+#endif
+
+/* BMX080 */
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#define L_BMEX80_SENSOR "Czujnik BMEx80"
+#define L_BMEX80_SENSORS "Czujniki BMEx80"
+#define L_NUMBER_OF_BMEX80_SENSORS "Ilość czujników BMEx80"
+#define L_IDX_GAS_SENSOR "IDX Czujnik gazu"
+#define L_IDX_IQA "IDX IQA"
+#define L_IDX_STATIC_IAQ "IDX Statyczny IQA"
+#define L_IDX_CO2_EQUVALENT "IDX CO2"
+#define L_IDX_BVOC_EQUIVALENT "IDX BVOC"
+#define L_MQTT_TOPIC_BMEX80 "Temat MQTT czujnika BMEx80"
+#define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
+#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu czujnika"
+#define L_ALTITIDE "Wysokość nad poziomem morza"
+#define L_METERS "Metrów"
+#endif
+
+/* BH1750 */
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#define L_BH1750_SENSOR "Czujnik BH1750"
+#define L_BH1750_SENSORS "Czujniki BH1750"
+#define L_NUMBER_OF_BH1750_SENSORS "Ilość czujników BH1750"
+#define L_MQTT_TOPIC_BH1750 "Temat MQTT czujnika BH1750"
+#endif
+
+/* AS3935 */
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#define L_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
+#define L_AS3935_SENSOR "Czujnik AS3935"
+#define L_NOISE_FLOOR "Poziom hałasu"
+#define L_NOISE_FLOOR_HINT "(0-najmniejszy, 7-największy)"
+#define L_WATCHDOG_THRESHOLD "Jakość detekcji"
+#define L_WATCHDOG_THRESHOLD_HINT "(1-najmniejsza, 10-największa)"
+#define L_SPIKES_REJECTION "Poziom odrzucenia detekcji piorunów"
+#define L_SPIKES_REJECTION_HINT "(1-najmniejsza, 11-największa)"
+#define L_MIN_SPIKES "Minimalna ilość piorunów, aby zaraportować detekcję burzy"
+#define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu hałasu"
+#define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom hałasu, w przypadku wyłączonej opcji Inteligentnej kontroli hałasu"
+#define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
+#define L_INDOOR "Wewnątrz budynku"
+#define L_OUTDOOR "Na zewnątrz"
+#define L_DISTANCE_UNIT "Jednostka odległości"
+#define L_KM "Kilometry"
+#define L_MILES "Mile"
+#define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
+#endif
+
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define L_ADDRESS "Adres"
+#endif
+
+/* Generic Sensors */
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_TEMPERATURE "Temperatura"
+#define L_IDX_TEMPERATURE "IDX Temperatura"
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Korekty"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Jednostki"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_HUMIDITY
+#define L_HUMIDITY "Wilgotność"
+#define L_IDX_HUMIDITY "IDX Wilgotność"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_DEW_POINT "IDX Punkt rosy"
+#define L_IDX_HEAT_INDEX "IDX Temp.odczuwalna"
+#define L_IDX_TEMP_HUM "IDX Temp/Wilgotność"
+#ifdef AFE_CONFIG_PRESSURE
+#define L_IDX_TEMP_HUM_BAR "IDX Temp/Wilg/Bar"
+#endif
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Korekty"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Jednostki"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_PRESSURE
+#define L_PRESSURE "Ciśnienie"
+#define L_IDX_PRESSURE "IDX Ciśnienie"
+#define L_IDX_ALT "Czujnik: wysokość n.p.m"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_RELATIVE_PRESSURE "IDX Ciśnienie względne"
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Korekty"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Jednostki"
+#endif
+#endif
+
 
 #endif

@@ -15,12 +15,12 @@
 #include <AFE-Firmware-Pro.h>
 #include <ESP8266WiFi.h>
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-#include <AFE-Sensor-BMx80.h>
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <AFE-Sensor-BMEX80.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -114,7 +114,7 @@ public:
   String addSwitchConfiguration(uint8_t id);
   String addProVersionSite();
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
   String addLEDConfiguration(uint8_t id);
   String addSystemLEDConfiguration();
 #endif
@@ -144,15 +144,19 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  String addHPMA115S0Configuration();
+  String addHPMA115S0Configuration(uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-  String addBMx80Configuration();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  String addBMEX80Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  String addBH1750Configuration();
+  String addBH1750Configuration(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  String addAS3935Configuration(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -163,7 +167,8 @@ public:
   String addSerialPortConfiguration();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  String addI2CPortConfiguration();
   String addDeviceI2CAddressSelection(uint8_t address);
 #endif
 

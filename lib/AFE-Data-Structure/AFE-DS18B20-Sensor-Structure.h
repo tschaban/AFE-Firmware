@@ -15,7 +15,7 @@
 struct DS18B20 {
   uint8_t gpio;
   float correction;
-  uint16_t interval;
+  uint32_t interval;
   uint8_t unit;
   boolean sendOnlyChanges;
   unsigned long idx;

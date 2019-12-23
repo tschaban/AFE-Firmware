@@ -6,13 +6,15 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 - decommissioned
+   - T4 - decommissioned, T0 took over 100% of it's functionality 
    - T5 Gate
    - T6 Wheater station
 
 More info: https://afe.smartnydom.pl
 LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 */
+
+#include <AFE-Configuration.h>
 
 /* Includes libraries for debugging in development compilation only */
 #ifdef DEBUG
@@ -31,7 +33,7 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-WiFi.h>
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 AFELED Led;
 #endif
@@ -89,24 +91,29 @@ AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_UART
+#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #include <AFE-Sensor-BH1750.h>
-AFESensorBH1750 BH1750Sensor;
+AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-BMx80.h>
-AFESensorBMx80 BMx80Sensor;
+#include <AFE-Sensor-BMEX80.h>
+AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-HPMA115S0.h>
-AFESensorHPMA115S0 ParticleSensor;
+AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#include <AFE-Sensor-AS3935.h>
+AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -116,13 +123,12 @@ AFEAnalogInput AnalogInput;
 
 void setup() {
 
-  Serial.begin(AFE_CONFIG_SERIAL_SPEED);
-  delay(10);
-
-/* Turn off publishing information to Serial if production release */
-#if !defined(DEBUG)
-  Serial.swap();
+#ifdef DEBUG
+Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+delay(10);
+//Serial.swap();
 #endif
+
 
 #ifdef DEBUG
   Serial << endl
@@ -141,15 +147,14 @@ void setup() {
     Serial << "mounted";
   } else {
     Serial << "ERROR: not mounted";
-#else
-    yield();
 #endif
+    yield();
   }
 
   Device.begin();
 
-  /* Checking if the device is launched for a first time. If so it loades
-   * default configuration */
+/* Checking if the device is launched for a first time. If so it loades
+ * default configuration */
 #ifdef DEBUG
   Serial << endl
          << "Checking if first time launch: Device.getMode()= "
@@ -169,6 +174,25 @@ void setup() {
   }
 #endif
 
+/* Initializing system LED (if exists) and turning it on */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  uint8_t systemLedID = Data.getSystemLedID();
+  yield();
+
+#ifdef DEBUG
+  Serial << endl << "System LED ID: " << systemLedID;
+#endif
+
+  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Led.begin(systemLedID);
+  }
+  Led.on();
+#ifdef DEBUG
+  Serial << endl << "System LED initialized";
+#endif
+#endif
+
+
 #ifdef DEBUG
   Serial << endl << "Checking, if WiFi hasn't been configured: ";
 #endif
@@ -177,7 +201,7 @@ void setup() {
     Serial << "YES";
 #endif
   } else {
-    /* Checking if the firmware has been upgraded */
+/* Checking if the firmware has been upgraded */
 #ifdef DEBUG
     Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
 #endif
@@ -215,29 +239,6 @@ void setup() {
   Serial << endl << "Network initialized";
 #endif
 
-  /* Initializing system LED (if exists)  */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
-  uint8_t systemLedID = Data.getSystemLedID();
-  delay(0);
-
-#ifdef DEBUG
-  Serial << endl << "System LED ID: " << systemLedID;
-#endif
-
-  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-      Device.configuration.noOfLEDs >= systemLedID + 1) {
-    Led.begin(systemLedID);
-  }
-
-  /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
-      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    Led.blinkingOn(100);
-  }
-#ifdef DEBUG
-  Serial << endl << "System LED initialized";
-#endif
-#endif
 
 #ifdef DEBUG
   Serial << endl << "Starting network";
@@ -256,6 +257,10 @@ void setup() {
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
+  #ifdef AFE_CONFIG_HARDWARE_LED
+  WebServer.initSystemLED(&Led);
+  #endif
+
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
 #endif
@@ -278,7 +283,7 @@ void setup() {
     initializeGate();
 #endif
 
-    /* Initializing DS18B20 or DHTxx sensor */
+/* Initializing DS18B20 or DHTxx sensor */
 #if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
     initalizeSensor();
 #ifdef DEBUG
@@ -292,25 +297,19 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    if (Device.configuration.isHPMA115S0) {
-      initHPMA115S0Sensor();
-    }
+    initializeHPMA115S0Sensor();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-    if (Device.configuration.isBMx80 == TYPE_BME680_SENSOR) {
-      BMx80Sensor.begin(TYPE_BME680_SENSOR);
-    } else if (Device.configuration.isBMx80 == TYPE_BME280_SENSOR) {
-      BMx80Sensor.begin(TYPE_BME280_SENSOR);
-    } else if (Device.configuration.isBMx80 == TYPE_BMP180_SENSOR) {
-      BMx80Sensor.begin(TYPE_BMP180_SENSOR);
-    }
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    initializeBMEX80Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    if (Device.configuration.isBH1750) {
-      BH1750Sensor.begin();
-    }
+    initializeBH1750Sensor();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+    initializeAS3935Sensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -335,7 +334,17 @@ void setup() {
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
   if (Device.getMode() == AFE_MODE_NORMAL) {
+    I2CScanner.begin();
     I2CScanner.scanAll();
+  }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.off();
+  /* If device in configuration mode then it starts LED blinking */
+  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
+      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
+    Led.blinkingOn(100);
   }
 #endif
 
@@ -392,15 +401,19 @@ void loop() {
 
 /* Sensor: HPMA115S0 related code  */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-        mainHPMA115S0Sensor();
+        HPMA115S0SensorEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BMX80
-        mainBMx80Sensor();
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+        BMEX80SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-        mainBH1750Sensor();
+        BH1750SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+        AS3935SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -415,7 +428,7 @@ void loop() {
         Firmware.listener();
 
       } else { /* Device runs in configuration mode over WiFi */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
         if (!Led.isBlinking()) {
           Led.blinkingOn(100);
         }
@@ -424,7 +437,7 @@ void loop() {
       }
     }
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
     else {
       if (Device.getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
@@ -440,8 +453,8 @@ void loop() {
   switchEventsListener();
   processSwitchEvents();
 
-  /* Led listener */
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+/* Led listener */
+#ifdef AFE_CONFIG_HARDWARE_LED
   Led.loop();
 #endif
 

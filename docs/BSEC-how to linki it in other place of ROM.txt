@@ -1,0 +1,4 @@
+add this line above - for BSEC
+
+*libalgobsec.a:(.literal.* .text.*)
+*(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom0.text.* .irom.text .irom.text.*)

@@ -31,7 +31,7 @@
 #elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "to control gate controller"
 #elif defined(T6_CONFIG)
-#define L_FIRMWARE_NAME "Wheater Station"
+#define L_FIRMWARE_NAME "Weather Station"
 #endif
 
 /* Menu */
@@ -85,7 +85,7 @@
   "hotspot name used for configuration mode"
 #define L_HARDWARE_CONFIGURATION "Hardware configuration"
 #define L_HARDWARE_CONFIGURATION_INFO "Select connected items to your device"
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 #define L_NUMBER_OF_LEDS "Number of LEDs"
 #endif
 #define L_NUMBER_OF_RELAYS "Number of relays"
@@ -136,7 +136,7 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
-#if AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS > 0
+#ifdef AFE_CONFIG_HARDWARE_LED
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"
 
@@ -276,6 +276,117 @@
 #define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
 #define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
 #define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
+#endif
+
+/* HPMA11BS0 */
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#define L_PARTICLE_SENSOR "PM2.5/PM10 Particle Sensor"
+#define L_NUMBER_OF_HPMA115S0_SENSORS "HPMA115S0 Sensor"
+#define L_SENSOR_POST_SLEEP_INTERVAL                                           \
+  "If the parameter below is different than 0, the sensor will go to sleep "   \
+  "mode between measurements. The setting below defined how many seconds "     \
+  "before a measurement the sensor should wake up. It should be lower than "   \
+  "measurement's interval"
+#define L_MEASURE_AFTER "Measure after"
+#define L_MQTT_TOPIC_HPMA115S0 "HPMA115S0 Sensor's MQTT Topic"
+#endif
+
+/* BMX080 */
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#define L_BMEX80_SENSOR "BMEx80 Sensor"
+#define L_BMEX80_SENSORS "BMEx80 Sensors"
+#define L_NUMBER_OF_BMEX80_SENSORS "Number of BMEx80 Sensors"
+#define L_IDX_GAS_SENSOR "IDX Gas sensor"
+#define L_IDX_IQA "IDX IQA"
+#define L_IDX_STATIC_IAQ "IDX Static IQA"
+#define L_IDX_CO2_EQUVALENT "IDX CO2 Equivalent"
+#define L_IDX_BVOC_EQUIVALENT "IDX BVOC Equivalent"
+#define L_MQTT_TOPIC_BMEX80 "BMEx80 Sensor's MQTT Topic"
+#define L_BMEX80_SENSOR_TYPE "BMEx80 Sensor type"
+#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Show/Refresh configuration settings after sensor type change"
+#define L_ALTITIDE "Above sea level"
+#define L_METERS "Meters"
+#endif
+
+/* BH1750 */
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#define L_BH1750_SENSOR "BH1750 Sensor"
+#define L_BH1750_SENSORS "BH1750 Sensors"
+#define L_NUMBER_OF_BH1750_SENSORS "Number of BH1750 Sensors"
+#define L_MQTT_TOPIC_BH1750 "BH1750 Sensor's MQTT Topic"
+#endif
+
+/* AS3935 */
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#define L_NUMBER_OF_AS3935_SENSORS "Number of AS3935 Sensors"
+#define L_AS3935_SENSOR "AS3935 Sensor"
+#define L_NOISE_FLOOR "Noise floor level"
+#define L_NOISE_FLOOR_HINT "(0-low, 7-high)"
+#define L_WATCHDOG_THRESHOLD "Detection quality"
+#define L_WATCHDOG_THRESHOLD_HINT "(1-low, 10-high)"
+#define L_SPIKES_REJECTION "Spikes rejections level"
+#define L_SPIKES_REJECTION_HINT "(1-low, 11-high)"
+#define L_MIN_SPIKES "Min. number of spikes to report the lightning"
+#define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligent noise control"
+#define L_SET_LEVEL_OF_NOISE_FLOOR "Set the level of noise if Intelignet noise control option is turned off"
+#define L_SENSOR_INDOOR_OUTDOOR "Sensor localisation"
+#define L_INDOOR "Indoor"
+#define L_OUTDOOR "Outdoor"
+#define L_DISTANCE_UNIT "Distance unit"
+#define L_KM "Kilometers"
+#define L_MILES "Miles"
+#define L_MQTT_TOPIC_AS3935 "AS3935 Sensor's MQTT Topic"
+#endif
+
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#define L_ADDRESS "Address"
+#endif
+
+/* Generic Sensors */
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_TEMPERATURE "Temperature"
+#define L_IDX_TEMPERATURE "IDX Temperature"
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_HUMIDITY
+#define L_HUMIDITY "Humidity"
+#define L_IDX_HUMIDITY "IDX Humidity"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_DEW_POINT "IDX Dew Point"
+#define L_IDX_HEAT_INDEX "IDX Heat Index"
+#define L_IDX_TEMP_HUM "IDX Temp/Humidity"
+#ifdef AFE_CONFIG_PRESSURE
+#define L_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
+#endif
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
+#endif
+
+#ifdef AFE_CONFIG_PRESSURE
+#define L_PRESSURE "Pressure"
+#define L_IDX_PRESSURE "IDX Pressure"
+#define L_IDX_ALT "Sensor: altitude"
+#ifdef AFE_CONFIG_TEMPERATURE
+#define L_IDX_RELATIVE_PRESSURE "IDX Relative pressure"
+#endif
+#ifndef L_CORRECTIONS
+#define L_CORRECTIONS "Corrections"
+#endif
+#ifndef L_UNITS
+#define L_UNITS "Units"
+#endif
 #endif
 
 #endif

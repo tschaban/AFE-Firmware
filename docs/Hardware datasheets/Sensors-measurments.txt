@@ -1,0 +1,3 @@
+BMP180 - temperature,pressure
+BMP280 - temperature,pressure,humidity
+BMP680 - temperature,pressure,humidity,gasResistance

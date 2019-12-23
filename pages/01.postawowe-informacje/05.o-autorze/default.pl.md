@@ -1,16 +1,25 @@
 ---
 title: 'O autorze'
+media_order: IMG_2805.jpg
 process:
     markdown: true
     twig: true
+recaptchacontact:
+    enabled: false
 ---
 
-Witaj, mam na imię Adrian, kiedyś zawodowo programowałem, teraz zostało tylko hobbistycznie. Hobbistycznie prowadzę również blog'a: [Smart'ny Dom](https://www.smartnydom.pl?target=_blank)
+<img src="/user/pages/01.postawowe-informacje/05.o-autorze/IMG_2805.jpg" style="float:right; display: block; padding-right: 10px; margin: 0;"  />
 
-Oprogramowanie AFE Firmware, dostępne na tej stronie, zrobiłem i rozwijam na własne potrzeby. Jeśli komuś się przyda to cieszy mnie to bardzo.
 
-Pozdrawiam!
+    
+Adrian Czabanowski, zawodowo związany z IT, w przeszłości programista, aktualnie kodujący jedynie hobbistycznie.
+Pasjonata nowych technologii szczególnie tych, które ułatwiają życie lub wspierają "zielone" środowisko.
+Prowadzi bloga [Smart'ny Dom](https://www.smartnydom.pl?target=_blank)
 
-[SMS'owy](http://adrian.czabanowski.com?target=_blank) kontakt ze mna.
+##### Kontakt
+* [Formularz kontaktowy](/kontakt)
+
+##### Kontakt przez media społecznościowe
 
 {% include 'partials/socialmedia.html.twig' %}
+    

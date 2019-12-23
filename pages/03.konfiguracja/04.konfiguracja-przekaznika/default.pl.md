@@ -1,9 +1,30 @@
 ---
-title: 'Konfiguracja przekaźnika'
-media_order: 'afe-firmware-konfiguracja-przekaznik.png,afe-firmware-konfiguracja-przekaznik-auto.png,afe-firmware-konfiguracja-przekaznik-domoticz.png,afe-firmware-konfiguracja-przekaznik-gpio.png,afe-firmware-konfiguracja-przekaznik-led.png,afe-firmware-konfiguracja-przekaznik-mqtt.png,afe-firmware-konfiguracja-przekaznik-wartosci-domyslne.png'
+title: Przekaźnik
+media_order: 'afe-firmware-konfiguracja-przekaznik.png,afe-firmware-konfiguracja-przekaznik-auto.png,afe-firmware-konfiguracja-przekaznik-domoticz.png,afe-firmware-konfiguracja-przekaznik-gpio.png,afe-firmware-konfiguracja-przekaznik-led.png,afe-firmware-konfiguracja-przekaznik-mqtt.png,afe-firmware-konfiguracja-przekaznik-wartosci-domyslne.png,RelayItem.jpg'
+process:
+    markdown: true
+    twig: true
+recaptchacontact:
+    enabled: false
 ---
 
+![](RelayItem.jpg)
+
 Jednym z podstawowych komponentów podłaczanch do ESP8266/8285 i stosowanych w automatyce są przekaźniki / styczniki. Służą one do otwierania / zamykania obwodów. Najpopularniejsze zastosowanie do włączanie / wyłączanie podłączonych do modułu urządzeń elektrycznych np. oświetlenia
+
+---
+
+{% if config.get('plugins.page-toc.active') or attribute(page.header, 'page-toc').active %}
+**Spis treści**
+<div class="page-toc">
+    {% set table_of_contents = toc(page.content, 4,2) %}
+    {% if table_of_contents is not empty %}
+    {{ table_of_contents }}
+    {% endif %}
+</div>
+{% endif %}
+
+---
 
 Ekran do konfiguracji przekaźnika uruchamia się wybierając pozycję **Przekaźnik** w menu AFE Firmware.
 
@@ -16,7 +37,7 @@ Ekran do konfiguracji przekaźnika uruchamia się wybierając pozycję **Przeka�
 ![](afe-firmware-konfiguracja-przekaznik-gpio.png)
 
 ##### GPIO
-* Numer GPIO do którego podłączona jest przekaźnik
+* Numer GPIO do którego podłączony jest przekaźnik
 * Zakres od 0 do 16
 * Wartość musi zostać wybrana
 
