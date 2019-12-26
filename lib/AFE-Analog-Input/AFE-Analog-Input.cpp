@@ -95,6 +95,6 @@ void AFEAnalogInput::listener() {
 
 void AFEAnalogInput::getJSON(char *json) {
  sprintf(json,
-          "{\"raw\":%d,\"percent\":%d,\"voltage\":%f,\"voltageCalculated\":%f}",
+          "{\"raw\":%d,\"percent\":%f,\"voltage\":%f,\"voltageCalculated\":%f}",
           data.raw, data.percent,data.voltage,data.voltageCalculated);
 }
