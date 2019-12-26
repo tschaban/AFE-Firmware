@@ -25,8 +25,9 @@ recaptchacontact:
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t0-wlacznik-wifi) dotyczące AFE Firmware T0
 * Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 
-##### [Pobierz najnowszą wersję 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.0.3](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
 **Poprzednie wersje**
+* Wersje 2.0.0 - 2.0.2: [Archiwum](https://drive.google.com/drive/folders/1dKf5vOTjD53RPvnlTQLNaxTWL-N3hKNC/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t0-esp8266-1mb/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t0-esp8285-1mb/?target=_blank)
 
 ---
