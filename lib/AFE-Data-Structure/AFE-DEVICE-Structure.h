@@ -22,9 +22,9 @@ struct DEVICE {
   char name[33];
   AFE_DEVICE_API api;
 #if defined(T0_CONFIG)
-  boolean isLED[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
-  boolean isSwitch[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
-  boolean isRelay[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
+  uint8_t noOfSwitches;
+  uint8_t noOfRelays;
+  uint8_t noOfLEDs;
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
@@ -81,5 +81,23 @@ struct DEVICE {
 #endif
 #endif
 };
+
+
+
+#ifdef T0_CONFIG
+/* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */
+struct DEVICE_T0_200 {
+  char name[33];
+  AFE_DEVICE_API api;
+#ifdef AFE_CONFIG_HARDWARE_LED
+  boolean isLED[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
+#endif
+  boolean isSwitch[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
+  boolean isRelay[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  boolean isAnalogInput;
+#endif
+};
+#endif
 
 #endif

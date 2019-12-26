@@ -1,5 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 void eventsListener() {
+
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
 #ifdef DEBUG
@@ -9,26 +10,48 @@ void eventsListener() {
            << endl
            << "Events listener: triggered";
 #endif
-    /* Update relay status to Domoticz */
+    /* Sendings hardware values to Domoticz */
     if (Device.configuration.api.domoticz) {
 #ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
+#ifdef DEBUG
+Serial << endl << "Sending current gate state to Domoticz";
+#endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         DomoticzPublishGateState(i);
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#ifdef DEBUG
+Serial << endl << "Sending current state of contactrons to Domoticz";
+#endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
         DomoticzPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#ifdef DEBUG
+Serial << endl << "Sending current state of switches to Domoticz";
+#endif
+      for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
+        if (Switch[i].getDomoticzIDX() > 0) {
+          Domoticz.sendSwitchCommand(Switch[i].getDomoticzIDX(),
+                                     Switch[i].getPhisicalState() ? "On"
+                                                                  : "Off");
+        }
+      }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+#ifdef DEBUG
+Serial << endl << "Sending current state of relays to Domoticz";
+#endif
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* For the Relay assigned to a gate code below is not needed for
@@ -52,6 +75,9 @@ void eventsListener() {
 #endif
 
 #if defined(T3_CONFIG)
+#ifdef DEBUG
+Serial << endl << "Sending current state of PIRs to Domoticz";
+#endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
         if (Device.configuration.isPIR[i]) {
           DomoticzPublishPirState(i);
@@ -130,10 +156,12 @@ void eventsListener() {
       }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
       /* Publishing state of Switch to MQTT */
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
         MQTTPublishSwitchState(i);
       }
+#endif
 
 /* Subscribing to MQTT ADC commands */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

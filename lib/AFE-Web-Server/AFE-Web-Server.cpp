@@ -13,9 +13,7 @@ void AFEWebServer::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void AFEWebServer::initSystemLED(AFELED *_SystemLED) {
-    SystemLED = _SystemLED;
-  }
+void AFEWebServer::initSystemLED(AFELED *_SystemLED) { SystemLED = _SystemLED; }
 #endif
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
@@ -267,7 +265,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     case AFE_CONFIG_SITE_AS3935:
-      Data.saveConfiguration(siteConfig.deviceID,getAS3935SensorData());
+      Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
       break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -360,7 +358,9 @@ void AFEWebServer::generate(boolean upload) {
         upgradeFailed = true;
       }
     } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+#ifdef AFE_CONFIG_HARDWARE_LED
       SystemLED->toggle();
+#endif
 #ifdef DEBUG
       Serial << ".";
 #endif
@@ -429,9 +429,9 @@ void AFEWebServer::generate(boolean upload) {
 
   /* Rebooting device */
   if (siteConfig.reboot) {
-    #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
     SystemLED->on();
-    #endif
+#endif
     Device->reboot(siteConfig.rebootMode);
   }
 
@@ -681,7 +681,6 @@ DEVICE AFEWebServer::getDeviceData() {
       server.arg("a3").length() > 0 ? server.arg("a3").toInt() : 0;
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
@@ -862,8 +861,9 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
   data.type = server.arg("m").length() > 0 ? server.arg("m").toInt()
                                            : AFE_SWITCH_TYPE_MONO;
 
-  data.sensitiveness = server.arg("s").length() > 0 ? server.arg("s").toInt()
-                                                    : AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
+  data.sensitiveness = server.arg("s").length() > 0
+                           ? server.arg("s").toInt()
+                           : AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
 
   data.functionality = server.arg("f").length() > 0
                            ? server.arg("f").toInt()
@@ -1176,16 +1176,13 @@ SERIALPORT AFEWebServer::getSerialPortData() {
 I2CPORT AFEWebServer::getI2CPortData() {
   I2CPORT data;
 
-  data.SDA = server.arg("a").length() > 0
-                 ? server.arg("a").toInt()
-                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
-  data.SCL = server.arg("l").length() > 0
-                 ? server.arg("l").toInt()
-                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+  data.SDA = server.arg("a").length() > 0 ? server.arg("a").toInt()
+                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
+  data.SCL = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
   return data;
 }
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
@@ -1244,7 +1241,7 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
   data.temperature.unit = server.arg("tu").length() > 0
                               ? server.arg("tu").toInt()
                               : AFE_TEMPERATURE_UNIT_CELSIUS;
-  
+
   data.temperature.correction =
       server.arg("tc").length() > 0 ? server.arg("tc").toFloat() : 0;
 
@@ -1346,7 +1343,7 @@ BH1750 AFEWebServer::getBH1750SensorData() {
 AS3935 AFEWebServer::getAS3935SensorData() {
   AS3935 data;
 
-    if (server.arg("n").length() > 0) {
+  if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
     data.name[0] = '\0';
@@ -1358,13 +1355,24 @@ AS3935 AFEWebServer::getAS3935SensorData() {
 
   data.setNoiseFloorAutomatically = server.arg("f").length() > 0 ? true : false;
 
-  data.noiseFloor = server.arg("nf").length() > 0 ? server.arg("nf").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+  data.noiseFloor = server.arg("nf").length() > 0
+                        ? server.arg("nf").toInt()
+                        : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
 
-  data.minimumNumberOfLightningSpikes = server.arg("m").length() > 0 ? server.arg("m").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
+  data.minimumNumberOfLightningSpikes =
+      server.arg("m").length() > 0
+          ? server.arg("m").toInt()
+          : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
 
-  data.watchdogThreshold = server.arg("e").length() > 0 ? server.arg("e").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_WATCHDOG_THRESHOLD;
+  data.watchdogThreshold =
+      server.arg("e").length() > 0
+          ? server.arg("e").toInt()
+          : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_WATCHDOG_THRESHOLD;
 
-  data.spikesRejectionLevel = server.arg("s").length() > 0 ? server.arg("s").toInt() : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
+  data.spikesRejectionLevel =
+      server.arg("s").length() > 0
+          ? server.arg("s").toInt()
+          : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
 
   data.indoor = server.arg("w").length() > 0 && server.arg("w").toInt() == 1
                     ? true
