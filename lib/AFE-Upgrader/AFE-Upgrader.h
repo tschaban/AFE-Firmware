@@ -11,9 +11,12 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
+
+
 class AFEUpgrader {
 
 private:
@@ -22,6 +25,10 @@ private:
   AFEDevice *Device;
   void upgradeFirmwarType();
   void updateFirmwareVersion();
+
+#ifdef T0_CONFIG
+  void upgradeToT0V203();
+#endif
 
 public:
   /* Constructor */

@@ -94,6 +94,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += "</a></li>";
   }
 
+#ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_LED;
@@ -101,6 +102,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
     page += L_LEDS;
     page += "</a></li>";
   }
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {

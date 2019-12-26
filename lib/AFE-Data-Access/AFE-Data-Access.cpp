@@ -407,6 +407,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #ifdef DEBUG
   else {
     Serial << "failure";
+    configFile.close();
   }
   Serial << endl << "--------------------------------------------------";
 #endif
@@ -1336,41 +1337,41 @@ void AFEDataAccess::createLEDConfigurationFile() {
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_1_DEFAULT_GPIO;
   saveConfiguration(1, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_4CH)
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_3G)
   LEDConfiguration.changeToOppositeValue = false;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_iECSv20)
   LEDConfiguration.changeToOppositeValue = true;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #elif defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
   LEDConfiguration.changeToOppositeValue = true;
-  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO ;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, LEDConfiguration);
-  index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;  
+  index = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #else
   LEDConfiguration.changeToOppositeValue = false;
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
@@ -1970,7 +1971,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_NAME);
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
-  RelayConfiguration.state.powerOn = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
+  RelayConfiguration.state.powerOn =
+      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
   saveRelayState(0, false);
   saveConfiguration(0, RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
@@ -2230,7 +2232,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   /* Saving first switch. Common for all devices */
   SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE;
-  SwitchConfiguration.functionality = AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
+  SwitchConfiguration.functionality =
+      AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
   saveConfiguration(0, SwitchConfiguration);
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -2259,7 +2262,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(3, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
-  index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
+  // Just one switch is possible for sonoff touch 1 gang, and one config file is created 
+  index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
   SwitchConfiguration.functionality =
@@ -2280,7 +2284,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(2, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SHELLY_1)
-  index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
+// Just one switch is possible for Shelly-1, and one config file is created for Switch
+  index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_iECSv20)
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
   SwitchConfiguration.functionality =
@@ -2762,7 +2767,6 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
 
       configuration.relayId = root["relayId"];
       sprintf(configuration.name, root["name"]);
@@ -3965,3 +3969,84 @@ IPAddress AFEDataAccess::IPfromString(const char *address) {
   };
   return ip;
 }
+
+/*************** OLD METHODS USED FOR UPGRADE ONLY ******************/
+
+#ifdef T0_CONFIG
+DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
+  DEVICE_T0_200 configuration;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "----------------- Reading File -------------------";
+  Serial << endl << "Opening file: cfg-device.json : ";
+  Serial << endl << "THIS IS OLD VERSION OF THE DEVICE FILE ";
+#endif
+
+  File configFile = SPIFFS.open("cfg-device.json", "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "Reading JSON : ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      sprintf(configuration.name, root["name"]);
+      configuration.api.http = root["api"]["http"];
+      configuration.api.mqtt = root["api"]["mqtt"];
+      configuration.api.domoticz = root["api"]["domoticz"];
+      /* HTTP API must be ON when Domoticz is ON */
+      if (configuration.api.domoticz && !configuration.api.http) {
+        configuration.api.http = true;
+      }
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
+        configuration.isLED[i] = root["led"][i];
+      }
+#endif
+
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES; i++) {
+        configuration.isSwitch[i] = root["switch"][i];
+      }
+
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
+        configuration.isRelay[i] = root["relay"][i];
+      }
+
+#ifdef CONFIG_HARDWARE_ADC_VCC
+      configuration.isAnalogInput = root["isAnalogInput"];
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << "success" << endl
+             << "JSON Buffer size: " << jsonBuffer.size();
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << "failure";
+    }
+#endif
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << "failure";
+  }
+  Serial << endl << "--------------------------------------------------";
+#endif
+
+  return configuration;
+}
+#endif

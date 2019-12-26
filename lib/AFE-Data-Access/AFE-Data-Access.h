@@ -17,9 +17,10 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-#include <Adafruit_BMP085.h>
-#endif
+// Disabled with T0 as it was added to the parsher, is it required for T6?
+//#ifdef AFE_CONFIG_HARDWARE_BMEX80
+//#include <Adafruit_BMP085.h>
+//#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -39,6 +40,9 @@ public:
   void createDeviceUIDFile();
 
   DEVICE getDeviceConfiguration();
+  #ifdef T0_CONFIG // Version 2.0.0 - 2 Device configuration. Method used only to upgrade to new version
+  DEVICE_T0_200 getDeviceT0v200Configuration();
+  #endif
   void saveConfiguration(DEVICE *);
   void createDeviceConfigurationFile();
 
