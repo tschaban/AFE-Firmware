@@ -6,7 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 - decommissioned, T0 took over 100% of it's functionality 
+   - T4 - decommissioned, T0 took over 100% of it's functionality
    - T5 Gate
    - T6 Wheater station
 
@@ -20,9 +20,13 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-API-Domoticz.h>
+#endif
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 #include <AFE-API-MQTT.h>
+#endif
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
@@ -65,14 +69,19 @@ AFEDataAccess Data;
 AFEFirmwarePro Firmware;
 AFEDevice Device;
 AFEWiFi Network;
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 AFEMQTT Mqtt;
+MQTT MQTTConfiguration;
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 AFEDomoticz Domoticz;
+#endif
 AFEWebServer WebServer;
 AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
-MQTT MQTTConfiguration;
 
 #if defined(T3_CONFIG)
 #include <AFE-PIR.h>
@@ -124,11 +133,10 @@ AFEAnalogInput AnalogInput;
 void setup() {
 
 #ifdef DEBUG
-Serial.begin(AFE_CONFIG_SERIAL_SPEED);
-delay(10);
-//Serial.swap();
+  Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+  delay(10);
+// Serial.swap();
 #endif
-
 
 #ifdef DEBUG
   Serial << endl
@@ -192,7 +200,6 @@ delay(10);
 #endif
 #endif
 
-
 #ifdef DEBUG
   Serial << endl << "Checking, if WiFi hasn't been configured: ";
 #endif
@@ -239,7 +246,6 @@ delay(10);
   Serial << endl << "Network initialized";
 #endif
 
-
 #ifdef DEBUG
   Serial << endl << "Starting network";
 #endif
@@ -257,9 +263,9 @@ delay(10);
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
-  #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   WebServer.initSystemLED(&Led);
-  #endif
+#endif
 
 #ifdef DEBUG
   Serial << endl << "WebServer initialized";
@@ -326,9 +332,14 @@ delay(10);
     }
 #endif
 
-    /* Initializing APIs */
+/* Initializing APIs */
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
     MQTTInit();
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     DomoticzInit();
+#endif
   }
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
@@ -369,11 +380,25 @@ void loop() {
         /* Triggerd when connectes/reconnects to WiFi */
         eventsListener();
 
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
-        if (Device.configuration.api.mqtt) {
+        if (
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
+            Device.configuration.api.mqtt
+#endif
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+            ||
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+            Device.configuration.api.mqttDomoticz
+#endif
+            ) {
           Mqtt.listener();
         }
+#endif
 
         /* Listens for HTTP requsts. Both for configuration panel HTTP
          * requests or HTTP API requests if it's turned on */

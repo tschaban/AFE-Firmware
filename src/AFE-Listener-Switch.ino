@@ -60,7 +60,7 @@ void processSwitchEvents() {
           MQTTPublishSwitchState(i);
         }
 
-        if (Device.configuration.api.domoticz) {
+        if (Device.configuration.api.httpDomoticz) {
           if (Switch[i].getDomoticzIDX() > 0) {
             Domoticz.sendSwitchCommand(Switch[i].getDomoticzIDX(),
                                        Switch[i].getPhisicalState() ? "On"

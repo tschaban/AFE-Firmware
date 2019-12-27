@@ -38,8 +38,10 @@ private:
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
   RELAY RelayConfiguration;
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
   char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
@@ -83,10 +85,14 @@ public:
    * after device has been crash */
   void setRelayAfterRestoringPower();
 
+
+
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   /* Method sets relay state after device is connected / reconnected to MQTT
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
+#endif  
 
   /* Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay is ON */
   byte get();
@@ -129,12 +135,17 @@ public:
   void setTimerUnitToSeconds(boolean value);
 #endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   /* Method returns MQTT topic for this relay */
   const char *getMQTTCommandTopic();
   const char *getMQTTStateTopic();
+#endif  
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
+#endif
+  
 };
 
 #endif

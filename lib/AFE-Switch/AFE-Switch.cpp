@@ -4,8 +4,6 @@
 
 AFESwitch::AFESwitch(){};
 
-// AFESwitch::AFESwitch(uint8_t id) { begin(id); }
-
 void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   AFEDataAccess Data;
   SwitchConfiguration = Data.getSwitchConfiguration(id);
@@ -186,6 +184,7 @@ uint8_t AFESwitch::getControlledRelayID() {
   return SwitchConfiguration.relayID;
 }
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
 const char *AFESwitch::getMQTTStateTopic() {
   if (strlen(SwitchConfiguration.mqtt.topic) > 0) {
     sprintf(mqttStateTopic, "%s/state", SwitchConfiguration.mqtt.topic);
@@ -194,7 +193,10 @@ const char *AFESwitch::getMQTTStateTopic() {
   }
   return mqttStateTopic;
 }
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 uint32_t AFESwitch::getDomoticzIDX() {
   return SwitchConfiguration.domoticz.idx;
 }
+#endif

@@ -108,7 +108,9 @@ public:
   String addNetworkConfiguration();
   String addConnectingSite();
   String addMQTTBrokerConfiguration();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   String addDomoticzServerConfiguration();
+#endif  
   String addPasswordConfigurationSite();
   String addRelayConfiguration(uint8_t id);
   String addSwitchConfiguration(uint8_t id);

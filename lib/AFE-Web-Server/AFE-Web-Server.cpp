@@ -625,7 +625,7 @@ DEVICE AFEWebServer::getDeviceData() {
 
   data.api.http = server.arg("h").length() > 0 ? true : false;
   data.api.mqtt = server.arg("m").length() > 0 ? true : false;
-  data.api.domoticz = server.arg("d").length() > 0 ? true : false;
+  data.api.httpDomoticz = server.arg("d").length() > 0 ? true : false;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   data.noOfLEDs = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;

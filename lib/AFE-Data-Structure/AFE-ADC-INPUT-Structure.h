@@ -9,12 +9,14 @@
 #include "WProgram.h"
 #endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
 struct ADCINPUT_DOMOTICZ {
   uint32_t raw;
   uint32_t percent;
   uint32_t voltage;
   uint32_t voltageCalculated;
 };
+#endif
 
 struct ADCINPUT_DATA {
   uint16_t raw;
@@ -33,8 +35,12 @@ struct ADCINPUT {
   uint32_t interval;
   uint16_t numberOfSamples;
   double maxVCC;
+#ifdef AFE_CONFIG_API_MQTT_ENABLED  
   MQTT_BASIC_CONFIG mqtt;
+#endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   ADCINPUT_DOMOTICZ domoticz;
+#endif  
   VOLTAGE_DIVIDER divider;
 };
 

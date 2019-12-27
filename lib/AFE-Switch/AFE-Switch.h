@@ -43,7 +43,9 @@ private:
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   char mqttStateTopic[sizeof(SwitchConfiguration.mqtt.topic) + 6];
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
@@ -85,10 +87,15 @@ public:
   /* Method returns ID of the relay controlled by the switch */
   uint8_t getControlledRelayID();
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   /* Method returns MQTT topic for this switch */
   const char *getMQTTStateTopic();
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Methods returns Domoticz IDX for this switch */
   uint32_t getDomoticzIDX();
+#endif
 };
 
 #endif

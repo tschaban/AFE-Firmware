@@ -239,12 +239,12 @@ void MQTTMessagesListener(char *topic, byte *payload, unsigned int length) {
           Serial << "Yes: Domoticz";
     #endif
           if ((char)payload[1] == 'n' && length == 2) { // on
-            Data.saveAPI(API_DOMOTICZ, true);
+            Data.saveAPI(API_HTTP_DOMOTICZ, true);
             Device.begin();
             DomoticzInit();
 
           } else if ((char)payload[1] == 'f' && length == 3) { // off
-            Data.saveAPI(API_DOMOTICZ, false);
+            Data.saveAPI(API_HTTP_DOMOTICZ, false);
             Device.begin();
             Domoticz.disconnect();
           }

@@ -12,9 +12,14 @@
 #include <AFE-Configuration.h>
 
 struct AFE_DEVICE_API {
-  boolean mqtt;
   boolean http;
-  boolean domoticz;
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
+  boolean mqtt;
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+  boolean httpDomoticz;
+  boolean mqttDomoticz;
+#endif
 };
 
 /* Custom DEVICE structure definition */
@@ -81,8 +86,6 @@ struct DEVICE {
 #endif
 #endif
 };
-
-
 
 #ifdef T0_CONFIG
 /* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */

@@ -11,7 +11,7 @@ void eventsListener() {
            << "Events listener: triggered";
 #endif
     /* Sendings hardware values to Domoticz */
-    if (Device.configuration.api.domoticz) {
+    if (Device.configuration.api.httpDomoticz) {
 #ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif

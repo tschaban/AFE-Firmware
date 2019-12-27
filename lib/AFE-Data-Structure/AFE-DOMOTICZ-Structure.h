@@ -9,9 +9,6 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-PROTOCOL-Structure.h>
-#include <IPAddress.h>
-
 struct DOMOTICZ_BASIC_CONFIG {
   uint32_t idx;
 };

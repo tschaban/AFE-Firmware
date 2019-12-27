@@ -34,7 +34,8 @@ void AFERelay::begin(uint8_t id) {
 }
 
 byte AFERelay::get() {
-  return digitalRead(RelayConfiguration.gpio) == HIGH ? AFE_RELAY_ON : AFE_RELAY_OFF;
+  return digitalRead(RelayConfiguration.gpio) == HIGH ? AFE_RELAY_ON
+                                                      : AFE_RELAY_OFF;
 }
 
 /* Set relay to ON */
@@ -97,6 +98,8 @@ void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(RelayConfiguration.state.powerOn);
 }
 
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
   if (RelayConfiguration.state.MQTTConnected ==
       5) { // request state from MQTT Broker
@@ -106,6 +109,7 @@ boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
     return true;
   }
 }
+#endif
 
 void AFERelay::setRelayAfterRestore(uint8_t option) {
 
@@ -123,7 +127,8 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 #ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
   if (RelayConfiguration.timeToOff > 0 &&
-      ((invert && get() == AFE_RELAY_OFF) || (!invert && get() == AFE_RELAY_ON)) &&
+      ((invert && get() == AFE_RELAY_OFF) ||
+       (!invert && get() == AFE_RELAY_ON)) &&
       millis() - turnOffCounter >=
           RelayConfiguration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
     invert ? on(invert) : off(invert);
@@ -160,10 +165,13 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
 }
 #endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 unsigned long AFERelay::getDomoticzIDX() {
   return RelayConfiguration.domoticz.idx;
 }
+#endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
 const char *AFERelay::getMQTTCommandTopic() {
   if (strlen(RelayConfiguration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
@@ -181,3 +189,4 @@ const char *AFERelay::getMQTTStateTopic() {
   }
   return mqttStateTopic;
 }
+#endif

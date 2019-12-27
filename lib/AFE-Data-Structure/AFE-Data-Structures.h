@@ -10,10 +10,14 @@
 #endif
 
 #include <AFE-DEVICE-Structure.h>
-#include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>
+
+/* APIs */
 #include <AFE-MQTT-Structure.h>
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#include <AFE-DOMOTICZ-Structure.h>
+#endif
 
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-PASSWORD-Structure.h>

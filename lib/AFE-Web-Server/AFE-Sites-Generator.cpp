@@ -79,20 +79,35 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += "\">";
   page += L_NETWORK;
   page += "</a></li>";
-  if (Device->configuration.api.mqtt) {
+
+  if (
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
+      Device->configuration.api.mqtt
+#endif
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+      ||
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      Device->configuration.api.mqttDomoticz
+#endif
+      ) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_MQTT;
     page += "\">";
     page += L_MQTT_BROKER;
     page += "</a></li>";
   }
-  if (Device->configuration.api.domoticz) {
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.httpDomoticz) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_DOMOTICZ;
     page += "\">";
     page += L_DOMOTICZ_SERVER;
     page += "</a></li>";
   }
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
@@ -264,7 +279,8 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
-/* Don't show it if I2C sensor is not added to the device, this is check for AFE T6 only*/
+/* Don't show it if I2C sensor is not added to the device, this is check for AFE
+ * T6 only*/
 #ifdef T6_CONFIG
   if (Device->configuration.noOfBMEX80s > 0 ||
       Device->configuration.noOfBH1750s > 0 ||
@@ -521,24 +537,40 @@ String AFESitesGenerator::addDeviceConfiguration() {
   page += addConfigurationBlock(L_CONTROLLED_GATES, "", body);
 #endif
 
-  body = "<fieldset><div class=\"cc\"><label><input name=\"m\" "
-         "type=\"checkbox\" value=\"1\"";
+  body = "<fieldset>";
+
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
+  body += "<div class=\"cc\"><label><input name=\"m\" "
+          "type=\"checkbox\" value=\"1\"";
   body += configuration.api.mqtt ? " checked=\"checked\"" : "";
   body += ">MQTT API ";
   body += L_ENABLED;
-  body += "?</label></div><div class=\"cc\"><label><input name=\"h\" "
+  body += "?</label></div>";
+#endif
+
+  body += "<div class=\"cc\"><label><input name=\"h\" "
           "type=\"checkbox\" value=\"1\"";
   body += configuration.api.http ? " checked=\"checked\"" : "";
   body += ">HTTP API ";
   body += L_ENABLED;
   body += "?</label></div>";
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   body += "<div class=\"cc\"><label><input name=\"d\" type=\"checkbox\" "
           "value=\"1\"";
-  body += configuration.api.domoticz ? " checked=\"checked\"" : "";
-  body += ">Domoticz API ";
+  body += configuration.api.httpDomoticz ? " checked=\"checked\"" : "";
+  body += ">Domoticz HTTP API ";
   body += L_ENABLED;
   body += "?</label></div>";
+
+  body += "<div class=\"cc\"><label><input name=\"q\" type=\"checkbox\" "
+          "value=\"1\"";
+  body += configuration.api.mqttDomoticz ? " checked=\"checked\"" : "";
+  body += ">Domoticz MQTT API ";
+  body += L_ENABLED;
+  body += "?</label></div>";
+#endif
+
   body += "</fieldset>";
 
   page += addConfigurationBlock(L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO,
@@ -686,6 +718,7 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   return page;
 }
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 String AFESitesGenerator::addDomoticzServerConfiguration() {
   DOMOTICZ configuration;
   configuration = Data.getDomoticzConfiguration();
@@ -713,6 +746,7 @@ String AFESitesGenerator::addDomoticzServerConfiguration() {
   return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,
                                L_DOMOTICZ_CONFIGURATION_INFO, body);
 }
+#endif
 
 String AFESitesGenerator::addPasswordConfigurationSite() {
   PASSWORD configuration = Data.getPasswordConfiguration();
@@ -822,7 +856,18 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
     body += "</option></select></div>";
 
-    if (Device->configuration.api.mqtt) {
+    if (
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
+        Device->configuration.api.mqtt
+#endif
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+        ||
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        Device->configuration.api.mqttDomoticz
+#endif
+        ) {
 
       body += "<div class=\"cf\">";
       body += "<label>";
@@ -968,7 +1013,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-    if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.httpDomoticz ||
+        Device->configuration.api.mqttDomoticz) {
 
       body = "<fieldset>";
       char _idx[7];
@@ -979,7 +1026,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
       page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
     }
+#endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
     if (Device->configuration.api.mqtt) {
       body = "<fieldset>";
       body +=
@@ -988,6 +1037,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       page +=
           addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
     }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
@@ -1149,7 +1200,9 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.httpDomoticz ||
+      Device->configuration.api.mqttDomoticz) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1160,7 +1213,9 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
+#endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
@@ -1168,6 +1223,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
     page +=
         addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
+#endif
 
   return page;
 }
@@ -1230,7 +1286,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
                                           : "DS18B20 temperature sensor",
                             "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
     body += "<div class=\"cf\">";
     body += "<label>IDX</label>";
@@ -1344,7 +1400,7 @@ String AFESitesGenerator::addDHTConfiguration() {
                     : "DHT temperature and humidity sensor",
       "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
     body += "<div class=\"cf\"><label> ";
     body +=
@@ -1535,7 +1591,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset><div class=\"cf\"><label>IDX</label><input name=\"x";
     body += id;
     body += "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
@@ -1594,7 +1650,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1763,7 +1819,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     }
   }
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1848,7 +1904,7 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_PARTICLE_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
@@ -1973,7 +2029,7 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
     body += "</fieldset>";
     page += addConfigurationBlock(L_CORRECTIONS, "", body);
 
-    if (Device->configuration.api.domoticz) {
+    if (Device->configuration.api.httpDomoticz) {
       body = "<fieldset>";
 
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
@@ -2074,7 +2130,7 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_BH1750_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2185,7 +2241,7 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Device->configuration.api.httpDomoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2249,17 +2305,19 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   if (device.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
+#endif
 
-  if (Device->configuration.api.domoticz) {
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.httpDomoticz ||
+      Device->configuration.api.mqttDomoticz) {
     body = "<fieldset>";
-
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.raw);
     body += addItem("number", "x0", L_RAW_DATA, _idx, "?", "0", "999999", "1");
@@ -2274,6 +2332,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
+#endif
 
   return page;
 }

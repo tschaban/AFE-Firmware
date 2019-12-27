@@ -26,8 +26,11 @@ private:
 public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
+
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
- 
+#endif
+
   /* Constructor */
   AFEAnalogInput();
 
@@ -43,7 +46,7 @@ public:
   /* Main method that takes care for analog reads based on config parameters */
   void listener();
 
-    /* Returns the sensor data in JSON format */
+  /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 };
 

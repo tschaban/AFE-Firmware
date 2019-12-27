@@ -460,7 +460,7 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
             ? API_HTTP
             : strcmp(request.name, "mqtt") == 0
                   ? API_MQTT
-                  : strcmp(request.name, "domoticz") == 0 ? API_DOMOTICZ : 9;
+                  : strcmp(request.name, "domoticz") == 0 ? API_HTTP_DOMOTICZ : 9;
     uint8_t _command = strcmp(request.command, "on") == 0
                            ? 1
                            : strcmp(request.command, "off") == 0 ? 0 : 9;
@@ -471,13 +471,13 @@ void processHTTPAPIRequest(HTTPCOMMAND request) {
       if (_command) {
         if (_api == API_MQTT) {
           MQTTInit();
-        } else if (_api == API_DOMOTICZ) {
+        } else if (_api == API_HTTP_DOMOTICZ) {
           DomoticzInit();
         }
       } else {
         if (_api == API_MQTT) {
           Mqtt.disconnect();
-        } else if (_api == API_DOMOTICZ) {
+        } else if (_api == API_HTTP_DOMOTICZ) {
           Domoticz.disconnect();
         }
       }

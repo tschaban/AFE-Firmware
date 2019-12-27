@@ -28,7 +28,8 @@
 /* APIs */
 #define API_HTTP 0
 #define API_MQTT 1
-#define API_DOMOTICZ 2
+#define API_HTTP_DOMOTICZ 2
+#define API_MQTT_DOMOTICZ 3
 
 #define AFE_MAX_MQTT_TOPIC_LENGTH 70
 
@@ -90,7 +91,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.3"
+#define AFE_FIRMWARE_VERSION "2.1.0.B1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Functionalities */
@@ -103,6 +104,10 @@
 //#define AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 
 #define AFE_CONFIG_HARDWARE_SWITCH
+
+/* Enabled APIs */
+//#define AFE_CONFIG_API_MQTT_ENABLED
+#define AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifndef AFE_DEVICE_SHELLY_1
 #define AFE_CONFIG_HARDWARE_LED
@@ -386,6 +391,7 @@
 #define AFE_CONFIG_HARDWARE_CONTACTRON
 #endif
 #endif
+
 
 /* ***************** HARDWARE: Config and defaults *********************/
 

@@ -347,9 +347,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       sprintf(configuration.name, root["name"]);
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
-      configuration.api.domoticz = root["api"]["domoticz"];
+      configuration.api.httpDomoticz = root["api"]["domoticz"];
       /* HTTP API must be ON when Domoticz is ON */
-      if (configuration.api.domoticz && !configuration.api.http) {
+      if (configuration.api.httpDomoticz && !configuration.api.http) {
         configuration.api.http = true;
       }
 
@@ -437,7 +437,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     JsonObject &jsonAPI = root.createNestedObject("api");
     jsonAPI["http"] = configuration->api.http;
     jsonAPI["mqtt"] = configuration->api.mqtt;
-    jsonAPI["domoticz"] = configuration->api.domoticz;
+    jsonAPI["domoticz"] = configuration->api.httpDomoticz;
 
     root["noOfLEDs"] = configuration->noOfLEDs;
     root["noOfSwitches"] = configuration->noOfSwitches;
@@ -564,7 +564,7 @@ defined(T4_CONFIG)
 
     saveAPI(API_MQTT, configuration.api.mqtt);
     saveAPI(API_HTTP, configuration.api.http);
-    saveAPI(API_DOMOTICZ, configuration.api.domoticz);
+    saveAPI(API_HTTP_DOMOTICZ, configuration.api.httpDomoticz);
 
 
   #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
@@ -606,7 +606,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   sprintf(deviceConfiguration.name, "AFE-Device");
   /* APIs */
   deviceConfiguration.api.mqtt = false;
-  deviceConfiguration.api.domoticz = false;
+  deviceConfiguration.api.httpDomoticz = false;
   deviceConfiguration.api.http = true;
 
 /* Relay presence */
@@ -3084,8 +3084,8 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
     configuration.api.http = state;
   } else if (apiID == API_MQTT) {
     configuration.api.mqtt = state;
-  } else if (apiID == API_DOMOTICZ) {
-    configuration.api.domoticz = state;
+  } else if (apiID == API_HTTP_DOMOTICZ) {
+    configuration.api.httpDomoticz = state;
     if (state) {
       configuration.api.http = true;
     }
@@ -4002,9 +4002,9 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
       sprintf(configuration.name, root["name"]);
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
-      configuration.api.domoticz = root["api"]["domoticz"];
+      configuration.api.httpDomoticz = root["api"]["domoticz"];
       /* HTTP API must be ON when Domoticz is ON */
-      if (configuration.api.domoticz && !configuration.api.http) {
+      if (configuration.api.httpDomoticz && !configuration.api.http) {
         configuration.api.http = true;
       }
 
