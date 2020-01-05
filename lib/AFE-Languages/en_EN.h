@@ -34,6 +34,11 @@
 #define L_FIRMWARE_NAME "Weather Station"
 #endif
 
+/* HTTP API */
+#define L_DEVICE_NOT_EXIST "\"Device does not exist\""
+#define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
+#define L_PASWORD_PROTECTED "\"Not possible. Configuration is protected by password\""
+
 /* Menu */
 #define L_DEVICE "Device"
 #define L_NETWORK "Network"

@@ -100,12 +100,12 @@ void AFEUpgrader::updateFirmwareVersion() {
 }
 
 void AFEUpgrader::upgradeToT0V203() {
-
+  /*
   DEVICE newDevice;
   DEVICE_T0_200 oldDevice = Data->getDeviceT0v200Configuration();
   uint8_t counter = 0;
 
-  /* Copy data from old structure to new structure */
+  // Copy data from old structure to new structure 
   sprintf(newDevice.name, oldDevice.name);
   newDevice.api = oldDevice.api;
 
@@ -134,6 +134,7 @@ void AFEUpgrader::upgradeToT0V203() {
   newDevice.noOfLEDs = counter ;
 #endif
 
-  /* Save to new JSON structure configuration file*/
+  // Save to new JSON structure configuration file
   Data->saveConfiguration(&newDevice);
+  */
 }

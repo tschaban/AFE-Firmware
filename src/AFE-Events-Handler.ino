@@ -10,6 +10,9 @@ void eventsListener() {
            << endl
            << "Events listener: triggered";
 #endif
+
+/* ################## HTTP DOMOTICZ ################### */
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     /* Sendings hardware values to Domoticz */
     if (Device.configuration.api.httpDomoticz) {
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -18,39 +21,39 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #ifdef DEBUG
-Serial << endl << "Sending current gate state to Domoticz";
+      Serial << endl << "Sending current gate state to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
-        DomoticzPublishGateState(i);
+    //    DomoticzPublishGateState(i);
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef DEBUG
-Serial << endl << "Sending current state of contactrons to Domoticz";
+      Serial << endl << "Sending current state of contactrons to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-        DomoticzPublishContactronState(i);
+    //    DomoticzPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 #ifdef DEBUG
-Serial << endl << "Sending current state of switches to Domoticz";
+      Serial << endl << "Sending current state of switches to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
-        if (Switch[i].getDomoticzIDX() > 0) {
-          Domoticz.sendSwitchCommand(Switch[i].getDomoticzIDX(),
-                                     Switch[i].getPhisicalState() ? "On"
-                                                                  : "Off");
+        if (Switch[i].configuration.domoticz.idx > 0) {
+    //      Domoticz.sendSwitchCommand(Switch[i].configuration.domoticz.idx,
+     //                                Switch[i].getPhisicalState() ? "On"
+                                                                  //: "Off");
         }
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
-Serial << endl << "Sending current state of relays to Domoticz";
+      Serial << endl << "Sending current state of relays to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -59,7 +62,7 @@ Serial << endl << "Sending current state of relays to Domoticz";
          */
         if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-          DomoticzPublishRelayState(i);
+      //    DomoticzPublishRelayState(i);
 #ifdef AFE_CONFIG_HARDWARE_GATE
           /* Closing the condition for skipping relay if assigned to a gate */
         }
@@ -76,11 +79,11 @@ Serial << endl << "Sending current state of relays to Domoticz";
 
 #if defined(T3_CONFIG)
 #ifdef DEBUG
-Serial << endl << "Sending current state of PIRs to Domoticz";
+      Serial << endl << "Sending current state of PIRs to Domoticz";
 #endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
         if (Device.configuration.isPIR[i]) {
-          DomoticzPublishPirState(i);
+        //  DomoticzPublishPirState(i);
         } else {
           break;
         }
@@ -91,18 +94,23 @@ Serial << endl << "Sending current state of PIRs to Domoticz";
       Led.off();
 #endif
     }
-  } /* End of Network.eventConnected() */
+#endif /* AFE_CONFIG_API_DOMOTICZ_ENABLED  */
+  }    /* End of Network.eventConnected() */
 
-  /* ## MQTT ## */
+  /* ################## MQTT ################### */
 
   if (Device.configuration.api.mqtt) {
-    if (Mqtt.eventConnected()) {
+    if (MqttAPI.Mqtt.eventConnected()) {
 #ifdef DEBUG
       Serial << endl
              << "Connected to MQTT Server: triggering post connection updates";
 #endif
+// @TODO 2.1.0
+// Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
 
-      Mqtt.publishTopic(Mqtt.getLWTTopic(), "connected");
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      MqttAPI.Mqtt.subscribe(AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT);
+#endif
 
 /* Publishing mesages after connection to MQTT Broker has been established */
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -132,15 +140,18 @@ Serial << endl << "Sending current state of PIRs to Domoticz";
 #endif
 
           /* Subscribing to MQTT Topic for Relay*/
-          Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
+
+          // @TODO 2.1.0
+          //    Mqtt.subscribe(Relay[i].getMQTTCommandTopic());
 
           if (!Relay[i].setRelayAfterRestoringMQTTConnection()) {
             /* Requesting state from MQTT Broker / service */
-            Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
+            // @TODO 2.1.0
+            // Mqtt.publishTopic(Relay[i].getMQTTStateTopic(), "get");
           } else {
             /* Updating relay state after setting default value after MQTT
              * connected */
-            MQTTPublishRelayState(i);
+            MqttAPI.publishRelayState(i);
           }
 #ifdef AFE_CONFIG_HARDWARE_GATE
           /* Closing the condition for skipping relay if assigned to a gate */
@@ -159,14 +170,15 @@ Serial << endl << "Sending current state of PIRs to Domoticz";
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
       /* Publishing state of Switch to MQTT */
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
-        MQTTPublishSwitchState(i);
+        MqttAPI.publishSwitchState(i);
       }
 #endif
 
 /* Subscribing to MQTT ADC commands */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       if (Device.configuration.isAnalogInput) {
-        Mqtt.subscribe(AnalogInput.mqttCommandTopic);
+        // @TODO 2.1.0
+        // Mqtt.subscribe(AnalogInput.mqttCommandTopic);
       }
 #endif
 

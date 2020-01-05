@@ -81,17 +81,8 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += "</a></li>";
 
   if (
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
-      Device->configuration.api.mqtt
-#endif
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-      ||
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      Device->configuration.api.mqttDomoticz
-#endif
-      ) {
+
+      Device->configuration.api.mqtt) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_MQTT;
     page += "\">";
@@ -539,39 +530,23 @@ String AFESitesGenerator::addDeviceConfiguration() {
 
   body = "<fieldset>";
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
-  body += "<div class=\"cc\"><label><input name=\"m\" "
-          "type=\"checkbox\" value=\"1\"";
-  body += configuration.api.mqtt ? " checked=\"checked\"" : "";
-  body += ">MQTT API ";
-  body += L_ENABLED;
-  body += "?</label></div>";
-#endif
-
   body += "<div class=\"cc\"><label><input name=\"h\" "
           "type=\"checkbox\" value=\"1\"";
   body += configuration.api.http ? " checked=\"checked\"" : "";
-  body += ">HTTP API ";
-  body += L_ENABLED;
-  body += "?</label></div>";
+  body += ">HTTP API</label></div><div class=\"cc\"><label>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  body += "<div class=\"cc\"><label><input name=\"d\" type=\"checkbox\" "
+  body += "<input disabled=\"disabled\" name=\"m\" type=\"radio\" "
           "value=\"1\"";
   body += configuration.api.httpDomoticz ? " checked=\"checked\"" : "";
-  body += ">Domoticz HTTP API ";
-  body += L_ENABLED;
-  body += "?</label></div>";
-
-  body += "<div class=\"cc\"><label><input name=\"q\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.api.mqttDomoticz ? " checked=\"checked\"" : "";
-  body += ">Domoticz MQTT API ";
-  body += L_ENABLED;
-  body += "?</label></div>";
+  body += ">Domoticz HTTP API</label></div>";
+  body += "<div class=\"cc\"><label><input name=\"m\" "
+          "type=\"radio\" value=\"2\"";
+  body += configuration.api.mqtt ? " checked=\"checked\"" : "";
+  body += ">Domoticz MQTT API";
 #endif
 
-  body += "</fieldset>";
+  body += "</label></div></fieldset>";
 
   page += addConfigurationBlock(L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO,
                                 body);
@@ -711,10 +686,14 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
 
   String page =
       addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   body = "<fieldset>";
   body += addItem("text", "t0", L_MQTT_TOPIC, configuration.lwt.topic, "64");
   body += "</fieldset>";
   page += addConfigurationBlock(L_MQTT_TOPIC_LWT, L_MQTT_TOPIC_EMPTY, body);
+#endif
+
   return page;
 }
 
@@ -857,17 +836,8 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     body += "</option></select></div>";
 
     if (
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
-        Device->configuration.api.mqtt
-#endif
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-        ||
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        Device->configuration.api.mqttDomoticz
-#endif
-        ) {
+
+        Device->configuration.api.mqtt) {
 
       body += "<div class=\"cf\">";
       body += "<label>";
@@ -904,12 +874,15 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += ">";
       body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
       body += "</option>";
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED      
       body += "<option value=\"5\"";
       body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
                                                       : "");
       body += ">";
       body += L_DEFAULT_GET_FROM_MQTT;
       body += "</option>";
+#endif
       body += "</select>";
       body += "</div>";
     }
@@ -1015,7 +988,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     if (Device->configuration.api.httpDomoticz ||
-        Device->configuration.api.mqttDomoticz) {
+        Device->configuration.api.mqtt) {
 
       body = "<fieldset>";
       char _idx[7];
@@ -1202,7 +1175,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.httpDomoticz ||
-      Device->configuration.api.mqttDomoticz) {
+      Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -2266,7 +2239,6 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 String AFESitesGenerator::addAnalogInputConfiguration() {
   ADCINPUT configuration = Data.getADCInputConfiguration();
-  DEVICE device = Device->configuration;
 
   String body = "<fieldset>";
 
@@ -2306,7 +2278,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
 #ifdef AFE_CONFIG_API_MQTT_ENABLED
-  if (device.api.mqtt) {
+  if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
@@ -2316,7 +2288,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.httpDomoticz ||
-      Device->configuration.api.mqttDomoticz) {
+      Device->configuration.api.mqtt) {
     body = "<fieldset>";
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.raw);
@@ -2476,7 +2448,7 @@ String AFESitesGenerator::addIndexSection(boolean authorized) {
   }
 
   body += "<form method=\"post\"><div class=\"cf\"><input name=\"p\" "
-          "type=\"text\" "
+          "type=\"password\" "
           "placeholder=\"";
   body += L_PASSWORD;
   body += "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "

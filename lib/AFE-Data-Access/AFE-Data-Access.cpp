@@ -346,13 +346,15 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #endif
       sprintf(configuration.name, root["name"]);
       configuration.api.http = root["api"]["http"];
+
       configuration.api.mqtt = root["api"]["mqtt"];
-      configuration.api.httpDomoticz = root["api"]["domoticz"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration.api.httpDomoticz = root["api"]["httpDomoticz"];
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration.api.httpDomoticz && !configuration.api.http) {
         configuration.api.http = true;
       }
-
+#endif
       configuration.noOfLEDs = root["noOfLEDs"];
       configuration.noOfSwitches = root["noOfSwitches"];
       configuration.noOfRelays = root["noOfRelays"];
@@ -437,8 +439,9 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     JsonObject &jsonAPI = root.createNestedObject("api");
     jsonAPI["http"] = configuration->api.http;
     jsonAPI["mqtt"] = configuration->api.mqtt;
-    jsonAPI["domoticz"] = configuration->api.httpDomoticz;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    jsonAPI["httpDomoticz"] = configuration->api.httpDomoticz;
+#endif
     root["noOfLEDs"] = configuration->noOfLEDs;
     root["noOfSwitches"] = configuration->noOfSwitches;
 
@@ -604,9 +607,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
   DEVICE deviceConfiguration;
   sprintf(deviceConfiguration.name, "AFE-Device");
-  /* APIs */
+/* APIs */
   deviceConfiguration.api.mqtt = false;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   deviceConfiguration.api.httpDomoticz = false;
+#endif
   deviceConfiguration.api.http = true;
 
 /* Relay presence */
@@ -1514,9 +1519,16 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
       sprintf(configuration.name, root["name"]);
       configuration.timeToOff = root["timeToOff"];
       configuration.state.powerOn = root["statePowerOn"];
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
       configuration.state.MQTTConnected = root["stateMQTTConnected"];
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
+#endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+#endif
       configuration.ledID = root["ledID"];
 
 #ifdef DEBUG
@@ -1714,11 +1726,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
     root["name"] = configuration.name;
     root["timeToOff"] = configuration.timeToOff;
     root["statePowerOn"] = configuration.state.powerOn;
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
     root["stateMQTTConnected"] = configuration.state.MQTTConnected;
+#endif
     root["ledID"] = configuration.ledID;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration.domoticz.idx;
+#endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
     root["MQTTTopic"] = configuration.mqtt.topic;
-
+#endif
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1857,11 +1875,17 @@ void AFEDataAccess::createRelayConfigurationFile() {
   /* Relay config */
 
   RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   RelayConfiguration.mqtt.topic[0] = '\0';
+#endif
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
-
+#endif
 #ifndef AFE_DEVICE_iECSv20
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
@@ -2132,8 +2156,12 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
       configuration.sensitiveness = root["sensitiveness"];
       configuration.functionality = root["functionality"];
       configuration.relayID = root["relayID"];
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -2188,9 +2216,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
     root["sensitiveness"] = configuration.sensitiveness;
     root["functionality"] = configuration.functionality;
     root["relayID"] = configuration.relayID;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration.domoticz.idx;
+#endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
     root["MQTTTopic"] = configuration.mqtt.topic;
-
+#endif
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -2226,9 +2257,12 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 #else
   SwitchConfiguration.relayID = 0;
 #endif
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   SwitchConfiguration.mqtt.topic[0] = '\0';
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-
+#endif
   /* Saving first switch. Common for all devices */
   SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE;
@@ -2262,7 +2296,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(3, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
-  // Just one switch is possible for sonoff touch 1 gang, and one config file is created 
+  // Just one switch is possible for sonoff touch 1 gang, and one config file is
+  // created
   index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
@@ -2284,7 +2319,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(2, SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SHELLY_1)
-// Just one switch is possible for Shelly-1, and one config file is created for Switch
+  // Just one switch is possible for Shelly-1, and one config file is created
+  // for Switch
   index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_iECSv20)
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
@@ -2353,12 +2389,16 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
       configuration.interval = root["interval"];
       configuration.numberOfSamples = root["numberOfSamples"];
       configuration.maxVCC = root["maxVCC"];
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.raw = root["idx"]["raw"];
       configuration.domoticz.percent = root["idx"]["percent"];
       configuration.domoticz.voltage = root["idx"]["voltage"];
       configuration.domoticz.voltageCalculated =
           root["idx"]["voltageCalculated"];
+#endif
       configuration.divider.Ra = root["divider"]["Ra"];
       configuration.divider.Rb = root["divider"]["Rb"];
 #ifdef DEBUG
@@ -2410,11 +2450,15 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     root["interval"] = configuration.interval;
     root["numberOfSamples"] = configuration.numberOfSamples;
     root["maxVCC"] = configuration.maxVCC;
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
     root["mqttTopic"] = configuration.mqtt.topic;
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     idx["raw"] = configuration.domoticz.raw;
     idx["percent"] = configuration.domoticz.percent;
     idx["voltage"] = configuration.domoticz.voltage;
     idx["voltageCalculated"] = configuration.domoticz.voltageCalculated;
+#endif
     divider["Ra"] = configuration.divider.Ra;
     divider["Rb"] = configuration.divider.Rb;
     root.printTo(configFile);
@@ -2447,11 +2491,15 @@ void AFEDataAccess::createADCInputConfigurationFile() {
   AnalogInputConfiguration.numberOfSamples =
       AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
   AnalogInputConfiguration.maxVCC = AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
   AnalogInputConfiguration.domoticz.percent = 0;
   AnalogInputConfiguration.domoticz.voltageCalculated = 0;
+#endif
   AnalogInputConfiguration.divider.Ra = 0;
   AnalogInputConfiguration.divider.Rb = 0;
   saveConfiguration(AnalogInputConfiguration);

@@ -40,9 +40,10 @@ public:
   void createDeviceUIDFile();
 
   DEVICE getDeviceConfiguration();
-  #ifdef T0_CONFIG // Version 2.0.0 - 2 Device configuration. Method used only to upgrade to new version
+#ifdef T0_CONFIG // Version 2.0.0 - 2 Device configuration. Method used only to
+                 // upgrade to new version
   DEVICE_T0_200 getDeviceT0v200Configuration();
-  #endif
+#endif
   void saveConfiguration(DEVICE *);
   void createDeviceConfigurationFile();
 
@@ -54,13 +55,18 @@ public:
   void saveConfiguration(NETWORK configuration);
   void createNetworkConfigurationFile();
 
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) ||                                \
+    defined(AFE_CONFIG_API_MQTT_ENABLED)
   MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
   void createMQTTConfigurationFile();
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ getDomoticzConfiguration();
   void saveConfiguration(DOMOTICZ configuration);
   void createDomoticzConfigurationFile();
+#endif
 
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
@@ -91,7 +97,7 @@ public:
   void saveConfiguration(PASSWORD configuration);
   void createPasswordConfigurationFile();
 
-  /* ADC Inout create/read/write methods */
+/* ADC Inout create/read/write methods */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getADCInputConfiguration();
   void saveConfiguration(ADCINPUT configuration);
@@ -146,7 +152,6 @@ public:
   uint8_t getGateState(uint8_t id);
   void saveGateState(uint8_t id, uint8_t state);
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   I2CPORT getI2CPortConfiguration();

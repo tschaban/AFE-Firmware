@@ -8,45 +8,45 @@ AFERelay::AFERelay(uint8_t id) { begin(id); }
 
 void AFERelay::begin(uint8_t id) {
   _id = id;
-  RelayConfiguration = Data.getRelayConfiguration(_id);
+  configuration = Data.getRelayConfiguration(_id);
 
-  pinMode(RelayConfiguration.gpio, OUTPUT);
+  pinMode(configuration.gpio, OUTPUT);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
   /* Initialzing Thermostat functionality for a relay */
-  Thermostat.begin(RelayConfiguration.thermostat);
+  Thermostat.begin(configuration.thermostat);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   /* Initialzing thermal protection functionality for a relay */
-  ThermalProtection.begin(RelayConfiguration.thermalProtection);
+  ThermalProtection.begin(configuration.thermalProtection);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  Humidistat.begin(RelayConfiguration.humidistat);
+  Humidistat.begin(configuration.humidistat);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  if (RelayConfiguration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(RelayConfiguration.ledID);
+  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Led.begin(configuration.ledID);
   }
 #endif
 }
 
 byte AFERelay::get() {
-  return digitalRead(RelayConfiguration.gpio) == HIGH ? AFE_RELAY_ON
+  return digitalRead(configuration.gpio) == HIGH ? AFE_RELAY_ON
                                                       : AFE_RELAY_OFF;
 }
 
 /* Set relay to ON */
 void AFERelay::on(boolean invert) {
   if (get() == AFE_RELAY_OFF) {
-    digitalWrite(RelayConfiguration.gpio, HIGH);
+    digitalWrite(configuration.gpio, HIGH);
 #ifdef AFE_CONFIG_HARDWARE_LED
     Led.on();
 #endif
     if (!invert &&
-        RelayConfiguration.timeToOff >
+        configuration.timeToOff >
             0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
@@ -65,12 +65,12 @@ void AFERelay::on(boolean invert) {
 /* Set relay to OFF */
 void AFERelay::off(boolean invert) {
   if (get() == AFE_RELAY_ON) {
-    digitalWrite(RelayConfiguration.gpio, LOW);
+    digitalWrite(configuration.gpio, LOW);
 #ifdef AFE_CONFIG_HARDWARE_LED
     Led.off();
 #endif
     if (invert &&
-        RelayConfiguration.timeToOff >
+        configuration.timeToOff >
             0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
@@ -87,7 +87,7 @@ void AFERelay::off(boolean invert) {
 
 /* Toggle relay */
 void AFERelay::toggle() {
-  if (digitalRead(RelayConfiguration.gpio) == LOW) {
+  if (digitalRead(configuration.gpio) == LOW) {
     on();
   } else {
     off();
@@ -95,17 +95,17 @@ void AFERelay::toggle() {
 }
 
 void AFERelay::setRelayAfterRestoringPower() {
-  setRelayAfterRestore(RelayConfiguration.state.powerOn);
+  setRelayAfterRestore(configuration.state.powerOn);
 }
 
 #if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
     defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
-  if (RelayConfiguration.state.MQTTConnected ==
+  if (configuration.state.MQTTConnected ==
       5) { // request state from MQTT Broker
     return false;
   } else {
-    setRelayAfterRestore(RelayConfiguration.state.MQTTConnected);
+    setRelayAfterRestore(configuration.state.MQTTConnected);
     return true;
   }
 }
@@ -126,11 +126,11 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 
 #ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
-  if (RelayConfiguration.timeToOff > 0 &&
+  if (configuration.timeToOff > 0 &&
       ((invert && get() == AFE_RELAY_OFF) ||
        (!invert && get() == AFE_RELAY_ON)) &&
       millis() - turnOffCounter >=
-          RelayConfiguration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
+          configuration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
     invert ? on(invert) : off(invert);
     return true;
   } else {
@@ -139,24 +139,24 @@ boolean AFERelay::autoTurnOff(boolean invert) {
 }
 #endif
 
-const char *AFERelay::getName() { return RelayConfiguration.name; }
+const char *AFERelay::getName() { return configuration.name; }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
-  if (RelayConfiguration.timeToOff > 0) {
+  if (configuration.timeToOff > 0) {
     turnOffCounter = millis();
   } else {
-    RelayConfiguration.timeToOff = timer;
+    configuration.timeToOff = timer;
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PIR
-void AFERelay::clearTimer() { RelayConfiguration.timeToOff = 0; }
+void AFERelay::clearTimer() { configuration.timeToOff = 0; }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-uint8_t AFERelay::getControlledLedID() { return RelayConfiguration.ledID; }
+uint8_t AFERelay::getControlledLedID() { return configuration.ledID; }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -165,16 +165,10 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
 }
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-unsigned long AFERelay::getDomoticzIDX() {
-  return RelayConfiguration.domoticz.idx;
-}
-#endif
-
 #ifdef AFE_CONFIG_API_MQTT_ENABLED
 const char *AFERelay::getMQTTCommandTopic() {
-  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", RelayConfiguration.mqtt.topic);
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
@@ -182,8 +176,8 @@ const char *AFERelay::getMQTTCommandTopic() {
 }
 
 const char *AFERelay::getMQTTStateTopic() {
-  if (strlen(RelayConfiguration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", RelayConfiguration.mqtt.topic);
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
     mqttStateTopic[0] = '\0';
   }

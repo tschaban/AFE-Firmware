@@ -20,7 +20,7 @@
 class AFESwitch {
 
 private:
-  SWITCH SwitchConfiguration;
+  
   boolean _initialized = false;
   boolean state;
   boolean previousState; // Actually this stores current switch state
@@ -52,6 +52,9 @@ private:
 #endif
 
 public:
+
+SWITCH configuration;
+
   /* Constructors */
   AFESwitch();
 
@@ -92,10 +95,7 @@ public:
   const char *getMQTTStateTopic();
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Methods returns Domoticz IDX for this switch */
-  uint32_t getDomoticzIDX();
-#endif
+
 };
 
 #endif

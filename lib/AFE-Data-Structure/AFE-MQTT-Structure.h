@@ -9,6 +9,13 @@
 #include "WProgram.h"
 #endif
 
+struct MQTT_MESSAGE {
+  char *topic;
+  byte *content;
+  uint16_t length;
+};
+
+
 struct MQTT_BASIC_CONFIG {
   char topic[65];
 };

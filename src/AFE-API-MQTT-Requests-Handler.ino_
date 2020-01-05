@@ -1,9 +1,12 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 /* Initializing MQTT */
+
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_API)
+
 void MQTTInit() {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
-      Device.configuration.api.mqtt) {
+      Device.configuration.api.mqttDomoticz) {
     MQTTConfiguration = Data.getMQTTConfiguration();
     Mqtt.begin();
 #ifdef DEBUG
@@ -468,11 +471,11 @@ void MQTTPublishAS3935SensorData(uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void MQTTPublishAnalogInputData() {
-    if (Device.configuration.api.mqtt) {
-        // @TODO check the size of the JSON before release!
-        char message[60];
-        AnalogInput.getJSON(message);
-        Mqtt.publishTopic(AnalogInput.configuration.mqtt.topic, message);
-    }
+  if (Device.configuration.api.mqtt) {
+    // @TODO check the size of the JSON before release!
+    char message[60];
+    AnalogInput.getJSON(message);
+    Mqtt.publishTopic(AnalogInput.configuration.mqtt.topic, message);
+  }
 }
 #endif

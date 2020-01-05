@@ -53,12 +53,17 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   case AFE_CONFIG_SITE_NETWORK:
     page += Site.addNetworkConfiguration();
     break;
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   case AFE_CONFIG_SITE_MQTT:
     page += Site.addMQTTBrokerConfiguration();
     break;
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   case AFE_CONFIG_SITE_DOMOTICZ:
     page += Site.addDomoticzServerConfiguration();
     break;
+#endif
   case AFE_CONFIG_SITE_PASSWORD:
     page += Site.addPasswordConfigurationSite();
     break;
@@ -194,12 +199,17 @@ void AFEWebServer::generate(boolean upload) {
     case AFE_CONFIG_SITE_NETWORK:
       Data.saveConfiguration(getNetworkData());
       break;
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
     case AFE_CONFIG_SITE_MQTT:
       Data.saveConfiguration(getMQTTData());
       break;
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     case AFE_CONFIG_SITE_DOMOTICZ:
       Data.saveConfiguration(getDomoticzServerData());
       break;
+#endif
     case AFE_CONFIG_SITE_PASSWORD:
       Data.saveConfiguration(getPasswordData());
       break;
@@ -624,8 +634,17 @@ DEVICE AFEWebServer::getDeviceData() {
   }
 
   data.api.http = server.arg("h").length() > 0 ? true : false;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.api.httpDomoticz = server.arg("m").length() > 0
+                              ? (server.arg("m").toInt() == 1 ? true : false)
+                              : false;
+  data.api.mqtt = server.arg("m").length() > 0
+                      ? (server.arg("m").toInt() == 2 ? true : false)
+                      : false;
+#else
   data.api.mqtt = server.arg("m").length() > 0 ? true : false;
-  data.api.httpDomoticz = server.arg("d").length() > 0 ? true : false;
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   data.noOfLEDs = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;
@@ -742,6 +761,9 @@ NETWORK AFEWebServer::getNetworkData() {
   return data;
 }
 
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+
 MQTT AFEWebServer::getMQTTData() {
   MQTT data;
   if (server.arg("h").length() > 0) {
@@ -781,6 +803,9 @@ MQTT AFEWebServer::getMQTTData() {
   return data;
 }
 
+#endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEWebServer::getDomoticzServerData() {
   DOMOTICZ data;
 
@@ -811,6 +836,7 @@ DOMOTICZ AFEWebServer::getDomoticzServerData() {
 
   return data;
 }
+#endif
 
 RELAY AFEWebServer::getRelayData(uint8_t id) {
   RELAY data;
@@ -831,11 +857,13 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.name[0] = '\0';
   }
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   data.thermalProtection = server.arg("tp" + String(id)).length() > 0
@@ -843,11 +871,16 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
                                : 0;
 #endif
 
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
+    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   data.state.MQTTConnected =
       server.arg("mc").length() > 0 ? server.arg("mc").toInt() : 0;
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+#endif
 
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
                                             : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -873,15 +906,18 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
 
   data.relayID = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+#endif
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
   return data;
 }
@@ -1421,12 +1457,15 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
   data.divider.Rb =
       server.arg("rb").length() > 0 ? server.arg("rb").toFloat() : 0;
 
+#ifdef AFE_CONFIG_API_MQTT_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.raw =
       server.arg("x0").length() > 0 ? server.arg("x0").toInt() : 0;
   data.domoticz.percent =
@@ -1435,6 +1474,7 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
       server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
   data.domoticz.voltageCalculated =
       server.arg("x3").length() > 0 ? server.arg("x3").toInt() : 0;
+#endif
 
   return data;
 }

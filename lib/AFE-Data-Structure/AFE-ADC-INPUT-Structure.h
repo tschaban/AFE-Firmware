@@ -9,7 +9,7 @@
 #include "WProgram.h"
 #endif
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct ADCINPUT_DOMOTICZ {
   uint32_t raw;
   uint32_t percent;
@@ -38,7 +38,7 @@ struct ADCINPUT {
 #ifdef AFE_CONFIG_API_MQTT_ENABLED  
   MQTT_BASIC_CONFIG mqtt;
 #endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   ADCINPUT_DOMOTICZ domoticz;
 #endif  
   VOLTAGE_DIVIDER divider;

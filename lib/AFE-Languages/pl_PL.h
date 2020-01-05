@@ -27,12 +27,18 @@
 #define L_FIRMWARE_NAME "Stacja Pogody"
 #endif
 
+/* HTTP API */
+#define L_DEVICE_NOT_EXIST "\"Urządzenie o takiej nazwie nie istnieje\""
+#define L_COMMAND_NOT_IMPLEMENTED "\"Komeda nie jest zaimplementowana\""
+
 /* Upgrades */
 #define L_UPGRADED_TO_NEW_VERSION                                              \
   "Została zainstalowana nowa wersja AFE Firmware"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
   "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna "        \
   "konfiguracja urządzenia."
+#define L_PASWORD_PROTECTED "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
+
 
 /* Menu */
 #define L_DEVICE "Urządzenie"
@@ -398,6 +404,8 @@
 #define L_UNITS "Jednostki"
 #endif
 #endif
+
+
 
 
 #endif

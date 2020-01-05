@@ -13,12 +13,9 @@
 
 struct AFE_DEVICE_API {
   boolean http;
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
   boolean mqtt;
-#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   boolean httpDomoticz;
-  boolean mqttDomoticz;
 #endif
 };
 
@@ -89,9 +86,16 @@ struct DEVICE {
 
 #ifdef T0_CONFIG
 /* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */
+
+struct AFE_DEVICE_API_T0_200 {
+  boolean http;
+  boolean mqtt;
+  boolean httpDomoticz;
+};
+
 struct DEVICE_T0_200 {
   char name[33];
-  AFE_DEVICE_API api;
+  AFE_DEVICE_API_T0_200 api;
 #ifdef AFE_CONFIG_HARDWARE_LED
   boolean isLED[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
 #endif

@@ -20,21 +20,30 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#include <AFE-API-Domoticz.h>
-#endif
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-#include <AFE-API-MQTT.h>
-#endif
+
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
-#include <AFE-Relay.h>
-#include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
+#include <AFE-API-HTTP.h>
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#include <AFE-API-Domoticz.h>
+#endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#include <AFE-API-MQTT-Domoticz.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#include <AFE-Relay.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#include <AFE-Switch.h>
+#endif
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -69,16 +78,19 @@ AFEDataAccess Data;
 AFEFirmwarePro Firmware;
 AFEDevice Device;
 AFEWiFi Network;
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-AFEMQTT Mqtt;
-MQTT MQTTConfiguration;
-#endif
+AFEAPIHTTP HttpAPI;
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+AFEAPIMQTTDomoticz MqttAPI;
 AFEDomoticz Domoticz;
 #endif
+
 AFEWebServer WebServer;
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
 AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
@@ -129,6 +141,8 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #include <AFE-Analog-Input.h>
 AFEAnalogInput AnalogInput;
 #endif
+
+
 
 void setup() {
 
@@ -231,8 +245,8 @@ void setup() {
     delete Upgrader;
     Upgrader = NULL;
 
-/* Initializing relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+    /* Initializing relay */
     initializeRelay();
 #ifdef DEBUG
     Serial << endl << "Relay(s) initialized";
@@ -271,10 +285,12 @@ void setup() {
   Serial << endl << "WebServer initialized";
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
   initializeSwitch();
 #ifdef DEBUG
   Serial << endl << "Switch(es) initialized";
+#endif
 #endif
 
   if (Device.getMode() == AFE_MODE_NORMAL) {
@@ -333,13 +349,28 @@ void setup() {
 #endif
 
 /* Initializing APIs */
+
+
+
 #if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
     defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-    MQTTInit();
+    initializeMQTTAPI();
 #endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    DomoticzInit();
+  //  DomoticzInit();
 #endif
+
+/* Initializing HTTP API */
+HttpAPI.begin(&Device,&WebServer,&MqttAPI,&Data);
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+HttpAPI.addClass(&Relay[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+HttpAPI.addClass(&AnalogInput);
+#endif
+
   }
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
@@ -380,32 +411,18 @@ void loop() {
         /* Triggerd when connectes/reconnects to WiFi */
         eventsListener();
 
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
-        if (
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
-            Device.configuration.api.mqtt
-#endif
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) &&                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-            ||
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-            Device.configuration.api.mqttDomoticz
-#endif
-            ) {
-          Mqtt.listener();
+        if (Device.configuration.api.mqtt) {
+          MqttAPI.listener();
         }
-#endif
 
         /* Listens for HTTP requsts. Both for configuration panel HTTP
          * requests or HTTP API requests if it's turned on */
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
-        HTTPRequestListener();
+        HttpAPI.listener();
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
         contractonEventsListener();
@@ -474,9 +491,11 @@ void loop() {
     WebServer.listener();
   }
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Listens and processes switch events */
   switchEventsListener();
   processSwitchEvents();
+#endif
 
 /* Led listener */
 #ifdef AFE_CONFIG_HARDWARE_LED

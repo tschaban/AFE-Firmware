@@ -1,5 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+
 /* Initializing Switches */
 void initializeSwitch() {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
@@ -44,29 +46,35 @@ void processSwitchEvents() {
 #endif
 
           Relay[Switch[i].getControlledRelayID()].toggle();
-          MQTTPublishRelayState(Switch[i].getControlledRelayID());
-          DomoticzPublishRelayState(Switch[i].getControlledRelayID());
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+          MqttAPI.publishRelayState(Switch[i].getControlledRelayID());
+#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      //    DomoticzPublishRelayState(Switch[i].getControlledRelayID());
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
           /* The code here is only appilcable for a Switch that controlls a Gate
            */
         }
 #endif
-
       }
 
       if (Switch[i].isPressed(true)) {
-        if (Device.configuration.api.mqtt) {
-          MQTTPublishSwitchState(i);
-        }
+#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+          MqttAPI.publishSwitchState(i);
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
         if (Device.configuration.api.httpDomoticz) {
-          if (Switch[i].getDomoticzIDX() > 0) {
-            Domoticz.sendSwitchCommand(Switch[i].getDomoticzIDX(),
+          if (Switch[i].configuration.domoticz.idx > 0) {
+            Domoticz.sendSwitchCommand(Switch[i].configuration.domoticz.idx,
                                        Switch[i].getPhisicalState() ? "On"
                                                                     : "Off");
           }
         }
+#endif
+
       }
     }
   }
@@ -95,3 +103,5 @@ void switchEventsListener() {
     }
   }
 }
+
+#endif //AFE_CONFIG_HARDWARE_SWITCH

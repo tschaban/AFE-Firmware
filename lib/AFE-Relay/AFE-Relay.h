@@ -36,11 +36,10 @@ class AFERelay {
 private:
   uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
-  RELAY RelayConfiguration;
 
 #ifdef AFE_CONFIG_API_MQTT_ENABLED
-  char mqttCommandTopic[sizeof(RelayConfiguration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(RelayConfiguration.mqtt.topic) + 6];
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -73,6 +72,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
+  RELAY configuration;
 
   /* Constructors */
   AFERelay();
@@ -141,10 +141,6 @@ public:
   const char *getMQTTStateTopic();
 #endif  
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Return relay IDX in Domoticz */
-  unsigned long getDomoticzIDX();
-#endif
   
 };
 
