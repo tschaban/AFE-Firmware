@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_API_MQTT_DOMOTICZ_h
-#define _AFE_API_MQTT_DOMOTICZ_h
+#ifndef _AFE_API_HTTP_DOMOTICZ_h
+#define _AFE_API_HTTP_DOMOTICZ_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
@@ -9,12 +9,14 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Configuration.h>
-#include <AFE-DOMOTICZ-Structure.h>
+#include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-MQTT-Structure.h>
-#include <AFE-MQTT.h>
-#include <ArduinoJson.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <rBase64.h>
+
+//#include <AFE-Configuration.h>
+//#include <AFE-DOMOTICZ-Structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-Relay.h>
@@ -32,17 +34,19 @@
 #include <Streaming.h>
 #endif
 
-class AFEAPIMQTTDomoticz {
+class AFEAPIHTTPDomoticz {
 
 private:
+  HTTPClient http;
+  WiFiClient client;
   AFEDataAccess *_Data;
   AFEDevice *_Device;
+  DOMOTICZ configuration;
+
+  char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];
 
   /* Is API enabled, set in begin() */
   boolean enabled = false;
-
-  void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
-  void generateDeviceValue(char *json, uint32_t idx, char *value);
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   DOMOTICZ_IDX_CACHE idxCache[AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH];
@@ -61,20 +65,18 @@ private:
   AFEAnalogInput *_Analog;
 #endif
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-  DOMOTICZ_MQTT_COMMAND getCommand();
-  void processRequest();
-  boolean idxForProcessing(uint32_t idx);
-#endif
+  const String getApiCall(const char *param, unsigned int idx);
+  boolean callURL(const String url);
+
+  boolean sendSwitchCommand(unsigned int idx, const char *value);
+  boolean sendCustomSensorCommand(unsigned int idx, const char *value);
 
 public:
-  AFEMQTT Mqtt;
-
   /* Constructor: it sets all necessary parameters */
-  AFEAPIMQTTDomoticz();
+  AFEAPIHTTPDomoticz();
   void begin(AFEDataAccess *, AFEDevice *);
 
-  void listener();
+  boolean idxForProcessing(uint32_t idx);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void addClass(AFERelay *);

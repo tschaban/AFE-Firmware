@@ -53,7 +53,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *deviceName) {
 #endif
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEMQTT::subscribe(const char *topic) {
 #ifdef DEBUG
   Serial << endl << "MQTT: Subscribing to : " << topic;
@@ -74,7 +74,7 @@ boolean AFEMQTT::listener() {
   boolean _ret = false;
   if (Broker.connected()) {
     _ret = Broker.loop();
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS    
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS    
     message.topic = Broker.topic;
     message.content = Broker.payload;
     message.length = Broker.length;

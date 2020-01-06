@@ -24,7 +24,7 @@ void eventsListener() {
       Serial << endl << "Sending current gate state to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
-    //    DomoticzPublishGateState(i);
+        //    DomoticzPublishGateState(i);
       }
 #endif
 
@@ -33,7 +33,7 @@ void eventsListener() {
       Serial << endl << "Sending current state of contactrons to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-    //    DomoticzPublishContactronState(i);
+        //    DomoticzPublishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
@@ -43,11 +43,7 @@ void eventsListener() {
       Serial << endl << "Sending current state of switches to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
-        if (Switch[i].configuration.domoticz.idx > 0) {
-    //      Domoticz.sendSwitchCommand(Switch[i].configuration.domoticz.idx,
-     //                                Switch[i].getPhisicalState() ? "On"
-                                                                  //: "Off");
-        }
+        HttpDomoticzAPI.publishSwitchState(i);
       }
 #endif
 
@@ -62,7 +58,7 @@ void eventsListener() {
          */
         if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-      //    DomoticzPublishRelayState(i);
+          HttpDomoticzAPI.publishRelayState(i);
 #ifdef AFE_CONFIG_HARDWARE_GATE
           /* Closing the condition for skipping relay if assigned to a gate */
         }
@@ -83,7 +79,7 @@ void eventsListener() {
 #endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
         if (Device.configuration.isPIR[i]) {
-        //  DomoticzPublishPirState(i);
+          //  DomoticzPublishPirState(i);
         } else {
           break;
         }

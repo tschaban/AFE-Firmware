@@ -15,20 +15,22 @@ void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
 
 void AFEAPIMQTTDomoticz::listener() {
   if (Mqtt.listener()) {
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
     processRequest();
 #endif
   }
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   DOMOTICZ_MQTT_COMMAND command;
   char json[Mqtt.message.length];
+
+
   for (uint16_t i = 0; i < Mqtt.message.length; i++) {
     json[i] = Mqtt.message.content[i];
   }
-  StaticJsonBuffer<200> jsonBuffer;
+  StaticJsonBuffer<AFE_CONFIG_API_JSON_BUFFER_SIZE > jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(json);
 
   if (root.success()) {
@@ -45,7 +47,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 #ifdef DEBUG
   else {
     Serial << endl
-           << "Error with JSON PHarsing"
+           << "Error with JSON pharsing"
            << "------------------------------------";
   }
 #endif
@@ -53,7 +55,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 }
 #endif
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTDomoticz::processRequest() {
   DOMOTICZ_MQTT_COMMAND command = getCommand();
   if (command.domoticz.idx > 0 && idxForProcessing(command.domoticz.idx)) {
@@ -115,7 +117,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 }
 #endif
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
   if (idx == bypassProcessing.idx) {

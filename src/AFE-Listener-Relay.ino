@@ -10,7 +10,6 @@ void initializeRelay() {
   }
 }
 
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Method checks if any relay should be automatically turned off */
 void relayEventsListener() {
@@ -21,8 +20,9 @@ void relayEventsListener() {
     if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
       if (Relay[i].autoTurnOff()) {
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
         MqttAPI.publishRelayState(i);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        HttpDomoticzAPI.publishRelayState(i);
 #endif
       }
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -32,6 +32,5 @@ void relayEventsListener() {
   }
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-
 
 #endif // AFE_CONFIG_HARDWARE_RELAY

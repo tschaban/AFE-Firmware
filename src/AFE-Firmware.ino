@@ -27,14 +27,13 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
+
 #include <AFE-API-HTTP.h>
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#include <AFE-API-Domoticz.h>
-#endif
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -82,7 +81,7 @@ AFEAPIHTTP HttpAPI;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 AFEAPIMQTTDomoticz MqttAPI;
-AFEDomoticz Domoticz;
+AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #endif
 
 AFEWebServer WebServer;
@@ -141,8 +140,6 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #include <AFE-Analog-Input.h>
 AFEAnalogInput AnalogInput;
 #endif
-
-
 
 void setup() {
 
@@ -348,29 +345,24 @@ void setup() {
     }
 #endif
 
-/* Initializing APIs */
-
-
-
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+    /* Initializing APIs */
     initializeMQTTAPI();
-#endif
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  //  DomoticzInit();
-#endif
 
 /* Initializing HTTP API */
-HttpAPI.begin(&Device,&WebServer,&MqttAPI,&Data);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    initializeHTTPDomoticzAPI();
+    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI, &HttpDomoticzAPI);
+#else
+
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-HttpAPI.addClass(&Relay[0]);
+    HttpAPI.addClass(&Relay[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-HttpAPI.addClass(&AnalogInput);
+    HttpAPI.addClass(&AnalogInput);
 #endif
-
   }
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)

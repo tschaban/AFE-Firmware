@@ -536,7 +536,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
   body += ">HTTP API</label></div><div class=\"cc\"><label>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  body += "<input disabled=\"disabled\" name=\"m\" type=\"radio\" "
+  body += "<input name=\"m\" type=\"radio\" "
           "value=\"1\"";
   body += configuration.api.httpDomoticz ? " checked=\"checked\"" : "";
   body += ">Domoticz HTTP API</label></div>";

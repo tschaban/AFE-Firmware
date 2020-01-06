@@ -15,7 +15,7 @@ struct DOMOTICZ_BASIC_CONFIG {
   uint32_t idx = 0;
 };
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 struct DOMOTICZ_MQTT_COMMAND {
   DOMOTICZ_BASIC_CONFIG domoticz;
   uint8_t nvalue;
@@ -31,7 +31,7 @@ struct DOMOTICZ_IDX_CACHE {
   uint8_t id;
   afe_domoticz_device_type_t type; 
 };
-#endif //AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#endif //AFE_CONFIG_API_PROCESS_REQUESTS
 
 
 struct DOMOTICZ {

@@ -60,7 +60,7 @@ private:
 #endif
 
 public:
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   MQTT_MESSAGE message;
 #endif
 
@@ -86,7 +86,7 @@ public:
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
 
-#ifdef AFE_CONFIG_API_PROCESS_MQTT_REQUESTS
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Methods subsribes to topic in the MQTT Broker */
   void subscribe(const char *);
 #endif

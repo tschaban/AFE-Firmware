@@ -32,8 +32,7 @@ void AFEDomoticz::sendSwitchCommand(unsigned int idx, const char *value) {
     String call = getApiCall("switchlight", idx);
     call += "&switchcmd=";
     call += value;
-    callURL(call);
- 
+    callURL(call); 
   }
 }
 

@@ -46,11 +46,9 @@ void processSwitchEvents() {
 #endif
 
           Relay[Switch[i].getControlledRelayID()].toggle();
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
           MqttAPI.publishRelayState(Switch[i].getControlledRelayID());
-#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      //    DomoticzPublishRelayState(Switch[i].getControlledRelayID());
+          HttpDomoticzAPI.publishRelayState(Switch[i].getControlledRelayID());
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -61,20 +59,10 @@ void processSwitchEvents() {
       }
 
       if (Switch[i].isPressed(true)) {
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-          MqttAPI.publishSwitchState(i);
-#endif
-
+        MqttAPI.publishSwitchState(i);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        if (Device.configuration.api.httpDomoticz) {
-          if (Switch[i].configuration.domoticz.idx > 0) {
-            Domoticz.sendSwitchCommand(Switch[i].configuration.domoticz.idx,
-                                       Switch[i].getPhisicalState() ? "On"
-                                                                    : "Off");
-          }
-        }
+        HttpDomoticzAPI.publishSwitchState(i);
 #endif
-
       }
     }
   }
@@ -104,4 +92,4 @@ void switchEventsListener() {
   }
 }
 
-#endif //AFE_CONFIG_HARDWARE_SWITCH
+#endif // AFE_CONFIG_HARDWARE_SWITCH

@@ -9,7 +9,7 @@ void analogInputEventsListener() {
     if (AnalogInput.isReady()) {
       MqttAPI.publishADCValues();
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-//  DomoticzPublishAnalogInputData();
+      HttpDomoticzAPI.publishADCValues();
 #endif
     }
   }

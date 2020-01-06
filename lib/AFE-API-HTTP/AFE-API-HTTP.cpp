@@ -5,19 +5,21 @@
 AFEAPIHTTP::AFEAPIHTTP() {}
 
 /* Initializing class */
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *WebServer,
-                       AFEAPIMQTTDomoticz *MqttAPI, AFEDataAccess *Data) {
+                       AFEDataAccess *Data, AFEAPIMQTTDomoticz *MqttAPI,
+                       AFEAPIHTTPDomoticz *HttpDomoticzAPI) {
   _Device = Device;
   if (_Device->configuration.api.http) {
     _Data = Data;
     _HTTP = WebServer;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     _MqttAPI = MqttAPI;
-#endif
+    _HttpAPIDomoticz = HttpDomoticzAPI;
     enabled = true;
   }
 }
 
+#endif
 /* Listening for HTTP requests - must be in loop() */
 void AFEAPIHTTP::listener() {
   if (enabled) {
@@ -110,11 +112,10 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
           _MqttAPI->publishRelayState(i);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-/* @TODO Bypass
-if (strcmp(request->source, "domoticz") != 0) {
-   DomoticzPublishRelayState(i);
- }
- */
+          if (_HttpAPIDomoticz->idxForProcessing(
+                  _Relay[i]->configuration.domoticz.idx)) {
+            _HttpAPIDomoticz->publishRelayState(i);
+          }
 #endif
           /* Checking if command: off */
         } else if (strcmp(request->command, "off") == 0) {
@@ -124,8 +125,9 @@ if (strcmp(request->source, "domoticz") != 0) {
           _MqttAPI->publishRelayState(i);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            // DomoticzPublishRelayState(i);
+          if (_HttpAPIDomoticz->idxForProcessing(
+                  _Relay[i]->configuration.domoticz.idx)) {
+            _HttpAPIDomoticz->publishRelayState(i);
           }
 #endif
           /* Checking if command: toggle */
@@ -135,8 +137,9 @@ if (strcmp(request->source, "domoticz") != 0) {
           sendRelayStatus(request, state != _Relay[i]->get(), _Relay[i]->get());
           _MqttAPI->publishRelayState(i);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            // DomoticzPublishRelayState(i);
+          if (_HttpAPIDomoticz->idxForProcessing(
+                  _Relay[i]->configuration.domoticz.idx)) {
+            _HttpAPIDomoticz->publishRelayState(i);
           }
 #endif
           /* Checking if command: get */
