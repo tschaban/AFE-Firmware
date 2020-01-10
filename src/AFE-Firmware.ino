@@ -33,7 +33,8 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
-
+#else
+#include <AFE-API-MQTT-Standard.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -82,6 +83,8 @@ AFEAPIHTTP HttpAPI;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
+#else
+AFEAPIMQTTStandard MqttAPI;
 #endif
 
 AFEWebServer WebServer;
@@ -146,7 +149,6 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-// Serial.swap();
 #endif
 
 #ifdef DEBUG
@@ -155,9 +157,9 @@ void setup() {
          << "################################ BOOTING "
             "################################"
          << endl
-         << "All classes and global variables initialized" << endl
-         << "Initializing device" << endl
-         << "File system: ";
+         << "INFO: All classes and global variables initialized" << endl
+         << "INFO: Initializing device" << endl
+         << "INFO: File system: ";
 #endif
 
   /* Initializing SPIFFS file system */
@@ -176,7 +178,7 @@ void setup() {
  * default configuration */
 #ifdef DEBUG
   Serial << endl
-         << "Checking if first time launch: Device.getMode()= "
+         << "INFO: Checking if first time launch: Device.getMode()= "
          << Device.getMode() << " : ";
 #endif
 
@@ -199,7 +201,7 @@ void setup() {
   yield();
 
 #ifdef DEBUG
-  Serial << endl << "System LED ID: " << systemLedID;
+  Serial << endl << "INFO: System LED ID: " << systemLedID;
 #endif
 
   if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -207,12 +209,12 @@ void setup() {
   }
   Led.on();
 #ifdef DEBUG
-  Serial << endl << "System LED initialized";
+  Serial << endl << "INFO: System LED initialized";
 #endif
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "Checking, if WiFi hasn't been configured: ";
+  Serial << endl << "INFO: Checking, if WiFi hasn't been configured: ";
 #endif
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -221,22 +223,22 @@ void setup() {
   } else {
 /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
-    Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
+    Serial << "NO" << endl << "INFO: Checking if firmware should be upgraded: ";
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
-      Serial << endl << "Firmware is not up2date. Upgrading...";
+      Serial << endl << "- Firmware is not up2date. Upgrading...";
 #endif
       Upgrader->upgrade();
 #ifdef DEBUG
-      Serial << endl << "Firmware upgraded";
+      Serial << endl << " - Firmware upgraded";
 #endif
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Firmware is up2date";
+      Serial << endl << "- Firmware is up2date";
     }
 #endif
     delete Upgrader;
@@ -246,7 +248,7 @@ void setup() {
     /* Initializing relay */
     initializeRelay();
 #ifdef DEBUG
-    Serial << endl << "Relay(s) initialized";
+    Serial << endl << "INFO: Relay(s) initialized";
 #endif
 #endif
   }
@@ -254,11 +256,11 @@ void setup() {
   /* Initialzing network */
   Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
-  Serial << endl << "Network initialized";
+  Serial << endl << "INFO: Network initialized";
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "Starting network";
+  Serial << endl << "INFO: Starting network";
 #endif
   Network.listener();
 
@@ -279,15 +281,12 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "WebServer initialized";
+  Serial << endl << "INFO: WebServer initialized";
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
   initializeSwitch();
-#ifdef DEBUG
-  Serial << endl << "Switch(es) initialized";
-#endif
 #endif
 
   if (Device.getMode() == AFE_MODE_NORMAL) {
@@ -353,7 +352,7 @@ void setup() {
     initializeHTTPDomoticzAPI();
     HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI, &HttpDomoticzAPI);
 #else
-
+    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY

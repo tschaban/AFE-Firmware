@@ -2,6 +2,8 @@
 
 #include "AFE-API-HTTP-Domoticz.h"
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 AFEAPIHTTPDomoticz::AFEAPIHTTPDomoticz(){};
 
 void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
@@ -186,3 +188,5 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
   }
 }
 #endif
+
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

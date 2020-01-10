@@ -23,7 +23,9 @@ void AFEDefaults::set() {
     Data->createFirmwareConfigurationFile();
     Data->createNetworkConfigurationFile();
     Data->createMQTTConfigurationFile();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     Data->createDomoticzConfigurationFile();
+#endif
     Data->createRelayConfigurationFile();
     Data->createSwitchConfigurationFile();
 

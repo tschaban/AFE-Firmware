@@ -9,14 +9,15 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <rBase64.h>
-
-//#include <AFE-Configuration.h>
-//#include <AFE-DOMOTICZ-Structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-Relay.h>
@@ -94,4 +95,6 @@ public:
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#endif // _AFE_API_HTTP_DOMOTICZ_h

@@ -9,7 +9,7 @@ void AFEAnalogInput::begin() {
   configuration = Data.getADCInputConfiguration();
   _initialized = true;
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {

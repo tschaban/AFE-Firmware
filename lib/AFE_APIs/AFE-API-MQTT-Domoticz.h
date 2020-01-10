@@ -3,6 +3,8 @@
 #ifndef _AFE_API_MQTT_DOMOTICZ_h
 #define _AFE_API_MQTT_DOMOTICZ_h
 
+
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
 #else
@@ -10,6 +12,9 @@
 #endif
 
 #include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 #include <AFE-DOMOTICZ-Structure.h>
 #include <AFE-Device.h>
 #include <AFE-MQTT-Structure.h>
@@ -92,4 +97,7 @@ public:
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#endif //_AFE_API_MQTT_DOMOTICZ_h
+

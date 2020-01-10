@@ -1,6 +1,11 @@
 void initializeMQTTAPI() {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
       Device.configuration.api.mqtt) {
+
+#ifdef DEBUG
+    Serial << endl << "INFO: API: Initializing MQTT";
+#endif
+
     MqttAPI.begin(&Data, &Device);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -18,7 +23,7 @@ void initializeMQTTAPI() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << "API: MQTT initialized";
+    Serial << endl << "INFO: API: MQTT init competed";
 #endif
   }
 }

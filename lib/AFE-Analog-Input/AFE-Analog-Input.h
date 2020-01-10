@@ -28,7 +28,7 @@ public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
 

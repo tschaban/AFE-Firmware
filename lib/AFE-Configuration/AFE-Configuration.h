@@ -26,10 +26,9 @@
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
 /* APIs */
-#define API_HTTP 0
-#define API_MQTT 1
-#define API_HTTP_DOMOTICZ 2
-#define API_MQTT_DOMOTICZ 3
+#define AFE_API_STANDARD 0
+#define AFE_API_DOMOTICZ 1
+
 
 #define AFE_MAX_MQTT_TOPIC_LENGTH 70
 
@@ -91,7 +90,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.1.0.B4"
+#define AFE_FIRMWARE_VERSION "2.1.0.B5"
 #define AFE_FIRMWARE_TYPE 0
 
 
@@ -104,8 +103,7 @@
 
 
 /* Enabled APIs */
-//#define AFE_CONFIG_API_MQTT_ENABLED
-#define AFE_CONFIG_API_DOMOTICZ_ENABLED
+//#define AFE_CONFIG_API_DOMOTICZ_ENABLED
 //#define AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 
 
@@ -848,20 +846,21 @@ typedef enum {
 
 
 /* Configs releated to standard APIs */
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #endif
 
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in"
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out"
 #define AFE_CONFIG_API_DOMOTICZ_SWITCH_OFF 0
 #define AFE_CONFIG_API_DOMOTICZ_SWITCH_ON 1
 #define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the JSON Buffer
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 55 // Used by API-MQTT-Domoticz
-#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 50  // Used by API-MQTT-Domoticz @TODO CHECK
+#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70  // Used by API-MQTT-Domoticz @TODO CHECK
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Used by API-HTTP-Domoticz @TODO CHECK
 #define AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+1 // Used by API-MQTT-Domoticz
 
@@ -870,6 +869,8 @@ typedef enum {
 #define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables processing incoming messages. Used for bypassing processing IDX
 #endif // AFE_CONFIG_API_PROCESS_REQUESTS
 #endif // AFE_CONFIG_HARDWARE_RELAY
+#else
+#define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Config releated to LWT Functionality */
@@ -880,4 +881,4 @@ typedef enum {
 #endif // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 
 
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

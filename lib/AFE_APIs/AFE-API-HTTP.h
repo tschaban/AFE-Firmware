@@ -24,6 +24,8 @@
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-API-MQTT-Domoticz.h>
 #include <AFE-API-HTTP-Domoticz.h>
+#else
+#include <AFE-API-MQTT-Standard.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -50,6 +52,8 @@ private:
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   AFEAPIMQTTDomoticz *_MqttAPI;
   AFEAPIHTTPDomoticz *_HttpAPIDomoticz;
+  #else
+    AFEAPIMQTTStandard *_MqttAPI;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -87,6 +91,8 @@ public:
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void begin(AFEDevice *, AFEWebServer *,AFEDataAccess *, AFEAPIMQTTDomoticz *, AFEAPIHTTPDomoticz *);
+  #else
+  void begin(AFEDevice *, AFEWebServer *,AFEDataAccess *, AFEAPIMQTTStandard *);
 #endif
 
   void listener();

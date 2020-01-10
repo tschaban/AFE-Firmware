@@ -177,15 +177,7 @@ void AFESwitch::listener() {
   }
 }
 
-uint8_t AFESwitch::getFunctionality() {
-  return configuration.functionality;
-}
-
-uint8_t AFESwitch::getControlledRelayID() {
-  return configuration.relayID;
-}
-
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 const char *AFESwitch::getMQTTStateTopic() {
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);

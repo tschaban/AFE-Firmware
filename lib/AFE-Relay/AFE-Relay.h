@@ -10,6 +10,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
+#include <AFE-MQTT-Structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -32,29 +33,6 @@
 #endif
 
 class AFERelay {
-
-private:
-  uint8_t _id;
-  AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
-
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
-#endif
-
-  unsigned long turnOffCounter = 0;
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
-  boolean timerUnitInSeconds = true;
-#endif
-
-  /* Method set relay state after power restore or connection to MQTT is
-   * established */
-
-  void setRelayAfterRestore(uint8_t option);
 
 public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -87,7 +65,7 @@ public:
 
 
 
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) || defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Method sets relay state after device is connected / reconnected to MQTT
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/
@@ -135,11 +113,34 @@ public:
   void setTimerUnitToSeconds(boolean value);
 #endif
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Method returns MQTT topic for this relay */
   const char *getMQTTCommandTopic();
   const char *getMQTTStateTopic();
 #endif  
+
+private:
+  uint8_t _id;
+  AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED Led;
+#endif
+
+  unsigned long turnOffCounter = 0;
+#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+  boolean timerUnitInSeconds = true;
+#endif
+
+  /* Method set relay state after power restore or connection to MQTT is
+   * established */
+
+  void setRelayAfterRestore(uint8_t option);
 
   
 };

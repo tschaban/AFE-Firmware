@@ -18,7 +18,17 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *WebServer,
     enabled = true;
   }
 }
-
+#else
+void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *WebServer,
+                       AFEDataAccess *Data, AFEAPIMQTTStandard *MqttAPI) {
+  _Device = Device;
+  if (_Device->configuration.api.http) {
+    _Data = Data;
+    _HTTP = WebServer;
+    _MqttAPI = MqttAPI;
+    enabled = true;
+  }
+}
 #endif
 /* Listening for HTTP requests - must be in loop() */
 void AFEAPIHTTP::listener() {

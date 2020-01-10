@@ -544,6 +544,11 @@ String AFESitesGenerator::addDeviceConfiguration() {
           "type=\"radio\" value=\"2\"";
   body += configuration.api.mqtt ? " checked=\"checked\"" : "";
   body += ">Domoticz MQTT API";
+#else
+  body += "<input name=\"m\" "
+          "type=\"checkbox\" value=\"1\"";
+  body += configuration.api.mqtt ? " checked=\"checked\"" : "";
+  body += ">MQTT API</label></div><div class=\"cc\">";
 #endif
 
   body += "</label></div></fieldset>";
@@ -875,7 +880,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
       body += "</option>";
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED      
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       body += "<option value=\"5\"";
       body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
                                                       : "");
@@ -999,9 +1004,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
       page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
     }
-#endif
-
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
     if (Device->configuration.api.mqtt) {
       body = "<fieldset>";
       body +=
@@ -1186,9 +1189,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
-#endif
-
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
@@ -2277,14 +2278,14 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     body += "</fieldset>";
     page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
-#endif
+#endif 
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.httpDomoticz ||
@@ -2523,7 +2524,13 @@ const String AFESitesGenerator::generateFooter(boolean extended) {
     body += AFE_DEVICE_TYPE_NAME;
     body += "-lightgrey.svg\" alt=\"DeviceID ";
     body += AFE_DEVICE_TYPE_ID;
-    body += "\" /> <img src=\"https://img.shields.io/badge/PRO-";
+    body += "\" /> <img src=\"https://img.shields.io/badge/API-";
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    body += "Domoticz";
+#else
+    body += "Standard";
+#endif
+    body += "-yellow.svg\" /> <img src=\"https://img.shields.io/badge/PRO-";
     body += Firmware->Pro.valid ? L_YES : L_NO;
     body += "-orange.svg\" alt=\"PRO\" /></div>";
   }

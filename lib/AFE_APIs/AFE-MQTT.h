@@ -54,28 +54,10 @@ private:
       uint8_t duration_between_connection_attempts,
       uint8_t duration_between_next_connection_attempts_series);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-  /* Method returns LWT topic, if configured */
-  const char *getLWTTopic();
-#endif
-
-public:
+protected:
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   MQTT_MESSAGE message;
 #endif
-
-  /* Constructor: it sets all necessary parameters */
-  AFEMQTT();
-
-  /* Initialization of the class */
-  void begin(AFEDataAccess *, char *);
-
-  /* Methods publishes a message to MQTT Broker */
-  boolean publish(const char *topic, const char *message);
-
-  /* Methods establishes connection from MQTT Broker, subscribed and set relay
-   * default values */
-  boolean listener();
 
   /* Connecting to MQTT Broker */
   void connect();
@@ -83,12 +65,34 @@ public:
   /* Method turns off MQTT API */
   void disconnect();
 
+
+
+public:
+  /* Constructor: it sets all necessary parameters */
+  AFEMQTT();
+
+  /* Initialization of the class */
+  void begin(AFEDataAccess *, char *);
+
+  /* Methods establishes connection from MQTT Broker, subscribed and set relay
+ * default values */
+  boolean listener();
+
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
+
+  
+  /* Methods publishes a message to MQTT Broker */
+  boolean publish(const char *topic, const char *message);
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Methods subsribes to topic in the MQTT Broker */
   void subscribe(const char *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+  /* Method returns LWT topic, if configured */
+  const char *getLWTTopic();
 #endif
 };
 

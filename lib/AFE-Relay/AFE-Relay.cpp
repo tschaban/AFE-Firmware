@@ -98,8 +98,7 @@ void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(configuration.state.powerOn);
 }
 
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
   if (configuration.state.MQTTConnected ==
       5) { // request state from MQTT Broker
@@ -165,7 +164,7 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
 }
 #endif
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 const char *AFERelay::getMQTTCommandTopic() {
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);

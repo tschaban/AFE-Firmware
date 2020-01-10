@@ -2,6 +2,8 @@
 
 #include "AFE-API-MQTT-Domoticz.h"
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 AFEAPIMQTTDomoticz::AFEAPIMQTTDomoticz(){
 
 };
@@ -243,3 +245,5 @@ void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
           "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":0,\"svalue\":\"%s\"}",
           idx, value);
 }
+
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

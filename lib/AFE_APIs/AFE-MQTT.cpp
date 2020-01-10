@@ -56,7 +56,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *deviceName) {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEMQTT::subscribe(const char *topic) {
 #ifdef DEBUG
-  Serial << endl << "MQTT: Subscribing to : " << topic;
+  Serial << endl << " - " << topic;
 #endif
   if (strlen(topic) > 0) {
     Broker.subscribe(topic);
@@ -121,8 +121,8 @@ void AFEMQTT::connect() {
                 ? Broker.connect(
                       _deviceName, configuration.user, configuration.password,
                       configuration.lwt.topic, 2, false, "disconnected")
-                : Broker.connect(deviceName, configuration.user,
-                                 _deviceName.password);
+                : Broker.connect(_deviceName, configuration.user,
+                                 configuration.password);
 #else
         boolean _connected = Broker.connect(_deviceName, configuration.user,
                                             configuration.password);
@@ -218,7 +218,7 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Status: WARNING, missing MQTT Topic";
+      Serial << endl << "WARN: No MQTT topic.";
     }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED

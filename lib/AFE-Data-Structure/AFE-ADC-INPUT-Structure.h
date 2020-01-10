@@ -35,10 +35,9 @@ struct ADCINPUT {
   uint32_t interval;
   uint16_t numberOfSamples;
   double maxVCC;
-#ifdef AFE_CONFIG_API_MQTT_ENABLED  
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   MQTT_BASIC_CONFIG mqtt;
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   ADCINPUT_DOMOTICZ domoticz;
 #endif  
   VOLTAGE_DIVIDER divider;

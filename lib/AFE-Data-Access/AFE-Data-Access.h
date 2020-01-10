@@ -55,12 +55,9 @@ public:
   void saveConfiguration(NETWORK configuration);
   void createNetworkConfigurationFile();
 
-#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) ||                                \
-    defined(AFE_CONFIG_API_MQTT_ENABLED)
   MQTT getMQTTConfiguration();
   void saveConfiguration(MQTT configuration);
   void createMQTTConfigurationFile();
-#endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ getDomoticzConfiguration();

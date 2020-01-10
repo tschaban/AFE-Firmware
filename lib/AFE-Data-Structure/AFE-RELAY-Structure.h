@@ -23,8 +23,7 @@ struct RELAY {
   uint8_t ledID;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz;
-#endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
   MQTT_BASIC_CONFIG mqtt;
 #endif  
   RELAY_DEFAULTS state;

@@ -53,12 +53,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   case AFE_CONFIG_SITE_NETWORK:
     page += Site.addNetworkConfiguration();
     break;
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   case AFE_CONFIG_SITE_MQTT:
     page += Site.addMQTTBrokerConfiguration();
     break;
-#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   case AFE_CONFIG_SITE_DOMOTICZ:
     page += Site.addDomoticzServerConfiguration();
@@ -199,12 +196,9 @@ void AFEWebServer::generate(boolean upload) {
     case AFE_CONFIG_SITE_NETWORK:
       Data.saveConfiguration(getNetworkData());
       break;
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
     case AFE_CONFIG_SITE_MQTT:
       Data.saveConfiguration(getMQTTData());
       break;
-#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     case AFE_CONFIG_SITE_DOMOTICZ:
       Data.saveConfiguration(getDomoticzServerData());
@@ -761,9 +755,6 @@ NETWORK AFEWebServer::getNetworkData() {
   return data;
 }
 
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-
 MQTT AFEWebServer::getMQTTData() {
   MQTT data;
   if (server.arg("h").length() > 0) {
@@ -793,17 +784,16 @@ MQTT AFEWebServer::getMQTTData() {
   } else {
     data.password[0] = '\0';
   }
-
+#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
   if (server.arg("t0").length() > 0) {
     server.arg("t0").toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
   } else {
     data.lwt.topic[0] = '\0';
   }
-
+#endif
   return data;
 }
 
-#endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEWebServer::getDomoticzServerData() {
@@ -857,7 +847,7 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.name[0] = '\0';
   }
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
@@ -871,13 +861,10 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
                                : 0;
 #endif
 
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.state.MQTTConnected =
       server.arg("mc").length() > 0 ? server.arg("mc").toInt() : 0;
-#endif
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 #endif
@@ -909,9 +896,7 @@ SWITCH AFEWebServer::getSwitchData(uint8_t id) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
-#endif
-
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
@@ -1289,6 +1274,7 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
   data.pressure.correction =
       server.arg("pc").length() > 0 ? server.arg("pc").toFloat() : 0;
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.temperatureHumidityPressure.idx =
       server.arg("i0").length() > 0 ? server.arg("i0").toInt() : 0;
 
@@ -1327,12 +1313,13 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
 
   data.domoticz.temperatureHumidity.idx =
       server.arg("i12").length() > 0 ? server.arg("i12").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
@@ -1356,14 +1343,16 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   data.mode = server.arg("m").length() > 0
                   ? server.arg("m").toInt()
                   : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED                  
   data.domoticz.idx =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
@@ -1457,15 +1446,13 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
   data.divider.Rb =
       server.arg("rb").length() > 0 ? server.arg("rb").toFloat() : 0;
 
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
-#endif
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   data.domoticz.raw =
       server.arg("x0").length() > 0 ? server.arg("x0").toInt() : 0;
   data.domoticz.percent =

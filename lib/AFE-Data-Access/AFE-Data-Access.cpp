@@ -565,9 +565,9 @@ defined(T4_CONFIG)
     }
   #endif
 
-    saveAPI(API_MQTT, configuration.api.mqtt);
-    saveAPI(API_HTTP, configuration.api.http);
-    saveAPI(API_HTTP_DOMOTICZ, configuration.api.httpDomoticz);
+    saveAPI(API_MQTT(not set), configuration.api.mqtt);
+    saveAPI(API_HTTP (not set), configuration.api.http);
+    saveAPI(API_HTTP_DOMOTICZ (not set), configuration.api.httpDomoticz);
 
 
   #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
@@ -607,7 +607,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
   DEVICE deviceConfiguration;
   sprintf(deviceConfiguration.name, "AFE-Device");
-/* APIs */
+  /* APIs */
   deviceConfiguration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   deviceConfiguration.api.httpDomoticz = false;
@@ -691,6 +691,7 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
       root.printTo(Serial);
 #endif
       configuration.type = root["type"].as<int>();
+      configuration.api = root["api"].as<int>();
       sprintf(configuration.version, root["version"]);
       sprintf(configuration.upgradeURL, root["upgradeURL"]);
       configuration.autoUpgrade = root["autoUpgrade"];
@@ -738,6 +739,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     StaticJsonBuffer<100> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["type"] = configuration->type;
+    root["api"] = configuration->api;
     root["version"] = configuration->version;
     root["autoUpgrade"] = configuration->autoUpgrade;
     root["upgradeURL"] = configuration->upgradeURL;
@@ -767,6 +769,7 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
+  firmwareConfiguration.api = AFE_FIRMARE_API;
   firmwareConfiguration.autoUpgrade = 0;
   firmwareConfiguration.upgradeURL[0] = '\0';
   saveConfiguration(&firmwareConfiguration);
@@ -1124,6 +1127,7 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   saveConfiguration(MQTTConfiguration);
 }
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
 #ifdef DEBUG
@@ -1233,6 +1237,7 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
   DomoticzConfiguration.port = 8080;
   saveConfiguration(DomoticzConfiguration);
 }
+#endif 
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
@@ -1519,14 +1524,12 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
       sprintf(configuration.name, root["name"]);
       configuration.timeToOff = root["timeToOff"];
       configuration.state.powerOn = root["statePowerOn"];
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.state.MQTTConnected = root["stateMQTTConnected"];
 #endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
-#endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
 #endif
       configuration.ledID = root["ledID"];
@@ -1726,15 +1729,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
     root["name"] = configuration.name;
     root["timeToOff"] = configuration.timeToOff;
     root["statePowerOn"] = configuration.state.powerOn;
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["stateMQTTConnected"] = configuration.state.MQTTConnected;
 #endif
     root["ledID"] = configuration.ledID;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration.domoticz.idx;
-#endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
     root["MQTTTopic"] = configuration.mqtt.topic;
 #endif
     root.printTo(configFile);
@@ -1878,11 +1879,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.mqtt.topic[0] = '\0';
-#endif
-#if defined(AFE_CONFIG_API_MQTT_ENABLED) ||                                    \
-    defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 #endif
@@ -2156,10 +2154,9 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
       configuration.sensitiveness = root["sensitiveness"];
       configuration.functionality = root["functionality"];
       configuration.relayID = root["relayID"];
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
       configuration.domoticz.idx = root["idx"];
 #endif
 
@@ -2218,8 +2215,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
     root["relayID"] = configuration.relayID;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration.domoticz.idx;
-#endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#else
     root["MQTTTopic"] = configuration.mqtt.topic;
 #endif
     root.printTo(configFile);
@@ -2257,10 +2253,9 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 #else
   SwitchConfiguration.relayID = 0;
 #endif
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   SwitchConfiguration.mqtt.topic[0] = '\0';
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
   /* Saving first switch. Common for all devices */
@@ -2389,10 +2384,9 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
       configuration.interval = root["interval"];
       configuration.numberOfSamples = root["numberOfSamples"];
       configuration.maxVCC = root["maxVCC"];
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
       configuration.domoticz.raw = root["idx"]["raw"];
       configuration.domoticz.percent = root["idx"]["percent"];
       configuration.domoticz.voltage = root["idx"]["voltage"];
@@ -2450,10 +2444,9 @@ void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
     root["interval"] = configuration.interval;
     root["numberOfSamples"] = configuration.numberOfSamples;
     root["maxVCC"] = configuration.maxVCC;
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration.mqtt.topic;
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
     idx["raw"] = configuration.domoticz.raw;
     idx["percent"] = configuration.domoticz.percent;
     idx["voltage"] = configuration.domoticz.voltage;
@@ -2491,10 +2484,9 @@ void AFEDataAccess::createADCInputConfigurationFile() {
   AnalogInputConfiguration.numberOfSamples =
       AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
   AnalogInputConfiguration.maxVCC = AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
-#ifdef AFE_CONFIG_API_MQTT_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
-#endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
   AnalogInputConfiguration.domoticz.percent = 0;
@@ -3132,7 +3124,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
     configuration.api.http = state;
   } else if (apiID == API_MQTT) {
     configuration.api.mqtt = state;
-  } else if (apiID == API_HTTP_DOMOTICZ) {
+  } else if (apiID == API_HTTP_DOMOTICZ (NOT SET)) {
     configuration.api.httpDomoticz = state;
     if (state) {
       configuration.api.http = true;
