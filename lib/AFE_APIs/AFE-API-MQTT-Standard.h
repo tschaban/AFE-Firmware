@@ -10,8 +10,10 @@
 #endif
 
 #include <AFE-Configuration.h>
-#include <AFE-API.h>
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#include <AFE-API.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -20,19 +22,24 @@
 class AFEAPIMQTTStandard : public AFEAPI {
 
 private:
-
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   void processRequest();
+  uint8_t currentCacheSize = 0;
+  MQTT_TOPICS_CACHE mqttTopicsCache[AFE_CONFIG_API_MQTT_TOPICS_CACHE_LENGTH];
 #endif
 
 public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIMQTTStandard();
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
+#else
   void begin(AFEDataAccess *, AFEDevice *);
+#endif
+
   void subscribe();
   void synchronize();
   void listener();
-
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   boolean publishRelayState(uint8_t id);
@@ -46,5 +53,7 @@ public:
   void publishADCValues();
 #endif
 };
+
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #endif

@@ -2,14 +2,31 @@
 
 #include "AFE-API.h"
 
-AFEAPI::AFEAPI() {};
+AFEAPI::AFEAPI(){};
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+
+void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device, AFELED *Led) {
+  _Data = Data;
+  _Device = Device;
+  _Led = Led;
+  if (_Device->configuration.api.mqtt) {
+    Mqtt.begin(Data, Device->configuration.name, Led);
+  }
+  enabled = true;
+}
+
+#else
 
 void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Data = Data;
   _Device = Device;
-  Mqtt.begin(_Data, _Device->configuration.name);
+  if (_Device->configuration.api.mqtt) {
+    Mqtt.begin(Data, Device->configuration.name);
+  }
   enabled = true;
 }
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPI::addClass(AFERelay *Relay) {
@@ -17,7 +34,7 @@ void AFEAPI::addClass(AFERelay *Relay) {
     _Relay[i] = Relay + i;
   }
 #ifdef DEBUG
-  Serial << endl << " - reference to the relays added";
+  Serial << endl << "INFO: The reference to the relays added";
 #endif
 }
 #endif
@@ -28,7 +45,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
     _Switch[i] = Switch + i;
   }
 #ifdef DEBUG
-  Serial << endl << " - reference to the switches added";
+  Serial << endl << "INFO: The reference to the switches added";
 #endif
 }
 #endif
@@ -37,7 +54,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
 void AFEAPI::addClass(AFEAnalogInput *Analog) {
   _AnalogInput = Analog;
 #ifdef DEBUG
-  Serial << endl << " - reference to the ADC added";
+  Serial << endl << "INFO: The reference to the ADC added";
 #endif
 }
 #endif

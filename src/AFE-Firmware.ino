@@ -347,21 +347,13 @@ void setup() {
     /* Initializing APIs */
     initializeMQTTAPI();
 
-/* Initializing HTTP API */
+/* Initializing Domoticz HTTP API */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     initializeHTTPDomoticzAPI();
-    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI, &HttpDomoticzAPI);
-#else
-    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-    HttpAPI.addClass(&Relay[0]);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    HttpAPI.addClass(&AnalogInput);
-#endif
+    /* Initializing HTTP API */
+    initializeHTTPAPI();
   }
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)

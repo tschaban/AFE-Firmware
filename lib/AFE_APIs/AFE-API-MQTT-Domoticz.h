@@ -3,8 +3,6 @@
 #ifndef _AFE_API_MQTT_DOMOTICZ_h
 #define _AFE_API_MQTT_DOMOTICZ_h
 
-
-
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
 #else
@@ -15,36 +13,16 @@
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-#include <AFE-DOMOTICZ-Structure.h>
-#include <AFE-Device.h>
-#include <AFE-MQTT-Structure.h>
-#include <AFE-MQTT.h>
+#include <AFE-API.h>
 #include <ArduinoJson.h>
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#include <AFE-Relay.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-#include <AFE-Switch.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-#include <AFE-Analog-Input.h>
-#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFEAPIMQTTDomoticz {
+class AFEAPIMQTTDomoticz : public AFEAPI {
 
 private:
-  AFEDataAccess *_Data;
-  AFEDevice *_Device;
-
-  /* Is API enabled, set in begin() */
-  boolean enabled = false;
 
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
   void generateDeviceValue(char *json, uint32_t idx, char *value);
@@ -54,16 +32,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
   DOMOTICZ_BASIC_CONFIG bypassProcessing;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-  AFESwitch *_Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  AFEAnalogInput *_Analog;
 #endif
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -73,26 +42,28 @@ private:
 #endif
 
 public:
-  AFEMQTT Mqtt;
-
   /* Constructor: it sets all necessary parameters */
   AFEAPIMQTTDomoticz();
   void begin(AFEDataAccess *, AFEDevice *);
-
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *Led);
+#endif
+  void subscribe();
+  void synchronize();
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void addClass(AFERelay *);
+  virtual void addClass(AFERelay *);
   boolean publishRelayState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void addClass(AFESwitch *);
+  virtual void addClass(AFESwitch *);
   boolean publishSwitchState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  void addClass(AFEAnalogInput *);
+  virtual void addClass(AFEAnalogInput *);
   void publishADCValues();
 #endif
 };
@@ -100,4 +71,3 @@ public:
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #endif //_AFE_API_MQTT_DOMOTICZ_h
-

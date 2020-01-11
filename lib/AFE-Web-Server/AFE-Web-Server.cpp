@@ -585,13 +585,13 @@ boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 void AFEWebServer::publishHTML(String page) {
 
 #ifdef DEBUG
-  Serial << endl << endl << "Site streaming started";
-  Serial << endl << " - Page size: " << page.length();
+  Serial << endl
+         << "INFO: Site streaming started. Size : " << page.length() << " ... ";
 #endif
 
   server.send(200, "text/html", page);
 #ifdef DEBUG
-  Serial << endl << " - Completed";
+  Serial << "Completed";
 #endif
 }
 
@@ -793,7 +793,6 @@ MQTT AFEWebServer::getMQTTData() {
 #endif
   return data;
 }
-
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEWebServer::getDomoticzServerData() {
@@ -1343,7 +1342,7 @@ BH1750 AFEWebServer::getBH1750SensorData() {
   data.mode = server.arg("m").length() > 0
                   ? server.arg("m").toInt()
                   : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED                  
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
 #else

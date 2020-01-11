@@ -14,6 +14,10 @@
 #include <AFE-MQTT-Structure.h>
 #include <AFE-MQTT.h>
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-Relay.h>
 #endif
@@ -31,24 +35,33 @@
 #endif
 
 class AFEAPI {
-
+private:
 public:
   AFEMQTT Mqtt;
   AFEDevice *_Device;
+  AFEDataAccess *_Data;
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED *_Led;
+#endif
 
   AFEAPI();
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
+#else
   void begin(AFEDataAccess *, AFEDevice *);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void addClass(AFERelay *);
+  virtual void addClass(AFERelay *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void addClass(AFESwitch *);
+  virtual void addClass(AFESwitch *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  void addClass(AFEAnalogInput *);
+  virtual void addClass(AFEAnalogInput *);
 #endif
 
 protected:
@@ -66,9 +79,6 @@ protected:
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   AFEAnalogInput *_AnalogInput;
 #endif
-
-private:
-  AFEDataAccess *_Data;
 };
 
 #endif // _AFE_API_h

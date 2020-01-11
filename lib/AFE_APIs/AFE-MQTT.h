@@ -29,12 +29,12 @@ private:
   WiFiClient esp;
   PubSubClient Broker;
   AFEDataAccess *_Data;
-  char *_deviceName;
+  char *_DeviceName;
   MQTT configuration;
   NETWORK NetworkConfiguration;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+  AFELED *_Led;
   unsigned long ledStartTime = 0;
 #endif
 
@@ -54,25 +54,27 @@ private:
       uint8_t duration_between_connection_attempts,
       uint8_t duration_between_next_connection_attempts_series);
 
-protected:
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-  MQTT_MESSAGE message;
-#endif
-
   /* Connecting to MQTT Broker */
   void connect();
 
   /* Method turns off MQTT API */
   void disconnect();
 
-
-
 public:
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+  MQTT_MESSAGE message;
+#endif
+
   /* Constructor: it sets all necessary parameters */
   AFEMQTT();
 
-  /* Initialization of the class */
+/* Initialization of the class */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, char *, AFELED *);
+#endif
+
   void begin(AFEDataAccess *, char *);
+
 
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
  * default values */
@@ -81,7 +83,6 @@ public:
   /* Method returns true if device connected to MQTT Broker */
   boolean eventConnected();
 
-  
   /* Methods publishes a message to MQTT Broker */
   boolean publish(const char *topic, const char *message);
 

@@ -27,7 +27,7 @@ private:
   void updateFirmwareVersion();
 
 #ifdef T0_CONFIG
-  void upgradeToT0V203();
+  void upgradeToT0V210();
 #endif
 
 public:

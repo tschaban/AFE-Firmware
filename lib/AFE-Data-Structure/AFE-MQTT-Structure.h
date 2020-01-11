@@ -15,14 +15,26 @@ struct MQTT_MESSAGE {
   byte *content;
   uint16_t length;
 };
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct MQTT_BASIC_CONFIG {
   char topic[65];
 };
 
-#endif
+
+typedef enum {
+  AFE_MQTT_DEVICE_RELAY = 0,
+  AFE_MQTT_DEVICE_ADC = 1,
+} afe_mqtt_standard_device_type_t;
+
+
+struct MQTT_TOPICS_CACHE {
+  MQTT_BASIC_CONFIG message;
+  uint8_t id;
+  afe_mqtt_standard_device_type_t type; 
+};
+#endif //AFE_CONFIG_API_PROCESS_REQUESTS
 
 struct MQTT {
   char host[33];

@@ -850,6 +850,18 @@ typedef enum {
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #endif
 
+/* Config releated to LWT Functionality */
+#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
+#define AFE_CONFIG_API_PROCESS_REQUESTS  // Configuration paramters which enables processing MQTT incoming messages.
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
+#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables processing MQTT incoming messages.
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -863,22 +875,10 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70  // Used by API-MQTT-Domoticz @TODO CHECK
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Used by API-HTTP-Domoticz @TODO CHECK
 #define AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+1 // Used by API-MQTT-Domoticz
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables processing incoming messages. Used for bypassing processing IDX
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif // AFE_CONFIG_HARDWARE_RELAY
 #else
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API
+#define AFE_CONFIG_API_MQTT_TOPICS_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+1
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-/* Config releated to LWT Functionality */
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 
-
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // _AFE_Configuration_h

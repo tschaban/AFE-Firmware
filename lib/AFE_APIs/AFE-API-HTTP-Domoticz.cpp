@@ -4,12 +4,22 @@
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-AFEAPIHTTPDomoticz::AFEAPIHTTPDomoticz(){};
+AFEAPIHTTPDomoticz::AFEAPIHTTPDomoticz() : AFEAPI(){};
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
+                               AFELED *Led) {
+  AFEAPI::begin(Data, Device, Led);
+  init();
+}
+#else
 void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
-  _Data = Data;
-  _Device = Device;
+  AFEAPI::begin(Data, Device);
+  init();
+}
+#endif
 
+void AFEAPIHTTPDomoticz::init() {
   configuration = _Data->getDomoticzConfiguration();
 
   char _user[45] = {0}; // base64 conversion takes ceil(n/3)*4 size of mem
@@ -27,8 +37,6 @@ void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
   sprintf(serverURL, "%s%s:%d/json.htm?type=command%s",
           configuration.protocol == 0 ? "http://" : "https://",
           configuration.host, configuration.port, authorization);
-
-  enabled = true;
 }
 
 const String AFEAPIHTTPDomoticz::getApiCall(const char *param,
@@ -41,20 +49,18 @@ const String AFEAPIHTTPDomoticz::getApiCall(const char *param,
 boolean AFEAPIHTTPDomoticz::callURL(const String url) {
   boolean _return;
 #ifdef AFE_CONFIG_HARDWARE_LED
-// Led.on();
+  _Led->on();
 #endif
 
 #ifdef DEBUG
-  Serial << endl << endl << "--------------- Domoticz ---------------";
-  Serial << endl << url;
-  Serial << endl << "----------------------------------------" << endl;
+  Serial << endl << "INFO: Publishing to Domoticz: " << url;
 #endif
   http.begin(client, url);
   _return = http.GET() == 200 ? true : false;
   http.end();
   delay(10);
 #ifdef AFE_CONFIG_HARDWARE_LED
-//  Led.off();
+  _Led->off();
 #endif
   return _return;
 }
@@ -72,7 +78,7 @@ boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
 }
 
 boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
-                                                 const char *value) {
+                                                    const char *value) {
   boolean _return = false;
   if (enabled) {
     String call = getApiCall("udevice", idx);
@@ -83,42 +89,27 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
   return _return;
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-boolean AFEAPIHTTPDomoticz::idxForProcessing(uint32_t idx) {
-  boolean _ret = true;
-  if (idx == bypassProcessing.idx) {
-    bypassProcessing.idx = 0;
-    _ret = false;
-  }
-  return _ret;
-}
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
-#ifdef DEBUG
-  Serial << endl << endl << "INFO: adding Relay's IDXs to Cache";
-#endif
+  AFEAPI::addClass(Relay);
 
-  // Cache idx
+#ifdef DEBUG
+  Serial << endl << "INFO: Caching IDXs for Relays";
+#endif
   uint8_t index = 0;
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    _Relay[i] = Relay + i;
-#ifdef DEBUG
-    Serial << endl << " - Relay[" << i << "]: " << _Relay[i]->getName() << " ";
-#endif
     if (_Relay[i]->configuration.domoticz.idx > 0) {
       idxCache[index].domoticz.idx = _Relay[i]->configuration.domoticz.idx;
       idxCache[index].id = i;
       idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
 #ifdef DEBUG
-      Serial << "added IDX: " << idxCache[index].domoticz.idx;
+      Serial << endl << " - added IDX: " << idxCache[index].domoticz.idx;
 #endif
       index++;
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "IDX not set";
+      Serial << endl << " - IDX not set";
     }
 #endif
   }
@@ -128,14 +119,10 @@ void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
   boolean publishStatus = false;
-  if (enabled && _Relay[id]->configuration.domoticz.idx > 0 &&
-      bypassProcessing.idx != _Relay[id]->configuration.domoticz.idx) {
-    if (_Relay[id]->configuration.domoticz.idx > 0) {
-      publishStatus =
-          sendSwitchCommand(_Relay[id]->configuration.domoticz.idx,
-                            _Relay[id]->get() == AFE_RELAY_ON ? "On" : "Off");
-      bypassProcessing.idx = _Relay[id]->configuration.domoticz.idx;
-    }
+  if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
+    publishStatus =
+        sendSwitchCommand(_Relay[id]->configuration.domoticz.idx,
+                          _Relay[id]->get() == AFE_RELAY_ON ? "On" : "Off");
   }
   return publishStatus;
 }
@@ -143,9 +130,7 @@ boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
-    _Switch[i] = Switch + i;
-  }
+  AFEAPI::addClass(Switch);
 }
 #endif
 
@@ -153,37 +138,42 @@ void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
 boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _Switch[id]->configuration.domoticz.idx) {
-    publishStatus = sendSwitchCommand(_Switch[id]->configuration.domoticz.idx,
-                      _Switch[id]->getPhisicalState() ? "Off" : "On");
+    publishStatus =
+        sendSwitchCommand(_Switch[id]->configuration.domoticz.idx,
+                          _Switch[id]->getPhisicalState() ? "Off" : "On");
   }
   return publishStatus;
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-void AFEAPIHTTPDomoticz::addClass(AFEAnalogInput *Analog) { _Analog = Analog; }
+void AFEAPIHTTPDomoticz::addClass(AFEAnalogInput *Analog) {
+  AFEAPI::addClass(Analog);
+}
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIHTTPDomoticz::publishADCValues() {
   if (enabled) {
     char value[20];
-    if (_Analog->configuration.domoticz.percent > 0) {
-      sprintf(value, "%-.2f", _Analog->data.percent);
-      sendCustomSensorCommand(_Analog->configuration.domoticz.percent, value);
-    }
-    if (_Analog->configuration.domoticz.voltage > 0) {
-      sprintf(value, "%-.4f", _Analog->data.voltage);
-      sendCustomSensorCommand(_Analog->configuration.domoticz.voltage, value);
-    }
-    if (_Analog->configuration.domoticz.voltageCalculated > 0) {
-      sprintf(value, "%-.4f", _Analog->data.voltageCalculated);
-      sendCustomSensorCommand(_Analog->configuration.domoticz.voltageCalculated,
+    if (_AnalogInput->configuration.domoticz.percent > 0) {
+      sprintf(value, "%-.2f", _AnalogInput->data.percent);
+      sendCustomSensorCommand(_AnalogInput->configuration.domoticz.percent,
                               value);
     }
-    if (_Analog->configuration.domoticz.raw > 0) {
-      sprintf(value, "%-d", _Analog->data.raw);
-      sendCustomSensorCommand(_Analog->configuration.domoticz.raw, value);
+    if (_AnalogInput->configuration.domoticz.voltage > 0) {
+      sprintf(value, "%-.4f", _AnalogInput->data.voltage);
+      sendCustomSensorCommand(_AnalogInput->configuration.domoticz.voltage,
+                              value);
+    }
+    if (_AnalogInput->configuration.domoticz.voltageCalculated > 0) {
+      sprintf(value, "%-.4f", _AnalogInput->data.voltageCalculated);
+      sendCustomSensorCommand(
+          _AnalogInput->configuration.domoticz.voltageCalculated, value);
+    }
+    if (_AnalogInput->configuration.domoticz.raw > 0) {
+      sprintf(value, "%-d", _AnalogInput->data.raw);
+      sendCustomSensorCommand(_AnalogInput->configuration.domoticz.raw, value);
     }
   }
 }

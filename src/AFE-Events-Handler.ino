@@ -4,24 +4,26 @@ void eventsListener() {
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
 #ifdef DEBUG
-    Serial << endl
-           << endl
-           << "#### CONNECTED TO THE WIFI ####" << endl
-           << endl
-           << "Events listener: triggered";
+    Serial << endl << "INFO: Connected to WiFi";
 #endif
 
 /* ################## HTTP DOMOTICZ ################### */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     /* Sendings hardware values to Domoticz */
+
     if (Device.configuration.api.httpDomoticz) {
+
+#ifdef DEBUG
+      Serial << endl << "INFO: Domoticz HTTP API boot actions triggering";
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
       Led.on();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #ifdef DEBUG
-      Serial << endl << "Sending current gate state to Domoticz";
+      Serial << endl << "INFO: Sending current gate state to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         //    DomoticzPublishGateState(i);
@@ -40,7 +42,7 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 #ifdef DEBUG
-      Serial << endl << "Sending current state of switches to Domoticz";
+      Serial << endl << "INFO: Sending current state of switches to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
         HttpDomoticzAPI.publishSwitchState(i);
@@ -49,7 +51,7 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
-      Serial << endl << "Sending current state of relays to Domoticz";
+      Serial << endl << "INFO: Sending current state of relays to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -65,7 +67,7 @@ void eventsListener() {
 #ifdef DEBUG
         else {
           Serial << endl
-                 << "Excluding relay: " << i
+                 << "INFO: Excluding relay: " << i
                  << " as it's assigned to a Gate: " << Relay[i].gateId;
         }
 #endif
@@ -75,7 +77,7 @@ void eventsListener() {
 
 #if defined(T3_CONFIG)
 #ifdef DEBUG
-      Serial << endl << "Sending current state of PIRs to Domoticz";
+      Serial << endl << "INFO: Sending current state of PIRs to Domoticz";
 #endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
         if (Device.configuration.isPIR[i]) {
@@ -91,16 +93,16 @@ void eventsListener() {
 #endif
     }
 #endif /* AFE_CONFIG_API_DOMOTICZ_ENABLED  */
-  }    /* End of Network.eventConnected() */
+
+#ifdef DEBUG
+    Serial << endl << "INFO: Post WiFi Connection actions completed";
+#endif
+
+  } /* End of Network.eventConnected() */
 
   /* ################## MQTT ################### */
-
   if (Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
-#ifdef DEBUG
-      Serial << endl
-             << "INFO: Connected to MQTT Server: triggering post connection updates";
-#endif
       MqttAPI.subscribe();
       MqttAPI.synchronize();
     }

@@ -48,6 +48,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   Serial << endl << "Device: " << request->device;
   Serial << endl << "Name: " << request->name;
   Serial << endl << "Command: " << request->command;
+  Serial << endl << "Source: " << request->source;
   Serial << endl << "----------------------------------" << endl;
 #endif
 
@@ -58,7 +59,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   else if (strcmp(request->device, "relay") == 0) {
 #ifdef DEBUG
-    Serial << endl << endl << "HTTP: Processing relay" << endl;
+    Serial << endl << "INFO: Processing Relay HTTP requests";
 #endif
     processRelay(request);
   }
@@ -67,7 +68,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   else if (strcmp(request->device, "ADC") == 0) {
 #ifdef DEBUG
-    Serial << endl << endl << "HTTP: Processing ADC" << endl;
+    Serial << endl << "INFO: Processing Relay ADC requests";
 #endif
     processAnalogInput(request);
   }
@@ -90,7 +91,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 #ifdef DEBUG
-  Serial << endl << endl << "HTTP: Request processed" << endl;
+  Serial << endl << "INFO: HTTP requst processed";
 #endif
 }
 
@@ -122,8 +123,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
           _MqttAPI->publishRelayState(i);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (_HttpAPIDomoticz->idxForProcessing(
-                  _Relay[i]->configuration.domoticz.idx)) {
+          if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRelayState(i);
           }
 #endif
@@ -135,8 +135,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
           _MqttAPI->publishRelayState(i);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (_HttpAPIDomoticz->idxForProcessing(
-                  _Relay[i]->configuration.domoticz.idx)) {
+          if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRelayState(i);
           }
 #endif
@@ -147,8 +146,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
           sendRelayStatus(request, state != _Relay[i]->get(), _Relay[i]->get());
           _MqttAPI->publishRelayState(i);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (_HttpAPIDomoticz->idxForProcessing(
-                  _Relay[i]->configuration.domoticz.idx)) {
+          if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRelayState(i);
           }
 #endif

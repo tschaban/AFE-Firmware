@@ -90,7 +90,7 @@ struct DEVICE {
 struct AFE_DEVICE_API_T0_200 {
   boolean http;
   boolean mqtt;
-  boolean httpDomoticz;
+  boolean domoticz;
 };
 
 struct DEVICE_T0_200 {
