@@ -34,6 +34,7 @@ public:
   AFEDataAccess();
 
   boolean formatFileSystem();
+  boolean fileExist(const char *);
 
   const String getDeviceUID();
   void saveDeviceUID(const char *);
@@ -50,6 +51,8 @@ public:
   FIRMWARE getFirmwareConfiguration();
   void saveConfiguration(FIRMWARE *);
   void createFirmwareConfigurationFile();
+  void saveFirmwareVersion(const char *);
+  void saveFirmwareAPIVersion();
 
   NETWORK getNetworkConfiguration();
   void saveConfiguration(NETWORK configuration);
@@ -79,10 +82,6 @@ public:
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void createSwitchConfigurationFile();
 
-  /* Methods saves firmware version from/to EEPROM */
-  void saveVersion(const char *);
-
-  /* Methods read and save device mode from/to EEPROM */
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 

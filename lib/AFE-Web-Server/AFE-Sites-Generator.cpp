@@ -91,7 +91,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_DOMOTICZ;
     page += "\">";
@@ -538,7 +538,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   body += "<input name=\"m\" type=\"radio\" "
           "value=\"1\"";
-  body += configuration.api.httpDomoticz ? " checked=\"checked\"" : "";
+  body += configuration.api.domoticz ? " checked=\"checked\"" : "";
   body += ">Domoticz HTTP API</label></div>";
   body += "<div class=\"cc\"><label><input name=\"m\" "
           "type=\"radio\" value=\"2\"";
@@ -992,7 +992,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    if (Device->configuration.api.httpDomoticz ||
+    if (Device->configuration.api.domoticz ||
         Device->configuration.api.mqtt) {
 
       body = "<fieldset>";
@@ -1177,7 +1177,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   String page = addConfigurationBlock(title, "", body);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.httpDomoticz ||
+  if (Device->configuration.api.domoticz ||
       Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
@@ -1260,7 +1260,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
                                           : "DS18B20 temperature sensor",
                             "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
     body += "<div class=\"cf\">";
     body += "<label>IDX</label>";
@@ -1374,7 +1374,7 @@ String AFESitesGenerator::addDHTConfiguration() {
                     : "DHT temperature and humidity sensor",
       "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
     body += "<div class=\"cf\"><label> ";
     body +=
@@ -1565,7 +1565,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset><div class=\"cf\"><label>IDX</label><input name=\"x";
     body += id;
     body += "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
@@ -1624,7 +1624,7 @@ String AFESitesGenerator::addContactronConfiguration(uint8_t id) {
 
   String page = addConfigurationBlock(title, "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1793,7 +1793,7 @@ String AFESitesGenerator::addGateConfiguration(uint8_t id) {
     }
   }
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1878,7 +1878,7 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_PARTICLE_SENSOR, "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
@@ -2003,7 +2003,7 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
     body += "</fieldset>";
     page += addConfigurationBlock(L_CORRECTIONS, "", body);
 
-    if (Device->configuration.api.httpDomoticz) {
+    if (Device->configuration.api.domoticz) {
       body = "<fieldset>";
 
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
@@ -2104,7 +2104,7 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_BH1750_SENSOR, "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2215,7 +2215,7 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
 
-  if (Device->configuration.api.httpDomoticz) {
+  if (Device->configuration.api.domoticz) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2288,7 +2288,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 #endif 
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.httpDomoticz ||
+  if (Device->configuration.api.domoticz ||
       Device->configuration.api.mqtt) {
     body = "<fieldset>";
     char _idx[7];

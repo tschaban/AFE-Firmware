@@ -25,6 +25,7 @@ private:
   AFEDevice *Device;
   void upgradeFirmwarType();
   void updateFirmwareVersion();
+  void updateFirmwareAPIVersion();
 
 #ifdef T0_CONFIG
   void upgradeToT0V210();

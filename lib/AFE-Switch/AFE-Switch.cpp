@@ -21,6 +21,22 @@ void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
     Led.begin(systeLedID - 1);
   }
 #endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Defining get and state MQTT Topics */
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
   _initialized = true;
 }
 
@@ -86,8 +102,8 @@ void AFESwitch::listener() {
 
       if (time - startTime >=
           configuration.sensitiveness) { // switch prssed, sensitiveness
-                                               // taken into account, processing
-                                               // event
+                                         // taken into account, processing
+                                         // event
         if (configuration.type == AFE_SWITCH_TYPE_MONO) {
 
           if (!_pressed) { // This is set only once when switch is pressed
@@ -176,14 +192,3 @@ void AFESwitch::listener() {
     }
   }
 }
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-const char *AFESwitch::getMQTTStateTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
-}
-#endif

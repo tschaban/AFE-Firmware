@@ -21,8 +21,11 @@ class AFESwitch {
 
 
 public:
-
 SWITCH configuration;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
 
   /* Constructors */
   AFESwitch();
@@ -52,11 +55,6 @@ SWITCH configuration;
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Method returns MQTT topic for this switch */
-  const char *getMQTTStateTopic();
-#endif
-
 private:
   
   boolean _initialized = false;
@@ -81,9 +79,7 @@ private:
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;

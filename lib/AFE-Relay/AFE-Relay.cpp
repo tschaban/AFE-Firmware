@@ -31,11 +31,25 @@ void AFERelay::begin(uint8_t id) {
     Led.begin(configuration.ledID);
   }
 #endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+/* Defining get and state MQTT Topics */
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = '\0';
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 
 byte AFERelay::get() {
-  return digitalRead(configuration.gpio) == HIGH ? AFE_RELAY_ON
-                                                      : AFE_RELAY_OFF;
+  return digitalRead(configuration.gpio) == HIGH ? AFE_RELAY_ON : AFE_RELAY_OFF;
 }
 
 /* Set relay to ON */
@@ -125,9 +139,8 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 
 #ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
 boolean AFERelay::autoTurnOff(boolean invert) {
-  if (configuration.timeToOff > 0 &&
-      ((invert && get() == AFE_RELAY_OFF) ||
-       (!invert && get() == AFE_RELAY_ON)) &&
+  if (configuration.timeToOff > 0 && ((invert && get() == AFE_RELAY_OFF) ||
+                                      (!invert && get() == AFE_RELAY_ON)) &&
       millis() - turnOffCounter >=
           configuration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
     invert ? on(invert) : off(invert);
@@ -137,8 +150,6 @@ boolean AFERelay::autoTurnOff(boolean invert) {
   }
 }
 #endif
-
-const char *AFERelay::getName() { return configuration.name; }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
@@ -154,32 +165,8 @@ void AFERelay::setTimer(float timer) {
 void AFERelay::clearTimer() { configuration.timeToOff = 0; }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-uint8_t AFERelay::getControlledLedID() { return configuration.ledID; }
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
-}
-#endif
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-const char *AFERelay::getMQTTCommandTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-
-const char *AFERelay::getMQTTStateTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
 }
 #endif

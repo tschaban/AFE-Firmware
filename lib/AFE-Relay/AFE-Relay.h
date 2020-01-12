@@ -52,6 +52,11 @@ public:
 #endif
   RELAY configuration;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructors */
   AFERelay();
   AFERelay(uint8_t id);
@@ -63,16 +68,15 @@ public:
    * after device has been crash */
   void setRelayAfterRestoringPower();
 
-
-
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Method sets relay state after device is connected / reconnected to MQTT
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/
   boolean setRelayAfterRestoringMQTTConnection();
-#endif  
+#endif
 
-  /* Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay is ON */
+  /* Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay is ON
+   */
   byte get();
 
   /* Turns on relay */
@@ -89,8 +93,6 @@ public:
   boolean autoTurnOff(boolean invert = false);
 #endif
 
-  /* Methods returns relay name */
-  const char *getName();
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
@@ -102,31 +104,15 @@ public:
   void clearTimer();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  /* It returns ID of the LED that shoud indicated Relay status */
-  uint8_t getControlledLedID();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* It sets unit of relay to auto turn off timer. Possible options: true -
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Method returns MQTT topic for this relay */
-  const char *getMQTTCommandTopic();
-  const char *getMQTTStateTopic();
-#endif  
-
 private:
   uint8_t _id;
   AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
@@ -141,8 +127,6 @@ private:
    * established */
 
   void setRelayAfterRestore(uint8_t option);
-
-  
 };
 
 #endif

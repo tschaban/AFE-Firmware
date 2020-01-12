@@ -219,7 +219,7 @@
 #define L_UPGRADE_INFO                                                             \
   "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "               \
   "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj "     \
-  "urządzenia przez conajmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
+  "urządzenia przez co najmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
   "domyślne ustawienia.<br><strong>Ten proces nie może zostać "                 \
   "przerwany</strong>"
 #define L_UPGRADE "Aktualizuj"

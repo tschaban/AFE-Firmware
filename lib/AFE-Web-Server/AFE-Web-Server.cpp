@@ -578,7 +578,8 @@ HTTPCOMMAND AFEWebServer::getHTTPCommand() {
   return httpCommand;
 }
 
-void AFEWebServer::listener() { server.handleClient(); }
+void AFEWebServer::listener() { 
+  server.handleClient(); }
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
@@ -630,7 +631,7 @@ DEVICE AFEWebServer::getDeviceData() {
   data.api.http = server.arg("h").length() > 0 ? true : false;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.api.httpDomoticz = server.arg("m").length() > 0
+  data.api.domoticz = server.arg("m").length() > 0
                               ? (server.arg("m").toInt() == 1 ? true : false)
                               : false;
   data.api.mqtt = server.arg("m").length() > 0

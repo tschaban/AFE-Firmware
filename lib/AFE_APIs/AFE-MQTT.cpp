@@ -55,14 +55,15 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEMQTT::subscribe(const char *topic) {
-#ifdef DEBUG
-  Serial << endl << " - " << topic;
-#endif
+
   if (strlen(topic) > 0) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->on();
 #endif
     Broker.subscribe(topic);
+#ifdef DEBUG
+  Serial << endl << " - " << topic;
+#endif    
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->off();
 #endif

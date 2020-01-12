@@ -43,14 +43,17 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   boolean publishRelayState(uint8_t id);
+  void processRelay(uint8_t *id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   boolean publishSwitchState(uint8_t id);
+  void processSwitch(uint8_t *id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   void publishADCValues();
+  void processADC();
 #endif
 };
 

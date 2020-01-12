@@ -4,7 +4,7 @@
 
 void initializeHTTPDomoticzAPI() {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
-      Device.configuration.api.httpDomoticz) {
+      Device.configuration.api.domoticz) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     HttpDomoticzAPI.begin(&Data, &Device, &Led);

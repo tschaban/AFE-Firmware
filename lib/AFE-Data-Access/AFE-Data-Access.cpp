@@ -11,6 +11,10 @@ boolean AFEDataAccess::formatFileSystem() {
   return SPIFFS.format();
 }
 
+boolean AFEDataAccess::fileExist(const char *path) {
+  return SPIFFS.exists(path);
+}
+
 const String AFEDataAccess::getDeviceUID() {
   String uid;
 
@@ -348,9 +352,9 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.api.httpDomoticz = root["api"]["httpDomoticz"] | false;
+      configuration.api.domoticz = root["api"]["domoticz"] | false;
       /* HTTP API must be ON when Domoticz is ON */
-      if (configuration.api.httpDomoticz && !configuration.api.http) {
+      if (configuration.api.domoticz && !configuration.api.http) {
         configuration.api.http = true;
       }
 #endif
@@ -439,7 +443,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     jsonAPI["http"] = configuration->api.http;
     jsonAPI["mqtt"] = configuration->api.mqtt;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    jsonAPI["httpDomoticz"] = configuration->api.httpDomoticz;
+    jsonAPI["domoticz"] = configuration->api.domoticz;
 #endif
     root["noOfLEDs"] = configuration->noOfLEDs;
     root["noOfSwitches"] = configuration->noOfSwitches;
@@ -566,7 +570,7 @@ defined(T4_CONFIG)
 
     saveAPI(API_MQTT(not set), configuration.api.mqtt);
     saveAPI(API_HTTP (not set), configuration.api.http);
-    saveAPI(API_HTTP_DOMOTICZ (not set), configuration.api.httpDomoticz);
+    saveAPI(API_HTTP_DOMOTICZ (not set), configuration.api.domoticz);
 
 
   #if defined(T1_CONFIG) || defined(T2_CONFIG) || defined(T5_CONFIG)
@@ -609,7 +613,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   /* APIs */
   deviceConfiguration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  deviceConfiguration.api.httpDomoticz = false;
+  deviceConfiguration.api.domoticz = false;
 #endif
   deviceConfiguration.api.http = true;
 
@@ -663,6 +667,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   saveConfiguration(&deviceConfiguration);
 }
 
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145
 FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
   FIRMWARE configuration;
 
@@ -683,14 +688,14 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<100> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FIRMWARE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
       configuration.type = root["type"].as<int>();
-      configuration.api = root["api"].as<int>() | AFE_FIRMARE_API;
+      configuration.api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       sprintf(configuration.version, root["version"]);
       sprintf(configuration.upgradeURL, root["upgradeURL"]);
       configuration.autoUpgrade = root["autoUpgrade"];
@@ -698,7 +703,10 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
 #ifdef DEBUG
       Serial << endl
              << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
+             << "JSON Buffer size: " << jsonBuffer.size() << endl
+             << (AFE_CONFIG_FILE_BUFFER_FIRMWARE < jsonBuffer.size() + 10
+                     ? "WARNING: Buffor size might be to small"
+                     : "Buffor size: OK");
 #endif
     }
 
@@ -735,7 +743,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     Serial << "success" << endl << "Writing JSON : ";
 #endif
 
-    StaticJsonBuffer<100> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FIRMWARE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["type"] = configuration->type;
     root["api"] = configuration->api;
@@ -751,7 +759,10 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
     Serial << endl
            << "success" << endl
-           << "JSON Buffer size: " << jsonBuffer.size();
+           << "JSON Buffer size: " << jsonBuffer.size() << endl
+           << (AFE_CONFIG_FILE_BUFFER_FIRMWARE < jsonBuffer.size() + 10
+                   ? "WARNING: Buffor size might be to small"
+                   : "Buffor size: OK");
 #endif
   }
 #ifdef DEBUG
@@ -774,9 +785,15 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   saveConfiguration(&firmwareConfiguration);
 }
 
-void AFEDataAccess::saveVersion(const char *version) {
+void AFEDataAccess::saveFirmwareVersion(const char *version) {
   FIRMWARE configuration = getFirmwareConfiguration();
   sprintf(configuration.version, version);
+  saveConfiguration(&configuration);
+}
+
+void AFEDataAccess::saveFirmwareAPIVersion() {
+  FIRMWARE configuration = getFirmwareConfiguration();
+  configuration.api = AFE_FIRMARE_API;
   saveConfiguration(&configuration);
 }
 
@@ -1138,10 +1155,10 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   Serial << endl
          << endl
          << "----------------- Reading File -------------------";
-  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+  Serial << endl << "Opening file: "<< AFE_FILE_DOMOTICZ_CONFIGURATION << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-domoticz-server.json", "r");
+  File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -1193,10 +1210,10 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
   Serial << endl
          << endl
          << "----------------- Writing File -------------------";
-  Serial << endl << "Opening file: cfg-domoticz-server.json : ";
+  Serial << endl << "Opening file: " << AFE_FILE_DOMOTICZ_CONFIGURATION << " : ";
 #endif
 
-  File configFile = SPIFFS.open("cfg-domoticz-server.json", "w");
+  File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
 
   if (configFile) {
 #ifdef DEBUG
@@ -3134,7 +3151,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
   } else if (apiID == API_MQTT) {
     configuration.api.mqtt = state;
   } else if (apiID == API_HTTP_DOMOTICZ(NOT SET)) {
-    configuration.api.httpDomoticz = state;
+    configuration.api.domoticz = state;
     if (state) {
       configuration.api.http = true;
     }

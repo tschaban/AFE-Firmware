@@ -229,11 +229,11 @@ void setup() {
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
-      Serial << endl << "- Firmware is not up2date. Upgrading...";
+      Serial << endl << "WARN: Firmware is not up2date. Upgrading...";
 #endif
       Upgrader->upgrade();
 #ifdef DEBUG
-      Serial << endl << " - Firmware upgraded";
+      Serial << endl << "INFO: Firmware upgraded";
 #endif
     }
 #ifdef DEBUG

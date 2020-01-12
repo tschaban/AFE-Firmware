@@ -1,6 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 void eventsListener() {
-
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
 #ifdef DEBUG
@@ -11,7 +10,7 @@ void eventsListener() {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     /* Sendings hardware values to Domoticz */
 
-    if (Device.configuration.api.httpDomoticz) {
+    if (Device.configuration.api.domoticz) {
 
 #ifdef DEBUG
       Serial << endl << "INFO: Domoticz HTTP API boot actions triggering";

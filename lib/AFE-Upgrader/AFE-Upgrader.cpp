@@ -8,7 +8,22 @@ AFEUpgrader::AFEUpgrader(AFEDataAccess *_Data, AFEDevice *_Device) {
   FirmwareConfiguration = Data->getFirmwareConfiguration();
 }
 
+/* It returns true if firmware has been upgraded */
 boolean AFEUpgrader::upgraded() {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: Firmware version (stored) T" << FirmwareConfiguration.type
+         << "-" << FirmwareConfiguration.version << "-"
+         << (FirmwareConfiguration.api == AFE_API_STANDARD
+                 ? "Standard"
+                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ ? "Domoticz"
+                                                                  : "Unknwon"));
+  Serial << endl
+         << "INFO: Firmware version (booted) T" << AFE_FIRMWARE_TYPE << "-"
+         << AFE_FIRMWARE_VERSION << "-"
+         << (AFE_FIRMARE_API == AFE_API_STANDARD ? "Standard" : "Domoticz");
+#endif
+
   if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) == 0 &&
       FirmwareConfiguration.type == AFE_FIRMWARE_TYPE &&
       FirmwareConfiguration.api ==
@@ -24,42 +39,48 @@ boolean AFEUpgrader::upgraded() {
   }
 }
 
+/* It kicks-off firmware upgrade */
 void AFEUpgrader::upgrade() {
+  /* Upgraded version from one T to other T */
   if (FirmwareConfiguration.type != AFE_FIRMWARE_TYPE) {
 #ifdef DEBUG
-    Serial << endl << "Upgrading Firmware type";
+    Serial << endl << "INFO: Upgrading Firmware type";
 #endif
     upgradeFirmwarType();
     Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
+    /* Upgrade from one version to other within the same T */
   } else if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) != 0) {
 #ifdef DEBUG
     Serial << endl
-           << "Upgrading Firmware T" << AFE_FIRMWARE_TYPE
+           << "INFO: Upgrading Firmware T" << AFE_FIRMWARE_TYPE
            << " from version: " << FirmwareConfiguration.version << " to "
            << AFE_FIRMWARE_VERSION;
 #endif
     updateFirmwareVersion();
     Device->upgraded = AFE_UPGRADE_VERSION;
-  } else if (FirmwareConfiguration.api != AFE_FIRMARE_API) {
+  }
+
+  /* Checking if in addition there has been API version change */
+  if (FirmwareConfiguration.api != AFE_FIRMARE_API) {
 #ifdef DEBUG
     Serial << endl
-           << "Firmware api version upgraded"
+           << "INFO: Firmware API version upgraded"
            << " from version: " << FirmwareConfiguration.api << " to "
-           << AFE_FIRMWARE_TYPE;
+           << AFE_FIRMARE_API;
 #endif
+    updateFirmwareAPIVersion();
   }
+
 #ifdef DEBUG
   Serial << endl
-         << "Upgrade to version " << AFE_FIRMWARE_VERSION << " completed";
+         << "INFO Upgrade to version " << AFE_FIRMWARE_VERSION << " completed";
 #endif
 }
 
 void AFEUpgrader::upgradeFirmwarType() {
   Data->createFirmwareConfigurationFile();
   Data->createDeviceConfigurationFile();
-
   Data->createSwitchConfigurationFile();
-
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   Data->createRelayConfigurationFile();
 #endif
@@ -110,9 +131,25 @@ void AFEUpgrader::updateFirmwareVersion() {
   }
 #endif
 
-  Data->saveVersion(AFE_FIRMWARE_VERSION);
+  Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
 }
 
+void AFEUpgrader::updateFirmwareAPIVersion() {
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (AFE_FIRMARE_API == AFE_API_DOMOTICZ) {
+    /* Checking if there is Domoticz server configuration file */
+    if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
+      Data->createDomoticzConfigurationFile();
+    }
+    Data->saveFirmwareAPIVersion();
+  }
+#endif
+
+  Data->saveFirmwareAPIVersion();
+}
+
+/* Specyfic upgrade to version T0 2.1 from version 2.0 */
 void AFEUpgrader::upgradeToT0V210() {
 
   DEVICE newDevice;
@@ -120,12 +157,12 @@ void AFEUpgrader::upgradeToT0V210() {
   uint8_t counter = 0;
 
   // Copy data from old structure to new structure
-  sprintf(newDevice.name, oldDevice.name);
 
+  sprintf(newDevice.name, oldDevice.name);
   newDevice.api.http = oldDevice.api.http;
   newDevice.api.mqtt = oldDevice.api.mqtt;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  newDevice.api.httpDomoticz = oldDevice.api.domoticz;
+  newDevice.api.domoticz = oldDevice.api.domoticz;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
