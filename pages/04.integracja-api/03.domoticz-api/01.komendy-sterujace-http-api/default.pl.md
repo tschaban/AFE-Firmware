@@ -4,6 +4,8 @@ recaptchacontact:
     enabled: false
 ---
 
+W przypadku integracji z urządzeniem za pomocą Domoticz API koniecznie jest wprowadzenie komend HTTP sterujących przekaźnikiem
+
 * Wciskamy przycisk **Edytuj** w elemencie sterującym naszą Lampą
 
 ![](domoticz-edytowane-przycisku.png)
