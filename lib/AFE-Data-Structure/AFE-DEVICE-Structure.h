@@ -12,9 +12,11 @@
 #include <AFE-Configuration.h>
 
 struct AFE_DEVICE_API {
-  boolean mqtt;
   boolean http;
+  boolean mqtt;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   boolean domoticz;
+#endif
 };
 
 /* Custom DEVICE structure definition */
@@ -82,13 +84,18 @@ struct DEVICE {
 #endif
 };
 
-
-
 #ifdef T0_CONFIG
 /* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */
+
+struct AFE_DEVICE_API_T0_200 {
+  boolean http;
+  boolean mqtt;
+  boolean domoticz;
+};
+
 struct DEVICE_T0_200 {
   char name[33];
-  AFE_DEVICE_API api;
+  AFE_DEVICE_API_T0_200 api;
 #ifdef AFE_CONFIG_HARDWARE_LED
   boolean isLED[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS];
 #endif

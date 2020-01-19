@@ -22,12 +22,16 @@ private:
   unsigned long startTime = 0;
   boolean _initialized = false;
   uint8_t counterOfSamplings = 0;
-
+  uint16_t temporaryAnalogData = 0;
+  
 public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
- 
+#endif
+
   /* Constructor */
   AFEAnalogInput();
 
@@ -43,7 +47,7 @@ public:
   /* Main method that takes care for analog reads based on config parameters */
   void listener();
 
-    /* Returns the sensor data in JSON format */
+  /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 };
 

@@ -17,12 +17,14 @@ recaptchacontact:
 **API**
 * HTTP
 * MQTT
-* Dedykowane API dla Domoticz, z wykorzystanie protokołu HTTP
+* Domoticz HTTP API
+* Domoticz MQTT API
 
 ** Funkcje **
 * Sterowanie przekaźnikami bezprzewodowo przez sieć WiFi 
 * Ustawiania stanu początkowego przekaźników po uruchomieniu
 * Ustawienie stany przekaźników po podłączeniu się do brokera MQTT
+* Obsługa wiadomości LWT
 * Automatyczne wyłączanie przekaźników po zadanym czasie
 * Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 * LED może informwać o stanie przekaźnika

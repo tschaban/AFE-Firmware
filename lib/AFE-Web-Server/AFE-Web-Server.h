@@ -20,7 +20,6 @@
 #include <AFE-LED.h>
 #endif
 
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -42,9 +41,9 @@ private:
   ESP8266WebServer server;
   AFEDevice *Device;
   AFEFirmwarePro *Firmware;
-  #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
-  #endif
+#endif
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -72,9 +71,15 @@ private:
   DEVICE getDeviceData();
   NETWORK getNetworkData();
   MQTT getMQTTData();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ getDomoticzServerData();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   RELAY getRelayData(uint8_t id);
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   SWITCH getSwitchData(uint8_t id);
+#endif
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 
@@ -128,7 +133,6 @@ private:
   AS3935 getAS3935SensorData();
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
 #endif
@@ -142,11 +146,10 @@ public:
   /* Method initialize WebServer and Updater server */
   void begin(AFEDevice *, AFEFirmwarePro *);
 
-
-  #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */
   void initSystemLED(AFELED *);
-  #endif
+#endif
 
   /* Method listens for HTTP requests */
   void listener();

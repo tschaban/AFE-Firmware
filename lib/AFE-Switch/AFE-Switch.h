@@ -19,37 +19,14 @@
 
 class AFESwitch {
 
-private:
-  SWITCH SwitchConfiguration;
-  boolean _initialized = false;
-  boolean state;
-  boolean previousState; // Actually this stores current switch state
-
-  unsigned long startTime = 0;
-
-  boolean pressed = false; // It's set to true once button pressed physically
-  boolean _pressed = false;
-
-  boolean phisicallyPressed = false;
-  boolean phisicallyState = false;
-
-  /* Forst one is set to true after X secodns. Second one controls LED */
-  boolean pressed4fiveSeconds = false;
-  boolean _pressed4fiveSeconds = false;
-
-  boolean pressed4tenSeconds = false;
-  boolean _pressed4tenSeconds = false;
-
-  boolean pressed4thirteenSeconds = false;
-  boolean _pressed4thirteenSeconds = false;
-
-  char mqttStateTopic[sizeof(SwitchConfiguration.mqtt.topic) + 6];
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
-#endif
 
 public:
+SWITCH configuration;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructors */
   AFESwitch();
 
@@ -78,17 +55,38 @@ public:
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 
-  /* Method returns type of switch functionality. See Data-Structure for
-   * SWITCH_.... constants */
-  uint8_t getFunctionality();
+private:
+  
+  boolean _initialized = false;
+  boolean state;
+  boolean previousState; // Actually this stores current switch state
 
-  /* Method returns ID of the relay controlled by the switch */
-  uint8_t getControlledRelayID();
+  unsigned long startTime = 0;
 
-  /* Method returns MQTT topic for this switch */
-  const char *getMQTTStateTopic();
+  boolean pressed = false; // It's set to true once button pressed physically
+  boolean _pressed = false;
 
-  uint32_t getDomoticzIDX();
+  boolean phisicallyPressed = false;
+  boolean phisicallyState = false;
+
+  /* Forst one is set to true after X secodns. Second one controls LED */
+  boolean pressed4fiveSeconds = false;
+  boolean _pressed4fiveSeconds = false;
+
+  boolean pressed4tenSeconds = false;
+  boolean _pressed4tenSeconds = false;
+
+  boolean pressed4thirteenSeconds = false;
+  boolean _pressed4thirteenSeconds = false;
+
+
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED Led;
+#endif
+
+
+
 };
 
 #endif
