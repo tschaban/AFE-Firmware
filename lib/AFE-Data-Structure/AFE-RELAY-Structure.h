@@ -21,8 +21,11 @@ struct RELAY {
   char name[17];
   float timeToOff;
   uint8_t ledID;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz;
+#else
   MQTT_BASIC_CONFIG mqtt;
+#endif  
   RELAY_DEFAULTS state;
   REGULATOR thermostat;
   REGULATOR humidistat;

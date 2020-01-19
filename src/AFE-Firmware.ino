@@ -6,7 +6,7 @@ This code combains AFE Firmware versions:
    - T1 (DS18B20)
    - T2 (DHTxx)
    - T3 (PIRs)
-   - T4 - decommissioned, T0 took over 100% of it's functionality 
+   - T4 - decommissioned, T0 took over 100% of it's functionality
    - T5 Gate
    - T6 Wheater station
 
@@ -21,16 +21,29 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <Streaming.h>
 #endif
 
-#include <AFE-API-Domoticz.h>
-#include <AFE-API-MQTT.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
-#include <AFE-Relay.h>
-#include <AFE-Switch.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
+
+#include <AFE-API-HTTP.h>
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#include <AFE-API-HTTP-Domoticz.h>
+#include <AFE-API-MQTT-Domoticz.h>
+#else
+#include <AFE-API-MQTT-Standard.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#include <AFE-Relay.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#include <AFE-Switch.h>
+#endif
 
 /* Shelly-1 device does not have LED. Excluding LED related code */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -65,14 +78,24 @@ AFEDataAccess Data;
 AFEFirmwarePro Firmware;
 AFEDevice Device;
 AFEWiFi Network;
-AFEMQTT Mqtt;
-AFEDomoticz Domoticz;
+AFEAPIHTTP HttpAPI;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+AFEAPIMQTTDomoticz MqttAPI;
+AFEAPIHTTPDomoticz HttpDomoticzAPI;
+#else
+AFEAPIMQTTStandard MqttAPI;
+#endif
+
 AFEWebServer WebServer;
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
 AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
-MQTT MQTTConfiguration;
 
 #if defined(T3_CONFIG)
 #include <AFE-PIR.h>
@@ -124,11 +147,9 @@ AFEAnalogInput AnalogInput;
 void setup() {
 
 #ifdef DEBUG
-Serial.begin(AFE_CONFIG_SERIAL_SPEED);
-delay(10);
-//Serial.swap();
+  Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+  delay(10);
 #endif
-
 
 #ifdef DEBUG
   Serial << endl
@@ -136,17 +157,16 @@ delay(10);
          << "################################ BOOTING "
             "################################"
          << endl
-         << "All classes and global variables initialized" << endl
-         << "Initializing device" << endl
-         << "File system: ";
+         << "INFO: All classes and global variables initialized" << endl
+         << "INFO: Initializing device" << endl;
 #endif
 
   /* Initializing SPIFFS file system */
   if (SPIFFS.begin()) {
 #ifdef DEBUG
-    Serial << "mounted";
+    Serial << "INFO: File system: mounted";
   } else {
-    Serial << "ERROR: not mounted";
+    Serial << "ERROR: File system not mounted";
 #endif
     yield();
   }
@@ -156,9 +176,7 @@ delay(10);
 /* Checking if the device is launched for a first time. If so it loades
  * default configuration */
 #ifdef DEBUG
-  Serial << endl
-         << "Checking if first time launch: Device.getMode()= "
-         << Device.getMode() << " : ";
+  Serial << endl << "INFO: Checking if first time launch ... ";
 #endif
 
   if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
@@ -180,7 +198,7 @@ delay(10);
   yield();
 
 #ifdef DEBUG
-  Serial << endl << "System LED ID: " << systemLedID;
+  Serial << endl << "INFO: System LED ID: " << systemLedID;
 #endif
 
   if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -188,13 +206,12 @@ delay(10);
   }
   Led.on();
 #ifdef DEBUG
-  Serial << endl << "System LED initialized";
+  Serial << endl << "INFO: System LED initialized";
 #endif
 #endif
-
 
 #ifdef DEBUG
-  Serial << endl << "Checking, if WiFi hasn't been configured: ";
+  Serial << endl << "INFO: Checking, if WiFi was configured: ";
 #endif
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -203,32 +220,32 @@ delay(10);
   } else {
 /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
-    Serial << "NO" << endl << "Checking if firmware should be upgraded: ";
+    Serial << "NO" << endl << "INFO: Checking if firmware should be upgraded?";
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
-      Serial << endl << "Firmware is not up2date. Upgrading...";
+      Serial << endl << "WARN: Firmware is not up2date. Upgrading...";
 #endif
       Upgrader->upgrade();
 #ifdef DEBUG
-      Serial << endl << "Firmware upgraded";
+      Serial << endl << "INFO: Firmware upgraded";
 #endif
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "Firmware is up2date";
+      Serial << endl << "INFO: Firmware is up2date";
     }
 #endif
     delete Upgrader;
     Upgrader = NULL;
 
-/* Initializing relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+    /* Initializing relay */
     initializeRelay();
 #ifdef DEBUG
-    Serial << endl << "Relay(s) initialized";
+    Serial << endl << "INFO: Relay(s) initialized";
 #endif
 #endif
   }
@@ -236,12 +253,11 @@ delay(10);
   /* Initialzing network */
   Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
-  Serial << endl << "Network initialized";
+  Serial << endl << "INFO: Network initialized";
 #endif
 
-
 #ifdef DEBUG
-  Serial << endl << "Starting network";
+  Serial << endl << "INFO: Starting network";
 #endif
   Network.listener();
 
@@ -257,18 +273,17 @@ delay(10);
   Firmware.begin();
 
   WebServer.begin(&Device, &Firmware);
-  #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   WebServer.initSystemLED(&Led);
-  #endif
-
-#ifdef DEBUG
-  Serial << endl << "WebServer initialized";
 #endif
 
+#ifdef DEBUG
+  Serial << endl << "INFO: WebServer initialized";
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
   initializeSwitch();
-#ifdef DEBUG
-  Serial << endl << "Switch(es) initialized";
 #endif
 
   if (Device.getMode() == AFE_MODE_NORMAL) {
@@ -327,8 +342,15 @@ delay(10);
 #endif
 
     /* Initializing APIs */
-    MQTTInit();
-    DomoticzInit();
+    initializeMQTTAPI();
+
+/* Initializing Domoticz HTTP API */
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    initializeHTTPDomoticzAPI();
+#endif
+
+    /* Initializing HTTP API */
+    initializeHTTPAPI();
   }
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
@@ -350,11 +372,16 @@ delay(10);
 
 #ifdef DEBUG
   Serial << endl
-         << "########################### BOOTING COMPLETED "
+         << "#############################################"
             "###########################"
          << endl
+         << "#                           BOOTING COMPLETED"
+            "                          #"
          << endl
-         << "###########################  STARTING DEVICE  "
+         << "#                            STARTING DEVICE "
+            "                          #"
+         << endl
+         << "#############################################"
             "###########################";
 #endif
 }
@@ -372,7 +399,7 @@ void loop() {
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
         if (Device.configuration.api.mqtt) {
-          Mqtt.listener();
+          MqttAPI.listener();
         }
 
         /* Listens for HTTP requsts. Both for configuration panel HTTP
@@ -380,7 +407,7 @@ void loop() {
         WebServer.listener();
 
         /* Checking if there was received HTTP API Command */
-        HTTPRequestListener();
+        HttpAPI.listener();
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
         contractonEventsListener();
@@ -449,9 +476,11 @@ void loop() {
     WebServer.listener();
   }
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Listens and processes switch events */
   switchEventsListener();
   processSwitchEvents();
+#endif
 
 /* Led listener */
 #ifdef AFE_CONFIG_HARDWARE_LED

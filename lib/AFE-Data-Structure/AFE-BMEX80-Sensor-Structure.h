@@ -11,10 +11,13 @@
 
 #include <AFE-Air-Item-Structure.h>
 #include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-DOMOTICZ-Structure.h>
+#endif
 #include <AFE-MQTT-Structure.h>
 
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct BMEX80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG temperature;
   DOMOTICZ_BASIC_CONFIG humidity;
@@ -30,6 +33,7 @@ struct BMEX80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG co2Equivalent;
   DOMOTICZ_BASIC_CONFIG breathVocEquivalent;
 };
+#endif
 
 struct BMEX80_OVERSAMPLING_SETTINGS {
   uint8_t temperature;
@@ -48,8 +52,11 @@ struct BMEX80 {
   AIR_ITEM_SETTING pressure;
   int16_t altitude;
   float seaLevelPressure;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   BMEX80_DOMOTICZ domoticz;
+#else
   MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 struct BMEX80_DATA {

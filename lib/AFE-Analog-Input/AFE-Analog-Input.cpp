@@ -9,11 +9,13 @@ void AFEAnalogInput::begin() {
   configuration = Data.getADCInputConfiguration();
   _initialized = true;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
+#endif
 
 #ifdef DEBUG
   Serial << endl << endl << "------------ AC VCC Input ------------";
@@ -41,7 +43,7 @@ boolean AFEAnalogInput::isReady() {
 }
 
 void AFEAnalogInput::listener() {
-  uint16_t temporaryAnalogData = 0;
+
   if (_initialized) {
     unsigned long time = millis();
 
@@ -55,8 +57,8 @@ void AFEAnalogInput::listener() {
         temporaryAnalogData += analogRead(configuration.gpio);
         counterOfSamplings++;
       } else {
-
         data.raw = (uint16_t)(temporaryAnalogData / configuration.numberOfSamples);
+
         data.percent = (float)data.raw  * 100 / 1024;
         data.voltage = (double)(configuration.maxVCC * data.raw  / 1024);
         if (configuration.divider.Rb > 0) {
@@ -81,6 +83,7 @@ void AFEAnalogInput::listener() {
 #endif
 
         counterOfSamplings = 0;
+        temporaryAnalogData = 0;
         ready = true;
         startTime = 0;
 

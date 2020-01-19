@@ -28,14 +28,14 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "Device is in mode: " << WiFiMode;
+  Serial << endl << "INFO: Device is in mode: " << WiFiMode;
 #endif
 
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   if (WiFiMode == AFE_MODE_ACCESS_POINT || WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Serial << endl << "Starting HotSpot: ";
+    Serial << endl << "INFO: Starting HotSpot: ";
 #endif
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
@@ -46,7 +46,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #endif
   } else {
 #ifdef DEBUG
-    Serial << endl << "Starting WiFi: in WIFI_STA mode";
+    Serial << endl << "INFO: Starting WiFi: in WIFI_STA mode";
 #endif
     if (!networkConfiguration.isDHCP) {
       IPAddress ip;
@@ -76,7 +76,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 
       WiFi.config(ip, gateway, subnet);
 #ifdef DEBUG
-      Serial << endl << "Settting fixed IP";
+      Serial << endl << "INFO: Settting fixed IP";
 #endif
     }
     WiFi.mode(WIFI_STA);
@@ -101,7 +101,7 @@ void AFEWiFi::listener() {
                 strlen(networkConfiguration.password) == 0) {
 #ifdef DEBUG
               Serial << endl
-                     << "WiFI is not configured. Going to configuration mode";
+                     << "ERROR: WiFI is not configured. Going to configuration mode";
 #endif
               Device->reboot(AFE_MODE_NETWORK_NOT_SET);
             }
@@ -172,7 +172,7 @@ void AFEWiFi::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << "INFO: Connection established"
+               << "INFO: WiFi Connection established"
                << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
 #endif
       }

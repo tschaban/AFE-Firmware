@@ -9,7 +9,9 @@
 #include "WProgram.h"
 #endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
 #include <AFE-DOMOTICZ-Structure.h>
+#endif
 #include <AFE-MQTT-Structure.h>
 
 struct GATES_CURRENT_STATE {
@@ -30,8 +32,11 @@ struct GATE {
   GATE_CONTACTRONS contactron;
   GATE_STATES states;
   char name[17];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   DOMOTICZ_BASIC_CONFIG domoticz;
+#else
   MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 #endif

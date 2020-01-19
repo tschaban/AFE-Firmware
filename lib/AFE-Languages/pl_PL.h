@@ -27,12 +27,19 @@
 #define L_FIRMWARE_NAME "Stacja Pogody"
 #endif
 
+/* HTTP API */
+#define L_DEVICE_NOT_EXIST "\"Urządzenie o takiej nazwie nie istnieje\""
+#define L_COMMAND_NOT_IMPLEMENTED "\"Komeda nie jest zaimplementowana\""
+
 /* Upgrades */
 #define L_UPGRADED_TO_NEW_VERSION                                              \
   "Została zainstalowana nowa wersja AFE Firmware"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
   "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna "        \
   "konfiguracja urządzenia."
+#define L_PASWORD_PROTECTED "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
+
+#define L_DONATE "&#10084; Wesprzyj jeśli soft Ci się przydał"
 
 /* Menu */
 #define L_DEVICE "Urządzenie"
@@ -53,6 +60,8 @@
 #define L_SETTINGS "Ustawienia"
 #define L_SETTINGS_HOT_SPOT "Ustawienia (Tryb HotSpot)"
 #define L_PRO_VERSION "Wersja PRO"
+#define L_CONNECTED "Podłączony"
+#define L_DISCONNECTED "Odłączony"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -128,6 +137,7 @@
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
 #define L_MQTT_TOPIC_LWT "Temat wiadomości LWT"
+#define L_MQTT_IDX_LWT "IDX dla wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO                                              \
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY                                                     \
@@ -213,7 +223,7 @@
 #define L_UPGRADE_INFO                                                             \
   "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "               \
   "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj "     \
-  "urządzenia przez conajmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
+  "urządzenia przez co najmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
   "domyślne ustawienia.<br><strong>Ten proces nie może zostać "                 \
   "przerwany</strong>"
 #define L_UPGRADE "Aktualizuj"
@@ -398,6 +408,8 @@
 #define L_UNITS "Jednostki"
 #endif
 #endif
+
+
 
 
 #endif

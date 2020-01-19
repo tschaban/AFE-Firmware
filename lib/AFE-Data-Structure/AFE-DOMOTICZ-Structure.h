@@ -9,12 +9,30 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-PROTOCOL-Structure.h>
-#include <IPAddress.h>
+#include <AFE-Configuration.h>
 
 struct DOMOTICZ_BASIC_CONFIG {
-  uint32_t idx;
+  uint32_t idx = 0;
 };
+
+#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+struct DOMOTICZ_MQTT_COMMAND {
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  uint8_t nvalue;
+};
+
+typedef enum {
+  AFE_DOMOTICZ_DEVICE_RELAY = 0
+} afe_domoticz_device_type_t;
+
+
+struct DOMOTICZ_IDX_CACHE {
+  DOMOTICZ_BASIC_CONFIG domoticz;
+  uint8_t id;
+  afe_domoticz_device_type_t type; 
+};
+#endif //AFE_CONFIG_API_PROCESS_REQUESTS
+
 
 struct DOMOTICZ {
   uint8_t protocol;
