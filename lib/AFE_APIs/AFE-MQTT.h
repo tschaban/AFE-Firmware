@@ -15,6 +15,14 @@
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_LANGUAGE == 0
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -26,11 +34,9 @@
 class AFEMQTT {
 
 private:
-  WiFiClient esp;
   PubSubClient Broker;
   AFEDataAccess *_Data;
   char *_DeviceName;
-  MQTT configuration;
   NETWORK NetworkConfiguration;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -64,6 +70,8 @@ public:
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   MQTT_MESSAGE message;
 #endif
+  WiFiClient esp;
+  MQTT configuration;
 
   /* Constructor: it sets all necessary parameters */
   AFEMQTT();
@@ -91,10 +99,6 @@ public:
   void subscribe(const char *);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-  /* Method returns LWT topic, if configured */
-  const char *getLWTTopic();
-#endif
 };
 
 #endif

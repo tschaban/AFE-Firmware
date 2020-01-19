@@ -158,16 +158,15 @@ void setup() {
             "################################"
          << endl
          << "INFO: All classes and global variables initialized" << endl
-         << "INFO: Initializing device" << endl
-         << "INFO: File system: ";
+         << "INFO: Initializing device" << endl;
 #endif
 
   /* Initializing SPIFFS file system */
   if (SPIFFS.begin()) {
 #ifdef DEBUG
-    Serial << "mounted";
+    Serial << "INFO: File system: mounted";
   } else {
-    Serial << "ERROR: not mounted";
+    Serial << "ERROR: File system not mounted";
 #endif
     yield();
   }
@@ -177,9 +176,7 @@ void setup() {
 /* Checking if the device is launched for a first time. If so it loades
  * default configuration */
 #ifdef DEBUG
-  Serial << endl
-         << "INFO: Checking if first time launch: Device.getMode()= "
-         << Device.getMode() << " : ";
+  Serial << endl << "INFO: Checking if first time launch ... ";
 #endif
 
   if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
@@ -214,7 +211,7 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Checking, if WiFi hasn't been configured: ";
+  Serial << endl << "INFO: Checking, if WiFi was configured: ";
 #endif
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -223,7 +220,7 @@ void setup() {
   } else {
 /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
-    Serial << "NO" << endl << "INFO: Checking if firmware should be upgraded: ";
+    Serial << "NO" << endl << "INFO: Checking if firmware should be upgraded?";
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
@@ -238,7 +235,7 @@ void setup() {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "- Firmware is up2date";
+      Serial << endl << "INFO: Firmware is up2date";
     }
 #endif
     delete Upgrader;
@@ -375,11 +372,16 @@ void setup() {
 
 #ifdef DEBUG
   Serial << endl
-         << "########################### BOOTING COMPLETED "
+         << "#############################################"
             "###########################"
          << endl
+         << "#                           BOOTING COMPLETED"
+            "                          #"
          << endl
-         << "###########################  STARTING DEVICE  "
+         << "#                            STARTING DEVICE "
+            "                          #"
+         << endl
+         << "#############################################"
             "###########################";
 #endif
 }

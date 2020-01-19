@@ -39,6 +39,7 @@
   "konfiguracja urządzenia."
 #define L_PASWORD_PROTECTED "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
 
+#define L_DONATE "&#10084; Wesprzyj jeśli soft Ci się przydał"
 
 /* Menu */
 #define L_DEVICE "Urządzenie"
@@ -59,6 +60,8 @@
 #define L_SETTINGS "Ustawienia"
 #define L_SETTINGS_HOT_SPOT "Ustawienia (Tryb HotSpot)"
 #define L_PRO_VERSION "Wersja PRO"
+#define L_CONNECTED "Podłączony"
+#define L_DISCONNECTED "Odłączony"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -134,6 +137,7 @@
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
 #define L_MQTT_TOPIC_LWT "Temat wiadomości LWT"
+#define L_MQTT_IDX_LWT "IDX dla wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO                                              \
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY                                                     \

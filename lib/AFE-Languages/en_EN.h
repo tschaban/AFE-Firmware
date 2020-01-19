@@ -39,6 +39,9 @@
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
 #define L_PASWORD_PROTECTED "\"Not possible. Configuration is protected by password\""
 
+#define L_DONATE_LINK "https://en.donate.afe-firmware.smartnydom.pl/"
+#define L_DONATE "&#10084; Donate if you found this useful"
+
 /* Menu */
 #define L_DEVICE "Device"
 #define L_NETWORK "Network"
@@ -58,6 +61,8 @@
 #define L_SETTINGS "Settings"
 #define L_SETTINGS_HOT_SPOT "Settings (HotSpot mode)"
 #define L_PRO_VERSION "PRO Version"
+#define L_CONNECTED "Connected"
+#define L_DISCONNECTED "Disconnected"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "chars"
@@ -129,7 +134,8 @@
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
-#define L_MQTT_TOPIC_LWT "LWT Topic"
+#define L_MQTT_IDX_LWT "LWT's IDX"
+#define L_MQTT_TOPIC_LWT "LWT's Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 

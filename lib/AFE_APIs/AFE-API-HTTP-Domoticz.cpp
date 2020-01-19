@@ -17,7 +17,7 @@ void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
   AFEAPI::begin(Data, Device);
   init();
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEAPIHTTPDomoticz::init() {
   configuration = _Data->getDomoticzConfiguration();
@@ -114,7 +114,7 @@ void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
 #endif
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
@@ -126,13 +126,13 @@ boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
   }
   return publishStatus;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
   AFEAPI::addClass(Switch);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
@@ -144,13 +144,13 @@ boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
   }
   return publishStatus;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIHTTPDomoticz::addClass(AFEAnalogInput *Analog) {
   AFEAPI::addClass(Analog);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIHTTPDomoticz::publishADCValues() {
@@ -177,6 +177,6 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
     }
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

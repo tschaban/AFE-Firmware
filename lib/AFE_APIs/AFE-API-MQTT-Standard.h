@@ -23,10 +23,13 @@ class AFEAPIMQTTStandard : public AFEAPI {
 
 private:
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+  /* Classifies incomming MQTT Topics and invokes code for processing them */
   void processRequest();
+  /* Size of the cache that stories MQTT Topics AFE has subsribed to */
   uint8_t currentCacheSize = 0;
+  /* Cache with MQTT Topics AFE has subsribed to */
   MQTT_TOPICS_CACHE mqttTopicsCache[AFE_CONFIG_API_MQTT_TOPICS_CACHE_LENGTH];
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -35,24 +38,36 @@ public:
   void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #else
   void begin(AFEDataAccess *, AFEDevice *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
+  /* Subscribes to MQTT Topcis */
   void subscribe();
+
+  /* Synchronize device's items values after connection to MQTT Broker is
+   * established */
   void synchronize();
+
+  /* Listens for MQTT Messages */
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+  /* Publishes relay state */
   boolean publishRelayState(uint8_t id);
+  /* Processes MQTT Request related to Relay */
   void processRelay(uint8_t *id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
+  /* Publishes switch state */
   boolean publishSwitchState(uint8_t id);
+  /* Processes MQTT Request related to Switch */
   void processSwitch(uint8_t *id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  /* Publishes ADC data */
   void publishADCValues();
+  /* Processes ADC MQTT requests */
   void processADC();
 #endif
 };

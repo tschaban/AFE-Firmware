@@ -74,8 +74,12 @@ private:
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ getDomoticzServerData();
 #endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   RELAY getRelayData(uint8_t id);
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   SWITCH getSwitchData(uint8_t id);
+#endif
   PASSWORD getPasswordData();
   PRO_VERSION getSerialNumberData();
 

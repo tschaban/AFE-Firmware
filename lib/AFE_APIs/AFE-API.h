@@ -1,5 +1,10 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
+/* Class
+- establishes connection to MQTT Broker
+- is a proxy between AFE-APIs and MQTT Broker
+- it also stories referencies to global classes that can be used for AFE-APIs */
+
 #ifndef _AFE_API_h
 #define _AFE_API_h
 
@@ -69,14 +74,17 @@ protected:
   boolean enabled = false;
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+  /* Stories reference to global Relay class */
   AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
+  /* Stories reference to global Switch class */
   AFESwitch *_Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  /* Stories reference to global ADC class */
   AFEAnalogInput *_AnalogInput;
 #endif
 };

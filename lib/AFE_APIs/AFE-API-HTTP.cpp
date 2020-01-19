@@ -29,7 +29,8 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *WebServer,
     enabled = true;
   }
 }
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 /* Listening for HTTP requests - must be in loop() */
 void AFEAPIHTTP::listener() {
   if (enabled) {

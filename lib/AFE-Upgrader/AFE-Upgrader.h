@@ -16,18 +16,24 @@
 #include <Streaming.h>
 #endif
 
-
 class AFEUpgrader {
 
 private:
   FIRMWARE FirmwareConfiguration;
   AFEDataAccess *Data;
   AFEDevice *Device;
+
+  /* Upgrades configuration files structure after firmware type change */
   void upgradeFirmwarType();
+
+  /* Upgrades configuration files structure after firmware version change */
   void updateFirmwareVersion();
+
+  /* Upgrades configuration files structure after firmware API Change */
   void updateFirmwareAPIVersion();
 
 #ifdef T0_CONFIG
+  /* Upgrades firmware from version T0-2.0.x to T0-2.1.x */
   void upgradeToT0V210();
 #endif
 

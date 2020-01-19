@@ -32,9 +32,9 @@ void AFEAPIMQTTStandard::synchronize() {
   Serial << endl << "INFO: Sending current device state to MQTT Broker  ...";
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-  Mqtt.publish(AFEAPI::Mqtt.getLWTTopic(), "connected");
-#endif
+
+Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
+
 
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -86,7 +86,7 @@ void AFEAPIMQTTStandard::subscribe() {
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
               _Switch[i]->mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RELAY;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_SWITCH;
       currentCacheSize++;
     }
   }

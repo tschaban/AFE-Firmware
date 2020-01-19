@@ -112,8 +112,15 @@ public:
   String addDomoticzServerConfiguration();
 #endif  
   String addPasswordConfigurationSite();
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY  
   String addRelayConfiguration(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   String addSwitchConfiguration(uint8_t id);
+#endif 
+  
   String addProVersionSite();
 
 #ifdef AFE_CONFIG_HARDWARE_LED

@@ -32,8 +32,11 @@ private:
 
 public:
   AFEDataAccess();
-
+  
+  /* It formats SPIFFS */
   boolean formatFileSystem();
+
+  /* Returns true if a file exists */
   boolean fileExist(const char *);
 
   const String getDeviceUID();

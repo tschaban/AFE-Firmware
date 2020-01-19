@@ -18,9 +18,8 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
   NetworkConfiguration = _Data->getNetworkConfiguration();
 
   Broker.setClient(esp);
-  if (strlen(configuration.host) > 0) {
-    Broker.setServer(configuration.host, configuration.port);
-  } else if (strlen(configuration.ip) > 0) {
+
+  if (strlen(configuration.ip) > 0) {
     IPAddress ip;
     if (ip.fromString(configuration.ip)) {
       Broker.setServer(configuration.ip, configuration.port);
@@ -31,6 +30,8 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
              << "ERROR: Problem with MQTT IP address: " << configuration.ip;
     }
 #endif
+  } else if (strlen(configuration.host) > 0) {
+    Broker.setServer(configuration.host, configuration.port);
   } else {
     isConfigured = false;
   }
@@ -39,17 +40,17 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
 
 #ifdef DEBUG
   Serial << endl
-         << endl
-         << "---------------------- MQTT ----------------------" << endl
-         << "Host: " << configuration.host << endl
-         << "IP: " << configuration.ip << endl
-         << "Port: " << configuration.port << endl
-         << "User: " << configuration.user << endl
-         << "Password: " << configuration.password << endl
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-         << "LWT Topic: " << configuration.lwt.topic << endl
-#endif
-         << "--------------------------------------------------";
+         << "INFO: MQTT Configuration" << endl
+         << "INFO: Host: " << configuration.host << endl
+         << "INFO: IP: " << configuration.ip << endl
+         << "INFO: Port: " << configuration.port << endl
+         << "INFO: User: " << configuration.user << endl
+         << "INFO: Password: " << configuration.password << endl
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+         << "INFO: LWT IDX: " << configuration.lwt.idx;
+#else
+         << "INFO: LWT Topic: " << configuration.lwt.topic;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif
 }
 
@@ -62,8 +63,8 @@ void AFEMQTT::subscribe(const char *topic) {
 #endif
     Broker.subscribe(topic);
 #ifdef DEBUG
-  Serial << endl << " - " << topic;
-#endif    
+    Serial << endl << " - " << topic;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->off();
 #endif
@@ -108,19 +109,34 @@ void AFEMQTT::connect() {
 #endif
       if (delayStartTime == 0) {
         delayStartTime = millis();
-/* Connecing to MQTT Broker depending on LWT topics being set or no */
+        /* Connecing to MQTT Broker depending on LWT topics being set or no */
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-        boolean _connected =
+        boolean _connected;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        char lwtMessage[100];
+
+        if (configuration.lwt.idx > 0) {
+          sprintf(
+              lwtMessage,
+              "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":0,\"svalue\":\"%s\",\"Battery\":0,\"RSSI\":0}",
+              configuration.lwt.idx,L_DISCONNECTED);
+
+          _connected = Broker.connect(
+              _DeviceName, configuration.user, configuration.password,
+              AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, 2, false, lwtMessage);
+        } else {
+          _connected = Broker.connect(_DeviceName, configuration.user,
+                                      configuration.password);
+        }
+#else
+        _connected =
             strlen(configuration.lwt.topic) > 0
                 ? Broker.connect(
                       _DeviceName, configuration.user, configuration.password,
                       configuration.lwt.topic, 2, false, "disconnected")
                 : Broker.connect(_DeviceName, configuration.user,
                                  configuration.password);
-#else
-        boolean _connected = Broker.connect(_DeviceName, configuration.user,
-                                            configuration.password);
 #endif
 
         if (_connected) {
@@ -233,7 +249,3 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
 
   return pubslishingStatus;
 }
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-const char *AFEMQTT::getLWTTopic() { return configuration.lwt.topic; }
-#endif

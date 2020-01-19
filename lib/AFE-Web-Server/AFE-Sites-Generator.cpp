@@ -130,8 +130,8 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   }
 #endif
 
-  /* Relay */
-
+/* Relay */
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   if (Device->configuration.noOfRelays > 0) {
     page += "<li  class=\"itm\"><a><i>";
     page += L_RELAYS_CONFIGURATION;
@@ -166,7 +166,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #endif
     }
   }
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   if (Device->configuration.noOfSwitches > 0) {
     page += "<li  class=\"itm\"><a><i>";
     page += L_BUTTONS_SWITCHES;
@@ -184,6 +186,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
       page += "</a></li>";
     }
   }
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 /* Pir */
 #if defined(T3_CONFIG)
@@ -378,7 +381,11 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += AFE_CONFIG_SITE_PRO_VERSION;
   page += "\">";
   page += L_PRO_VERSION;
-  page += "</a></li><br><br><li class=\"itm\"><a href=\"\\?o=";
+  page += "</a></li><br><li class=\"itm\"><a href=\"https://";
+  page += L_LANGUAGE_SHORT;
+  page += ".donate.afe-firmware.smartnydom.pl\">";
+  page += L_DONATE;
+  page += "</a></li><br><li class=\"itm\"><a href=\"\\?o=";
   page += AFE_CONFIG_SITE_EXIT;
   page += "\">";
   page += L_FINISH_CONFIGURATION;
@@ -438,11 +445,12 @@ String AFESitesGenerator::addDeviceConfiguration() {
                                     L_NUMBER_OF_RELAYS);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Switch */
-
   body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
                                     Device->configuration.noOfSwitches, "s",
                                     L_NUMBER_OF_SWITCHES);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
@@ -692,8 +700,14 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   String page =
       addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   body = "<fieldset>";
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char _idx[7];
+  sprintf(_idx, "%d", configuration.lwt.idx);
+  body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
+  body += "</fieldset>";
+  page += addConfigurationBlock(L_MQTT_IDX_LWT, L_NO_IF_IDX_0, body);
+#else
   body += addItem("text", "t0", L_MQTT_TOPIC, configuration.lwt.topic, "64");
   body += "</fieldset>";
   page += addConfigurationBlock(L_MQTT_TOPIC_LWT, L_MQTT_TOPIC_EMPTY, body);
@@ -785,6 +799,7 @@ String AFESitesGenerator::addSystemLEDConfiguration() {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   RELAY configuration = Data.getRelayConfiguration(id);
 
@@ -992,8 +1007,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    if (Device->configuration.api.domoticz ||
-        Device->configuration.api.mqtt) {
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
 
       body = "<fieldset>";
       char _idx[7];
@@ -1005,14 +1019,12 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
       page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
     }
 #else
-    if (Device->configuration.api.mqtt) {
-      body = "<fieldset>";
-      body +=
-          addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-      body += "</fieldset>";
-      page +=
-          addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
-    }
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+  }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -1020,6 +1032,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
   return page;
 }
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
@@ -1059,6 +1072,7 @@ String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
 String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   SWITCH configuration;
@@ -1177,8 +1191,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
   String page = addConfigurationBlock(title, "", body);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz ||
-      Device->configuration.api.mqtt) {
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
     char _idx[7];
@@ -1201,6 +1214,7 @@ String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
 
   return page;
 }
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 String AFESitesGenerator::addDS18B20Configuration() {
@@ -2278,18 +2292,8 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
 
   page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-  if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
-  }
-#endif 
-
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz ||
-      Device->configuration.api.mqtt) {
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     body = "<fieldset>";
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.raw);
@@ -2304,6 +2308,13 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
     body += "</fieldset>";
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    body = "<fieldset>";
+    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    body += "</fieldset>";
+    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
   }
 #endif
 
@@ -2491,10 +2502,21 @@ String AFESitesGenerator::addProVersionSite() {
 }
 
 const String AFESitesGenerator::generateFooter(boolean extended) {
-  String body = "</div></div>";
+
+String body ="";
+if (Device->getMode() == AFE_MODE_NORMAL) {
+  body += "<a style=\"color:#0475b6;\" href=\"https://";
+  body += L_LANGUAGE_SHORT;
+  body += ".donate.afe-firmware.smartnydom.pl\">";
+  body += L_DONATE;
+  body += "</a>";
+}
+
+  body += "</div></div>";
 
   if (extended) {
-    body += "<div style=\"padding: 5px 0\"><a "
+    body += "<div style=\"padding: 5px 0\">";
+    body += "<a "
             "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
             "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
     body += L_HELP;

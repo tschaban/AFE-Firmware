@@ -22,8 +22,14 @@
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-PASSWORD-Structure.h>
 #include <AFE-PRO-VERSION-Structure.h>
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-RELAY-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
 #include <AFE-SWITCH-Structure.h>
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED-Structure.h>

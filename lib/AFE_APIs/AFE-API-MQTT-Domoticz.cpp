@@ -11,12 +11,11 @@ void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
                                AFELED *Led) {
   AFEAPI::begin(Data, Device, Led);
 }
-
 #else
 void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
   AFEAPI::begin(Data, Device);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEAPIMQTTDomoticz::listener() {
   if (Mqtt.listener()) {
@@ -44,6 +43,17 @@ void AFEAPIMQTTDomoticz::synchronize() {
     publishSwitchState(i);
   }
 #endif
+
+#ifdef DEBUG
+  Serial << endl << "INFO: Sending message: device is connected ...";
+#endif
+  if (Mqtt.configuration.lwt.idx > 0) {
+    char lwtMessage[100];
+    sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
+                        "\"Battery\":100,\"RSSI\":%d}",
+            Mqtt.configuration.lwt.idx, L_CONNECTED, getRSSI());
+    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
+  }
 }
 
 void AFEAPIMQTTDomoticz::subscribe() {
@@ -68,15 +78,14 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
     command.domoticz.idx = root["idx"];
     command.nvalue = root["nvalue"];
 #ifdef DEBUG
-    Serial << endl 
+    Serial << endl
            << "INFO: Domoticz: Got command: " << command.nvalue
            << ", IDX: " << command.domoticz.idx;
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl
-           << "ERROR: Domoticz: Problem with JSON pharsing";
+    Serial << endl << "ERROR: Domoticz: Problem with JSON pharsing";
   }
 #endif
   return command;
@@ -96,11 +105,12 @@ void AFEAPIMQTTDomoticz::processRequest() {
         /* Processing Relay command*/
         case AFE_DOMOTICZ_DEVICE_RELAY:
 #ifdef DEBUG
-          Serial << endl << "INFO: Domoticz: Found Relay ID: " << idxCache[i].id;
+          Serial << endl
+                 << "INFO: Domoticz: Found Relay ID: " << idxCache[i].id;
           _found = true;
 #endif
           if (_Relay[idxCache[i].id]->get() != (byte)command.nvalue) {
-            if (command.nvalue == AFE_CONFIG_API_DOMOTICZ_SWITCH_OFF) {
+            if (command.nvalue == AFE_SWITCH_OFF) {
               _Relay[i]->off();
             } else {
               _Relay[i]->on();
@@ -126,19 +136,22 @@ void AFEAPIMQTTDomoticz::processRequest() {
     }
 #ifdef DEBUG
     if (!_found) {
-      Serial << endl << "WARN: Domoticz: No item found with IDX: " << command.domoticz.idx;
+      Serial << endl
+             << "WARN: Domoticz: No item found with IDX: "
+             << command.domoticz.idx;
     }
 #endif
   }
 #ifdef DEBUG
   else {
     Serial << endl
-           << (command.domoticz.idx > 0 ? "INFO: Domoticz: Bypassing IDX: " : " - no IDX: ")
+           << (command.domoticz.idx > 0 ? "INFO: Domoticz: Bypassing IDX: "
+                                        : " - no IDX: ")
            << command.domoticz.idx;
   }
 #endif
 }
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
@@ -149,7 +162,7 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   }
   return _ret;
 }
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
@@ -177,7 +190,7 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 #endif
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
@@ -191,13 +204,13 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
   }
   return publishStatus;
 }
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIMQTTDomoticz::addClass(AFESwitch *Switch) {
   AFEAPI::addClass(Switch);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
@@ -206,14 +219,13 @@ boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
     char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
 
     generateSwitchMessage(json, _Switch[id]->configuration.domoticz.idx,
-                          _Switch[id]->getPhisicalState() == 1
-                              ? AFE_CONFIG_API_DOMOTICZ_SWITCH_OFF
-                              : AFE_CONFIG_API_DOMOTICZ_SWITCH_ON);
+                          _Switch[id]->getPhisicalState() == 1 ? AFE_SWITCH_OFF
+                                                               : AFE_SWITCH_ON);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
   }
   return publishStatus;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIMQTTDomoticz::addClass(AFEAnalogInput *Analog) {
@@ -265,6 +277,20 @@ void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
   sprintf(json,
           "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":0,\"svalue\":\"%s\"}",
           idx, value);
+}
+
+uint8_t AFEAPIMQTTDomoticz::getRSSI() {
+  uint8_t _ret;
+  long current = WiFi.RSSI();
+  if (current > -50) {
+    _ret = 10;
+  } else if (current < -98) {
+    _ret = 0;
+  } else {
+    _ret = ((current + 97) / 5) + 1;
+  }
+
+  return _ret;
 }
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

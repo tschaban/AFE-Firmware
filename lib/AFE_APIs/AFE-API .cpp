@@ -26,7 +26,7 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
   }
   enabled = true;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPI::addClass(AFERelay *Relay) {

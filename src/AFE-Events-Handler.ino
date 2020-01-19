@@ -99,7 +99,7 @@ void eventsListener() {
 
   } /* End of Network.eventConnected() */
 
-  /* ################## MQTT ################### */
+/* Checking if device has connected to MQTT Broker. If yes it subsribes to MQTT Topics and sends device's items current states */
   if (Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
       MqttAPI.subscribe();
