@@ -24,9 +24,12 @@ recaptchacontact:
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t0-wlacznik-wifi) dotyczące AFE Firmware T0
 * Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
+* Pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz. Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+* Domoticz API nie zostało jeszcze w całości udokumentowane na tej stronie. Przeczytaj ten [wątek](https://www.smartnydom.pl/forum/firmware-do-przelacznika-sonoff/afe-firmware-t0-2-1-domoticz-http-raz-mqtt/), aby uzystkać więcej informacji
 
-##### [Pobierz najnowszą wersję 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
 **Poprzednie wersje**
+* [Wersje 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
 * Wersje 2.0.0 - 2.0.1: [Archiwum](https://drive.google.com/drive/folders/1dKf5vOTjD53RPvnlTQLNaxTWL-N3hKNC/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t0-esp8266-1mb/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t0-esp8285-1mb/?target=_blank)
 
