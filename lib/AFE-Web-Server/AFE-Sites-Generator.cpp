@@ -686,14 +686,16 @@ String AFESitesGenerator::addMQTTBrokerConfiguration() {
   String body = "<fieldset>";
 
   body += addItem("text", "h", "Hostname", configuration.host, "32");
-  body += addItem("text", "i", L_IP_ADDRESS, configuration.ip);
+  body += addItem("text", "a", L_IP_ADDRESS, configuration.ip);
 
-  char _number[6];
+  char _number[7];
   sprintf(_number, "%d", configuration.port);
   body += addItem("number", "p", "Port", _number, "?", "0", "65535", "1");
 
   body += addItem("text", "u", L_USERNAME, configuration.user, "32");
   body += addItem("password", "s", L_PASSWORD, configuration.password, "32");
+  sprintf(_number, "%d", configuration.timeout);  
+  body += addItem("number", "t", L_TIMEOUT, _number, "?", "0", "30000", "1",L_MILISECONDS);
 
   body += "</fieldset>";
 
@@ -1229,7 +1231,7 @@ String AFESitesGenerator::addDS18B20Configuration() {
   body += "<label>";
   body += language == 0 ? "Odczyty co" : "Read every";
   body += "</label>";
-  body += "<input name=\"i\" min=\"5\" max=\"86400\" step=\"1\" "
+  body += "<input name=\"in\" min=\"5\" max=\"86400\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
   body += configuration.interval;
@@ -1319,7 +1321,7 @@ String AFESitesGenerator::addDHTConfiguration() {
 
   body += "<div class=\"cf\"><label>";
   body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label><input name=\"i\" min=\"10\" max=\"86400\" step=\"1\" "
+  body += "</label><input name=\"in\" min=\"10\" max=\"86400\" step=\"1\" "
           "type=\"number\" "
           "value=\"";
   body += configuration.interval;
@@ -2263,7 +2265,7 @@ String AFESitesGenerator::addAnalogInputConfiguration() {
   body += addItem("number", "g", "GPIO", _number, "?", "?", "?", "?");
 
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "i", L_MEASURMENTS_INTERVAL, _number, "?", "1",
+  body += addItem("number", "v", L_MEASURMENTS_INTERVAL, _number, "?", "1",
                   "86400", "1", L_SECONDS);
 
   sprintf(_number, "%d", configuration.numberOfSamples);

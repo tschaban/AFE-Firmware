@@ -760,14 +760,20 @@ MQTT AFEWebServer::getMQTTData() {
     data.host[0] = '\0';
   }
 
-  if (server.arg("i").length() > 0) {
-    server.arg("i").toCharArray(data.ip, sizeof(data.ip));
+  if (server.arg("a").length() > 0) {
+    server.arg("a").toCharArray(data.ip, sizeof(data.ip));
+
+
   } else {
     data.ip[0] = '\0';
   }
 
   if (server.arg("p").length() > 0) {
     data.port = server.arg("p").toInt();
+  }
+
+   if (server.arg("t").length() > 0) {
+    data.timeout = server.arg("t").toInt();
   }
 
   if (server.arg("u").length() > 0) {
@@ -1428,8 +1434,8 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
                   ? server.arg("g").toInt()
                   : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO;
 
-  data.interval = server.arg("i").length() > 0
-                      ? server.arg("i").toInt()
+  data.interval = server.arg("v").length() > 0
+                      ? server.arg("v").toInt()
                       : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL;
 
   data.numberOfSamples =

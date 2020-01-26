@@ -7,7 +7,7 @@ void initializeSwitch() {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
     Switch[i].begin(i, &Device);
   }
-  #ifdef DEBUG
+#ifdef DEBUG
   Serial << endl << "INFO: Switch(es) initialized";
 #endif
 }
@@ -18,7 +18,8 @@ void processSwitchEvents() {
     for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
       /* One of the switches has been shortly pressed */
       if (Switch[i].isPressed() &&
-          Switch[i].configuration.functionality != AFE_SWITCH_FUNCTIONALITY_NONE &&
+          Switch[i].configuration.functionality !=
+              AFE_SWITCH_FUNCTIONALITY_NONE &&
           Switch[i].configuration.relayID != AFE_HARDWARE_ITEM_NOT_EXIST &&
           Switch[i].configuration.relayID + 1 <=
               Device.configuration.noOfRelays) {
@@ -78,7 +79,8 @@ void switchEventsListener() {
     Switch[i].listener();
 
     /* One of the Multifunction switches pressed for 10 seconds */
-    if (Switch[i].configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
+    if (Switch[i].configuration.functionality ==
+        AFE_SWITCH_FUNCTIONALITY_MULTI) {
       if (Switch[i].is10s()) {
         Device.getMode() == AFE_MODE_NORMAL
             ? Device.reboot(AFE_MODE_ACCESS_POINT)

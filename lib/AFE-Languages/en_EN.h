@@ -138,6 +138,7 @@
 #define L_MQTT_TOPIC_LWT "LWT's Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
+#define L_TIMEOUT "Timeout"
 
 /* Form: Domoticz server configuration */
 #define L_PROTOCOL "Protocol"
