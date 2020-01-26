@@ -9,11 +9,13 @@ void AFESensorBH1750::begin(uint8_t id) {
   configuration = Data.getBH1750SensorConfiguration(id);
   I2CPORT I2C = Data.getI2CPortConfiguration();
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
+#endif
 
 #ifdef DEBUG
   Serial << endl << endl << "----- BH1750: Initializing -----";
@@ -84,13 +86,13 @@ void AFESensorBH1750::listener() {
       Serial << endl << "Time: " << (millis() - startTime) / 1000 << "s";
 #endif
 
-      currentLightLevel = bh1750.readLightLevel();
-      if (currentLightLevel >= 0) {
+      data = bh1750.readLightLevel();
+      if (data >= 0) {
         ready = true;
       }
 
 #if defined(DEBUG)
-      Serial << endl << "Lux: " << currentLightLevel << "lx";
+      Serial << endl << "Lux: " << data << "lx";
       Serial << endl << "---------------------------";
 #endif
 
@@ -101,5 +103,5 @@ void AFESensorBH1750::listener() {
 
 void AFESensorBH1750::getJSON(char *json) {
   sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}",
-          currentLightLevel);
+          data);
 }

@@ -33,8 +33,12 @@ private:
 
 public:
   BMEX80 configuration;
-  BMEX80_DATA sensorData;
+  BMEX80_DATA data;
+  
+  
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+#endif
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMEX80();

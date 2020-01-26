@@ -8,11 +8,13 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
   configuration = Data.getHPMA115S0SensorConfiguration(id);
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
+#endif
 
   // SerialBus.init(13, 14, false, 64);
   // SerialBus.begin(9600);

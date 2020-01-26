@@ -1164,7 +1164,6 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   MQTTConfiguration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
   saveConfiguration(MQTTConfiguration);
 }
-  
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
@@ -3213,7 +3212,10 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
       configuration.timeToMeasure = root["timeToMeasure"];
       configuration.domoticz.pm25.idx = root["idx"]["pm25"];
       configuration.domoticz.pm10.idx = root["idx"]["pm10"];
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
       sprintf(configuration.name, root["name"]);
 
 #ifdef DEBUG
@@ -3269,7 +3271,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
     root["interval"] = configuration.interval;
     root["timeToMeasure"] = configuration.timeToMeasure;
     root["name"] = configuration.name;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration.mqtt.topic;
+#endif
     idx["pm25"] = configuration.domoticz.pm25.idx;
     idx["pm10"] = configuration.domoticz.pm10.idx;
 
@@ -3307,7 +3312,9 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   configuration.domoticz.pm25.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.pm10.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.mqtt.topic, "HPMA115S0/%d", i + 1);
+#endif
     sprintf(configuration.name, "HPMA115S0-%d", i + 1);
     saveConfiguration(i, configuration);
   }
@@ -3599,7 +3606,10 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.pressure.correction = root["pressure"]["correction"];
       configuration.seaLevelPressure = root["pressure"]["seaLevelPressure"];
       configuration.altitude = root["pressure"]["altitude"];
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -3658,8 +3668,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
     root["interval"] = configuration.interval;
     root["name"] = configuration.name;
     root["i2cAddress"] = configuration.i2cAddress;
-    root["mqttTopic"] = configuration.mqtt.topic;
     root["resolution"] = configuration.resolution;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration.mqtt.topic;
+#else
     idx["temperatureHumidity"] = configuration.domoticz.temperatureHumidity.idx;
     idx["temperatureHumidityPressure"] =
         configuration.domoticz.temperatureHumidityPressure.idx;
@@ -3674,7 +3686,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
     idx["staticIaq"] = configuration.domoticz.staticIaq.idx;
     idx["co2Equivalent"] = configuration.domoticz.co2Equivalent.idx;
     idx["breathVocEquivalent"] = configuration.domoticz.breathVocEquivalent.idx;
-
+#endif
     temperature["unit"] = configuration.temperature.unit;
     temperature["correction"] = configuration.temperature.correction;
     humidity["correction"] = configuration.humidity.correction;
@@ -3713,7 +3725,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
   configuration.interval = AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
-  configuration.resolution = BMP085_ULTRAHIGHRES;
+  configuration.resolution = 3; //  BMP085_ULTRAHIGHRES;
   configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
   configuration.temperature.correction = 0;
   configuration.humidity.correction = 0;
@@ -3722,6 +3734,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.altitude = 0;
   configuration.seaLevelPressure = AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.temperatureHumidityPressure.idx =
       AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.temperatureHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
@@ -3736,9 +3749,12 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.domoticz.staticIaq.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.co2Equivalent.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.breathVocEquivalent.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.mqtt.topic, "BMEX80/%d", i + 1);
+#endif
     sprintf(configuration.name, "BMEX80-%d", i + 1);
     saveConfiguration(i, configuration);
   }
@@ -3780,8 +3796,11 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
       configuration.mode = root["mode"];
       configuration.interval = root["interval"];
       configuration.i2cAddress = root["i2cAddress"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
+#else
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -3836,8 +3855,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
     root["mode"] = configuration.mode;
     root["interval"] = configuration.interval;
     root["i2cAddress"] = configuration.i2cAddress;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration.mqtt.topic;
+#else
     root["idx"] = configuration.domoticz.idx;
+#endif
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -3869,10 +3891,14 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
   BH1750 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = 0;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
   configuration.mode = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
+#endif
     sprintf(configuration.name, "BH1750-%d", i + 1);
     saveConfiguration(i, configuration);
   }
@@ -3923,8 +3949,11 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
       configuration.spikesRejectionLevel = root["spikesRejectionLevel"];
       configuration.indoor = root["indoor"];
       configuration.unit = root["unit"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
+#else
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -3989,9 +4018,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 configuration) {
     root["spikesRejectionLevel"] = configuration.spikesRejectionLevel;
     root["indoor"] = configuration.indoor;
     root["unit"] = configuration.unit;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration.mqtt.topic;
+#else
     root["idx"] = configuration.domoticz.idx;
-
+#endif
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -4030,11 +4061,15 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
   configuration.spikesRejectionLevel =
       AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
   configuration.indoor = true;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
   configuration.unit = AFE_DISTANCE_KM;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935; i++) {
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.mqtt.topic, "AS3935/%d", i + 1);
+#endif
     sprintf(configuration.name, "AS3935-%d", i + 1);
     saveConfiguration(i, configuration);
   }
