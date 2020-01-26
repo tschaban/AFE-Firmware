@@ -52,6 +52,7 @@ struct MQTT {
 #else
   MQTT_BASIC_CONFIG lwt;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+  uint16_t timeout;
 };
 
 #endif

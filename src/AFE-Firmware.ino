@@ -148,6 +148,7 @@ void setup() {
 
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
+  // Serial.setDebugOutput(true);
   delay(10);
 #endif
 
@@ -379,8 +380,14 @@ void setup() {
             "                          #"
          << endl
          << "#                            STARTING DEVICE "
-            "                          #"
-         << endl
+            "                          #";
+  if (Device.getMode() != AFE_MODE_NORMAL) {
+    Serial << endl
+         << "#                           CONFIGURATION MODE"
+            "                         #";
+  }
+
+  Serial << endl
          << "#############################################"
             "###########################";
 #endif
@@ -471,6 +478,7 @@ void loop() {
       }
     }
 #endif
+    yield();
     Network.listener();
   } else { /* Deviced runs in Access Point mode */
     WebServer.listener();

@@ -1061,13 +1061,14 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
 #else
       sprintf(configuration.lwt.topic, root["lwt"] | "");
 #endif
+      configuration.timeout = root["timeout"] | AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
 
 #ifdef DEBUG
       Serial << endl
              << "INFO: JSON: Buffer size: "
              << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER
              << ", actual JSON size: " << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size() + 10) {
+      if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size()) {
         Serial << endl << "WARN: Too small buffer size";
       }
 #endif
@@ -1118,6 +1119,9 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
 #else
     root["lwt"] = configuration.lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+    root["timeout"] = configuration.timeout;
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1129,7 +1133,7 @@ void AFEDataAccess::saveConfiguration(MQTT configuration) {
            << "INFO: Data saved" << endl
            << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER
            << ", actual JSON size: " << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size() + 10) {
+    if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size()) {
       Serial << endl << "WARN: Too small buffer size";
     }
 #endif
@@ -1151,14 +1155,16 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   MQTTConfiguration.ip[0] = '\0';
   MQTTConfiguration.user[0] = '\0';
   MQTTConfiguration.password[0] = '\0';
-  MQTTConfiguration.port = 1883;
+  MQTTConfiguration.port = AFE_CONFIG_MQTT_DEFAULT_PORT;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   MQTTConfiguration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   MQTTConfiguration.lwt.topic[0] = '\0';
 #endif
+  MQTTConfiguration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
   saveConfiguration(MQTTConfiguration);
 }
+  
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
