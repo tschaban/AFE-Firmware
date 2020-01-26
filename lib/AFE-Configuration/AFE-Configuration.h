@@ -82,7 +82,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.1.0"
+#define AFE_FIRMWARE_VERSION "2.1.1"
 #define AFE_FIRMWARE_TYPE 0
 
 
@@ -847,6 +847,7 @@ typedef enum {
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
@@ -864,6 +865,10 @@ typedef enum {
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
+
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
+#define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
+
 /* Config releated to LWT Functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #ifndef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -880,7 +885,7 @@ typedef enum {
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 322 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
 
 
 #endif // _AFE_Configuration_h

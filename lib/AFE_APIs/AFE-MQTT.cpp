@@ -17,6 +17,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
   configuration = _Data->getMQTTConfiguration();
   NetworkConfiguration = _Data->getNetworkConfiguration();
 
+  esp.setTimeout(configuration.timeout);
   Broker.setClient(esp);
 
   if (strlen(configuration.ip) > 0) {
@@ -165,6 +166,7 @@ void AFEMQTT::connect() {
           delayStartTime + (NetworkConfiguration.waitTimeConnections * 1000)) {
 
         connections++;
+        yield();
 #ifdef DEBUG
         Serial << endl
                << "INFO: MQTT Connection attempt: " << connections + 1

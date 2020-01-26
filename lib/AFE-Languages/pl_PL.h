@@ -143,6 +143,7 @@
 #define L_MQTT_TOPIC_EMPTY                                                     \
   "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT " \
   "Brokera"
+#define L_TIMEOUT "Limit czasu odpowiedzi"
 
 /* Form:Domoticz server configuration */
 #define L_PROTOCOL "Protokół"

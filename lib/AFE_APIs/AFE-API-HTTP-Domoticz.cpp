@@ -34,6 +34,8 @@ void AFEAPIHTTPDomoticz::init() {
     sprintf(authorization, "&username=%s&password=%s", _user, _pass);
   }
 
+  http.setTimeout(AFE_CONFIG_API_HTTP_TIMEOUT);
+
   sprintf(serverURL, "%s%s:%d/json.htm?type=command%s",
           configuration.protocol == 0 ? "http://" : "https://",
           configuration.host, configuration.port, authorization);

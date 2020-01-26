@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-Wifi.h"
 
 AFEWiFi::AFEWiFi() {}
@@ -33,7 +31,8 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
-  if (WiFiMode == AFE_MODE_ACCESS_POINT || WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
+  if (WiFiMode == AFE_MODE_ACCESS_POINT ||
+      WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << "INFO: Starting HotSpot: ";
 #endif
@@ -79,12 +78,16 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
       Serial << endl << "INFO: Settting fixed IP";
 #endif
     }
+    
+    WiFi.persistent(false);
+    WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA);
   }
 }
 
 void AFEWiFi::listener() {
-  if (!(WiFiMode == AFE_MODE_ACCESS_POINT || WiFiMode == AFE_MODE_NETWORK_NOT_SET)) {
+  if (!(WiFiMode == AFE_MODE_ACCESS_POINT ||
+        WiFiMode == AFE_MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
       if (sleepMode) {
         if (millis() - sleepStartTime >=
@@ -101,7 +104,8 @@ void AFEWiFi::listener() {
                 strlen(networkConfiguration.password) == 0) {
 #ifdef DEBUG
               Serial << endl
-                     << "ERROR: WiFI is not configured. Going to configuration mode";
+                     << "ERROR: WiFI is not configured. Going to configuration "
+                        "mode";
 #endif
               Device->reboot(AFE_MODE_NETWORK_NOT_SET);
             }
@@ -131,12 +135,13 @@ void AFEWiFi::listener() {
         if (millis() > delayStartTime +
                            (networkConfiguration.waitTimeConnections * 1000)) {
           connections++;
-          delay(0);
+          delay(10);
 #ifdef DEBUG
           Serial << endl
                  << "INFO: WiFi connection attempt: " << connections << " from "
                  << networkConfiguration.noConnectionAttempts << ", IP("
-                 << WiFi.localIP() << ")";
+                 << WiFi.localIP() << ")"
+                 << " WL-Status=" << WiFi.status();
 #endif
           delayStartTime = 0;
         }
@@ -179,11 +184,14 @@ void AFEWiFi::listener() {
     }
   }
 }
-boolean AFEWiFi::connected() {
-  if ((networkConfiguration.isDHCP &&
-       WiFi.localIP().toString() != "(IP unset)") ||
-      (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
 
+boolean AFEWiFi::connected() {
+ // if ((networkConfiguration.isDHCP &&
+ //      WiFi.localIP().toString() != "(IP unset)") ||
+ //     (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
+    
+   if (WiFi.waitForConnectResult() == WL_CONNECTED) {
+    
     delay(10);
     if (disconnected) {
       eventConnectionEstablished = true;

@@ -1,5 +1,5 @@
 ---
-title: MQTT
+title: 'Standardowe MQTT'
 process:
     markdown: true
     twig: true
@@ -8,6 +8,8 @@ recaptchacontact:
 ---
 
 Urządzeniem można sterować wiadomościami MQTT. Jest to zalecana przeze mnie metoda sterowaniem urządzeniem z AFE Firmware.
+
+W przypadku korzystania z system do automatyki Domoticz, przejdź do instrukcji konfiguracji [Domoticz API](/integracja-api/domoticz-api)
 
 MQTT to bardzo prosty i lekki protokół do wymiany informacji oparty o mechanizm publikowania wiadomości i subskrybowania się do tematów. Został specjalnie opracowany do wymiany danych w sieciach, gdzie mogą występować niskie przepustowości, długie czasy oczekiwań, czy zwyczajnie problem z jej działaniem. Protokół mimo potencjalnych problemów z siecią zapewnia niezawodność. Idealnie nadaje się do wymiany danych między urządzeniami, IoT, ma szerokie zastosowanie w automatyce.
 

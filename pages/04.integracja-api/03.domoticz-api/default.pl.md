@@ -6,8 +6,10 @@ recaptchacontact:
 ---
 
 * Domoticz API umożliwia dwukierunkową integrację między urządzeniem z AFE Firmware, a Domoticz
-* Integracja opiera się o protokół HTTP
-* Do poprawnego działania Domoticz API, należy go włączyć w [konfiguracji urządzenia](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia) oraz [skonfigurować połączenie do serwera](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/serwer-domoticz) z zainstalowanym Domoticz.
+* Integracja opiera się o protokół HTTP lub MQTT (od AFE wersji 2.1)
+* Do poprawnego działania Domoticz API, należy go włączyć w [konfiguracji urządzenia](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia) oraz 
+	* w przypadku Domoticz HTTP API [skonfigurować połączenie do serwera Domoticz](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/serwer-domoticz)
+	* w przypadku Domoticz MQTT API [skonfigurować połączenie do brokera MQTT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/mqtt-broker) 
 
 ##### Procedura konfiguracji wygląda następująco:
 * w Domoticz dodajemy urządzenie typu Dummy, do którego dodajemy wirtualne elementy, jak włączniki, czy czujniki np.: temperatury
@@ -58,31 +60,14 @@ recaptchacontact:
 
 ![](domoticz-zmiana-typu-przelacznika.png)
 
-* W kolejnych krokach wprowadzimy komendy sterujące przekaźnikem
-* Wciskamy przycisk **Edytuj** w elemencie sterującym naszą Lampą
+! W przypadku zastosowania Domoticz HTTP API w kolejnym kroku konieczne jest [ustawienie komend sterujących przekaźnikiem](/integracja-api/domoticz-api/komendy-sterujace-http-api/?target=_blank).
 
-![](domoticz-edytowane-przycisku.png)
-
-* Wprowadzamy w polach: **Włącza akcję** i **Wyłącz akcje** następujące komendy w formacie
-
-**włącz**: `http://ADRES-IP-URZADZENIA/?device=relay&source=domoticz&name=NAZWA-PRZEKAZNIKA&command=on`
-
-**wyłącz**: `http://ADRES-IP-URZADZENIA/?device=relay&source=domoticz&name=NAZWA-PRZEKAZNIKA&command=off`
-
-**Parametery**: 
-* _ADRES-IP-URZADZENIA_ - to adres IP urządzenia z zainstlowanym AFE Firmware
-* _NAZWA-PRZEKAZNIKA_, definiowany jest w AFE Firmware w [konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
-
-! Z doświadczenia wiem, że wielu użytkowników AFE Firmware zapomina dodawać ten fragment **&source=domoticz** do komendy sterującej. Jeśli ten fragment nie zostanie dodany do komendy sterującej, może to spowodować, że Domoticz + Urządzenie z AFE Firmware wpadnie w pętlę włączania / wyłączania się
-
-! Kolejną częstą pomyłką jest wpisanie w adres URL nazwę urządzenia zamiast nazwę przekaźnika. Konieczne jest wpisanie **nazwę przekaźnika**, którą wprowadza się w [konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika)
-
-![](domoticz-ustawianie-akcji-przekaznika.png)
+!! **Uwaga**. W przypadku zastosowania Domoticz MQTT API komendy sterującę (Włącz / Wyłacz akcja) nie mogą być wprowadzone. Domoticz automatycznie wysyła komendy do AFE Firmware za pośrednictwem MQTT Brokera. Należy na to zwrócić szczególną uwagę w przypadku aktualizacji AFE Firmware ze starszych wersji. Pozostawienie komend włącz/wyłącz może spowodować, że Domoticz i urządzenie z AFE Firmware wpadną w pętlę włączania / wyłączania przekaźnika
 
 * W tym momencie zakończona została konfiguracja w Domoticz
 * W kolejnych krokach wpisane zostaną identyfikatory IDX w konfiguracji AFE Firmware
 * Otwieramy Panel Konfiguracyjny AFE Firmware
-* Otwieramy f[ormularz konfiguracyjny przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika), a następnie w polu IDX wprowadzamy identyfikator zapamiętany w poprzednich krokach
+* Otwieramy [formularz konfiguracyjny przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika), a następnie w polu IDX wprowadzamy identyfikator zapamiętany w poprzednich krokach
 
 ![](afe-firmware-konfiguracja-przekaznik-domoticz.png)
 
