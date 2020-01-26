@@ -49,9 +49,11 @@ void AFEAPIMQTTDomoticz::synchronize() {
 #endif
   if (Mqtt.configuration.lwt.idx > 0) {
     char lwtMessage[100];
-    sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
-                        "\"Battery\":100,\"RSSI\":%d}",
-            Mqtt.configuration.lwt.idx, L_CONNECTED, getRSSI());
+    sprintf(
+        lwtMessage,
+        "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
+        "\"Battery\":100,\"RSSI\":%d}",
+        Mqtt.configuration.lwt.idx, L_CONNECTED, getRSSI());
     Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
   }
 }
@@ -292,5 +294,35 @@ uint8_t AFEAPIMQTTDomoticz::getRSSI() {
 
   return _ret;
 }
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void AFEAPIMQTTDomoticz::addClass(AFESensorBMEX80 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) { return true; }
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+void AFEAPIMQTTDomoticz::addClass(AFESensorHPMA115S0 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishHPMA115S0SensorData(uint8_t id) {
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+void AFEAPIMQTTDomoticz::addClass(AFESensorBH1750 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishBH1750SensorData(uint8_t id) { return true; }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+void AFEAPIMQTTDomoticz::addClass(AFESensorAS3935 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) { return true; }
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

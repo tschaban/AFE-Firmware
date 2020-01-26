@@ -12,7 +12,7 @@
 #include <AFE-Configuration.h>
 
 struct DOMOTICZ_BASIC_CONFIG {
-  uint32_t idx = 0;
+  uint32_t idx = AFE_DOMOTICZ_DEFAULT_IDX;
 };
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS

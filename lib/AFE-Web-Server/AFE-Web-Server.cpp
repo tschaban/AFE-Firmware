@@ -1223,17 +1223,18 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
       server.arg("m").length() > 0
           ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.pm25.idx =
-      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
+      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : AFE_DOMOTICZ_DEFAULT_IDX;
   data.domoticz.pm10.idx =
-      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : 0;
-
+      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
@@ -1412,16 +1413,16 @@ AS3935 AFEWebServer::getAS3935SensorData() {
 
   data.unit =
       server.arg("u").length() > 0 ? server.arg("u").toInt() : AFE_DISTANCE_KM;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
-
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   return data;
 }
 #endif

@@ -81,6 +81,27 @@ public:
   /* Publishes current ADC data to Domoticz */
   void publishADCValues();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  virtual void addClass(AFESensorBMEX80 *);
+  boolean publishBMx80SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  virtual void addClass(AFESensorHPMA115S0 *);
+  boolean publishHPMA115S0SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  virtual void addClass(AFESensorBH1750 *);
+  boolean publishBH1750SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  virtual void addClass(AFESensorAS3935 *);
+  boolean publishAS3935SensorData(uint8_t id);
+#endif
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

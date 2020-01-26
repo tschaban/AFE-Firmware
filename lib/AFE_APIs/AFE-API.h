@@ -35,6 +35,22 @@
 #include <AFE-Analog-Input.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <AFE-Sensor-BMEX80.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#include <AFE-Sensor-HPMA115S0.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#include <AFE-Sensor-BH1750.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#include <AFE-Sensor-AS3935.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -69,6 +85,23 @@ public:
   virtual void addClass(AFEAnalogInput *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  virtual void addClass(AFESensorBMEX80 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  virtual void addClass(AFESensorHPMA115S0 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  virtual void addClass(AFESensorBH1750 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  virtual void addClass(AFESensorAS3935 *);
+#endif
+
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -87,6 +120,24 @@ protected:
   /* Stories reference to global ADC class */
   AFEAnalogInput *_AnalogInput;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  AFESensorBMEX80 *_BMx80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  AFESensorHPMA115S0 *_HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  AFESensorBH1750 *_BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
+#endif
+
+
 };
 
 #endif // _AFE_API_h

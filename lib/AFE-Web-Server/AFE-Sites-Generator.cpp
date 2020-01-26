@@ -1894,7 +1894,8 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_PARTICLE_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
@@ -1909,7 +1910,7 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
 
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
-
+#else
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
@@ -1917,7 +1918,7 @@ String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
     page +=
         addConfigurationBlock(L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY, body);
   }
-
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   return page;
 }
 #endif
@@ -2019,7 +2020,8 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
     body += "</fieldset>";
     page += addConfigurationBlock(L_CORRECTIONS, "", body);
 
-    if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
       body = "<fieldset>";
 
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
@@ -2081,7 +2083,7 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
       body += "</fieldset>";
       page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
     }
-
+#else
     if (Device->configuration.api.mqtt) {
       body = "<fieldset>";
       body +=
@@ -2090,6 +2092,7 @@ String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
       page +=
           addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
     }
+#endif //AFE_CONFIG_API_DOMOTICZ_ENABLED    
   }
 
   return page;
@@ -2120,7 +2123,8 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
 
   String page = addConfigurationBlock(L_BH1750_SENSOR, "", body);
 
-  if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2129,7 +2133,7 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
     body += "</fieldset>";
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
-
+#else
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
@@ -2137,6 +2141,7 @@ String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
     page +=
         addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
   }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   return page;
 }
@@ -2230,8 +2235,8 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
   body += "</fieldset>";
 
   String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
-
-  if (Device->configuration.api.domoticz) {
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     body = "<fieldset>";
 
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2240,7 +2245,7 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
     body += "</fieldset>";
     page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
   }
-
+#else
   if (Device->configuration.api.mqtt) {
     body = "<fieldset>";
     body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
@@ -2248,7 +2253,7 @@ String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
     page +=
         addConfigurationBlock(L_MQTT_TOPIC_AS3935, L_MQTT_TOPIC_EMPTY, body);
   }
-
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   return page;
 }
 #endif
