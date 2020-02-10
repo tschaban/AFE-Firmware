@@ -406,21 +406,14 @@ void AFEWebServer::generate(boolean upload) {
   } else {
 
 #ifdef DEBUG
-    Serial << endl << "---------------- Generating Site -----------------";
-    Serial << endl << "Site ID: " << siteConfig.ID;
-    Serial << endl
-           << "Site Type: "
-           << (siteConfig.twoColumns ? "Two Columns" : "One Column");
-    Serial << endl << "Device ID: " << siteConfig.deviceID;
-    Serial << endl << "Command: " << command;
-    Serial << endl << "Reboot: " << (siteConfig.reboot ? "Yes" : "No");
+    Serial << endl << "INFO: Generating " << (siteConfig.twoColumns ? "Two Columns" : "One Column") << " site: " << siteConfig.ID;
+    Serial << ", device ID: " << siteConfig.deviceID;
+    Serial << ", Command: " << command;
+    Serial << ", Reboot: " << (siteConfig.reboot ? "Yes" : "No");
     if (siteConfig.reboot) {
-      Serial << endl << " - Mode: " << siteConfig.rebootMode;
-      Serial << endl << " - Time: " << siteConfig.rebootTime;
+      Serial  << ", Mode: " << siteConfig.rebootMode;
+      Serial  << ", Time: " << siteConfig.rebootTime;
     }
-
-    Serial << endl << "---------------------------------------------------";
-
 #endif
 
     publishHTML(generateSite(&siteConfig));

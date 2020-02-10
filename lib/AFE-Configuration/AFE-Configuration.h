@@ -884,10 +884,42 @@ typedef enum {
 #define AFE_FILE_DOMOTICZ_CONFIGURATION "cfg-domoticz-server.json"
 #define AFE_FILE_DEVICE_UID "cfg-device-uid.json"
 #define AFE_FILE_MQTT_BROKER_CONFIGURATION "cfg-mqtt-broker.json"
+#define AFE_FILE_I2C_CONFIGURATION "cfg-i2c.json"
+#define AFE_FILE_DEVICE_MODE "cfg-device-mode.json"
+#define AFE_FILE_PRO_VERSION_CONFIGURATION "cfg-pro-version.json"
+#define AFE_FILE_PASSWORD_CONFIGURATION "cfg-password.json"
+#define AFE_FILE_DEVICE_CONFIGURATION "cfg-device.json"
+#define AFE_FILE_FIRMWARE_CONFIGURATION "cfg-firmware.json"
+#define AFE_FILE_NETWORK_CONFIGURATION "cfg-network.json"
+#define AFE_FILE_SYSTEM_LED_CONFIGURATION "cfg-system-led.json"
+#define AFE_FILE_ADC_CONFIGURATION "cfg-analog-input.json"
+#define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
+
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_BH1750 230
+#define AFE_CONFIG_FILE_BUFFER_I2C 54 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 405 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 375 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_LED 76 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_RELAY 240
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_SWITCH 210
+#define AFE_CONFIG_FILE_BUFFER_ADC 300
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 240
+#define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 570
+#define AFE_CONFIG_FILE_BUFFER_AS3935 240
+
+
+#define AFE_RESPONSE_KEY_VALIDATION 135
 
 
 #endif // _AFE_Configuration_h
