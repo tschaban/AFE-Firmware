@@ -67,10 +67,21 @@ Aby skonfigurować połaczenie do Brokera MQTT, należy wybrać **MQTT Broker** 
 * Maksymalnie 32 znaki
 * Informacja jest wymagana jeśli broker MQTT wymaga autentykacji
 
+#### Limit czasu odpowiedzi
+* Czas oczekiwania na odpowiedź z MQTT Brokera
+* Maksymalnie 30 sekund
+* Wartość wymagana, standardowo 5 sekund
+* Jednosta wprowadzania: milisekundy
+
+> Jeśli jest konieczność, aby urządzenie działało lub działało szybciej podczas sytuacji odłączenia MQTT Brokera od sieci LAN, Limit ten należy obniżyć do np.200msek. W przypadku zmiany wartości domyślnej, wymiana danych między brokerem MQTT, a urządzeniem może nie działac w 100% prawidłowo. Wartość należy ustawić metodą prób i błędów do uzyskania pożądanego efektu.
+
 ### Sekcja: Konfigurcja wiadomości LWT
 
 Wiadomość LWT (Last Will and Testament), wykorzystywana jest, aby powiadomić innych klientów o niespodziewanym odłączeniu urządzenia od brokera MQTT. 
-W AFE Firmware z tym tematem wysyłana jest wiadomośc do brokera MQTT o podłączeniu lub rozłączeniu się urządzenia od brokera MQTT
+
+W przypadku 
+* Standardowego API, AFE Firmware wysyła wiadomość do brokera MQTT o podłączeniu się urządzenia od brokera MQTT. Gdy urządzenie rozłączy się MQTT Broker publikuje informację o rozłączeniu się urządzenia od MQTT Brokera.
+* Domoticz API, AFE Firmware aktualizuje stan wirtualnego przełącznika, który informuje, czy urządzenie jest podłaczone lub rozłączone od MQTT Brokera
 
 > Funkcjonalność można wykorzystać między innymi do: monitorowania podłączenia urządzenia do brokera WiFi,  utraty połączenia z siecią WiFi, niespodziewanych brakach zasilania, czy "zawieszeniu" się urządzenia
 
@@ -78,6 +89,14 @@ W AFE Firmware z tym tematem wysyłana jest wiadomośc do brokera MQTT o podłą
 
 #### Temat 
 
+* widoczne dla AFE Firmware ze standardowym MQTT API
 * temat MQTT
 * Informacja nie jest wymagana. W przypadku nie wprowadzenia tematu wiadomości LWT, nie będzie do brokera MQTT wysyłana informacja o połączeniu / rozłączeniu się urządzenia od brokera MQTT
 * Więcej o tematach MQTT moższ znaleśc w rodziale: [Integracja API MQTT](/integracja-api/mqtt)
+
+#### IDX 
+
+* widoczne dla AFE Firmware z Domoticz MQTT API
+* Wartość z zakresu 1 do 999999
+* W przypadku wprowadzenia 0, LWT nie będzie wysyłane do Domoticz
+* Więcej o tematach Domoticz MQTT API moższ znaleśc w rodziale: [Domoticz API](/integracja-api/domoticz-api)
