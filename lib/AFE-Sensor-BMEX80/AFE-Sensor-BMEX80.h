@@ -10,17 +10,15 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <ArduinoJson.h>
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
 #include <AFE-Sensor-BMP180.h>
 #include <AFE-Sensors-Common.h>
-
+#include <ArduinoJson.h>
 
 class AFESensorBMEX80 {
 
 private:
-
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
@@ -34,8 +32,7 @@ private:
 public:
   BMEX80 configuration;
   BMEX80_DATA data;
-  
-  
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
@@ -52,6 +49,10 @@ public:
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
+
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
+  afe_humidity_domoticz_state_t getDomoticzHumidityState(float value);
+#endif
 };
 
 #endif

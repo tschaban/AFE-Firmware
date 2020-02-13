@@ -344,7 +344,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Device->configuration.noOfAS3935s > 0 && Firmware->Pro.valid) {
-    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
     page += AFE_CONFIG_SITE_AS3935;
     page += "\">";
     page += L_AS3935_SENSOR;

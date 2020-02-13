@@ -21,7 +21,10 @@ boolean AFESensorAS3935::begin(uint8_t id) {
          << "Min.strikes level : "
          << configuration.minimumNumberOfLightningSpikes;
   Serial << endl << "Indoor? : " << configuration.indoor;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   Serial << endl << "IDX: " << configuration.domoticz.idx;
+#endif
+
 #endif
   if (configuration.i2cAddress != 0) {
 #ifdef DEBUG

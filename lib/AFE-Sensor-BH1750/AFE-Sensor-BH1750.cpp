@@ -59,7 +59,9 @@ void AFESensorBH1750::begin(uint8_t id) {
   if (_initialized) {
     Serial << endl << "Mode: " << configuration.mode;
     Serial << endl << "Interval: " << configuration.interval;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     Serial << endl << "IDX: " << configuration.domoticz.idx;
+#endif
   }
   Serial << endl
          << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
@@ -102,6 +104,5 @@ void AFESensorBH1750::listener() {
 }
 
 void AFESensorBH1750::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}",
-          data);
+  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}", data);
 }

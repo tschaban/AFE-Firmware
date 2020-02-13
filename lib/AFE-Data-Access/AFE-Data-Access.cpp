@@ -18,7 +18,9 @@ boolean AFEDataAccess::fileExist(const char *path) {
 const String AFEDataAccess::getDeviceUID() {
   String uid;
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << AFE_FILE_DEVICE_UID << " ... ";
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_DEVICE_UID << " ... ";
 #endif
 
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "r");
@@ -68,7 +70,9 @@ const String AFEDataAccess::getDeviceUID() {
 }
 void AFEDataAccess::saveDeviceUID(const char *uid) {
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << AFE_FILE_DEVICE_UID << " ... ";
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_DEVICE_UID << " ... ";
 #endif
 
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "w");
@@ -797,7 +801,9 @@ void AFEDataAccess::saveFirmwareAPIVersion() {
 uint8_t AFEDataAccess::getDeviceMode() {
   uint8_t mode = AFE_MODE_FIRST_TIME_LAUNCH;
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << AFE_FILE_DEVICE_MODE << " ... ";
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_DEVICE_MODE << " ... ";
 #endif
 
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "r");
@@ -847,7 +853,9 @@ uint8_t AFEDataAccess::getDeviceMode() {
 }
 void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << AFE_FILE_DEVICE_MODE << " ... ";
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_DEVICE_MODE << " ... ";
 #endif
 
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "w");
@@ -1276,7 +1284,7 @@ LED AFEDataAccess::getLEDConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-led-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -1330,7 +1338,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED configuration) {
   sprintf(fileName, "cfg-led-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -1529,7 +1537,7 @@ RELAY AFEDataAccess::getRelayConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-relay-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
   File configFile = SPIFFS.open(fileName, "r");
 
@@ -1735,7 +1743,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY configuration) {
   sprintf(fileName, "cfg-relay-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -2049,7 +2057,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
   sprintf(fileName, "cfg-relay-state-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -2101,7 +2109,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   sprintf(fileName, "cfg-relay-state-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -2148,7 +2156,7 @@ SWITCH AFEDataAccess::getSwitchConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-switch-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -2211,7 +2219,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH configuration) {
   sprintf(fileName, "cfg-switch-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -3164,7 +3172,7 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-hpma115s0-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -3186,10 +3194,10 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
 
       configuration.interval = root["interval"];
       configuration.timeToMeasure = root["timeToMeasure"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.pm25.idx = root["idx"]["pm25"];
       configuration.domoticz.pm10.idx = root["idx"]["pm10"];
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
 #endif
       sprintf(configuration.name, root["name"]);
@@ -3226,7 +3234,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
   sprintf(fileName, "cfg-hpma115s0-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -3238,17 +3246,20 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
     JsonObject &idx = root.createNestedObject("idx");
+#endif
 
     root["interval"] = configuration.interval;
     root["timeToMeasure"] = configuration.timeToMeasure;
     root["name"] = configuration.name;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration.mqtt.topic;
-#endif
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     idx["pm25"] = configuration.domoticz.pm25.idx;
     idx["pm10"] = configuration.domoticz.pm10.idx;
+#else
+    root["mqttTopic"] = configuration.mqtt.topic;
+#endif
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -3279,8 +3290,10 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   configuration.interval = AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
   configuration.timeToMeasure =
       AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.pm25.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.pm10.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
 #ifdef DEBUG
     Serial << endl << "Creating file: cfg-hpma115s0-" << i << ".json";
@@ -3515,7 +3528,7 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-BMEX80-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -3540,8 +3553,9 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       sprintf(configuration.name, root["name"]);
       configuration.interval = root["interval"];
       configuration.resolution = root["resolution"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED      
       configuration.domoticz.temperatureHumidityPressure.idx =
-          root["idx"]["temperatureHumidityPressure"];
+          root["idx"]["temperatureHumidityPressure"];      
       configuration.domoticz.temperatureHumidity.idx =
           root["idx"]["temperatureHumidity"];
       configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
@@ -3564,8 +3578,7 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.pressure.correction = root["pressure"]["correction"];
       configuration.seaLevelPressure = root["pressure"]["seaLevelPressure"];
       configuration.altitude = root["pressure"]["altitude"];
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
       sprintf(configuration.mqtt.topic, root["mqttTopic"]);
 #endif
 
@@ -3600,7 +3613,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
   sprintf(fileName, "cfg-BMEX80-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -3612,7 +3625,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
     JsonObject &idx = root.createNestedObject("idx");
+#endif    
     JsonObject &temperature = root.createNestedObject("temperature");
     JsonObject &humidity = root.createNestedObject("humidity");
     JsonObject &pressure = root.createNestedObject("pressure");
@@ -3722,7 +3737,7 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-bh1750-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -3785,7 +3800,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 configuration) {
   sprintf(fileName, "cfg-bh1750-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");
@@ -3860,7 +3875,7 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
   sprintf(fileName, "cfg-as3935-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "r");
@@ -3932,7 +3947,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 configuration) {
   sprintf(fileName, "cfg-as3935-%d.json", id);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
 
   File configFile = SPIFFS.open(fileName, "w");

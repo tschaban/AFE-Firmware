@@ -195,21 +195,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
       sendCustomSensorCommand(
           _BMx80Sensor[id]->configuration.domoticz.temperature.idx, value);
     }
-    if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.humidity.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.heatIndex.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.heatIndex.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.heatIndex.idx, value);
-    }
+
     if (_BMx80Sensor[id]->configuration.domoticz.pressure.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.pressure.value);
       sendCustomSensorCommand(
@@ -220,33 +206,81 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
       sendCustomSensorCommand(
           _BMx80Sensor[id]->configuration.domoticz.relativePressure.idx, value);
     }
-    if (_BMx80Sensor[id]->configuration.domoticz.gasResistance.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.gasResistance.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.gasResistance.idx, value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.iaq.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.iaq.value);
-      sendCustomSensorCommand(_BMx80Sensor[id]->configuration.domoticz.iaq.idx,
-                              value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.staticIaq.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.staticIaq.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.staticIaq.idx, value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.co2Equivalent.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.co2Equivalent.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.co2Equivalent.idx, value);
-    }
-    if (_BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.breathVocEquivalent.value);
-      sendCustomSensorCommand(
-          _BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx,
-          value);
+
+    if (_BMx80Sensor[id]->configuration.type != AFE_BMP180_SENSOR) {
+
+
+if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
+          0) {
+        sprintf(value, "%-.2f;%-.2f;%-d",
+                _BMx80Sensor[id]->data.temperature.value,
+                _BMx80Sensor[id]->data.humidity.value,
+                _BMx80Sensor[id]->getDomoticzHumidityState(
+                    _BMx80Sensor[id]->data.humidity.value));
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
+      }
+
+      if (_BMx80Sensor[id]
+              ->configuration.domoticz.temperatureHumidityPressure.idx > 0) {
+        sprintf(value, "%-.2f;%-.2f;%-d;%-.2f;0",
+                _BMx80Sensor[id]->data.temperature.value,
+                _BMx80Sensor[id]->data.humidity.value,
+                _BMx80Sensor[id]->getDomoticzHumidityState(
+                    _BMx80Sensor[id]->data.humidity.value),
+                _BMx80Sensor[id]->data.pressure.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
+      }
+
+
+      if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.humidity.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.heatIndex.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.heatIndex.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.heatIndex.idx, value);
+      }
     }
 
+    if (_BMx80Sensor[id]->configuration.type == AFE_BME680_SENSOR) {
+      if (_BMx80Sensor[id]->configuration.domoticz.gasResistance.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.gasResistance.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.gasResistance.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.iaq.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.iaq.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.iaq.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.staticIaq.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.staticIaq.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.staticIaq.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.co2Equivalent.idx > 0) {
+        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.co2Equivalent.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.co2Equivalent.idx, value);
+      }
+      if (_BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx >
+          0) {
+        sprintf(value, "%-.2f",
+                _BMx80Sensor[id]->data.breathVocEquivalent.value);
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx,
+            value);
+      }
+    }
     /* ADD SENDING THESE TWO
       DOMOTICZ_BASIC_CONFIG temperatureHumidity;
   DOMOTICZ_BASIC_CONFIG temperatureHumidityPressure;

@@ -32,9 +32,7 @@ void AFEAPIMQTTStandard::synchronize() {
   Serial << endl << "INFO: Sending current device state to MQTT Broker  ...";
 #endif
 
-
-Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
-
+  Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
 
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -149,8 +147,9 @@ void AFEAPIMQTTStandard::processRequest() {
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    Mqtt.publish(_Relay[id]->mqttStateTopic,
-                 _Relay[id]->get() == AFE_RELAY_ON ? "on" : "off");
+    publishStatus =
+        Mqtt.publish(_Relay[id]->mqttStateTopic,
+                     _Relay[id]->get() == AFE_RELAY_ON ? "on" : "off");
   }
   return publishStatus;
 }
@@ -203,8 +202,9 @@ void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    Mqtt.publish(_Switch[id]->mqttStateTopic,
-                 _Switch[id]->getPhisicalState() ? "open" : "closed");
+    publishStatus =
+        Mqtt.publish(_Switch[id]->mqttStateTopic,
+                     _Switch[id]->getPhisicalState() ? "open" : "closed");
   }
   return publishStatus;
 }
@@ -236,5 +236,109 @@ void AFEAPIMQTTStandard::processADC() {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC && AFE_CONFIG_API_PROCESS_REQUESTS
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing BMX80 ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishBMx80SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishBMx80SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _BMx80Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_BMx80Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+void AFEAPIMQTTStandard::processHPMA115S0(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing HPMA115S0 ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishHPMA115S0SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishHPMA115S0SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _HPMA115S0Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_HPMA115S0Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+void AFEAPIMQTTStandard::processBH1750(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing BH1750 ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishBH1750SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _BH1750Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_BH1750Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing AS3935 ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishAS3935SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _AS3935Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_AS3935Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

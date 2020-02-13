@@ -255,3 +255,17 @@ void AFESensorBMEX80::applyCorrections() {
   }
 #endif
 }
+
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
+afe_humidity_domoticz_state_t AFESensorBMEX80::getDomoticzHumidityState(float value) {
+  if (value < 40) {
+    return AFE_HUMIDITY_DRY;
+  } else if (value >= 40 && value <= 60) {
+    return AFE_HUMIDITY_COMFORTABLE;
+  } else if (value > 60) {
+    return AFE_HUMIDITY_WET;
+  } else {
+    return AFE_HUMIDITY_NORMAL;
+  }
+}
+#endif

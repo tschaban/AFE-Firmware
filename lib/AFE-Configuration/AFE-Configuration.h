@@ -878,6 +878,16 @@ typedef enum {
 #endif // AFE_CONFIG_API_PROCESS_REQUESTS
 #endif // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
+/* Humidity Domoticz state*/
+typedef enum {
+  AFE_HUMIDITY_NORMAL = 0,
+  AFE_HUMIDITY_COMFORTABLE = 1,
+  AFE_HUMIDITY_DRY = 2,
+  AFE_HUMIDITY_WET = 3,
+} afe_humidity_domoticz_state_t;
+#endif
+
 /* ***************** Files: Config and defaults *********************/
 
 /* Configuration files names */
