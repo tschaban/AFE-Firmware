@@ -102,6 +102,66 @@ void AFEAPIMQTTStandard::subscribe() {
     }
   }
 #endif
+
+/* Subscribe: BMx80 */
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
+    Mqtt.subscribe(_BMx80Sensor[i]->mqttCommandTopic);
+    if (strlen(_BMx80Sensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _BMx80Sensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BMX80;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+/* Subscribe: BH1750 */
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
+    Mqtt.subscribe(_BH1750Sensor[i]->mqttCommandTopic);
+    if (strlen(_BH1750Sensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _BH1750Sensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BH1750;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+/* Subscribe: AS3935 */
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
+    Mqtt.subscribe(_AS3935Sensor[i]->mqttCommandTopic);
+    if (strlen(_AS3935Sensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _AS3935Sensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_AS3935;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
+    Mqtt.subscribe(_HPMA115S0Sensor[i]->mqttCommandTopic);
+    if (strlen(_HPMA115S0Sensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _HPMA115S0Sensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_HPMA115S0;
+      currentCacheSize++;
+    }
+  }
+
+#endif
+
+
+
+
 }
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -120,12 +180,39 @@ void AFEAPIMQTTStandard::processRequest() {
              << mqttTopicsCache[i].type;
 #endif
       switch (mqttTopicsCache[i].type) {
+#ifdef AFE_CONFIG_HARDWARE_RELAY        
       case AFE_MQTT_DEVICE_RELAY: // RELAY
         processRelay(&mqttTopicsCache[i].id);
         break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH        
+      case AFE_MQTT_DEVICE_SWITCH:
+        processSwitch(&mqttTopicsCache[i].id);
+        break;
+#endif          
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
         processADC();
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+      case AFE_MQTT_DEVICE_BH1750:
+        processBH1750(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+      case AFE_MQTT_DEVICE_BMX80:
+        processBMEX80(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+      case AFE_MQTT_DEVICE_AS3935:
+        processAS3935(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+      case AFE_MQTT_DEVICE_HPMA115S0:
+        processHPMA115S0(&mqttTopicsCache[i].id);
         break;
 #endif
       default:

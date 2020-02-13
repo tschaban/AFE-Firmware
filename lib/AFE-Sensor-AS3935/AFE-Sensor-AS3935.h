@@ -10,9 +10,10 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <SparkFun_AS3935.h>
 #include <AFE-I2C-Scanner.h>
+#include <SparkFun_AS3935.h>
 #include <Wire.h>
+
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -32,6 +33,10 @@ public:
   /* Stories information about the distance to the storm */
   uint8_t distance;
   uint8_t eventType;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+#endif
 
   /* Constructor */
   AFESensorAS3935();

@@ -15,7 +15,6 @@
 #include <AFE-HTTP-COMMAND-Structure.h>
 #include <AFE-Web-Server.h>
 
-
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
@@ -36,6 +35,22 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #include <AFE-Analog-Input.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <AFE-Sensor-BMEX80.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#include <AFE-Sensor-HPMA115S0.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#include <AFE-Sensor-BH1750.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#include <AFE-Sensor-AS3935.h>
 #endif
 
 #ifdef DEBUG
@@ -67,6 +82,22 @@ private:
   AFEAnalogInput *_AnalogInput;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  AFESensorBMEX80 *_BMx80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  AFESensorHPMA115S0 *_HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  AFESensorBH1750 *_BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -78,6 +109,22 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Processing HTTP request for ADC */
   void processAnalogInput(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  void processBMEX80(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  void processHPMA115S0(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  void processBH1750(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  void processAS3935(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -102,7 +149,7 @@ public:
   void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *,
              AFEAPIMQTTStandard *);
 #endif
-  
+
   /* Listens fr HTTP requests */
   void listener();
 
@@ -112,8 +159,24 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-/* Adds global class for reference */
+  /* Adds global class for reference */
   void addClass(AFEAnalogInput *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  void addClass(AFESensorBMEX80 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  void addClass(AFESensorHPMA115S0 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  void addClass(AFESensorBH1750 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  void addClass(AFESensorAS3935 *);
 #endif
 };
 

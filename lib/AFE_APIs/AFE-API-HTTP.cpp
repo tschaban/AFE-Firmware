@@ -69,11 +69,47 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   else if (strcmp(request->device, "ADC") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing Relay ADC requests";
+    Serial << endl << "INFO: Processing ADC requests";
 #endif
     processAnalogInput(request);
   }
 #endif
+/* Checking if BMx80 Input request */
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  // @TODO change in doc BMX80
+  else if (strcmp(request->device, "BMEX80") == 0 ||
+           strcmp(request->device, "BMX80") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing BMX80 requests";
+#endif
+    processBMEX80(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  else if (strcmp(request->device, "BH1750") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing BH1750 requests";
+#endif
+    processBH1750(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  else if (strcmp(request->device, "AS3935") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing AS3935 requests";
+#endif
+    processAS3935(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_AS3935
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  else if (strcmp(request->device, "HPMA115S0") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing HPMA115S0 requests";
+#endif
+    processHPMA115S0(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -242,11 +278,122 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
   }
 }
-
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
-/* Method creates JSON respons after processing HTTP API request, and pushes it.
- * The second one method converts float to charString before pushing response */
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void AFEAPIHTTP::addClass(AFESensorBMEX80 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
+    _BMx80Sensor[i] = Sensor + i;
+  }
+}
+
+void AFEAPIHTTP::processBMEX80(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
+    if (strcmp(request->name, _BMx80Sensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH]; // @TODO check the
+                                                           // size
+        _BMx80Sensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+void AFEAPIHTTP::addClass(AFESensorBH1750 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
+    _BH1750Sensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
+    if (strcmp(request->name, _BH1750Sensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH]; // @TODO check the
+                                                           // size
+        _BH1750Sensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+void AFEAPIHTTP::addClass(AFESensorHPMA115S0 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
+    _HPMA115S0Sensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processHPMA115S0(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
+    if (strcmp(request->name, _HPMA115S0Sensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH]; // @TODO check the
+                                                              // size
+        _HPMA115S0Sensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+void AFEAPIHTTP::addClass(AFESensorAS3935 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
+    _AS3935Sensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
+    if (strcmp(request->name, _AS3935Sensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH]; // @TODO check the
+                                                           // size
+        _AS3935Sensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+
+#endif // AFE_CONFIG_HARDWARE_AS3935
+
+/* Method creates JSON respons after processing HTTP API request, and pushes
+ * it.
+ * The second one method converts float to charString before pushing response
+ */
 void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   String respond;
   respond = "{\"device\":{";

@@ -9,6 +9,8 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
@@ -28,9 +30,27 @@ struct MQTT_BASIC_CONFIG {
 
 /* Types of items in MQTT Topics cache */
 typedef enum {
+#ifdef AFE_CONFIG_HARDWARE_RELAY  
   AFE_MQTT_DEVICE_RELAY = 0,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC  
   AFE_MQTT_DEVICE_ADC = 1,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH  
   AFE_MQTT_DEVICE_SWITCH = 2,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80  
+  AFE_MQTT_DEVICE_BMX80 = 3,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  AFE_MQTT_DEVICE_BH1750 = 4,
+#endif  
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  AFE_MQTT_DEVICE_AS3935 = 5,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  AFE_MQTT_DEVICE_HPMA115S0 = 6,
+#endif  
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */
