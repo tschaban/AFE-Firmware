@@ -80,11 +80,14 @@ boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
 }
 
 boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
-                                                    const char *value) {
+                                                    const char *value,
+                                                    uint8_t nvalue) {
   boolean _return = false;
   if (enabled) {
     String call = getApiCall("udevice", idx);
-    call += "&nvalue=0&svalue=";
+    call += "&nvalue=";
+    call += nvalue;
+    call += "&svalue=";
     call += value;
     _return = callURL(call);
   }
@@ -209,8 +212,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
 
     if (_BMx80Sensor[id]->configuration.type != AFE_BMP180_SENSOR) {
 
-
-if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
+      if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
           0) {
         sprintf(value, "%-.2f;%-.2f;%-d",
                 _BMx80Sensor[id]->data.temperature.value,
@@ -218,7 +220,8 @@ if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
                 _BMx80Sensor[id]->getDomoticzHumidityState(
                     _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
-            _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
+            _BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx,
+            value);
       }
 
       if (_BMx80Sensor[id]
@@ -230,14 +233,16 @@ if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
                     _BMx80Sensor[id]->data.humidity.value),
                 _BMx80Sensor[id]->data.pressure.value);
         sendCustomSensorCommand(
-            _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
+            _BMx80Sensor[id]
+                ->configuration.domoticz.temperatureHumidityPressure.idx,
+            value);
       }
 
-
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.humidity.value);
+        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(_BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
-            _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value);
+            _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,
+            (uint8_t)_BMx80Sensor[id]->data.humidity.value);
       }
       if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);

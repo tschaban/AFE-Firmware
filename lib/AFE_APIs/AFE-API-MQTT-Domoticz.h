@@ -34,7 +34,7 @@ private:
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
 
   /* Generates custome sensor JSON */
-  void generateDeviceValue(char *json, uint32_t idx, char *value);
+  void generateDeviceValue(char *json, uint32_t idx, char *svalue, uint8_t nvalue=0);
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Cache that stories IDXs */

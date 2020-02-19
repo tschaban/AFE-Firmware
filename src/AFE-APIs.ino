@@ -126,6 +126,25 @@ void initializeHTTPAPI() {
     HttpAPI.addClass(&AnalogInput);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  HttpAPI.addClass(&BMEX80Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  HttpAPI.addClass(&ParticleSensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  HttpAPI.addClass(&BH1750Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  HttpAPI.addClass(&AS3935Sensor[0]);
+#endif
+
+
+
+
 #ifdef DEBUG
     Serial << endl << "INFO: API: HTTP init completed";
 #endif

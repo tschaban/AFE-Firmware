@@ -57,6 +57,7 @@ void AFESensorBH1750::begin(uint8_t id) {
 
 #ifdef DEBUG
   if (_initialized) {
+     Serial << endl << "Name: " << configuration.name;
     Serial << endl << "Mode: " << configuration.mode;
     Serial << endl << "Interval: " << configuration.interval;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED

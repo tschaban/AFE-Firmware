@@ -341,7 +341,7 @@ void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishBMx80SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    char message[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH];
     _BMx80Sensor[id]->getJSON(message);
     publishStatus =
         Mqtt.publish(_BMx80Sensor[id]->configuration.mqtt.topic, message);
@@ -367,7 +367,7 @@ void AFEAPIMQTTStandard::processHPMA115S0(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishHPMA115S0SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    char message[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH];
     _HPMA115S0Sensor[id]->getJSON(message);
     publishStatus =
         Mqtt.publish(_HPMA115S0Sensor[id]->configuration.mqtt.topic, message);
@@ -393,7 +393,7 @@ void AFEAPIMQTTStandard::processBH1750(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    char message[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];
     _BH1750Sensor[id]->getJSON(message);
     publishStatus =
         Mqtt.publish(_BH1750Sensor[id]->configuration.mqtt.topic, message);
@@ -419,7 +419,7 @@ void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    char message[AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH];
     _AS3935Sensor[id]->getJSON(message);
     publishStatus =
         Mqtt.publish(_AS3935Sensor[id]->configuration.mqtt.topic, message);

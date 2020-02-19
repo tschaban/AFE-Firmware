@@ -49,7 +49,7 @@ private:
   boolean sendSwitchCommand(unsigned int idx, const char *value);
 
   /* sends to Domoticz custome sensor call */
-  boolean sendCustomSensorCommand(unsigned int idx, const char *value);
+  boolean sendCustomSensorCommand(unsigned int idx, const char *value, uint8_t nvalue=0);
 
 public:
   /* Constructor: it sets all necessary parameters */

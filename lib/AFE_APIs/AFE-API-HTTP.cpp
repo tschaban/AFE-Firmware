@@ -293,8 +293,7 @@ void AFEAPIHTTP::processBMEX80(HTTPCOMMAND *request) {
     if (strcmp(request->name, _BMx80Sensor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
-        char json[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH]; // @TODO check the
-                                                           // size
+        char json[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH];
         _BMx80Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
@@ -316,13 +315,14 @@ void AFEAPIHTTP::addClass(AFESensorBH1750 *Sensor) {
 }
 void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
+
   for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
     if (strcmp(request->name, _BH1750Sensor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
-        char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH]; // @TODO check the
-                                                           // size
-        _BH1750Sensor[i]->getJSON(json);
+        char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];        
+          _BH1750Sensor[i]->getJSON(json);
+
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -347,8 +347,7 @@ void AFEAPIHTTP::processHPMA115S0(HTTPCOMMAND *request) {
     if (strcmp(request->name, _HPMA115S0Sensor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
-        char json[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH]; // @TODO check the
-                                                              // size
+        char json[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH];
         _HPMA115S0Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {

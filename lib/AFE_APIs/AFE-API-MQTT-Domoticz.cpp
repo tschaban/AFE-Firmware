@@ -275,10 +275,12 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 }
 
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
-                                             char *value) {
-  sprintf(json,
-          "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":0,\"svalue\":\"%s\"}",
-          idx, value);
+                                             char *svalue, uint8_t nvalue) {
+
+  sprintf(
+      json,
+      "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":%d,\"svalue\":\"%s\"}",
+      idx, nvalue, svalue);
 }
 
 uint8_t AFEAPIMQTTDomoticz::getRSSI() {
@@ -356,11 +358,14 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
       }
 
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-        sprintf(value, "%-.2f", _BMx80Sensor[id]->data.humidity.value);
+        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(
+                                  _BMx80Sensor[id]->data.humidity.value));
         generateDeviceValue(
-            json, _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value);
+            json, _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,
+            (uint8_t)_BMx80Sensor[id]->data.humidity.value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+
       if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);
         generateDeviceValue(
@@ -405,7 +410,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
       }
       if (_BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx >
           0) {
-        sprintf(value, "%-.0f",
+        sprintf(value, "%-.1f",
                 _BMx80Sensor[id]->data.breathVocEquivalent.value);
         generateDeviceValue(
             json,
