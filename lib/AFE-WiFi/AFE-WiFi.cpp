@@ -28,7 +28,6 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #ifdef DEBUG
   Serial << endl << "INFO: Device is in mode: " << WiFiMode;
 #endif
-
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   if (WiFiMode == AFE_MODE_ACCESS_POINT ||
@@ -78,7 +77,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
       Serial << endl << "INFO: Settting fixed IP";
 #endif
     }
-    
+
     WiFi.persistent(false);
     WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA);
@@ -186,12 +185,12 @@ void AFEWiFi::listener() {
 }
 
 boolean AFEWiFi::connected() {
- // if ((networkConfiguration.isDHCP &&
- //      WiFi.localIP().toString() != "(IP unset)") ||
- //     (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
-    
-   if (WiFi.waitForConnectResult() == WL_CONNECTED) {
-    
+  if ((networkConfiguration.isDHCP &&
+       WiFi.localIP().toString() != "(IP unset)") ||
+      (!networkConfiguration.isDHCP && WiFi.status() == WL_CONNECTED)) {
+
+    // if (WiFi.waitForConnectResult() == WL_CONNECTED) {
+
     delay(10);
     if (disconnected) {
       eventConnectionEstablished = true;

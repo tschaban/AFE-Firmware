@@ -3246,7 +3246,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     JsonObject &idx = root.createNestedObject("idx");
 #endif
 
@@ -3553,9 +3553,9 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       sprintf(configuration.name, root["name"]);
       configuration.interval = root["interval"];
       configuration.resolution = root["resolution"];
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED      
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.temperatureHumidityPressure.idx =
-          root["idx"]["temperatureHumidityPressure"];      
+          root["idx"]["temperatureHumidityPressure"];
       configuration.domoticz.temperatureHumidity.idx =
           root["idx"]["temperatureHumidity"];
       configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
@@ -3571,6 +3571,9 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"];
       configuration.domoticz.breathVocEquivalent.idx =
           root["idx"]["breathVocEquivalent"];
+#else
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+#endif
       configuration.temperature.unit = root["temperature"]["unit"];
       configuration.temperature.correction = root["temperature"]["correction"];
       configuration.humidity.correction = root["humidity"]["correction"];
@@ -3578,9 +3581,6 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.pressure.correction = root["pressure"]["correction"];
       configuration.seaLevelPressure = root["pressure"]["seaLevelPressure"];
       configuration.altitude = root["pressure"]["altitude"];
-#else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
-#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -3625,9 +3625,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     JsonObject &idx = root.createNestedObject("idx");
-#endif    
+#endif
     JsonObject &temperature = root.createNestedObject("temperature");
     JsonObject &humidity = root.createNestedObject("humidity");
     JsonObject &pressure = root.createNestedObject("pressure");

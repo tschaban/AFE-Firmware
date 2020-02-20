@@ -69,10 +69,12 @@ public:
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
-
+ 
+  /* Method sends command to the sensor */
   boolean sendCommand(const uint8_t *command,
                       uint8_t howManyTimesRetry = HPMA115S0_RETRY);
-
+  
+  /* It returns the data in JSON format */
   void getJSON(char *json);
 };
 

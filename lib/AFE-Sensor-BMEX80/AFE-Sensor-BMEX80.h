@@ -39,11 +39,14 @@ public:
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMEX80();
-
+  
+  /* Initialization of the sensor */
   void begin(uint8_t id);
 
+  /* Returns sensor data in JSON format */
   void getJSON(char *);
 
+  /* True if data in a buffer - ready to read */
   boolean isReady();
 
   /* Method has to be added to the loop in order to listen for sensor value

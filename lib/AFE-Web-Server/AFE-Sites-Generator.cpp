@@ -1828,6 +1828,8 @@ void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
   BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
+
+
   char _number[7];
 
   addConfigurationBlock(page, L_BMEX80_SENSOR, "");
@@ -1905,6 +1907,9 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
       addItem(page, "number", "hc", L_HUMIDITY, _number, "?", "-99.999",
               "99.999", "0.001");
     }
+
+
+
 
     sprintf(_number, "%-.3f", configuration.pressure.correction);
     addItem(page, "number", "pc", L_PRESSURE, _number, "?", "-999.999",

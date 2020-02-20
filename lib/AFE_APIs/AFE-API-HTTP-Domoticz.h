@@ -66,41 +66,37 @@ public:
   virtual void addClass(AFERelay *);
   /* Publishes current relay state to Domoticz */
   boolean publishRelayState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  /* Add reference to global class */
   virtual void addClass(AFESwitch *);
-  /* Publishes current switch state to Domoticz */
   boolean publishSwitchState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Add reference to global class*/
   virtual void addClass(AFEAnalogInput *);
-  /* Publishes current ADC data to Domoticz */
   void publishADCValues();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
   boolean publishBMx80SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   virtual void addClass(AFESensorHPMA115S0 *);
   boolean publishHPMA115S0SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   virtual void addClass(AFESensorBH1750 *);
   boolean publishBH1750SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   virtual void addClass(AFESensorAS3935 *);
   boolean publishAS3935SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 };
 

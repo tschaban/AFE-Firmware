@@ -93,5 +93,4 @@ public:
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
-#endif
+#endif // _AFE_API_MQTT_STANDARD_h

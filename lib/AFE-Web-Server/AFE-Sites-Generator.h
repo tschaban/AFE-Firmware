@@ -167,7 +167,6 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  // String addAS3935Configuration(uint8_t id);
   void addAS3935Configuration(String &page, uint8_t id);
 #endif
 

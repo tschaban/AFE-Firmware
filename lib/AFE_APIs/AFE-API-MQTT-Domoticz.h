@@ -54,7 +54,7 @@ private:
 
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();
@@ -83,21 +83,21 @@ public:
   virtual void addClass(AFERelay *);
   /* Publishes MQTT Message with relay state */
   boolean publishRelayState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Adds global class for reference (passes it to base class)*/
   virtual void addClass(AFESwitch *);
   /* Publishes MQTT Message with switch state */
   boolean publishSwitchState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Adds global class for reference (passes it to base class). */
   virtual void addClass(AFEAnalogInput *);
   /* Publishes MQTT Message with Analog data */
   void publishADCValues();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
@@ -121,5 +121,4 @@ public:
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
 #endif //_AFE_API_MQTT_DOMOTICZ_h

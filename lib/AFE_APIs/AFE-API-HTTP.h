@@ -64,7 +64,7 @@ private:
   AFEWebServer *_HTTP;
   AFEDataAccess *_Data;
 
-  /* Is set to true if HTTP API is enabled (could be used) */
+  /* Ture if HTTP API is enabled */
   boolean enabled = false;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -72,7 +72,7 @@ private:
   AFEAPIHTTPDomoticz *_HttpAPIDomoticz;
 #else
   AFEAPIMQTTStandard *_MqttAPI;
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
@@ -142,13 +142,14 @@ public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIHTTP();
 
+/* Depending on the API compilication different classes are referenced */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *, AFEAPIMQTTDomoticz *,
              AFEAPIHTTPDomoticz *);
 #else
   void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *,
              AFEAPIMQTTStandard *);
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   /* Listens fr HTTP requests */
   void listener();
@@ -159,7 +160,6 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Adds global class for reference */
   void addClass(AFEAnalogInput *);
 #endif
 
