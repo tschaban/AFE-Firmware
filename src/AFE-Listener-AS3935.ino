@@ -24,8 +24,10 @@ void initializeAS3935Sensor() {
 void AS3935SensorEventsListener() {
   if (Device.configuration.noOfAS3935s > 0) {
     if (AS3935Sensor[0].strikeDetected()) {
-      MQTTPublishAS3935SensorData(0);
-      DomoticzPublishAS3935SesnorData(0);
+      MqttAPI.publishAS3935SensorData(0);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED      
+      HttpDomoticzAPI.publishAS3935SensorData(0);
+#endif      
     }
   }
 }

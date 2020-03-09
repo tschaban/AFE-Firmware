@@ -20,9 +20,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   String page;
 
   if (siteConfig->twoColumns) {
-    page = Site.generateTwoColumnsLayout();
+    Site.generateTwoColumnsLayout(page);
   } else {
-    page = Site.generateOneColumnLayout(siteConfig->rebootTime);
+    Site.generateOneColumnLayout(page, siteConfig->rebootTime);
   }
 
   if (siteConfig->form) {
@@ -39,62 +39,62 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 
   switch (siteConfig->ID) {
   case AFE_CONFIG_SITE_INDEX:
-    page += Site.addIndexSection(siteConfig->deviceID == -1 ? true : false);
+    Site.addIndexSection(page, siteConfig->deviceID == -1 ? true : false);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
-    page += Site.addNetworkConfiguration();
+    Site.addNetworkConfiguration(page);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME_CONNECTING:
-    page += Site.addConnectingSite();
+    Site.addConnectingSite(page);
     break;
   case AFE_CONFIG_SITE_DEVICE:
-    page += Site.addDeviceConfiguration();
+    Site.addDeviceConfiguration(page);
     break;
   case AFE_CONFIG_SITE_NETWORK:
-    page += Site.addNetworkConfiguration();
+    Site.addNetworkConfiguration(page);
     break;
   case AFE_CONFIG_SITE_MQTT:
-    page += Site.addMQTTBrokerConfiguration();
+    Site.addMQTTBrokerConfiguration(page);
     break;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   case AFE_CONFIG_SITE_DOMOTICZ:
-    page += Site.addDomoticzServerConfiguration();
+    Site.addDomoticzServerConfiguration(page);
     break;
 #endif
   case AFE_CONFIG_SITE_PASSWORD:
-    page += Site.addPasswordConfigurationSite();
+    Site.addPasswordConfigurationSite(page);
     break;
   case AFE_CONFIG_SITE_PRO_VERSION:
-    page += Site.addProVersionSite();
+    Site.addProVersionSite(page);
     break;
   case AFE_CONFIG_SITE_EXIT:
-    page += Site.addExitSection(siteConfig->rebootMode);
+    Site.addExitSection(page, siteConfig->rebootMode);
     break;
   case AFE_CONFIG_SITE_RESET:
-    page += Site.addResetSection();
+    Site.addResetSection(page);
     break;
   case AFE_CONFIG_SITE_POST_RESET:
-    page += Site.addPostResetSection();
+    Site.addPostResetSection(page);
     break;
   case AFE_CONFIG_SITE_UPGRADE:
-    page += Site.addUpgradeSection();
+    Site.addUpgradeSection(page);
     break;
   case AFE_CONFIG_SITE_POST_UPGRADE:
-    page += Site.addPostUpgradeSection(upgradeFailed);
+    Site.addPostUpgradeSection(page, upgradeFailed);
     break;
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   case AFE_CONFIG_SITE_RELAY:
-    page += Site.addRelayConfiguration(siteConfig->deviceID);
+    Site.addRelayConfiguration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   case AFE_CONFIG_SITE_SWITCH:
-    page += Site.addSwitchConfiguration(siteConfig->deviceID);
+    Site.addSwitchConfiguration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   case AFE_CONFIG_SITE_ANALOG_INPUT:
-    page += Site.addAnalogInputConfiguration();
+    Site.addAnalogInputConfiguration(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -109,40 +109,40 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
   case AFE_CONFIG_SITE_UART:
-    page += Site.addSerialPortConfiguration();
+    Site.addSerialPortConfiguration(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_I2C
   case AFE_CONFIG_SITE_I2C:
-    page += Site.addI2CPortConfiguration();
+    Site.addI2CPortConfiguration(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   case AFE_CONFIG_SITE_BMEX80:
-    page += Site.addBMEX80Configuration(siteConfig->deviceID);
+    Site.addBMEX80Configuration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   case AFE_CONFIG_SITE_HPMA115S0:
-    page += Site.addHPMA115S0Configuration(siteConfig->deviceID);
+    Site.addHPMA115S0Configuration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   case AFE_CONFIG_SITE_BH1750:
-    page += Site.addBH1750Configuration(siteConfig->deviceID);
+    Site.addBH1750Configuration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   case AFE_CONFIG_SITE_AS3935:
-    page += Site.addAS3935Configuration(siteConfig->deviceID);
+    Site.addAS3935Configuration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-      page += Site.addLEDConfiguration(i);
+      Site.addLEDConfiguration(page, i);
     }
-    page += Site.addSystemLEDConfiguration();
+    Site.addSystemLEDConfiguration(page);
     break;
 #endif
   }
@@ -156,10 +156,10 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     page += "</form>";
   }
 
-  page += Site.generateFooter((Device->getMode() == AFE_MODE_NORMAL ||
-                               Device->getMode() == AFE_MODE_CONFIGURATION)
-                                  ? true
-                                  : false);
+  Site.generateFooter(page, (Device->getMode() == AFE_MODE_NORMAL ||
+                             Device->getMode() == AFE_MODE_CONFIGURATION)
+                                ? true
+                                : false);
 
   return page;
 }
@@ -406,21 +406,17 @@ void AFEWebServer::generate(boolean upload) {
   } else {
 
 #ifdef DEBUG
-    Serial << endl << "---------------- Generating Site -----------------";
-    Serial << endl << "Site ID: " << siteConfig.ID;
     Serial << endl
-           << "Site Type: "
-           << (siteConfig.twoColumns ? "Two Columns" : "One Column");
-    Serial << endl << "Device ID: " << siteConfig.deviceID;
-    Serial << endl << "Command: " << command;
-    Serial << endl << "Reboot: " << (siteConfig.reboot ? "Yes" : "No");
+           << "INFO: Generating "
+           << (siteConfig.twoColumns ? "Two Columns" : "One Column")
+           << " site: " << siteConfig.ID;
+    Serial << ", device ID: " << siteConfig.deviceID;
+    Serial << ", Command: " << command;
+    Serial << ", Reboot: " << (siteConfig.reboot ? "Yes" : "No");
     if (siteConfig.reboot) {
-      Serial << endl << " - Mode: " << siteConfig.rebootMode;
-      Serial << endl << " - Time: " << siteConfig.rebootTime;
+      Serial << ", Mode: " << siteConfig.rebootMode;
+      Serial << ", Time: " << siteConfig.rebootTime;
     }
-
-    Serial << endl << "---------------------------------------------------";
-
 #endif
 
     publishHTML(generateSite(&siteConfig));
@@ -578,13 +574,34 @@ void AFEWebServer::listener() { server.handleClient(); }
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(String page) {
-
+  uint16_t pageSize = page.length();
+  uint16_t size = 1024;
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Site streaming started. Size : " << page.length() << " ... ";
+         << endl
+         << "INFO: Site streaming started. Size : " << pageSize << " ... ";
 #endif
 
-  server.send(200, "text/html", page);
+  server.setContentLength(pageSize);
+  if (pageSize > size) {
+    server.send(200, "text/html", page.substring(0, size));
+    uint16_t transfered = size;
+    uint16_t nextChunk;
+#ifdef DEBUG
+    Serial << endl << "INFO: Publishing in chunks ";
+#endif
+    while (transfered < pageSize) {
+      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+      server.sendContent(page.substring(transfered, nextChunk));
+      transfered = nextChunk;
+#ifdef DEBUG
+      Serial << ".";
+#endif
+    }
+  } else {
+    server.send(200, "text/html", page);
+  }
+
 #ifdef DEBUG
   Serial << "Completed";
 #endif
@@ -763,7 +780,6 @@ MQTT AFEWebServer::getMQTTData() {
   if (server.arg("a").length() > 0) {
     server.arg("a").toCharArray(data.ip, sizeof(data.ip));
 
-
   } else {
     data.ip[0] = '\0';
   }
@@ -772,7 +788,7 @@ MQTT AFEWebServer::getMQTTData() {
     data.port = server.arg("p").toInt();
   }
 
-   if (server.arg("t").length() > 0) {
+  if (server.arg("t").length() > 0) {
     data.timeout = server.arg("t").toInt();
   }
 
@@ -788,8 +804,7 @@ MQTT AFEWebServer::getMQTTData() {
     data.password[0] = '\0';
   }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.lwt.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+  data.lwt.idx = server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 #else
   if (server.arg("t0").length() > 0) {
     server.arg("t0").toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
@@ -1223,17 +1238,20 @@ HPMA115S0 AFEWebServer::getHPMA115S0SensorData() {
       server.arg("m").length() > 0
           ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
-
-  data.domoticz.pm25.idx =
-      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
-  data.domoticz.pm10.idx =
-      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : 0;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.pm25.idx = server.arg("x2").length() > 0
+                               ? server.arg("x2").toInt()
+                               : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.pm10.idx = server.arg("x1").length() > 0
+                               ? server.arg("x1").toInt()
+                               : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
@@ -1412,16 +1430,16 @@ AS3935 AFEWebServer::getAS3935SensorData() {
 
   data.unit =
       server.arg("u").length() > 0 ? server.arg("u").toInt() : AFE_DISTANCE_KM;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
-
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   return data;
 }
 #endif

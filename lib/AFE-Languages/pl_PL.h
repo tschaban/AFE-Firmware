@@ -39,7 +39,7 @@
   "konfiguracja urządzenia."
 #define L_PASWORD_PROTECTED "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
 
-#define L_DONATE "&#10084; Wesprzyj jeśli soft Ci się przydał"
+#define L_DONATE "&#128077; Wesprzyj jeśli soft Ci się przydał"
 
 /* Menu */
 #define L_DEVICE "Urządzenie"

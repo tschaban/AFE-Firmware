@@ -34,7 +34,7 @@ private:
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
 
   /* Generates custome sensor JSON */
-  void generateDeviceValue(char *json, uint32_t idx, char *value);
+  void generateDeviceValue(char *json, uint32_t idx, char *svalue, uint8_t nvalue=0);
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Cache that stories IDXs */
@@ -54,7 +54,7 @@ private:
 
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
-#endif
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();
@@ -83,23 +83,42 @@ public:
   virtual void addClass(AFERelay *);
   /* Publishes MQTT Message with relay state */
   boolean publishRelayState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Adds global class for reference (passes it to base class)*/
   virtual void addClass(AFESwitch *);
   /* Publishes MQTT Message with switch state */
   boolean publishSwitchState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Adds global class for reference (passes it to base class). */
   virtual void addClass(AFEAnalogInput *);
   /* Publishes MQTT Message with Analog data */
   void publishADCValues();
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  virtual void addClass(AFESensorBMEX80 *);
+  boolean publishBMx80SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  virtual void addClass(AFESensorHPMA115S0 *);
+  boolean publishHPMA115S0SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  virtual void addClass(AFESensorBH1750 *);
+  boolean publishBH1750SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  virtual void addClass(AFESensorAS3935 *);
+  boolean publishAS3935SensorData(uint8_t id);
 #endif
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
 #endif //_AFE_API_MQTT_DOMOTICZ_h

@@ -71,19 +71,22 @@ public:
   void createDomoticzConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   RELAY getRelayConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, RELAY configuration);
   void createRelayConfigurationFile();
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
+
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
   SWITCH getSwitchConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, SWITCH configuration);
   void createSwitchConfigurationFile();
+#endif
 
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);

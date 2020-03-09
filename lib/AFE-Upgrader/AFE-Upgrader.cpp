@@ -150,6 +150,8 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 }
 
 /* Specyfic upgrade to version T0 2.1 from version 2.0 */
+
+#ifdef T0_CONFIG
 void AFEUpgrader::upgradeToT0V210() {
 
   DEVICE newDevice;
@@ -193,3 +195,5 @@ void AFEUpgrader::upgradeToT0V210() {
   // Save to new JSON structure configuration file
   Data->saveConfiguration(&newDevice);
 }
+
+#endif // T0_CONFIG

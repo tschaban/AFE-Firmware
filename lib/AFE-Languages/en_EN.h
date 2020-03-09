@@ -40,7 +40,7 @@
 #define L_PASWORD_PROTECTED "\"Not possible. Configuration is protected by password\""
 
 #define L_DONATE_LINK "https://en.donate.afe-firmware.smartnydom.pl/"
-#define L_DONATE "&#10084; Donate if you found this useful"
+#define L_DONATE "&#128077; Donate if you found this useful"
 
 /* Menu */
 #define L_DEVICE "Device"

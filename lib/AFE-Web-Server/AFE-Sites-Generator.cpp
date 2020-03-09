@@ -11,15 +11,15 @@ void AFESitesGenerator::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   Data.getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
 }
 
-const String AFESitesGenerator::generateHeader(uint8_t redirect) {
+void AFESitesGenerator::generateHeader(String &page, uint8_t redirect) {
 
-  String page = "<!doctype html><html lang=\"";
+  page += "<!doctype html><html lang=\"";
   page += L_LANGUAGE;
   page += "\"><head><meta charset=\"utf-8\">";
 
   if (redirect > 0) {
     page += "<meta http-equiv=\"refresh\" content=\"";
-    page += String(redirect);
+    page += redirect;
     page += "; url=/\">";
   }
 
@@ -49,18 +49,17 @@ const String AFESitesGenerator::generateHeader(uint8_t redirect) {
   }
 
   page += "<div id=\"c\">";
-
-  return page;
 }
 
-const String AFESitesGenerator::generateOneColumnLayout(uint8_t redirect) {
-  String page = generateHeader(redirect);
+void AFESitesGenerator::generateOneColumnLayout(String &page,
+                                                uint8_t redirect) {
+  generateHeader(page, redirect);
   page += "<div id=\"r\">";
-  return page;
 }
 
-const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
-  String page = generateHeader(redirect);
+void AFESitesGenerator::generateTwoColumnsLayout(String &page,
+                                                 uint8_t redirect) {
+  generateHeader(page, redirect);
   page += "<div id=\"l\">";
   if (Device->getMode() == AFE_MODE_ACCESS_POINT) {
     page += "<h3 class=\"ltit\">AFE FIRMWARE</h3>";
@@ -80,9 +79,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
   page += L_NETWORK;
   page += "</a></li>";
 
-  if (
-
-      Device->configuration.api.mqtt) {
+  if (Device->configuration.api.mqtt) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_MQTT;
     page += "\">";
@@ -260,11 +257,9 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   if (Device->configuration.noOfHPMA115S0s > 0) {
 #endif
-
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_UART;
     page += "\">UART</a></li>";
-
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   }
 #endif
@@ -344,7 +339,7 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Device->configuration.noOfAS3935s > 0 && Firmware->Pro.valid) {
-    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
     page += AFE_CONFIG_SITE_AS3935;
     page += "\">";
     page += L_AS3935_SENSOR;
@@ -392,13 +387,10 @@ const String AFESitesGenerator::generateTwoColumnsLayout(uint8_t redirect) {
 
   /* Information section */
   page += "</a></li></ul></div><div id=\"r\">";
-
-  return page;
 }
 
-String AFESitesGenerator::addDeviceConfiguration() {
+void AFESitesGenerator::addDeviceConfiguration(String &page) {
   DEVICE configuration = Device->configuration;
-  String page = "";
 
   if (Device->upgraded != AFE_UPGRADE_NONE) {
     page += "<h4 class=\"bc\" style=\"padding:5px;\">";
@@ -414,42 +406,40 @@ String AFESitesGenerator::addDeviceConfiguration() {
     Device->upgraded = AFE_UPGRADE_NONE;
   }
 
-  String body = "<fieldset>";
-  body += addItem("text", "n", L_DEVICE_NAME, configuration.name, "16");
-  body += "</fieldset>";
-  page += addConfigurationBlock(L_DEVICE, L_DEVICE_SECTION_INFO, body);
-  body = "<fieldset>";
+  addConfigurationBlock(page, L_DEVICE, L_DEVICE_SECTION_INFO);
+  addItem(page, "text", "n", L_DEVICE_NAME, configuration.name, "16");
+  page += "</fieldset></div>";
+
+  addConfigurationBlock(page, L_HARDWARE_CONFIGURATION,
+                        L_HARDWARE_CONFIGURATION_INFO);
 
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
-
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
-                                    Device->configuration.noOfLEDs, "l",
-                                    L_NUMBER_OF_LEDS);
-
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
+                            Device->configuration.noOfLEDs, "l",
+                            L_NUMBER_OF_LEDS);
 #endif
 
 /* Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
-                                    Device->configuration.noOfContactrons, "co",
-                                    L_NUMBER_OF_MAGNETIC_SENSORS);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+                            Device->configuration.noOfContactrons, "co",
+                            L_NUMBER_OF_MAGNETIC_SENSORS);
 
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /* Relay */
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
-                                    Device->configuration.noOfRelays, "r",
-                                    L_NUMBER_OF_RELAYS);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
+                            Device->configuration.noOfRelays, "r",
+                            L_NUMBER_OF_RELAYS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Switch */
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
-                                    Device->configuration.noOfSwitches, "s",
-                                    L_NUMBER_OF_SWITCHES);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
+                            Device->configuration.noOfSwitches, "s",
+                            L_NUMBER_OF_SWITCHES);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -470,38 +460,38 @@ String AFESitesGenerator::addDeviceConfiguration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
-                                    Device->configuration.noOfHPMA115S0s, "hp",
-                                    L_NUMBER_OF_HPMA115S0_SENSORS);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
+                            Device->configuration.noOfHPMA115S0s, "hp",
+                            L_NUMBER_OF_HPMA115S0_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
-                                    Device->configuration.noOfBH1750s, "bh",
-                                    L_NUMBER_OF_BH1750_SENSORS);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
+                            Device->configuration.noOfBH1750s, "bh",
+                            L_NUMBER_OF_BH1750_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
-                                    Device->configuration.noOfBMEX80s, "b6",
-                                    L_NUMBER_OF_BMEX80_SENSORS);
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
+                            Device->configuration.noOfBMEX80s, "b6",
+                            L_NUMBER_OF_BMEX80_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Firmware->Pro.valid) {
-    body += generateHardwareItemsList(AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
-                                      Device->configuration.noOfAS3935s, "a3",
-                                      L_NUMBER_OF_AS3935_SENSORS);
+    generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+                              Device->configuration.noOfAS3935s, "a3",
+                              L_NUMBER_OF_AS3935_SENSORS);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Firmware->Pro.valid) {
-    body += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
+    page += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
             "value=\"1\"";
-    body += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
-    body += L_DO_MEASURE_ADC;
-    body += "</label></div>";
+    page += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
+    page += L_DO_MEASURE_ADC;
+    page += "</label></div>";
   }
 
 #endif
@@ -519,10 +509,7 @@ String AFESitesGenerator::addDeviceConfiguration() {
       language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
 
-  body += "</fieldset>";
-
-  page += addConfigurationBlock(L_HARDWARE_CONFIGURATION,
-                                L_HARDWARE_CONFIGURATION_INFO, body);
+  page += "</fieldset></div>";
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   body = "<fieldset>";
@@ -536,69 +523,62 @@ String AFESitesGenerator::addDeviceConfiguration() {
   page += addConfigurationBlock(L_CONTROLLED_GATES, "", body);
 #endif
 
-  body = "<fieldset>";
-
-  body += "<div class=\"cc\"><label><input name=\"h\" "
+  addConfigurationBlock(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
+  page += "<div class=\"cc\"><label><input name=\"h\" "
           "type=\"checkbox\" value=\"1\"";
-  body += configuration.api.http ? " checked=\"checked\"" : "";
-  body += ">HTTP API</label></div><div class=\"cc\"><label>";
+  page += configuration.api.http ? " checked=\"checked\"" : "";
+  page += ">HTTP API</label></div><div class=\"cc\"><label>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  body += "<input name=\"m\" type=\"radio\" "
+  page += "<input name=\"m\" type=\"radio\" "
           "value=\"1\"";
-  body += configuration.api.domoticz ? " checked=\"checked\"" : "";
-  body += ">Domoticz HTTP API</label></div>";
-  body += "<div class=\"cc\"><label><input name=\"m\" "
+  page += configuration.api.domoticz ? " checked=\"checked\"" : "";
+  page += ">Domoticz HTTP API</label></div>";
+  page += "<div class=\"cc\"><label><input name=\"m\" "
           "type=\"radio\" value=\"2\"";
-  body += configuration.api.mqtt ? " checked=\"checked\"" : "";
-  body += ">Domoticz MQTT API";
+  page += configuration.api.mqtt ? " checked=\"checked\"" : "";
+  page += ">Domoticz MQTT API";
 #else
-  body += "<input name=\"m\" "
+  page += "<input name=\"m\" "
           "type=\"checkbox\" value=\"1\"";
-  body += configuration.api.mqtt ? " checked=\"checked\"" : "";
-  body += ">MQTT API</label></div><div class=\"cc\">";
+  page += configuration.api.mqtt ? " checked=\"checked\"" : "";
+  page += ">MQTT API</label></div><div class=\"cc\">";
 #endif
 
-  body += "</label></div></fieldset>";
-
-  page += addConfigurationBlock(L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO,
-                                body);
-
-  return page;
+  page += "</label></div></fieldset></div>";
 }
 
-String AFESitesGenerator::addConnectingSite() {
+void AFESitesGenerator::addConnectingSite(String &page) {
   NETWORK configuration = Data.getNetworkConfiguration();
-  String body = "<p>";
-  body += L_DEVICE_CONNECTS;
-  body += ": <strong>";
-  body += configuration.ssid;
-  body += "</strong> [";
-  body += configuration.password;
-  body += "]</p><ul><li>";
-  body += L_CONNECT_TO;
-  body += ": ";
-  body += configuration.ssid;
-  body += "</li><li>";
-  body += L_SEARCH_FOR_IP_ADDRESS;
-  body += ": ";
-  body += WiFi.macAddress();
-  body += "</li><li>";
-  body += L_FINISH_NETWORK_CONFIGURATION;
-  body += "</li></ul>";
-  return body;
+  page += "<p>";
+  page += L_DEVICE_CONNECTS;
+  page += ": <strong>";
+  page += configuration.ssid;
+  page += "</strong> [";
+  page += configuration.password;
+  page += "]</p><ul><li>";
+  page += L_CONNECT_TO;
+  page += ": ";
+  page += configuration.ssid;
+  page += "</li><li>";
+  page += L_SEARCH_FOR_IP_ADDRESS;
+  page += ": ";
+  page += WiFi.macAddress();
+  page += "</li><li>";
+  page += L_FINISH_NETWORK_CONFIGURATION;
+  page += "</li></ul>";
 }
 
-String AFESitesGenerator::addNetworkConfiguration() {
-
+void AFESitesGenerator::addNetworkConfiguration(String &page) {
   NETWORK configuration;
   configuration = Data.getNetworkConfiguration();
 
-  String body = "<fieldset>";
+  addConfigurationBlock(page, L_NETWORK_CONFIGURATION,
+                        L_NETWORK_CONFIGURATION_INFO);
   char _ssid[sizeof(configuration.ssid)];
-  body += "<div class=\"cf\"><label>";
-  body += L_SSID;
-  body += "</label><select name=\"s\">";
+  page += "<div class=\"cf\"><label>";
+  page += L_SSID;
+  page += "</label><select name=\"s\">";
 #ifdef DEBUG
   Serial << endl << "Searching for WiFi networks: ";
 #endif
@@ -614,196 +594,173 @@ String AFESitesGenerator::addNetworkConfiguration() {
     Serial << endl << " - " << WiFi.SSID(i);
 #endif
 
-    body += "<option value=\"";
-    body += WiFi.SSID(i);
+    page += "<option value=\"";
+    page += WiFi.SSID(i);
     WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-    body += "\"";
-    body +=
+    page += "\"";
+    page +=
         strcmp(_ssid, configuration.ssid) == 0 ? " selected=\"selected\"" : "";
-    body += ">";
-    body += WiFi.SSID(i);
-    body += "</option>";
+    page += ">";
+    page += WiFi.SSID(i);
+    page += "</option>";
   }
 
-  body += "</select><input type=\"submit\" class =\"b bc\" value=\"";
-  body += L_REFRESH;
-  body += "\" formaction=\"/?o=";
-  body += AFE_CONFIG_SITE_NETWORK;
-  body += "&c=0\"></div>";
-  body += addItem("password", "p", L_PASSWORD, configuration.password, "32");
+  page += "</select><input type=\"submit\" class =\"b bc\" value=\"";
+  page += L_REFRESH;
+  page += "\" formaction=\"/?o=";
+  page += AFE_CONFIG_SITE_NETWORK;
+  page += "&c=0\"></div>";
+  addItem(page, "password", "p", L_PASSWORD, configuration.password, "32");
 
   char _ip[18];
   WiFi.macAddress().toCharArray(_ip, 18);
+  addItem(page, "text", "m", "MAC", _ip, "?", "?", "?", "?", "?", true);
+  page += "</fieldset></div>";
 
-  body += addItem("text", "m", "MAC", _ip, "?", "?", "?", "?", "?", true);
+  addConfigurationBlock(page, L_DEVICE_IP, L_DEVICE_IP_INFO);
 
-  body += "</fieldset>";
+  page += "<div class=\"cc\"><label><input name=\"d\" "
+          "type=\"checkbox\" value=\"1\"";
+  page += (configuration.isDHCP ? " checked=\"checked\"" : "");
+  page += "> ";
+  page += L_DHCP_ENABLED;
+  page += "?</label></div>";
 
-  String page = addConfigurationBlock(L_NETWORK_CONFIGURATION,
-                                      L_NETWORK_CONFIGURATION_INFO, body);
+  addItem(page, "text", "i1", L_IP_ADDRESS, configuration.ip);
+  addItem(page, "text", "i2", L_GATEWAY, configuration.gateway);
+  addItem(page, "text", "i3", L_SUBNET, configuration.subnet);
 
-  body = "<fieldset><div class=\"cc\"><label><input name=\"d\" "
-         "type=\"checkbox\" value=\"1\"";
-  body += (configuration.isDHCP ? " checked=\"checked\"" : "");
-  body += "> ";
-  body += L_DHCP_ENABLED;
-  body += "?</label></div>";
-
-  body += addItem("text", "i1", L_IP_ADDRESS, configuration.ip);
-  body += addItem("text", "i2", L_GATEWAY, configuration.gateway);
-  body += addItem("text", "i3", L_SUBNET, configuration.subnet);
-
-  body += "</fieldset>";
-
-  page += addConfigurationBlock(L_DEVICE_IP, L_DEVICE_IP_INFO, body);
+  page += "</fieldset></div>";
 
   char _int[4];
   sprintf(_int, "%d", configuration.noConnectionAttempts);
 
-  body = "<fieldset>";
-  body += addItem("number", "na", L_NUMBER_OF_CONNECTIONS, _int, "?", "1",
-                  "255", "1");
+  addConfigurationBlock(page, L_ADVANCED, "");
+  addItem(page, "number", "na", L_NUMBER_OF_CONNECTIONS, _int, "?", "1", "255",
+          "1");
 
   sprintf(_int, "%d", configuration.waitTimeConnections);
-  body += addItem("number", "wc", L_TIME_BETWEEN_CONNECTIONS, _int, "?", "1",
-                  "255", "1", L_SECONDS);
+  addItem(page, "number", "wc", L_TIME_BETWEEN_CONNECTIONS, _int, "?", "1",
+          "255", "1", L_SECONDS);
 
   sprintf(_int, "%d", configuration.waitTimeSeries);
-  body += addItem("number", "ws", L_SLEEP_TIME, _int, "?", "1", "255", "1",
-                  L_SECONDS);
+  addItem(page, "number", "ws", L_SLEEP_TIME, _int, "?", "1", "255", "1",
+          L_SECONDS);
 
-  body += "</fieldset>";
-
-  page += addConfigurationBlock(L_ADVANCED, "", body);
-
-  return page;
+  page += "</fieldset></div>";
 }
 
-String AFESitesGenerator::addMQTTBrokerConfiguration() {
+void AFESitesGenerator::addMQTTBrokerConfiguration(String &page) {
   MQTT configuration;
   configuration = Data.getMQTTConfiguration();
 
-  String body = "<fieldset>";
-
-  body += addItem("text", "h", "Hostname", configuration.host, "32");
-  body += addItem("text", "a", L_IP_ADDRESS, configuration.ip);
-
+  addConfigurationBlock(page, "MQTT Broker", L_MQTT_CONFIGURATION_INFO);
+  addItem(page, "text", "h", "Hostname", configuration.host, "32");
+  addItem(page, "text", "a", L_IP_ADDRESS, configuration.ip);
   char _number[7];
   sprintf(_number, "%d", configuration.port);
-  body += addItem("number", "p", "Port", _number, "?", "0", "65535", "1");
+  addItem(page, "number", "p", "Port", _number, "?", "0", "65535", "1");
+  addItem(page, "text", "u", L_USERNAME, configuration.user, "32");
+  addItem(page, "password", "s", L_PASSWORD, configuration.password, "32");
+  sprintf(_number, "%d", configuration.timeout);
+  addItem(page, "number", "t", L_TIMEOUT, _number, "?", "0", "30000", "1",
+          L_MILISECONDS);
+  page += "</fieldset></div>";
 
-  body += addItem("text", "u", L_USERNAME, configuration.user, "32");
-  body += addItem("password", "s", L_PASSWORD, configuration.password, "32");
-  sprintf(_number, "%d", configuration.timeout);  
-  body += addItem("number", "t", L_TIMEOUT, _number, "?", "0", "30000", "1",L_MILISECONDS);
-
-  body += "</fieldset>";
-
-  String page =
-      addConfigurationBlock("MQTT Broker", L_MQTT_CONFIGURATION_INFO, body);
-
-  body = "<fieldset>";
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char _idx[7];
   sprintf(_idx, "%d", configuration.lwt.idx);
-  body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
-  body += "</fieldset>";
-  page += addConfigurationBlock(L_MQTT_IDX_LWT, L_NO_IF_IDX_0, body);
+  addConfigurationBlock(page, L_MQTT_IDX_LWT, L_NO_IF_IDX_0);
+  addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+  page += "</fieldset></div>";
 #else
-  body += addItem("text", "t0", L_MQTT_TOPIC, configuration.lwt.topic, "64");
-  body += "</fieldset>";
-  page += addConfigurationBlock(L_MQTT_TOPIC_LWT, L_MQTT_TOPIC_EMPTY, body);
+  addConfigurationBlock(page, L_MQTT_TOPIC_LWT, L_MQTT_TOPIC_EMPTY);
+  addItem(page, "text", "t0", L_MQTT_TOPIC, configuration.lwt.topic, "64");
+  page += "</fieldset></div>";
 #endif
-
-  return page;
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-String AFESitesGenerator::addDomoticzServerConfiguration() {
+void AFESitesGenerator::addDomoticzServerConfiguration(String &page) {
   DOMOTICZ configuration;
   configuration = Data.getDomoticzConfiguration();
 
-  String body = "<fieldset>";
+  addConfigurationBlock(page, L_DOMOTICZ_CONFIGURATION,
+                        L_DOMOTICZ_CONFIGURATION_INFO);
+  page += "<div class=\"cf\"><label>";
+  page += L_PROTOCOL;
+  page += "</label><select name=\"t\"><option value=\"0\"";
+  page += configuration.protocol == 0 ? " selected=\"selected\"" : "";
+  page += ">http://</option><option value=\"1\"";
+  page += configuration.protocol == 1 ? " selected=\"selected\"" : "";
+  page += ">https://</option></select></div>";
 
-  body += "<div class=\"cf\"><label>";
-  body += L_PROTOCOL;
-  body += "</label><select name=\"t\"><option value=\"0\"";
-  body += configuration.protocol == 0 ? " selected=\"selected\"" : "";
-  body += ">http://</option><option value=\"1\"";
-  body += configuration.protocol == 1 ? " selected=\"selected\"" : "";
-  body += ">https://</option></select></div>";
-
-  body += addItem("text", "h", "Hostname/IP", configuration.host, "40");
+  addItem(page, "text", "h", "Hostname/IP", configuration.host, "40");
 
   char _number[6];
   sprintf(_number, "%d", configuration.port);
-  body += addItem("number", "p", "Port", _number, "?", "0", "65535", "1");
-  body += addItem("text", "u", L_USERNAME, configuration.user, "32");
-  body += addItem("password", "s", L_PASSWORD, configuration.password, "32");
+  addItem(page, "number", "p", "Port", _number, "?", "0", "65535", "1");
+  addItem(page, "text", "u", L_USERNAME, configuration.user, "32");
+  addItem(page, "password", "s", L_PASSWORD, configuration.password, "32");
 
-  body += "</fieldset>";
-
-  return addConfigurationBlock(L_DOMOTICZ_CONFIGURATION,
-                               L_DOMOTICZ_CONFIGURATION_INFO, body);
+  page += "</fieldset></div>";
 }
 #endif
 
-String AFESitesGenerator::addPasswordConfigurationSite() {
+void AFESitesGenerator::addPasswordConfigurationSite(String &page) {
   PASSWORD configuration = Data.getPasswordConfiguration();
-
-  String body = "<fieldset><div class=\"cc\"><label><input name=\"r\" "
-                "type=\"checkbox\" value=\"1\"";
-  body += (configuration.protect ? " checked=\"checked\"" : "");
-  body += "> ";
-  body += L_PROTECT_BY_PASSWORD;
-  body += "?</label></div>";
+  addConfigurationBlock(page, L_SET_PASSWORD_TO_PANEL, "");
+  page += "<div class=\"cc\"><label><input name=\"r\" "
+          "type=\"checkbox\" value=\"1\"";
+  page += (configuration.protect ? " checked=\"checked\"" : "");
+  page += "> ";
+  page += L_PROTECT_BY_PASSWORD;
+  page += "?</label></div>";
 
   if (configuration.protect) {
-    body += addItem("text", "p", L_PASSWORD, configuration.password, "8");
+    addItem(page, "text", "p", L_PASSWORD, configuration.password, "8");
   }
-  body += "</fieldset>";
-
-  return addConfigurationBlock(L_SET_PASSWORD_TO_PANEL, "", body);
+  page += "</fieldset></div>";
 }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-String AFESitesGenerator::addLEDConfiguration(uint8_t id) {
+void AFESitesGenerator::addLEDConfiguration(String &page, uint8_t id) {
   LED configuration;
   configuration = Data.getLEDConfiguration(id);
 
-  String body = "<fieldset>";
+  char title[7];
+  sprintf(title, "LED #%d", id + 1);
+  addConfigurationBlock(page, title, "");
   char field[13];
   sprintf(field, "g%d", id);
-  body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO(field, configuration.gpio);
-  body += "<label style=\"width: 300px;\"><input name=\"o";
-  body += id;
-  body += "\" type=\"checkbox\" value=\"1\"";
-  body += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
-  body += ">";
-  body += L_CHANGE_LED_INDICATION;
-  body += "</label></div></fieldset>";
-
-  return addConfigurationBlock("LED #" + String(id + 1), "", body);
+  page += "<div class=\"cf\">";
+  generateConfigParameter_GPIO(page, field, configuration.gpio);
+  page += "<label style=\"width: 300px;\"><input name=\"o";
+  page += id;
+  page += "\" type=\"checkbox\" value=\"1\"";
+  page += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
+  page += ">";
+  page += L_CHANGE_LED_INDICATION;
+  page += "</label></div></fieldset></div>";
 }
 
-String AFESitesGenerator::addSystemLEDConfiguration() {
+void AFESitesGenerator::addSystemLEDConfiguration(String &page) {
   uint8_t configuration = Data.getSystemLedID();
-
-  String body = "<fieldset>";
-
-  body += generateHardwareList(Device->configuration.noOfLEDs, configuration,
-                               "s", "LED", 0, AFE_HARDWARE_ITEM_NOT_EXIST);
-
-  body += "</fieldset>";
-
-  return addConfigurationBlock(L_SYSTEM_LED, L_SYSTEM_LED_INFO, body);
+  addConfigurationBlock(page, L_SYSTEM_LED, L_SYSTEM_LED_INFO);
+  generateHardwareList(page, Device->configuration.noOfLEDs, configuration, "s",
+                       "LED", 0, AFE_HARDWARE_ITEM_NOT_EXIST);
+  page += "</fieldset></div>";
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
+void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
   RELAY configuration = Data.getRelayConfiguration(id);
+
+  char title[23];
+  sprintf(title, "%s #%d", L_RELAY, id + 1);
+
+  addConfigurationBlock(page, title, "");
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
@@ -818,10 +775,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
     }
   }
 #endif
-
-  String body = "<fieldset>";
-
-  body += generateConfigParameter_GPIO("g", configuration.gpio);
+  generateConfigParameter_GPIO(page, "g", configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not
@@ -829,84 +783,73 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-    body += addItem("text", "n", L_NAME, configuration.name, "16");
+    addItem(page, "text", "n", L_NAME, configuration.name, "16");
+    page += "<p class=\"cm\">";
+    page += L_DEFAULT_VALUES;
+    page += "</p><div class=\"cf\"><label>";
+    page += L_DEFAULT_POWER_RESTORED;
+    page += "</label><select name=\"pr\"><option value=\"0\"";
+    page += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
+    page += ">";
+    page += L_NO_ACTION;
+    page += "</option><option value=\"1\"";
+    page += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
+    page += ">";
+    page += L_OFF;
+    page += "</option><option value=\"2\"";
+    page += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
+    page += ">";
+    page += L_ON;
+    page += "</option><option value=\"3\"";
+    page += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
+    page += ">";
+    page += L_LAST_KNOWN_STATE;
+    page += "</option><option value=\"4\"";
+    page += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
+    page += ">";
+    page += L_OPPOSITE_TO_LAST_KNOWN_STATE;
+    page += "</option></select></div>";
 
-    body += "<p class=\"cm\">";
-    body += L_DEFAULT_VALUES;
-    body += "</p><div class=\"cf\"><label>";
-    body += L_DEFAULT_POWER_RESTORED;
-    body += "</label><select name=\"pr\"><option value=\"0\"";
-    body += (configuration.state.powerOn == 0 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += L_NO_ACTION;
-    body += "</option><option value=\"1\"";
-    body += (configuration.state.powerOn == 1 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += L_OFF;
-    body += "</option><option value=\"2\"";
-    body += (configuration.state.powerOn == 2 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += L_ON;
-    body += "</option><option value=\"3\"";
-    body += (configuration.state.powerOn == 3 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += L_LAST_KNOWN_STATE;
-    body += "</option><option value=\"4\"";
-    body += (configuration.state.powerOn == 4 ? " selected=\"selected\"" : "");
-    body += ">";
-    body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
-    body += "</option></select></div>";
+    if (Device->configuration.api.mqtt) {
 
-    if (
-
-        Device->configuration.api.mqtt) {
-
-      body += "<div class=\"cf\">";
-      body += "<label>";
-      body += L_DEFAULT_MQTT_CONNECTED;
-      body += "</label>";
-      body += "<select  name=\"mc\">";
-      body += "<option value=\"0\"";
-      body += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
+      page += "<div class=\"cf\"><label>";
+      page += L_DEFAULT_MQTT_CONNECTED;
+      page += "</label><select  name=\"mc\"><option value=\"0\"";
+      page += (configuration.state.MQTTConnected == 0 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_NO_ACTION;
-      body += "</option>";
-      body += "<option value=\"1\"";
-      body += (configuration.state.MQTTConnected == 1 ? " selected=\"selected\""
+      page += ">";
+      page += L_NO_ACTION;
+      page += "</option><option value=\"1\"";
+      page += (configuration.state.MQTTConnected == 1 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_OFF;
-      body += "</option>";
-      body += "<option value=\"2\"";
-      body += (configuration.state.MQTTConnected == 2 ? " selected=\"selected\""
+      page += ">";
+      page += L_OFF;
+      page += "</option><option value=\"2\"";
+      page += (configuration.state.MQTTConnected == 2 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_ON;
-      body += "</option>";
-      body += "<option value=\"3\"";
-      body += (configuration.state.MQTTConnected == 3 ? " selected=\"selected\""
+      page += ">";
+      page += L_ON;
+      page += "</option><option value=\"3\"";
+      page += (configuration.state.MQTTConnected == 3 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_LAST_KNOWN_STATE;
-      body += "</option>";
-      body += "<option value=\"4\"";
-      body += (configuration.state.MQTTConnected == 4 ? " selected=\"selected\""
+      page += ">";
+      page += L_LAST_KNOWN_STATE;
+      page += "</option><option value=\"4\"";
+      page += (configuration.state.MQTTConnected == 4 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_OPPOSITE_TO_LAST_KNOWN_STATE;
-      body += "</option>";
+      page += ">";
+      page += L_OPPOSITE_TO_LAST_KNOWN_STATE;
+      page += "</option>";
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      body += "<option value=\"5\"";
-      body += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
+      page += "<option value=\"5\"";
+      page += (configuration.state.MQTTConnected == 5 ? " selected=\"selected\""
                                                       : "");
-      body += ">";
-      body += L_DEFAULT_GET_FROM_MQTT;
-      body += "</option>";
+      page += ">";
+      page += L_DEFAULT_GET_FROM_MQTT;
+      page += "</option>";
 #endif
-      body += "</select>";
-      body += "</div>";
+      page += "</select></div>";
     }
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -918,9 +861,9 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
    * shown if the relay is assigned to the Gate */
   if (!isGateRelay) {
 #endif
-    body += "<br><p class=\"cm\">";
-    body += L_AUTOMATIC_SWITCHING_OFF;
-    body += "</p>";
+    page += "<br><p class=\"cm\">";
+    page += L_AUTOMATIC_SWITCHING_OFF;
+    page += "</p>";
 #ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
@@ -930,15 +873,15 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (isGateRelay) {
-    body += addItem("number", "ot", L_IMPULSE_DURATION, _number, "?", "1",
-                    "99999", "1", L_MILISECONDS);
+    addItem(page, "number", "ot", L_IMPULSE_DURATION, _number, "?", "1",
+            "99999", "1", L_MILISECONDS);
   } else {
-    body += addItem("number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0",
-                    "86400", "0.1", L_SECONDS);
+    addItem(page, "number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0",
+            "86400", "0.1", L_SECONDS);
   }
 #else // Not a GATE
-  body += addItem("number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0",
-                  "86400", "0.1", L_SECONDS);
+  addItem(page, "number", "ot", L_SWITCH_OFF_AFTER, _number, "?", "0", "86400",
+          "0.1", L_SECONDS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -951,24 +894,19 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
     {
-
-      body += "<br><p class=\"cm\">";
-      body += L_THERMAL_PROTECTION;
-      body += "</p>";
-
-      body += "<div class=\"cf\">";
-      body += "<label>";
-      body += L_SWITCH_OFF_ABOVE;
-      body += "</label>";
-      body += "<input name=\"tp" + String(id) +
-              "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
-      body += configuration.thermalProtection;
-      body += "\">";
-      body += "<span class=\"hint\">";
-      body += L_RANGE;
-      body += ": -55C : +125C (-67F : +259F). ";
-      body += L_NO_ACTION_IF_0;
-      body += "</span></div>";
+      page += "<br><p class=\"cm\">";
+      page += L_THERMAL_PROTECTION;
+      page += "</p><div class=\"cf\"><label>";
+      page += L_SWITCH_OFF_ABOVE;
+      page += "</label><input name=\"tp";
+      page += id;
+      page += "\" type=\"number\" step=\"1\" min=\"-67\" max=\"259\"  value=\"";
+      page += configuration.thermalProtection;
+      page += "\"><span class=\"hint\">";
+      page += L_RANGE;
+      page += ": -55C : +125C (-67F : +259F). ";
+      page += L_NO_ACTION_IF_0;
+      page += "</span></div>";
     }
 #endif
 
@@ -979,14 +917,13 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
+    page += "<br><p class=\"cm\">";
+    page += L_SELECT_LED_4_RELAY;
+    page += "</p>";
 
-    body += "<br><p class=\"cm\">";
-    body += L_SELECT_LED_4_RELAY;
-    body += "</p>";
-
-    body += generateHardwareList(Device->configuration.noOfLEDs,
-                                 configuration.ledID, "l", "LED", 0,
-                                 AFE_HARDWARE_ITEM_NOT_EXIST);
+    generateHardwareList(page, Device->configuration.noOfLEDs,
+                         configuration.ledID, "l", "LED", 0,
+                         AFE_HARDWARE_ITEM_NOT_EXIST);
 
 #endif
 
@@ -995,12 +932,7 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
   }
 #endif
 
-  body += "</fieldset>";
-
-  char title[23];
-  sprintf(title, "%s #%d", L_RELAY, id + 1);
-
-  String page = addConfigurationBlock(title, "", body);
+  page += "</fieldset></div>";
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* Excluded code below for Gate functionality and the relay assigned to
@@ -1010,29 +942,23 @@ String AFESitesGenerator::addRelayConfiguration(uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-
-      body = "<fieldset>";
+      addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
       char _idx[7];
       sprintf(_idx, "%d", configuration.domoticz.idx);
-      body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
-
-      body += "</fieldset>";
-
-      page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+      addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+      page += "</fieldset></div>";
     }
 #else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addItem(page,"text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   }
 #endif
-  return page;
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -1075,146 +1001,135 @@ String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-String AFESitesGenerator::addSwitchConfiguration(uint8_t id) {
-
-  SWITCH configuration;
-  configuration = Data.getSwitchConfiguration(id);
+void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
 #endif
 
-  String body = "<fieldset>";
-  body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO("g", configuration.gpio);
-  body += "</div><div class=\"cf\"><label>";
-  body += L_FUNCTIONALITY;
-  body += "</label><select name=\"f\"><option value=\"";
-  body += AFE_SWITCH_FUNCTIONALITY_NONE;
-  body += "\"";
-  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_NONE
+  char title[23];
+  sprintf(title, "%s #%d", L_SWITCH_BUTTON, id + 1);
+  addConfigurationBlock(page, title, "");
+
+  SWITCH configuration = Data.getSwitchConfiguration(id);
+  page += "<div class=\"cf\">";
+  
+  generateConfigParameter_GPIO(page, "g", configuration.gpio);
+  page += "</div><div class=\"cf\"><label>";
+  page += L_FUNCTIONALITY;
+  page += "</label><select name=\"f\"><option value=\"";
+  page += AFE_SWITCH_FUNCTIONALITY_NONE;
+  page += "\"";
+  page += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_NONE
                ? " selected=\"selected\""
                : "");
-  body += ">";
-  body += L_NONE;
-  body += "</option><option value=\"";
-  body += AFE_SWITCH_FUNCTIONALITY_MULTI;
-  body += "\"";
-  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI
+  page += ">";
+  page += L_NONE;
+  page += "</option><option value=\"";
+  page += AFE_SWITCH_FUNCTIONALITY_MULTI;
+  page += "\"";
+  page += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI
                ? " selected=\"selected\""
                : "");
-  body += ">";
-  body += L_SYSTEM_BUTTON;
-  body += "</option>";
+  page += ">";
+  page += L_SYSTEM_BUTTON;
+  page += "</option>";
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
-  body += "<option value=\"";
-  body += AFE_SWITCH_FUNCTIONALITY_RELAY;
-  body += "\"";
-  body += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_RELAY
+  page += "<option value=\"";
+  page += AFE_SWITCH_FUNCTIONALITY_RELAY;
+  page += "\"";
+  page += (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_RELAY
                ? " selected=\"selected\""
                : "");
-  body += ">";
-  body += L_CONTROL_RELAY;
-  body += "</option></select></div><div class=\"cf\"><label>";
-  body += L_RELAY_CONTROLLED_BY_SWITCH;
-  body += "</label><select name=\"r\"><option value=\"";
-  body += AFE_HARDWARE_ITEM_NOT_EXIST;
-  body += "\"";
-  body += configuration.relayID == AFE_HARDWARE_ITEM_NOT_EXIST
+  page += ">";
+  page += L_CONTROL_RELAY;
+  page += "</option></select></div><div class=\"cf\"><label>";
+  page += L_RELAY_CONTROLLED_BY_SWITCH;
+  page += "</label><select name=\"r\"><option value=\"";
+  page += AFE_HARDWARE_ITEM_NOT_EXIST;
+  page += "\"";
+  page += configuration.relayID == AFE_HARDWARE_ITEM_NOT_EXIST
               ? " selected=\"selected\""
               : "";
-  body += ">";
-  body += L_NONE;
-  body += "</option>";
+  page += ">";
+  page += L_NONE;
+  page += "</option>";
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t relayIsForGate;
 #endif
 
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
-    body += "<option value=\"";
-    body += i;
-    body += "\"";
-    body += configuration.relayID == i ? " selected=\"selected\"" : "";
-    body += ">";
+    page += "<option value=\"";
+    page += i;
+    page += "\"";
+    page += configuration.relayID == i ? " selected=\"selected\"" : "";
+    page += ">";
 #ifdef AFE_CONFIG_HARDWARE_GATE
     relayIsForGate = false;
     for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
       gateConfiguration = Data.getGateConfiguration(j);
       if (i == gateConfiguration.relayId) {
-        body += L_GATE;
-        body += ": ";
-        body += gateConfiguration.name;
+        page += L_GATE;
+        page += ": ";
+        page += gateConfiguration.name;
         relayIsForGate = true;
         break;
       }
     }
     if (!relayIsForGate) {
-      body += L_RELAY;
-      body += ": ";
-      body += i + 1;
+      page += L_RELAY;
+      page += ": ";
+      page += i + 1;
     }
 #else
-    body += L_RELAY;
-    body += ": ";
-    body += i + 1;
+    page += L_RELAY;
+    page += ": ";
+    page += i + 1;
 #endif
-    body += "</option>";
+    page += "</option>";
   }
-  body += "</select></div>";
+  page += "</select></div>";
 
 #endif
 
-  body += "<div class=\"cf\"><label>";
-  body += L_TYPE;
-  body += "</label><select name=\"m\"><option value=\"0\"";
-  body += (configuration.type == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_MONOSTABLE;
-  body += "</option><option value=\"1\"";
-  body += (configuration.type == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_BISTABLE;
-  body += "</option></select></div><br><p class=\"cm\">";
-  body += L__SENSITIVENESS_HINT;
-  body += "</p>";
+  page += "<div class=\"cf\"><label>";
+  page += L_TYPE;
+  page += "</label><select name=\"m\"><option value=\"0\"";
+  page += (configuration.type == 0 ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_MONOSTABLE;
+  page += "</option><option value=\"1\"";
+  page += (configuration.type == 1 ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_BISTABLE;
+  page += "</option></select></div><br><p class=\"cm\">";
+  page += L__SENSITIVENESS_HINT;
+  page += "</p>";
 
   char _number[4];
   sprintf(_number, "%d", configuration.sensitiveness);
 
-  body += addItem("number", "s", L_SENSITIVENESS, _number, "?", "0", "999", "1",
-                  L_MILISECONDS);
-  body += "</fieldset>";
-
-  char title[23];
-  sprintf(title, "%s #%d", L_SWITCH_BUTTON, id + 1);
-
-  String page = addConfigurationBlock(title, "", body);
+  addItem(page, "number", "s", L_SENSITIVENESS, _number, "?", "0", "999", "1",
+          L_MILISECONDS);
+  page += "</fieldset></div>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
-    body += addItem("number", "x", "IDX", _idx, "?", "0", "999999", "1");
-
-    body += "</fieldset>";
-
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
   }
 #else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
 #endif
-
-  return page;
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1869,765 +1784,701 @@ const String AFESitesGenerator::generateGateStatesList(uint8_t id, byte state) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-String AFESitesGenerator::addHPMA115S0Configuration(uint8_t id) {
+void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
   HPMA115S0 configuration = Data.getHPMA115S0SensorConfiguration(id);
-
-  String body = "<fieldset>";
-
-  body += addItem("text", "n", L_NAME, configuration.name, "16");
+  addConfigurationBlock(page, L_PARTICLE_SENSOR, "");
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
 
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
-                  "86400", "f", L_SECONDS);
+  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+          "86400", "f", L_SECONDS);
 
-  body += "<br><br>";
-  body += "<p class=\"cm\">";
-  body += L_SENSOR_POST_SLEEP_INTERVAL;
-  body += "</p>";
+  page += "<br><br>";
+  page += "<p class=\"cm\">";
+  page += L_SENSOR_POST_SLEEP_INTERVAL;
+  page += "</p>";
 
   sprintf(_number, "%d", configuration.timeToMeasure);
-  body += addItem("number", "m", L_MEASURE_AFTER, _number, "?", "0", "999", "1",
-                  L_SECONDS);
+  addItem(page, "number", "m", L_MEASURE_AFTER, _number, "?", "0", "999", "1",
+          L_SECONDS);
+  page += "</fieldset></div>";
 
-  body += "</fieldset>";
-
-  String page = addConfigurationBlock(L_PARTICLE_SENSOR, "", body);
-
-  if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
 
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
-    body +=
-        addItem("number", "x2", "IDX PM2.5", _number, "?", "0", "999999", "1");
-
+    addItem(page, "number", "x2", "IDX PM2.5", _number, "?", "0", "999999",
+            "1");
     sprintf(_number, "%d", configuration.domoticz.pm10.idx);
-    body +=
-        addItem("number", "x1", "IDX PM10", _number, "?", "0", "999999", "1");
-
-    body += "</fieldset>";
-
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    addItem(page, "number", "x1", "IDX PM10", _number, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
   }
-
+#else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY);
+    addItem(page,"text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
-
-  return page;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-String AFESitesGenerator::addBMEX80Configuration(uint8_t id) {
+void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
   BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
+
+
   char _number[7];
-  String page;
-  String body = "<fieldset>";
 
-  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
+  addConfigurationBlock(page, L_BMEX80_SENSOR, "");
 
-  body += "<div class=\"cf\"><label>";
-  body += L_BMEX80_SENSOR_TYPE;
-  body += "</label><select name=\"b\"><option value=\"";
-  body += AFE_BMX_UNKNOWN_SENSOR;
-  body += "\"";
-  body +=
+  addDeviceI2CAddressSelection(page, configuration.i2cAddress);
+
+  page += "<div class=\"cf\"><label>";
+  page += L_BMEX80_SENSOR_TYPE;
+  page += "</label><select name=\"b\"><option value=\"";
+  page += AFE_BMX_UNKNOWN_SENSOR;
+  page += "\"";
+  page +=
       (configuration.type == AFE_BMX_UNKNOWN_SENSOR ? " selected=\"selected\""
                                                     : "");
-  body += ">";
-  body += L_NONE;
-  body += "</option><option value=\"";
-  body += AFE_BMP180_SENSOR;
-  body += "\"";
-  body +=
+  page += ">";
+  page += L_NONE;
+  page += "</option><option value=\"";
+  page += AFE_BMP180_SENSOR;
+  page += "\"";
+  page +=
       (configuration.type == AFE_BMP180_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BMx085/BMx180</option><option value=\"";
-  body += AFE_BME280_SENSOR;
-  body += "\"";
-  body +=
+  page += ">BMx085/BMx180</option><option value=\"";
+  page += AFE_BME280_SENSOR;
+  page += "\"";
+  page +=
       (configuration.type == AFE_BME280_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BMx280</option><option value=\"";
-  body += AFE_BME680_SENSOR;
-  body += "\"";
-  body +=
+  page += ">BMx280</option><option value=\"";
+  page += AFE_BME680_SENSOR;
+  page += "\"";
+  page +=
       (configuration.type == AFE_BME680_SENSOR ? " selected=\"selected\"" : "");
-  body += ">BMx680</option></select></div>";
+  page += ">BMx680</option></select></div>";
 
-  body += "<input type=\"submit\" class=\"b bw\" value=\"";
-  body += L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR;
-  body += "\"><br><br>";
+  page += "<input type=\"submit\" class=\"b bw\" value=\"";
+  page += L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR;
+  page += "\"><br><br>";
 
-  body += addItem("text", "n", L_NAME, configuration.name, "16");
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
 
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
-                  "86400", "1", L_SECONDS);
+  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+          "86400", "1", L_SECONDS);
 
-  body += "</fieldset>";
-
-  page = addConfigurationBlock(L_BMEX80_SENSOR, "", body);
+  page += "</fieldset></div>";
 
   if (configuration.type != AFE_BMX_UNKNOWN_SENSOR) {
 
     /* Sensor's units */
-    body = "<fieldset>";
+    addConfigurationBlock(page, L_UNITS, "");
 
-    body += "<div class=\"cf\"><label>";
-    body += L_TEMPERATURE;
-    body += "</label><select name=\"tu\"><option value=\"";
-    body += AFE_TEMPERATURE_UNIT_CELSIUS;
-    body += "\"";
-    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+    page += "<div class=\"cf\"><label>";
+    page += L_TEMPERATURE;
+    page += "</label><select name=\"tu\"><option value=\"";
+    page += AFE_TEMPERATURE_UNIT_CELSIUS;
+    page += "\"";
+    page += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
                  ? " selected=\"selected\""
                  : "");
-    body += ">C</option><option value=\"";
-    body += AFE_TEMPERATURE_UNIT_FAHRENHEIT;
-    body += "\"";
-    body += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+    page += ">C</option><option value=\"";
+    page += AFE_TEMPERATURE_UNIT_FAHRENHEIT;
+    page += "\"";
+    page += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
                  ? " selected=\"selected\""
                  : "");
-    body += ">F</option></select></div>";
-
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_UNITS, "", body);
+    page += ">F</option></select></div></fieldset><div>";
 
     /* Corrections of sensor values */
-    body = "<fieldset>";
-    sprintf(_number, "%.3f", configuration.temperature.correction);
-    body += addItem("number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
-                    "99.999", "0.001");
+    addConfigurationBlock(page, L_CORRECTIONS, "");
+    sprintf(_number, "%-.3f", configuration.temperature.correction);
+    addItem(page, "number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
+            "99.999", "0.001");
 
     if (configuration.type != AFE_BMP180_SENSOR) {
-      sprintf(_number, "%.3f", configuration.humidity.correction);
-      body += addItem("number", "hc", L_HUMIDITY, _number, "?", "-99.999",
-                      "99.999", "0.001");
+      sprintf(_number, "%-.3f", configuration.humidity.correction);
+      addItem(page, "number", "hc", L_HUMIDITY, _number, "?", "-99.999",
+              "99.999", "0.001");
     }
 
-    sprintf(_number, "%.3f", configuration.pressure.correction);
-    body += addItem("number", "pc", L_PRESSURE, _number, "?", "-999.999",
-                    "999.999", "0.001");
+
+
+
+    sprintf(_number, "%-.3f", configuration.pressure.correction);
+    addItem(page, "number", "pc", L_PRESSURE, _number, "?", "-999.999",
+            "999.999", "0.001");
 
     sprintf(_number, "%d", configuration.altitude);
-    body += addItem("number", "hi", L_ALTITIDE, _number, "?", "-431", "8850",
-                    "1", L_METERS);
+    addItem(page, "number", "hi", L_ALTITIDE, _number, "?", "-431", "8850", "1",
+            L_METERS);
 
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_CORRECTIONS, "", body);
+    page += "</fieldset></div>";
 
-    if (Device->configuration.api.domoticz) {
-      body = "<fieldset>";
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+      addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
 
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
-      body += addItem("number", "i1", L_IDX_TEMPERATURE, _number, "?", "0",
-                      "999999", "1");
+      addItem(page, "number", "i1", L_IDX_TEMPERATURE, _number, "?", "0",
+              "999999", "1");
 
       if (configuration.type != AFE_BMP180_SENSOR) {
         sprintf(_number, "%d", configuration.domoticz.humidity.idx);
-        body += addItem("number", "i2", L_IDX_HUMIDITY, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i2", L_IDX_HUMIDITY, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
-        body += addItem("number", "i3", L_IDX_DEW_POINT, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i3", L_IDX_DEW_POINT, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
-        body += addItem("number", "i4", L_IDX_HEAT_INDEX, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i4", L_IDX_HEAT_INDEX, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d",
                 configuration.domoticz.temperatureHumidityPressure.idx);
-        body += addItem("number", "i0", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i0", L_IDX_TEMP_HUM_BAR, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
-        body += addItem("number", "i12", L_IDX_TEMP_HUM, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i12", L_IDX_TEMP_HUM, _number, "?", "0",
+                "999999", "1");
       }
 
       sprintf(_number, "%d", configuration.domoticz.pressure.idx);
-      body += addItem("number", "i5", L_IDX_PRESSURE, _number, "?", "0",
-                      "999999", "1");
+      addItem(page, "number", "i5", L_IDX_PRESSURE, _number, "?", "0", "999999",
+              "1");
 
       sprintf(_number, "%d", configuration.domoticz.relativePressure.idx);
-      body += addItem("number", "i6", L_IDX_RELATIVE_PRESSURE, _number, "?",
-                      "0", "999999", "1");
+      addItem(page, "number", "i6", L_IDX_RELATIVE_PRESSURE, _number, "?", "0",
+              "999999", "1");
 
       if (configuration.type == AFE_BME680_SENSOR) {
         sprintf(_number, "%d", configuration.domoticz.iaq.idx);
-        body += addItem("number", "i7", L_IDX_IQA, _number, "?", "0", "999999",
-                        "1");
+        addItem(page, "number", "i7", L_IDX_IQA, _number, "?", "0", "999999",
+                "1");
 
         sprintf(_number, "%d", configuration.domoticz.staticIaq.idx);
-        body += addItem("number", "i8", L_IDX_STATIC_IAQ, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i8", L_IDX_STATIC_IAQ, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.co2Equivalent.idx);
-        body += addItem("number", "i9", L_IDX_CO2_EQUVALENT, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i9", L_IDX_CO2_EQUVALENT, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.breathVocEquivalent.idx);
-        body += addItem("number", "i10", L_IDX_BVOC_EQUIVALENT, _number, "?",
-                        "0", "999999", "1");
+        addItem(page, "number", "i10", L_IDX_BVOC_EQUIVALENT, _number, "?", "0",
+                "999999", "1");
 
         sprintf(_number, "%d", configuration.domoticz.gasResistance.idx);
-        body += addItem("number", "i11", L_IDX_GAS_SENSOR, _number, "?", "0",
-                        "999999", "1");
+        addItem(page, "number", "i11", L_IDX_GAS_SENSOR, _number, "?", "0",
+                "999999", "1");
       }
-      body += "</fieldset>";
-      page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+      page += "</fieldset></div>";
     }
-
+#else
     if (Device->configuration.api.mqtt) {
-      body = "<fieldset>";
-      body +=
-          addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-      body += "</fieldset>";
-      page +=
-          addConfigurationBlock(L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY, body);
+      addConfigurationBlock(page, L_MQTT_TOPIC_BMEX80, L_MQTT_TOPIC_EMPTY);
+      addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+      page += "</fieldset></div>";
     }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   }
-
-  return page;
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-String AFESitesGenerator::addBH1750Configuration(uint8_t id) {
+void AFESitesGenerator::addBH1750Configuration(String &page, uint8_t id) {
 
   BH1750 configuration = Data.getBH1750SensorConfiguration(id);
-
-  String body = "<fieldset>";
-
-  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
-
-  body += addItem("text", "n", L_NAME, configuration.name, "16");
+  addConfigurationBlock(page, L_BH1750_SENSOR, "");
+  addDeviceI2CAddressSelection(page, configuration.i2cAddress);
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
 
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
-                  "86400", "1", L_SECONDS);
+  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+          "86400", "1", L_SECONDS);
 
   sprintf(_number, "%d", configuration.mode);
-  body += addItem("number", "m", L_SENSITIVENESS, _number, "?", "?", "?", "?",
-                  L_CANT_CHANGE, true);
+  addItem(page, "number", "m", L_SENSITIVENESS, _number, "?", "?", "?", "?",
+          L_CANT_CHANGE, true);
 
-  body += "</fieldset>";
+  page += "</fieldset></div>";
 
-  String page = addConfigurationBlock(L_BH1750_SENSOR, "", body);
-
-  if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
     sprintf(_number, "%d", configuration.domoticz.idx);
-    body += addItem("number", "d", "IDX", _number, "?", "0", "999999", "1");
-
-    body += "</fieldset>";
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    addItem(page, "number", "d", "IDX", _number, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
   }
-
+#else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_MQTT_TOPIC_BH1750, L_MQTT_TOPIC_EMPTY);
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
-
-  return page;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
+// String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
+void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
   AS3935 configuration = Data.getAS3935SensorConfiguration(id);
   char _number[2];
 
-  String body = "<fieldset>";
+  addConfigurationBlock(page, L_AS3935_SENSOR, "");
+  addDeviceI2CAddressSelection(page, configuration.i2cAddress);
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
+  page += "<div class=\"cf\">";
+  generateConfigParameter_GPIO(page, "g", configuration.irqGPIO);
+  page += "</div>";
 
-  body += addDeviceI2CAddressSelection(configuration.i2cAddress);
-
-  body += addItem("text", "n", L_NAME, configuration.name, "16");
-
-  body += "<div class=\"cf\">";
-  body += generateConfigParameter_GPIO("g", configuration.irqGPIO);
-  body += "</div>";
-
-  body += "<div class=\"cf\"><label>";
-  body += L_DISTANCE_UNIT;
-  body += "</label><select name=\"u\"><option value=\"";
-  body += AFE_DISTANCE_KM;
-  body += "\"";
-  body +=
+  page += "<div class=\"cf\"><label>";
+  page += L_DISTANCE_UNIT;
+  page += "</label><select name=\"u\"><option value=\"";
+  page += AFE_DISTANCE_KM;
+  page += "\"";
+  page +=
       (configuration.unit == AFE_DISTANCE_KM ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_KM;
-  body += "</option><option value=\"";
-  body += AFE_DISTANCE_MIL;
-  body += "\"";
-  body +=
+  page += ">";
+  page += L_KM;
+  page += "</option><option value=\"";
+  page += AFE_DISTANCE_MIL;
+  page += "\"";
+  page +=
       (configuration.unit == AFE_DISTANCE_MIL ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_MILES;
-  body += "</option></select></div>";
+  page += ">";
+  page += L_MILES;
+  page += "</option></select></div>";
 
   sprintf(_number, "%d", configuration.watchdogThreshold);
-  body += addItem("number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10",
-                  "1", L_WATCHDOG_THRESHOLD_HINT);
+  addItem(page, "number", "e", L_WATCHDOG_THRESHOLD, _number, "?", "1", "10",
+          "1", L_WATCHDOG_THRESHOLD_HINT);
 
   sprintf(_number, "%d", configuration.spikesRejectionLevel);
-  body += addItem("number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11",
-                  "1", L_SPIKES_REJECTION_HINT);
+  addItem(page, "number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11", "1",
+          L_SPIKES_REJECTION_HINT);
 
-  body += "<div class=\"cf\"><label>";
-  body += L_MIN_SPIKES;
-  body += "</label><select name=\"m\"><option value=\"1\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 1
+  page += "<div class=\"cf\"><label>";
+  page += L_MIN_SPIKES;
+  page += "</label><select name=\"m\"><option value=\"1\"";
+  page += (configuration.minimumNumberOfLightningSpikes == 1
                ? " selected=\"selected\""
                : "");
-  body += ">1</option><option value=\"5\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 5
+  page += ">1</option><option value=\"5\"";
+  page += (configuration.minimumNumberOfLightningSpikes == 5
                ? " selected=\"selected\""
                : "");
-  body += ">5</option><option value=\"9\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 9
+  page += ">5</option><option value=\"9\"";
+  page += (configuration.minimumNumberOfLightningSpikes == 9
                ? " selected=\"selected\""
                : "");
-  body += ">9</option><option value=\"16\"";
-  body += (configuration.minimumNumberOfLightningSpikes == 16
+  page += ">9</option><option value=\"16\"";
+  page += (configuration.minimumNumberOfLightningSpikes == 16
                ? " selected=\"selected\""
                : "");
-  body += ">16</option></select></div>";
+  page += ">16</option></select></div>";
 
-  body += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
+  page += "<div class=\"cc\"><label><input name =\"f\" type=\"checkbox\" "
           "value=\"1\"";
-  body +=
+  page +=
       configuration.setNoiseFloorAutomatically ? " checked=\"checked\">" : ">";
-  body += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
-  body += "</label></div><p class=\"cm\">";
+  page += L_AUTOMATIC_NOISE_FLOOR_CONTROL;
+  page += "</label></div><p class=\"cm\">";
 
-  body += L_SET_LEVEL_OF_NOISE_FLOOR;
+  page += L_SET_LEVEL_OF_NOISE_FLOOR;
   sprintf(_number, "%d", configuration.noiseFloor);
-  body += addItem("number", "nf", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
-                  L_NOISE_FLOOR_HINT);
+  addItem(page, "number", "nf", L_NOISE_FLOOR, _number, "?", "1", "7", "1",
+          L_NOISE_FLOOR_HINT);
 
-  body += "</p><div class=\"cf\"><label>";
-  body += L_SENSOR_INDOOR_OUTDOOR;
-  body += "</label><select name=\"w\"><option value=\"1\"";
-  body += (configuration.indoor == true ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_INDOOR;
-  body += "</option><option value=\"0\"";
-  body += (configuration.indoor == false ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_OUTDOOR;
-  body += "</option></select></div>";
+  page += "</p><div class=\"cf\"><label>";
+  page += L_SENSOR_INDOOR_OUTDOOR;
+  page += "</label><select name=\"w\"><option value=\"1\"";
+  page += (configuration.indoor == true ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_INDOOR;
+  page += "</option><option value=\"0\"";
+  page += (configuration.indoor == false ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_OUTDOOR;
+  page += "</option></select></div>";
 
-  body += "</fieldset>";
+  page += "</fieldset></div>";
 
-  String page = addConfigurationBlock(L_AS3935_SENSOR, "", body);
-
-  if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
     sprintf(_number, "%d", configuration.domoticz.idx);
-    body += addItem("number", "d", "IDX", _number, "?", "0", "999999", "1");
-
-    body += "</fieldset>";
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    addItem(page, "number", "d", "IDX", _number, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
   }
-
+#else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page +=
-        addConfigurationBlock(L_MQTT_TOPIC_AS3935, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_MQTT_TOPIC_AS3935, L_MQTT_TOPIC_EMPTY);
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
-
-  return page;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-String AFESitesGenerator::addAnalogInputConfiguration() {
+void AFESitesGenerator::addAnalogInputConfiguration(String &page) {
   ADCINPUT configuration = Data.getADCInputConfiguration();
 
-  String body = "<fieldset>";
+  addConfigurationBlock(page, L_ANALOG_INPUT, "");
 
   char _number[13];
 
   sprintf(_number, "%d", configuration.gpio);
-  body += addItem("number", "g", "GPIO", _number, "?", "?", "?", "?");
+  addItem(page, "number", "g", "GPIO", _number, "?", "?", "?", "?");
 
   sprintf(_number, "%d", configuration.interval);
-  body += addItem("number", "v", L_MEASURMENTS_INTERVAL, _number, "?", "1",
-                  "86400", "1", L_SECONDS);
+  addItem(page, "number", "v", L_MEASURMENTS_INTERVAL, _number, "?", "1",
+          "86400", "1", L_SECONDS);
 
   sprintf(_number, "%d", configuration.numberOfSamples);
-  body += addItem("number", "n", L_NUMBER_OF_SAMPLES, _number, "?", "1", "999",
-                  "1");
+  addItem(page, "number", "n", L_NUMBER_OF_SAMPLES, _number, "?", "1", "999",
+          "1");
 
-  body += "</fieldset>";
+  page += "</fieldset></div>";
 
-  String page = addConfigurationBlock(L_ANALOG_INPUT, "", body);
-
-  body = "<fieldset>";
+  addConfigurationBlock(page, L_VOLTAGE_DIVIDER, "");
 
   dtostrf((float)configuration.maxVCC, 3, 2, _number);
 
-  body += addItem("number", "m", L_MEASURED_VOLTAGE, _number, "?", "0", "1000",
-                  "0.01", "V");
+  addItem(page, "number", "m", L_MEASURED_VOLTAGE, _number, "?", "0", "1000",
+          "0.01", "V");
 
   sprintf(_number, "%d", (uint32_t)configuration.divider.Ra);
-  body +=
-      addItem("number", "ra", "R[a]", _number, "?", "0", "90000000", "1", "Om");
+  addItem(page, "number", "ra", "R[a]", _number, "?", "0", "90000000", "1",
+          "Om");
 
   sprintf(_number, "%d", (uint32_t)configuration.divider.Rb);
-  body +=
-      addItem("number", "rb", "R[b]", _number, "?", "0", "90000000", "1", "Om");
-  body += "</fieldset>";
-
-  page += addConfigurationBlock(L_VOLTAGE_DIVIDER, "", body);
+  addItem(page, "number", "rb", "R[b]", _number, "?", "0", "90000000", "1",
+          "Om");
+  page += "</fieldset></div>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    body = "<fieldset>";
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.raw);
-    body += addItem("number", "x0", L_RAW_DATA, _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "x0", L_RAW_DATA, _idx, "?", "0", "999999", "1");
     sprintf(_idx, "%d", configuration.domoticz.percent);
-    body += addItem("number", "x1", L_PERCENT, _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "x1", L_PERCENT, _idx, "?", "0", "999999", "1");
     sprintf(_idx, "%d", configuration.domoticz.voltage);
-    body += addItem("number", "x2", L_VOLTAGE, _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "x2", L_VOLTAGE, _idx, "?", "0", "999999", "1");
     sprintf(_idx, "%d", configuration.domoticz.voltageCalculated);
-    body += addItem("number", "x3", L_VOLTAGE_CALCULATED, _idx, "?", "0",
-                    "999999", "1");
-    body += "</fieldset>";
-
-    page += addConfigurationBlock("Domoticz", L_NO_IF_IDX_0, body);
+    addItem(page, "number", "x3", L_VOLTAGE_CALCULATED, _idx, "?", "0",
+            "999999", "1");
+    page += "</fieldset></div>";
   }
 #else
   if (Device->configuration.api.mqtt) {
-    body = "<fieldset>";
-    body += addItem("text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    body += "</fieldset>";
-    page += addConfigurationBlock(L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY, body);
+    addConfigurationBlock(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
   }
 #endif
-
-  return page;
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-String AFESitesGenerator::addSerialPortConfiguration() {
+void AFESitesGenerator::addSerialPortConfiguration(String &page) {
   SERIALPORT configuration = Data.getSerialPortConfiguration();
-
-  String body = "<fieldset>";
-
-  body += generateConfigParameter_GPIO("r", configuration.RXD, "GPIO RXD");
-  body += generateConfigParameter_GPIO("t", configuration.TXD, "GPIO TXD");
-
-  body += "</fieldset>";
-  return addConfigurationBlock("UART", "", body);
-  ;
+  addConfigurationBlock(page, "UART", "");
+  generateConfigParameter_GPIO(page, "r", configuration.RXD, "GPIO RXD");
+  generateConfigParameter_GPIO(page, "t", configuration.TXD, "GPIO TXD");
+  page += "</fieldset></div>";
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-String AFESitesGenerator::addI2CPortConfiguration() {
+void AFESitesGenerator::addI2CPortConfiguration(String &page) {
   I2CPORT configuration = Data.getI2CPortConfiguration();
-
-  String body = "<fieldset>";
-
-  body += generateConfigParameter_GPIO("a", configuration.SDA, "GPIO SDA");
-  body += generateConfigParameter_GPIO("l", configuration.SCL, "GPIO SCL");
-
-  body += "</fieldset>";
-  return addConfigurationBlock("I2C", "", body);
-  ;
+  addConfigurationBlock(page, "I2C", "");
+  generateConfigParameter_GPIO(page, "a", configuration.SDA, "GPIO SDA");
+  generateConfigParameter_GPIO(page, "l", configuration.SCL, "GPIO SCL");
+  page += "</fieldset></div>";
 }
 
-String AFESitesGenerator::addDeviceI2CAddressSelection(uint8_t address) {
+void AFESitesGenerator::addDeviceI2CAddressSelection(String &page,
+                                                     uint8_t address) {
   AFEI2CScanner I2CScanner;
   I2CScanner.begin();
-  String body = "<div class=\"cf\"><label>I2C ";
-  body += L_ADDRESS;
-  body += ": </label><select name=\"a\">";
-  body += "<option value=\"0\"";
-  body += address == 0 ? " selected=\"selected\"" : "";
-  body += ">";
-  body += L_NONE;
-  body += "</option>";
+  page += "<div class=\"cf\"><label>I2C ";
+  page += L_ADDRESS;
+  page += ": </label><select name=\"a\">";
+  page += "<option value=\"0\"";
+  page += address == 0 ? " selected=\"selected\"" : "";
+  page += ">";
+  page += L_NONE;
+  page += "</option>";
 
   for (byte addressToScan = 1; addressToScan < 127; addressToScan++) {
     if (I2CScanner.scan(addressToScan)) {
-      body += "<option value=\"";
-      body += addressToScan;
-      body += "\"";
-      body += addressToScan == address ? " selected=\"selected\"" : "";
-      body += ">[0x";
-      body += String(addressToScan, HEX);
-      body += "] : ";
-      body += I2CScanner.getName(addressToScan);
-      body += "</option>";
+      page += "<option value=\"";
+      page += addressToScan;
+      page += "\"";
+      page += addressToScan == address ? " selected=\"selected\"" : "";
+      page += ">[0x";
+      page += String(addressToScan, HEX);
+      page += "] : ";
+      page += I2CScanner.getName(addressToScan);
+      page += "</option>";
     }
   }
-  body += "</select></div>";
-  return body;
+  page += "</select></div>";
 }
+
 #endif
 
-String AFESitesGenerator::addUpgradeSection() {
-  String body = "<form method=\"post\" action=\"upgrade?o=";
-  body += AFE_CONFIG_SITE_POST_UPGRADE;
-  body += "\" enctype=\"multipart/form-data\">";
-  body += "<fieldset><div class=\"cf\"><label>";
-  body += L_SELECT_FIRMWARE;
-  body += "</label><input class=\"bs\" name=\"update\" type=\"file\" "
+void AFESitesGenerator::addUpgradeSection(String &page) {
+  addConfigurationBlock(page, L_FIRMWARE_UPGRADE, L_DONT_PLUG_OFF);
+  page += "<form method=\"post\" action=\"upgrade?o=";
+  page += AFE_CONFIG_SITE_POST_UPGRADE;
+  page += "\" enctype=\"multipart/form-data\">";
+  page += "<div class=\"cf\"><label>";
+  page += L_SELECT_FIRMWARE;
+  page += "</label><input class=\"bs\" name=\"update\" type=\"file\" "
           "accept=\".bin\"></div><p class=\"cm\">";
-  body += L_UPGRADE_INFO;
-  body += ".</p><button type=\"submit\" class=\"b be\">";
-  body += L_UPGRADE;
-  body += "</button></fieldset></form>";
-  return addConfigurationBlock(L_FIRMWARE_UPGRADE, L_DONT_PLUG_OFF, body);
+  page += L_UPGRADE_INFO;
+  page += ".</p><button type=\"submit\" class=\"b be\">";
+  page += L_UPGRADE;
+  page += "</button></form></fieldset></div>";
 }
 
-String AFESitesGenerator::addPostUpgradeSection(boolean status) {
-
-  String body = "<fieldset><ul>";
+void AFESitesGenerator::addPostUpgradeSection(String &page, boolean status) {
+  addConfigurationBlock(page, L_FIRMWARE_UPGRADE, "");
+  page += "<ul>";
   if (status) {
-    body += "<li style=\"color:red\">";
-    body += L_UPGRADE_FAILED;
+    page += "<li style=\"color:red\">";
+    page += L_UPGRADE_FAILED;
   } else {
-    body += "<li>";
-    body += L_UPGRADE_SUCCESSFUL;
+    page += "<li>";
+    page += L_UPGRADE_SUCCESSFUL;
   }
-  body += "</li><li>";
-  body += L_DEVICE_WILL_BE_REBOOTED;
-  body += "...</li></fieldset>";
-  return addConfigurationBlock(L_FIRMWARE_UPGRADE, "", body);
+  page += "</li><li>";
+  page += L_DEVICE_WILL_BE_REBOOTED;
+  page += "...</li></fieldset></div>";
 }
 
-String AFESitesGenerator::addResetSection() {
-  String body = "<fieldset><p class=\"cm\"><strong>";
-  body += L_WARNING;
-  body += "</strong>: ";
-  body += "</p><p class=\"cm\">";
-  body += L_CONFIGURATION_WILL_BE_REMOVED;
-  body += ": </p><input type=\"submit\" class=\"b be\" value=\"";
-  body += L_RESTORE_DEFAULT_SETTINGS;
-  body += "\"></fieldset>";
-
-  return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, "", body);
+void AFESitesGenerator::addResetSection(String &page) {
+  addConfigurationBlock(page, L_RESTORING_DEFAULT_SETTING, "");
+  page += "<p class=\"cm\"><strong>";
+  page += L_WARNING;
+  page += "</strong>: </p><p class=\"cm\">";
+  page += L_CONFIGURATION_WILL_BE_REMOVED;
+  page += ": </p><input type=\"submit\" class=\"b be\" value=\"";
+  page += L_RESTORE_DEFAULT_SETTINGS;
+  page += "\"></fieldset></div>";
 }
 
-String AFESitesGenerator::addPostResetSection() {
-  String body = "<fieldset><p class=\"cm\">";
-  body += L_UPGRADE_IN_PROGRESS;
-  body += "</p><p class=\"cm\">";
-  body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
-  body += ": </p><a href=\"http://192.168.5.1\">http://192.168.5.1</a>";
-  body += "</fieldset>";
-  return addConfigurationBlock(L_RESTORING_DEFAULT_SETTING, "", body);
+void AFESitesGenerator::addPostResetSection(String &page) {
+  addConfigurationBlock(page, L_RESTORING_DEFAULT_SETTING, "");
+  page += "<fieldset><p class=\"cm\">";
+  page += L_UPGRADE_IN_PROGRESS;
+  page += "</p><p class=\"cm\">";
+  page += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
+  page += ": </p><a "
+          "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset></div>";
 }
 
-String AFESitesGenerator::addExitSection(uint8_t command) {
-  String body = "<fieldset><div class=\"cf\"><ul><li>";
-  body += L_REBOOT_IN_PROGRESS;
-  body += "</li><li>";
+void AFESitesGenerator::addExitSection(String &page, uint8_t command) {
+  addConfigurationBlock(page, L_REBOOT, "");
+  page += "<div class=\"cf\"><ul><li>";
+  page += L_REBOOT_IN_PROGRESS;
+  page += "</li><li>";
   if (command != AFE_MODE_ACCESS_POINT) {
-    body += L_SITE_WILL_BE_RELOADED;
+    page += L_SITE_WILL_BE_RELOADED;
   } else {
-    body += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
-    body += ": <a href=\"http://192.168.5.1\">http://192.168.5.1</a></p>";
+    page += L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE;
+    page += ": <a href=\"http://192.168.5.1\">http://192.168.5.1</a></p>";
   }
-  body += "</li></ul></div></fieldset>";
-  return addConfigurationBlock(L_REBOOT, "", body);
+  page += "</li></ul></div></fieldset></div>";
 }
 
-String AFESitesGenerator::addIndexSection(boolean authorized) {
+void AFESitesGenerator::addIndexSection(String &page, boolean authorized) {
   DEVICE configuration;
   configuration = Device->configuration;
-  String body = "<fieldset>";
+  addConfigurationBlock(page, L_LAUNCH_CONFIGURATION_PANEL, "");
   if (!authorized) {
-    body += "<h3>";
-    body += L_WRONG_PASSWORD;
-    body += "</h3>";
+    page += "<h3>";
+    page += L_WRONG_PASSWORD;
+    page += "</h3>";
   }
 
-  body += "<form method=\"post\"><div class=\"cf\"><input name=\"p\" "
+  page += "<form method=\"post\"><div class=\"cf\"><input name=\"p\" "
           "type=\"password\" "
           "placeholder=\"";
-  body += L_PASSWORD;
-  body += "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "
+  page += L_PASSWORD;
+  page += "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "
           "value=\"";
-  body += L_NORMAL_MODE;
-  body += "\" formaction=\"/?o=0&i=";
-  body += AFE_MODE_CONFIGURATION;
-  body += "\" /> <input type=\"submit\" class=\"b be\" value=\"";
-  body += L_HOTSPOT_MODE;
-  body += "\" formaction=\"/?o=0&i=";
-  body += AFE_MODE_ACCESS_POINT;
-  body += "\" /></div></form>";
-
-  String page = addConfigurationBlock(L_LAUNCH_CONFIGURATION_PANEL, "", body);
-  return page;
+  page += L_NORMAL_MODE;
+  page += "\" formaction=\"/?o=0&i=";
+  page += AFE_MODE_CONFIGURATION;
+  page += "\" /> <input type=\"submit\" class=\"b be\" value=\"";
+  page += L_HOTSPOT_MODE;
+  page += "\" formaction=\"/?o=0&i=";
+  page += AFE_MODE_ACCESS_POINT;
+  page += "\" /></div></form></fieldset></div>";
 }
 
-String AFESitesGenerator::addProVersionSite() {
+void AFESitesGenerator::addProVersionSite(String &page) {
   PRO_VERSION configuration = Data.getProVersionConfiguration();
   String body;
+  addConfigurationBlock(page, L_PRO_VERSION, "");
   if (Device->getMode() == AFE_MODE_CONFIGURATION) {
-    body = "<fieldset>";
-    body += addItem("text", "k", L_KEY, configuration.serial, "18");
-    body += "<div class=\"cf\"><label>";
-    body += L_VALID;
-    body += "?</label><span>";
-    body += configuration.valid ? L_YES : L_NO;
-    body += "</span></div>";
-    body += "<input name=\"v\" type=\"hidden\" value=\"";
-    body += configuration.valid;
-    body += "\">";
-    body += "</fieldset>";
+    addItem(page, "text", "k", L_KEY, configuration.serial, "18");
+    page += "<div class=\"cf\"><label>";
+    page += L_VALID;
+    page += "?</label><span>";
+    page += configuration.valid ? L_YES : L_NO;
+    page += "</span></div><input name=\"v\" type=\"hidden\" value=\"";
+    page += configuration.valid;
+    page += "\">";
   } else {
-    body = "<h3>";
-    body += L_PRO_CANNOT_BE_COFIGURED;
-    body += "</h3>";
+    page += "<h3>";
+    page += L_PRO_CANNOT_BE_COFIGURED;
+    page += "</h3>";
   }
-  return addConfigurationBlock(L_PRO_VERSION, "", body);
+  page += "</fieldset></div>";
 }
 
-const String AFESitesGenerator::generateFooter(boolean extended) {
+void AFESitesGenerator::generateFooter(String &page, boolean extended) {
+  if (Device->getMode() == AFE_MODE_NORMAL) {
+    page += "<a style=\"color:#0475b6;\" href=\"https://";
+    page += L_LANGUAGE_SHORT;
+    page += ".donate.afe-firmware.smartnydom.pl\">";
+    page += L_DONATE;
+    page += "</a>";
+  }
 
-String body ="";
-if (Device->getMode() == AFE_MODE_NORMAL) {
-  body += "<a style=\"color:#0475b6;\" href=\"https://";
-  body += L_LANGUAGE_SHORT;
-  body += ".donate.afe-firmware.smartnydom.pl\">";
-  body += L_DONATE;
-  body += "</a>";
-}
-
-  body += "</div></div>";
+  page += "</div></div>";
 
   if (extended) {
-    body += "<div style=\"padding: 5px 0\">";
-    body += "<a "
+    page += "<div style=\"padding: 5px 0\">";
+    page += "<a "
             "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
             "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
-    body += L_HELP;
-    body += "-Forum-red.svg\"alt=\"Forum\" /></a> <a "
+    page += L_HELP;
+    page += "-Forum-red.svg\"alt=\"Forum\" /></a> <a "
             "href=\"https://afe.smartnydom.pl/";
-    body += L_LANGUAGE_SHORT;
-    body += "/\" target=\"_blank\"><img src=\"https://img.shields.io/badge/";
-    body += L_HELP;
-    body += "-";
-    body += L_DOCUMENTATION;
-    body += "-green.svg\" alt=\"";
-    body += L_DOCUMENTATION;
-    body += "\" /></a> <a href=\"https://afe.smartnydom.pl/";
-    body += L_LANGUAGE_SHORT;
-    body += "/pliki-to-pobrania/historia-zmian\" "
+    page += L_LANGUAGE_SHORT;
+    page += "/\" target=\"_blank\"><img src=\"https://img.shields.io/badge/";
+    page += L_HELP;
+    page += "-";
+    page += L_DOCUMENTATION;
+    page += "-green.svg\" alt=\"";
+    page += L_DOCUMENTATION;
+    page += "\" /></a> <a href=\"https://afe.smartnydom.pl/";
+    page += L_LANGUAGE_SHORT;
+    page += "/pliki-to-pobrania/historia-zmian\" "
             "target=\"_blank\"><img src=\"https://img.shields.io/badge/";
-    body += L_VERSION;
-    body += "%20-%20";
-    body += AFE_FIRMWARE_VERSION;
-    body += "[T";
-    body += AFE_FIRMWARE_TYPE;
-    body += "]-blue.svg\" alt=\"T";
-    body += AFE_FIRMWARE_TYPE;
-    body += "-";
-    body += AFE_FIRMWARE_VERSION;
-    body += "\" /></a> <img src=\"https://img.shields.io/badge/Device-";
-    body += AFE_DEVICE_TYPE_NAME;
-    body += "-lightgrey.svg\" alt=\"DeviceID ";
-    body += AFE_DEVICE_TYPE_ID;
-    body += "\" /> <img src=\"https://img.shields.io/badge/API-";
+    page += L_VERSION;
+    page += "%20-%20";
+    page += AFE_FIRMWARE_VERSION;
+    page += "[T";
+    page += AFE_FIRMWARE_TYPE;
+    page += "]-blue.svg\" alt=\"T";
+    page += AFE_FIRMWARE_TYPE;
+    page += "-";
+    page += AFE_FIRMWARE_VERSION;
+    page += "\" /></a> <img src=\"https://img.shields.io/badge/Device-";
+    page += AFE_DEVICE_TYPE_NAME;
+    page += "-lightgrey.svg\" alt=\"DeviceID ";
+    page += AFE_DEVICE_TYPE_ID;
+    page += "\" /> <img src=\"https://img.shields.io/badge/API-";
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    body += "Domoticz";
+    page += "Domoticz";
 #else
-    body += "Standard";
+    page += "Standard";
 #endif
-    body += "-yellow.svg\" /> <img src=\"https://img.shields.io/badge/PRO-";
-    body += Firmware->Pro.valid ? L_YES : L_NO;
-    body += "-orange.svg\" alt=\"PRO\" /></div>";
+    page += "-yellow.svg\" /> <img src=\"https://img.shields.io/badge/PRO-";
+    page += Firmware->Pro.valid ? L_YES : L_NO;
+    page += "-orange.svg\" alt=\"PRO\" /></div>";
   }
-  body += "</body></html>";
-  return body;
+  page += "</body></html>";
 }
 
-String AFESitesGenerator::addConfigurationBlock(const String title,
-                                                const String description,
-                                                const String body) {
-  String page = "<div class=\"ci\">";
-  page += "<h1>" + title + "</h1>";
-  page += "<p class=\"cd\">" + description + "</p>";
-  page += body;
-  page += "</div>";
-
-  return page;
-}
-
-const String AFESitesGenerator::generateConfigParameter_GPIO(
-    const char *field, uint8_t selected, const String title) {
-  String page = "<div class=\"cf\"><label>";
+void AFESitesGenerator::addConfigurationBlock(String &page, const char *title,
+                                              const char *description) {
+  page += "<div class=\"ci\"><h1>";
   page += title;
+  page += "</h1><p class=\"cd\">";
+  page += description;
+  page += "</p>";
+}
+
+void AFESitesGenerator::generateConfigParameter_GPIO(String &item,
+                                                     const char *field,
+                                                     uint8_t selected,
+                                                     const char *title) {
+
+  item += "<div class=\"cf\"><label>";
+  item += title;
+  item += "</label><select name=\"";
+  item += field;
+  item += "\">";
+  for (uint8_t i = 0; i <= 16; i++) {
+    item += "<option value=\"";
+    item += i;
+    item += "\"";
+    item += (selected == i ? "selected=\"selected\"" : "");
+    item += ">";
+    item += i;
+    item += "</option>";
+  }
+  item += "</select></div>";
+}
+
+void AFESitesGenerator::generateHardwareList(String &page, uint8_t noOfItems,
+                                             uint8_t noOffConnected,
+                                             const char *field,
+                                             const char *label, uint8_t index,
+                                             uint8_t noneValue) {
+  page += "<div class=\"cf\"><label>";
+  page += label;
   page += "</label><select name=\"";
   page += field;
-  page += "\">";
-  for (uint8_t i = 0; i <= 16; i++) {
-    page += "<option value=\"" + String(i) + "\"" +
-            (selected == i ? "selected=\"selected\"" : "") + ">" + String(i) +
-            "</option>";
-  }
-  page += "</select></div>";
-  return page;
-}
-
-const String AFESitesGenerator::generateHardwareList(
-    uint8_t noOfItems, uint8_t noOffConnected, const char *field,
-    const char *label, uint8_t index, uint8_t noneValue) {
-  String body = "<div class=\"cf\"><label>";
-  body += label;
-  body += "</label>";
-  body += "<select name=\"";
-  body += field;
-  body += "\">";
-  body += "<option value=\"";
-  body += noneValue;
-  body += "\"";
-  body += (noOffConnected == noneValue ? " selected=\"selected\"" : "");
-  body += ">";
-  body += L_NONE;
-  body += "</option>";
+  page += "\"><option value=\"";
+  page += noneValue;
+  page += "\"";
+  page += (noOffConnected == noneValue ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_NONE;
+  page += "</option>";
   /* @TODO not a nice code with this index. It can't be different than 0
    * or 1. So far only 0,1 are planned */
   for (uint8_t i = index; i < noOfItems + index; i++) {
-    body += "<option value=\"";
-    body += i;
-    body += "\"";
-    body += noOffConnected == i ? " selected=\"selected\"" : "";
-    body += ">";
-    body += i + (index == 0 ? 1 : 0);
-    body += "</option>";
+    page += "<option value=\"";
+    page += i;
+    page += "\"";
+    page += noOffConnected == i ? " selected=\"selected\"" : "";
+    page += ">";
+    page += i + (index == 0 ? 1 : 0);
+    page += "</option>";
   }
-
-  body += "</select>";
-  body += "</div>";
-
-  return body;
+  page += "</select></div>";
 }
 
-const String AFESitesGenerator::generateHardwareItemsList(
-    uint8_t noOfItems, uint8_t noOffConnected, const char *field,
-    const char *label) {
-  return generateHardwareList(noOfItems, noOffConnected, field, label, 1, 0);
+void AFESitesGenerator::generateHardwareItemsList(String &page,
+                                                  uint8_t noOfItems,
+                                                  uint8_t noOffConnected,
+                                                  const char *field,
+                                                  const char *label) {
+  generateHardwareList(page,noOfItems, noOffConnected, field, label, 1, 0);
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -2728,13 +2579,13 @@ AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
 }
 #endif
 
-const String AFESitesGenerator::addItem(const char *type, const char *name,
-                                        const char *label, const char *value,
-                                        const char *size, const char *min,
-                                        const char *max, const char *step,
-                                        const char *hint, boolean readonly) {
-  String item;
-  item = "<div class=\"cf\"><label>";
+void AFESitesGenerator::addItem(String &item, const char *type,
+                                const char *name, const char *label,
+                                const char *value, const char *size,
+                                const char *min, const char *max,
+                                const char *step, const char *hint,
+                                boolean readonly) {
+  item += "<div class=\"cf\"><label>";
   item += label;
   item += "</label><input name=\"";
   item += name;
@@ -2796,5 +2647,4 @@ const String AFESitesGenerator::addItem(const char *type, const char *name,
     }
   }
   item += "</div>";
-  return item;
 }

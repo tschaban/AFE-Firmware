@@ -46,11 +46,13 @@ private:
   AFEFirmwarePro *Firmware;
   char deviceID[17];
 
-  const String generateHeader(uint8_t redirect);
+  void generateHeader(String &page, uint8_t redirect);
 
   /* Method generates GPIO selecton list */
-  const String generateConfigParameter_GPIO(const char *field, uint8_t selected,
-                                            const String title = "GPIO");
+  void generateConfigParameter_GPIO(String &item, const char *field,
+                                    uint8_t selected,
+                                    const char *title = "GPIO");
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
@@ -58,23 +60,23 @@ private:
 #endif
 
   /* Method addes configuration block to the site */
-  String addConfigurationBlock(const String title, const String description,
-                               const String body);
-
-  const String generateHardwareList(uint8_t noOfItems, uint8_t noOffConnected,
-                                    const char *field, const char *label,
-                                    uint8_t index, uint8_t noneValue);
+  void addConfigurationBlock(String &page, const char *, const char *);
 
   /* It uses generateHardwareItemsList() */
-  const String generateHardwareItemsList(uint8_t noOfItems,
-                                         uint8_t noOffConnected,
-                                         const char *field, const char *label);
+  void generateHardwareList(String &item, uint8_t noOfItems,
+                            uint8_t noOffConnected, const char *field,
+                            const char *label, uint8_t index,
+                            uint8_t noneValue);
+                            
+  void generateHardwareItemsList(String &item, uint8_t noOfItems,
+                                 uint8_t noOffConnected, const char *field,
+                                 const char *label);
 
-  const String addItem(const char *type, const char *name, const char *label,
-                       const char *value, const char *size = "?",
-                       const char *min = "?", const char *max = "?",
-                       const char *step = "?", const char *hint = "?",
-                       boolean readonly = false);
+  void addItem(String &item, const char *type, const char *name,
+               const char *label, const char *value, const char *size = "?",
+               const char *min = "?", const char *max = "?",
+               const char *step = "?", const char *hint = "?",
+               boolean readonly = false);
 
 #if defined(T5_CONFIG)
   const String generateGateStatesList(uint8_t id, byte state);
@@ -97,35 +99,35 @@ public:
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  const String generateOneColumnLayout(uint8_t redirect = 0);
-  const String generateTwoColumnsLayout(uint8_t redirect = 0);
+  void generateOneColumnLayout(String &page, uint8_t redirect = 0);
+  void generateTwoColumnsLayout(String &page, uint8_t redirect = 0);
 
   /* Method generates site footer */
-  const String generateFooter(boolean extended = false);
+  void generateFooter(String &page, boolean extended = false);
 
   /* All following methods generates configuration sections */
-  String addDeviceConfiguration();
-  String addNetworkConfiguration();
-  String addConnectingSite();
-  String addMQTTBrokerConfiguration();
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
-  String addDomoticzServerConfiguration();
-#endif  
-  String addPasswordConfigurationSite();
+  void addDeviceConfiguration(String &page);
+  void addNetworkConfiguration(String &page);
+  void addConnectingSite(String &page);
+  void addMQTTBrokerConfiguration(String &page);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  void addDomoticzServerConfiguration(String &page);
+#endif
+  void addPasswordConfigurationSite(String &page);
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY  
-  String addRelayConfiguration(uint8_t id);
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  void addRelayConfiguration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  String addSwitchConfiguration(uint8_t id);
-#endif 
-  
-  String addProVersionSite();
+  void addSwitchConfiguration(String &page, uint8_t id);
+#endif
+
+  void addProVersionSite(String &page);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  String addLEDConfiguration(uint8_t id);
-  String addSystemLEDConfiguration();
+  void addLEDConfiguration(String &page, uint8_t id);
+  void addSystemLEDConfiguration(String &page);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -153,48 +155,49 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  String addHPMA115S0Configuration(uint8_t id);
+  void addHPMA115S0Configuration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  String addBMEX80Configuration(uint8_t id);
+  void addBMEX80Configuration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  String addBH1750Configuration(uint8_t id);
+  void addBH1750Configuration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  String addAS3935Configuration(uint8_t id);
+  void addAS3935Configuration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  String addAnalogInputConfiguration();
+  void addAnalogInputConfiguration(String &page);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-  String addSerialPortConfiguration();
+  void addSerialPortConfiguration(String &page);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  String addI2CPortConfiguration();
-  String addDeviceI2CAddressSelection(uint8_t address);
+  void addI2CPortConfiguration(String &page);
+  // String addDeviceI2CAddressSelection(uint8_t address);
+  void addDeviceI2CAddressSelection(String &page, uint8_t address);
 #endif
 
   /* These methods generates firmware upgrade sections */
-  String addUpgradeSection();
-  String addPostUpgradeSection(boolean status);
+  void addUpgradeSection(String &page);
+  void addPostUpgradeSection(String &page, boolean status);
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */
-  String addResetSection();
-  String addPostResetSection();
+  void addResetSection(String &page);
+  void addPostResetSection(String &page);
 
   /* Method addes info that device is being reset */
-  String addExitSection(uint8_t command);
+  void addExitSection(String &page, uint8_t command);
 
   /* Method generates section shown when device is in norma mode */
-  String addIndexSection(boolean authorized);
+  void addIndexSection(String &page, boolean authorized);
 };
 
 #endif

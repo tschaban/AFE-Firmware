@@ -70,8 +70,27 @@ public:
   /* Processes ADC MQTT requests */
   void processADC();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  void processBMEX80(uint8_t *id);
+  boolean publishBMx80SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  void processHPMA115S0(uint8_t *id);
+  boolean publishHPMA115S0SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  void processBH1750(uint8_t *id);
+  boolean publishBH1750SensorData(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  void processAS3935(uint8_t *id);
+  boolean publishAS3935SensorData(uint8_t id);
+#endif
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
-#endif
+#endif // _AFE_API_MQTT_STANDARD_h

@@ -26,6 +26,25 @@ void initializeHTTPDomoticzAPI() {
     }
 #endif
 
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  HttpDomoticzAPI.addClass(&ParticleSensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
+#endif
+
+
+
 #ifdef DEBUG
     Serial << endl << "API: MQTT init completed";
 #endif
@@ -63,6 +82,22 @@ void initializeMQTTAPI() {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  MqttAPI.addClass(&BMEX80Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  MqttAPI.addClass(&ParticleSensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  MqttAPI.addClass(&BH1750Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  MqttAPI.addClass(&AS3935Sensor[0]);
+#endif
+
 #ifdef DEBUG
     Serial << endl << "INFO: API: MQTT init completed";
 #endif
@@ -90,6 +125,25 @@ void initializeHTTPAPI() {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     HttpAPI.addClass(&AnalogInput);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  HttpAPI.addClass(&BMEX80Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  HttpAPI.addClass(&ParticleSensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  HttpAPI.addClass(&BH1750Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  HttpAPI.addClass(&AS3935Sensor[0]);
+#endif
+
+
+
 
 #ifdef DEBUG
     Serial << endl << "INFO: API: HTTP init completed";

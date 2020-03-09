@@ -52,7 +52,10 @@ private:
 public:
   HPMA115S0 configuration;
   HPMA115S0_DATA data;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
+#endif
 
   /* Constructor */
   AFESensorHPMA115S0();
@@ -66,10 +69,12 @@ public:
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
   void listener();
-
+ 
+  /* Method sends command to the sensor */
   boolean sendCommand(const uint8_t *command,
                       uint8_t howManyTimesRetry = HPMA115S0_RETRY);
-
+  
+  /* It returns the data in JSON format */
   void getJSON(char *json);
 };
 

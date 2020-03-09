@@ -124,7 +124,7 @@ AFEI2CScanner I2CScanner;
 AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 #include <AFE-Sensor-BMEX80.h>
 AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
@@ -272,7 +272,6 @@ void setup() {
 
   /* Initializing Firmware: version PRO */
   Firmware.begin();
-
   WebServer.begin(&Device, &Firmware);
 #ifdef AFE_CONFIG_HARDWARE_LED
   WebServer.initSystemLED(&Led);

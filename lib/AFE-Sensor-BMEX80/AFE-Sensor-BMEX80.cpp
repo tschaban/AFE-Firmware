@@ -9,11 +9,13 @@ void AFESensorBMEX80::begin(uint8_t id) {
   configuration = Data.getBMEX80SensorConfiguration(id);
   I2CPORT I2C = Data.getI2CPortConfiguration();
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
   }
+#endif
 
 #if defined(DEBUG)
   Serial << endl << endl << "-------- BMEX80: Initializing --------";
@@ -73,7 +75,7 @@ void AFESensorBMEX80::listener() {
               : configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
 
       if (readStatus) {
-        sensorData =
+        data =
             configuration.type == AFE_BME680_SENSOR
                 ? s6.data
                 : configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
@@ -83,29 +85,29 @@ void AFESensorBMEX80::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << "Temperature = " << sensorData.temperature.value << endl
-               << "Pressure = " << sensorData.pressure.value
-               << ", Relative = " << sensorData.relativePressure.value;
+               << "Temperature = " << data.temperature.value << endl
+               << "Pressure = " << data.pressure.value
+               << ", Relative = " << data.relativePressure.value;
         if (configuration.type != AFE_BMP180_SENSOR) {
-          Serial << endl << "Humidity = " << sensorData.humidity.value;
-          Serial << endl << "Dew Point = " << sensorData.dewPoint.value;
+          Serial << endl << "Humidity = " << data.humidity.value;
+          Serial << endl << "Dew Point = " << data.dewPoint.value;
         }
         if (configuration.type == AFE_BME680_SENSOR) {
           Serial << endl
-                 << "Gas Resistance = " << sensorData.gasResistance.value;
-          Serial << endl << "IAQ = " << sensorData.iaq.value;
-          Serial << endl << "IAQ Accuracy = " << sensorData.iaq.accuracy;
-          Serial << endl << "Static IAQ = " << sensorData.staticIaq.value;
+                 << "Gas Resistance = " << data.gasResistance.value;
+          Serial << endl << "IAQ = " << data.iaq.value;
+          Serial << endl << "IAQ Accuracy = " << data.iaq.accuracy;
+          Serial << endl << "Static IAQ = " << data.staticIaq.value;
           Serial << endl
-                 << "Static IAQ Accuracy = " << sensorData.staticIaq.accuracy;
+                 << "Static IAQ Accuracy = " << data.staticIaq.accuracy;
           Serial << endl
-                 << "Breath VOC = " << sensorData.breathVocEquivalent.value;
+                 << "Breath VOC = " << data.breathVocEquivalent.value;
           Serial << endl
                  << "Breath VOC Accuracy = "
-                 << sensorData.breathVocEquivalent.accuracy;
-          Serial << endl << "CO2 = " << sensorData.co2Equivalent.value;
+                 << data.breathVocEquivalent.accuracy;
+          Serial << endl << "CO2 = " << data.co2Equivalent.value;
           Serial << endl
-                 << "CO2 Accuracy = " << sensorData.co2Equivalent.accuracy;
+                 << "CO2 Accuracy = " << data.co2Equivalent.accuracy;
         }
 
       } else {
@@ -130,18 +132,18 @@ void AFESensorBMEX80::getJSON(char *json) {
   JsonObject &pressure = root.createNestedObject("pressure");
   JsonObject &relativePressure = root.createNestedObject("relativePressure");
 
-  temperature["value"] = sensorData.temperature.value;
+  temperature["value"] = data.temperature.value;
   temperature["unit"] =
       configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
                                                                      : "F";
   temperature["correction"] = configuration.temperature.correction;
 
-  pressure["value"] = sensorData.pressure.value;
+  pressure["value"] = data.pressure.value;
   pressure["unit"] =
       configuration.pressure.unit == AFE_PRESSURE_UNIT_HPA ? "hPa" : "?";
   pressure["correction"] = configuration.pressure.correction;
 
-  relativePressure["value"] = sensorData.relativePressure.value;
+  relativePressure["value"] = data.relativePressure.value;
   relativePressure["unit"] = pressure["unit"];
 
   /* Not applicable for BMP180 Sensor */
@@ -150,14 +152,14 @@ void AFESensorBMEX80::getJSON(char *json) {
     JsonObject &humidity = root.createNestedObject("humidity");
     JsonObject &heatIndex = root.createNestedObject("heatIndex");
 
-    dewPoint["value"] = sensorData.dewPoint.value;
+    dewPoint["value"] = data.dewPoint.value;
     dewPoint["unit"] = temperature["unit"];
-    humidity["value"] = sensorData.humidity.value;
+    humidity["value"] = data.humidity.value;
     humidity["unit"] = "%";
     humidity["correction"] = configuration.humidity.correction;
-    humidity["rating"] = sensorData.humidity.rating;
+    humidity["rating"] = data.humidity.rating;
 
-    heatIndex["value"] = sensorData.heatIndex.value;
+    heatIndex["value"] = data.heatIndex.value;
     heatIndex["unit"] = temperature["unit"];
   }
 
@@ -170,24 +172,24 @@ void AFESensorBMEX80::getJSON(char *json) {
         root.createNestedObject("breathVocEquivalent");
     JsonObject &gasResistance = root.createNestedObject("gasResistance");
 
-    iaq["value"] = sensorData.iaq.value;
-    iaq["rating"] = sensorData.iaq.rating;
-    iaq["accuracy"] = sensorData.iaq.accuracy;
+    iaq["value"] = data.iaq.value;
+    iaq["rating"] = data.iaq.rating;
+    iaq["accuracy"] = data.iaq.accuracy;
 
-    staticIaq["value"] = sensorData.staticIaq.value;
-    staticIaq["rating"] = sensorData.staticIaq.rating;
-    staticIaq["accuracy"] = sensorData.staticIaq.accuracy;
+    staticIaq["value"] = data.staticIaq.value;
+    staticIaq["rating"] = data.staticIaq.rating;
+    staticIaq["accuracy"] = data.staticIaq.accuracy;
 
-    co2Equivalent["value"] = sensorData.co2Equivalent.value;
+    co2Equivalent["value"] = data.co2Equivalent.value;
     co2Equivalent["unit"] = "ppm";
-    co2Equivalent["rating"] = sensorData.co2Equivalent.rating;
-    co2Equivalent["accuracy"] = sensorData.co2Equivalent.accuracy;
+    co2Equivalent["rating"] = data.co2Equivalent.rating;
+    co2Equivalent["accuracy"] = data.co2Equivalent.accuracy;
 
-    breathVocEquivalent["value"] = sensorData.breathVocEquivalent.value;
+    breathVocEquivalent["value"] = data.breathVocEquivalent.value;
     breathVocEquivalent["unit"] = "?";
-    breathVocEquivalent["accuracy"] = sensorData.breathVocEquivalent.accuracy;
+    breathVocEquivalent["accuracy"] = data.breathVocEquivalent.accuracy;
 
-    gasResistance["value"] = sensorData.gasResistance.value;
+    gasResistance["value"] = data.gasResistance.value;
     gasResistance["unit"] = "kOm";
   }
   //@TODO Estimate max size of JSON
@@ -202,54 +204,68 @@ void AFESensorBMEX80::applyCorrections() {
   AFESensorsCommon calculation;
 
   if (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
-    sensorData.temperature.value =
-        calculation.celsiusToFerenheit(sensorData.temperature.value);
+    data.temperature.value =
+        calculation.celsiusToFerenheit(data.temperature.value);
   }
 
   if (configuration.temperature.correction != 0) {
-    sensorData.temperature.value += configuration.temperature.correction;
+    data.temperature.value += configuration.temperature.correction;
   }
 
   if (configuration.type != AFE_BMP180_SENSOR) {
     if (configuration.humidity.correction != 0) {
-      sensorData.humidity.value += configuration.humidity.correction;
+      data.humidity.value += configuration.humidity.correction;
     }
 
-    sensorData.heatIndex.value =
+    data.heatIndex.value =
         configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
-            ? calculation.heatIndexF((double)sensorData.temperature.value,
-                                     (double)sensorData.humidity.value)
-            : calculation.heatIndexC((double)sensorData.temperature.value,
-                                     (double)sensorData.humidity.value);
+            ? calculation.heatIndexF((double)data.temperature.value,
+                                     (double)data.humidity.value)
+            : calculation.heatIndexC((double)data.temperature.value,
+                                     (double)data.humidity.value);
 
-    sensorData.dewPoint.value =
+    data.dewPoint.value =
         configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
             ? calculation.celsiusToFerenheit(calculation.dewPoint(
-                  calculation.ferenheitToCelsius(sensorData.temperature.value),
-                  sensorData.humidity.value))
-            : calculation.dewPoint(sensorData.temperature.value,
-                                   sensorData.humidity.value);
+                  calculation.ferenheitToCelsius(data.temperature.value),
+                  data.humidity.value))
+            : calculation.dewPoint(data.temperature.value,
+                                   data.humidity.value);
 
 #ifdef AFE_CONFIG_HUMIDITY
-    sensorData.humidity.rating =
-        calculation.humidityRating(sensorData.humidity.value);
+    data.humidity.rating =
+        calculation.humidityRating(data.humidity.value);
 #endif
   }
 
   if (configuration.pressure.correction != 0) {
-    sensorData.pressure.value += configuration.pressure.correction;
+    data.pressure.value += configuration.pressure.correction;
   }
-  sensorData.relativePressure.value = calculation.relativePressure(
-      sensorData.pressure.value, configuration.altitude,
-      sensorData.temperature.value);
+  data.relativePressure.value = calculation.relativePressure(
+      data.pressure.value, configuration.altitude,
+      data.temperature.value);
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   if (configuration.type == AFE_BME680_SENSOR) {
-    sensorData.iaq.rating = calculation.iaqRating(sensorData.iaq.value);
-    sensorData.staticIaq.rating =
-        calculation.iaqRating(sensorData.staticIaq.value);
-    sensorData.co2Equivalent.rating =
-        calculation.co2Rating(sensorData.co2Equivalent.value);
+    data.iaq.rating = calculation.iaqRating(data.iaq.value);
+    data.staticIaq.rating =
+        calculation.iaqRating(data.staticIaq.value);
+    data.co2Equivalent.rating =
+        calculation.co2Rating(data.co2Equivalent.value);
   }
 #endif
 }
+
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
+afe_humidity_domoticz_state_t AFESensorBMEX80::getDomoticzHumidityState(float value) {
+  if (value < 40) {
+    return AFE_HUMIDITY_DRY;
+  } else if (value >= 40 && value <= 60) {
+    return AFE_HUMIDITY_COMFORTABLE;
+  } else if (value > 60) {
+    return AFE_HUMIDITY_WET;
+  } else {
+    return AFE_HUMIDITY_NORMAL;
+  }
+}
+#endif

@@ -21,49 +21,36 @@ boolean AFEFirmwarePro::callService(uint8_t method) {
 
 #ifdef DEBUG
   Serial << endl
-         << endl
+         << "INFO: "
          << (method == AFE_WEBSERVICE_VALIDATE_KEY ? "Validating" : "Adding")
          << " serial number" << endl
-         << "URL: " << url << endl
-         << "response: ";
+         << "INFO: URL: " << url << endl
+         << "INFO: Response: ";
 #endif
 
   http.begin(client, url);
   int httpCode = http.GET();
   if (httpCode > 0) {
-    /* ArduinoJson v5 */
-    StaticJsonBuffer<135> jsonBuffer;
+    StaticJsonBuffer<AFE_RESPONSE_KEY_VALIDATION> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(http.getString());
-
-    /* ArduinoJson v6
-    StaticJsonDocument<135> root;
-    DeserializationError error = deserializeJson(root, http.getString());
-*/
-    /* ArduinoJson v5*/
     if (root.success()) {
+
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: JSON: ";
+#endif
+
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
 
-      /* ArduinoJson v6
-      if (!error) {
-  #ifdef DEBUG
-        serializeJson(root, Serial);
-  #endif
-  */
       Pro.valid = root["status"];
-
 #ifdef DEBUG
-      /* ArduinoJson v5 */
       Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << jsonBuffer.size();
-
-      /* ArduinoJson v6
-      Serial << endl
-             << "success" << endl
-             << "JSON Buffer size: " << root.size();*/
-
+             << "INFO: JSON: Buffer size: " << AFE_RESPONSE_KEY_VALIDATION
+             << ", actual JSON size: " << jsonBuffer.size();
+      if (AFE_RESPONSE_KEY_VALIDATION < jsonBuffer.size() + 10) {
+        Serial << endl << "WARN: Too small buffer size";
+      }
 #endif
 
       Data.saveConfiguration(Pro);
@@ -71,13 +58,14 @@ boolean AFEFirmwarePro::callService(uint8_t method) {
 
 #ifdef DEBUG
     else {
-      Serial << "failure parshing JSON";
+      Serial << "ERROR: JSON not pharsed";
     }
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << "failure: opening HTTP [" << httpCode << "]";
+     
+    Serial << endl << "ERROR: HTTP [" << httpCode << "] not opended";
   }
 #endif
   http.end();
@@ -89,15 +77,13 @@ void AFEFirmwarePro::reValidateKey() {
 
 #ifdef DEBUG
   Serial << endl
-         << endl
-         << "-------------------- CHECKING KEY -----------------------" << endl
-         << "After: " << minutes << " minutes";
+         << "INFO: Checking AFE PRO Key after: " << minutes << " minutes";
 #endif
 
   if (strlen(Pro.serial) == 0 && Pro.valid) {
     Pro.valid = false;
 #ifdef DEBUG
-    Serial << endl << "WARN: Valid with no Key";
+    Serial << endl << "INFO: Valid with no Key";
 #endif
     Data.saveConfiguration(Pro);
   } else if (strlen(Pro.serial) > 0) {
@@ -105,17 +91,13 @@ void AFEFirmwarePro::reValidateKey() {
     if (_valid != Pro.valid) {
 #ifdef DEBUG
       Serial << endl
-             << "Key status is not up2date. Saving it state: Valid: " << endl
+             << "INFO: Key status is not up2date. Saving it state: Valid: " << endl
              << (_valid ? "YES" : "NO");
 #endif
       Pro.valid = _valid;
       Data.saveConfiguration(Pro);
     }
   }
-
-#ifdef DEBUG
-  Serial << endl << "---------------------------------------------------------";
-#endif
 }
 
 void AFEFirmwarePro::listener() {
