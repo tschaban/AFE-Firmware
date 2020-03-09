@@ -269,7 +269,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.1.0.B2"
+#define AFE_FIRMWARE_VERSION "2.1.0"
 #define AFE_FIRMWARE_TYPE 6
 
 //#define AFE_CONFIG_API_DOMOTICZ_ENABLED
