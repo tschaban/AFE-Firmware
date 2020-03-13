@@ -82,7 +82,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.1.1"
+#define AFE_FIRMWARE_VERSION "2.1.2.B1"
 #define AFE_FIRMWARE_TYPE 0
 
 

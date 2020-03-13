@@ -97,7 +97,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTDomoticz::processRequest() {
   DOMOTICZ_MQTT_COMMAND command = getCommand();
-  if (command.domoticz.idx > 0 && idxForProcessing(command.domoticz.idx)) {
+  if (command.domoticz.idx > 0) {
 #ifdef DEBUG
     uint8_t _found = false;
 #endif
