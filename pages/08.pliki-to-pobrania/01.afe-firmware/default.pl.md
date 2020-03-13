@@ -28,6 +28,10 @@ recaptchacontact:
 
 
 ##### [Pobierz najnowszą wersję 2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1//?target=_blank)
+**Wersja Beta**
+* [Wersja 2.1.2.B1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-2-b1-domoticz/?target=_blank)
+!!!! Dla Domoticz 4.11x Beta
+
 **Poprzednie wersje**
 * [Wersje 2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
 * [Wersje 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
