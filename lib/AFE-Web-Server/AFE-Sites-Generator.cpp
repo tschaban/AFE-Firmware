@@ -529,7 +529,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 
   page += "<div class=\"cf\"><label>";
   page += L_VERSION;
-  page += " Domoitcz</label><select name=\"v\"><option value=\"";
+  page += " Domoticz</label><select name=\"v\"><option value=\"";
   page += AFE_DOMOTICZ_VERSION_0;
   page += "\"";
   page += configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
