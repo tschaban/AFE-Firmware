@@ -5,7 +5,7 @@
 
 $type = "0";
 $version = "2.2.0";
-$language = "EN";
+$language = "PL";
 
 /******************/
 
