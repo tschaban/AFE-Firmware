@@ -524,12 +524,37 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #endif
 
   addConfigurationBlock(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+  page += "<div class=\"cf\"><label>";
+  page += L_VERSION;
+  page += " Domoitcz</label><select name=\"v\"><option value=\"";
+  page += AFE_DOMOTICZ_VERSION_0;
+  page += "\"";
+  page += configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
+              ? " selected=\"selected\""
+              : "";
+  page += ">";
+  page += L_DOMOTICZ_VERSION_410;
+  page += "</option><option value=\"";
+  page += AFE_DOMOTICZ_VERSION_1;
+  page += "\"";
+  page += configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_1
+              ? " selected=\"selected\""
+              : "";
+  page += ">";
+  page += L_DOMOTICZ_VERSION_2020;
+  page += "</option></select></div>";
+#endif
+
   page += "<div class=\"cc\"><label><input name=\"h\" "
           "type=\"checkbox\" value=\"1\"";
   page += configuration.api.http ? " checked=\"checked\"" : "";
   page += ">HTTP API</label></div><div class=\"cc\"><label>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
   page += "<input name=\"m\" type=\"radio\" "
           "value=\"1\"";
   page += configuration.api.domoticz ? " checked=\"checked\"" : "";
@@ -951,7 +976,7 @@ void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
 #else
   if (Device->configuration.api.mqtt) {
     addConfigurationBlock(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
-    addItem(page,"text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     page += "</fieldset></div>";
   }
 #endif
@@ -1013,7 +1038,7 @@ void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 
   SWITCH configuration = Data.getSwitchConfiguration(id);
   page += "<div class=\"cf\">";
-  
+
   generateConfigParameter_GPIO(page, "g", configuration.gpio);
   page += "</div><div class=\"cf\"><label>";
   page += L_FUNCTIONALITY;
@@ -1818,7 +1843,7 @@ void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
 #else
   if (Device->configuration.api.mqtt) {
     addConfigurationBlock(page, L_MQTT_TOPIC_HPMA115S0, L_MQTT_TOPIC_EMPTY);
-    addItem(page,"text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
     page += "</fieldset></div>";
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -1828,7 +1853,6 @@ void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
   BMEX80 configuration = Data.getBMEX80SensorConfiguration(id);
-
 
   char _number[7];
 
@@ -1907,9 +1931,6 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
       addItem(page, "number", "hc", L_HUMIDITY, _number, "?", "-99.999",
               "99.999", "0.001");
     }
-
-
-
 
     sprintf(_number, "%-.3f", configuration.pressure.correction);
     addItem(page, "number", "pc", L_PRESSURE, _number, "?", "-999.999",
@@ -2478,7 +2499,7 @@ void AFESitesGenerator::generateHardwareItemsList(String &page,
                                                   uint8_t noOffConnected,
                                                   const char *field,
                                                   const char *label) {
-  generateHardwareList(page,noOfItems, noOffConnected, field, label, 1, 0);
+  generateHardwareList(page, noOfItems, noOffConnected, field, label, 1, 0);
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR

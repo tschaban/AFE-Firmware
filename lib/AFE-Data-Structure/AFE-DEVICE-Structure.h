@@ -16,6 +16,7 @@ struct AFE_DEVICE_API {
   boolean mqtt;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   boolean domoticz;
+  uint8_t domoticzVersion;
 #endif
 };
 

@@ -382,8 +382,8 @@ void setup() {
             "                          #";
   if (Device.getMode() != AFE_MODE_NORMAL) {
     Serial << endl
-         << "#                           CONFIGURATION MODE"
-            "                         #";
+           << "#                           CONFIGURATION MODE"
+              "                         #";
   }
 
   Serial << endl
@@ -421,10 +421,6 @@ void loop() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
         gateEventsListener();
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-        relayEventsListener();
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
@@ -487,6 +483,10 @@ void loop() {
   /* Listens and processes switch events */
   switchEventsListener();
   processSwitchEvents();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+  relayEventsListener();
 #endif
 
 /* Led listener */
