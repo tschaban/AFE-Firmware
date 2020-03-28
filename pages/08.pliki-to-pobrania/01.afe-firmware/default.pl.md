@@ -23,8 +23,9 @@ recaptchacontact:
 * Podstawowa wersja z opcją automatycznego wyłączania do 4 przekaźników
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t0-wlacznik-wifi) dotyczące AFE Firmware T0
-* Paczka do ściągnięcia zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
-* Pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+* Paczka do ściągnięcia 
+	* zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
+	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
 ##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-2-0/?target=_blank)
@@ -59,7 +60,7 @@ recaptchacontact:
 * [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t6-stacja-pogody) dotyczące AFE Firmware T6
 * Paczka do ściągnięcia 
 	* zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
-	* zawiera wersje API dla użytkowników Domoticz. Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+	* pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
 ##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-0/?target=_blank)
