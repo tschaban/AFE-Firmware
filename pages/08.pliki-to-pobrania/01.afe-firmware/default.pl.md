@@ -62,9 +62,10 @@ recaptchacontact:
 	* zawiera wersje API dla użytkowników Domoticz. Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
-##### [Pobierz najnowszą wersję 2.1.0](https://www.smartnydom.pl/download/afe-firmware-t6-2-1-0//?target=_blank)
+##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-0/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja 2.1.0 [ESP8266/ESP8285](https://www.smartnydom.pl/download/afe-firmware-t6-2-1-0/?target=_blank)
 * Wersja 2.0.0 [ESP8266/ESP8285](https://www.smartnydom.pl/download/afe-firmware-t6/?target=_blank)
 * Wersja 1.0.1 [ESP8266/ESP8285](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
 
