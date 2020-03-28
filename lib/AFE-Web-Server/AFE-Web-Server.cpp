@@ -648,6 +648,9 @@ DEVICE AFEWebServer::getDeviceData() {
   data.api.mqtt = server.arg("m").length() > 0
                       ? (server.arg("m").toInt() == 2 ? true : false)
                       : false;
+  data.api.domoticzVersion = server.arg("v").length() > 0
+                                 ? server.arg("v").toInt()
+                                 : AFE_DOMOTICZ_VERSION_DEFAULT;
 #else
   data.api.mqtt = server.arg("m").length() > 0 ? true : false;
 #endif

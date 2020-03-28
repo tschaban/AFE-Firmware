@@ -82,7 +82,7 @@
 
 /* Basic Switch */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.1.2.B1"
+#define AFE_FIRMWARE_VERSION "2.2.0"
 #define AFE_FIRMWARE_TYPE 0
 
 
@@ -853,6 +853,10 @@ typedef enum {
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define AFE_DOMOTICZ_VERSION_0 0 // 4.10x
+#define AFE_DOMOTICZ_VERSION_1 1 // 2020.x
+#define AFE_DOMOTICZ_VERSION_DEFAULT AFE_DOMOTICZ_VERSION_0
+
 #define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX

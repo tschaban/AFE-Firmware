@@ -107,6 +107,13 @@
 #define L_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
 #endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define L_DOMOTICZ_VERSION_410 "4.10x i wcześniejsze"
+#define L_DOMOTICZ_VERSION_2020 "2020.x i późniejsze"
+#endif
+
+
+
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
 #define L_NETWORK_CONFIGURATION_INFO                                               \
@@ -152,6 +159,7 @@
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_NO_IF_IDX_0                                                          \
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
+
 
 /* Form: Led configuration */
 #ifdef AFE_CONFIG_HARDWARE_LED

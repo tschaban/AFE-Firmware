@@ -148,6 +148,11 @@
 #define L_NO_IF_IDX_0                                                          \
   "If IDX is set to 0 then a value won't be sent to Domoticz"
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define L_DOMOTICZ_VERSION_410 "4.10x or older"
+#define L_DOMOTICZ_VERSION_2020 "2020.x or newer"
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
 /* Form: Led configuration */
 #define L_CHANGE_LED_INDICATION "Change LED ligtning to opposite"

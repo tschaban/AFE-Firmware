@@ -360,6 +360,7 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       configuration.api.mqtt = root["api"]["mqtt"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.api.domoticz = root["api"]["domoticz"] | false;
+      configuration.api.domoticzVersion = root["api"]["domoticzVersion"] | AFE_DOMOTICZ_VERSION_DEFAULT;
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration.api.domoticz && !configuration.api.http) {
         configuration.api.http = true;
@@ -448,6 +449,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     jsonAPI["mqtt"] = configuration->api.mqtt;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     jsonAPI["domoticz"] = configuration->api.domoticz;
+    jsonAPI["domoticzVersion"] = configuration->api.domoticzVersion;
 #endif
     root["noOfLEDs"] = configuration->noOfLEDs;
     root["noOfSwitches"] = configuration->noOfSwitches;
@@ -618,6 +620,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   deviceConfiguration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   deviceConfiguration.api.domoticz = false;
+  deviceConfiguration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
 #endif
   deviceConfiguration.api.http = true;
 

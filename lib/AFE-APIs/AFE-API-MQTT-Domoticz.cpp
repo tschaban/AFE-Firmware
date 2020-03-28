@@ -10,6 +10,13 @@ AFEAPIMQTTDomoticz::AFEAPIMQTTDomoticz() : AFEAPI(){};
 void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
                                AFELED *Led) {
   AFEAPI::begin(Data, Device, Led);
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: Domoticz version: "
+         << (Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
+                 ? L_DOMOTICZ_VERSION_410
+                 : L_DOMOTICZ_VERSION_2020);
+#endif
 }
 #else
 void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
@@ -97,7 +104,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTDomoticz::processRequest() {
   DOMOTICZ_MQTT_COMMAND command = getCommand();
-  if (command.domoticz.idx > 0) {
+  if (command.domoticz.idx > 0 && idxForProcessing(command.domoticz.idx)) {
 #ifdef DEBUG
     uint8_t _found = false;
 #endif
@@ -158,7 +165,9 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
-  if (idx == bypassProcessing.idx) {
+// Returns true if Domoticz is in version 2020.x. All requests are processed
+  if (idx == bypassProcessing.idx &&
+      _Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0) {
     bypassProcessing.idx = 0;
     _ret = false;
   }
@@ -359,7 +368,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
 
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
         sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(
-                                  _BMx80Sensor[id]->data.humidity.value));
+                                 _BMx80Sensor[id]->data.humidity.value));
         generateDeviceValue(
             json, _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,
             (uint8_t)_BMx80Sensor[id]->data.humidity.value);
