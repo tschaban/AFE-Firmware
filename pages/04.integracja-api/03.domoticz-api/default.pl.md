@@ -11,7 +11,7 @@ recaptchacontact:
 	* w przypadku Domoticz HTTP API [skonfigurować połączenie do serwera Domoticz](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/serwer-domoticz)
 	* w przypadku Domoticz MQTT API [skonfigurować połączenie do brokera MQTT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/mqtt-broker) 
 
-!! Bezproblemowe wsparcie Domoticz w wersji 2020 dostępne jest od AFE w wersji 2.2.x
+!!! Bezproblemowe wsparcie Domoticz w wersji 2020 dostępne jest od AFE w wersji 2.2.x
 
 ##### Procedura konfiguracji wygląda następująco:
 * w Domoticz dodajemy urządzenie typu Dummy, do którego dodajemy wirtualne elementy, jak włączniki, czy czujniki np.: temperatury
