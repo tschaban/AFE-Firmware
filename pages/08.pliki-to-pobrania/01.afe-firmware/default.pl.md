@@ -27,12 +27,10 @@ recaptchacontact:
 * Pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz. Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
-##### [Pobierz najnowszą wersję 2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1//?target=_blank)
-**Wersja Beta**
-* [Wersja 2.1.2.B1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-2-b1-domoticz/?target=_blank) - Tylko dla Domoticz 4.11x Beta
-
+##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-2-0/?target=_blank)
 
 **Poprzednie wersje**
+* [Wersje 2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1/?target=_blank)
 * [Wersje 2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
 * [Wersje 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
 * Wersje 2.0.0 - 2.0.1: [Archiwum](https://drive.google.com/drive/folders/1dKf5vOTjD53RPvnlTQLNaxTWL-N3hKNC/?target=_blank)
