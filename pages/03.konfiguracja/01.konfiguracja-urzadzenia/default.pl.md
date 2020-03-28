@@ -53,6 +53,10 @@ Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządze
 #### Sekcja: Sterowanie urządzeniem
 ![](afe-firmware-konfiguracja-urzadzenia-api.png)
 
+* Wybranie wersji Domoticz 
+	* 4.10 i wersje wcześniejsze
+	* 2020 oraz wersje późniejsze
+! Opcja widoczna jest tylko dla AFE Firmware z Domoticz API
 * Włączanie / wyłączanie mechanizmów sterowania urządzeniem (API)
 * Włączanie danego API, jeśli tego wymaga, uaktywnia sekcję konfiguracyjną w menu Panelu Konfiguracyjny
 * Domoticz API wymaga do swojego poprawnego działania, również włączone HTTP API
