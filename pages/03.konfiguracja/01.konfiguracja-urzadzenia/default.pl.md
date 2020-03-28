@@ -32,19 +32,16 @@ Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządze
 ![](afe-firmware-konfiguracja-urzadzenia.png)
 
 #### Sekcja: Urządzenie
-
-![](afe-firmware-konfiguracja-urzadzenia-nazwa.png)
-
 ##### Nazwa urządzenia
+![](afe-firmware-konfiguracja-urzadzenia-nazwa.png)
 * Powinna to być unikalną nazwą urządzenia w ramach twojej lokalnej sieci (LAN).
 * Podczas konfiguracji urządzenia w trybie Access Point (HotSpot) wpisana wartość stanie się nazwą sieci WiFi urządzenia
 * Wprowadzenie **Nazwy** jest wymagane
 
 ! Jeśli do sterowania urządzeniami wykorzystywany jest MQTT API to każde urządzenia łączące się z brokerem MQTT musi mieć unikalną nazwię
 
-![](afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png)
-
 #### Sekcja: Konfiguracja urządzenia
+![](afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png)
 
 * W tej sekcji wybierane są jakie elementy typu przekaźniki, czujniki, diody LED itp są podłączone do urządzania
 
@@ -53,9 +50,9 @@ Ekran do konfiguracji urządzenia uruchamia się zaznaczając element **Urządze
 * Włączenie danego elementu powoduj uaktywnienie sekcji konfiguracji w menu panelu konfiguracji dla danego elementu urządzenia
 * Liczba określa ile elementów danego typu jest podłączonych do ESP8266/8285
 
+#### Sekcja: Sterowanie urządzeniem
 ![](afe-firmware-konfiguracja-urzadzenia-api.png)
 
-#### Sekcja: Sterowanie urządzeniem
 * Włączanie / wyłączanie mechanizmów sterowania urządzeniem (API)
 * Włączanie danego API, jeśli tego wymaga, uaktywnia sekcję konfiguracyjną w menu Panelu Konfiguracyjny
 * Domoticz API wymaga do swojego poprawnego działania, również włączone HTTP API
