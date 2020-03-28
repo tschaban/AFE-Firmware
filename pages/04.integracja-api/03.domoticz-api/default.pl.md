@@ -7,7 +7,7 @@ recaptchacontact:
 
 * Domoticz API umożliwia dwukierunkową integrację między urządzeniem z AFE Firmware, a Domoticz
 * Integracja opiera się o protokół HTTP lub MQTT (od AFE wersji 2.1)
-* Do poprawnego działania Domoticz API, należy go włączyć w [konfiguracji urządzenia](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia) oraz 
+* Do poprawnego działania Domoticz API, należy ustawić wersję Domoticz oraz wybrać API, z którego chcemy korzystać w [konfiguracji urządzenia](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia) oraz 
 	* w przypadku Domoticz HTTP API [skonfigurować połączenie do serwera Domoticz](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/serwer-domoticz)
 	* w przypadku Domoticz MQTT API [skonfigurować połączenie do brokera MQTT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-mechanizmow-sterowania/mqtt-broker) 
 
