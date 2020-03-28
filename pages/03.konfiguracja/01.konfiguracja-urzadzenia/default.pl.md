@@ -1,6 +1,6 @@
 ---
 title: Urządzenie
-media_order: 'afe-firmware-konfiguracja-urzadzenia-api.png,afe-firmware-konfiguracja-urzadzenia-nazwa.png,afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png,afe-firmware-konfiguracja-urzadzenia.png'
+media_order: 'afe-firmware-konfiguracja-urzadzenia-nazwa.png,afe-firmware-konfiguracja-urzadzenia-podlaczone-elementy.png,afe-firmware-konfiguracja-urzadzenia.png,afe-firmware-konfiguracja-urzadzenia-api.png'
 process:
     markdown: true
     twig: true
