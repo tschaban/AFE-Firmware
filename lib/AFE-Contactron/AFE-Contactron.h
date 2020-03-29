@@ -23,6 +23,11 @@ public:
   // ID of the GATE the contactron is assigned to. 255 None.
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructors */
   AFEContactron();
 
@@ -31,10 +36,6 @@ public:
 
   /* Method returns contactorn state */
   boolean get();
-
-  /* Method returns MQTT topic for this contactron */
-  const char *getMQTTCommandTopic();
-  const char *getMQTTStateTopic();
 
   /* Method returns true if cotactron state ahs changed */
   boolean changed();
@@ -57,9 +58,6 @@ private:
   unsigned long startTime = 0;
 
   AFELED ContactronLed;
-
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 };
 
 #endif

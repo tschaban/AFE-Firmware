@@ -165,7 +165,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
-// Returns true if Domoticz is in version 2020.x. All requests are processed
+  // Returns true if Domoticz is in version 2020.x. All requests are processed
   if (idx == bypassProcessing.idx &&
       _Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0) {
     bypassProcessing.idx = 0;
@@ -499,5 +499,31 @@ boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) {
   return true;
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
+
+boolean AFEAPIMQTTDomoticz::publishGateState(uint8_t id) {
+  char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
+  char value[4];
+  uint8_t gateState = _Gate[id]->get();
+  generateDeviceValue(json, _Gate[id]->configuration.domoticz.idx, "");
+  Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  return true;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPIMQTTDomoticz::addClass(AFEContactron *Item) {
+  AFEAPI::addClass(Item);
+}
+boolean AFEAPIMQTTDomoticz::publishContactronState(uint8_t id) {
+  char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
+  uint8_t state = _Contactron[id]->get();
+  generateDeviceValue(json, _Contactron[id]->configuration.domoticz.idx, "");
+  Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  return true;
+}
+#endif
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -99,12 +99,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   case AFE_CONFIG_SITE_CONTACTRON:
-    page += Site.addContactronConfiguration(siteConfig->deviceID);
+    Site.addContactronConfiguration(page,siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   case AFE_CONFIG_SITE_GATE:
-    page += Site.addGateConfiguration(siteConfig->deviceID);
+    Site.addGateConfiguration(page,siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -1008,15 +1008,16 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
     data.name[0] = '\0';
   }
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
-
+#endif
   return data;
 }
 #endif
@@ -1047,15 +1048,16 @@ GATE AFEWebServer::getGateData() {
                                ? server.arg("s" + String(i)).toInt()
                                : AFE_GATE_UNKNOWN;
   }
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
-
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
   return data;
 }

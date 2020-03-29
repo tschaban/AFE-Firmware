@@ -51,6 +51,14 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <AFE-Gate.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#include <AFE-Contactron.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -101,6 +109,13 @@ public:
   virtual void addClass(AFESensorAS3935 *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  virtual void addClass(AFEGate *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  virtual void addClass(AFEContactron *);
+#endif
 
 protected:
   /* Is API enabled, set in begin() */
@@ -137,6 +152,13 @@ protected:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+#endif
 
 };
 

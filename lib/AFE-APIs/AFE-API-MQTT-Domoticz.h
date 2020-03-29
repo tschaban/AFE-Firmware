@@ -99,6 +99,7 @@ public:
   void publishADCValues();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
   boolean publishBMx80SensorData(uint8_t id);
@@ -118,6 +119,18 @@ public:
   virtual void addClass(AFESensorAS3935 *);
   boolean publishAS3935SensorData(uint8_t id);
 #endif
+
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  virtual void addClass(AFEGate *);
+  boolean publishGateState(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  virtual void addClass(AFEContactron *);
+  boolean publishContactronState(uint8_t id);
+#endif
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

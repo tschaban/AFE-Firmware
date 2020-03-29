@@ -93,10 +93,12 @@
 #define AFE_CONFIG_HARDWARE_LED
 #endif
 
-
-/* Enabled APIs */
-//#define AFE_CONFIG_API_DOMOTICZ_ENABLED
-//#define AFE_CONFIG_FUNCTIONALITY_API_CONTROL
+/* Max number of hardware items, per AFE version */
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
+#ifdef AFE_CONFIG_HARDWARE_LED
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
+#endif
 
 
 /* Max number of hardware items per specyfic hardware device */
@@ -131,12 +133,7 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 5
 #endif
 
-/* Max number of hardware items, per AFE version */
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
-#ifdef AFE_CONFIG_HARDWARE_LED
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
-#endif
+
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -213,20 +210,16 @@
 #define AFE_FIRMWARE_TYPE 4
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-/* Gate */
+/* Gate --------------------------------------------------------------------------*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.1"
+#define AFE_FIRMWARE_VERSION "2.2.0.B1"
 #define AFE_FIRMWARE_TYPE 5
 
-/* Functionalities */
-#define AFE_CONFIG_FUNCTIONALITY_RELAY
-#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-#define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
-#define AFE_CONFIG_FUNCTIONALITY_GATE
-#define AFE_CONFIG_FUNCTIONALITY_ADC
 
+/* Define Hardware */
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
+#define AFE_CONFIG_FUNCTIONALITY_ADC
 
 /* Max number of hardware items per AFE version */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 2
@@ -235,6 +228,7 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS 4
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
 
+
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECSv20)
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
@@ -242,14 +236,15 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_GATES 2
-#else
 /* Generic version */
+#else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 4
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_GATES 2
 #endif
+
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECSv20)
@@ -266,6 +261,15 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 0
 #endif
+
+
+/* Functionalities */
+#define AFE_CONFIG_FUNCTIONALITY_RELAY
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
+#define AFE_CONFIG_FUNCTIONALITY_GATE
+#define AFE_CONFIG_FUNCTIONALITY_ADC
+
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
@@ -914,6 +918,7 @@ typedef enum {
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
 
 
+
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
@@ -935,6 +940,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 570
 #define AFE_CONFIG_FILE_BUFFER_AS3935 240
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 200 // not verfied
+#define AFE_CONFIG_FILE_BUFFER_GATE 300 // not verfied
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 34 // not verfied
 
 
 #define AFE_RESPONSE_KEY_VALIDATION 135

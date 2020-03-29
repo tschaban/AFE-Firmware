@@ -42,8 +42,8 @@ void gateEventsListener() {
     if (Gate[gateId].event()) {
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates.state[gateId] != _gateState) {
-        MQTTPublishGateState(gateId);
-        DomoticzPublishGateState(gateId);
+     //   MQTTPublishGateState(gateId);
+      //  DomoticzPublishGateState(gateId);
         GatesCurrentStates.state[gateId] = _gateState;
       }
     }

@@ -13,6 +13,17 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     ContactronLed.begin(configuration.ledID);
   }
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+    mqttStateTopic[0] = '\0';
+  }
+#endif
+
   _initialized = true;
 }
 
@@ -69,26 +80,4 @@ void AFEContactron::listener() {
       startTime = 0;
     }
   }
-}
-
-const char *AFEContactron::getMQTTCommandTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-
-const char *AFEContactron::getMQTTStateTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
-}
-
-unsigned long AFEContactron::getDomoticzIDX() {
-  return configuration.domoticz.idx;
 }

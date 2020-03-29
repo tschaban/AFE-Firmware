@@ -45,6 +45,17 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
     Contactron[i].begin(configuration.contactron.id[i], _Device, _Data);
   }
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+        sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+     mqttStateTopic[0] = '\0';
+  }
+#endif
+
+
 #ifdef DEBUG
   Serial << endl << "Gate Initialization completed";
 #endif
@@ -121,23 +132,3 @@ void AFEGate ::triggerEvent() {
 
   _event = true;
 }
-
-const char *AFEGate::getMQTTCommandTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = '\0';
-  }
-  return mqttCommandTopic;
-}
-
-const char *AFEGate::getMQTTStateTopic() {
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = '\0';
-  }
-  return mqttStateTopic;
-}
-
-unsigned long AFEGate::getDomoticzIDX() { return configuration.domoticz.idx; }

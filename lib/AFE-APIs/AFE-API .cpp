@@ -32,10 +32,10 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
 void AFEAPI::addClass(AFERelay *Relay) {
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     _Relay[i] = Relay + i;
-  }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the relays added";
+    Serial << endl << "INFO: The reference to the relay: " << i + 1 << " added";
 #endif
+  }
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -43,10 +43,11 @@ void AFEAPI::addClass(AFERelay *Relay) {
 void AFEAPI::addClass(AFESwitch *Switch) {
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
     _Switch[i] = Switch + i;
-  }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the switches added";
+    Serial << endl
+           << "INFO: The reference to the switche: " << i + 1 << " added";
 #endif
+  }
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -102,3 +103,26 @@ void AFEAPI::addClass(AFESensorAS3935 *Sensor) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPI::addClass(AFEGate *Item) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    _Gate[i] = Item + i;
+#ifdef DEBUG
+    Serial << endl << "INFO: The reference to the Gate: " << i + 1 << " added";
+#endif
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPI::addClass(AFEContactron *Item) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+    _Contactron[i] = Item + i;
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: The reference to the Contactron: " << i + 1 << " added";
+#endif
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON

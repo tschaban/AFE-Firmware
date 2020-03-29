@@ -67,7 +67,7 @@ private:
                             uint8_t noOffConnected, const char *field,
                             const char *label, uint8_t index,
                             uint8_t noneValue);
-                            
+
   void generateHardwareItemsList(String &item, uint8_t noOfItems,
                                  uint8_t noOffConnected, const char *field,
                                  const char *label);
@@ -79,7 +79,7 @@ private:
                boolean readonly = false);
 
 #if defined(T5_CONFIG)
-  const String generateGateStatesList(uint8_t id, byte state);
+  void generateGateStatesList(String &item, uint8_t id, byte state);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -147,11 +147,11 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  String addGateConfiguration(uint8_t id);
+  void addGateConfiguration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  String addContactronConfiguration(uint8_t id);
+  void addContactronConfiguration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0

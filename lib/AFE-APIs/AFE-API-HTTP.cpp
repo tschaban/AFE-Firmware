@@ -245,7 +245,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
     else {
       Serial << endl
              << "Excluding relay: " << i
-             << " as it's assigned to a Gate: " << Relay[i].gateId;
+             << " as it's assigned to a Gate: " << _Relay[i]->gateId;
     }
 #endif
 #endif

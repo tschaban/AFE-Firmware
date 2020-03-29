@@ -35,8 +35,8 @@ void contractonEventsListener() {
       }
 #endif
 
-      MQTTPublishContactronState(i);
-      DomoticzPublishContactronState(i);
+     // MQTTPublishContactronState(i);
+     // DomoticzPublishContactronState(i);
     }
   }
 }
