@@ -131,6 +131,14 @@ void AFEUpgrader::updateFirmwareVersion() {
   }
 #endif
 
+#ifdef T5_CONFIG
+  if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.0.1") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.2.0.B1") == 0) {
+    upgradeToT5V220();
+  }
+#endif
+
   Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
 }
 
@@ -194,6 +202,15 @@ void AFEUpgrader::upgradeToT0V210() {
 
   // Save to new JSON structure configuration file
   Data->saveConfiguration(&newDevice);
+}
+
+#endif // T0_CONFIG
+
+#ifdef T5_CONFIG
+void AFEUpgrader::upgradeToT5V220() {
+  Data->createI2CConfigurationFile();
+  Data->createBMEX80SensorConfigurationFile();
+  Data->createBH1750SensorConfigurationFile();
 }
 
 #endif // T0_CONFIG

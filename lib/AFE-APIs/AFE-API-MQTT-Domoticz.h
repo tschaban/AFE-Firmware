@@ -34,12 +34,21 @@ private:
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
 
   /* Generates custome sensor JSON */
-  void generateDeviceValue(char *json, uint32_t idx, char *svalue, uint8_t nvalue=0);
+  void generateDeviceValue(char *json, uint32_t idx, char *svalue,
+                           uint8_t nvalue = 0);
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Cache that stories IDXs */
-  DOMOTICZ_IDX_CACHE idxCache[AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH];
+  uint8_t lastIDXChacheIndex = 0;
+  DOMOTICZ_IDX_CACHE idxCache[1
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
 #endif
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+#endif
+  ];
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /* It stories IDX of a device that should be excluded from processing */
@@ -99,7 +108,6 @@ public:
   void publishADCValues();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
-
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
   boolean publishBMx80SensorData(uint8_t id);
@@ -120,7 +128,6 @@ public:
   boolean publishAS3935SensorData(uint8_t id);
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
   boolean publishGateState(uint8_t id);
@@ -130,7 +137,6 @@ public:
   virtual void addClass(AFEContactron *);
   boolean publishContactronState(uint8_t id);
 #endif
-
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

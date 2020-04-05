@@ -1770,8 +1770,13 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
     addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
     page += "<fieldset>";
     char _idx[7];
+
+    sprintf(_idx, "%d", gateConfiguration.domoticzControl.idx);
+    addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999", "1");
+
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
-    addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999", "1");
+
     page += "</fieldset></div>";
   }
 #else

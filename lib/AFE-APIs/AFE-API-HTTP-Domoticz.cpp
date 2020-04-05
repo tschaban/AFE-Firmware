@@ -97,7 +97,7 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
   AFEAPI::addClass(Relay);
-
+/*
 #ifdef DEBUG
   Serial << endl << "INFO: Caching IDXs for Relays";
 #endif
@@ -117,7 +117,7 @@ void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
       Serial << endl << " - IDX not set";
     }
 #endif
-  }
+  }*/
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 

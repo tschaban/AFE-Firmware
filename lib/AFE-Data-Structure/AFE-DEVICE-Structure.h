@@ -14,13 +14,48 @@
 struct AFE_DEVICE_API {
   boolean http;
   boolean mqtt;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   boolean domoticz;
   uint8_t domoticzVersion;
 #endif
 };
 
-/* Custom DEVICE structure definition */
+struct DEVICE {
+  char name[33];
+  AFE_DEVICE_API api;
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+  uint8_t noOfSwitches;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  uint8_t noOfRelays;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+  uint8_t noOfLEDs;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  boolean isAnalogInput;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  uint8_t noOfGates;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  uint8_t noOfContactrons;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  uint8_t noOfBMEX80s;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  uint8_t noOfHPMA115S0s;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  uint8_t noOfBH1750s;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  uint8_t noOfAS3935s;
+#endif
+};
+
+/* Custom DEVICE structure definition
 struct DEVICE {
   char name[33];
   AFE_DEVICE_API api;
@@ -68,6 +103,9 @@ struct DEVICE {
   uint8_t noOfSwitches;
   uint8_t noOfRelays;
   uint8_t noOfLEDs;
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  uint8_t noOfBMEX80s;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   boolean isAnalogInput;
 #endif
@@ -84,6 +122,7 @@ struct DEVICE {
 #endif
 #endif
 };
+*/
 
 #ifdef T0_CONFIG
 /* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */

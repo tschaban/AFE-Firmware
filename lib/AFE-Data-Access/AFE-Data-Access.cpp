@@ -367,36 +367,36 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
         configuration.api.http = true;
       }
 #endif
-      configuration.noOfLEDs = root["noOfLEDs"];
-      configuration.noOfSwitches = root["noOfSwitches"];
-      configuration.noOfRelays = root["noOfRelays"];
+      configuration.noOfLEDs = root["noOfLEDs"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
+      configuration.noOfSwitches = root["noOfSwitches"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
+      configuration.noOfRelays = root["noOfRelays"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       configuration.isAnalogInput = root["isAnalogInput"] | false;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-      configuration.noOfContactrons = root["noOfContactrons"];
+      configuration.noOfContactrons = root["noOfContactrons"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-      configuration.noOfGates = root["noOfGates"];
+      configuration.noOfGates = root["noOfGates"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-      configuration.noOfBMEX80s = root["noOfBMEX80s"];
+      configuration.noOfBMEX80s = root["noOfBMEX80s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-      configuration.noOfHPMA115S0s = root["noOfHPMA115S0s"];
+      configuration.noOfHPMA115S0s = root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-      configuration.noOfBH1750s = root["noOfBH1750s"];
+      configuration.noOfBH1750s = root["noOfBH1750s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-      configuration.noOfAS3935s = root["noOfAS3935s"];
+      configuration.noOfAS3935s = root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935;
 #endif
 
 #ifdef DEBUG
@@ -483,7 +483,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfBH1750s"] = configuration->noOfBH1750s;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_AS3935
     root["noOfAS3935s"] = configuration->noOfAS3935s;
 #endif
 
@@ -2610,6 +2610,7 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
       }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.idx = root["idx"];
+      configuration.domoticzControl.idx = root["idxControl"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
 #endif
@@ -2688,6 +2689,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE configuration) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration.domoticz.idx;
+    root["idxControl"] = configuration.domoticzControl.idx;
 #else
     root["MQTTTopic"] = configuration.mqtt.topic;
 #endif
@@ -2720,6 +2722,7 @@ void AFEDataAccess::createGateConfigurationFile() {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   GateConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  GateConfiguration.domoticzControl.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   GateConfiguration.mqtt.topic[0] = '\0';
 #endif

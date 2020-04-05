@@ -33,7 +33,8 @@ struct GATE {
   GATE_STATES states;
   char name[17];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
-  DOMOTICZ_BASIC_CONFIG domoticz;
+  DOMOTICZ_BASIC_CONFIG domoticz; // IDX for gate state
+  DOMOTICZ_BASIC_CONFIG domoticzControl; // IDX for gate controll
 #else
   MQTT_BASIC_CONFIG mqtt;
 #endif

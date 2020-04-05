@@ -293,6 +293,7 @@
 #define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
 #define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
 #define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
+#define L_IDX_GATE_STATE "IDX Gate/Door state"
 #endif
 
 /* HPMA11BS0 */

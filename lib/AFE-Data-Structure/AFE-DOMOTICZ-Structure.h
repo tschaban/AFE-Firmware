@@ -23,16 +23,17 @@ struct DOMOTICZ_MQTT_COMMAND {
 
 typedef enum {
   AFE_DOMOTICZ_DEVICE_RELAY = 0
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  , AFE_DOMOTICZ_DEVICE_GATE = 1
+#endif
 } afe_domoticz_device_type_t;
-
 
 struct DOMOTICZ_IDX_CACHE {
   DOMOTICZ_BASIC_CONFIG domoticz;
   uint8_t id;
-  afe_domoticz_device_type_t type; 
+  afe_domoticz_device_type_t type;
 };
-#endif //AFE_CONFIG_API_PROCESS_REQUESTS
-
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 struct DOMOTICZ {
   uint8_t protocol;

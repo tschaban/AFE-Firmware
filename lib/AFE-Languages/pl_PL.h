@@ -305,6 +305,7 @@
 #define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
 #define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
 #define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
+#define L_IDX_GATE_STATE "IDX Stan bramy/drzwi"
 #endif
 
 /* HPMA11BS0 */
