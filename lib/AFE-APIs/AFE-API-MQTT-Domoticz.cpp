@@ -40,6 +40,9 @@ void AFEAPIMQTTDomoticz::synchronize() {
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing RELAY: " << i;
+#endif
     publishRelayState(i);
   }
 #endif
@@ -47,7 +50,30 @@ void AFEAPIMQTTDomoticz::synchronize() {
 /* Synchronize: Switch */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing SWITCH: " << i;
+#endif
     publishSwitchState(i);
+  }
+#endif
+
+/* Synchronize: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing CONTACTRON: " << i;
+#endif
+    publishContactronState(i);
+  }
+#endif
+
+/* Synchronize: Gate */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing GATE: " << i;
+#endif
+    publishGateState(i);
   }
 #endif
 
@@ -504,11 +530,12 @@ boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) {
 void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
 
 boolean AFEAPIMQTTDomoticz::publishGateState(uint8_t id) {
-  char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
-  char value[4];
-  uint8_t gateState = _Gate[id]->get();
-  generateDeviceValue(json, _Gate[id]->configuration.domoticz.idx, "");
-  Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH];
+    generateSwitchMessage(json, _Gate[id]->configuration.domoticz.idx,
+                          _Gate[id]->get() == AFE_GATE_CLOSED ? false : true);
+    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
   return true;
 }
 #endif
@@ -518,10 +545,13 @@ void AFEAPIMQTTDomoticz::addClass(AFEContactron *Item) {
   AFEAPI::addClass(Item);
 }
 boolean AFEAPIMQTTDomoticz::publishContactronState(uint8_t id) {
-  char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
-  uint8_t state = _Contactron[id]->get();
-  generateDeviceValue(json, _Contactron[id]->configuration.domoticz.idx, "");
-  Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH];
+    generateSwitchMessage(
+        json, _Contactron[id]->configuration.domoticz.idx,
+        _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? true : false);
+    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
   return true;
 }
 #endif

@@ -25,16 +25,17 @@ void eventsListener() {
       Serial << endl << "INFO: Sending current gate state to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
-        //    DomoticzPublishGateState(i);
+        HttpDomoticzAPI.publishGateState(i);
       }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef DEBUG
-      Serial << endl << "Sending current state of contactrons to Domoticz";
+      Serial << endl
+             << "INFO: Sending current state of contactrons to Domoticz";
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-        //    DomoticzPublishContactronState(i);
+        HttpDomoticzAPI.publishContactronState(i);
         lastPublishedContactronState[i] = Contactron[i].get();
       }
 #endif
@@ -99,7 +100,8 @@ void eventsListener() {
 
   } /* End of Network.eventConnected() */
 
-/* Checking if device has connected to MQTT Broker. If yes it subsribes to MQTT Topics and sends device's items current states */
+  /* Checking if device has connected to MQTT Broker. If yes it subsribes to
+   * MQTT Topics and sends device's items current states */
   if (Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
       MqttAPI.subscribe();

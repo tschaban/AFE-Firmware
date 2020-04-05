@@ -81,3 +81,8 @@ void AFEContactron::listener() {
     }
   }
 }
+
+void AFEContactron::getJSON(char *json) {
+  sprintf(json, "{\"state\":\":%s\"}",
+          (get() == AFE_CONTACTRON_OPEN ? "open" : "closed"));
+}

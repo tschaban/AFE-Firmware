@@ -7,7 +7,7 @@ AFEGate::AFEGate(){};
 void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
 #ifdef DEBUG
-  Serial << endl << "Initializing the Gate: " << id;
+  Serial << endl << "INFO: Initializing the Gate: " << id;
 #endif
 
   Device = _Device;
@@ -16,7 +16,8 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
   gateId = id;
   configuration = Data->getGateConfiguration(gateId);
 #ifdef DEBUG
-  Serial << endl << "Initializing the gate's relay: " << configuration.relayId;
+  Serial << endl
+         << "INFO: Initializing the gate's relay: " << configuration.relayId;
 #endif
   if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
     GateRelay.begin(configuration.relayId);
@@ -24,7 +25,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
     GateRelay.gateId = id;
   }
 #ifdef DEBUG
-  Serial << endl << "Initializing the gate's " << id << ", contactrons";
+  Serial << endl << "INFO: Initializing the gate's " << id << ", contactrons";
 #endif
 
   /* How many contactrons monitors the gate. Default 0 set in class init
@@ -38,7 +39,8 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
 #ifdef DEBUG
   Serial << endl
-         << "Number of contactrons to initialize: " << numberOfContractons;
+         << "INFO: Number of contactrons to initialize: "
+         << numberOfContractons;
 #endif
 
   for (uint8_t i = 0; i < numberOfContractons; i++) {
@@ -48,24 +50,27 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-        sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
     mqttCommandTopic[0] = '\0';
-     mqttStateTopic[0] = '\0';
+    mqttStateTopic[0] = '\0';
   }
 #endif
 
-
 #ifdef DEBUG
-  Serial << endl << "Gate Initialization completed";
+  Serial << endl << "INFO: Gate Initialization completed";
 #endif
 }
 
 void AFEGate::toggle() {
+#ifdef DEBUG
+  Serial << endl << "INFO: Toggling gate";
+#endif
   GateRelay.on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractons == 0) {
-    Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN : AFE_GATE_CLOSED);
+    Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN
+                                                         : AFE_GATE_CLOSED);
     _event = true;
   }
 }
@@ -125,10 +130,21 @@ boolean AFEGate::event() {
   }
 }
 
-void AFEGate ::triggerEvent() {
+void AFEGate::triggerEvent() {
 #ifdef DEBUG
-  Serial << endl << "Gate event triggered externally";
+  Serial << endl << "INFO: Gate event triggered externally";
 #endif
 
   _event = true;
+}
+
+void AFEGate::getJSON(char *json) {
+  uint8_t _state = get();
+  sprintf(json, "{\"state\":\":%s\"}",
+          (_state == AFE_GATE_OPEN
+               ? "open"
+               : (_state == AFE_GATE_CLOSED
+                      ? "closed"
+                      : (_state == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen"
+                                                           : "unknown"))));
 }

@@ -43,10 +43,9 @@ public:
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 
-  /* Return IDX in Domoticz */
-  unsigned long getDomoticzIDX();
+      /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 
-protected:
 private:
   AFEDevice *Device;
   AFEDataAccess *Data;

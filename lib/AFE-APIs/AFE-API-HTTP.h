@@ -98,6 +98,14 @@ private:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -125,6 +133,14 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void processAS3935(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void processGate(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void processContactron(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -178,6 +194,16 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void addClass(AFESensorAS3935 *);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void addClass(AFEGate *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void addClass(AFEContactron *);
+#endif
+
+
 };
 
 #endif

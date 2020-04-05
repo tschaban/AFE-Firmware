@@ -13,7 +13,7 @@ void initializeGate() {
       Relay[Gate[i].configuration.relayId].gateId = i;
 #ifdef DEBUG
       Serial << endl
-             << "- For a RelayID: " << Gate[i].configuration.relayId
+             << "INFO: For a RelayID: " << Gate[i].configuration.relayId
              << " setting GateID: " << i;
 #endif
     }
@@ -23,13 +23,13 @@ void initializeGate() {
       Contactron[Gate[i].getContactronId(j)].gateId = i;
 #ifdef DEBUG
       Serial << endl
-             << "- For a ContactronID: " << Gate[i].getContactronId(j)
+             << "INFO: For a ContactronID: " << Gate[i].getContactronId(j)
              << " setting GateID: " << i;
 #endif
     }
 
 #ifdef DEBUG
-    Serial << endl << "Gate: " << i << " initialized";
+    Serial << endl << "INFO: Gate: " << i << " initialized";
 #endif
   }
 #endif
@@ -42,8 +42,10 @@ void gateEventsListener() {
     if (Gate[gateId].event()) {
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates.state[gateId] != _gateState) {
-     //   MQTTPublishGateState(gateId);
-      //  DomoticzPublishGateState(gateId);
+        MqttAPI.publishGateState(gateId);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        HttpDomoticzAPI.publishGateState(gateId);
+#endif
         GatesCurrentStates.state[gateId] = _gateState;
       }
     }

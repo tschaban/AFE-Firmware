@@ -26,24 +26,29 @@ void initializeHTTPDomoticzAPI() {
     }
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
+    HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HttpDomoticzAPI.addClass(&ParticleSensor[0]);
+    HttpDomoticzAPI.addClass(&ParticleSensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
+    HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
+    HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    HttpDomoticzAPI.addClass(&Contactron[0]);
+#endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    HttpDomoticzAPI.addClass(&Gate[0]);
+#endif
 
 #ifdef DEBUG
     Serial << endl << "API: MQTT init completed";
@@ -83,19 +88,27 @@ void initializeMQTTAPI() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  MqttAPI.addClass(&BMEX80Sensor[0]);
+    MqttAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  MqttAPI.addClass(&ParticleSensor[0]);
+    MqttAPI.addClass(&ParticleSensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  MqttAPI.addClass(&BH1750Sensor[0]);
+    MqttAPI.addClass(&BH1750Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  MqttAPI.addClass(&AS3935Sensor[0]);
+    MqttAPI.addClass(&AS3935Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    MqttAPI.addClass(&Gate[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    MqttAPI.addClass(&Contactron[0]);
 #endif
 
 #ifdef DEBUG
@@ -127,23 +140,28 @@ void initializeHTTPAPI() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  HttpAPI.addClass(&BMEX80Sensor[0]);
+    HttpAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HttpAPI.addClass(&ParticleSensor[0]);
+    HttpAPI.addClass(&ParticleSensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  HttpAPI.addClass(&BH1750Sensor[0]);
+    HttpAPI.addClass(&BH1750Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  HttpAPI.addClass(&AS3935Sensor[0]);
+    HttpAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    HttpAPI.addClass(&Gate[0]);
+#endif
 
-
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    HttpAPI.addClass(&Contactron[0]);
+#endif
 
 #ifdef DEBUG
     Serial << endl << "INFO: API: HTTP init completed";

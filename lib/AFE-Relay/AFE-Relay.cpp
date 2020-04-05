@@ -33,7 +33,7 @@ void AFERelay::begin(uint8_t id) {
 #endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-/* Defining get and state MQTT Topics */
+  /* Defining get and state MQTT Topics */
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
@@ -54,6 +54,11 @@ byte AFERelay::get() {
 
 /* Set relay to ON */
 void AFERelay::on(boolean invert) {
+
+#ifdef DEBUG
+  Serial << endl << "INFO: Relay: ON, inverted: " << (invert ? "YES" : "NO");
+#endif
+
   if (get() == AFE_RELAY_OFF) {
     digitalWrite(configuration.gpio, HIGH);
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -78,6 +83,11 @@ void AFERelay::on(boolean invert) {
 
 /* Set relay to OFF */
 void AFERelay::off(boolean invert) {
+
+#ifdef DEBUG
+  Serial << endl << "INFO: Relay: OFF, inverted: " << (invert ? "YES" : "NO");
+#endif
+
   if (get() == AFE_RELAY_ON) {
     digitalWrite(configuration.gpio, LOW);
 #ifdef AFE_CONFIG_HARDWARE_LED

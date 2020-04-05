@@ -109,7 +109,22 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processHPMA115S0(request);
   }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
-
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  else if (strcmp(request->device, "gate") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing GATE requests";
+#endif
+    processGate(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_GATE
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  else if (strcmp(request->device, "contactron") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing CONTACTRON requests";
+#endif
+    processContactron(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -320,8 +335,8 @@ void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
     if (strcmp(request->name, _BH1750Sensor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
-        char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];        
-          _BH1750Sensor[i]->getJSON(json);
+        char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];
+        _BH1750Sensor[i]->getJSON(json);
 
         send(request, true, json);
       } else {
@@ -388,6 +403,66 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPIHTTP::addClass(AFEGate *Item) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    _Gate[i] = Item + i;
+  }
+}
+void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    if (strcmp(request->name, _Gate[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      char json[AFE_CONFIG_API_JSON_GATE_DATA_LENGTH];
+      if (strcmp(request->command, "toggle") == 0) {
+        _Gate[i]->toggle();
+        _MqttAPI->publishGateState(i);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        _HttpAPIDomoticz->publishGateState(i);
+#endif
+        _Gate[i]->getJSON(json);
+        send(request, true, json);
+      } else if (strcmp(request->command, "get") == 0) {
+        _Gate[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPIHTTP::addClass(AFEContactron *Item) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+    _Contactron[i] = Item + i;
+  }
+}
+void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+    if (strcmp(request->name, _Contactron[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH];
+        _Contactron[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 /* Method creates JSON respons after processing HTTP API request, and pushes
  * it.

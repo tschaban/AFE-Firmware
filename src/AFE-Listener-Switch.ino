@@ -40,10 +40,9 @@ void processSwitchEvents() {
 
 #ifdef DEBUG
             Serial << endl
-                   << "- Relay is assigned to a gate: "
+                   << "INFO: Relay is assigned to a gate: "
                    << Relay[Switch[i].configuration.relayID].gateId;
 #endif
-
             Gate[Relay[Switch[i].configuration.relayID].gateId].toggle();
           }
         } else {

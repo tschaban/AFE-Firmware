@@ -870,6 +870,17 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 55 // Outgoing MQTT message size for switch
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70  // Outgoing MQTT message size for custom sensor
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH  200 // Not checked
+#endif
+
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Outgoing url size for statuses updates to Domoticz
 #define AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+1 // Size of the IDX cache
 #else

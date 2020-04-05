@@ -239,7 +239,8 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
       }
 
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(_BMx80Sensor[id]->data.humidity.value));
+        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(
+                                 _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,
             (uint8_t)_BMx80Sensor[id]->data.humidity.value);
@@ -354,4 +355,34 @@ boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
   return _ret;
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
+
+boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
+  boolean _ret = false;
+  if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
+    _ret = sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
+                             _Gate[id]->get() == AFE_GATE_OPEN ? "On" : "Off");
+  }
+  return _ret;
+}
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPIHTTPDomoticz::addClass(AFEContactron *Item) {
+  AFEAPI::addClass(Item);
+}
+
+boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
+  boolean _ret = false;
+  if (enabled && _Contactron[id]->configuration.domoticz.idx > 0) {
+    _ret = sendSwitchCommand(
+        _Contactron[id]->configuration.domoticz.idx,
+        _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? "On" : "Off");
+  }
+  return _ret;
+}
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

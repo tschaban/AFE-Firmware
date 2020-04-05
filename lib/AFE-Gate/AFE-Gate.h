@@ -56,6 +56,9 @@ public:
   /* It triggers event - used eg when contactron state is changed */
   void triggerEvent();
 
+    /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
+
 private:
   AFEDevice *Device;
   AFEDataAccess *Data;
