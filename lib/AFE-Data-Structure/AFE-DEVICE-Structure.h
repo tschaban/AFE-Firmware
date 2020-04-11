@@ -23,6 +23,7 @@ struct AFE_DEVICE_API {
 struct DEVICE {
   char name[33];
   AFE_DEVICE_API api;
+  uint8_t timeToAutoLogOff;
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   uint8_t noOfSwitches;
 #endif

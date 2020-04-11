@@ -46,7 +46,7 @@ private:
   AFEFirmwarePro *Firmware;
   char deviceID[17];
 
-  void generateHeader(String &page, uint8_t redirect);
+  void generateHeader(String &page, uint16_t redirect);
 
   /* Method generates GPIO selecton list */
   void generateConfigParameter_GPIO(String &item, const char *field,
@@ -65,12 +65,12 @@ private:
   /* It uses generateHardwareItemsList() */
   void generateHardwareList(String &item, uint8_t noOfItems,
                             uint8_t noOffConnected, const char *field,
-                            const char *label, uint8_t index,
-                            uint8_t noneValue);
+                            const char *label, uint8_t index, uint8_t noneValue,
+                            boolean disabled = false);
 
   void generateHardwareItemsList(String &item, uint8_t noOfItems,
                                  uint8_t noOffConnected, const char *field,
-                                 const char *label);
+                                 const char *label, boolean disabled = false);
 
   void addItem(String &item, const char *type, const char *name,
                const char *label, const char *value, const char *size = "?",

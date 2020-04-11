@@ -112,7 +112,8 @@
 #define L_DOMOTICZ_VERSION_2020 "2020.x i późniejsze"
 #endif
 
-
+#define L_AUTOLOGOUT_TITLE "Automatyczne zakończenie konfiguracji"
+#define L_AUTOLOGOUT_DESCRIPTION "Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w panelu konfiguracyjnym"
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"

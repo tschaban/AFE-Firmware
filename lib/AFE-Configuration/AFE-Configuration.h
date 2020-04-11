@@ -41,6 +41,9 @@
 /* Not existing hardware item. Used as a default value */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 
+/* Default time to auto-logout from config panel: in minutes */
+#define AFE_AUTOLOGOFF_DEFAULT_TIME 10
+
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_DEVICE_TYPE_NAME "Sonoff Basic V1"
@@ -212,7 +215,7 @@
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Gate --------------------------------------------------------------------------*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.2.0.B2"
+#define AFE_FIRMWARE_VERSION "2.2.0.B4"
 #define AFE_FIRMWARE_TYPE 5
 
 
@@ -693,6 +696,9 @@
 #define AFE_MQTT_GATE_CLOSED "closed"
 #define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
 #define AFE_MQTT_GATE_UNKNOWN "unknown"
+
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked, used by HTTP API
+
 #endif
 
 
@@ -710,6 +716,8 @@
 /* Contactron MQTT messages */
 #define AFE_MQTT_CONTACTRON_OPEN "open"
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
+
+#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH  200 // Not checked. used by HTTP API
 #endif
 
 /* Temperature */
@@ -885,12 +893,11 @@ typedef enum {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
-#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
-#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH  200 // Not checked
 #endif
 
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Outgoing url size for statuses updates to Domoticz
@@ -962,9 +969,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 570
 #define AFE_CONFIG_FILE_BUFFER_AS3935 240
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 200 // not verfied
-#define AFE_CONFIG_FILE_BUFFER_GATE 300 // not verfied
-#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 34 // not verfied
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
 
 
 #define AFE_RESPONSE_KEY_VALIDATION 135

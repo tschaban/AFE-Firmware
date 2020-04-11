@@ -106,6 +106,10 @@
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_CONTROLLED_GATES "Gates/Doors controlled"
 #endif
+#define L_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
+#define L_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
+
+
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "WiFi Configuration"

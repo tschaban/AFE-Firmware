@@ -90,6 +90,18 @@ public:
   void processAS3935(uint8_t *id);
   boolean publishAS3935SensorData(uint8_t id);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void processGate(uint8_t *id);
+  boolean publishGateState(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void processContactron(uint8_t *id);
+  boolean publishContactronState(uint8_t id);
+#endif
+
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

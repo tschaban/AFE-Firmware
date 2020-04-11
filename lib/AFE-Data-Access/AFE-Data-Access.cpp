@@ -125,7 +125,8 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
   PRO_VERSION configuration;
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_PRO_VERSION_CONFIGURATION
          << " ... ";
 #endif
@@ -179,7 +180,8 @@ PRO_VERSION AFEDataAccess::getProVersionConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_PRO_VERSION_CONFIGURATION
          << " ... ";
 #endif
@@ -219,7 +221,8 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION configuration) {
 }
 void AFEDataAccess::createProVersionConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Creating file: " << AFE_FILE_PRO_VERSION_CONFIGURATION;
+  Serial << endl
+         << "INFO: Creating file: " << AFE_FILE_PRO_VERSION_CONFIGURATION;
 #endif
   PRO_VERSION ProConfiguration;
   ProConfiguration.serial[0] = '\0';
@@ -231,7 +234,8 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
   PASSWORD configuration;
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_PASSWORD_CONFIGURATION
          << " ... ";
 #endif
@@ -283,7 +287,8 @@ PASSWORD AFEDataAccess::getPasswordConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(PASSWORD configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_PASSWORD_CONFIGURATION
          << " ... ";
 #endif
@@ -335,7 +340,8 @@ void AFEDataAccess::createPasswordConfigurationFile() {
 DEVICE AFEDataAccess::getDeviceConfiguration() {
   DEVICE configuration;
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_DEVICE_CONFIGURATION << " ... ";
 #endif
 
@@ -356,6 +362,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       root.printTo(Serial);
 #endif
       sprintf(configuration.name, root["name"]);
+      configuration.timeToAutoLogOff =
+          root["timeToAutoLogOff"] | AFE_AUTOLOGOFF_DEFAULT_TIME;
       configuration.api.http = root["api"]["http"];
       configuration.api.mqtt = root["api"]["mqtt"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -367,36 +375,46 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
         configuration.api.http = true;
       }
 #endif
-      configuration.noOfLEDs = root["noOfLEDs"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
-      configuration.noOfSwitches = root["noOfSwitches"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
-      configuration.noOfRelays = root["noOfRelays"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
+      configuration.noOfLEDs =
+          root["noOfLEDs"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
+      configuration.noOfSwitches =
+          root["noOfSwitches"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
+      configuration.noOfRelays =
+          root["noOfRelays"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       configuration.isAnalogInput = root["isAnalogInput"] | false;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-      configuration.noOfContactrons = root["noOfContactrons"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
+      configuration.noOfContactrons =
+          root["noOfContactrons"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-      configuration.noOfGates = root["noOfGates"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
+      configuration.noOfGates =
+          root["noOfGates"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-      configuration.noOfBMEX80s = root["noOfBMEX80s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
+      configuration.noOfBMEX80s =
+          root["noOfBMEX80s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-      configuration.noOfHPMA115S0s = root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0;
+      configuration.noOfHPMA115S0s =
+          root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-      configuration.noOfBH1750s = root["noOfBH1750s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750;
+      configuration.noOfBH1750s =
+          root["noOfBH1750s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-      configuration.noOfAS3935s = root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935;
+      configuration.noOfAS3935s =
+          root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935;
 #endif
 
 #ifdef DEBUG
@@ -430,7 +448,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_DEVICE_CONFIGURATION << " ... ";
 #endif
 
@@ -444,7 +463,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["name"] = configuration->name;
-
+    root["timeToAutoLogOff"] = configuration->timeToAutoLogOff;
     JsonObject &jsonAPI = root.createNestedObject("api");
     jsonAPI["http"] = configuration->api.http;
     jsonAPI["mqtt"] = configuration->api.mqtt;
@@ -509,6 +528,32 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     Serial << endl << "ERROR: failed to open file for writing";
   }
 #endif
+
+// Removing connection between relay and a gate, if exists reseting changing the
+// number of gates
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  if (configuration->noOfGates < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES) {
+    GATE _Gate;
+    for (uint8_t i = configuration->noOfGates;
+         i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
+#ifdef DEBUG
+      Serial << endl << "INFO: Update of Gate configuration";
+
+#endif
+      _Gate = getGateConfiguration(i);
+      if (_Gate.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+        _Gate.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+        saveConfiguration(i, _Gate);
+      }
+#ifdef DEBUG
+      else {
+        Serial << ": NOT required";
+      }
+#endif
+    }
+  }
+
+#endif
 }
 
 void AFEDataAccess::createDeviceConfigurationFile() {
@@ -517,6 +562,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
   DEVICE deviceConfiguration;
   sprintf(deviceConfiguration.name, "AFE-Device");
+  deviceConfiguration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
   /* APIs */
   deviceConfiguration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -579,7 +625,8 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
   FIRMWARE configuration;
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_FIRMWARE_CONFIGURATION
          << " ... ";
 #endif
@@ -636,7 +683,8 @@ FIRMWARE AFEDataAccess::getFirmwareConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_FIRMWARE_CONFIGURATION
          << " ... ";
 #endif
@@ -794,7 +842,8 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 NETWORK AFEDataAccess::getNetworkConfiguration() {
   NETWORK configuration;
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_NETWORK_CONFIGURATION << " ... ";
 #endif
 
@@ -858,7 +907,8 @@ NETWORK AFEDataAccess::getNetworkConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(NETWORK configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_NETWORK_CONFIGURATION << " ... ";
 #endif
 
@@ -926,7 +976,8 @@ void AFEDataAccess::createNetworkConfigurationFile() {
 MQTT AFEDataAccess::getMQTTConfiguration() {
   MQTT configuration;
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_MQTT_BROKER_CONFIGURATION
          << " ... ";
 #endif
@@ -992,7 +1043,8 @@ MQTT AFEDataAccess::getMQTTConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(MQTT configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_MQTT_BROKER_CONFIGURATION
          << " ... ";
 #endif
@@ -1066,7 +1118,8 @@ void AFEDataAccess::createMQTTConfigurationFile() {
 DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
   DOMOTICZ configuration;
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_DOMOTICZ_CONFIGURATION
          << " ... ";
 #endif
@@ -1124,7 +1177,8 @@ DOMOTICZ AFEDataAccess::getDomoticzConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(DOMOTICZ configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_DOMOTICZ_CONFIGURATION
          << " ... ";
 #endif
@@ -1386,7 +1440,8 @@ uint8_t AFEDataAccess::getSystemLedID() {
 }
 void AFEDataAccess::saveSystemLedID(uint8_t id) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_SYSTEM_LED_CONFIGURATION
          << " ... ";
 #endif
@@ -2143,7 +2198,8 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
   ADCINPUT configuration;
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_ADC_CONFIGURATION << " ... ";
 #endif
 
@@ -2210,7 +2266,8 @@ ADCINPUT AFEDataAccess::getADCInputConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(ADCINPUT configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_ADC_CONFIGURATION << " ... ";
 #endif
 
@@ -2448,9 +2505,9 @@ CONTACTRON AFEDataAccess::getContactronConfiguration(uint8_t id) {
       configuration.bouncing = root["bouncing"];
       configuration.ledID = root["ledID"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"];
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -2609,10 +2666,11 @@ GATE AFEDataAccess::getGateConfiguration(uint8_t id) {
         configuration.states.state[i] = root["states"][i];
       }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"];
-      configuration.domoticzControl.idx = root["idxControl"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticzControl.idx =
+          root["idxControl"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["MQTTTopic"]);
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -2752,7 +2810,7 @@ void AFEDataAccess::createGateConfigurationFile() {
        i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
 #ifdef DEBUG
     Serial << endl << "INFO: Creating file: cfg-gate-" << i << ".json";
-#endif         
+#endif
     sprintf(GateConfiguration.name, "G%d", i + 1);
     saveConfiguration(i, GateConfiguration);
     saveGateState(i, AFE_GATE_UNKNOWN);
@@ -2834,7 +2892,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE_STATE> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    
+
     root["state"] = state;
 
     root.printTo(configFile);
@@ -3077,7 +3135,8 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
   SERIALPORT configuration;
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_UART_CONFIGURATION << " ... ";
 #endif
 
@@ -3131,7 +3190,8 @@ SERIALPORT AFEDataAccess::getSerialPortConfiguration() {
 
 void AFEDataAccess::saveConfiguration(SERIALPORT configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_UART_CONFIGURATION << " ... ";
 #endif
 
@@ -3184,7 +3244,8 @@ I2CPORT AFEDataAccess::getI2CPortConfiguration() {
   I2CPORT configuration;
 
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_I2C_CONFIGURATION << " ... ";
 #endif
 
@@ -3237,7 +3298,8 @@ I2CPORT AFEDataAccess::getI2CPortConfiguration() {
 }
 void AFEDataAccess::saveConfiguration(I2CPORT configuration) {
 #ifdef DEBUG
-  Serial << endl<< endl
+  Serial << endl
+         << endl
          << "INFO: Opening file: " << AFE_FILE_I2C_CONFIGURATION << " ... ";
 #endif
 
@@ -3633,7 +3695,6 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-// @TODO reasses the size afert adding name parameter
 AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
   AS3935 configuration;
   char fileName[18];

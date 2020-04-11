@@ -20,7 +20,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   String page;
 
   if (siteConfig->twoColumns) {
-    Site.generateTwoColumnsLayout(page);
+    Site.generateTwoColumnsLayout(page, siteConfig->rebootTime);
   } else {
     Site.generateOneColumnLayout(page, siteConfig->rebootTime);
   }
@@ -180,6 +180,15 @@ void AFEWebServer::generate(boolean upload) {
   siteConfig.ID = getSiteID();
   uint8_t command = getCommand();
   siteConfig.deviceID = getID();
+
+  /* Setting page refresh time if automatic logout is set */
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    siteConfig.rebootTime =
+        Device->configuration.timeToAutoLogOff * 60 +
+        10; // adds additional 10sec for a reboot to be finished
+  }
 
   if (command == AFE_SERVER_CMD_SAVE) {
     switch (siteConfig.ID) {
@@ -413,10 +422,8 @@ void AFEWebServer::generate(boolean upload) {
     Serial << ", device ID: " << siteConfig.deviceID;
     Serial << ", Command: " << command;
     Serial << ", Reboot: " << (siteConfig.reboot ? "Yes" : "No");
-    if (siteConfig.reboot) {
-      Serial << ", Mode: " << siteConfig.rebootMode;
-      Serial << ", Time: " << siteConfig.rebootTime;
-    }
+    Serial << ", Mode: " << siteConfig.rebootMode;
+    Serial << ", Time: " << siteConfig.rebootTime;
 #endif
 
     publishHTML(generateSite(&siteConfig));
@@ -569,7 +576,24 @@ HTTPCOMMAND AFEWebServer::getHTTPCommand() {
   return httpCommand;
 }
 
-void AFEWebServer::listener() { server.handleClient(); }
+void AFEWebServer::listener() {
+  server.handleClient();
+  /* Code for automatic logoff from the config panel */
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    if (Device->configuration.timeToAutoLogOff * 60000 + howLongInConfigMode <
+        millis()) {
+#ifdef DEBUG
+      Serial << endl
+             << endl
+             << "INFO: Automatic logout from the config panel after : "
+             << Device->configuration.timeToAutoLogOff << "min. of idle time";
+#endif
+      Device->reboot(AFE_MODE_NORMAL);
+    }
+  }
+}
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
@@ -605,6 +629,12 @@ void AFEWebServer::publishHTML(String page) {
 #ifdef DEBUG
   Serial << "Completed";
 #endif
+
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    howLongInConfigMode = millis();
+  }
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -714,6 +744,9 @@ DEVICE AFEWebServer::getDeviceData() {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
+
+  data.timeToAutoLogOff =
+      server.arg("al").length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 
   return data;
 }
@@ -887,8 +920,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.mqtt.topic[0] = '\0';
   }
 #else
-  data.domoticz.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()

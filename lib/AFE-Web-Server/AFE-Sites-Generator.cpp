@@ -11,7 +11,7 @@ void AFESitesGenerator::begin(AFEDevice *_Device, AFEFirmwarePro *_Firmware) {
   Data.getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
 }
 
-void AFESitesGenerator::generateHeader(String &page, uint8_t redirect) {
+void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
   page += "<!doctype html><html lang=\"";
   page += L_LANGUAGE_SHORT;
@@ -338,7 +338,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  if (Device->configuration.noOfAS3935s > 0 && Firmware->Pro.valid) {
+  if (Device->configuration.noOfAS3935s > 0) {
     page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
     page += AFE_CONFIG_SITE_AS3935;
     page += "\">";
@@ -348,7 +348,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  if (Device->configuration.isAnalogInput && Firmware->Pro.valid) {
+  if (Device->configuration.isAnalogInput) {
     page += "<li class=\"itm\"><a href=\"\\?o=";
     page += AFE_CONFIG_SITE_ANALOG_INPUT;
     page += "\">";
@@ -391,6 +391,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 
 void AFESitesGenerator::addDeviceConfiguration(String &page) {
   DEVICE configuration = Device->configuration;
+  boolean _itemDisabled = false;
 
   if (Device->upgraded != AFE_UPGRADE_NONE) {
     page += "<h4 class=\"bc\" style=\"padding:5px;\">";
@@ -468,34 +469,52 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef T5_CONFIG // Functionality is PRO for T5
+  _itemDisabled = !Firmware->Pro.valid;
+#else
+  _itemDisabled = false;
+#endif
+
   generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                             Device->configuration.noOfBH1750s, "bh",
-                            L_NUMBER_OF_BH1750_SENSORS);
+                            L_NUMBER_OF_BH1750_SENSORS, _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
+
+#ifdef T5_CONFIG // Functionality is PRO for T5
+  _itemDisabled = !Firmware->Pro.valid;
+#else
+  _itemDisabled = false;
+#endif
+
   generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
                             Device->configuration.noOfBMEX80s, "b6",
-                            L_NUMBER_OF_BMEX80_SENSORS);
+                            L_NUMBER_OF_BMEX80_SENSORS, _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  if (Firmware->Pro.valid) {
-    generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
-                              Device->configuration.noOfAS3935s, "a3",
-                              L_NUMBER_OF_AS3935_SENSORS);
-  }
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+                            Device->configuration.noOfAS3935s, "a3",
+                            L_NUMBER_OF_AS3935_SENSORS, !Firmware->Pro.valid);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  if (Firmware->Pro.valid) {
-    page += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
-            "value=\"1\"";
-    page += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
-    page += L_DO_MEASURE_ADC;
-    page += "</label></div>";
+  page += "<div class=\"cc\"><label><input name =\"ad\" type=\"checkbox\" "
+          "value=\"1\"";
+  if (!Firmware->Pro.valid) {
+    page += " disabled=\"disabled\"";
   }
-
+  page += configuration.isAnalogInput ? " checked=\"checked\">" : ">";
+  page += L_DO_MEASURE_ADC;
+  page += "</label>";
+  if (!Firmware->Pro.valid) {
+    page += "<span class=\"hint\">(";
+    page += L_PRO_VERSION;
+    page += ")</span>";
+  }
+  page += "</div>";
 #endif
 
 #if defined(T3_CONFIG)
@@ -526,7 +545,6 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #endif
 
   addConfigurationBlock(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
-
   page += "<fieldset>";
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -567,11 +585,22 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
   page += configuration.api.mqtt ? " checked=\"checked\"" : "";
   page += ">Domoticz MQTT API</label></div>";
 #else
-  page += "<div class=\"cc\"><input name=\"m\" "
+  page += "<div class=\"cc\"><label><input name=\"m\" "
           "type=\"checkbox\" value=\"1\"";
   page += configuration.api.mqtt ? " checked=\"checked\"" : "";
   page += ">MQTT API</label></div>";
 #endif
+
+  page += "</fieldset></div>";
+
+  addConfigurationBlock(page, L_AUTOLOGOUT_TITLE, L_AUTOLOGOUT_DESCRIPTION);
+  page += "<fieldset>";
+
+  page += "<div class=\"cc\"><label><input name =\"al\" type=\"checkbox\" "
+          "value=\"1\"";
+  page += configuration.timeToAutoLogOff > 0 ? " checked=\"checked\">" : ">";
+  page += L_ENABLED;
+  page += "?</label></div>";
 
   page += "</fieldset></div>";
 }
@@ -1772,18 +1801,21 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
     char _idx[7];
 
     sprintf(_idx, "%d", gateConfiguration.domoticzControl.idx);
-    addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999",
+            "1");
 
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
-    addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999", "1");
+    addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999",
+            "1");
 
     page += "</fieldset></div>";
   }
 #else
   if (Device->configuration.api.mqtt) {
     addConfigurationBlock(page, L_GATE_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
-    page += "<fieldset>" addItem(page, "text", "t", L_MQTT_TOPIC,
-                                 gateConfiguration.mqtt.topic, "64");
+    page += "<fieldset>";
+    addItem(page, "text", "t", L_MQTT_TOPIC, gateConfiguration.mqtt.topic,
+            "64");
     page += "</fieldset></div>";
   }
 #endif
@@ -2495,16 +2527,18 @@ void AFESitesGenerator::generateConfigParameter_GPIO(String &item,
   item += "</select></div>";
 }
 
-void AFESitesGenerator::generateHardwareList(String &page, uint8_t noOfItems,
-                                             uint8_t noOffConnected,
-                                             const char *field,
-                                             const char *label, uint8_t index,
-                                             uint8_t noneValue) {
+void AFESitesGenerator::generateHardwareList(
+    String &page, uint8_t noOfItems, uint8_t noOffConnected, const char *field,
+    const char *label, uint8_t index, uint8_t noneValue, boolean disabled) {
   page += "<div class=\"cf\"><label>";
   page += label;
   page += "</label><select name=\"";
   page += field;
-  page += "\"><option value=\"";
+  page += "\"";
+  if (disabled) {
+    page += " disabled=\"disabled\"";
+  }
+  page += "><option value=\"";
   page += noneValue;
   page += "\"";
   page += (noOffConnected == noneValue ? " selected=\"selected\"" : "");
@@ -2513,24 +2547,32 @@ void AFESitesGenerator::generateHardwareList(String &page, uint8_t noOfItems,
   page += "</option>";
   /* @TODO not a nice code with this index. It can't be different than 0
    * or 1. So far only 0,1 are planned */
-  for (uint8_t i = index; i < noOfItems + index; i++) {
-    page += "<option value=\"";
-    page += i;
-    page += "\"";
-    page += noOffConnected == i ? " selected=\"selected\"" : "";
-    page += ">";
-    page += i + (index == 0 ? 1 : 0);
-    page += "</option>";
+  if (!disabled) { // generate other values if item is not vis
+    for (uint8_t i = index; i < noOfItems + index; i++) {
+      page += "<option value=\"";
+      page += i;
+      page += "\"";
+      page += noOffConnected == i ? " selected=\"selected\"" : "";
+      page += ">";
+      page += i + (index == 0 ? 1 : 0);
+      page += "</option>";
+    }
   }
-  page += "</select></div>";
+  page += "</select>";
+  if (disabled) {
+    page += "<span class=\"hint\">(";
+    page += L_PRO_VERSION;
+    page += ")</span>";
+  }
+
+  page += "</div>";
 }
 
-void AFESitesGenerator::generateHardwareItemsList(String &page,
-                                                  uint8_t noOfItems,
-                                                  uint8_t noOffConnected,
-                                                  const char *field,
-                                                  const char *label) {
-  generateHardwareList(page, noOfItems, noOffConnected, field, label, 1, 0);
+void AFESitesGenerator::generateHardwareItemsList(
+    String &page, uint8_t noOfItems, uint8_t noOffConnected, const char *field,
+    const char *label, boolean disabled) {
+  generateHardwareList(page, noOfItems, noOffConnected, field, label, 1, 0,
+                       disabled);
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
