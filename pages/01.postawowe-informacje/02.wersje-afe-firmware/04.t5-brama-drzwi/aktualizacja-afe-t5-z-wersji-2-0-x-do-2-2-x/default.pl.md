@@ -29,6 +29,16 @@ Aby dokonać aktualizację przez WiFi
 6. Połącz się z AccessPoint'em o nazwie AFE-Device, a następnie uruchom przeglądarkę internetową z adresem: http://192.168.5.1
 7. Więcej o pierwszym uruchomieniu znajdziesz [tutaj](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie)
 
+##### Aktualizacja AFE Firmware do wersji 4Mb przez adapter USB (TTL)
+
+1. Przeprowadź instalację zgodnie z tą [instrukcją](/instalacja/instalacja-zanim-zainstalujesz-firmware/instalacja)
+2. Zmień jedynie rozmiar pamięci Flash na 4Mb
+3. Jeśli LED w ESP8266 zacznie migać, urządzenie gotowe jest do konfiguracji
+4. Połącz się z AccessPoint'em o nazwie AFE-Device, a następnie uruchom przeglądarkę internetową z adresem: http://192.168.5.1
+5. Więcej o pierwszym uruchomieniu znajdziesz [tutaj](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie)
+ 
+
+
 W razie pytań zadaj je [tutaj](https://www.smartnydom.pl/forum/firmware-do-przelacznika-sonoff/)
 
 
