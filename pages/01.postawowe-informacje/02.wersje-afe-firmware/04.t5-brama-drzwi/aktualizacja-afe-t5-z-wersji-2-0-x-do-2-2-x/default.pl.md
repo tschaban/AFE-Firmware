@@ -19,7 +19,7 @@ Jeśli wgrywasz wersję za pomocą adaptera USB (TTL) wgraj wersję 4Mb
 
 !! **Uwaga** Aktualizacja z wersji 2.0.x do 2.2.x 4Mb powoduję utratę konfiguracji. Po aktualizacji konieczna jest ponowna konfiguracja urządzenia, [jak za pierwszym razem](https://afe.smartnydom.pl/pl/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie).
 
-###### Aby dokonać aktualizację przez WiFi
+**Aby dokonać aktualizację przez WiFi**
 1. Upewnij się, że masz wgrane do urządzenia AFE Firmware T5 w wersji 2.0.x. Nie może to być wersja deweloperska z włączonymi log'ami
 2. W panelu konfiguracyjnym zaktualizuj AFE Firmware do wersji T5 2.2.x. Nie może to być wersja deweloperska z włączonymi log'ami
 3. Po aktualizacji ESP8266 będzie formatowane do 4Mb. 
