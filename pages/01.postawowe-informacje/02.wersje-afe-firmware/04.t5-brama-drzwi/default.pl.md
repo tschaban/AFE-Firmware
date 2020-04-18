@@ -20,7 +20,7 @@ recaptchacontact:
 * Czujnik [Bosch BMP180/BME280/BME680](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx) (temperatura, wilgotność, ciśnienie, inne) [[W wersji PRO](/postawowe-informacje/wersja-pro)]
 * Czujnik [BH1750](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750) - natężenie światła [[W wersji PRO](/postawowe-informacje/wersja-pro)]
 
-! Czujniki Bosch BMx80 oraz BH1750 dostępne w 4Mb wersji AFE Firmware T5. 
+! Czujniki Bosch BMx80 oraz BH1750 dostępne są **tylko** w 4Mb wersji AFE Firmware T5. 
 
 **API**
 * HTTP
