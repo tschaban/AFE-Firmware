@@ -12,7 +12,7 @@ AFE Firmware T5 4Mb dodatkowo zawiera obsługę czujników
 * Bosch z serii BMx80 oraz
 * czujnika natężenia światła BH1750
 
-### Aktualizacja AFE Firmware T5 z wersji 2.0.x do wersji 2.2.x 4Mb
+#### Aktualizacja AFE Firmware T5 z wersji 2.0.x do wersji 2.2.x 4Mb przez WiFi
 
 !! *Uwaga* Aktualizacja z wersji 2.0.1 do 2.2.x 4Mb powoduję utratę konfiguracji. Po aktualizacji konieczna jest ponowna konfiguracja urządzenia, [jak za pierwszym razem](https://afe.smartnydom.pl/pl/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie).
 
