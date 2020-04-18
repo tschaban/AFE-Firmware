@@ -112,7 +112,8 @@
 #define L_DOMOTICZ_VERSION_2020 "2020.x i późniejsze"
 #endif
 
-
+#define L_AUTOLOGOUT_TITLE "Automatyczne zakończenie konfiguracji"
+#define L_AUTOLOGOUT_DESCRIPTION "Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w panelu konfiguracyjnym"
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
@@ -305,6 +306,7 @@
 #define L_NUMBER_OF_CONTROLLED_GATES "Ilość sterowanych bram/drzwi"
 #define L_RELAY_ID_CONTROLLING_GATE "Przekaźnik sterujący bramą/drzwiami"
 #define L_GATE_MQTT_TOPIC "Temat MQTT sterujący bramą/drzwiami"
+#define L_IDX_GATE_STATE "IDX Stan bramy/drzwi"
 #endif
 
 /* HPMA11BS0 */

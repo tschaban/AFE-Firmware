@@ -26,7 +26,6 @@ struct CONTACTRON {
 #else
   MQTT_BASIC_CONFIG mqtt;
 #endif
-#endif
 };
 
 #endif

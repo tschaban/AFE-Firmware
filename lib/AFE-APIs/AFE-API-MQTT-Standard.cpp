@@ -54,6 +54,20 @@ void AFEAPIMQTTStandard::synchronize() {
     publishSwitchState(i);
   }
 #endif
+
+/* Synchronize: Gate */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    publishGateState(i);
+  }
+#endif
+
+/* Synchronize: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+    publishContactronState(i);
+  }
+#endif
 }
 
 void AFEAPIMQTTStandard::subscribe() {
@@ -145,6 +159,7 @@ void AFEAPIMQTTStandard::subscribe() {
   }
 #endif
 
+/* Subscribe: HPMA115S0 */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
     Mqtt.subscribe(_HPMA115S0Sensor[i]->mqttCommandTopic);
@@ -156,12 +171,35 @@ void AFEAPIMQTTStandard::subscribe() {
       currentCacheSize++;
     }
   }
-
 #endif
 
+/* Subscribe: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+    Mqtt.subscribe(_Contactron[i]->mqttCommandTopic);
+    if (strlen(_Contactron[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _Contactron[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_CONTACTRON;
+      currentCacheSize++;
+    }
+  }
+#endif
 
-
-
+/* Subscribe: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    Mqtt.subscribe(_Gate[i]->mqttCommandTopic);
+    if (strlen(_Gate[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _Gate[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_GATE;
+      currentCacheSize++;
+    }
+  }
+#endif
 }
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -180,16 +218,16 @@ void AFEAPIMQTTStandard::processRequest() {
              << mqttTopicsCache[i].type;
 #endif
       switch (mqttTopicsCache[i].type) {
-#ifdef AFE_CONFIG_HARDWARE_RELAY        
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       case AFE_MQTT_DEVICE_RELAY: // RELAY
         processRelay(&mqttTopicsCache[i].id);
         break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_SWITCH        
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
       case AFE_MQTT_DEVICE_SWITCH:
         processSwitch(&mqttTopicsCache[i].id);
         break;
-#endif          
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
         processADC();
@@ -213,6 +251,16 @@ void AFEAPIMQTTStandard::processRequest() {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       case AFE_MQTT_DEVICE_HPMA115S0:
         processHPMA115S0(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      case AFE_MQTT_DEVICE_GATE:
+        processGate(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+      case AFE_MQTT_DEVICE_CONTACTRON:
+        processContactron(&mqttTopicsCache[i].id);
         break;
 #endif
       default:
@@ -338,6 +386,7 @@ void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
   }
 #endif
 }
+
 boolean AFEAPIMQTTStandard::publishBMx80SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
@@ -427,5 +476,66 @@ boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
   return publishStatus;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPIMQTTStandard::processGate(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing Gate ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
+    _Gate[*id]->toggle();
+  } else if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishGateState(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+
+boolean AFEAPIMQTTStandard::publishGateState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    uint8_t _state = _Gate[id]->get();
+    publishStatus = Mqtt.publish(_Gate[id]->mqttStateTopic,
+                                 _state == AFE_GATE_OPEN
+                                     ? AFE_MQTT_GATE_OPEN
+                                     : _state == AFE_GATE_CLOSED
+                                           ? AFE_MQTT_GATE_CLOSED
+                                           : _state == AFE_GATE_PARTIALLY_OPEN
+                                                 ? AFE_MQTT_GATE_PARTIALLY_OPEN
+                                                 : AFE_MQTT_GATE_UNKNOWN);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing Contactron ID: " << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishContactronState(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+
+boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    publishStatus = Mqtt.publish(_Contactron[id]->mqttStateTopic,
+                                 _Contactron[id]->get() == AFE_CONTACTRON_OPEN
+                                     ? AFE_MQTT_CONTACTRON_OPEN
+                                     : AFE_MQTT_CONTACTRON_CLOSED);
+  }
+  return publishStatus;
+}
+#endif //  AFE_CONFIG_HARDWARE_CONTACTRON
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

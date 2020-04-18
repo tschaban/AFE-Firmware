@@ -11,7 +11,8 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED // Code excluded for not Standard API version of Firmware
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED // Code excluded for not Standard API
+                                       // version of Firmware
 
 #include <AFE-API.h>
 #include <ESP8266HTTPClient.h>
@@ -30,11 +31,19 @@ private:
   DOMOTICZ configuration;
 
   char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];
-
+/*
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-  // Stories IDXs
-  DOMOTICZ_IDX_CACHE idxCache[AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH];
+  uint8_t lastIDXChacheIndex = 0;
+  DOMOTICZ_IDX_CACHE idxCache[1
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
 #endif
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+#endif
+  ];
+#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+*/
 
   /* Invokes API setup */
   void init();
@@ -49,7 +58,8 @@ private:
   boolean sendSwitchCommand(unsigned int idx, const char *value);
 
   /* sends to Domoticz custome sensor call */
-  boolean sendCustomSensorCommand(unsigned int idx, const char *value, uint8_t nvalue=0);
+  boolean sendCustomSensorCommand(unsigned int idx, const char *value,
+                                  uint8_t nvalue = 0);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -58,7 +68,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #else
-  void begin(AFEDataAccess *, AFEDevice *);
+void begin(AFEDataAccess *, AFEDevice *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -98,6 +108,15 @@ public:
   boolean publishAS3935SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  virtual void addClass(AFEGate *);
+  boolean publishGateState(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  virtual void addClass(AFEContactron *);
+  boolean publishContactronState(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

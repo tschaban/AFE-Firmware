@@ -306,11 +306,6 @@ void setup() {
 #endif
 #endif
 
-/* Initializing T6 sensor */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-    Wire.begin();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     initializeHPMA115S0Sensor();
 #endif

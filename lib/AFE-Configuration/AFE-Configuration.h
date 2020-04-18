@@ -41,6 +41,9 @@
 /* Not existing hardware item. Used as a default value */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 
+/* Default time to auto-logout from config panel: in minutes */
+#define AFE_AUTOLOGOFF_DEFAULT_TIME 10
+
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_DEVICE_TYPE_NAME "Sonoff Basic V1"
@@ -93,10 +96,12 @@
 #define AFE_CONFIG_HARDWARE_LED
 #endif
 
-
-/* Enabled APIs */
-//#define AFE_CONFIG_API_DOMOTICZ_ENABLED
-//#define AFE_CONFIG_FUNCTIONALITY_API_CONTROL
+/* Max number of hardware items, per AFE version */
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
+#ifdef AFE_CONFIG_HARDWARE_LED
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
+#endif
 
 
 /* Max number of hardware items per specyfic hardware device */
@@ -131,12 +136,7 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 5
 #endif
 
-/* Max number of hardware items, per AFE version */
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
-#ifdef AFE_CONFIG_HARDWARE_LED
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
-#endif
+
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -213,20 +213,19 @@
 #define AFE_FIRMWARE_TYPE 4
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-/* Gate */
+/* Gate --------------------------------------------------------------------------*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.0.1"
+#define AFE_FIRMWARE_VERSION "2.2.0"
 #define AFE_FIRMWARE_TYPE 5
 
-/* Functionalities */
-#define AFE_CONFIG_FUNCTIONALITY_RELAY
-#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-#define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
-#define AFE_CONFIG_FUNCTIONALITY_GATE
-#define AFE_CONFIG_FUNCTIONALITY_ADC
-
+/* Define Hardware */
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
+#define AFE_CONFIG_FUNCTIONALITY_ADC
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_BMEX80
+#define AFE_CONFIG_HARDWARE_BH1750
+#endif
 
 /* Max number of hardware items per AFE version */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 2
@@ -234,6 +233,10 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 3
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS 4
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80 1
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750 1
+#endif
 
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECSv20)
@@ -242,14 +245,23 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_GATES 2
-#else
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750 1
+#endif
 /* Generic version */
+#else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 2
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS 4
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_GATES 2
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750 1
 #endif
+#endif
+
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECSv20)
@@ -258,6 +270,10 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 1
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
+#endif
 #else
 /* Generic version */
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
@@ -265,7 +281,20 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 0
+#ifdef ESP_4MB // Only available in 4MB Flash
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
 #endif
+#endif
+
+
+/* Functionalities */
+#define AFE_CONFIG_FUNCTIONALITY_RELAY
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
+#define AFE_CONFIG_FUNCTIONALITY_GATE
+#define AFE_CONFIG_FUNCTIONALITY_ADC
+
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
@@ -677,6 +706,9 @@
 #define AFE_MQTT_GATE_CLOSED "closed"
 #define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
 #define AFE_MQTT_GATE_UNKNOWN "unknown"
+
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked, used by HTTP API
+
 #endif
 
 
@@ -694,6 +726,8 @@
 /* Contactron MQTT messages */
 #define AFE_MQTT_CONTACTRON_OPEN "open"
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
+
+#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH  200 // Not checked. used by HTTP API
 #endif
 
 /* Temperature */
@@ -866,8 +900,17 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 55 // Outgoing MQTT message size for switch
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70  // Outgoing MQTT message size for custom sensor
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#endif
+
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Outgoing url size for statuses updates to Domoticz
-#define AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+1 // Size of the IDX cache
 #else
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
@@ -914,6 +957,7 @@ typedef enum {
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
 
 
+
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
@@ -935,6 +979,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 570
 #define AFE_CONFIG_FILE_BUFFER_AS3935 240
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
 
 
 #define AFE_RESPONSE_KEY_VALIDATION 135

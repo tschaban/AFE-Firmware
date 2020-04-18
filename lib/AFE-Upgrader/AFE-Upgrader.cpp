@@ -131,6 +131,14 @@ void AFEUpgrader::updateFirmwareVersion() {
   }
 #endif
 
+#ifdef T5_CONFIG
+  if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.0.1") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.2.0.B1") == 0) {
+    upgradeToT5V220();
+  }
+#endif
+
   Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
 }
 
@@ -194,6 +202,25 @@ void AFEUpgrader::upgradeToT0V210() {
 
   // Save to new JSON structure configuration file
   Data->saveConfiguration(&newDevice);
+}
+
+#endif // T0_CONFIG
+
+#ifdef T5_CONFIG
+void AFEUpgrader::upgradeToT5V220() {
+
+// It will do nothing for ESP8266 1MB - sensors are e  
+#if defined(AFE_CONFIG_HARDWARE_BMEX80) || defined(AFE_CONFIG_HARDWARE_BH1750)
+  Data->createI2CConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  Data->createBMEX80SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  Data->createBH1750SensorConfigurationFile();
+#endif
 }
 
 #endif // T0_CONFIG

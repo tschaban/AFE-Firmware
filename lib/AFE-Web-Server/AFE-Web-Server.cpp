@@ -20,7 +20,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
   String page;
 
   if (siteConfig->twoColumns) {
-    Site.generateTwoColumnsLayout(page);
+    Site.generateTwoColumnsLayout(page, siteConfig->rebootTime);
   } else {
     Site.generateOneColumnLayout(page, siteConfig->rebootTime);
   }
@@ -99,12 +99,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   case AFE_CONFIG_SITE_CONTACTRON:
-    page += Site.addContactronConfiguration(siteConfig->deviceID);
+    Site.addContactronConfiguration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   case AFE_CONFIG_SITE_GATE:
-    page += Site.addGateConfiguration(siteConfig->deviceID);
+    Site.addGateConfiguration(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -170,174 +170,192 @@ void AFEWebServer::generate(boolean upload) {
     return;
   }
 
-  if (_refreshConfiguration) {
-    _refreshConfiguration = false;
-    Device->begin();
-  }
+    if (_refreshConfiguration) {
+      _refreshConfiguration = false;
+      Device->begin();
+    }
 
-  AFE_SITE_PARAMETERS siteConfig;
+    AFE_SITE_PARAMETERS siteConfig;
 
-  siteConfig.ID = getSiteID();
-  uint8_t command = getCommand();
-  siteConfig.deviceID = getID();
+    siteConfig.ID = getSiteID();
+    uint8_t command = getCommand();
+    siteConfig.deviceID = getID();
 
-  if (command == AFE_SERVER_CMD_SAVE) {
-    switch (siteConfig.ID) {
-    case AFE_CONFIG_SITE_FIRST_TIME:
-      Data.saveConfiguration(getNetworkData());
-      siteConfig.twoColumns = false;
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
-      siteConfig.form = false;
-      siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
-      break;
-    case AFE_CONFIG_SITE_DEVICE:
-      DEVICE configuration;
-      configuration = getDeviceData();
-      Data.saveConfiguration(&configuration);
-      configuration = {0};
-      break;
-    case AFE_CONFIG_SITE_NETWORK:
-      Data.saveConfiguration(getNetworkData());
-      break;
-    case AFE_CONFIG_SITE_MQTT:
-      Data.saveConfiguration(getMQTTData());
-      break;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    case AFE_CONFIG_SITE_DOMOTICZ:
-      Data.saveConfiguration(getDomoticzServerData());
-      break;
-#endif
-    case AFE_CONFIG_SITE_PASSWORD:
-      Data.saveConfiguration(getPasswordData());
-      break;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    case AFE_CONFIG_SITE_ANALOG_INPUT:
-      Data.saveConfiguration(getAnalogInputData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_LED
-    case AFE_CONFIG_SITE_LED:
-      for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-        Data.saveConfiguration(i, getLEDData(i));
-      }
-      Data.saveSystemLedID(getSystemLEDData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-    case AFE_CONFIG_SITE_RELAY:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getRelayData(siteConfig.deviceID));
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-    case AFE_CONFIG_SITE_SWITCH:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getSwitchData(siteConfig.deviceID));
-      break;
-#endif
-    case AFE_CONFIG_SITE_RESET:
-      siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
-      siteConfig.rebootTime = 15;
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_PRO_VERSION:
-      Data.saveConfiguration(getSerialNumberData());
-      Firmware->begin();
-      Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
-      break;
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    case AFE_CONFIG_SITE_CONTACTRON:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getContactronData(siteConfig.deviceID));
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    case AFE_CONFIG_SITE_GATE:
-      Data.saveConfiguration(siteConfig.deviceID, getGateData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    case AFE_CONFIG_SITE_HPMA115S0:
-      Data.saveConfiguration(siteConfig.deviceID, getHPMA115S0SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-    case AFE_CONFIG_SITE_BMEX80:
-      Data.saveConfiguration(siteConfig.deviceID, getBMEX80SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-    case AFE_CONFIG_SITE_BH1750:
-      Data.saveConfiguration(siteConfig.deviceID, getBH1750SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-    case AFE_CONFIG_SITE_AS3935:
-      Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_UART
-    case AFE_CONFIG_SITE_UART:
-      Data.saveConfiguration(getSerialPortData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_I2C
-    case AFE_CONFIG_SITE_I2C:
-      Data.saveConfiguration(getI2CPortData());
-      break;
+  if (!upload) {
+
+    /* Setting page refresh time if automatic logout is set */
+    if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+         Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+        Device->configuration.timeToAutoLogOff > 0) {
+
+      siteConfig.rebootTime =
+          Device->configuration.timeToAutoLogOff * 60 +
+          10; // adds additional 10sec for a reboot to be finished
+#ifdef DEBUG
+      Serial << endl
+             << "INFO: Setting auto-logout to " << siteConfig.rebootTime
+             << "seconds";
 #endif
     }
-  } else if (command == AFE_SERVER_CMD_NONE) {
-    switch (siteConfig.ID) {
-    case AFE_CONFIG_SITE_INDEX:
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      if (siteConfig.deviceID > AFE_MODE_NORMAL) {
-        boolean authorize = true;
-        PASSWORD accessControl = Data.getPasswordConfiguration();
-        if (accessControl.protect) {
-          PASSWORD data = getPasswordData();
-          if (strcmp(accessControl.password, data.password) != 0) {
-            authorize = false;
-          }
+
+    if (command == AFE_SERVER_CMD_SAVE) {
+      switch (siteConfig.ID) {
+      case AFE_CONFIG_SITE_FIRST_TIME:
+        Data.saveConfiguration(getNetworkData());
+        siteConfig.twoColumns = false;
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
+        siteConfig.form = false;
+        siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
+        break;
+      case AFE_CONFIG_SITE_DEVICE:
+        DEVICE configuration;
+        configuration = getDeviceData();
+        Data.saveConfiguration(&configuration);
+        configuration = {0};
+        break;
+      case AFE_CONFIG_SITE_NETWORK:
+        Data.saveConfiguration(getNetworkData());
+        break;
+      case AFE_CONFIG_SITE_MQTT:
+        Data.saveConfiguration(getMQTTData());
+        break;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      case AFE_CONFIG_SITE_DOMOTICZ:
+        Data.saveConfiguration(getDomoticzServerData());
+        break;
+#endif
+      case AFE_CONFIG_SITE_PASSWORD:
+        Data.saveConfiguration(getPasswordData());
+        break;
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+      case AFE_CONFIG_SITE_ANALOG_INPUT:
+        Data.saveConfiguration(getAnalogInputData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+      case AFE_CONFIG_SITE_LED:
+        for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
+          Data.saveConfiguration(i, getLEDData(i));
         }
-        if (authorize) {
-          siteConfig.rebootMode = siteConfig.deviceID;
-          siteConfig.ID = AFE_CONFIG_SITE_EXIT;
-          siteConfig.reboot = true;
-          siteConfig.rebootTime = 10;
-        }
-      }
-      break;
-    case AFE_CONFIG_SITE_EXIT:
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_NORMAL;
-      siteConfig.rebootTime = 10;
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_FIRST_TIME:
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_RESET:
-      siteConfig.formButton = false;
-      break;
-    case AFE_CONFIG_SITE_UPGRADE:
-      siteConfig.form = false;
-      break;
-    case AFE_CONFIG_SITE_POST_UPGRADE:
-      if (!upload) {
+        Data.saveSystemLedID(getSystemLEDData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+      case AFE_CONFIG_SITE_RELAY:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getRelayData(siteConfig.deviceID));
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+      case AFE_CONFIG_SITE_SWITCH:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getSwitchData(siteConfig.deviceID));
+        break;
+#endif
+      case AFE_CONFIG_SITE_RESET:
+        siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
+        siteConfig.rebootTime = 15;
         siteConfig.form = false;
         siteConfig.twoColumns = false;
-        siteConfig.rebootTime = 15;
-        siteConfig.reboot = true;
-        siteConfig.rebootMode = Device->getMode();
+        break;
+      case AFE_CONFIG_SITE_PRO_VERSION:
+        Data.saveConfiguration(getSerialNumberData());
+        Firmware->begin();
+        Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
+        break;
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+      case AFE_CONFIG_SITE_CONTACTRON:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getContactronData(siteConfig.deviceID));
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      case AFE_CONFIG_SITE_GATE:
+        Data.saveConfiguration(siteConfig.deviceID, getGateData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+      case AFE_CONFIG_SITE_HPMA115S0:
+        Data.saveConfiguration(siteConfig.deviceID, getHPMA115S0SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+      case AFE_CONFIG_SITE_BMEX80:
+        Data.saveConfiguration(siteConfig.deviceID, getBMEX80SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+      case AFE_CONFIG_SITE_BH1750:
+        Data.saveConfiguration(siteConfig.deviceID, getBH1750SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+      case AFE_CONFIG_SITE_AS3935:
+        Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_UART
+      case AFE_CONFIG_SITE_UART:
+        Data.saveConfiguration(getSerialPortData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+      case AFE_CONFIG_SITE_I2C:
+        Data.saveConfiguration(getI2CPortData());
+        break;
+#endif
       }
-      break;
+    } else if (command == AFE_SERVER_CMD_NONE) {
+      switch (siteConfig.ID) {
+      case AFE_CONFIG_SITE_INDEX:
+        siteConfig.form = false;
+        siteConfig.twoColumns = false;
+        if (siteConfig.deviceID > AFE_MODE_NORMAL) {
+          boolean authorize = true;
+          PASSWORD accessControl = Data.getPasswordConfiguration();
+          if (accessControl.protect) {
+            PASSWORD data = getPasswordData();
+            if (strcmp(accessControl.password, data.password) != 0) {
+              authorize = false;
+            }
+          }
+          if (authorize) {
+            siteConfig.rebootMode = siteConfig.deviceID;
+            siteConfig.ID = AFE_CONFIG_SITE_EXIT;
+            siteConfig.reboot = true;
+            siteConfig.rebootTime = 10;
+          }
+        }
+        break;
+      case AFE_CONFIG_SITE_EXIT:
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_NORMAL;
+        siteConfig.rebootTime = 10;
+        siteConfig.form = false;
+        siteConfig.twoColumns = false;
+        break;
+      case AFE_CONFIG_SITE_FIRST_TIME:
+        siteConfig.twoColumns = false;
+        break;
+      case AFE_CONFIG_SITE_RESET:
+        siteConfig.formButton = false;
+        break;
+      case AFE_CONFIG_SITE_UPGRADE:
+        siteConfig.form = false;
+        break;
+      case AFE_CONFIG_SITE_POST_UPGRADE:
+        if (!upload) {
+          siteConfig.form = false;
+          siteConfig.twoColumns = false;
+          siteConfig.rebootTime = 15;
+          siteConfig.reboot = true;
+          siteConfig.rebootMode = Device->getMode();
+        }
+        break;
+      }
     }
   }
 
@@ -413,10 +431,8 @@ void AFEWebServer::generate(boolean upload) {
     Serial << ", device ID: " << siteConfig.deviceID;
     Serial << ", Command: " << command;
     Serial << ", Reboot: " << (siteConfig.reboot ? "Yes" : "No");
-    if (siteConfig.reboot) {
-      Serial << ", Mode: " << siteConfig.rebootMode;
-      Serial << ", Time: " << siteConfig.rebootTime;
-    }
+    Serial << ", Mode: " << siteConfig.rebootMode;
+    Serial << ", Time: " << siteConfig.rebootTime;
 #endif
 
     publishHTML(generateSite(&siteConfig));
@@ -569,7 +585,24 @@ HTTPCOMMAND AFEWebServer::getHTTPCommand() {
   return httpCommand;
 }
 
-void AFEWebServer::listener() { server.handleClient(); }
+void AFEWebServer::listener() {
+  server.handleClient();
+  /* Code for automatic logoff from the config panel */
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    if (Device->configuration.timeToAutoLogOff * 60000 + howLongInConfigMode <
+        millis()) {
+#ifdef DEBUG
+      Serial << endl
+             << endl
+             << "INFO: Automatic logout from the config panel after : "
+             << Device->configuration.timeToAutoLogOff << "min. of idle time";
+#endif
+      Device->reboot(AFE_MODE_NORMAL);
+    }
+  }
+}
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
@@ -605,6 +638,12 @@ void AFEWebServer::publishHTML(String page) {
 #ifdef DEBUG
   Serial << "Completed";
 #endif
+
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    howLongInConfigMode = millis();
+  }
 }
 
 void AFEWebServer::sendJSON(String json) {
@@ -714,6 +753,9 @@ DEVICE AFEWebServer::getDeviceData() {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
+
+  data.timeToAutoLogOff =
+      server.arg("al").length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 
   return data;
 }
@@ -887,8 +929,8 @@ RELAY AFEWebServer::getRelayData(uint8_t id) {
     data.mqtt.topic[0] = '\0';
   }
 #else
-  data.domoticz.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
@@ -1008,15 +1050,16 @@ CONTACTRON AFEWebServer::getContactronData(uint8_t id) {
     data.name[0] = '\0';
   }
 
-  data.domoticz.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
-
+#endif
   return data;
 }
 #endif
@@ -1047,15 +1090,19 @@ GATE AFEWebServer::getGateData() {
                                ? server.arg("s" + String(i)).toInt()
                                : AFE_GATE_UNKNOWN;
   }
-
-  data.domoticz.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
-
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticzControl.idx = server.arg("z").length() > 0
+                                 ? server.arg("z").toInt()
+                                 : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = '\0';
   }
+#endif
 
   return data;
 }
@@ -1304,43 +1351,56 @@ BMEX80 AFEWebServer::getBMEX80SensorData() {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.temperatureHumidityPressure.idx =
-      server.arg("i0").length() > 0 ? server.arg("i0").toInt() : 0;
+      server.arg("i0").length() > 0 ? server.arg("i0").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.temperature.idx =
-      server.arg("i1").length() > 0 ? server.arg("i1").toInt() : 0;
+  data.domoticz.temperature.idx = server.arg("i1").length() > 0
+                                      ? server.arg("i1").toInt()
+                                      : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.humidity.idx =
-      server.arg("i2").length() > 0 ? server.arg("i2").toInt() : 0;
+  data.domoticz.humidity.idx = server.arg("i2").length() > 0
+                                   ? server.arg("i2").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.dewPoint.idx =
-      server.arg("i3").length() > 0 ? server.arg("i3").toInt() : 0;
+  data.domoticz.dewPoint.idx = server.arg("i3").length() > 0
+                                   ? server.arg("i3").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.heatIndex.idx =
-      server.arg("i4").length() > 0 ? server.arg("i4").toInt() : 0;
+  data.domoticz.heatIndex.idx = server.arg("i4").length() > 0
+                                    ? server.arg("i4").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.pressure.idx =
-      server.arg("i5").length() > 0 ? server.arg("i5").toInt() : 0;
+  data.domoticz.pressure.idx = server.arg("i5").length() > 0
+                                   ? server.arg("i5").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.relativePressure.idx =
-      server.arg("i6").length() > 0 ? server.arg("i6").toInt() : 0;
+  data.domoticz.relativePressure.idx = server.arg("i6").length() > 0
+                                           ? server.arg("i6").toInt()
+                                           : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.iaq.idx =
-      server.arg("i7").length() > 0 ? server.arg("i7").toInt() : 0;
+  data.domoticz.iaq.idx = server.arg("i7").length() > 0
+                              ? server.arg("i7").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.staticIaq.idx =
-      server.arg("i8").length() > 0 ? server.arg("i8").toInt() : 0;
+  data.domoticz.staticIaq.idx = server.arg("i8").length() > 0
+                                    ? server.arg("i8").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.co2Equivalent.idx =
-      server.arg("i9").length() > 0 ? server.arg("i9").toInt() : 0;
+  data.domoticz.co2Equivalent.idx = server.arg("i9").length() > 0
+                                        ? server.arg("i9").toInt()
+                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.breathVocEquivalent.idx =
-      server.arg("i10").length() > 0 ? server.arg("i10").toInt() : 0;
+  data.domoticz.breathVocEquivalent.idx = server.arg("i10").length() > 0
+                                              ? server.arg("i10").toInt()
+                                              : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.gasResistance.idx =
-      server.arg("i11").length() > 0 ? server.arg("i11").toInt() : 0;
+  data.domoticz.gasResistance.idx = server.arg("i11").length() > 0
+                                        ? server.arg("i11").toInt()
+                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.temperatureHumidity.idx =
-      server.arg("i12").length() > 0 ? server.arg("i12").toInt() : 0;
+  data.domoticz.temperatureHumidity.idx = server.arg("i12").length() > 0
+                                              ? server.arg("i12").toInt()
+                                              : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -1372,8 +1432,8 @@ BH1750 AFEWebServer::getBH1750SensorData() {
                   ? server.arg("m").toInt()
                   : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.domoticz.idx =
-      server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
+  data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -1481,14 +1541,17 @@ ADCINPUT AFEWebServer::getAnalogInputData() {
     data.mqtt.topic[0] = '\0';
   }
 #else
-  data.domoticz.raw =
-      server.arg("x0").length() > 0 ? server.arg("x0").toInt() : 0;
-  data.domoticz.percent =
-      server.arg("x1").length() > 0 ? server.arg("x1").toInt() : 0;
-  data.domoticz.voltage =
-      server.arg("x2").length() > 0 ? server.arg("x2").toInt() : 0;
-  data.domoticz.voltageCalculated =
-      server.arg("x3").length() > 0 ? server.arg("x3").toInt() : 0;
+  data.domoticz.raw = server.arg("x0").length() > 0 ? server.arg("x0").toInt()
+                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.percent = server.arg("x1").length() > 0
+                              ? server.arg("x1").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.voltage = server.arg("x2").length() > 0
+                              ? server.arg("x2").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.voltageCalculated = server.arg("x3").length() > 0
+                                        ? server.arg("x3").toInt()
+                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
   return data;

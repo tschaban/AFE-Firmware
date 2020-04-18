@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="utf-8">
-  <title>AFE Firmware 1.4.0 [T2]</title>
+  <title>AFE Firmware 2.2.0.B1 [T5]</title>
   <style>
     #l,
     #r {
-      padding: 20px
+      padding: 20px;
+      display: table-cell
     }
 
-    .ltag,
     .ltit,
     body {
       margin: 0
@@ -32,14 +32,9 @@
       width: 100%
     }
 
-    #l,
-    #r {
-      display: table-cell
-    }
-
     #l {
       width: 300px;
-      background: #282828;
+      background: #33363b;
       color: #eee
     }
 
@@ -60,12 +55,6 @@
       font-family: sans-serif
     }
 
-    .ltag {
-      font-weight: 300;
-      color: #b0cadb;
-      margin-bottom: 20px
-    }
-
     .lst {
       list-style: none;
       margin: 0;
@@ -78,6 +67,10 @@
       padding: .2em 1em;
       color: #777;
       font-size: 95%
+    }
+
+    a {
+      color: #36f
     }
 
     .cf label,
@@ -205,71 +198,93 @@
   </style>
 </head>
 
-<body>
+<body><img src="http://api.smartnydom.pl/logo/T5/2.2.0.B1/6889C6e8-3Ad6D63a/0" style="width: 100%;display: block"
+    alt="AFE Firmware">
   <div id="c">
     <div id="l">
-      <h3 class="ltit">AFE FIRMWARE</h3>
-      <h4 class="ltag">Włącznik z czujnikiem temperatury i wilgotności</h4>
-      <h4>MENU</h4>
+      <h4>to control gate controller</h4>
       <ul class="lst">
-        <li class="itm"><a href="\?option=device">Urządzenie</a></li>
-        <li class="itm"><a href="\?option=network">Sieć WiFi</a></li>
-        <li class="itm"><a href="\?option=mqtt">MQTT Broker</a></li>
-        <li class="itm"><a href="\?option=led">LEDy</a></li>
-        <li class="itm"><a href="\?option=DHT">Czujnik DHT</a></li><br><br>
-        <li class="itm"><a href="\?option=language">[PL] Język / [EN] Language</a></li><br><br>
-        <li class="itm"><a href="\update">Aktulizacja firmware</a></li>
-        <li class="itm"><a href="\?option=reset">Przywracanie ustawień początkowych</a></li><br><br>
-        <li class="itm"><a href="\?option=exit">Zakończ konfigurację</a></li>
-      </ul><br><br>
-      <h4>INFORMACJE</h4>
-      <ul class="lst">
-        <li class="itm"><a href="https://www.smartnydom.pl/afe-firmware-pl/" target="_blank">Dokumentacja</a></li>
+        <li class="itm"><a href="\?o=1">Device</a></li>
+        <li class="itm"><a href="\?o=2">Network</a></li>
+        <li class="itm"><a href="\?o=3">MQTT Broker</a></li>
+        <li class="itm"><a href="\?o=6">LEDs</a></li>
+        <li class="itm"><a><i>Gate/Door configuration</i></a></li>
+        <li class="itm"><a href="\?o=13&i=0">&#8227; Gate/Door: 1</a></li>
+        <li class="itm"><a><i>Relays configuration</i></a></li>
+        <li class="itm"><a href="\?o=7&i=0">&#8227; Relay: 1</a></li>
+        <li class="itm"><a><i>Button / Switches</i></a></li>
+        <li class="itm"><a href="\?o=8&i=0">&#8227; Switch: 1</a></li>
+        <li class="itm"><a><i>Magnetic's sensors</i></a></li>
+        <li class="itm"><a href="\?o=12&i=0">&#8227; Sensor: 1</a></li>
+        <li class="itm"><a href="\?o=12&i=1">&#8227; Sensor: 2</a></li>
+        <li class="itm"><br><a href="\?o=9">Set password</a><br></li>
+        <li class="itm"><a href="\?o=19">Firmware upgrade</a></li>
+        <li class="itm"><a href="\?o=15">Reset to orginal state</a></li>
+        <li class="itm"><a href="\?o=10">PRO Version</a></li>
+        <li class="itm"><br><a href="https://en.donate.afe-firmware.smartnydom.pl">&#128077; Donate if you found this
+            useful</a><br></li>
+        <li class="itm"><a href="\?o=14">Finish configuration</a></li>
       </ul>
     </div>
     <div id="r">
-      <form action="/?option=device&cmd=1" method="post">
+      <form method="post" action="/?c=1&o=12&i=0">
         <div class="ci">
-          <h1>Urządzenie</h1>
-          <p class="cd">Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako nazwa hotspot'a urządzenia</p>
+          <h1>Magnetic's sensor #1</h1>
+          <p class="cd"></p>
           <fieldset>
-            <div class="cf"><label>Nazwa urządzenia</label><input name="dn" type="text" maxlength="16" value="Sensor"><span class="hint">Max 16 znaków</span></div>
-          </fieldset>
-        </div>
-        <div class="ci">
-          <h1>Konfiguracja urządzenia</h1>
-          <p class="cd">Wybierz podłączone elementy do urządzenia</p>
-          <fieldset>
-            <div class="cf"><label>Ilość Led'ów</label><select name="hl">
-                <option value="0">Brak</option>
-                <option value="1" selected="selected">1</option>
-                <option value="2">2</option>
+            <div class="cf">
+              <div class="cf"><label>GPIO</label><select name="g">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4" selected="selected">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                </select></div>
+            </div>
+            <div class="cf"><label>Name</label><input name="n" type="text" maxlength="16" value="C1"><span
+                class="hint">Max 16 chars</span></div>
+            <div class="cf"><label>Type</label><select name="y">
+                <option value="0">NO</option>
+                <option value="1" selected="selected">NC</option>
               </select></div>
-            <div class="cf"><label>Ilość przekaźników</label><select name="hr">
-                <option value="0" selected="selected">Brak</option>
-                <option value="1">1</option>
-              </select></div>
-            <div class="cf"><label>Ilość przycisków</label><select name="hs">
-                <option value="0" selected="selected">Brak</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-              </select></div>
-            <div class="cc"><label><input name="ds" type="checkbox" value="1" checked="checked">Czujnik DHT</label></div>
+            <div class="cf"><label>LED assigned to the sensor</label><select name="l">
+                <option value="255">None</option>
+                <option value="0" selected="selected">1</option>
+              </select></div><br>
+            <p class="cm">Sensitiveness should be adjusted experimentally until sensor behaves as expected</p>
+            <div class="cf"><label>Sensitiveness</label><input name="b" type="number" min="0" max="2000" step="1"
+                value="200"><span class="hint"> Range 0 - 2000 milisekonds</span></div>
           </fieldset>
-        </div>
-        <div class="ci">
-          <h1>Sterowanie urządzeniem</h1>
-          <p class="cd">Włączanie / Wyłączanie mechanizmów sterowania urządzeniem</p>
-          <fieldset>
-            <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT API włączone?</label></div>
-            <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP API włączone?</label></div>
-            <div class="cc"><label><input name="d" type="checkbox" value="1">Domoticz API włączone?</label></div>
-          </fieldset>
-        </div><input type="submit" class="b bs" value="Zapisz">
+          <div class="ci">
+            <h1>Domoticz</h1>
+            <p class="cd">If IDX is set to 0 then a value won't be sent to Domoticz</p>
+            <fieldset>
+              <div class="cf"><label>IDX</label><input name="x" type="number" min="0" max="999999" step="1"
+                  value="1"><span class="hint"> Range 0 - 999999</span></div>
+            </fieldset><input type="submit" class="b bs" value="Save">
       </form>
-      <hr style="border:0;border-top:1px solid #eee;" />
     </div>
   </div>
+  <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
+        src="https://img.shields.io/badge/Help-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/en/"
+      target="_blank"><img src="https://img.shields.io/badge/Help-Documentation-green.svg" alt="Documentation" /></a> <a
+      href="https://afe.smartnydom.pl/en/pliki-to-pobrania/historia-zmian" target="_blank"><img
+        src="https://img.shields.io/badge/Version%20-%202.2.0.B1[T5]-blue.svg" alt="T5-2.2.0.B1" /></a> <img
+      src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 0" /> <img
+      src="https://img.shields.io/badge/API-Domoticz-yellow.svg" /> <img
+      src="https://img.shields.io/badge/PRO-No-orange.svg" alt="PRO" /></div>
 </body>
 
 </html>

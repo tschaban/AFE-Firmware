@@ -30,7 +30,7 @@ struct AFE_SITE_PARAMETERS {
   int8_t deviceID = -1;
   boolean reboot = false;
   uint8_t rebootMode = 0;
-  uint8_t rebootTime = 0;
+  uint16_t rebootTime = 0;
   boolean form = true;
   boolean formButton = true;
 };
@@ -52,6 +52,11 @@ private:
   /* when it's set to true device configuration is refreshed. Required by
    * generate() method */
   boolean _refreshConfiguration = false;
+
+  /* Used to auto-logoff from the config panel */
+  unsigned long howLongInConfigMode = 0;
+
+  uint16_t uploadLED = 1023;
 
   AFEDataAccess Data;
   AFESitesGenerator Site;

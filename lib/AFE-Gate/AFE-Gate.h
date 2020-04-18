@@ -26,6 +26,11 @@ public:
   AFEContactron Contactron[2];
   GATE configuration;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructors */
   AFEGate();
 
@@ -51,12 +56,8 @@ public:
   /* It triggers event - used eg when contactron state is changed */
   void triggerEvent();
 
-  /* Get MQTT Topics */
-  const char *getMQTTCommandTopic();
-  const char *getMQTTStateTopic();
-
-  /* Return IDX in Domoticz */
-  unsigned long getDomoticzIDX();
+    /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 
 private:
   AFEDevice *Device;
@@ -66,9 +67,6 @@ private:
   uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
   boolean _event = false;
   AFERelay GateRelay;
-
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

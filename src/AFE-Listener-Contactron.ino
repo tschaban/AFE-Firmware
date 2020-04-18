@@ -5,12 +5,12 @@
 /* Method initialize contactrons */
 void initializeContractons() {
 #ifdef DEBUG
-  Serial << endl << "Initializing contractons";
+  Serial << endl << "INFO: Initializing contractons";
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
     Contactron[i].begin(i, &Device, &Data);
 #ifdef DEBUG
-    Serial << endl << " - Contactron: " << i << " initialized";
+    Serial << endl << "INFO: Contactron: " << i << " initialized";
 #endif
   }
 }
@@ -21,7 +21,7 @@ void contractonEventsListener() {
     Contactron[i].listener();
     if (Contactron[i].changed()) {
 #ifdef DEBUG
-      Serial << endl << " - Contactron: " << i << " has changed the state";
+      Serial << endl << "INFO: Contactron: " << i << " has changed the state";
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -35,8 +35,10 @@ void contractonEventsListener() {
       }
 #endif
 
-      MQTTPublishContactronState(i);
-      DomoticzPublishContactronState(i);
+        MqttAPI.publishContactronState(i);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        HttpDomoticzAPI.publishContactronState(i);
+#endif
     }
   }
 }

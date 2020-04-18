@@ -46,7 +46,7 @@ private:
   AFEFirmwarePro *Firmware;
   char deviceID[17];
 
-  void generateHeader(String &page, uint8_t redirect);
+  void generateHeader(String &page, uint16_t redirect);
 
   /* Method generates GPIO selecton list */
   void generateConfigParameter_GPIO(String &item, const char *field,
@@ -65,12 +65,12 @@ private:
   /* It uses generateHardwareItemsList() */
   void generateHardwareList(String &item, uint8_t noOfItems,
                             uint8_t noOffConnected, const char *field,
-                            const char *label, uint8_t index,
-                            uint8_t noneValue);
-                            
+                            const char *label, uint8_t index, uint8_t noneValue,
+                            boolean disabled = false);
+
   void generateHardwareItemsList(String &item, uint8_t noOfItems,
                                  uint8_t noOffConnected, const char *field,
-                                 const char *label);
+                                 const char *label, boolean disabled = false);
 
   void addItem(String &item, const char *type, const char *name,
                const char *label, const char *value, const char *size = "?",
@@ -79,7 +79,7 @@ private:
                boolean readonly = false);
 
 #if defined(T5_CONFIG)
-  const String generateGateStatesList(uint8_t id, byte state);
+  void generateGateStatesList(String &item, uint8_t id, byte state);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -99,8 +99,8 @@ public:
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  void generateOneColumnLayout(String &page, uint8_t redirect = 0);
-  void generateTwoColumnsLayout(String &page, uint8_t redirect = 0);
+  void generateOneColumnLayout(String &page, uint16_t redirect = 0);
+  void generateTwoColumnsLayout(String &page, uint16_t redirect = 0);
 
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
@@ -147,11 +147,11 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  String addGateConfiguration(uint8_t id);
+  void addGateConfiguration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  String addContactronConfiguration(uint8_t id);
+  void addContactronConfiguration(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0

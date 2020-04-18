@@ -50,6 +50,12 @@ typedef enum {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   AFE_MQTT_DEVICE_HPMA115S0 = 6,
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  AFE_MQTT_DEVICE_GATE = 7,
+#endif  
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  AFE_MQTT_DEVICE_CONTACTRON = 8,
 #endif  
 } afe_mqtt_standard_device_type_t;
 

@@ -106,6 +106,10 @@
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_CONTROLLED_GATES "Gates/Doors controlled"
 #endif
+#define L_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
+#define L_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
+
+
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "WiFi Configuration"
@@ -293,6 +297,7 @@
 #define L_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
 #define L_RELAY_ID_CONTROLLING_GATE "Gate/Door controlled by Relay"
 #define L_GATE_MQTT_TOPIC "MQTT Topic to control the gate/door"
+#define L_IDX_GATE_STATE "IDX Gate/Door state"
 #endif
 
 /* HPMA11BS0 */

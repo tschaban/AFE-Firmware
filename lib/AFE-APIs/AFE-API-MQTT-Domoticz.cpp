@@ -40,6 +40,9 @@ void AFEAPIMQTTDomoticz::synchronize() {
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing RELAY: " << i;
+#endif
     publishRelayState(i);
   }
 #endif
@@ -47,7 +50,30 @@ void AFEAPIMQTTDomoticz::synchronize() {
 /* Synchronize: Switch */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing SWITCH: " << i;
+#endif
     publishSwitchState(i);
+  }
+#endif
+
+/* Synchronize: Contactron */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing CONTACTRON: " << i;
+#endif
+    publishContactronState(i);
+  }
+#endif
+
+/* Synchronize: Gate */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Synchronizing GATE: " << i;
+#endif
+    publishGateState(i);
   }
 #endif
 
@@ -108,7 +134,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef DEBUG
     uint8_t _found = false;
 #endif
-    for (uint8_t i = 0; i < AFE_CONFIG_API_DOMOTICZ_IDX_CACHE_LENGTH; i++) {
+    for (uint8_t i = 0; i < lastIDXChacheIndex; i++) {
       if (idxCache[i].domoticz.idx == command.domoticz.idx) {
         switch (idxCache[i].type) {
         /* Processing Relay command*/
@@ -120,17 +146,27 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif
           if (_Relay[idxCache[i].id]->get() != (byte)command.nvalue) {
             if (command.nvalue == AFE_SWITCH_OFF) {
-              _Relay[i]->off();
+              _Relay[idxCache[i].id]->off();
             } else {
-              _Relay[i]->on();
+              _Relay[idxCache[i].id]->on();
             }
-            publishRelayState(i);
+            publishRelayState(idxCache[i].id);
           }
 #ifdef DEBUG
           else {
             Serial << endl << "WARN: Domoticz: Same state. No change needed";
           }
 #endif
+          break;
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        /* Processing Gate command*/
+        case AFE_DOMOTICZ_DEVICE_GATE:
+#ifdef DEBUG
+          Serial << endl << "INFO: Domoticz: Found Gate ID: " << idxCache[i].id;
+          _found = true;
+#endif
+          _Gate[idxCache[i].id]->toggle();
+#endif // AFE_CONFIG_HARDWARE_GATE
           break;
         /* Processing Unknown command*/
         default:
@@ -165,7 +201,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
-// Returns true if Domoticz is in version 2020.x. All requests are processed
+  // Returns true if Domoticz is in version 2020.x. All requests are processed
   if (idx == bypassProcessing.idx &&
       _Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0) {
     bypassProcessing.idx = 0;
@@ -183,16 +219,17 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
   Serial << endl << "INFO: Caching IDXs for Relays";
 #endif
 
-  uint8_t index = 0;
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     if (_Relay[i]->configuration.domoticz.idx > 0) {
-      idxCache[index].domoticz.idx = _Relay[i]->configuration.domoticz.idx;
-      idxCache[index].id = i;
-      idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
+      idxCache[lastIDXChacheIndex].domoticz.idx =
+          _Relay[i]->configuration.domoticz.idx;
+      idxCache[lastIDXChacheIndex].id = i;
+      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_RELAY;
 #ifdef DEBUG
-      Serial << endl << " - added IDX: " << idxCache[index].domoticz.idx;
+      Serial << endl
+             << " - added IDX: " << idxCache[lastIDXChacheIndex].domoticz.idx;
 #endif
-      index++;
+      lastIDXChacheIndex++;
     }
 #ifdef DEBUG
     else {
@@ -205,6 +242,11 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: Publishing relay: " << id
+         << ", IDX: " << idxCache[id].domoticz.idx << " state";
+#endif
   boolean publishStatus = false;
   if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
     char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
@@ -213,6 +255,11 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     bypassProcessing.idx = _Relay[id]->configuration.domoticz.idx;
   }
+#ifdef DEBUG
+  else {
+    Serial << endl << "INFO: Not published";
+  }
+#endif
   return publishStatus;
 }
 #endif // AFE_CONFIG_API_PROCESS_REQUESTS
@@ -499,5 +546,60 @@ boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) {
   return true;
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
+  AFEAPI::addClass(Item);
+
+#ifdef DEBUG
+  Serial << endl << "INFO: Caching IDXs for Gates";
+#endif
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+    if (_Gate[i]->configuration.domoticzControl.idx > 0) {
+      idxCache[lastIDXChacheIndex].domoticz.idx =
+          _Gate[i]->configuration.domoticzControl.idx;
+      idxCache[lastIDXChacheIndex].id = i;
+      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_GATE;
+#ifdef DEBUG
+      Serial << endl
+             << " - added IDX: " << idxCache[lastIDXChacheIndex].domoticz.idx;
+#endif
+      lastIDXChacheIndex++;
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << " - IDX not set";
+    }
+#endif
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishGateState(uint8_t id) {
+  if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
+    char json[AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH];
+    generateSwitchMessage(json, _Gate[id]->configuration.domoticz.idx,
+                          _Gate[id]->get() == AFE_GATE_CLOSED ? false : true);
+    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
+  return true;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+void AFEAPIMQTTDomoticz::addClass(AFEContactron *Item) {
+  AFEAPI::addClass(Item);
+}
+boolean AFEAPIMQTTDomoticz::publishContactronState(uint8_t id) {
+  if (enabled && _Contactron[id]->configuration.domoticz.idx > 0) {
+    char json[AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH];
+    generateSwitchMessage(
+        json, _Contactron[id]->configuration.domoticz.idx,
+        _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? true : false);
+    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
+  return true;
+}
+#endif
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
