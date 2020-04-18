@@ -17,8 +17,8 @@ recaptchacontact:
 * do 3 przycisków: mono/bi-stabilnych
 * do 4 diod LED
 * Do 4 kontaktronów (czujników magnetycznych, krańcowych itp)
-* Czujnik [Bosch BMP180/BME280/BME680](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx) (temperatura, wilgotność, ciśnienie, inne)
-* Czujnik [BH1750](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750) - natężenie światła
+* [W wersji PRO](/postawowe-informacje/wersja-pro) Czujnik [Bosch BMP180/BME280/BME680](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx) (temperatura, wilgotność, ciśnienie, inne)
+* [W wersji PRO](/postawowe-informacje/wersja-pro) Czujnik [BH1750](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750) - natężenie światła
 
 ! Czujniki Bosch BMx80 oraz BH1750 dostępne w 4Mb wersji AFE Firmware T5. 
 
@@ -44,12 +44,14 @@ recaptchacontact:
 	* Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 	* LED może informwać o stanie przekaźnika
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
+* Pomiar temperatury, wilgotności, ciśnienia względnego i bezwzględnego, punktu rosy, IAQ, BVOC - w zależności od zainstalowanego czujnika Bosch [[w wersji PRO](/postawowe-informacje/wersja-pro)]
+* Pomiar natężeni światła (lux) [[W wersji PRO](/postawowe-informacje/wersja-pro)]
 * Obsługa wiadomości LWT
 * Konfiguracja przez przeglądarkę w języku PL lub EN
 * Możliwość nadania stałego adresu IP dla urządzenia
 * Aktualizacja oprogramowania przez przeglądarkę
 
-!!! Wersja 2.x nie obsługuje czujnika temperatury oraz wilgotności DHTxx. Jeśli potrzebujesz obsługę tego czujnika pobierz wersję 1.x. W wersji 2.0.1 zostanie dodana obsługa szyny I2C  (najprawdopodobniej z czujnikami serii BMEx)
+!!! Wersja 2.x nie obsługuje czujnika temperatury oraz wilgotności DHTxx.
 
 ** Gotowe moduły **
 * Idealnie pasuje do [iECS Sterownik Bramą v2](https://www.smartnydom.pl/sterownik-bramy-wersja-v2/?target=_blank), [iECS Sterownik bramą v1](https://www.smartnydom.pl/forum/uklady-esp8266-i-inne-zrob-to-sam/sterownik-bramy-dla-afe-firmware-t5/?target=_blank), własnych konstrukcji opartych na ESP8266/8285
