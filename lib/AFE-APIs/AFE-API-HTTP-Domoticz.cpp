@@ -363,7 +363,7 @@ boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
   boolean _ret = false;
   if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
     _ret = sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
-                             _Gate[id]->get() == AFE_GATE_OPEN ? "On" : "Off");
+                             _Gate[id]->get() == AFE_GATE_CLOSED ? "Off" : "On");
   }
   return _ret;
 }

@@ -11,6 +11,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_I2C
+
 #include <Wire.h>
 #include <AFE-Data-Access.h>
 
@@ -42,4 +45,5 @@ public:
   const char *getName(byte deviceAddress);
 };
 
+#endif // AFE_CONFIG_HARDWARE_I2C
 #endif

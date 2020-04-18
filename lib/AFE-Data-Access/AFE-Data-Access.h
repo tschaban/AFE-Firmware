@@ -182,6 +182,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, BH1750 configuration);
+       
   void createBH1750SensorConfigurationFile();
 #endif
 

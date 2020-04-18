@@ -208,9 +208,19 @@ void AFEUpgrader::upgradeToT0V210() {
 
 #ifdef T5_CONFIG
 void AFEUpgrader::upgradeToT5V220() {
+
+// It will do nothing for ESP8266 1MB - sensors are e  
+#if defined(AFE_CONFIG_HARDWARE_BMEX80) || defined(AFE_CONFIG_HARDWARE_BH1750)
   Data->createI2CConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
   Data->createBMEX80SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
   Data->createBH1750SensorConfigurationFile();
+#endif
 }
 
 #endif // T0_CONFIG

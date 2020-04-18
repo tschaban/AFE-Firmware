@@ -52,13 +52,13 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 }
 
 void AFESitesGenerator::generateOneColumnLayout(String &page,
-                                                uint8_t redirect) {
+                                                uint16_t redirect) {
   generateHeader(page, redirect);
   page += "<div id=\"r\">";
 }
 
 void AFESitesGenerator::generateTwoColumnsLayout(String &page,
-                                                 uint8_t redirect) {
+                                                 uint16_t redirect) {
   generateHeader(page, redirect);
   page += "<div id=\"l\">";
   if (Device->getMode() == AFE_MODE_ACCESS_POINT) {
@@ -595,7 +595,6 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 
   addConfigurationBlock(page, L_AUTOLOGOUT_TITLE, L_AUTOLOGOUT_DESCRIPTION);
   page += "<fieldset>";
-
   page += "<div class=\"cc\"><label><input name =\"al\" type=\"checkbox\" "
           "value=\"1\"";
   page += configuration.timeToAutoLogOff > 0 ? " checked=\"checked\">" : ">";
@@ -1800,10 +1799,12 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
     page += "<fieldset>";
     char _idx[7];
 
-    sprintf(_idx, "%d", gateConfiguration.domoticzControl.idx);
-    addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999",
-            "1");
-
+    if (Device->configuration.api.mqtt) {
+      sprintf(_idx, "%d", gateConfiguration.domoticzControl.idx);
+      addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999",
+              "1");
+    }
+    
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
     addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999",
             "1");
@@ -1965,10 +1966,11 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
     page += (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
                  ? " selected=\"selected\""
                  : "");
-    page += ">F</option></select></div></fieldset><div>";
+    page += ">F</option></select></div></fieldset></div>";
 
     /* Corrections of sensor values */
     addConfigurationBlock(page, L_CORRECTIONS, "");
+        page += "<fieldset>";
     sprintf(_number, "%-.3f", configuration.temperature.correction);
     addItem(page, "number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
             "99.999", "0.001");
@@ -2483,7 +2485,13 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
     page += AFE_DEVICE_TYPE_NAME;
     page += "-lightgrey.svg\" alt=\"DeviceID ";
     page += AFE_DEVICE_TYPE_ID;
-    page += "\" /> <img src=\"https://img.shields.io/badge/API-";
+    page += "\" /> <img src=\"https://img.shields.io/badge/Size-";
+#ifdef ESP_4MB
+    page += "4Mb";
+#else
+    page += "1Mb";
+#endif
+    page += "-yellowgreen.svg\" /> <img src=\"https://img.shields.io/badge/API-";
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     page += "Domoticz";
 #else

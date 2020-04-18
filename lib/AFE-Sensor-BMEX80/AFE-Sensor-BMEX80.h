@@ -9,6 +9,10 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
@@ -58,4 +62,5 @@ public:
 #endif
 };
 
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 #endif

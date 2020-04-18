@@ -170,183 +170,192 @@ void AFEWebServer::generate(boolean upload) {
     return;
   }
 
-  if (_refreshConfiguration) {
-    _refreshConfiguration = false;
-    Device->begin();
-  }
+    if (_refreshConfiguration) {
+      _refreshConfiguration = false;
+      Device->begin();
+    }
 
-  AFE_SITE_PARAMETERS siteConfig;
+    AFE_SITE_PARAMETERS siteConfig;
 
-  siteConfig.ID = getSiteID();
-  uint8_t command = getCommand();
-  siteConfig.deviceID = getID();
+    siteConfig.ID = getSiteID();
+    uint8_t command = getCommand();
+    siteConfig.deviceID = getID();
 
-  /* Setting page refresh time if automatic logout is set */
-  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
-       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-      Device->configuration.timeToAutoLogOff > 0) {
-    siteConfig.rebootTime =
-        Device->configuration.timeToAutoLogOff * 60 +
-        10; // adds additional 10sec for a reboot to be finished
-  }
+  if (!upload) {
 
-  if (command == AFE_SERVER_CMD_SAVE) {
-    switch (siteConfig.ID) {
-    case AFE_CONFIG_SITE_FIRST_TIME:
-      Data.saveConfiguration(getNetworkData());
-      siteConfig.twoColumns = false;
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
-      siteConfig.form = false;
-      siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
-      break;
-    case AFE_CONFIG_SITE_DEVICE:
-      DEVICE configuration;
-      configuration = getDeviceData();
-      Data.saveConfiguration(&configuration);
-      configuration = {0};
-      break;
-    case AFE_CONFIG_SITE_NETWORK:
-      Data.saveConfiguration(getNetworkData());
-      break;
-    case AFE_CONFIG_SITE_MQTT:
-      Data.saveConfiguration(getMQTTData());
-      break;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    case AFE_CONFIG_SITE_DOMOTICZ:
-      Data.saveConfiguration(getDomoticzServerData());
-      break;
-#endif
-    case AFE_CONFIG_SITE_PASSWORD:
-      Data.saveConfiguration(getPasswordData());
-      break;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    case AFE_CONFIG_SITE_ANALOG_INPUT:
-      Data.saveConfiguration(getAnalogInputData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_LED
-    case AFE_CONFIG_SITE_LED:
-      for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-        Data.saveConfiguration(i, getLEDData(i));
-      }
-      Data.saveSystemLedID(getSystemLEDData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-    case AFE_CONFIG_SITE_RELAY:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getRelayData(siteConfig.deviceID));
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-    case AFE_CONFIG_SITE_SWITCH:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getSwitchData(siteConfig.deviceID));
-      break;
-#endif
-    case AFE_CONFIG_SITE_RESET:
-      siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
-      siteConfig.rebootTime = 15;
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_PRO_VERSION:
-      Data.saveConfiguration(getSerialNumberData());
-      Firmware->begin();
-      Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
-      break;
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    case AFE_CONFIG_SITE_CONTACTRON:
-      Data.saveConfiguration(siteConfig.deviceID,
-                             getContactronData(siteConfig.deviceID));
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    case AFE_CONFIG_SITE_GATE:
-      Data.saveConfiguration(siteConfig.deviceID, getGateData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    case AFE_CONFIG_SITE_HPMA115S0:
-      Data.saveConfiguration(siteConfig.deviceID, getHPMA115S0SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-    case AFE_CONFIG_SITE_BMEX80:
-      Data.saveConfiguration(siteConfig.deviceID, getBMEX80SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-    case AFE_CONFIG_SITE_BH1750:
-      Data.saveConfiguration(siteConfig.deviceID, getBH1750SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-    case AFE_CONFIG_SITE_AS3935:
-      Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_UART
-    case AFE_CONFIG_SITE_UART:
-      Data.saveConfiguration(getSerialPortData());
-      break;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_I2C
-    case AFE_CONFIG_SITE_I2C:
-      Data.saveConfiguration(getI2CPortData());
-      break;
+    /* Setting page refresh time if automatic logout is set */
+    if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+         Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+        Device->configuration.timeToAutoLogOff > 0) {
+
+      siteConfig.rebootTime =
+          Device->configuration.timeToAutoLogOff * 60 +
+          10; // adds additional 10sec for a reboot to be finished
+#ifdef DEBUG
+      Serial << endl
+             << "INFO: Setting auto-logout to " << siteConfig.rebootTime
+             << "seconds";
 #endif
     }
-  } else if (command == AFE_SERVER_CMD_NONE) {
-    switch (siteConfig.ID) {
-    case AFE_CONFIG_SITE_INDEX:
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      if (siteConfig.deviceID > AFE_MODE_NORMAL) {
-        boolean authorize = true;
-        PASSWORD accessControl = Data.getPasswordConfiguration();
-        if (accessControl.protect) {
-          PASSWORD data = getPasswordData();
-          if (strcmp(accessControl.password, data.password) != 0) {
-            authorize = false;
-          }
+
+    if (command == AFE_SERVER_CMD_SAVE) {
+      switch (siteConfig.ID) {
+      case AFE_CONFIG_SITE_FIRST_TIME:
+        Data.saveConfiguration(getNetworkData());
+        siteConfig.twoColumns = false;
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
+        siteConfig.form = false;
+        siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
+        break;
+      case AFE_CONFIG_SITE_DEVICE:
+        DEVICE configuration;
+        configuration = getDeviceData();
+        Data.saveConfiguration(&configuration);
+        configuration = {0};
+        break;
+      case AFE_CONFIG_SITE_NETWORK:
+        Data.saveConfiguration(getNetworkData());
+        break;
+      case AFE_CONFIG_SITE_MQTT:
+        Data.saveConfiguration(getMQTTData());
+        break;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      case AFE_CONFIG_SITE_DOMOTICZ:
+        Data.saveConfiguration(getDomoticzServerData());
+        break;
+#endif
+      case AFE_CONFIG_SITE_PASSWORD:
+        Data.saveConfiguration(getPasswordData());
+        break;
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+      case AFE_CONFIG_SITE_ANALOG_INPUT:
+        Data.saveConfiguration(getAnalogInputData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+      case AFE_CONFIG_SITE_LED:
+        for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
+          Data.saveConfiguration(i, getLEDData(i));
         }
-        if (authorize) {
-          siteConfig.rebootMode = siteConfig.deviceID;
-          siteConfig.ID = AFE_CONFIG_SITE_EXIT;
-          siteConfig.reboot = true;
-          siteConfig.rebootTime = 10;
-        }
-      }
-      break;
-    case AFE_CONFIG_SITE_EXIT:
-      siteConfig.reboot = true;
-      siteConfig.rebootMode = AFE_MODE_NORMAL;
-      siteConfig.rebootTime = 10;
-      siteConfig.form = false;
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_FIRST_TIME:
-      siteConfig.twoColumns = false;
-      break;
-    case AFE_CONFIG_SITE_RESET:
-      siteConfig.formButton = false;
-      break;
-    case AFE_CONFIG_SITE_UPGRADE:
-      siteConfig.form = false;
-      break;
-    case AFE_CONFIG_SITE_POST_UPGRADE:
-      if (!upload) {
+        Data.saveSystemLedID(getSystemLEDData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+      case AFE_CONFIG_SITE_RELAY:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getRelayData(siteConfig.deviceID));
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+      case AFE_CONFIG_SITE_SWITCH:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getSwitchData(siteConfig.deviceID));
+        break;
+#endif
+      case AFE_CONFIG_SITE_RESET:
+        siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
+        siteConfig.rebootTime = 15;
         siteConfig.form = false;
         siteConfig.twoColumns = false;
-        siteConfig.rebootTime = 15;
-        siteConfig.reboot = true;
-        siteConfig.rebootMode = Device->getMode();
+        break;
+      case AFE_CONFIG_SITE_PRO_VERSION:
+        Data.saveConfiguration(getSerialNumberData());
+        Firmware->begin();
+        Firmware->callService(AFE_WEBSERVICE_ADD_KEY);
+        break;
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+      case AFE_CONFIG_SITE_CONTACTRON:
+        Data.saveConfiguration(siteConfig.deviceID,
+                               getContactronData(siteConfig.deviceID));
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+      case AFE_CONFIG_SITE_GATE:
+        Data.saveConfiguration(siteConfig.deviceID, getGateData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+      case AFE_CONFIG_SITE_HPMA115S0:
+        Data.saveConfiguration(siteConfig.deviceID, getHPMA115S0SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+      case AFE_CONFIG_SITE_BMEX80:
+        Data.saveConfiguration(siteConfig.deviceID, getBMEX80SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+      case AFE_CONFIG_SITE_BH1750:
+        Data.saveConfiguration(siteConfig.deviceID, getBH1750SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+      case AFE_CONFIG_SITE_AS3935:
+        Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_UART
+      case AFE_CONFIG_SITE_UART:
+        Data.saveConfiguration(getSerialPortData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+      case AFE_CONFIG_SITE_I2C:
+        Data.saveConfiguration(getI2CPortData());
+        break;
+#endif
       }
-      break;
+    } else if (command == AFE_SERVER_CMD_NONE) {
+      switch (siteConfig.ID) {
+      case AFE_CONFIG_SITE_INDEX:
+        siteConfig.form = false;
+        siteConfig.twoColumns = false;
+        if (siteConfig.deviceID > AFE_MODE_NORMAL) {
+          boolean authorize = true;
+          PASSWORD accessControl = Data.getPasswordConfiguration();
+          if (accessControl.protect) {
+            PASSWORD data = getPasswordData();
+            if (strcmp(accessControl.password, data.password) != 0) {
+              authorize = false;
+            }
+          }
+          if (authorize) {
+            siteConfig.rebootMode = siteConfig.deviceID;
+            siteConfig.ID = AFE_CONFIG_SITE_EXIT;
+            siteConfig.reboot = true;
+            siteConfig.rebootTime = 10;
+          }
+        }
+        break;
+      case AFE_CONFIG_SITE_EXIT:
+        siteConfig.reboot = true;
+        siteConfig.rebootMode = AFE_MODE_NORMAL;
+        siteConfig.rebootTime = 10;
+        siteConfig.form = false;
+        siteConfig.twoColumns = false;
+        break;
+      case AFE_CONFIG_SITE_FIRST_TIME:
+        siteConfig.twoColumns = false;
+        break;
+      case AFE_CONFIG_SITE_RESET:
+        siteConfig.formButton = false;
+        break;
+      case AFE_CONFIG_SITE_UPGRADE:
+        siteConfig.form = false;
+        break;
+      case AFE_CONFIG_SITE_POST_UPGRADE:
+        if (!upload) {
+          siteConfig.form = false;
+          siteConfig.twoColumns = false;
+          siteConfig.rebootTime = 15;
+          siteConfig.reboot = true;
+          siteConfig.rebootMode = Device->getMode();
+        }
+        break;
+      }
     }
   }
 

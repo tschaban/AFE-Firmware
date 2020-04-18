@@ -9,6 +9,10 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+
 #include <AFE-Data-Access.h>
 #include <BH1750.h>
 #include <AFE-I2C-Scanner.h>
@@ -52,4 +56,5 @@ public:
   void getJSON(char *json);
 };
 
+#endif // AFE_CONFIG_HARDWARE_BH1750
 #endif

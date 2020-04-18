@@ -1,6 +1,8 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
+
 #include "AFE-I2C-Scanner.h"
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 AFEI2CScanner::AFEI2CScanner() {};
 
@@ -215,3 +217,5 @@ const char *AFEI2CScanner::getName(byte deviceAddress) {
   else
     return "UNKNOWN";
 }
+
+#endif // AFE_CONFIG_HARDWARE_I2C

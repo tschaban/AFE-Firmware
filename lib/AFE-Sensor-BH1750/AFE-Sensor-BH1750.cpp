@@ -2,6 +2,8 @@
 
 #include "AFE-Sensor-BH1750.h"
 
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+
 AFESensorBH1750::AFESensorBH1750(){};
 
 void AFESensorBH1750::begin(uint8_t id) {
@@ -107,3 +109,5 @@ void AFESensorBH1750::listener() {
 void AFESensorBH1750::getJSON(char *json) {
   sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}", data);
 }
+
+#endif // AFE_CONFIG_HARDWARE_BH1750

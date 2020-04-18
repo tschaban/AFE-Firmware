@@ -376,11 +376,11 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
       }
 #endif
       configuration.noOfLEDs =
-          root["noOfLEDs"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
+          root["noOfLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
       configuration.noOfSwitches =
-          root["noOfSwitches"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
+          root["noOfSwitches"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
       configuration.noOfRelays =
-          root["noOfRelays"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS;
+          root["noOfRelays"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       configuration.isAnalogInput = root["isAnalogInput"] | false;
@@ -404,17 +404,17 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       configuration.noOfHPMA115S0s =
-          root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0;
+          root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
       configuration.noOfBH1750s =
-          root["noOfBH1750s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750;
+          root["noOfBH1750s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       configuration.noOfAS3935s =
-          root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935;
+          root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
 #ifdef DEBUG
@@ -3018,10 +3018,10 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.timeToMeasure = root["timeToMeasure"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.pm25.idx = root["idx"]["pm25"];
-      configuration.domoticz.pm10.idx = root["idx"]["pm10"];
+      configuration.domoticz.pm25.idx = root["idx"]["pm25"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pm10.idx = root["idx"]["pm10"]| AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
 #endif
       sprintf(configuration.name, root["name"]);
 
@@ -3382,24 +3382,24 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
       configuration.resolution = root["resolution"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration.domoticz.temperatureHumidityPressure.idx =
-          root["idx"]["temperatureHumidityPressure"];
+          root["idx"]["temperatureHumidityPressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.temperatureHumidity.idx =
-          root["idx"]["temperatureHumidity"];
-      configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"];
-      configuration.domoticz.temperature.idx = root["idx"]["temperature"];
-      configuration.domoticz.humidity.idx = root["idx"]["humidity"];
-      configuration.domoticz.pressure.idx = root["idx"]["pressure"];
+          root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.temperature.idx = root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.humidity.idx = root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pressure.idx = root["idx"]["pressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.relativePressure.idx =
-          root["idx"]["relativePressure"];
-      configuration.domoticz.dewPoint.idx = root["idx"]["dewPoint"];
-      configuration.domoticz.heatIndex.idx = root["idx"]["heatIndex"];
-      configuration.domoticz.iaq.idx = root["idx"]["iaq"];
-      configuration.domoticz.staticIaq.idx = root["idx"]["staticIaq"];
-      configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"];
+          root["idx"]["relativePressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.dewPoint.idx = root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.heatIndex.idx = root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.iaq.idx = root["idx"]["iaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.staticIaq.idx = root["idx"]["staticIaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.breathVocEquivalent.idx =
-          root["idx"]["breathVocEquivalent"];
+          root["idx"]["breathVocEquivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
       configuration.temperature.unit = root["temperature"]["unit"];
       configuration.temperature.correction = root["temperature"]["correction"];
@@ -3589,9 +3589,9 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.i2cAddress = root["i2cAddress"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"];
+      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
 #endif
 
 #ifdef DEBUG
@@ -3734,9 +3734,9 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
       configuration.indoor = root["indoor"];
       configuration.unit = root["unit"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"];
+      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]);
+      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
 #endif
 
 #ifdef DEBUG

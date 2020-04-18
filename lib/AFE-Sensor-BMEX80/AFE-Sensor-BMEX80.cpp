@@ -1,6 +1,8 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
+
 #include "AFE-Sensor-BMEX80.h"
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 AFESensorBMEX80::AFESensorBMEX80(){};
 
@@ -268,4 +270,5 @@ afe_humidity_domoticz_state_t AFESensorBMEX80::getDomoticzHumidityState(float va
     return AFE_HUMIDITY_NORMAL;
   }
 }
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 #endif
