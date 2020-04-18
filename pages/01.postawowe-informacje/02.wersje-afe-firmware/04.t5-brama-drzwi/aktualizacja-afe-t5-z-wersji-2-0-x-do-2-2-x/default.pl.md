@@ -14,7 +14,7 @@ AFE Firmware T5 4Mb dodatkowo zawiera obsługę czujników
 
 ##### Aktualizacja AFE Firmware T5 z wersji 2.0.x do wersji 2.2.x 4Mb przez WiFi
 
-!! **Uwaga** Aktualizacja z wersji 2.0.1 do 2.2.x 4Mb powoduję utratę konfiguracji. Po aktualizacji konieczna jest ponowna konfiguracja urządzenia, [jak za pierwszym razem](https://afe.smartnydom.pl/pl/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie).
+!! **Uwaga** Aktualizacja z wersji 2.0.x do 2.2.x 4Mb powoduję utratę konfiguracji. Po aktualizacji konieczna jest ponowna konfiguracja urządzenia, [jak za pierwszym razem](https://afe.smartnydom.pl/pl/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie).
 
 Aby dokonać aktualizację przez WiFi
 1. Upewnij się, że masz wgrane do urządzenia AFE Firmware T5 w wersji 2.0.x. Nie może to być wersja deweloperska z włączonymi log'ami
