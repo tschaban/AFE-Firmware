@@ -48,9 +48,11 @@ recaptchacontact:
 	* zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 	* pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
-!! AFE Firmware T5 dostępne jest w wersji 1Mb oraz 4Mb. Czujniki Bosch oraz BH1750 dostępne są tylko w wersji AFE 4Mb. AFE 4Mb wymaga ESP8266 z 4Mb rozmiarem pamięci flash 
+! AFE Firmware T5 dostępne jest w wersji 1Mb oraz 4Mb. Czujniki Bosch oraz BH1750 dostępne są tylko w wersji AFE 4Mb. AFE 4Mb wymaga ESP8266 z 4Mb rozmiarem pamięci flash 
 
 ##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-0//?target=_blank)
+
+!! Przeczytaj koniecznie: [Aktualizacjia do wersji 4Mb](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi/aktualizacja-afe-t5-z-wersji-2-0-x-do-2-2-x) 
 
 **Poprzednie wersje**
 * Wersja [2.0.1](https://www.smartnydom.pl/download/afe-firmware-t5-v2/?target=_blank)
