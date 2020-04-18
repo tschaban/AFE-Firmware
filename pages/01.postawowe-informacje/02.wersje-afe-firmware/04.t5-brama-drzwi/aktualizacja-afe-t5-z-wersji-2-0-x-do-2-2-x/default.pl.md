@@ -20,9 +20,11 @@ Aby dokonać aktualizację przez WiFi
 1. Upewnij się, że masz wgrane do urządzenia AFE Firmware T5 w wersji 2.0.x. Nie może to być wersja deweloperska z włączonymi log'ami
 2. W panelu konfiguracyjnym zaktualizuj AFE Firmware do wersji T5 2.2.x. Nie może to być wersja deweloperska z włączonymi log'ami
 3. Po aktualizacji ESP8266 będzie formatowane do 4Mb. 
-4. Reset urządzenia potrwa dłużej niż standardowa. Poczekaj ok 1-2min
+4. Reset urządzenia potrwa dłużej niż standardowa aktualizacja. Poczekaj ok 1-2min
 5. Jeśli LED w ESP8266 zacznie migać, urządzenie gotowe jest do konfiguracji
-6. Połącz się w HotSpot'em AFE-Device, a następnie uruchom przeglądarkę internetową z adresem: http://192.168.5.1
+6. Połącz się z AccessPoint'em o nazwie AFE-Device, a następnie uruchom przeglądarkę internetową z adresem: http://192.168.5.1
 7. Więcej o pierwszym uruchomieniu znajdziesz [tutaj](/instalacja/instalacja-zanim-zainstalujesz-firmware/pierwsze-uruchomienie)
+
+W razie pytań zadaj je [tutaj](https://www.smartnydom.pl/forum/firmware-do-przelacznika-sonoff/)
 
 
