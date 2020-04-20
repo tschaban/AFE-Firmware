@@ -1,6 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-
 #include "AFE-Sensor-BMEX80.h"
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
@@ -39,7 +38,8 @@ void AFESensorBMEX80::begin(uint8_t id) {
 
 #ifdef DEBUG
   Serial << endl
-         << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
+         << "INFO: Device: "
+         << (_initialized ? "Found" : "Not found: check wiring");
   Serial << endl << "--------------------------------------" << endl;
 #endif
 }
@@ -56,6 +56,11 @@ boolean AFESensorBMEX80::isReady() {
 void AFESensorBMEX80::listener() {
   if (_initialized) {
     unsigned long time = millis();
+    boolean readStatus = false;
+
+    if (configuration.type == AFE_BME680_SENSOR) {
+      readStatus = s6.read();
+    }
 
     if (startTime == 0) { // starting timer. used for switch sensitiveness
       startTime = time;
@@ -71,49 +76,48 @@ void AFESensorBMEX80::listener() {
              << "--------";
 #endif
 
-      boolean readStatus =
-          configuration.type == AFE_BME680_SENSOR
-              ? s6.read()
-              : configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
+      if (configuration.type != AFE_BME680_SENSOR) {
+        readStatus =
+            configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
+      }
 
       if (readStatus) {
-        data =
-            configuration.type == AFE_BME680_SENSOR
-                ? s6.data
-                : configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
 
+        if (configuration.type == AFE_BME680_SENSOR) {
+          s6.get(data);
+        } else {
+          data = configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
+        }
         applyCorrections();
         ready = true;
 
 #ifdef DEBUG
         Serial << endl
-               << "Temperature = " << data.temperature.value << endl
-               << "Pressure = " << data.pressure.value
+               << " - Temperature = " << data.temperature.value << endl
+               << " - Pressure = " << data.pressure.value
                << ", Relative = " << data.relativePressure.value;
         if (configuration.type != AFE_BMP180_SENSOR) {
-          Serial << endl << "Humidity = " << data.humidity.value;
-          Serial << endl << "Dew Point = " << data.dewPoint.value;
+          Serial << endl << " - Humidity = " << data.humidity.value;
+          Serial << endl << " - Dew Point = " << data.dewPoint.value;
         }
         if (configuration.type == AFE_BME680_SENSOR) {
+          Serial << endl << " - Gas Resistance = " << data.gasResistance.value;
+          Serial << endl << " - IAQ = " << data.iaq.value;
+          Serial << endl << " - IAQ Accuracy = " << data.iaq.accuracy;
+          Serial << endl << " - Static IAQ = " << data.staticIaq.value;
           Serial << endl
-                 << "Gas Resistance = " << data.gasResistance.value;
-          Serial << endl << "IAQ = " << data.iaq.value;
-          Serial << endl << "IAQ Accuracy = " << data.iaq.accuracy;
-          Serial << endl << "Static IAQ = " << data.staticIaq.value;
+                 << " - Static IAQ Accuracy = " << data.staticIaq.accuracy;
           Serial << endl
-                 << "Static IAQ Accuracy = " << data.staticIaq.accuracy;
+                 << " - Breath VOC = " << data.breathVocEquivalent.value;
           Serial << endl
-                 << "Breath VOC = " << data.breathVocEquivalent.value;
-          Serial << endl
-                 << "Breath VOC Accuracy = "
+                 << " - Breath VOC Accuracy = "
                  << data.breathVocEquivalent.accuracy;
-          Serial << endl << "CO2 = " << data.co2Equivalent.value;
-          Serial << endl
-                 << "CO2 Accuracy = " << data.co2Equivalent.accuracy;
+          Serial << endl << " - CO2 = " << data.co2Equivalent.value;
+          Serial << endl << " - CO2 Accuracy = " << data.co2Equivalent.accuracy;
         }
 
       } else {
-        Serial << endl << "No data found";
+        Serial << endl << "WARN: No data found";
 #endif
       }
       startTime = 0;
@@ -200,7 +204,7 @@ void AFESensorBMEX80::getJSON(char *json) {
 
 void AFESensorBMEX80::applyCorrections() {
 #ifdef DEBUG
-  Serial << endl << "Applying correction to values";
+  Serial << endl << "INFO: Applying correction to values";
 #endif
 
   AFESensorsCommon calculation;
@@ -231,12 +235,10 @@ void AFESensorBMEX80::applyCorrections() {
             ? calculation.celsiusToFerenheit(calculation.dewPoint(
                   calculation.ferenheitToCelsius(data.temperature.value),
                   data.humidity.value))
-            : calculation.dewPoint(data.temperature.value,
-                                   data.humidity.value);
+            : calculation.dewPoint(data.temperature.value, data.humidity.value);
 
 #ifdef AFE_CONFIG_HUMIDITY
-    data.humidity.rating =
-        calculation.humidityRating(data.humidity.value);
+    data.humidity.rating = calculation.humidityRating(data.humidity.value);
 #endif
   }
 
@@ -244,22 +246,20 @@ void AFESensorBMEX80::applyCorrections() {
     data.pressure.value += configuration.pressure.correction;
   }
   data.relativePressure.value = calculation.relativePressure(
-      data.pressure.value, configuration.altitude,
-      data.temperature.value);
+      data.pressure.value, configuration.altitude, data.temperature.value);
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   if (configuration.type == AFE_BME680_SENSOR) {
     data.iaq.rating = calculation.iaqRating(data.iaq.value);
-    data.staticIaq.rating =
-        calculation.iaqRating(data.staticIaq.value);
-    data.co2Equivalent.rating =
-        calculation.co2Rating(data.co2Equivalent.value);
+    data.staticIaq.rating = calculation.iaqRating(data.staticIaq.value);
+    data.co2Equivalent.rating = calculation.co2Rating(data.co2Equivalent.value);
   }
 #endif
 }
 
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
-afe_humidity_domoticz_state_t AFESensorBMEX80::getDomoticzHumidityState(float value) {
+afe_humidity_domoticz_state_t
+AFESensorBMEX80::getDomoticzHumidityState(float value) {
   if (value < 40) {
     return AFE_HUMIDITY_DRY;
   } else if (value >= 40 && value <= 60) {
