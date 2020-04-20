@@ -1,0 +1,187 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+
+#include "AFE-Sensor-BME680.h"
+
+AFESensorBME680::AFESensorBME680(){};
+
+boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
+#ifdef DEBUG
+  Serial << endl << "INFO: Initializing: Sensor type: BME680";
+#endif
+
+  boolean _initialized = false;
+
+//  EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
+#ifdef DEBUG
+  Serial << endl << "INFO: EEPROM initialized: Size reserved: ";
+//         << BSEC_MAX_STATE_BLOB_SIZE + 1;
+#endif
+
+  configuration = _configuration;
+  if (configuration->i2cAddress != 0) {
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: Setting I2C: SDA:" << I2C->SDA << ", SCL:" << I2C->SCL;
+#endif
+    Wire.begin(I2C->SDA, I2C->SCL);
+#ifdef DEBUG
+    Serial << ", completed." << endl
+           << "INFO: Sensor address: 0x" << _HEX(configuration->i2cAddress);
+#endif
+
+    return_values_init ret;
+    ret =
+        bsec_iot_init(configuration->i2cAddress, BSEC_SAMPLE_RATE_LP, 0.0f,
+                      &bus_write, &bus_read, &sleep, &state_load, &config_load);
+    if (ret.bme680_status) {
+#ifdef DEBUG
+      Serial << endl << "ERROR: Initializing BME680";
+#endif
+    } else if (ret.bsec_status) {
+#ifdef DEBUG
+      Serial << endl << "ERROR: Initializing BSEC library";
+#endif
+    } else {
+      _initialized = true;
+#ifdef DEBUG
+      Serial << endl << "INFO: BME680 and BSEC Initialized";
+#endif
+    }
+  }
+
+  return _initialized;
+}
+
+boolean AFESensorBME680::read() {
+#ifdef DEBUG
+  Serial << endl << "INFO: Reading sensor data: BME680";
+#endif
+
+  get(sleep, get_timestamp_us, output_ready, state_save, 10000);
+}
+
+int8_t AFESensorBME680::bus_write(uint8_t dev_addr, uint8_t reg_addr,
+                                  uint8_t *reg_data_ptr, uint16_t data_len) {
+  Wire.beginTransmission(dev_addr);
+  Wire.write(reg_addr); /* Set register address to start writing to */
+
+  /* Write the data */
+  for (int index = 0; index < data_len; index++) {
+    Wire.write(reg_data_ptr[index]);
+  }
+
+  return (int8_t)Wire.endTransmission();
+}
+
+int8_t AFESensorBME680::bus_read(uint8_t dev_addr, uint8_t reg_addr,
+                                 uint8_t *reg_data_ptr, uint16_t data_len) {
+  int8_t comResult = 0;
+  Wire.beginTransmission(dev_addr);
+  Wire.write(reg_addr); /* Set register address to start reading from */
+  comResult = Wire.endTransmission();
+
+  delayMicroseconds(150); /* Precautionary response delay */
+  Wire.requestFrom(dev_addr, (uint8_t)data_len); /* Request data */
+
+  int index = 0;
+  while (Wire.available()) /* The slave device may send less than requested
+                              (burst read) */
+  {
+    reg_data_ptr[index] = Wire.read();
+    index++;
+  }
+
+  return comResult;
+}
+
+void AFESensorBME680::sleep(uint32_t t_ms) { delay(t_ms); }
+
+int64_t AFESensorBME680::get_timestamp_us() { return (int64_t)millis() * 1000; }
+
+/*!
+ * @brief           Handling of the ready outputs
+ *
+ * @param[in]       timestamp       time in nanoseconds
+ * @param[in]       iaq             IAQ signal
+ * @param[in]       iaq_accuracy    accuracy of IAQ signal
+ * @param[in]       temperature     temperature signal
+ * @param[in]       humidity        humidity signal
+ * @param[in]       pressure        pressure signal
+ * @param[in]       raw_temperature raw temperature signal
+ * @param[in]       raw_humidity    raw humidity signal
+ * @param[in]       gas             raw gas sensor signal
+ * @param[in]       bsec_status     value returned by the bsec_do_steps() call
+ *
+ * @return          none
+ */
+void AFESensorBME680::output_ready(int64_t timestamp, float iaq,
+                                   uint8_t iaq_accuracy, float temperature,
+                                   float humidity, float pressure,
+                                   float raw_temperature, float raw_humidity,
+                                   float gas,
+                                   bsec_library_return_t bsec_status) {
+
+  data.temperature.value = temperature;
+  data.pressure.value = pressure / 100;
+  data.humidity.value = humidity;
+  data.gasResistance.value = gas / 1000;
+  data.iaq.value = iaq;
+  data.iaq.accuracy = iaq_accuracy;
+  // data.staticIaq.value = Bme.staticIaq;
+  // data.staticIaq.accuracy = Bme.staticIaqAccuracy;
+  // data.co2Equivalent.value = Bme.co2Equivalent;
+  // data.co2Equivalent.accuracy = Bme.co2Accuracy;
+  // data.breathVocEquivalent.value = Bme.breathVocEquivalent;
+  // data.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
+}
+
+/*!
+ * @brief           Load previous library state from non-volatile memory
+ *
+ * @param[in,out]   state_buffer    buffer to hold the loaded state string
+ * @param[in]       n_buffer        size of the allocated state buffer
+ *
+ * @return          number of bytes copied to state_buffer
+ */
+uint32_t AFESensorBME680::state_load(uint8_t *state_buffer, uint32_t n_buffer) {
+  // ...
+  // Load a previous library state from non-volatile memory, if available.
+  //
+  // Return zero if loading was unsuccessful or no state was available,
+  // otherwise return length of loaded state string.
+  // ...
+  return 0;
+}
+
+/*!
+ * @brief           Save library state to non-volatile memory
+ *
+ * @param[in]       state_buffer    buffer holding the state to be stored
+ * @param[in]       length          length of the state string to be stored
+ *
+ * @return          none
+ */
+void AFESensorBME680::state_save(const uint8_t *state_buffer, uint32_t length) {
+  // ...
+  // Save the string some form of non-volatile memory, if possible.
+  // ...
+}
+
+/*!
+ * @brief           Load library config from non-volatile memory
+ *
+ * @param[in,out]   config_buffer    buffer to hold the loaded state string
+ * @param[in]       n_buffer        size of the allocated state buffer
+ *
+ * @return          number of bytes copied to config_buffer
+ */
+uint32_t AFESensorBME680::config_load(uint8_t *config_buffer,
+                                      uint32_t n_buffer) {
+  // ...
+  // Load a library config from non-volatile memory, if available.
+  //
+  // Return zero if loading was unsuccessful or no config was available,
+  // otherwise return length of loaded config string.
+  // ...
+  return 0;
+}
