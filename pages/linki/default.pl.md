@@ -1,6 +1,7 @@
 ---
-title: Pomoc
+title: Linki
 recaptchacontact:
     enabled: false
 ---
 
+Bla bla
