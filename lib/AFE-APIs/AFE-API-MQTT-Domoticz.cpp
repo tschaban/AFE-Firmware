@@ -165,7 +165,16 @@ void AFEAPIMQTTDomoticz::processRequest() {
           Serial << endl << "INFO: Domoticz: Found Gate ID: " << idxCache[i].id;
           _found = true;
 #endif
-          _Gate[idxCache[i].id]->toggle();
+
+          if (command.nvalue == AFE_SWITCH_ON) {
+            _Gate[idxCache[i].id]->toggle();
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl << "INFO: OFF Command, skipping";
+          }
+#endif
+
 #endif // AFE_CONFIG_HARDWARE_GATE
           break;
         /* Processing Unknown command*/
