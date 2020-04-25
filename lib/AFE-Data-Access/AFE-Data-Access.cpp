@@ -404,7 +404,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       configuration.noOfHPMA115S0s =
-          root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
+          root["noOfHPMA115S0s"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -415,6 +416,12 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       configuration.noOfAS3935s =
           root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+      configuration.noOfWindSensors =
+          root["noOfWindSensors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_WIND_SENSORS;
 #endif
 
 #ifdef DEBUG
@@ -504,6 +511,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     root["noOfAS3935s"] = configuration->noOfAS3935s;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+    root["noOfWindSensors"] = configuration->noOfWindSensors;
 #endif
 
     root.printTo(configFile);
@@ -616,6 +627,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   deviceConfiguration.noOfAS3935s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  deviceConfiguration.noOfWindSensors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_WIND_SENSORS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -3018,10 +3034,12 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.timeToMeasure = root["timeToMeasure"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.pm25.idx = root["idx"]["pm25"]| AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.pm10.idx = root["idx"]["pm10"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pm25.idx =
+          root["idx"]["pm25"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pm10.idx =
+          root["idx"]["pm10"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
       sprintf(configuration.name, root["name"]);
 
@@ -3385,17 +3403,26 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
           root["idx"]["temperatureHumidityPressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.temperatureHumidity.idx =
           root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.temperature.idx = root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.humidity.idx = root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.pressure.idx = root["idx"]["pressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.gasResistance.idx =
+          root["idx"]["gasResistance"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.temperature.idx =
+          root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.humidity.idx =
+          root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pressure.idx =
+          root["idx"]["pressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.relativePressure.idx =
           root["idx"]["relativePressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.dewPoint.idx = root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.heatIndex.idx = root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.iaq.idx = root["idx"]["iaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.staticIaq.idx = root["idx"]["staticIaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.dewPoint.idx =
+          root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.heatIndex.idx =
+          root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.iaq.idx =
+          root["idx"]["iaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.staticIaq.idx =
+          root["idx"]["staticIaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.co2Equivalent.idx =
+          root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.breathVocEquivalent.idx =
           root["idx"]["breathVocEquivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3589,9 +3616,9 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.i2cAddress = root["i2cAddress"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -3734,9 +3761,9 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
       configuration.indoor = root["indoor"];
       configuration.unit = root["unit"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -3948,3 +3975,150 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
   return configuration;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+WINDSENSOR AFEDataAccess::getWindSensorConfiguration() {
+
+  WINDSENSOR configuration;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION
+         << " ... ";
+#endif
+
+  File configFile = SPIFFS.open(AFE_FILE_WIND_SENSOR_CONFIGURATION, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: JSON: ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_WIND_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration.gpio = root["gpio"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+      configuration.sensitiveness =
+          root["sensitiveness"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+      configuration.interval =
+          root["interval"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+      configuration.impulseDistance =
+          root["impulseDistance"] |
+          AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+      configuration.impulseDistanceUnit =
+          root["impulseDistanceUnit"] |
+          AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      sprintf(configuration.mqtt.topic, root["MQTTTopic"] | "");
+#else
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << "INFO: JSON: Buffer size: "
+             << AFE_CONFIG_FILE_BUFFER_WIND_SENSOR
+             << ", actual JSON size: " << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_WIND_SENSOR < jsonBuffer.size() + 10) {
+        Serial << endl << "WARN: Too small buffer size";
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << "ERROR: JSON not pharsed";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << "ERROR: Configuration file: "
+           << AFE_FILE_WIND_SENSOR_CONFIGURATION << " not opened";
+  }
+#endif
+  return configuration;
+}
+
+void AFEDataAccess::saveConfiguration(WINDSENSOR configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "INFO: Opening file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION
+         << " ... ";
+#endif
+
+  File configFile = SPIFFS.open(AFE_FILE_WIND_SENSOR_CONFIGURATION, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: Writing JSON: ";
+#endif
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_WIND_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration.gpio;
+    root["sensitiveness"] = configuration.sensitiveness;
+    root["interval"] = configuration.interval;
+    root["impulseDistance"] = configuration.impulseDistance;
+    root["impulseDistanceUnit"] = configuration.impulseDistanceUnit;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration.domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration.mqtt.topic;
+#endif
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: Data saved" << endl
+           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_WIND_SENSOR
+           << ", actual JSON size: " << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_WIND_SENSOR < jsonBuffer.size() + 10) {
+      Serial << endl << "WARN: Too small buffer size";
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "ERROR: failed to open file for writing";
+  }
+#endif
+}
+
+void AFEDataAccess::createWindSensorConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: Creating file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION;
+#endif
+  WINDSENSOR configuration;
+  configuration.sensitiveness = AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+  configuration.interval = AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.mqtt.topic[0] = '\0';
+#else
+  configuration->domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+  /* Saving first switch. Common for all devices */
+  configuration.gpio = AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+  configuration.impulseDistance =
+      AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+  configuration.impulseDistanceUnit =
+      AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+  saveConfiguration(configuration);
+}
+#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR

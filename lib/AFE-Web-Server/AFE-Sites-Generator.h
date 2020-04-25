@@ -170,6 +170,10 @@ public:
   void addAS3935Configuration(String &page, uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  void addWindSensorConfiguration(String &page);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   void addAnalogInputConfiguration(String &page);
 #endif

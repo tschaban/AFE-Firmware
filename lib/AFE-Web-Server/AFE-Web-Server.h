@@ -138,6 +138,10 @@ private:
   AS3935 getAS3935SensorData();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  WINDSENSOR getWindSensorData();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   ADCINPUT getAnalogInputData();
 #endif
@@ -168,11 +172,13 @@ public:
                              ESP8266WebServer::THandlerFunction handlerUpgrade,
                              ESP8266WebServer::THandlerFunction handlerUpload);
 
-  /* Method generate HTML side. It reads also data from HTTP requests arguments
+  /* Method generate HTML side. It reads also data from HTTP requests
+   * arguments
    * and pass them to Configuration Panel class */
   void generate(boolean upload = false);
 
-  /* Method listens for HTTP API requests. If get True command is in httpCommand
+  /* Method listens for HTTP API requests. If get True command is in
+   * httpCommand
    */
   boolean httpAPIlistener();
 

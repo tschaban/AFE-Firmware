@@ -137,6 +137,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     Site.addAS3935Configuration(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  case AFE_CONFIG_SITE_WIND_SENSOR:
+    Site.addWindSensorConfiguration(page);
+    break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
@@ -170,16 +175,16 @@ void AFEWebServer::generate(boolean upload) {
     return;
   }
 
-    if (_refreshConfiguration) {
-      _refreshConfiguration = false;
-      Device->begin();
-    }
+  if (_refreshConfiguration) {
+    _refreshConfiguration = false;
+    Device->begin();
+  }
 
-    AFE_SITE_PARAMETERS siteConfig;
+  AFE_SITE_PARAMETERS siteConfig;
 
-    siteConfig.ID = getSiteID();
-    uint8_t command = getCommand();
-    siteConfig.deviceID = getID();
+  siteConfig.ID = getSiteID();
+  uint8_t command = getCommand();
+  siteConfig.deviceID = getID();
 
   if (!upload) {
 
@@ -295,6 +300,11 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       case AFE_CONFIG_SITE_AS3935:
         Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+      case AFE_CONFIG_SITE_WIND_SENSOR:
+        Data.saveConfiguration(getWindSensorData());
         break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -748,6 +758,11 @@ DEVICE AFEWebServer::getDeviceData() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   data.noOfAS3935s =
       server.arg("a3").length() > 0 ? server.arg("a3").toInt() : 0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  data.noOfWindSensors =
+      server.arg("w").length() > 0 ? server.arg("w").toInt() : 0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -1506,6 +1521,46 @@ AS3935 AFEWebServer::getAS3935SensorData() {
   return data;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+WINDSENSOR AFEWebServer::getWindSensorData() {
+  WINDSENSOR data;
+
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+
+  data.sensitiveness = server.arg("s").length() > 0
+                           ? server.arg("s").toInt()
+                           : AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+
+  data.impulseDistance =
+      server.arg("d").length() > 0
+          ? server.arg("d").toFloat()
+          : AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+
+  data.impulseDistanceUnit =
+      server.arg("u").length() > 0
+          ? server.arg("u").toInt()
+          : AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx =
+      server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+  return data;
+}
+#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 ADCINPUT AFEWebServer::getAnalogInputData() {

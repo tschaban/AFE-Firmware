@@ -118,6 +118,10 @@ void AFEUpgrader::upgradeFirmwarType() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   Data->createAS3935SensorConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  Data->createWindSensorConfigurationFile();
+#endif
 }
 
 void AFEUpgrader::updateFirmwareVersion() {
@@ -136,6 +140,15 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(FirmwareConfiguration.version, "2.0.1") == 0 ||
       strcmp(FirmwareConfiguration.version, "2.2.0.B1") == 0) {
     upgradeToT5V220();
+  }
+#endif
+
+#ifdef T6_CONFIG
+  if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.1.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.2.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.2.1")) {
+    upgradeToT6V230();
   }
 #endif
 
@@ -209,7 +222,7 @@ void AFEUpgrader::upgradeToT0V210() {
 #ifdef T5_CONFIG
 void AFEUpgrader::upgradeToT5V220() {
 
-// It will do nothing for ESP8266 1MB - sensors are e  
+// It will do nothing for ESP8266 1MB - sensors are e
 #if defined(AFE_CONFIG_HARDWARE_BMEX80) || defined(AFE_CONFIG_HARDWARE_BH1750)
   Data->createI2CConfigurationFile();
 #endif
@@ -224,3 +237,11 @@ void AFEUpgrader::upgradeToT5V220() {
 }
 
 #endif // T0_CONFIG
+
+#ifdef T6_CONFIG
+void AFEUpgrader::upgradeToT6V230() {
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  Data->createWindSensorConfigurationFile();
+#endif
+}
+#endif // T6_CONFIG

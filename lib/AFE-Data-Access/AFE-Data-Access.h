@@ -192,6 +192,13 @@ public:
   void createAS3935SensorConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  WINDSENSOR getWindSensorConfiguration();
+  void saveConfiguration(WINDSENSOR configuration);
+  void createWindSensorConfigurationFile();
+#endif
+
+
 /* Methods turns on / off APIs */
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);

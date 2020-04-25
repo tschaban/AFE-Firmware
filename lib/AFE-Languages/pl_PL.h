@@ -374,6 +374,12 @@
 #define L_ADDRESS "Adres"
 #endif
 
+/* Wind Sensor */
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+#define L_NUMBER_OF_WIND_SENSORS "Czujnik siły wiatru"
+#endif
+
+
 /* Generic Sensors */
 #ifdef AFE_CONFIG_TEMPERATURE
 #define L_TEMPERATURE "Temperatura"

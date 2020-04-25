@@ -337,6 +337,16 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  if (Device->configuration.noOfWindSensors > 0) {
+    page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
+    page += AFE_CONFIG_SITE_WIND_SENSOR;
+    page += "\">";
+    page += L_NUMBER_OF_WIND_SENSORS;
+    page += "</a></li>";
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Device->configuration.noOfAS3935s > 0) {
     page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
@@ -498,6 +508,12 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
   generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
                             Device->configuration.noOfAS3935s, "a3",
                             L_NUMBER_OF_AS3935_SENSORS, !Firmware->Pro.valid);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_WIND_SENSORS,
+                            Device->configuration.noOfWindSensors, "w",
+                            L_NUMBER_OF_WIND_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -2208,6 +2224,12 @@ void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  void AFESitesGenerator::addWindSensorConfiguration(String &page) {
+    
+  }
+#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFESitesGenerator::addAnalogInputConfiguration(String &page) {

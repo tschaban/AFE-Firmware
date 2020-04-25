@@ -144,6 +144,16 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 AFEAnalogInput AnalogInput;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+#include <AFE-Sensor-Wind.h>
+AFESensorBinary WindImpulse;
+AFESensorWind WindSensor;
+#endif
+
 void setup() {
 
 #ifdef DEBUG
@@ -365,6 +375,10 @@ void setup() {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+  initializeWindSensor();
+#endif
+
 #ifdef DEBUG
   Serial << endl
          << "#############################################"
@@ -442,6 +456,10 @@ void loop() {
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
         analogInputEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+        windSensorListener();
 #endif
 
 #if defined(T3_CONFIG)

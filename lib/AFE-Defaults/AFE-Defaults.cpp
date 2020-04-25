@@ -98,6 +98,10 @@ void AFEDefaults::set() {
     Data->createAS3935SensorConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+    Data->createWindSensorConfigurationFile();
+#endif
+
 /* DS18B20 presence */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     deviceConfiguration.isDS18B20 = false;
