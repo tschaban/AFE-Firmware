@@ -108,6 +108,12 @@ void begin(AFEDataAccess *, AFEDevice *);
   boolean publishAS3935SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  virtual void addClass(AFESensorAnemometer *);
+  void publishAnemometerSensor();
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
   boolean publishGateState(uint8_t id);

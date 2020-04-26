@@ -42,6 +42,11 @@ void initializeHTTPDomoticzAPI() {
     HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    HttpDomoticzAPI.addClass(&AnemometerSensor);
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     HttpDomoticzAPI.addClass(&Contactron[0]);
 #endif
@@ -103,6 +108,10 @@ void initializeMQTTAPI() {
     MqttAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    MqttAPI.addClass(&AnemometerSensor);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
     MqttAPI.addClass(&Gate[0]);
 #endif
@@ -153,6 +162,10 @@ void initializeHTTPAPI() {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     HttpAPI.addClass(&AS3935Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    HttpAPI.addClass(&AnemometerSensor);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE

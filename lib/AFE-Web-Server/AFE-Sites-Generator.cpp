@@ -337,12 +337,12 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  if (Device->configuration.noOfWindSensors > 0) {
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  if (Device->configuration.noOfAnemometerSensors > 0) {
     page += "<li class=\"itm\"><a href=\"\\?i=0&o=";
-    page += AFE_CONFIG_SITE_WIND_SENSOR;
+    page += AFE_CONFIG_SITE_ANEMOMETER_SENSOR;
     page += "\">";
-    page += L_NUMBER_OF_WIND_SENSORS;
+    page += L_ANEMOMETER_SENSOR;
     page += "</a></li>";
   }
 #endif
@@ -510,10 +510,10 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
                             L_NUMBER_OF_AS3935_SENSORS, !Firmware->Pro.valid);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_WIND_SENSORS,
-                            Device->configuration.noOfWindSensors, "w",
-                            L_NUMBER_OF_WIND_SENSORS);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  generateHardwareItemsList(
+      page, AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS,
+      Device->configuration.noOfAnemometerSensors, "w", L_ANEMOMETER_SENSOR);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -1820,7 +1820,7 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
       addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999",
               "1");
     }
-    
+
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
     addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999",
             "1");
@@ -1986,7 +1986,7 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
 
     /* Corrections of sensor values */
     addConfigurationBlock(page, L_CORRECTIONS, "");
-        page += "<fieldset>";
+    page += "<fieldset>";
     sprintf(_number, "%-.3f", configuration.temperature.correction);
     addItem(page, "number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
             "99.999", "0.001");
@@ -2225,11 +2225,89 @@ void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  void AFESitesGenerator::addWindSensorConfiguration(String &page) {
-    
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFESitesGenerator::addAnemometerSensorConfiguration(String &page) {
+
+  addConfigurationBlock(page, L_ANEMOMETER_SENSOR, "");
+  page += "<fieldset>";
+  ANEMOMETER configuration = Data.getAnemometerSensorConfiguration();
+
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
+
+  page += "<div class=\"cf\">";
+  generateConfigParameter_GPIO(page, "g", configuration.gpio);
+  page += "</div>";
+  
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+          "86400", "1", L_SECONDS);
+  
+   page += "</fieldset></div>";
+
+  addConfigurationBlock(page, L_ANEMOMETER_CALIBRATION, L_ANEMOMETER_IMPULSE_DISTANCE_HINT);
+  page += "<fieldset>";
+
+  sprintf(_number, "%-.2f", configuration.impulseDistance);
+
+
+  addItem(page, "number", "l", L_ANEMOMETER_IMPULSE_DISTANCE, _number, "?", "0",
+            "999.99", "0.01");
+
+
+page += "<div class=\"cf\"><label>";
+  page += L_DISTANCE_UNIT;
+  page += "</label><select name=\"u\"><option value=\"";
+  page += AFE_DISTANCE_CENTIMETER;
+  page += "\"";
+  page +=
+      (configuration.impulseDistanceUnit == AFE_DISTANCE_CENTIMETER ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_CM;
+  page += "</option><option value=\"";
+  page += AFE_DISTANCE_METER;
+  page += "\"";
+  page +=
+      (configuration.impulseDistanceUnit == AFE_DISTANCE_METER ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_M;
+  page += "</option><option value=\"";
+  page += AFE_DISTANCE_KILOMETER;
+  page += "\"";
+  page +=
+      (configuration.impulseDistanceUnit == AFE_DISTANCE_KILOMETER ? " selected=\"selected\"" : "");
+  page += ">";
+  page += L_KM;
+  page += "</option></select></div>";
+
+  page += "<br><p class=\"cm\">";
+  page += L_ANEMOMETER_SENSITIVENESS_HINT;
+  page += "</p>";
+  sprintf(_number, "%d", configuration.sensitiveness);
+  addItem(page, "number", "s", L_SENSITIVENESS, _number, "?", "0", "255", "1",
+          L_MILISECONDS);
+
+  page += "</fieldset></div>";
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
+    page += "<fieldset>";
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
   }
-#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR
+#else
+  if (Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    page += "<fieldset>";
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFESitesGenerator::addAnalogInputConfiguration(String &page) {
@@ -2513,7 +2591,8 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 #else
     page += "1Mb";
 #endif
-    page += "-yellowgreen.svg\" /> <img src=\"https://img.shields.io/badge/API-";
+    page +=
+        "-yellowgreen.svg\" /> <img src=\"https://img.shields.io/badge/API-";
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     page += "Domoticz";
 #else

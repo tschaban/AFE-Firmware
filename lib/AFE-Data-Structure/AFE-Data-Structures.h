@@ -71,8 +71,8 @@
 #include <AFE-I2C-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-#include <AFE-WIND-Sensor-Structure.h>
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Anemometer-Sensor-Structure.h>
 #endif
 
 #endif

@@ -104,6 +104,16 @@ void AFEAPI::addClass(AFESensorAS3935 *Sensor) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFEAPI::addClass(AFESensorAnemometer *AnemometerSensor) {
+  _AnemometerSensor = AnemometerSensor;
+#ifdef DEBUG
+  Serial << endl << "INFO: The reference to the Anemometer added";
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPI::addClass(AFEGate *Item) {
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {

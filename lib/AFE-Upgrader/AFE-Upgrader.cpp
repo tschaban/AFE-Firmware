@@ -119,8 +119,8 @@ void AFEUpgrader::upgradeFirmwarType() {
   Data->createAS3935SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  Data->createWindSensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  Data->createAnemometerSensorConfigurationFile();
 #endif
 }
 
@@ -240,8 +240,8 @@ void AFEUpgrader::upgradeToT5V220() {
 
 #ifdef T6_CONFIG
 void AFEUpgrader::upgradeToT6V230() {
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  Data->createWindSensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  Data->createAnemometerSensorConfigurationFile();
 #endif
 }
 #endif // T6_CONFIG

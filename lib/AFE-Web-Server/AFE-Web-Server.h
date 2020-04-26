@@ -138,8 +138,9 @@ private:
   AS3935 getAS3935SensorData();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  WINDSENSOR getWindSensorData();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  ANEMOMETER getAnemometerSensorData();
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

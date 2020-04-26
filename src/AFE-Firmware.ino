@@ -148,10 +148,10 @@ AFEAnalogInput AnalogInput;
 #include <AFE-Sensor-Binary.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-#include <AFE-Sensor-Wind.h>
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
 AFESensorBinary WindImpulse;
-AFESensorWind WindSensor;
+AFESensorAnemometer AnemometerSensor;
 #endif
 
 void setup() {
@@ -375,8 +375,8 @@ void setup() {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  initializeWindSensor();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  initializeAnemometerSensor();
 #endif
 
 #ifdef DEBUG
@@ -458,7 +458,7 @@ void loop() {
         analogInputEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
         windSensorListener();
 #endif
 

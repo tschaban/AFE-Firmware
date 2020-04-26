@@ -12,23 +12,27 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-Binary.h>
 
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFESensorWind {
+class AFESensorAnemometer {
 
 public:
-  WINDSENSOR configuration;
+  ANEMOMETER configuration;
+  float lastSpeedMS =
+      0; // used by HTTPs API - stores and gets the lastest value by HTTP API
+  float lastSpeedKMH =
+      0; // used by HTTPs API - stores and gets the lastest value by HTTP API
 
   /* Constructors */
-  AFESensorWind();
+  AFESensorAnemometer();
 
   /* Init switch */
   boolean begin(AFEDataAccess *, AFESensorBinary *);
 
-  void get(float &speedMS, float &speedKMH);
+  /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 
   boolean listener(void);
 
@@ -37,9 +41,7 @@ private:
   AFEDataAccess *_Data;
   boolean _initialized = false;
   uint32_t startTime = 0;
-
   float oneImpulseDistanceCM = 0;
-
 };
 
 #endif

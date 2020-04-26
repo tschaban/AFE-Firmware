@@ -192,10 +192,10 @@ public:
   void createAS3935SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  WINDSENSOR getWindSensorConfiguration();
-  void saveConfiguration(WINDSENSOR configuration);
-  void createWindSensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  ANEMOMETER getAnemometerSensorConfiguration();
+  void saveConfiguration(ANEMOMETER configuration);
+  void createAnemometerSensorConfigurationFile();
 #endif
 
 

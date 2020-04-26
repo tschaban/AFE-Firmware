@@ -51,6 +51,10 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 #endif
@@ -109,6 +113,10 @@ public:
   virtual void addClass(AFESensorAS3935 *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  virtual void addClass(AFESensorAnemometer *);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
 #endif
@@ -150,6 +158,10 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  AFESensorAnemometer *_AnemometerSensor;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE

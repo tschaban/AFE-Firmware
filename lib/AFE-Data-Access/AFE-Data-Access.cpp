@@ -418,10 +418,10 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
           root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-      configuration.noOfWindSensors =
-          root["noOfWindSensors"] |
-          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_WIND_SENSORS;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+      configuration.noOfAnemometerSensors =
+          root["noOfAnemometerSensors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS;
 #endif
 
 #ifdef DEBUG
@@ -513,8 +513,8 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfAS3935s"] = configuration->noOfAS3935s;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-    root["noOfWindSensors"] = configuration->noOfWindSensors;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    root["noOfAnemometerSensors"] = configuration->noOfAnemometerSensors;
 #endif
 
     root.printTo(configFile);
@@ -629,9 +629,9 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  deviceConfiguration.noOfWindSensors =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_WIND_SENSORS;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  deviceConfiguration.noOfAnemometerSensors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -3976,18 +3976,18 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-WINDSENSOR AFEDataAccess::getWindSensorConfiguration() {
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+ANEMOMETER AFEDataAccess::getAnemometerSensorConfiguration() {
 
-  WINDSENSOR configuration;
+  ANEMOMETER configuration;
 #ifdef DEBUG
   Serial << endl
          << endl
-         << "INFO: Opening file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION
+         << "INFO: Opening file: " << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION
          << " ... ";
 #endif
 
-  File configFile = SPIFFS.open(AFE_FILE_WIND_SENSOR_CONFIGURATION, "r");
+  File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -3997,24 +3997,23 @@ WINDSENSOR AFEDataAccess::getWindSensorConfiguration() {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_WIND_SENSOR> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
-      configuration.gpio = root["gpio"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+      sprintf(configuration.name, root["name"] | "");
+      configuration.gpio = root["gpio"] | AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO;
       configuration.sensitiveness =
-          root["sensitiveness"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+          root["sensitiveness"] | AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
       configuration.interval =
-          root["interval"] | AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+          root["interval"] | AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL;
       configuration.impulseDistance =
-          root["impulseDistance"] |
-          AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+          root["impulseDistance"].as<float>();
       configuration.impulseDistanceUnit =
           root["impulseDistanceUnit"] |
-          AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+          AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration.mqtt.topic, root["MQTTTopic"] | "");
@@ -4025,9 +4024,9 @@ WINDSENSOR AFEDataAccess::getWindSensorConfiguration() {
 #ifdef DEBUG
       Serial << endl
              << "INFO: JSON: Buffer size: "
-             << AFE_CONFIG_FILE_BUFFER_WIND_SENSOR
+             << AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR
              << ", actual JSON size: " << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_WIND_SENSOR < jsonBuffer.size() + 10) {
+      if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR < jsonBuffer.size() + 10) {
         Serial << endl << "WARN: Too small buffer size";
       }
 #endif
@@ -4045,28 +4044,29 @@ WINDSENSOR AFEDataAccess::getWindSensorConfiguration() {
   else {
     Serial << endl
            << "ERROR: Configuration file: "
-           << AFE_FILE_WIND_SENSOR_CONFIGURATION << " not opened";
+           << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << " not opened";
   }
 #endif
   return configuration;
 }
 
-void AFEDataAccess::saveConfiguration(WINDSENSOR configuration) {
+void AFEDataAccess::saveConfiguration(ANEMOMETER configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << "INFO: Opening file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION
+         << "INFO: Opening file: " << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION
          << " ... ";
 #endif
 
-  File configFile = SPIFFS.open(AFE_FILE_WIND_SENSOR_CONFIGURATION, "w");
+  File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
 
   if (configFile) {
 #ifdef DEBUG
     Serial << "success" << endl << "INFO: Writing JSON: ";
 #endif
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_WIND_SENSOR> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration.name;
     root["gpio"] = configuration.gpio;
     root["sensitiveness"] = configuration.sensitiveness;
     root["interval"] = configuration.interval;
@@ -4086,9 +4086,9 @@ void AFEDataAccess::saveConfiguration(WINDSENSOR configuration) {
 #ifdef DEBUG
     Serial << endl
            << "INFO: Data saved" << endl
-           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_WIND_SENSOR
+           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR
            << ", actual JSON size: " << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_WIND_SENSOR < jsonBuffer.size() + 10) {
+    if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR < jsonBuffer.size() + 10) {
       Serial << endl << "WARN: Too small buffer size";
     }
 #endif
@@ -4100,25 +4100,28 @@ void AFEDataAccess::saveConfiguration(WINDSENSOR configuration) {
 #endif
 }
 
-void AFEDataAccess::createWindSensorConfigurationFile() {
+void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Creating file: " << AFE_FILE_WIND_SENSOR_CONFIGURATION;
+         << "INFO: Creating file: " << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION;
 #endif
-  WINDSENSOR configuration;
-  configuration.sensitiveness = AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
-  configuration.interval = AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+  ANEMOMETER configuration;
+  configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
+  configuration.interval = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.mqtt.topic[0] = '\0';
 #else
-  configuration->domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
   /* Saving first switch. Common for all devices */
-  configuration.gpio = AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+  configuration.gpio = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO;
   configuration.impulseDistance =
-      AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+      AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE;
   configuration.impulseDistanceUnit =
-      AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+      AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+
+  sprintf(configuration.name, "anemometer");
+
   saveConfiguration(configuration);
 }
-#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR

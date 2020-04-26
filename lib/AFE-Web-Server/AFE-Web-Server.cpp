@@ -137,9 +137,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     Site.addAS3935Configuration(page, siteConfig->deviceID);
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  case AFE_CONFIG_SITE_WIND_SENSOR:
-    Site.addWindSensorConfiguration(page);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
+    Site.addAnemometerSensorConfiguration(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -302,9 +302,9 @@ void AFEWebServer::generate(boolean upload) {
         Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
         break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-      case AFE_CONFIG_SITE_WIND_SENSOR:
-        Data.saveConfiguration(getWindSensorData());
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+      case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
+        Data.saveConfiguration(getAnemometerSensorData());
         break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -760,8 +760,8 @@ DEVICE AFEWebServer::getDeviceData() {
       server.arg("a3").length() > 0 ? server.arg("a3").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-  data.noOfWindSensors =
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  data.noOfAnemometerSensors =
       server.arg("w").length() > 0 ? server.arg("w").toInt() : 0;
 #endif
 
@@ -1522,35 +1522,42 @@ AS3935 AFEWebServer::getAS3935SensorData() {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-WINDSENSOR AFEWebServer::getWindSensorData() {
-  WINDSENSOR data;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+ANEMOMETER AFEWebServer::getAnemometerSensorData() {
+  ANEMOMETER data;
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
+  }
+
 
   data.gpio = server.arg("g").length() > 0
                   ? server.arg("g").toInt()
-                  : AFE_HARDWARE_WIND_SENSOR_DEFAULT_GPIO;
+                  : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO;
 
   data.interval = server.arg("f").length() > 0
                       ? server.arg("f").toInt()
-                      : AFE_HARDWARE_WIND_SENSOR_DEFAULT_INTERVAL;
+                      : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL;
 
   data.sensitiveness = server.arg("s").length() > 0
                            ? server.arg("s").toInt()
-                           : AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+                           : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
 
   data.impulseDistance =
-      server.arg("d").length() > 0
-          ? server.arg("d").toFloat()
-          : AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+      server.arg("l").length() > 0
+          ? server.arg("l").toFloat()
+          : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE;
 
   data.impulseDistanceUnit =
       server.arg("u").length() > 0
           ? server.arg("u").toInt()
-          : AFE_HARDWARE_WIND_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+          : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
-      server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -1560,7 +1567,7 @@ WINDSENSOR AFEWebServer::getWindSensorData() {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   return data;
 }
-#endif // AFE_CONFIG_HARDWARE_WIND_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 ADCINPUT AFEWebServer::getAnalogInputData() {

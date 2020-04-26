@@ -23,13 +23,13 @@
 class AFESensorBinary {
 
 public:
-  uint16_t bouncing = AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING;
+  uint16_t bouncing = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
 
   /* Constructors */
   AFESensorBinary();
 
   /* Init switch */
-  void begin(uint16_t _bouncing = AFE_HARDWARE_WIND_SENSOR_DEFAULT_BOUNCING);
+  void begin(uint16_t _bouncing = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING);
 
   void newImpulse(void);
   void get(uint32_t &noOfImpulses, uint32_t &duration);

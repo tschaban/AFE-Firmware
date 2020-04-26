@@ -97,27 +97,27 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
   AFEAPI::addClass(Relay);
-/*
-#ifdef DEBUG
-  Serial << endl << "INFO: Caching IDXs for Relays";
-#endif
-  uint8_t index = 0;
-  for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    if (_Relay[i]->configuration.domoticz.idx > 0) {
-      idxCache[index].domoticz.idx = _Relay[i]->configuration.domoticz.idx;
-      idxCache[index].id = i;
-      idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
-#ifdef DEBUG
-      Serial << endl << " - added IDX: " << idxCache[index].domoticz.idx;
-#endif
-      index++;
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << " - IDX not set";
-    }
-#endif
-  }*/
+  /*
+  #ifdef DEBUG
+    Serial << endl << "INFO: Caching IDXs for Relays";
+  #endif
+    uint8_t index = 0;
+    for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+      if (_Relay[i]->configuration.domoticz.idx > 0) {
+        idxCache[index].domoticz.idx = _Relay[i]->configuration.domoticz.idx;
+        idxCache[index].id = i;
+        idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
+  #ifdef DEBUG
+        Serial << endl << " - added IDX: " << idxCache[index].domoticz.idx;
+  #endif
+        index++;
+      }
+  #ifdef DEBUG
+      else {
+        Serial << endl << " - IDX not set";
+      }
+  #endif
+    }*/
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -356,14 +356,32 @@ boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFEAPIHTTPDomoticz::addClass(AFESensorAnemometer *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+void AFEAPIHTTPDomoticz::publishAnemometerSensor() {
+  if (enabled) {
+    char value[20];
+    if (_AnemometerSensor->configuration.domoticz.idx > 0) {
+      sprintf(value, "0;N;%-.2f;0;?;?", 10*_AnemometerSensor->lastSpeedMS);
+      sendCustomSensorCommand(_AnemometerSensor->configuration.domoticz.idx,
+                              value);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
 
 boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
   boolean _ret = false;
   if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
-    _ret = sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
-                             _Gate[id]->get() == AFE_GATE_CLOSED ? "Off" : "On");
+    _ret =
+        sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
+                          _Gate[id]->get() == AFE_GATE_CLOSED ? "Off" : "On");
   }
   return _ret;
 }

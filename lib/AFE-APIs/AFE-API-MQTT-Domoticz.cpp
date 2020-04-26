@@ -556,6 +556,29 @@ boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFEAPIMQTTDomoticz::addClass(AFESensorAnemometer *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+void AFEAPIMQTTDomoticz::publishAnemometerSensor() {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH];
+
+    char value[20];
+
+    if (_AnemometerSensor->configuration.domoticz.idx > 0) {
+
+      sprintf(value, "0;N;%-.2f;0;?;?", 10*_AnemometerSensor->lastSpeedMS);
+
+      generateDeviceValue(
+          json, _AnemometerSensor->configuration.domoticz.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
   AFEAPI::addClass(Item);

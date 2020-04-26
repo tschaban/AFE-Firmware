@@ -109,6 +109,15 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processHPMA115S0(request);
   }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
+/* Checking if Anemometer request */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  else if (strcmp(request->device, "anemometer") == 0) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Processing Anemometer requests";
+#endif
+    processAnemometerSensor(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_GATE
   else if (strcmp(request->device, "gate") == 0) {
 #ifdef DEBUG
@@ -403,6 +412,24 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+
+/* Processing ADC Input request */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+/* Adding pointer to ADC class */
+void AFEAPIHTTP::addClass(AFESensorAnemometer *AnemometerSensor) { _AnemometerSensor = AnemometerSensor; }
+
+void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
+  if (strcmp(request->command, "get") == 0) {
+    char json[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
+    _AnemometerSensor->getJSON(json);
+    send(request, true, json);
+  } else {
+    send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTP::addClass(AFEGate *Item) {

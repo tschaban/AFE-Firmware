@@ -98,8 +98,8 @@ void AFEDefaults::set() {
     Data->createAS3935SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-    Data->createWindSensorConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    Data->createAnemometerSensorConfigurationFile();
 #endif
 
 /* DS18B20 presence */

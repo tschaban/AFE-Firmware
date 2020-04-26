@@ -79,6 +79,11 @@
 #define L_YES "Tak"
 #define L_NO "Nie"
 #define L_SENSOR "Czujnik"
+#define L_DISTANCE_UNIT "Jednostka odległości"
+#define L_CM "Centrymetry"
+#define L_M "Metry"
+#define L_KM "Kilometry"
+#define L_MILES "Mile"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -363,9 +368,8 @@
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
 #define L_INDOOR "Wewnątrz budynku"
 #define L_OUTDOOR "Na zewnątrz"
-#define L_DISTANCE_UNIT "Jednostka odległości"
-#define L_KM "Kilometry"
-#define L_MILES "Mile"
+
+
 #define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif
 
@@ -374,9 +378,13 @@
 #define L_ADDRESS "Adres"
 #endif
 
-/* Wind Sensor */
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-#define L_NUMBER_OF_WIND_SENSORS "Czujnik siły wiatru"
+/* Anemometer Sensor */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define L_ANEMOMETER_SENSOR "Czujnik siły wiatru"
+#define L_ANEMOMETER_SENSITIVENESS_HINT "Czułość czujnika należy ustawić metodą prób i błędów, aż do uzyskania zamierzonego efektu. Im wartość jest mniejsza tym czułość jest większa"
+#define L_ANEMOMETER_CALIBRATION "Kalibracja anemometru"
+#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Odległość jaką wiatr przebędzie w jednym impulsie anemometra"
+#define L_ANEMOMETER_IMPULSE_DISTANCE "Odległość"
 #endif
 
 

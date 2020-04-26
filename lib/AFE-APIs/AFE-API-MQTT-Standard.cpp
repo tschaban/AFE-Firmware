@@ -477,6 +477,30 @@ boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
 }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFEAPIMQTTStandard::publishAnemometerSensor() {
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
+    _AnemometerSensor->getJSON(message);
+    Mqtt.publish(_AnemometerSensor->configuration.mqtt.topic, message);
+  }
+}
+
+void AFEAPIMQTTStandard::processAnemometerSensorData() {
+#ifdef DEBUG
+  Serial << endl << "INFO: MQTT: Processing Anemometer: ";
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishAnemometerSensor();
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "WARN: MQTT: Command not implemente";
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 #ifdef DEBUG

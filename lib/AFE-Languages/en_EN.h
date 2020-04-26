@@ -80,6 +80,11 @@
 #define L_YES "Yes"
 #define L_NO "No"
 #define L_SENSOR "Sensor"
+#define L_DISTANCE_UNIT "Distance unit"
+#define L_CM "Centimeter"
+#define L_M "Meter"
+#define L_KM "Kilometers"
+#define L_MILES "Miles"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Incorrect password"
@@ -354,9 +359,6 @@
 #define L_SENSOR_INDOOR_OUTDOOR "Sensor localisation"
 #define L_INDOOR "Indoor"
 #define L_OUTDOOR "Outdoor"
-#define L_DISTANCE_UNIT "Distance unit"
-#define L_KM "Kilometers"
-#define L_MILES "Miles"
 #define L_MQTT_TOPIC_AS3935 "AS3935 Sensor's MQTT Topic"
 #endif
 
@@ -365,10 +367,16 @@
 #define L_ADDRESS "Address"
 #endif
 
-/* Wind Sensor */
-#ifdef AFE_CONFIG_HARDWARE_WIND_SENSOR
-#define L_NUMBER_OF_WIND_SENSORS "Wind speed sensor"
+/* Anemometer Sensor */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define L_ANEMOMETER_SENSOR "Anemometer speed sensor"
+#define L_ANEMOMETER_SENSITIVENESS_HINT "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
+  "expected. Lower value more sensitive sensor"
+#define L_ANEMOMETER_CALIBRATION "Anemometer calibration"
+#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Wind distans per one anemometer impulse"
+#define L_ANEMOMETER_IMPULSE_DISTANCE "Distance"
 #endif
+
 
 /* Generic Sensors */
 #ifdef AFE_CONFIG_TEMPERATURE
