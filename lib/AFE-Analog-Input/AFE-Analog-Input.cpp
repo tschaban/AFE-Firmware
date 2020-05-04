@@ -6,7 +6,7 @@ AFEAnalogInput::AFEAnalogInput(){};
 
 void AFEAnalogInput::begin() {
   AFEDataAccess Data;
-  configuration = Data.getADCInputConfiguration();
+   Data.getConfiguration(&configuration);
   _initialized = true;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -18,16 +18,16 @@ void AFEAnalogInput::begin() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << endl << "------------ AC VCC Input ------------";
+  Serial << endl << endl << F("------------ AC VCC Input ------------");
   Serial << endl
-         << "- Initialized" << endl
-         << "- GPIO: " << configuration.gpio << endl
-         << "- Interval: " << configuration.interval << endl
-         << "- Max VCC: " << configuration.maxVCC << endl
-         << "- No of Samples: " << configuration.numberOfSamples << endl
-         << "- R[A]: " << configuration.divider.Ra << endl
-         << "- R[B]: " << configuration.divider.Rb << endl
-         << "-------------------------------------";
+         << F("- Initialized") << endl
+         << F("- GPIO: ") << configuration.gpio << endl
+         << F("- Interval: ") << configuration.interval << endl
+         << F("- Max VCC: ") << configuration.maxVCC << endl
+         << F("- No of Samples: ") << configuration.numberOfSamples << endl
+         << F("- R[A]: ") << configuration.divider.Ra << endl
+         << F("- R[B]: ") << configuration.divider.Rb << endl
+         << F("-------------------------------------");
 
 #endif
 }
@@ -72,14 +72,14 @@ void AFEAnalogInput::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << " - Number of samples: " << counterOfSamplings << endl
-               << " - Analog value = " << data.raw  << endl
-               << " - Percent = " << data.percent  << endl
-               << " - Voltage = " << data.voltage  << endl
-               << " - VoltageCalculated = " << data.voltageCalculated  << endl
-               << " - Sampling time = "
+               << F(" - Number of samples: ") << counterOfSamplings << endl
+               << F(" - Analog value = ") << data.raw  << endl
+               << F(" - Percent = ") << data.percent  << endl
+               << F(" - Voltage = ") << data.voltage  << endl
+               << F(" - VoltageCalculated = ") << data.voltageCalculated  << endl
+               << F(" - Sampling time = ")
                << millis() - startTime - configuration.interval * 1000
-               << "msec.";
+               << F("msec.");
 #endif
 
         counterOfSamplings = 0;
@@ -88,7 +88,7 @@ void AFEAnalogInput::listener() {
         startTime = 0;
 
 #ifdef DEBUG
-        Serial << endl << "-------------------------------------------";
+        Serial << endl << F("-------------------------------------------");
 #endif
       }
     }

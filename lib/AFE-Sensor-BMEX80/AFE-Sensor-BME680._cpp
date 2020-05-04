@@ -6,14 +6,14 @@ AFESensorBME680::AFESensorBME680(){};
 
 boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 #ifdef DEBUG
-  Serial << endl << "INFO: Initializing: Sensor type: BME680";
+  Serial << endl << F("INFO: Initializing: Sensor type: BME680";
 #endif
 
   boolean _initialized = false;
 
 //  EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
 #ifdef DEBUG
-  Serial << endl << "INFO: EEPROM initialized: Size reserved: ";
+  Serial << endl << F("INFO: EEPROM initialized: Size reserved: ";
 //         << BSEC_MAX_STATE_BLOB_SIZE + 1;
 #endif
 
@@ -21,12 +21,12 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
   if (configuration->i2cAddress != 0) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Setting I2C: SDA:" << I2C->SDA << ", SCL:" << I2C->SCL;
+           << F("INFO: Setting I2C: SDA:") << I2C->SDA << F(", SCL:") << I2C->SCL;
 #endif
     Wire.begin(I2C->SDA, I2C->SCL);
 #ifdef DEBUG
-    Serial << ", completed." << endl
-           << "INFO: Sensor address: 0x" << _HEX(configuration->i2cAddress);
+    Serial << F(", completed.") << endl
+           << F("INFO: Sensor address: 0x") << _HEX(configuration->i2cAddress);
 #endif
 
     return_values_init ret;
@@ -35,16 +35,16 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
                       &bus_write, &bus_read, &sleep, &state_load, &config_load);
     if (ret.bme680_status) {
 #ifdef DEBUG
-      Serial << endl << "ERROR: Initializing BME680";
+      Serial << endl << F("ERROR: Initializing BME680";
 #endif
     } else if (ret.bsec_status) {
 #ifdef DEBUG
-      Serial << endl << "ERROR: Initializing BSEC library";
+      Serial << endl << F("ERROR: Initializing BSEC library";
 #endif
     } else {
       _initialized = true;
 #ifdef DEBUG
-      Serial << endl << "INFO: BME680 and BSEC Initialized";
+      Serial << endl << F("INFO: BME680 and BSEC Initialized";
 #endif
     }
   }
@@ -54,7 +54,7 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 
 boolean AFESensorBME680::read() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Reading sensor data: BME680";
+  Serial << endl << F("INFO: Reading sensor data: BME680";
 #endif
 
   get(sleep, get_timestamp_us, output_ready, state_save, 10000);

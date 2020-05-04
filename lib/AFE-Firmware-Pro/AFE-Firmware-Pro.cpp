@@ -4,99 +4,61 @@
 
 AFEFirmwarePro::AFEFirmwarePro(){};
 
-void AFEFirmwarePro::begin() {
-  Pro = Data.getProVersionConfiguration();
+void AFEFirmwarePro::begin(AFEWiFi *_Network) {
+  Data.getConfiguration(&Pro);
+  Network = _Network;
   miliseconds = millis();
 }
 
-boolean AFEFirmwarePro::callService(uint8_t method) {
-  HTTPClient http;
-  WiFiClient client;
+void AFEFirmwarePro::callService(uint8_t method) {
 
+  Data.getConfiguration(&Pro);
+
+  String _response;
   String url = (method == AFE_WEBSERVICE_VALIDATE_KEY ? AFE_URL_VALIDATE_KEY
                                                       : AFE_URL_ADD_KEY);
-  url += Data.getDeviceUID();
-  url += "/";
-  url += Pro.serial;
+  url.concat(Data.getDeviceUID());
+  url.concat("/");
+  url.concat(Pro.serial);
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: "
-         << (method == AFE_WEBSERVICE_VALIDATE_KEY ? "Validating" : "Adding")
-         << " serial number" << endl
-         << "INFO: URL: " << url << endl
-         << "INFO: Response: ";
+         << F("INFO: ")
+         << (method == AFE_WEBSERVICE_VALIDATE_KEY ? F("Validating")
+                                                   : F("Adding"))
+         << F(" serial number") << endl
+         << F("INFO: URL: ") << url;
 #endif
 
-  http.begin(client, url);
-  int httpCode = http.GET();
-  if (httpCode > 0) {
-    StaticJsonBuffer<AFE_RESPONSE_KEY_VALIDATION> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(http.getString());
-    if (root.success()) {
+  uint16_t httpCode = Network->getJSON(url, _response);
 
 #ifdef DEBUG
-    Serial << "success" << endl << "INFO: JSON: ";
+  Serial << endl << F("INFO: HTTP Response: ") << _response;
 #endif
-
-#ifdef DEBUG
-      root.printTo(Serial);
-#endif
-
-      Pro.valid = root["status"];
-#ifdef DEBUG
-      Serial << endl
-             << "INFO: JSON: Buffer size: " << AFE_RESPONSE_KEY_VALIDATION
-             << ", actual JSON size: " << jsonBuffer.size();
-      if (AFE_RESPONSE_KEY_VALIDATION < jsonBuffer.size() + 10) {
-        Serial << endl << "WARN: Too small buffer size";
-      }
-#endif
-
-      Data.saveConfiguration(Pro);
-    }
-
-#ifdef DEBUG
-    else {
-      Serial << "ERROR: JSON not pharsed";
-    }
-#endif
+  if (_response.substring(10, 11) == "t" ||
+      _response.substring(10, 11) == "f") {
+    Pro.valid = _response.substring(10, 11) == "t" ? true : false;
   }
-#ifdef DEBUG
-  else {
-     
-    Serial << endl << "ERROR: HTTP [" << httpCode << "] not opended";
+  if (httpCode == 200) {
+    Data.saveConfiguration(&Pro);
   }
-#endif
-  http.end();
-
-  return Pro.valid;
 }
 
 void AFEFirmwarePro::reValidateKey() {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Checking AFE PRO Key after: " << minutes << " minutes";
+         << F("INFO: Checking AFE PRO Key after: ") << minutes << F(" minutes");
 #endif
 
   if (strlen(Pro.serial) == 0 && Pro.valid) {
     Pro.valid = false;
 #ifdef DEBUG
-    Serial << endl << "INFO: Valid with no Key";
+    Serial << endl << F("INFO: Valid with no Key");
 #endif
-    Data.saveConfiguration(Pro);
+    Data.saveConfiguration(&Pro);
   } else if (strlen(Pro.serial) > 0) {
-    boolean _valid = callService(AFE_WEBSERVICE_VALIDATE_KEY);
-    if (_valid != Pro.valid) {
-#ifdef DEBUG
-      Serial << endl
-             << "INFO: Key status is not up2date. Saving it state: Valid: " << endl
-             << (_valid ? "YES" : "NO");
-#endif
-      Pro.valid = _valid;
-      Data.saveConfiguration(Pro);
-    }
+    callService(AFE_WEBSERVICE_VALIDATE_KEY);
   }
 }
 

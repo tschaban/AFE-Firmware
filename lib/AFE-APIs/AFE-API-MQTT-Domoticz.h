@@ -126,8 +126,13 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   virtual void addClass(AFESensorAnemometer *);
-  void publishAnemometerSensor();
+  void publishAnemometerSensorData();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  virtual void addClass(AFESensorRainmeter *);
+  void publishRainSensorData();
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);

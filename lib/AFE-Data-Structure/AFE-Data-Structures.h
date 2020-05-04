@@ -72,7 +72,11 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#include <AFE-Anemometer-Sensor-Structure.h>
+#include <AFE-ANEMOMETER-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-RAINMETER-Sensor-Structure.h>
 #endif
 
 #endif

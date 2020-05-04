@@ -19,14 +19,14 @@ void initializeAnemometerSensor(void) {
           newWindImpulse, RISING);
 #ifdef DEBUG
       Serial << endl
-             << "INFO: Interrupt attached to GPIO: "
+             << F("INFO: Interrupt attached to GPIO: ")
              << AnemometerSensor.configuration.gpio;
 #endif
     }
 #ifdef DEBUG
     else {
       Serial << endl
-             << "ERROR: Interrupt NOT attached to GPIO: "
+             << F("ERROR: Interrupt NOT attached to GPIO: ")
              << AnemometerSensor.configuration.gpio;
     }
 #endif
@@ -36,9 +36,9 @@ void initializeAnemometerSensor(void) {
 void windSensorListener(void) {
   if (Device.configuration.noOfAnemometerSensors > 0) {
     if (AnemometerSensor.listener()) {
-      MqttAPI.publishAnemometerSensor();
+      MqttAPI.publishAnemometerSensorData();
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      HttpDomoticzAPI.publishAnemometerSensor();
+      HttpDomoticzAPI.publishAnemometerSensorData();
 #endif
     }
   }

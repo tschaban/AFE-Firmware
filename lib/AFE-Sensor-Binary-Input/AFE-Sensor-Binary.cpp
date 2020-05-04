@@ -8,7 +8,7 @@ void AFESensorBinary::begin(uint16_t _bouncing) {
   active = true;
   bouncing = _bouncing;
 #ifdef DEBUG
-  Serial << endl << "INFO: Binary sensor initialized and working";;
+  Serial << endl << F("INFO: Binary sensor initialized and working");
 #endif
 }
 
@@ -17,8 +17,8 @@ void AFESensorBinary::newImpulse(void) {
     impulseCounter++;
 #ifdef DEBUG
     Serial << endl
-           << "INFO: New impulse. Total: " << impulseCounter
-           << ", during: " << ((millis() - counterStarted) / 1000) << "sec.";
+           << F("INFO: New impulse. Total: ") << impulseCounter
+           << F(", during: ") << ((millis() - counterStarted) / 1000) << F("sec.");
 #endif
   }
 }
@@ -34,7 +34,7 @@ void AFESensorBinary::get(uint32_t &noOfImpulses, uint32_t &duration) {
   counterStarted = millis();
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Reading data from Binary sensor: Impulses: " << noOfImpulses
-         << ", during: " << (duration / 1000) << "sec.";
+         << F("INFO: Reading data from Binary sensor: Impulses: ") << noOfImpulses
+         << F(", during: ") << (duration / 1000) << F("sec.");
 #endif
 }

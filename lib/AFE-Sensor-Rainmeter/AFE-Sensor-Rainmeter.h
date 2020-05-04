@@ -1,13 +1,18 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Sensor_Wind_h
-#define _AFE_Sensor_Wind_h
+#ifndef _AFE_Sensor_Rainmeter_h
+#define _AFE_Sensor_Rainmeter_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "arduino.h"
 #else
 #include "WProgram.h"
 #endif
+
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
 
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-Binary.h>
@@ -16,21 +21,22 @@
 #include <Streaming.h>
 #endif
 
-class AFESensorAnemometer {
+class AFESensorRainmeter {
 
 public:
-  ANEMOMETER configuration;
-  float lastSpeedMS =
-      0; // used by HTTPs API - stores and gets the lastest value by HTTP API
-  float lastSpeedKMH =
-      0; // used by HTTPs API - stores and gets the lastest value by HTTP API
+  RAINMETER configuration;
+
+  float rainLevelLast1Minute = 0;
+  float rainLevelLastHour = 0;
+  float rainLevelLast12Hours = 0;
+  float rainLevelLast24Hours = 0;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
 
   /* Constructors */
-  AFESensorAnemometer();
+  AFESensorRainmeter();
 
   /* Init switch */
   boolean begin(AFEDataAccess *, AFESensorBinary *);
@@ -45,7 +51,17 @@ private:
   AFEDataAccess *_Data;
   boolean _initialized = false;
   uint32_t startTime = 0;
-  float oneImpulseDistanceCM = 0;
+  uint32_t start60Sec = 0;
+
+  float rainLevelDuring1Hour[60];
+  uint8_t currentIndex1Hour = 0;
+
+  float rainLevelDuring12Hours[12];
+  uint8_t currentIndex12Hours = 0;
+
+  float rainLevelDuring24Hours[2];
+  uint8_t currentIndex24Hours = 0;
 };
 
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #endif

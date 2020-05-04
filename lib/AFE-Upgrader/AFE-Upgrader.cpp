@@ -5,23 +5,23 @@
 AFEUpgrader::AFEUpgrader(AFEDataAccess *_Data, AFEDevice *_Device) {
   Data = _Data;
   Device = _Device;
-  FirmwareConfiguration = Data->getFirmwareConfiguration();
+  Data->getConfiguration(&FirmwareConfiguration);
 }
 
 /* It returns true if firmware has been upgraded */
 boolean AFEUpgrader::upgraded() {
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Firmware version (stored) T" << FirmwareConfiguration.type
-         << "-" << FirmwareConfiguration.version << "-"
+         << F("INFO: Firmware version (stored) T") << FirmwareConfiguration.type
+         << F("-") << FirmwareConfiguration.version << F("-")
          << (FirmwareConfiguration.api == AFE_API_STANDARD
-                 ? "Standard"
-                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ ? "Domoticz"
-                                                                  : "Unknwon"));
+                 ? F("Standard")
+                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ ? F("Domoticz")
+                                                                  : F("Unknwon")));
   Serial << endl
-         << "INFO: Firmware version (booted) T" << AFE_FIRMWARE_TYPE << "-"
-         << AFE_FIRMWARE_VERSION << "-"
-         << (AFE_FIRMARE_API == AFE_API_STANDARD ? "Standard" : "Domoticz");
+         << F("INFO: Firmware version (booted) T") << AFE_FIRMWARE_TYPE << F("-")
+         << AFE_FIRMWARE_VERSION << F("-")
+         << (AFE_FIRMARE_API == AFE_API_STANDARD ? F("Standard") : F("Domoticz"));
 #endif
 
   if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) == 0 &&
@@ -44,7 +44,7 @@ void AFEUpgrader::upgrade() {
   /* Upgraded version from one T to other T */
   if (FirmwareConfiguration.type != AFE_FIRMWARE_TYPE) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Upgrading Firmware type";
+    Serial << endl << F("INFO: Upgrading Firmware type");
 #endif
     upgradeFirmwarType();
     Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
@@ -52,8 +52,8 @@ void AFEUpgrader::upgrade() {
   } else if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) != 0) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Upgrading Firmware T" << AFE_FIRMWARE_TYPE
-           << " from version: " << FirmwareConfiguration.version << " to "
+           << F("INFO: Upgrading Firmware T") << AFE_FIRMWARE_TYPE
+           << F(" from version: ") << FirmwareConfiguration.version << F(" to ")
            << AFE_FIRMWARE_VERSION;
 #endif
     updateFirmwareVersion();
@@ -64,8 +64,8 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.api != AFE_FIRMARE_API) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Firmware API version upgraded"
-           << " from version: " << FirmwareConfiguration.api << " to "
+           << F("INFO: Firmware API version upgraded")
+           << F(" from version: ") << FirmwareConfiguration.api << F(" to ")
            << AFE_FIRMARE_API;
 #endif
     updateFirmwareAPIVersion();
@@ -73,7 +73,7 @@ void AFEUpgrader::upgrade() {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO Upgrade to version " << AFE_FIRMWARE_VERSION << " completed";
+         << F("INFO Upgrade to version ") << AFE_FIRMWARE_VERSION << F(" completed");
 #endif
 }
 
@@ -242,6 +242,9 @@ void AFEUpgrader::upgradeToT5V220() {
 void AFEUpgrader::upgradeToT6V230() {
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   Data->createAnemometerSensorConfigurationFile();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  Data->createRainmeterSensorConfigurationFile();
 #endif
 }
 #endif // T6_CONFIG

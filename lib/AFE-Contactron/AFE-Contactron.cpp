@@ -8,7 +8,7 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
                           AFEDataAccess *_Data) {
   Data = _Data;
   Device = _Device;
-  configuration = Data->getContactronConfiguration(id);
+  Data->getConfiguration(id,&configuration);
   pinMode(configuration.gpio, INPUT_PULLUP);
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     ContactronLed.begin(configuration.ledID);

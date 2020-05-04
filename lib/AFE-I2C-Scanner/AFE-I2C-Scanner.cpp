@@ -8,7 +8,8 @@ AFEI2CScanner::AFEI2CScanner() {};
 
  void AFEI2CScanner::begin() {
   AFEDataAccess Data;
-  I2CPORT I2C = Data.getI2CPortConfiguration();
+  I2CPORT I2C;
+  Data.getConfiguration(&I2C);
   WirePort.begin(I2C.SDA, I2C.SCL);
  }
 
@@ -20,7 +21,7 @@ void AFEI2CScanner::scanAll() {
 
   Serial << endl
          << endl
-         << "------------------ I2C Scanner ------------------";
+         << F("------------------ I2C Scanner ------------------");
 
   for (uint8_t address = 1; address < 127; address++) {
 
@@ -31,13 +32,13 @@ void AFEI2CScanner::scanAll() {
   }
 
   if (numberOfDeficesFound == 0) {
-    Serial << endl << "No I2C devices found";
+    Serial << endl << F("No I2C devices found");
   } else {
-    Serial << endl << "Scanning completed";
+    Serial << endl << F("Scanning completed");
   }
 
   Serial << endl
-         << "---------------------------------------------------" << endl;
+         << F("---------------------------------------------------") << endl;
 }
 #endif
 
@@ -47,11 +48,11 @@ boolean AFEI2CScanner::scan(byte address) {
   status = WirePort.endTransmission();
   if (status == 0) {
 #ifdef DEBUG
-    Serial << endl << "Sensor Found [0x";
+    Serial << endl << F("Sensor Found [0x");
     if (address < 16) {
-      Serial << "0";
+      Serial << F("0");
     }
-    Serial << _HEX(address) << "] : " << getName(address);
+    Serial << _HEX(address) << F("] : ") << getName(address);
 #endif
     return true;
   } else {

@@ -12,7 +12,7 @@ void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
   AFEAPI::begin(Data, Device, Led);
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Domoticz version: "
+         << F("INFO: Domoticz version: ")
          << (Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
                  ? L_DOMOTICZ_VERSION_410
                  : L_DOMOTICZ_VERSION_2020);
@@ -34,14 +34,14 @@ void AFEAPIMQTTDomoticz::listener() {
 
 void AFEAPIMQTTDomoticz::synchronize() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Sending current device state to MQTT Broker  ...";
+  Serial << endl << F("INFO: Sending current device state to MQTT Broker  ...");
 #endif
 
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Synchronizing RELAY: " << i;
+    Serial << endl << F("INFO: Synchronizing RELAY: ") << i;
 #endif
     publishRelayState(i);
   }
@@ -51,7 +51,7 @@ void AFEAPIMQTTDomoticz::synchronize() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Synchronizing SWITCH: " << i;
+    Serial << endl << F("INFO: Synchronizing SWITCH: ") << i;
 #endif
     publishSwitchState(i);
   }
@@ -61,7 +61,7 @@ void AFEAPIMQTTDomoticz::synchronize() {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Synchronizing CONTACTRON: " << i;
+    Serial << endl << F("INFO: Synchronizing CONTACTRON: ") << i;
 #endif
     publishContactronState(i);
   }
@@ -71,14 +71,14 @@ void AFEAPIMQTTDomoticz::synchronize() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Synchronizing GATE: " << i;
+    Serial << endl << F("INFO: Synchronizing GATE: ") << i;
 #endif
     publishGateState(i);
   }
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Sending message: device is connected ...";
+  Serial << endl << F("INFO: Sending message: device is connected ...");
 #endif
   if (Mqtt.configuration.lwt.idx > 0) {
     char lwtMessage[100];
@@ -93,7 +93,7 @@ void AFEAPIMQTTDomoticz::synchronize() {
 
 void AFEAPIMQTTDomoticz::subscribe() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Subsribing to MQTT Topics ...";
+  Serial << endl << F("INFO: Subsribing to MQTT Topics ...");
 #endif
   Mqtt.subscribe(AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT);
 }
@@ -114,13 +114,13 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
     command.nvalue = root["nvalue"];
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Domoticz: Got command: " << command.nvalue
-           << ", IDX: " << command.domoticz.idx;
+           << F("INFO: Domoticz: Got command: ") << command.nvalue
+           << F(", IDX: ") << command.domoticz.idx;
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "ERROR: Domoticz: Problem with JSON pharsing";
+    Serial << endl << F("ERROR: Domoticz: Problem with JSON pharsing");
   }
 #endif
   return command;
@@ -141,7 +141,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
         case AFE_DOMOTICZ_DEVICE_RELAY:
 #ifdef DEBUG
           Serial << endl
-                 << "INFO: Domoticz: Found Relay ID: " << idxCache[i].id;
+                 << F("INFO: Domoticz: Found Relay ID: ") << idxCache[i].id;
           _found = true;
 #endif
           if (_Relay[idxCache[i].id]->get() != (byte)command.nvalue) {
@@ -154,7 +154,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #ifdef DEBUG
           else {
-            Serial << endl << "WARN: Domoticz: Same state. No change needed";
+            Serial << endl << F("WARN: Domoticz: Same state. No change needed");
           }
 #endif
           break;
@@ -162,7 +162,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
         /* Processing Gate command*/
         case AFE_DOMOTICZ_DEVICE_GATE:
 #ifdef DEBUG
-          Serial << endl << "INFO: Domoticz: Found Gate ID: " << idxCache[i].id;
+          Serial << endl << F("INFO: Domoticz: Found Gate ID: ") << idxCache[i].id;
           _found = true;
 #endif
 
@@ -171,7 +171,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #ifdef DEBUG
           else {
-            Serial << endl << "INFO: OFF Command, skipping";
+            Serial << endl << F("INFO: OFF Command, skipping";
           }
 #endif
 
@@ -181,7 +181,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
         default:
 #ifdef DEBUG
           Serial << endl
-                 << "ERROR: Domoticz: Device type not handled. Type: "
+                 << F("ERROR: Domoticz: Device type not handled. Type: ")
                  << idxCache[i].type;
 #endif
           break;
@@ -191,7 +191,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef DEBUG
     if (!_found) {
       Serial << endl
-             << "WARN: Domoticz: No item found with IDX: "
+             << F("WARN: Domoticz: No item found with IDX: ")
              << command.domoticz.idx;
     }
 #endif
@@ -225,7 +225,7 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
   AFEAPI::addClass(Relay);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Caching IDXs for Relays";
+  Serial << endl << F("INFO: Caching IDXs for Relays");
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
@@ -236,13 +236,13 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
       idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_RELAY;
 #ifdef DEBUG
       Serial << endl
-             << " - added IDX: " << idxCache[lastIDXChacheIndex].domoticz.idx;
+             << F(" - added IDX: ") << idxCache[lastIDXChacheIndex].domoticz.idx;
 #endif
       lastIDXChacheIndex++;
     }
 #ifdef DEBUG
     else {
-      Serial << endl << " - IDX not set";
+      Serial << endl << F(" - IDX not set");
     }
 #endif
   }
@@ -253,8 +253,8 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Publishing relay: " << id
-         << ", IDX: " << idxCache[id].domoticz.idx << " state";
+         << F("INFO: Publishing relay: ") << id
+         << F(", IDX: ") << idxCache[id].domoticz.idx << F(" state");
 #endif
   boolean publishStatus = false;
   if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
@@ -266,7 +266,7 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "INFO: Not published";
+    Serial << endl << F("INFO: Not published");
   }
 #endif
   return publishStatus;
@@ -378,13 +378,13 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
     if (_BMx80Sensor[id]->configuration.domoticz.pressure.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.pressure.value);
+      sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.pressure.value);
       generateDeviceValue(
           json, _BMx80Sensor[id]->configuration.domoticz.pressure.idx, value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
     if (_BMx80Sensor[id]->configuration.domoticz.relativePressure.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.relativePressure.value);
+      sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.relativePressure.value);
       generateDeviceValue(
           json, _BMx80Sensor[id]->configuration.domoticz.relativePressure.idx,
           value);
@@ -561,7 +561,7 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorAnemometer *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-void AFEAPIMQTTDomoticz::publishAnemometerSensor() {
+void AFEAPIMQTTDomoticz::publishAnemometerSensorData() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH];
 
@@ -579,12 +579,35 @@ void AFEAPIMQTTDomoticz::publishAnemometerSensor() {
 }
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+void AFEAPIMQTTDomoticz::addClass(AFESensorRainmeter *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+void AFEAPIMQTTDomoticz::publishRainSensorData() {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_RAINMETER_COMMAND_LENGTH];
+
+    char value[20];
+
+    if (_RainmeterSensor->configuration.domoticz.idx > 0) {
+
+      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour*100,_RainmeterSensor->rainLevelLast1Minute);
+
+      generateDeviceValue(
+          json, _RainmeterSensor->configuration.domoticz.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
   AFEAPI::addClass(Item);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Caching IDXs for Gates";
+  Serial << endl << F("INFO: Caching IDXs for Gates";
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
@@ -595,13 +618,13 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
       idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_GATE;
 #ifdef DEBUG
       Serial << endl
-             << " - added IDX: " << idxCache[lastIDXChacheIndex].domoticz.idx;
+             << F(" - added IDX: ") << idxCache[lastIDXChacheIndex].domoticz.idx;
 #endif
       lastIDXChacheIndex++;
     }
 #ifdef DEBUG
     else {
-      Serial << endl << " - IDX not set";
+      Serial << endl << F(" - IDX not set";
     }
 #endif
   }

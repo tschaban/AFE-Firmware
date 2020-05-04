@@ -29,7 +29,7 @@ void AFEAPIMQTTStandard::listener() {
 void AFEAPIMQTTStandard::synchronize() {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Sending current device state to MQTT Broker  ...";
+  Serial << endl << F("INFO: Sending current device state to MQTT Broker  ...");
 #endif
 
   Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
@@ -73,7 +73,7 @@ void AFEAPIMQTTStandard::synchronize() {
 void AFEAPIMQTTStandard::subscribe() {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Subsribing to MQTT Topics ...";
+  Serial << endl << F("INFO: Subsribing to MQTT Topics ...");
 #endif
 
 /* Subscribe: Relay */
@@ -173,6 +173,32 @@ void AFEAPIMQTTStandard::subscribe() {
   }
 #endif
 
+/* Subscribe: ANEMOMETER */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  if (_Device->configuration.noOfAnemometerSensors>0) {
+    Mqtt.subscribe(_AnemometerSensor->mqttCommandTopic);
+    if (strlen(_AnemometerSensor->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _AnemometerSensor->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ANEMOMETER;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+/* Subscribe: RAIN */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  if (_Device->configuration.noOfRainmeterSensors>0) {
+    Mqtt.subscribe(_RainmeterSensor->mqttCommandTopic);
+    if (strlen(_RainmeterSensor->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _RainmeterSensor->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RAINMETER;
+      currentCacheSize++;
+    }
+  }
+#endif
+
 /* Subscribe: Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
@@ -205,7 +231,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTStandard::processRequest() {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Got message: " << Mqtt.message.topic << " | ";
+  Serial << endl << F("INFO: MQTT: Got message: ") << Mqtt.message.topic << F(" | ");
   for (uint8_t i = 0; i < Mqtt.message.length; i++) {
     Serial << (char)Mqtt.message.content[i];
   }
@@ -214,7 +240,7 @@ void AFEAPIMQTTStandard::processRequest() {
     if (strcmp(Mqtt.message.topic, mqttTopicsCache[i].message.topic) == 0) {
 #ifdef DEBUG
       Serial << endl
-             << "INFO: MQTT: Found topic in cache: Device Type="
+             << F("INFO: MQTT: Found topic in cache: Device Type=")
              << mqttTopicsCache[i].type;
 #endif
       switch (mqttTopicsCache[i].type) {
@@ -248,6 +274,16 @@ void AFEAPIMQTTStandard::processRequest() {
         processAS3935(&mqttTopicsCache[i].id);
         break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+      case AFE_MQTT_DEVICE_ANEMOMETER:
+        processAnemometerSensor();
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+      case AFE_MQTT_DEVICE_RAINMETER:
+        processRainSensor();
+        break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       case AFE_MQTT_DEVICE_HPMA115S0:
         processHPMA115S0(&mqttTopicsCache[i].id);
@@ -266,8 +302,8 @@ void AFEAPIMQTTStandard::processRequest() {
       default:
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: Device type " << mqttTopicsCache[i].type
-               << " not found";
+               << F("ERROR: Device type ") << mqttTopicsCache[i].type
+               << F(" not found");
 #endif
         break;
       }
@@ -296,7 +332,7 @@ void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
   boolean publishState = true;
 
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing Relay ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing Relay ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 2) {
     _Relay[*id]->on();
@@ -308,7 +344,7 @@ void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
   } else {
     publishState = false;
 #ifdef DEBUG
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
 #endif
   }
   if (publishState) {
@@ -320,14 +356,14 @@ void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing Switch ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing Switch ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishSwitchState(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -359,14 +395,14 @@ void AFEAPIMQTTStandard::publishADCValues() {
     defined(AFE_CONFIG_API_PROCESS_REQUESTS)
 void AFEAPIMQTTStandard::processADC() {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing ADC: ";
+  Serial << endl << F("INFO: MQTT: Processing ADC: ");
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishADCValues();
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -375,14 +411,14 @@ void AFEAPIMQTTStandard::processADC() {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing BMX80 ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing BMX80 ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishBMx80SensorData(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -402,14 +438,14 @@ boolean AFEAPIMQTTStandard::publishBMx80SensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEAPIMQTTStandard::processHPMA115S0(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing HPMA115S0 ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing HPMA115S0 ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishHPMA115S0SensorData(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -428,14 +464,14 @@ boolean AFEAPIMQTTStandard::publishHPMA115S0SensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEAPIMQTTStandard::processBH1750(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing BH1750 ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing BH1750 ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishBH1750SensorData(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -454,14 +490,14 @@ boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing AS3935 ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing AS3935 ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishAS3935SensorData(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -478,7 +514,7 @@ boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-void AFEAPIMQTTStandard::publishAnemometerSensor() {
+void AFEAPIMQTTStandard::publishAnemometerSensorData() {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
     _AnemometerSensor->getJSON(message);
@@ -486,25 +522,50 @@ void AFEAPIMQTTStandard::publishAnemometerSensor() {
   }
 }
 
-void AFEAPIMQTTStandard::processAnemometerSensorData() {
+void AFEAPIMQTTStandard::processAnemometerSensor() {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing Anemometer: ";
+  Serial << endl << F("INFO: MQTT: Processing Anemometer: ");
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
-    publishAnemometerSensor();
+    publishAnemometerSensorData();
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+void AFEAPIMQTTStandard::publishRainSensorData() {
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_RAINMETER_DATA_LENGTH];
+    _RainmeterSensor->getJSON(message);
+    Mqtt.publish(_RainmeterSensor->configuration.mqtt.topic, message);
+  }
+}
+
+void AFEAPIMQTTStandard::processRainSensor() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing Rain: ");
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishRainSensorData();
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemente");
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing Gate ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing Gate ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
     _Gate[*id]->toggle();
@@ -513,7 +574,7 @@ void AFEAPIMQTTStandard::processGate(uint8_t *id) {
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }
@@ -538,14 +599,14 @@ boolean AFEAPIMQTTStandard::publishGateState(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MQTT: Processing Contactron ID: " << *id;
+  Serial << endl << F("INFO: MQTT: Processing Contactron ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
     publishContactronState(*id);
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "WARN: MQTT: Command not implemente";
+    Serial << endl << F("WARN: MQTT: Command not implemente");
   }
 #endif
 }

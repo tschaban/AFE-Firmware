@@ -207,7 +207,7 @@
 #define L_MONOSTABLE "Monostable"
 #define L_BISTABLE "Bistable"
 #define L_SENSITIVENESS "Sensitiveness"
-#define L__SENSITIVENESS_HINT                                                  \
+#define L_SENSITIVENESS_HINT                                                  \
   "Sensitiveness should be adjusted if switch didn't behave as expected "      \
   "while pressing it"
 #define L_SWITCH_BUTTON "Switch / Button"

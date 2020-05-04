@@ -6,7 +6,7 @@ AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
 void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getHPMA115S0SensorConfiguration(id);
+  Data.getConfiguration(id,&configuration);
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
@@ -32,20 +32,20 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   data.pm10 = data.pm25 = buffer.pm10 = buffer.pm25 = 0;
 
 #if defined(DEBUG)
-  Serial << endl << endl << "----- HPMA115S0: Initializing -----";
-  Serial << endl << "Cleaning serial. Size=" << UART.SerialBus.available();
+  Serial << endl << endl << F("----- HPMA115S0: Initializing -----");
+  Serial << endl << F("Cleaning serial. Size=") << UART.SerialBus.available();
 #endif
   UART.clean();
 
 #if defined(DEBUG)
-  Serial << endl << "Turning Autosending: OFF";
+  Serial << endl << F("Turning Autosending: OFF");
 #endif
 
   /* Turn off autosending */
   sendCommand(commandAutoOFF);
 
 #if defined(DEBUG)
-  Serial << endl << "Cleaning serial. Size=" << UART.SerialBus.available();
+  Serial << endl << F("Cleaning serial. Size=") << UART.SerialBus.available();
 #endif
 
   /* Clean buffer */
@@ -60,8 +60,8 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   }
 
 #if defined(DEBUG)
-  Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
-  Serial << endl << "-----------------------------------";
+  Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+  Serial << endl << F("-----------------------------------");
 #endif
 }
 
@@ -73,7 +73,7 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
 
 #ifdef DEBUG
   Serial << endl
-         << "UART: Size of a data in the buffer ="
+         << F("UART: Size of a data in the buffer =")
          << UART.SerialBus.available();
 #endif
 
@@ -86,7 +86,7 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
 
 #ifdef DEBUG
   if (UART.SerialBus.available() > 0) {
-    Serial << endl << "UART Raw data: ";
+    Serial << endl << F("UART Raw data: ");
   }
 #endif
 
@@ -96,7 +96,7 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
       responseBuffer[index] = UART.SerialBus.read();
 
 #ifdef DEBUG
-      Serial << " ";
+      Serial << F(" ");
       Serial.print(responseBuffer[index], HEX);
 #endif
 
@@ -143,18 +143,18 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
     if (index > 0) {
 
 #ifdef DEBUG
-      Serial << endl << "UART data to process:";
+      Serial << endl << F("UART data to process:");
       for (index = 0; index < responseSize; index++) {
-        Serial << " ";
+        Serial << F(" ");
         Serial.print(responseBuffer[index], HEX);
       }
-      Serial << endl << "Message: ";
+      Serial << endl << F("Message: ");
 #endif
 
       /* Check if ACK response */
       if (responseBuffer[0] == 0xA5 && responseBuffer[1] == 0xA5) {
 #ifdef DEBUG
-        Serial << " Success (ACK)";
+        Serial << F(" Success (ACK)");
 #endif
         return true;
       }
@@ -162,7 +162,7 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
       /* Check if NACK response */
       if (responseBuffer[0] == 0x96 && responseBuffer[1] == 0x96) {
 #ifdef DEBUG
-        Serial << " Failure (NACK)";
+        Serial << F(" Failure (NACK)");
 #endif
         return false;
       }
@@ -182,14 +182,14 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
           buffer.pm25 = responseBuffer[3] * 256 + responseBuffer[4];
           buffer.pm10 = responseBuffer[5] * 256 + responseBuffer[6];
 #ifdef DEBUG
-          Serial << " Success (PM2.5=" << buffer.pm25 << "ug/m3, "
-                 << "PM10=" << buffer.pm10 << "ug/m3)";
+          Serial << F(" Success (PM2.5=") << buffer.pm25 << F("ug/m3, ")
+                 << F("PM10=") << buffer.pm10 << F("ug/m3)");
 #endif
           return expectingACK ? false : true;
         } else {
 
 #ifdef DEBUG
-          Serial << " Failure (Checksum mismatch)";
+          Serial << F(" Failure (Checksum mismatch)");
 #endif
           return false;
         }
@@ -210,26 +210,26 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
           buffer.pm25 = responseBuffer[6] * 256 + responseBuffer[7];
           buffer.pm10 = responseBuffer[8] * 256 + responseBuffer[9];
 #ifdef DEBUG
-          Serial << " Success (PM2.5=" << buffer.pm25 << "ug/m3, "
-                 << "PM10=" << buffer.pm10 << "ug/m3)";
+          Serial << F(" Success (PM2.5=") << buffer.pm25 << F("ug/m3, ")
+                 << F("PM10=") << buffer.pm10 << F("ug/m3)");
 #endif
           return expectingACK ? false : true;
         } else {
 #ifdef DEBUG
-          Serial << " Failure (Checksum mismatch)";
+          Serial << F(" Failure (Checksum mismatch)");
 #endif
         }
       }
     }
 
 #ifdef DEBUG
-    Serial << " Failure (Wrong or no response)";
+    Serial << F(" Failure (Wrong or no response)");
 #endif
     return false;
   }
 #ifdef DEBUG
   else {
-    Serial << " Failure (TimeOut)";
+    Serial << F(" Failure (TimeOut)");
   }
 #endif
 
@@ -275,8 +275,8 @@ void AFESensorHPMA115S0::listener() {
     if ((millis() - startTime >= configuration.interval * 1000) &&
         _measuremntsON) {
 #if defined(DEBUG)
-      Serial << endl << endl << "----- HPMA115S0: Reading -----";
-      Serial << endl << "Time: " << (millis() - startTime) / 1000 << "s";
+      Serial << endl << endl << F("----- HPMA115S0: Reading -----");
+      Serial << endl << F("Time: ") << (millis() - startTime) / 1000 << F("s");
 #endif
       startTime = millis();
 
@@ -284,7 +284,7 @@ void AFESensorHPMA115S0::listener() {
 //      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
-      Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
+      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
 #endif
 
       UART.send(commandRead);
@@ -302,8 +302,8 @@ void AFESensorHPMA115S0::listener() {
         read(true) ? _measuremntsON = false : _measuremntsON = true;
       }
 #if defined(DEBUG)
-      Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
-      Serial << endl << "------------------------------";
+      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl << F("------------------------------");
 #endif
     }
     /* Wake up sensor */
@@ -313,15 +313,15 @@ void AFESensorHPMA115S0::listener() {
              !_measuremntsON) {
 
 #ifdef DEBUG
-      Serial << endl << endl << "----- HPMA115S0: Turning ON -----";
+      Serial << endl << endl << F("----- HPMA115S0: Turning ON -----");
 #endif
       if (!_measuremntsON) {
         UART.send(commandTurnON);
         read(true) ? _measuremntsON = true : _measuremntsON = false;
       }
 #if defined(DEBUG)
-      Serial << endl << "Device is: " << (_measuremntsON ? "ON" : "OFF");
-      Serial << endl << "---------------------------------";
+      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl << F("---------------------------------");
 #endif
     }
   }

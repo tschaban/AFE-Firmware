@@ -57,6 +57,10 @@
 #include <AFE-Sensor-Anemometer.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-Sensor-Rainmeter.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -106,6 +110,10 @@ private:
   AFESensorAnemometer *_AnemometerSensor;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  AFESensorRainmeter *_RainmeterSensor;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
 #endif
@@ -145,6 +153,10 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   void processAnemometerSensor(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void processRainSensor(HTTPCOMMAND *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -211,6 +223,9 @@ public:
   void addClass(AFESensorAnemometer *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void addClass(AFESensorRainmeter *);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void addClass(AFEGate *);

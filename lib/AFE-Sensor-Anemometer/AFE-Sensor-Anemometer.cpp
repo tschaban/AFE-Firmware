@@ -9,7 +9,16 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
   _Data = Data;
   _Sensor = Sensor;
   startTime = millis();
-  configuration = Data->getAnemometerSensorConfiguration();
+  Data->getConfiguration(&configuration);
+
+
+  #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = '\0';
+  }
+#endif
 
   _initialized = true;
 
@@ -28,8 +37,8 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
 #ifdef DEBUG
     Serial
         << endl
-        << "ERROR: Anemometer sensor NOT initialized. Wrong distance unit for "
-           "impulse: "
+        << F("ERROR: Anemometer sensor NOT initialized. Wrong distance unit for "
+           "impulse: ")
         << configuration.impulseDistanceUnit;
 #endif
     break;
@@ -39,13 +48,13 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
     _Sensor->begin(configuration.sensitiveness);
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Anemometer sensor initialized and working" << endl
-           << " - GPIO: " << configuration.gpio << endl
-           << " - Interval: " << configuration.interval << endl
-           << " - 1 impulse distance: " << configuration.impulseDistance << endl
-           << " - 1 impulse distance unit: "
+           << F("INFO: Anemometer sensor initialized and working") << endl
+           << F(" - GPIO: ") << configuration.gpio << endl
+           << F(" - Interval: ") << configuration.interval << endl
+           << F(" - 1 impulse distance: ") << configuration.impulseDistance << endl
+           << F(" - 1 impulse distance unit: ")
            << configuration.impulseDistanceUnit << endl
-           << " - Boucing: " << configuration.sensitiveness;
+           << F(" - Boucing: ") << configuration.sensitiveness;
 #endif
   }
 
@@ -67,11 +76,11 @@ boolean AFESensorAnemometer::listener(void) {
 
 #ifdef DEBUG
       Serial << endl
-             << "INFO: Anemometer speed: " << lastSpeedMS << "m/s, " << lastSpeedKMH
-             << "km/h" << endl
-             << " - no of impulses: " << noOfImpulses << endl
-             << " - duration: " << duration << "msec. [" << duration / 1000
-             << "sec]";
+             << F("INFO: Anemometer speed: ") << lastSpeedMS << F("m/s, ") << lastSpeedKMH
+             << F("km/h") << endl
+             << F(" - no of impulses: ") << noOfImpulses << endl
+             << F(" - duration: ") << duration << F("msec. [") << duration / 1000
+             << F("sec]");
 #endif
       startTime = millis();
       _ret = true;
@@ -81,7 +90,7 @@ boolean AFESensorAnemometer::listener(void) {
 }
 
 void AFESensorAnemometer::getJSON(char *json) {
-  sprintf(json, "{\"windSpeed\":[{\"value\":%.2f,\"unit\":\"m/"
+  sprintf(json, "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
                 "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
           lastSpeedMS, lastSpeedKMH);
 }

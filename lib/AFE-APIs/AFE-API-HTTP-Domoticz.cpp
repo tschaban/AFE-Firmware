@@ -20,7 +20,7 @@ void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEAPIHTTPDomoticz::init() {
-  configuration = _Data->getDomoticzConfiguration();
+  _Data->getConfiguration(&configuration);
 
   char _user[45] = {0}; // base64 conversion takes ceil(n/3)*4 size of mem
   char _pass[45] = {0};
@@ -55,7 +55,7 @@ boolean AFEAPIHTTPDomoticz::callURL(const String url) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Publishing to Domoticz: " << url;
+  Serial << endl << F("INFO: Publishing to Domoticz: ") << url;
 #endif
   http.begin(client, url);
   _return = http.GET() == 200 ? true : false;
@@ -99,7 +99,7 @@ void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
   AFEAPI::addClass(Relay);
   /*
   #ifdef DEBUG
-    Serial << endl << "INFO: Caching IDXs for Relays";
+    Serial << endl << F("INFO: Caching IDXs for Relays";
   #endif
     uint8_t index = 0;
     for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
@@ -108,13 +108,13 @@ void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
         idxCache[index].id = i;
         idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
   #ifdef DEBUG
-        Serial << endl << " - added IDX: " << idxCache[index].domoticz.idx;
+        Serial << endl << F(" - added IDX: ") << idxCache[index].domoticz.idx;
   #endif
         index++;
       }
   #ifdef DEBUG
       else {
-        Serial << endl << " - IDX not set";
+        Serial << endl << F(" - IDX not set";
       }
   #endif
     }*/
@@ -200,12 +200,12 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
     }
 
     if (_BMx80Sensor[id]->configuration.domoticz.pressure.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.pressure.value);
+      sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.pressure.value);
       sendCustomSensorCommand(
           _BMx80Sensor[id]->configuration.domoticz.pressure.idx, value);
     }
     if (_BMx80Sensor[id]->configuration.domoticz.relativePressure.idx > 0) {
-      sprintf(value, "%-.2f", _BMx80Sensor[id]->data.relativePressure.value);
+      sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.relativePressure.value);
       sendCustomSensorCommand(
           _BMx80Sensor[id]->configuration.domoticz.relativePressure.idx, value);
     }
@@ -361,17 +361,33 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorAnemometer *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-void AFEAPIHTTPDomoticz::publishAnemometerSensor() {
+void AFEAPIHTTPDomoticz::publishAnemometerSensorData() {
   if (enabled) {
     char value[20];
     if (_AnemometerSensor->configuration.domoticz.idx > 0) {
-      sprintf(value, "0;N;%-.2f;0;?;?", 10*_AnemometerSensor->lastSpeedMS);
+      sprintf(value, "0;N;%-.2f;0;?;?", 10 * _AnemometerSensor->lastSpeedMS);
       sendCustomSensorCommand(_AnemometerSensor->configuration.domoticz.idx,
                               value);
     }
   }
 }
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+void AFEAPIHTTPDomoticz::addClass(AFESensorRainmeter *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+void AFEAPIHTTPDomoticz::publishRainSensorData() {
+  if (enabled) {
+    char value[20];
+    if (_RainmeterSensor->configuration.domoticz.idx > 0) {
+      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour*100,_RainmeterSensor->rainLevelLast1Minute);
+      sendCustomSensorCommand(_RainmeterSensor->configuration.domoticz.idx, value);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }

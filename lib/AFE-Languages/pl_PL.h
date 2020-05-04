@@ -215,7 +215,7 @@
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
 #define L_SENSITIVENESS "Czułość"
-#define L__SENSITIVENESS_HINT                                                         \
+#define L_SENSITIVENESS_HINT                                                         \
   "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie " \
   "przycisku podczas jego wciskania"
 #define L_SWITCH_BUTTON "Przycisk / Włącznik"
@@ -385,6 +385,13 @@
 #define L_ANEMOMETER_CALIBRATION "Kalibracja anemometru"
 #define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Odległość jaką wiatr przebędzie w jednym impulsie anemometra"
 #define L_ANEMOMETER_IMPULSE_DISTANCE "Odległość"
+#endif
+
+/* Rainmeter Sensor */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define L_RAINMETER "Czujnik deszczu"
+#define L_RAINMETER_CALIBRATION "Rozdzielczość czujnika deszczu"
+#define L_RAINMETER_RESOLUTION "Rozdzielczość"
 #endif
 
 

@@ -88,10 +88,15 @@ public:
 #endif //  AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  void publishAnemometerSensor();
-  void processAnemometerSensorData();
+  void processAnemometerSensor();
+  void publishAnemometerSensorData();
+  
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR  
+  void processRainSensor();
+  void publishRainSensorData();
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void processGate(uint8_t *id);
