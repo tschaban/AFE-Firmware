@@ -184,6 +184,21 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues() {
+  boolean _ret = false;
+  if (enabled) {
+    char value[8];
+    if (_AnalogInput->configuration.battery.domoticz.idx > 0) {
+      sprintf(value, "%-.3f", _AnalogInput->batteryPercentage);
+      _ret = sendCustomSensorCommand(
+          _AnalogInput->configuration.battery.domoticz.idx, value);
+    }
+  }
+  return _ret;
+}
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIHTTPDomoticz::addClass(AFESensorBMEX80 *Sensor) {
   AFEAPI::addClass(Sensor);
@@ -382,8 +397,10 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
   if (enabled) {
     char value[20];
     if (_RainmeterSensor->configuration.domoticz.idx > 0) {
-      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour*100,_RainmeterSensor->rainLevelLast1Minute);
-      sendCustomSensorCommand(_RainmeterSensor->configuration.domoticz.idx, value);
+      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour * 100,
+              _RainmeterSensor->rainLevelLast1Minute);
+      sendCustomSensorCommand(_RainmeterSensor->configuration.domoticz.idx,
+                              value);
     }
   }
 }

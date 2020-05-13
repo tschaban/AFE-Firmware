@@ -74,6 +74,15 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processAnalogInput(request);
   }
 #endif
+/* Checking if Battery Meter request */
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  else if (strcmp(request->device, "batterymeter") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing ADC requests");
+#endif
+    processBatteryMeter(request);
+  }
+#endif
 /* Checking if BMx80 Input request */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   // @TODO change in doc BMX80
@@ -314,6 +323,18 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
+  if (strcmp(request->command, "get") == 0) {
+    char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
+    _AnalogInput->getBatteryMeterJSON(json);
+    send(request, true, json);
+  } else {
+    send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+  }
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIHTTP::addClass(AFESensorBMEX80 *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
@@ -423,12 +444,13 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-
 /* Processing Anemometer Input request */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 /* Adding pointer to Anemometer class */
-void AFEAPIHTTP::addClass(AFESensorAnemometer *AnemometerSensor) { _AnemometerSensor = AnemometerSensor; }
+void AFEAPIHTTP::addClass(AFESensorAnemometer *AnemometerSensor) {
+  _AnemometerSensor = AnemometerSensor;
+}
 
 void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
   if (strcmp(request->command, "get") == 0) {
@@ -444,7 +466,9 @@ void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
 /* Processing Rain Input request */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 /* Adding pointer to Rainclass */
-void AFEAPIHTTP::addClass(AFESensorRainmeter *RainmeterSensor) { _RainmeterSensor = RainmeterSensor; }
+void AFEAPIHTTP::addClass(AFESensorRainmeter *RainmeterSensor) {
+  _RainmeterSensor = RainmeterSensor;
+}
 
 void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
   if (strcmp(request->command, "get") == 0) {
@@ -456,8 +480,6 @@ void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-
-
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTP::addClass(AFEGate *Item) {

@@ -67,6 +67,11 @@ public:
   void processADC();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void processBatteryMeter();
+  boolean publishBatteryMeterValues();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void processBMEX80(uint8_t *id);
   boolean publishBMx80SensorData(uint8_t id);
@@ -90,10 +95,10 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   void processAnemometerSensor();
   void publishAnemometerSensorData();
-  
+
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR  
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   void processRainSensor();
   void publishRainSensorData();
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
@@ -107,8 +112,6 @@ public:
   void processContactron(uint8_t *id);
   boolean publishContactronState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
-
-
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

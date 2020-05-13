@@ -104,6 +104,10 @@ public:
   void publishADCValues();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void publishBatteryMeterValues();
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
   boolean publishBMx80SensorData(uint8_t id);

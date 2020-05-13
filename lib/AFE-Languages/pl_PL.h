@@ -232,6 +232,13 @@
 #define L_VOLTAGE_CALCULATED "IDX Napięcie przeliczone"
 #define L_RESISTOR "Rezystor"
 #define L_VOLTAGE_DIVIDER "Dzielnik napięcia"
+#define L_ADC_MQTT_TOPIC "Temat MQTT dla informacji z ADC"
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define L_BATTERY_METER "Pomiar naładowania baterii"
+#define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
+#define L_BATTERY_MIN_LEVEL "Minimalny poziom baterii"
+#define L_BATTERY_MAX_LEVEL "Maksymalny poziom baterii"
+#endif
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"

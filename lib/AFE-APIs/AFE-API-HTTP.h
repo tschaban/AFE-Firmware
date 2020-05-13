@@ -131,8 +131,11 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Processing HTTP request for ADC */
   void processAnalogInput(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void processBatteryMeter(HTTPCOMMAND *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

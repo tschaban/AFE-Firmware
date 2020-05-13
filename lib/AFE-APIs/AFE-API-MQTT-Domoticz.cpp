@@ -162,7 +162,8 @@ void AFEAPIMQTTDomoticz::processRequest() {
         /* Processing Gate command*/
         case AFE_DOMOTICZ_DEVICE_GATE:
 #ifdef DEBUG
-          Serial << endl << F("INFO: Domoticz: Found Gate ID: ") << idxCache[i].id;
+          Serial << endl
+                 << F("INFO: Domoticz: Found Gate ID: ") << idxCache[i].id;
           _found = true;
 #endif
 
@@ -236,7 +237,8 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
       idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_RELAY;
 #ifdef DEBUG
       Serial << endl
-             << F(" - added IDX: ") << idxCache[lastIDXChacheIndex].domoticz.idx;
+             << F(" - added IDX: ")
+             << idxCache[lastIDXChacheIndex].domoticz.idx;
 #endif
       lastIDXChacheIndex++;
     }
@@ -253,8 +255,8 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Publishing relay: ") << id
-         << F(", IDX: ") << idxCache[id].domoticz.idx << F(" state");
+         << F("INFO: Publishing relay: ") << id << F(", IDX: ")
+         << idxCache[id].domoticz.idx << F(" state");
 #endif
   boolean publishStatus = false;
   if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
@@ -332,6 +334,21 @@ void AFEAPIMQTTDomoticz::publishADCValues() {
   }
 }
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
+    char value[8];
+    if (_AnalogInput->configuration.battery.domoticz.idx > 0) {
+      sprintf(value, "%-.3f", _AnalogInput->batteryPercentage);
+      generateDeviceValue(json, _AnalogInput->configuration.battery.domoticz.idx,
+                          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
                                                boolean state) {
@@ -569,10 +586,10 @@ void AFEAPIMQTTDomoticz::publishAnemometerSensorData() {
 
     if (_AnemometerSensor->configuration.domoticz.idx > 0) {
 
-      sprintf(value, "0;N;%-.2f;0;?;?", 10*_AnemometerSensor->lastSpeedMS);
+      sprintf(value, "0;N;%-.2f;0;?;?", 10 * _AnemometerSensor->lastSpeedMS);
 
-      generateDeviceValue(
-          json, _AnemometerSensor->configuration.domoticz.idx, value);
+      generateDeviceValue(json, _AnemometerSensor->configuration.domoticz.idx,
+                          value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
   }
@@ -592,10 +609,11 @@ void AFEAPIMQTTDomoticz::publishRainSensorData() {
 
     if (_RainmeterSensor->configuration.domoticz.idx > 0) {
 
-      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour*100,_RainmeterSensor->rainLevelLast1Minute);
+      sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour * 100,
+              _RainmeterSensor->rainLevelLast1Minute);
 
-      generateDeviceValue(
-          json, _RainmeterSensor->configuration.domoticz.idx, value);
+      generateDeviceValue(json, _RainmeterSensor->configuration.domoticz.idx,
+                          value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
   }
@@ -618,7 +636,8 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
       idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_GATE;
 #ifdef DEBUG
       Serial << endl
-             << F(" - added IDX: ") << idxCache[lastIDXChacheIndex].domoticz.idx;
+             << F(" - added IDX: ")
+             << idxCache[lastIDXChacheIndex].domoticz.idx;
 #endif
       lastIDXChacheIndex++;
     }

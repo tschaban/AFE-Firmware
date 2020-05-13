@@ -439,7 +439,8 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Firmware upgrade. Update: ") << upload.filename.c_str();
+             << F("INFO: Firmware upgrade. Update: ")
+             << upload.filename.c_str();
 #endif
 
       uint32_t maxSketchSpace =
@@ -447,7 +448,8 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
       Serial << endl << F("INFO: Sketch size: ") << ESP.getSketchSize();
-      Serial << endl << F("INFO: Free sketch size: ") << ESP.getFreeSketchSpace();
+      Serial << endl
+             << F("INFO: Free sketch size: ") << ESP.getFreeSketchSpace();
       Serial << endl << F("INFO: Max sketch space: ") << maxSketchSpace;
 #endif
 
@@ -671,7 +673,8 @@ void AFEWebServer::listener() {
       Serial << endl
              << endl
              << F("INFO: Automatic logout from the config panel after : ")
-             << Device->configuration.timeToAutoLogOff << F("min. of idle time");
+             << Device->configuration.timeToAutoLogOff
+             << F("min. of idle time");
 #endif
       Device->reboot(AFE_MODE_NORMAL);
     }
@@ -687,7 +690,8 @@ void AFEWebServer::publishHTML(String &page) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Site streaming started. Size : ") << pageSize << F(" ... ");
+         << F("INFO: Site streaming started. Size : ") << pageSize
+         << F(" ... ");
 
   if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
     Serial << endl
@@ -701,9 +705,9 @@ void AFEWebServer::publishHTML(String &page) {
   if (pageSize > size) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Free Memory after sending Header = ")
-           << system_get_free_heap_size() / 1024 << F("kB transfer") << endl
-           << F("INFO: Sending over TCP: ");
+           << F("INFO: Heap size after sending Header: ")
+           << system_get_free_heap_size() / 1024 << F("kB") << endl
+           << F("INFO: Transfering site over TCP: ");
 #endif
     server.send(200, "text/html", page.substring(0, size));
     uint16_t transfered = size;
@@ -1631,6 +1635,31 @@ void AFEWebServer::getAnalogInputData(ADCINPUT *data) {
                                          ? server.arg("x3").toInt()
                                          : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  data->battery.minVoltage =
+      server.arg("lv").length() > 0
+          ? server.arg("lv").toFloat()
+          : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MIN_V;
+
+  data->battery.maxVoltage =
+      server.arg("hv").length() > 0
+          ? server.arg("hv").toFloat()
+          : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (server.arg("bt").length() > 0) {
+    server.arg("bt").toCharArray(data->battery.mqtt.topic,
+                                 sizeof(data->battery.mqtt.topic));
+  } else {
+    data->battery.mqtt.topic[0] = '\0';
+  }
+#else
+  data->battery.domoticz.idx = server.arg("bx").length() > 0 ? server.arg("bx").toInt()
+                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 

@@ -223,7 +223,6 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #endif
 }
 
-
 void AFEDataAccess::createProVersionConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
@@ -333,7 +332,8 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
 }
 void AFEDataAccess::createPasswordConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_PASSWORD_CONFIGURATION;
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_PASSWORD_CONFIGURATION;
 #endif
   PASSWORD PasswordConfiguration;
   PasswordConfiguration.protect = false;
@@ -760,7 +760,8 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 }
 void AFEDataAccess::createFirmwareConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_FIRMWARE_CONFIGURATION;
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_FIRMWARE_CONFIGURATION;
 #endif
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
@@ -991,7 +992,8 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 }
 void AFEDataAccess::createNetworkConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_NETWORK_CONFIGURATION;
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_NETWORK_CONFIGURATION;
 #endif
 
   NETWORK networkConfiguration;
@@ -2212,7 +2214,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
     for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
          i++) {
 #ifdef DEBUG
-      Serial << endl << F("INFO: Creating file: cfg-switch-") << i << F(".json");
+      Serial << endl
+             << F("INFO: Creating file: cfg-switch-") << i << F(".json");
 #endif
       SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
       saveConfiguration(i, &SwitchConfiguration);
@@ -2266,6 +2269,20 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
       configuration->divider.Ra = root["divider"]["Ra"];
       configuration->divider.Rb = root["divider"]["Rb"];
 #ifdef DEBUG
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+      configuration->battery.maxVoltage =
+          root["batteryMeter"]["maxV"].as<float>();
+      configuration->battery.minVoltage =
+          root["batteryMeter"]["minV"].as<float>();
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      sprintf(configuration->battery.mqtt.topic, root["batteryMeter"]["mqttTopic"] | "");
+#else
+      configuration->battery.domoticz.idx =
+          root["batteryMeter"]["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_ADC
              << F(", actual JSON size: ") << jsonBuffer.size();
@@ -2314,6 +2331,10 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
 #endif
     JsonObject &divider = root.createNestedObject("divider");
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+    JsonObject &battery = root.createNestedObject("batteryMeter");
+#endif
+
     root["gpio"] = configuration->gpio;
     root["interval"] = configuration->interval;
     root["numberOfSamples"] = configuration->numberOfSamples;
@@ -2325,9 +2346,20 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
     idx["percent"] = configuration->domoticz.percent;
     idx["voltage"] = configuration->domoticz.voltage;
     idx["voltageCalculated"] = configuration->domoticz.voltageCalculated;
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
     divider["Ra"] = configuration->divider.Ra;
     divider["Rb"] = configuration->divider.Rb;
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+    battery["maxV"] = configuration->battery.maxVoltage;
+    battery["minV"] = configuration->battery.minVoltage;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    battery["mqttTopic"] = configuration->battery.mqtt.topic;
+#else
+    battery["idx"] = configuration->battery.domoticz.idx;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -2363,7 +2395,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
       AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
   AnalogInputConfiguration.maxVCC = AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  sprintf(AnalogInputConfiguration.mqtt.topic, "analog");
+  AnalogInputConfiguration.mqtt.topic[0] = '\0';
 #else
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
@@ -2372,9 +2404,22 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif
   AnalogInputConfiguration.divider.Ra = 0;
   AnalogInputConfiguration.divider.Rb = 0;
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  AnalogInputConfiguration.battery.minVoltage =
+      AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MIN_V;
+  AnalogInputConfiguration.battery.maxVoltage =
+      AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  AnalogInputConfiguration.battery.mqtt.topic[0] = '\0';
+#else
+  AnalogInputConfiguration.battery.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
   saveConfiguration(&AnalogInputConfiguration);
 }
-#endif
+#endif //  AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 DS18B20 AFEDataAccess::getSensorConfiguration() {
@@ -2650,7 +2695,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
        i++) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Creating file: cfg-contactron-") << i << F(".json");
+    Serial << endl
+           << F("INFO: Creating file: cfg-contactron-") << i << F(".json");
 #endif
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
     saveConfiguration(i, ContactronConfiguration);
@@ -3150,7 +3196,8 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #endif
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Creating file: cfg-hpma115s0-") << i << F(".json");
+    Serial << endl
+           << F("INFO: Creating file: cfg-hpma115s0-") << i << F(".json");
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.mqtt.topic, "HPMA115S0/%d", i + 1);
@@ -4106,7 +4153,8 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
 void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION;
+         << F("INFO: Creating file: ")
+         << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION;
 #endif
   ANEMOMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
@@ -4251,7 +4299,8 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 void AFEDataAccess::createRainmeterSensorConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION;
+         << F("INFO: Creating file: ")
+         << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION;
 #endif
   RAINMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_BOUNCING;
