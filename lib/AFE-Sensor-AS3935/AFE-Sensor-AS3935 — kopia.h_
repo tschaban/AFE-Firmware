@@ -11,8 +11,9 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-I2C-Scanner.h>
+#include <SparkFun_AS3935.h>
+#include <Wire.h>
 
-#include <AS3935.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -21,9 +22,10 @@
 class AFESensorAS3935 {
 
 private:
-  AS3935Sensor AS3935LightingSensor;
+  SparkFun_AS3935 AS3935Sensor;
 
   boolean ready = false;
+  void increaseNoiseLevel();
 
 public:
   AS3935 configuration;

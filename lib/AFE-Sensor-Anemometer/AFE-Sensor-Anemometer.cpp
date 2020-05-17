@@ -72,7 +72,7 @@ boolean AFESensorAnemometer::listener(void) {
 
       lastSpeedMS =
           ((noOfImpulses * (oneImpulseDistanceCM / 100) * 1000) / duration);
-      lastSpeedKMH = lastSpeedMS * 36 / 10;
+      lastSpeedKMH = lastSpeedMS * 18 / 5;
 
 #ifdef DEBUG
       Serial << endl

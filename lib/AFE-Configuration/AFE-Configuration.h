@@ -301,7 +301,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.0.B3"
+#define AFE_FIRMWARE_VERSION "2.3.0.B4"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */

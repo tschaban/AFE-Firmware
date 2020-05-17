@@ -538,7 +538,7 @@ void loop() {
 /* Debug information */
 #if defined(DEBUG)
   if (Device.getMode() == AFE_MODE_NORMAL) {
-    debugListener();
+  //  debugListener();
   }
 #endif
 }
