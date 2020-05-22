@@ -24,9 +24,12 @@ private:
   AS3935Sensor AS3935LightingSensor;
 
   boolean ready = false;
+  
 
 public:
   AS3935 configuration;
+
+  uint8_t test = 0;
 
   /* Stories information about the distance to the storm */
   uint8_t distance;

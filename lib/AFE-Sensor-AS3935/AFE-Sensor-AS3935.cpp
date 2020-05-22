@@ -9,8 +9,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
   Data.getConfiguration(id, &configuration);
   I2CPORT I2C;
   Data.getConfiguration(&I2C);
-  boolean _initialize = false;
-
+  test = 2;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
@@ -88,17 +87,15 @@ boolean AFESensorAS3935::begin(uint8_t id) {
              << "INFO: AS3935: Frequency division ration for antenna tuning: "
              << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
 
-#endif
+      Serial << endl << endl << "INFO: AS3935 Configuring the sensor";
 
-// AS3935LightingSensor.setDefault();
+#endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: AS3935 Calibrates the internal RC Oscillators "
-                  "automatically");
+      Serial << endl << " - resetting to defalut values";
 #endif
 
-      //  AS3935LightingSensor.calibrateRCO();
+      AS3935LightingSensor.setDefautSettings();
 
       AS3935LightingSensor.setIndoor(configuration.indoor);
 
@@ -108,7 +105,46 @@ boolean AFESensorAS3935::begin(uint8_t id) {
 
       AS3935LightingSensor.setMinimumNumberOfLightning(
           configuration.minimumNumberOfLightningSpikes);
-      _initialize = true;
+
+      AS3935LightingSensor.setSpikeRejection(
+          configuration.spikesRejectionLevel);
+
+      AS3935LightingSensor.setWatchdogThreshold(
+          configuration.watchdogThreshold);
+
+      AS3935LightingSensor.calibrateInternalRSOscillators();
+
+      AS3935LightingSensor.setFrequencyDivisionForAntennaTuning(16);
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: AS3935: AFE Gain: ")
+             << (AS3935LightingSensor.isIndoor()
+                     ? "Indoor"
+                     : AS3935LightingSensor.isOutdoor() ? "Outdoor"
+                                                        : "Unknown");
+
+      Serial << endl
+             << "INFO: AS3935: Minimum Number Of Lightning: "
+             << AS3935LightingSensor.readMinimumNumberOfLightning();
+      Serial << endl
+             << "INFO: AS3935: Noise Floor Level: "
+             << AS3935LightingSensor.readNoiseFloorLevel();
+      Serial << endl
+             << "INFO: AS3935: Spike rejection: "
+             << AS3935LightingSensor.readSpikeRejection();
+      Serial << endl
+             << "INFO: AS3935: Watchdog threshold: "
+             << AS3935LightingSensor.readWatchdogThreshold();
+      Serial << endl
+             << "INFO: AS3935: Mask Disturber: "
+             << AS3935LightingSensor.readMaskDisturber();
+      Serial << endl
+             << "INFO: AS3935: Frequency division ration for antenna tuning: "
+             << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
+
+#endif
+
     }
 #ifdef DEBUG
     else {
@@ -123,8 +159,6 @@ boolean AFESensorAS3935::begin(uint8_t id) {
     Serial << endl << F("ERROR: Address not set");
   }
 #endif
-
-  return _initialize;
 }
 
 void AFESensorAS3935::interruptionReported() {
@@ -167,21 +201,22 @@ void AFESensorAS3935::interruptionReported() {
   default:
     ready = false;
 #ifdef DEBUG
-// Serial << F("?") << endl << F("WARN: AS3935: Unknown interruption!");
+// Serial << F("?") << endl << F("WARN: AS3935: Unknown interruption: ") <<
+// eventType;
 #endif
   }
 }
 
 boolean AFESensorAS3935::strikeDetected() {
 
-  if (digitalRead(configuration.irqGPIO) == HIGH) {
+// if (digitalRead(configuration.irqGPIO) == HIGH) {
 
 #ifdef DEBUG
 // Serial << endl << F("INFO: AS3935: Interuption");
 #endif
 
-    interruptionReported();
-  }
+  interruptionReported();
+  // }
 
   if (ready) {
     ready = false;

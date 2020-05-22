@@ -349,7 +349,7 @@
 #define L_AS3935_SENSOR "AS3935 Sensor"
 #define L_NOISE_FLOOR "Noise floor level"
 #define L_NOISE_FLOOR_HINT "(0-low, 7-high)"
-#define L_WATCHDOG_THRESHOLD "Detection quality"
+#define L_WATCHDOG_THRESHOLD "Sensitiveness"
 #define L_WATCHDOG_THRESHOLD_HINT "(1-low, 10-high)"
 #define L_SPIKES_REJECTION "Spikes rejections level"
 #define L_SPIKES_REJECTION_HINT "(1-low, 11-high)"
