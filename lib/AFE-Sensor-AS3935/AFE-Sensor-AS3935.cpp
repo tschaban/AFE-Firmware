@@ -166,7 +166,7 @@ void AFESensorAS3935::interruptionReported() {
   distance = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE;
 
 #ifdef DEBUG
-// Serial << endl << F("INFO: AS3935, Reading event type ");
+ Serial << endl << F("INFO: AS3935, Reading event type ");
 #endif
   eventType = AS3935LightingSensor.readIntrruptReason();
   switch (eventType) {
@@ -201,22 +201,25 @@ void AFESensorAS3935::interruptionReported() {
   default:
     ready = false;
 #ifdef DEBUG
-// Serial << F("?") << endl << F("WARN: AS3935: Unknown interruption: ") <<
-// eventType;
+ Serial << F("?") << endl << F("WARN: AS3935: Unknown interruption: ") <<
+ eventType;
 #endif
   }
 }
 
 boolean AFESensorAS3935::strikeDetected() {
-
-// if (digitalRead(configuration.irqGPIO) == HIGH) {
+/*
+if (digitalRead(configuration.irqGPIO) == HIGH) {
 
 #ifdef DEBUG
 // Serial << endl << F("INFO: AS3935: Interuption");
 #endif
 
   interruptionReported();
-  // }
+ }
+*/
+
+//interruptionReported();
 
   if (ready) {
     ready = false;

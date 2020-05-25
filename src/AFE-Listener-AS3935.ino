@@ -13,8 +13,6 @@ void ICACHE_RAM_ATTR handleAS3935Interraption() {
   Serial << endl << F("INFO: AS3935, IRQ triggered");
 #endif
   AS3935Intrrupted = true;
- // AS3935Sensor[0].interruptionReported();
- // Serial << endl << "1 . test=" << AS3935Sensor[0].test;
 }
 
 /* Initializing the sensor */
@@ -26,8 +24,9 @@ void initializeAS3935Sensor() {
              << F("INFO: AS3935, Attaching interupt on GPIO")
              << AS3935Sensor[0].configuration.irqGPIO;
 #endif
-  //    attachInterrupt(AS3935Sensor[0].configuration.irqGPIO,
-    //                  handleAS3935Interraption, RISING);
+
+      attachInterrupt(AS3935Sensor[0].configuration.irqGPIO,
+                      handleAS3935Interraption, RISING);
     }
   }
 }
@@ -35,15 +34,17 @@ void initializeAS3935Sensor() {
 /* Main code for processing sensor */
 void AS3935SensorEventsListener() {
   if (Device.configuration.noOfAS3935s > 0) {
-    /*
-       if (AS3935Intrrupted) {
-   #ifdef DEBUG
-     Serial << endl << F("INFO: AS3935, Processing event");
-   #endif
-         AS3935Sensor[0].interruptionReported();
-         AS3935Intrrupted=false;
-       }
-   */
+
+    // AS3935Sensor[0].interruptionReported();
+
+    if (AS3935Intrrupted) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: AS3935, Processing event");
+#endif
+      AS3935Sensor[0].interruptionReported();
+      AS3935Intrrupted = false;
+    }
+
     if (AS3935Sensor[0].strikeDetected()) {
       MqttAPI.publishAS3935SensorData(0);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
