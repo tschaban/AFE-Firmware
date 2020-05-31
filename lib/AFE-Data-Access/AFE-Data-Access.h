@@ -32,7 +32,7 @@ private:
 
 public:
   AFEDataAccess();
-  
+
   /* It formats SPIFFS */
   boolean formatFileSystem();
 
@@ -76,7 +76,6 @@ public:
   void saveConfiguration(uint8_t id, RELAY configuration);
   void createRelayConfigurationFile();
 
-
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -117,8 +116,9 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  DS18B20 getSensorConfiguration();
-  void saveConfiguration(DS18B20 configuration);
+  DS18B20 getDS18B20SensorConfiguration(uint8_t id);
+  void saveConfiguration(uint8_t id, DS18B20 *);
+  void createDS18B20SensorConfigurationFile(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -182,7 +182,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   BH1750 getBH1750SensorConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, BH1750 configuration);
-       
+
   void createBH1750SensorConfigurationFile();
 #endif
 

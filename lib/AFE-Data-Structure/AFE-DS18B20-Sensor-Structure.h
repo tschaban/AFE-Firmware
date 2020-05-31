@@ -9,16 +9,27 @@
 #include "WProgram.h"
 #endif
 
-#define UNIT_CELCIUS 0
-#define UNIT_FAHRENHEIT 1
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#include <AFE-DOMOTICZ-Structure.h>
+#endif
+#include <AFE-MQTT-Structure.h>
+
 
 struct DS18B20 {
+  char name[17];
   uint8_t gpio;
+  uint8_t address;
   float correction;
   uint32_t interval;
   uint8_t unit;
   boolean sendOnlyChanges;
-  unsigned long idx;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
+
 };
 
 #endif

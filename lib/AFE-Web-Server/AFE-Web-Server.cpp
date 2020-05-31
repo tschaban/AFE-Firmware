@@ -137,6 +137,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig) {
     Site.addAS3935Configuration(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  case AFE_CONFIG_SITE_DS18B20:
+    Site.addDS18B20Configuration(page, siteConfig->deviceID);
+    break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
@@ -170,16 +175,16 @@ void AFEWebServer::generate(boolean upload) {
     return;
   }
 
-    if (_refreshConfiguration) {
-      _refreshConfiguration = false;
-      Device->begin();
-    }
+  if (_refreshConfiguration) {
+    _refreshConfiguration = false;
+    Device->begin();
+  }
 
-    AFE_SITE_PARAMETERS siteConfig;
+  AFE_SITE_PARAMETERS siteConfig;
 
-    siteConfig.ID = getSiteID();
-    uint8_t command = getCommand();
-    siteConfig.deviceID = getID();
+  siteConfig.ID = getSiteID();
+  uint8_t command = getCommand();
+  siteConfig.deviceID = getID();
 
   if (!upload) {
 
@@ -295,6 +300,13 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       case AFE_CONFIG_SITE_AS3935:
         Data.saveConfiguration(siteConfig.deviceID, getAS3935SensorData());
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+      case AFE_CONFIG_SITE_DS18B20:
+        DS18B20 ds18B20Configuration;
+        get(ds18B20Configuration);
+        Data.saveConfiguration(siteConfig.deviceID, &ds18B20Configuration);
         break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -695,7 +707,9 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  data.noOfLEDs = server.arg("l").length() > 0 ? server.arg("l").toInt() : 0;
+  data.noOfLEDs = server.arg("l").length() > 0
+                      ? server.arg("l").toInt()
+                      : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -708,16 +722,21 @@ DEVICE AFEWebServer::getDeviceData() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  data.noOfRelays = server.arg("r").length() > 0 ? server.arg("r").toInt() : 0;
+  data.noOfRelays = server.arg("r").length() > 0
+                        ? server.arg("r").toInt()
+                        : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  data.noOfSwitches =
-      server.arg("s").length() > 0 ? server.arg("s").toInt() : 0;
+  data.noOfSwitches = server.arg("s").length() > 0
+                          ? server.arg("s").toInt()
+                          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  data.isDS18B20 = server.arg("ds").length() > 0 ? true : false;
+  data.noOfDS18B20s = server.arg("ds").length() > 0
+                          ? server.arg("ds").toInt()
+                          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -804,8 +823,7 @@ NETWORK AFEWebServer::getNetworkData() {
     data.waitTimeSeries = server.arg("ws").toInt();
   }
 
-  if (server.arg("d").length() > 0 ||
-      (server.arg("d").length() == 0 && server.arg("ws").length() == 0)) {
+  if (server.arg("d").length() > 0) {
     data.isDHCP = true;
   } else {
     data.isDHCP = false;
@@ -1167,33 +1185,47 @@ uint8_t AFEWebServer::getSystemLEDData() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-DS18B20 AFEWebServer::getDS18B20Data() {
-  DS18B20 data;
+void AFEWebServer::get(DS18B20 &data) {
 
-  if (server.arg("g").length() > 0) {
-    data.gpio = server.arg("g").toInt();
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = '\0';
   }
 
-  if (server.arg("c").length() > 0) {
-    data.correction = server.arg("c").toFloat();
-  }
+  data.address = server.arg("a").length() > 0
+                     ? server.arg("a").toInt()
+                     : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_ADDRESS;
 
-  if (server.arg("i").length() > 0) {
-    data.interval = server.arg("i").toInt();
-  }
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_GPIO;
 
-  if (server.arg("u").length() > 0) {
-    data.unit = server.arg("u").toInt();
-  }
+  data.correction =
+      server.arg("k").length() > 0
+          ? server.arg("k").toFloat()
+          : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_TEMPERATURE_CORRECTION;
 
-  server.arg("o").length() > 0 ? data.sendOnlyChanges = true
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_INTERVAL;
+
+  data.unit = server.arg("u").length() > 0 ? server.arg("u").toInt()
+                                           : AFE_TEMPERATURE_UNIT_CELSIUS;
+
+  server.arg("s").length() > 0 ? data.sendOnlyChanges = true
                                : data.sendOnlyChanges = false;
 
-  if (server.arg("x").length() > 0) {
-    data.idx = server.arg("x").toInt();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = '\0';
   }
-
-  return data;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 
 #endif

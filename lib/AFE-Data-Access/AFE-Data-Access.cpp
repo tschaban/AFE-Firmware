@@ -404,7 +404,8 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       configuration.noOfHPMA115S0s =
-          root["noOfHPMA115S0s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
+          root["noOfHPMA115S0s"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -415,6 +416,11 @@ DEVICE AFEDataAccess::getDeviceConfiguration() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       configuration.noOfAS3935s =
           root["noOfAS3935s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+      configuration.noOfDS18B20s =
+          root["noOfDS18B20s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
 #ifdef DEBUG
@@ -505,6 +511,11 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     root["noOfAS3935s"] = configuration->noOfAS3935s;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    root["noOfDS18B20s"] = configuration->noOfDS18B20s;
+#endif
+
 
     root.printTo(configFile);
 
@@ -616,6 +627,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   deviceConfiguration.noOfAS3935s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  deviceConfiguration.noOfDS18B20s =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -2347,24 +2363,155 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-DS18B20 AFEDataAccess::getSensorConfiguration() {
+DS18B20 AFEDataAccess::getDS18B20SensorConfiguration(uint8_t id) {
   DS18B20 configuration;
-  configuration.gpio = Eeprom.readUInt8(370);
-  configuration.correction = Eeprom.read(371, 5).toFloat();
-  configuration.interval = Eeprom.read(376, 5).toInt();
-  configuration.unit = Eeprom.readUInt8(381);
-  configuration.sendOnlyChanges = Eeprom.read(446);
-  configuration.idx = Eeprom.read(936, 6).toInt();
+
+  char fileName[20];
+  sprintf(fileName, "/cfg-ds18b20-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: JSON: ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DS18B20> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration.name, root["name"]);
+      configuration.address = root["address"];
+      configuration.gpio = root["gpio"];
+      configuration.correction = root["correction"];
+      configuration.interval = root["interval"];
+      configuration.unit = root["unit"];
+      configuration.sendOnlyChanges = root["sendOnlyChanges"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DS18B20
+             << ", actual JSON size: " << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_DS18B20 < jsonBuffer.size() + 10) {
+        Serial << endl << "WARN: Too small buffer size";
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << "ERROR: JSON not pharsed";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << "ERROR: Configuration file: " << fileName << " not opened";
+  }
+#endif
+
   return configuration;
 }
-void AFEDataAccess::saveConfiguration(DS18B20 configuration) {
-  Eeprom.writeUInt8(370, configuration.gpio);
-  Eeprom.write(371, 5, (float)configuration.correction);
-  Eeprom.write(376, 5, (long)configuration.interval);
-  Eeprom.writeUInt8(381, configuration.unit);
-  Eeprom.write(446, configuration.sendOnlyChanges);
-  Eeprom.write(936, 6, (long)configuration.idx);
+void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
+
+  char fileName[20];
+  sprintf(fileName, "/cfg-ds18b20-%d.json", id);
+
+#ifdef DEBUG
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: Writing JSON: ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DS18B20> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["name"] = configuration->name;
+    root["address"] = configuration->address;
+    root["gpio"] = configuration->gpio;
+    root["correction"] = configuration->correction;
+    root["interval"] = configuration->interval;
+    root["unit"] = configuration->unit;
+    root["sendOnlyChanges"] = configuration->sendOnlyChanges;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    root["idx"] = configuration->domoticz.idx;
+#endif
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: Data saved" << endl
+           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DS18B20
+           << ", actual JSON size: " << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_DS18B20 < jsonBuffer.size() + 10) {
+      Serial << endl << "WARN: Too small buffer size";
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "ERROR: failed to open file for writing";
+  }
+#endif
 }
+
+void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
+  DS18B20 configuration;
+
+  configuration.gpio = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_GPIO;
+  configuration.correction =
+      AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_TEMPERATURE_CORRECTION;
+  configuration.interval = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_INTERVAL;
+  configuration.address = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_ADDRESS;
+  configuration.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
+  configuration.sendOnlyChanges =
+      AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_SENDING_ONLY_CHANGES;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Creating file: /cfg-ds18b20-" << i << ".json";
+#endif
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    configuration.mqtt.topic[0] = '\0';
+#endif
+    sprintf(configuration.name, "DS18B20-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -3018,10 +3165,12 @@ HPMA115S0 AFEDataAccess::getHPMA115S0SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.timeToMeasure = root["timeToMeasure"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.pm25.idx = root["idx"]["pm25"]| AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.pm10.idx = root["idx"]["pm10"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pm25.idx =
+          root["idx"]["pm25"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pm10.idx =
+          root["idx"]["pm10"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
       sprintf(configuration.name, root["name"]);
 
@@ -3385,17 +3534,26 @@ BMEX80 AFEDataAccess::getBMEX80SensorConfiguration(uint8_t id) {
           root["idx"]["temperatureHumidityPressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.temperatureHumidity.idx =
           root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.gasResistance.idx = root["idx"]["gasResistance"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.temperature.idx = root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.humidity.idx = root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.pressure.idx = root["idx"]["pressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.gasResistance.idx =
+          root["idx"]["gasResistance"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.temperature.idx =
+          root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.humidity.idx =
+          root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.pressure.idx =
+          root["idx"]["pressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.relativePressure.idx =
           root["idx"]["relativePressure"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.dewPoint.idx = root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.heatIndex.idx = root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.iaq.idx = root["idx"]["iaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.staticIaq.idx = root["idx"]["staticIaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration.domoticz.co2Equivalent.idx = root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.dewPoint.idx =
+          root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.heatIndex.idx =
+          root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.iaq.idx =
+          root["idx"]["iaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.staticIaq.idx =
+          root["idx"]["staticIaq"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.co2Equivalent.idx =
+          root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration.domoticz.breathVocEquivalent.idx =
           root["idx"]["breathVocEquivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3589,9 +3747,9 @@ BH1750 AFEDataAccess::getBH1750SensorConfiguration(uint8_t id) {
       configuration.interval = root["interval"];
       configuration.i2cAddress = root["i2cAddress"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -3734,9 +3892,9 @@ AS3935 AFEDataAccess::getAS3935SensorConfiguration(uint8_t id) {
       configuration.indoor = root["indoor"];
       configuration.unit = root["unit"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"]| AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"]|"");
+      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
 #endif
 
 #ifdef DEBUG

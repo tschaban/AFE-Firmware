@@ -234,10 +234,22 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 
 /* Sensor DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  if (Device->configuration.isDS18B20) {
-    page += "<li class=\"itm\"><a href=\"\\?o=ds18b20\">";
-    page += language == 0 ? "Czujnik temperatury" : "Temperature sensor";
-    page += "</a></li>";
+  if (Device->configuration.noOfDS18B20s > 0) {
+    page += "<li  class=\"itm\"><a><i>";
+    page += L_DS18B20_SENSORS;
+    page += "</i></a></li>";
+
+    for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
+      page += "<li class=\"itm\"><a href=\"\\?o=";
+      page += AFE_CONFIG_SITE_DS18B20;
+      page += "&i=";
+      page += i;
+      page += "\">&#8227; ";
+      page += L_SENSOR;
+      page += ": ";
+      page += i + 1;
+      page += "</a></li>";
+    }
   }
 #endif
 
@@ -446,11 +458,9 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  body += "<div class=\"cc\"><label><input name =\"ds\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.isDS18B20 ? " checked=\"checked\">" : ">";
-  body += " DS18B20";
-  body += "</label></div>";
+  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
+                            Device->configuration.noOfDS18B20s, "ds",
+                            L_NUMBER_OF_DS18B20_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -957,7 +967,7 @@ void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  if (Device->isDS18B20)
+  if (Device->configuration.noOfDS18B20s > 0)
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -1209,84 +1219,85 @@ void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-String AFESitesGenerator::addDS18B20Configuration() {
+void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
+  DS18B20 configuration = Data.getDS18B20SensorConfiguration(id);
 
-  DS18B20 configuration = Data.getSensorConfiguration();
-  DEVICE device = Data.getDeviceConfiguration();
-
-  String body = "<fieldset>";
-  body += generateConfigParameter_GPIO("g", configuration.gpio);
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label>";
-  body += "<input name=\"in\" min=\"5\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\">";
-  body += "<span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 5 do 86400sek"
-                        : "seconds. Range: 5 to 86400sec";
-  body += " (24h)</span>";
-  body += "</div>";
-
-  body += "<div class=\"cc\"><label><input name=\"o\" type=\"checkbox\" "
-          "value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body += language == 0
-              ? ">Wysyłać dane tylko, gdy wartość temperatury zmieni się"
-              : ">Send data only if value of temperature has changed";
-  body += "</label>";
-  body += "</div>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Korekta wartości o" : "Temperature correction";
-  body += "</label><input name=\"c\" type=\"number\" min=\"-9.99\" "
-          "max=\"9.99\" "
-          "step=\"0.01\" "
-          "value=\"";
-  body += configuration.correction;
-  body += "\">";
-  body += "<span class=\"hint\">";
-  body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99 - +9.99</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Jednostka" : "Unit";
-  body += "</label><select name=\"u\"><option value=\"0\"";
-  body += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
-  body += language == 0 ? "Celsjusz" : "Celsius";
-  body += "</option>option value=\"1\"";
-  body += (configuration.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">Fahrenheit</option></select></div></fieldset>";
-
-  String page =
-      addConfigurationBlock(language == 0 ? "Czujnik temperatury DS18B20"
-                                          : "DS18B20 temperature sensor",
-                            "", body);
-
-  if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
-    body += "<div class=\"cf\">";
-    body += "<label>IDX</label>";
-    body += "<input name=\"x\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.idx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-    body += "</fieldset>";
-    page += addConfigurationBlock(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
+  AFESensorDS18B20 DS18B20Sensor;
+  DS18B20Sensor.scan(configuration.gpio);
+   addConfigurationBlock(page, L_DS18B20_SENSOR, "");
+  page += "<fieldset>";
+  generateConfigParameter_GPIO(page, "g", configuration.gpio);
+  page += "<div class=\"cf\"><label>";
+  page += L_ADDRESS;
+  page += ": </label><select name=\"a\">";
+  page += "<option value=\"0\"";
+  page += configuration.address == 0 ? " selected=\"selected\"" : "";
+  page += ">";
+  page += L_NONE;
+  page += "</option>";
+ /*
+  for (uint8_t index = 0; index < DS18B20Sensor.numberOfDevicesOnBus; index++) {
+    page += "<option value=\"";
+    page += DS18B20Sensor.addressesOfScannedItems[index];
+    page += "\"";
+    page += DS18B20Sensor.addressesOfScannedItems[index] == configuration.address
+                ? " selected=\"selected\""
+                : "";
+    page += ">0x";
+    page += String(DS18B20Sensor.addressesOfScannedItems[index], HEX);
+    page += "</option>";
   }
-  return page;
+  */
+  page += "</select></div>";
+
+  addItem(page, "text", "n", L_NAME, configuration.name, "16");
+
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+
+  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
+          "86400", "1", L_SECONDS);
+
+  page += "<div class=\"cc\"><label><input name=\"s\" type=\"checkbox\" "
+          "value=\"1\"";
+  page += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
+  page += ">";
+  page += L_DS18B20_SENT_ONLY_CHANGES;
+  page += "</label>";
+  page += "</div>";
+
+  sprintf(_number, "%-.2f", configuration.correction);
+  addItem(page, "number", "k", L_DS18B20_TEMPERATURE_CORRECTION, _number, "?",
+          "-100.99", "100.99", "0.01");
+
+  page += "<div class=\"cf\"><label>";
+  page += L_UNITS;
+  page += "</label><select name=\"u\"><option value=\"0\"";
+  page += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
+  page += "C";
+  page += "</option><option value=\"1\"";
+  page += (configuration.unit == 1 ? " selected=\"selected\"" : "");
+  page += ">F</option></select></div>";
+
+  page += "</fieldset></div>";
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
+    page += "<fieldset>";
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
+    page += "</fieldset></div>";
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    addConfigurationBlock(page, L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    page += "<fieldset>";
+    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
+    page += "</fieldset></div>";
+  }
+#endif
 }
 #endif
 
@@ -1804,7 +1815,7 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
       addItem(page, "number", "z", "IDX Start/Stop", _idx, "?", "0", "999999",
               "1");
     }
-    
+
     sprintf(_idx, "%d", gateConfiguration.domoticz.idx);
     addItem(page, "number", "x", L_IDX_GATE_STATE, _idx, "?", "0", "999999",
             "1");
@@ -1970,7 +1981,7 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
 
     /* Corrections of sensor values */
     addConfigurationBlock(page, L_CORRECTIONS, "");
-        page += "<fieldset>";
+    page += "<fieldset>";
     sprintf(_number, "%-.3f", configuration.temperature.correction);
     addItem(page, "number", "tc", L_TEMPERATURE, _number, "?", "-99.999",
             "99.999", "0.001");
@@ -2491,7 +2502,8 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 #else
     page += "1Mb";
 #endif
-    page += "-yellowgreen.svg\" /> <img src=\"https://img.shields.io/badge/API-";
+    page +=
+        "-yellowgreen.svg\" /> <img src=\"https://img.shields.io/badge/API-";
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     page += "Domoticz";
 #else

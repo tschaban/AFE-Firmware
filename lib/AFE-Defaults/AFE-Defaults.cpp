@@ -100,65 +100,7 @@ void AFEDefaults::set() {
 
 /* DS18B20 presence */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-    deviceConfiguration.isDS18B20 = false;
-#endif
-
-/* DHxx presence */
-#ifdef AFE_CONFIG_HARDWARE_DHXX
-    deviceConfiguration.isDHT = false;
-#endif
-
-/* PIR */
-#if defined(T3_CONFIG)
-    for (uint8_t i = 1; i < sizeof(deviceConfiguration.isPIR); i++) {
-      deviceConfiguration.isPIR[i] = false;
-    }
-#endif
-
-/* Regulator config */
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-    RegulatorConfiguration.enabled = false;
-    RegulatorConfiguration.turnOn = 0;
-    RegulatorConfiguration.turnOnAbove = false;
-    RegulatorConfiguration.turnOff = 0;
-    RegulatorConfiguration.turnOffAbove = true;
-#endif
-
-/* Thermostat configuration */
-#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                             \
-    defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
-    Data->saveConfiguration(RegulatorConfiguration, THERMOSTAT_REGULATOR);
-#endif
-
-/* Hunidistat confiuration */
-#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) &&                             \
-    defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
-    Data->saveConfiguration(RegulatorConfiguration, HUMIDISTAT_REGULATOR);
-#endif
-
-/* DS18B20 or DHTxx Sensor configuration */
-#if defined(AFE_CONFIG_HARDWARE_DHXX) || defined(AFE_CONFIG_HARDWARE_DS18B20)
-    SensorConfiguration.gpio = 14;
-    SensorConfiguration.sendOnlyChanges = true;
-    SensorConfiguration.interval = 60;
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-    SensorConfiguration.correction = 0;
-    SensorConfiguration.unit = 0;
-    SensorConfiguration.idx = 0;
-#else
-    SensorConfiguration.gpio = 2;
-    SensorConfiguration.type = 1;
-    SensorConfiguration.temperature.correction = 0;
-    SensorConfiguration.humidity.correction = 0;
-    SensorConfiguration.temperature.unit = 0;
-    SensorConfiguration.publishHeatIndex = false;
-    SensorConfiguration.publishDewPoint = false;
-    SensorConfiguration.temperatureIdx = 0;
-    SensorConfiguration.humidityIdx = 0;
-    SensorConfiguration.temperatureAndHumidityIdx = 0;
-#endif
-
-    Data->saveConfiguration(SensorConfiguration);
+    Data->createDS18B20SensorConfigurationFile();
 #endif
 
 #if defined(T3_CONFIG)

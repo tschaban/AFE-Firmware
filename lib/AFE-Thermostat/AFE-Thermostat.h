@@ -11,6 +11,9 @@
 #include "WProgram.h"
 #endif
 
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+
 #include <AFE-Data-Access.h>
 
 class AFEThermostat {
@@ -52,4 +55,6 @@ public:
   void toggle();
 };
 
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+
+#endif 

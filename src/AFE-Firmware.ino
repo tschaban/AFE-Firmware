@@ -54,7 +54,7 @@ AFELED Led;
 /* T1 Set up, DS18B20 sensor */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
-AFESensorDS18B20 Sensor;
+AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #endif
 
 /* T2 Setup, DHxx sensor */
@@ -298,12 +298,9 @@ void setup() {
     initializeGate();
 #endif
 
-/* Initializing DS18B20 or DHTxx sensor */
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
-    initalizeSensor();
-#ifdef DEBUG
-    Serial << endl << "Sensors initialized";
-#endif
+/* Initializing DS18B20  */
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    initializeDS18B20Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -418,9 +415,8 @@ void loop() {
         gateEventsListener();
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
-        /* Sensor: DS18B20 or DHT related code */
-        mainSensor();
+#if defined(AFE_CONFIG_HARDWARE_DS18B20)
+        //DS18B20SensorEventsListener();
 #endif
 
 /* Sensor: HPMA115S0 related code  */

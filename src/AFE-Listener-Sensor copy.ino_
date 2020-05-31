@@ -4,7 +4,7 @@
 /* Initializing sensor */
 void initalizeSensor() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  if (Device.configuration.isDS18B20) {
+  if (Device.configuration.noOfDS18B20s > 0) {
     Sensor.begin();
   }
 #endif

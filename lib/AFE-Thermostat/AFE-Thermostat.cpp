@@ -1,8 +1,9 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
   
-
 #include "AFE-Thermostat.h"
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 
 AFEThermostat::AFEThermostat(){};
 
@@ -60,3 +61,5 @@ void AFEThermostat::enable(boolean state) {
   AFEDataAccess Data;
   Data.saveRegulatorState(state, THERMOSTAT_REGULATOR);
 }
+
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT

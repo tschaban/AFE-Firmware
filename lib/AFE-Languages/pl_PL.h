@@ -369,8 +369,16 @@
 #define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif
 
-/* I2C */
-#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#define L_DS18B20_SENSOR "Czujnik temperatury DS18B20"
+#define L_DS18B20_SENSORS "Czujniki DS18B20"
+#define L_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
+#define L_DS18B20_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury zmieni się"
+#define L_DS18B20_TEMPERATURE_CORRECTION "Korekta wartości o"
+#endif
+
+/* I2C or DS18B20 */
+#if defined(AFE_CONFIG_HARDWARE_I2C) || defined(AFE_CONFIG_HARDWARE_DS18B20)
 #define L_ADDRESS "Adres"
 #endif
 

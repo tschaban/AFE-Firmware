@@ -94,7 +94,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  DS18B20 getDS18B20Data();
+  void get(DS18B20 &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
