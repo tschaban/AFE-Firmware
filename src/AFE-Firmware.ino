@@ -468,6 +468,7 @@ void loop() {
       }
     }
 #endif
+
     yield();
     Network.listener();
   } else { /* Deviced runs in Access Point mode */
