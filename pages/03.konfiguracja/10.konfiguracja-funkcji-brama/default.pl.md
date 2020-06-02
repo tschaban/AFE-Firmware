@@ -142,7 +142,7 @@ Ostatnim etapem konfiguracji jest konfiguracja przekaźnika przpisanego do bramy
 * Czas, na jak długo przekaźnik ma zostać załączony (długość impulsu)
 * Wartość ustawiana jest w milisekundach od 1msek do 99999msek - co daje prawie ;-) 100sek
 
-===
+---
 
 ### Przykładowa konfiguracja z openHAB
 
