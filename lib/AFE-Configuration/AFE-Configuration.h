@@ -14,7 +14,7 @@
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Max size of the configuration HTML page */
-#define AFE_MAX_PAGE_SIZE 7000
+#define AFE_MAX_PAGE_SIZE 7100
 
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
@@ -301,7 +301,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.0.B5"
+#define AFE_FIRMWARE_VERSION "2.3.0.B7"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -1048,6 +1048,7 @@ typedef enum {
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
 #define AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION "cfg-anemometer-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
+#define AFE_FILE_RAINMETER_SENSOR_DATA_FILE "/cfg-rainmeter-data-0.json"
 
 
 
@@ -1077,6 +1078,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
 #define AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR 200 // Not verfied
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR 200 // Not verfied
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA 1100 // Not verfied
 
 
 #define AFE_RESPONSE_KEY_VALIDATION 135

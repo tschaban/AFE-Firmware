@@ -200,6 +200,11 @@ public:
   void getConfiguration(RAINMETER *);
   void saveConfiguration(RAINMETER *);
   void createRainmeterSensorConfigurationFile();
+
+  void get(RAINMETER_DATA *);
+  void save(RAINMETER_DATA *);
+  void createRainmeterSensorDataConfigurationFile();
+
 #endif
 
 /* Methods turns on / off APIs */

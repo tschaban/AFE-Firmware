@@ -25,11 +25,14 @@ class AFESensorRainmeter {
 
 public:
   RAINMETER configuration;
-
+  
+  RAINMETER_DATA current;
   float rainLevelLast1Minute = 0;
   float rainLevelLastHour = 0;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   float rainLevelLast12Hours = 0;
   float rainLevelLast24Hours = 0;
+#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
@@ -52,15 +55,6 @@ private:
   boolean _initialized = false;
   uint32_t startTime = 0;
   uint32_t start60Sec = 0;
-
-  float rainLevelDuring1Hour[60];
-  uint8_t currentIndex1Hour = 0;
-
-  float rainLevelDuring12Hours[12];
-  uint8_t currentIndex12Hours = 0;
-
-  float rainLevelDuring24Hours[2];
-  uint8_t currentIndex24Hours = 0;
 };
 
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR

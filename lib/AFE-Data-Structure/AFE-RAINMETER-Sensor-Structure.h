@@ -22,4 +22,17 @@ struct RAINMETER {
 #endif
 };
 
+struct RAINMETER_DATA {
+  float last1h[60];
+  uint8_t index1h;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  float counter;
+#else
+  float last12h[12];
+  uint8_t index12h;
+  float last24h[2];
+  uint8_t index24h;
+#endif
+};
+
 #endif

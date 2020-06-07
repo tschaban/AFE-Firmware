@@ -104,6 +104,7 @@ void AFEDefaults::set() {
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
     Data->createRainmeterSensorConfigurationFile();
+    Data->createRainmeterSensorDataConfigurationFile();
 #endif
 
 /* DS18B20 presence */

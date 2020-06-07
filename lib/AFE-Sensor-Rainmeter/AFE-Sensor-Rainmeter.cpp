@@ -6,10 +6,11 @@
 
 AFESensorRainmeter::AFESensorRainmeter(){};
 
-boolean AFESensorRainmeter::begin(AFEDataAccess *Data, AFESensorBinary *Sensor) {
+boolean AFESensorRainmeter::begin(AFEDataAccess *Data,
+                                  AFESensorBinary *Sensor) {
   _Data = Data;
   _Sensor = Sensor;
- Data->getConfiguration(&configuration);
+  Data->getConfiguration(&configuration);
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
@@ -30,16 +31,24 @@ boolean AFESensorRainmeter::begin(AFEDataAccess *Data, AFESensorBinary *Sensor) 
          << F(" - Boucing: ") << configuration.sensitiveness;
 #endif
 
-  /* Clean arrays */
-  for (uint8_t i = 0; i < 60; i++) {
-    rainLevelDuring1Hour[i] = 0;
-  }
-  for (uint8_t i = 0; i < 12; i++) {
-    rainLevelDuring12Hours[i] = 0;
-  }
-  rainLevelDuring24Hours[0] = 0;
-  rainLevelDuring24Hours[1] = 0;
+  RAINMETER_DATA _previous;
+  _Data->get(&_previous);
 
+  memcpy(current.last1h, _previous.last1h, sizeof(_previous.last1h[0]) * 60);
+  current.index1h = _previous.index1h;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  current.counter = _previous.counter;
+#else
+  for (uint8_t i = 0; i < 12; i++) {
+    current.last12h[i] = _previous.last12h[i];
+  }
+  current.last24h[0] = _previous.last24h[0];
+  current.last24h[1] = _previous.last24h[1];
+
+  current.index12h = _previous.index12h;
+  current.index24h = _previous.index24h;
+#endif
   startTime = millis();
   start60Sec = millis();
 
@@ -58,58 +67,68 @@ boolean AFESensorRainmeter::listener(void) {
       _Sensor->get(noOfImpulses, duration);
 
       /* Level during last 1 minute */
-      rainLevelLast1Minute = noOfImpulses * configuration.resolution/ 1000;
-
+      rainLevelLast1Minute = noOfImpulses * configuration.resolution / 1000;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      current.counter += rainLevelLast1Minute;
+#endif
       /* Storing water level for passed 1 minute */
-      rainLevelDuring1Hour[currentIndex1Hour] = rainLevelLast1Minute;
+      current.last1h[current.index1h] = rainLevelLast1Minute;
 
       /* Recalculating the water level during the last hour */
       rainLevelLastHour = 0;
-      for (uint8_t i = 0; i <= currentIndex1Hour; i++) {
-        rainLevelLastHour = rainLevelLastHour + rainLevelDuring1Hour[i];
+      for (uint8_t i = 0; i <= current.index1h; i++) {
+        rainLevelLastHour = rainLevelLastHour + current.last1h[i];
       }
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED // Not required for Domoticz
       /* Storing water level for passed hour */
-      rainLevelDuring12Hours[currentIndex12Hours] = rainLevelLastHour;
+
+      current.last12h[current.index12h] = rainLevelLastHour;
       /* Recalculating the water level during the last 12 hours */
       rainLevelLast12Hours = 0;
-      for (uint8_t i = 0; i <= currentIndex12Hours; i++) {
-        rainLevelLast12Hours = rainLevelLast12Hours + rainLevelDuring12Hours[i];
+
+      for (uint8_t i = 0; i <= current.index12h; i++) {
+        rainLevelLast12Hours = rainLevelLast12Hours + current.last12h[i];
       }
 
-      rainLevelDuring24Hours[currentIndex24Hours] = rainLevelLast12Hours;
+      current.last24h[current.index24h] = rainLevelLast12Hours;
 
-      rainLevelLast24Hours =
-          rainLevelDuring24Hours[0] + rainLevelDuring24Hours[1];
+      rainLevelLast24Hours = current.last24h[0] + current.last24h[1];
 
-      if (currentIndex1Hour == 59) {
+      if (current.index1h >= 59) {
 
-        if (currentIndex12Hours == 11) {
-          currentIndex24Hours = currentIndex24Hours == 0 ? 1 : 0;
+        if (current.index12h == 11) {
+          current.index24h = current.index24h == 0 ? 1 : 0;
         }
 
         /* Changing index for 12 hours array */
-        currentIndex12Hours =
-            currentIndex12Hours == 11 ? 0 : currentIndex12Hours + 1;
+        current.index12h = current.index12h == 11 ? 0 : current.index12h + 1;
       }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
       /* Changing index for 60 minutes array */
-      currentIndex1Hour = currentIndex1Hour == 59 ? 0 : currentIndex1Hour + 1;
+      current.index1h = current.index1h == 59 ? 0 : current.index1h + 1;
 
 #ifdef DEBUG
       Serial << endl
              << F("INFO: Reading rain sensor data:") << endl
-             << F(" - last 1min: ") << rainLevelLast1Minute << F(" mm/min") << endl
-             << F(" - last hour: ") << rainLevelLastHour << F(" mm/hour") << endl
+             << F(" - last 1min: ") << rainLevelLast1Minute << F(" mm/min")
+             << endl
+             << F(" - last hour: ") << rainLevelLastHour << F(" mm/hour")
+             << endl
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
              << F(" - last 12 hours: ") << rainLevelLast12Hours << F(" mm/12-hours")
              << endl
-             << F(" - last 24 hours: ") << rainLevelLast24Hours << F(" mm/24-hours")
-             << endl
+             << F(" - last 24 hours: ") << rainLevelLast24Hours
+             << F(" mm/24-hours") << endl
+#endif
              << F(" - INDEX: ") << endl
-             << F("  : Hour Index= ") << currentIndex1Hour << endl
-             << F("  : 12 Hours Index = ") << currentIndex12Hours << endl
-             << F("  : 24 Hours index = ") << currentIndex24Hours << endl;
-
+             << F("  : Hour Index= ") << current.index1h << endl
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+             << F("  : 12 Hours Index = ") << current.index12h << endl
+             << F("  : 24 Hours index = ") << current.index24h
+#endif
+             << endl;
 #endif
 
       start60Sec = millis();
@@ -119,6 +138,7 @@ boolean AFESensorRainmeter::listener(void) {
   /* Counter for calculating the data */
   if ((millis() - startTime >= configuration.interval * 1000)) {
     startTime = millis();
+    _Data->save(&current);
     _ret = true;
   }
 
@@ -126,9 +146,19 @@ boolean AFESensorRainmeter::listener(void) {
 }
 
 void AFESensorRainmeter::getJSON(char *json) {
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
-                "min\"},{\"value\":%.3f,\"unit\":\"mm/h\"},{\"value\":%.3f,\"unit\":\"mm/12h\"},{\"value\":%.3f,\"unit\":\"mm/24h\"}]}",
-          rainLevelLast1Minute, rainLevelLastHour, rainLevelLast12Hours, rainLevelLast24Hours);
+                "min\"},{\"value\":%.3f,\"unit\":\"mm/"
+                "h\"},{\"value\":%.3f,\"unit\":\"mm/"
+                "12h\"},{\"value\":%.3f,\"unit\":\"mm/24h\"}]}",
+          rainLevelLast1Minute, rainLevelLastHour, rainLevelLast12Hours,
+          rainLevelLast24Hours);
+#else
+  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
+                "min\"},{\"value\":%.3f,\"unit\":\"mm/"
+                "h\"}]}",
+          rainLevelLast1Minute, rainLevelLastHour);
+#endif
 }
 
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR

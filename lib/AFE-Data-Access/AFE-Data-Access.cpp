@@ -2276,7 +2276,8 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
       configuration->battery.minVoltage =
           root["batteryMeter"]["minV"].as<float>();
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->battery.mqtt.topic, root["batteryMeter"]["mqttTopic"] | "");
+      sprintf(configuration->battery.mqtt.topic,
+              root["batteryMeter"]["mqttTopic"] | "");
 #else
       configuration->battery.domoticz.idx =
           root["batteryMeter"]["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -4318,4 +4319,162 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile() {
 
   saveConfiguration(&configuration);
 }
+
+void AFEDataAccess::get(RAINMETER_DATA *data) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE
+         << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA_FILE, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      data->index1h = root["index1h"];
+      for (uint8_t i = 0; i < 60; i++) {
+        data->last1h[i] = root["last1h"][i].as<float>();
+      }
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      data->counter = root["counter"].as<float>();
+#else
+      data->index12h = root["index12h"];
+      data->index24h = root["index24h"];
+      for (uint8_t i = 0; i < 12; i++) {
+        data->last12h[i] = root["last12h"][i].as<float>();
+      }
+
+      data->last24h[0] = root["last24h"][0].as<float>();
+      data->last24h[1] = root["last24h"][1].as<float>();
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA <
+          jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ")
+           << AFE_FILE_RAINMETER_SENSOR_DATA_FILE << F(" not opened");
+  }
+#endif
+}
+void AFEDataAccess::save(RAINMETER_DATA *data) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE
+         << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA_FILE, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonArray &last1h = jsonBuffer.createArray();
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    JsonArray &last12h = jsonBuffer.createArray();
+    JsonArray &last24h = jsonBuffer.createArray();
+#endif
+
+    last1h.copyFrom(data->last1h);
+    root["index1h"] = data->index1h;
+    root["last1h"] = last1h;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["counter"] = data->counter;
+#else
+    
+    last12h.copyFrom(data->last12h);
+    root["index12h"] = data->index12h;
+    root["last12h"] = last12h;
+
+    last24h.copyFrom(data->last24h);
+    root["index24h"] = data->index24h;
+    root["last24h"] = last24h;
+#endif
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE;
+#endif
+  RAINMETER_DATA data;
+  data.index1h = 0;
+  for (uint8_t i = 0; i < 60; i++) {
+    data.last1h[i] = 0;
+  }
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.counter = 0;
+#else
+  for (uint8_t i = 0; i < 12; i++) {
+    data.last12h[i] = 0;
+  }
+  data.last24h[0] = 0;
+  data.last24h[1] = 0;
+  data.index12h = 0;
+  data.index24h = 0;
+#endif
+
+  save(&data);
+}
+
 #endif // #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
