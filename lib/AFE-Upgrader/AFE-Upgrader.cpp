@@ -16,12 +16,14 @@ boolean AFEUpgrader::upgraded() {
          << F("-") << FirmwareConfiguration.version << F("-")
          << (FirmwareConfiguration.api == AFE_API_STANDARD
                  ? F("Standard")
-                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ ? F("Domoticz")
-                                                                  : F("Unknwon")));
+                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ
+                        ? F("Domoticz")
+                        : F("Unknwon")));
   Serial << endl
-         << F("INFO: Firmware version (booted) T") << AFE_FIRMWARE_TYPE << F("-")
-         << AFE_FIRMWARE_VERSION << F("-")
-         << (AFE_FIRMARE_API == AFE_API_STANDARD ? F("Standard") : F("Domoticz"));
+         << F("INFO: Firmware version (booted) T") << AFE_FIRMWARE_TYPE
+         << F("-") << AFE_FIRMWARE_VERSION << F("-")
+         << (AFE_FIRMARE_API == AFE_API_STANDARD ? F("Standard")
+                                                 : F("Domoticz"));
 #endif
 
   if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) == 0 &&
@@ -64,16 +66,16 @@ void AFEUpgrader::upgrade() {
   if (FirmwareConfiguration.api != AFE_FIRMARE_API) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Firmware API version upgraded")
-           << F(" from version: ") << FirmwareConfiguration.api << F(" to ")
-           << AFE_FIRMARE_API;
+           << F("INFO: Firmware API version upgraded") << F(" from version: ")
+           << FirmwareConfiguration.api << F(" to ") << AFE_FIRMARE_API;
 #endif
     updateFirmwareAPIVersion();
   }
 
 #ifdef DEBUG
   Serial << endl
-         << F("INFO Upgrade to version ") << AFE_FIRMWARE_VERSION << F(" completed");
+         << F("INFO Upgrade to version ") << AFE_FIRMWARE_VERSION
+         << F(" completed");
 #endif
 }
 
@@ -147,7 +149,8 @@ void AFEUpgrader::updateFirmwareVersion() {
   if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
       strcmp(FirmwareConfiguration.version, "2.1.0") == 0 ||
       strcmp(FirmwareConfiguration.version, "2.2.0") == 0 ||
-      strcmp(FirmwareConfiguration.version, "2.2.1")) {
+      strcmp(FirmwareConfiguration.version, "2.2.1") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.2.2") == 0) {
     upgradeToT6V230();
   }
 #endif
@@ -245,6 +248,10 @@ void AFEUpgrader::upgradeToT6V230() {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   Data->createRainmeterSensorConfigurationFile();
+  Data->createRainmeterSensorDataConfigurationFile();
+#endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  Data->createADCInputConfigurationFile();
 #endif
 }
 #endif // T6_CONFIG

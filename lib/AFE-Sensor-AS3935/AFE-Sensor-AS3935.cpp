@@ -9,7 +9,6 @@ boolean AFESensorAS3935::begin(uint8_t id) {
   Data.getConfiguration(id, &configuration);
   I2CPORT I2C;
   Data.getConfiguration(&I2C);
-  test = 2;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
@@ -94,7 +93,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
 #ifdef DEBUG
       Serial << endl << " - resetting to defalut values";
 #endif
-
+      AS3935LightingSensor.clearStatistics();
       AS3935LightingSensor.setDefautSettings();
 
       AS3935LightingSensor.setIndoor(configuration.indoor);
@@ -166,7 +165,7 @@ void AFESensorAS3935::interruptionReported() {
   distance = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE;
 
 #ifdef DEBUG
- Serial << endl << F("INFO: AS3935, Reading event type ");
+  Serial << endl << F("INFO: AS3935, Reading event type ");
 #endif
   eventType = AS3935LightingSensor.readIntrruptReason();
   switch (eventType) {
@@ -201,25 +200,25 @@ void AFESensorAS3935::interruptionReported() {
   default:
     ready = false;
 #ifdef DEBUG
- Serial << F("?") << endl << F("WARN: AS3935: Unknown interruption: ") <<
- eventType;
+    Serial << F("?") << endl
+           << F("WARN: AS3935: Unknown interruption: ") << eventType;
 #endif
   }
 }
 
 boolean AFESensorAS3935::strikeDetected() {
-/*
-if (digitalRead(configuration.irqGPIO) == HIGH) {
+  /*
+  if (digitalRead(configuration.irqGPIO) == HIGH) {
 
-#ifdef DEBUG
-// Serial << endl << F("INFO: AS3935: Interuption");
-#endif
+  #ifdef DEBUG
+  // Serial << endl << F("INFO: AS3935: Interuption");
+  #endif
 
-  interruptionReported();
- }
-*/
+    interruptionReported();
+   }
+  */
 
-//interruptionReported();
+  // interruptionReported();
 
   if (ready) {
     ready = false;

@@ -44,13 +44,13 @@ void AS3935SensorEventsListener() {
       AS3935Sensor[0].interruptionReported();
       AS3935Intrrupted = false;
     }
+  }
 
-    if (AS3935Sensor[0].strikeDetected()) {
-      MqttAPI.publishAS3935SensorData(0);
+  if (AS3935Sensor[0].strikeDetected()) {
+    MqttAPI.publishAS3935SensorData(0);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      HttpDomoticzAPI.publishAS3935SensorData(0);
+    HttpDomoticzAPI.publishAS3935SensorData(0);
 #endif
-    }
   }
 }
 #endif

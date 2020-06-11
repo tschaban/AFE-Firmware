@@ -97,17 +97,17 @@ boolean AFESensorRainmeter::listener(void) {
 
       if (current.index1h >= 59) {
 
-        if (current.index12h == 11) {
+        if (current.index12h >= 11) {
           current.index24h = current.index24h == 0 ? 1 : 0;
         }
 
         /* Changing index for 12 hours array */
-        current.index12h = current.index12h == 11 ? 0 : current.index12h + 1;
+        current.index12h = current.index12h >= 11 ? 0 : current.index12h + 1;
       }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
       /* Changing index for 60 minutes array */
-      current.index1h = current.index1h == 59 ? 0 : current.index1h + 1;
+      current.index1h = current.index1h >= 59 ? 0 : current.index1h + 1;
 
 #ifdef DEBUG
       Serial << endl

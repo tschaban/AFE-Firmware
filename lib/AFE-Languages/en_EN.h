@@ -224,6 +224,14 @@
 #define L_VOLTAGE_CALCULATED "IDX voltage calculated"
 #define L_RESISTOR "Resistor"
 #define L_VOLTAGE_DIVIDER "Voltage Divider"
+#define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define L_BATTERY_METER "Battery level"
+#define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
+#define L_BATTERY_MIN_LEVEL "Battery level: min"
+#define L_BATTERY_MAX_LEVEL "Battery level: max"
+#endif
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Select Firmware"
@@ -377,6 +385,12 @@
 #define L_ANEMOMETER_IMPULSE_DISTANCE "Distance"
 #endif
 
+/* Rainmeter Sensor */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define L_RAINMETER "Rainmeter"
+#define L_RAINMETER_CALIBRATION "Rainmeter resolution"
+#define L_RAINMETER_RESOLUTION "Resolution"
+#endif
 
 /* Generic Sensors */
 #ifdef AFE_CONFIG_TEMPERATURE

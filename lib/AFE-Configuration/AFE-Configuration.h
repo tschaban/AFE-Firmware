@@ -14,7 +14,7 @@
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Max size of the configuration HTML page */
-#define AFE_MAX_PAGE_SIZE 7100
+#define AFE_MAX_PAGE_SIZE 7700
 
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
@@ -301,7 +301,7 @@
 
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.0.B7"
+#define AFE_FIRMWARE_VERSION "2.3.0"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -1055,7 +1055,7 @@ typedef enum {
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_BH1750 230
+#define AFE_CONFIG_FILE_BUFFER_BH1750 221 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_I2C 54 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78 // Verfied by ArduinoJson Assistant 
@@ -1065,19 +1065,24 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_NETWORK 375 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_LED 76 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_RELAY 240
+#define AFE_CONFIG_FILE_BUFFER_RELAY 287 // Verfied by ArduinoJson Assistant for T6 only
 #define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_SWITCH 210
-#define AFE_CONFIG_FILE_BUFFER_ADC 300
-#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 240
+#define AFE_CONFIG_FILE_BUFFER_SWITCH 238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_ADC 489 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 570
-#define AFE_CONFIG_FILE_BUFFER_AS3935 240
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 984 // Verfied by ArduinoJson Assistant 
+#else
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // Verfied by ArduinoJson Assistant 
+#endif
+
+#define AFE_CONFIG_FILE_BUFFER_AS3935 439 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
-#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR 200 // Not verfied
-#define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR 200 // Not verfied
+#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER_SENSOR 303 // Verfied by ArduinoJson Assistant 
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR 259 // Verfied by ArduinoJson Assistant 
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA 1100 // Not verfied
 
 
