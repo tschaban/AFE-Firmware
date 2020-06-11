@@ -1251,7 +1251,8 @@ void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
-  DS18B20 configuration = Data.getDS18B20SensorConfiguration(id);
+  DS18B20 configuration;
+  Data->getConfiguration(id,&configuration);
 
   AFESensorDS18B20 DS18B20Sensor;
   DS18B20Sensor.scan(configuration.gpio);
@@ -1280,8 +1281,7 @@ void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
   }
   */
   page += "</select></div>";
-  DS18B20 configuration = Data->getSensorConfiguration();
-  DEVICE device = Data->getConfiguration();
+
 
   addItem(page, "text", "n", L_NAME, configuration.name, "16");
 

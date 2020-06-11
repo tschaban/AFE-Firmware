@@ -141,6 +141,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   case AFE_CONFIG_SITE_DS18B20:
     Site.addDS18B20Configuration(page, siteConfig->deviceID);
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
     Site.addAnemometerSensorConfiguration(page);
@@ -372,11 +373,12 @@ void AFEWebServer::generate(boolean upload) {
       }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-      case AFE_CONFIG_SITE_DS18B20:
+      else if (siteConfig.ID == AFE_CONFIG_SITE_DS18B20) {
         DS18B20 ds18B20Configuration;
         get(ds18B20Configuration);
-        Data.saveConfiguration(siteConfig.deviceID, &ds18B20Configuration);
-        break;
+        Data->saveConfiguration(siteConfig.deviceID, &ds18B20Configuration);
+        ds18B20Configuration = {0};
+      }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
       else if (siteConfig.ID == AFE_CONFIG_SITE_UART) {
@@ -795,7 +797,7 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  data.noOfLEDs = server.arg("l").length() > 0
+  data->noOfLEDs = server.arg("l").length() > 0
                       ? server.arg("l").toInt()
                       : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
@@ -810,19 +812,19 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  data.noOfRelays = server.arg("r").length() > 0
+  data->noOfRelays = server.arg("r").length() > 0
                         ? server.arg("r").toInt()
                         : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  data.noOfSwitches = server.arg("s").length() > 0
+  data->noOfSwitches = server.arg("s").length() > 0
                           ? server.arg("s").toInt()
                           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  data.noOfDS18B20s = server.arg("ds").length() > 0
+  data->noOfDS18B20s = server.arg("ds").length() > 0
                           ? server.arg("ds").toInt()
                           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
@@ -920,7 +922,7 @@ void AFEWebServer::getNetworkData(NETWORK *data) {
   }
 
   if (server.arg("d").length() > 0) {
-    data.isDHCP = true;
+    data->isDHCP = true;
   } else {
     data->isDHCP = false;
   }
@@ -1688,8 +1690,9 @@ void AFEWebServer::getAnalogInputData(ADCINPUT *data) {
     data->battery.mqtt.topic[0] = '\0';
   }
 #else
-  data->battery.domoticz.idx = server.arg("bx").length() > 0 ? server.arg("bx").toInt()
-                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+  data->battery.domoticz.idx = server.arg("bx").length() > 0
+                                   ? server.arg("bx").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER

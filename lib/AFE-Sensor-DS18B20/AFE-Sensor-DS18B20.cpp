@@ -6,7 +6,7 @@ AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getDS18B20SensorConfiguration(id);
+  Data.getConfiguration(id,&configuration);
   WireBUS.begin(configuration.gpio);
   Sensor.setOneWire(&WireBUS);
   _initialized = false;

@@ -423,8 +423,10 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-      configuration.noOfDS18B20s =
+      configuration->noOfDS18B20s =
           root["noOfDS18B20s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
       configuration->noOfAnemometerSensors =
           root["noOfAnemometerSensors"] |
@@ -653,6 +655,8 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   deviceConfiguration.noOfDS18B20s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   deviceConfiguration.noOfAnemometerSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS;
@@ -2433,8 +2437,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif //  AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-DS18B20 AFEDataAccess::getDS18B20SensorConfiguration(uint8_t id) {
-  DS18B20 configuration;
+void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 
   char fileName[20];
   sprintf(fileName, "/cfg-ds18b20-%d.json", id);
@@ -2460,17 +2463,17 @@ DS18B20 AFEDataAccess::getDS18B20SensorConfiguration(uint8_t id) {
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration.name, root["name"]);
-      configuration.address = root["address"];
-      configuration.gpio = root["gpio"];
-      configuration.correction = root["correction"];
-      configuration.interval = root["interval"];
-      configuration.unit = root["unit"];
-      configuration.sendOnlyChanges = root["sendOnlyChanges"];
+      sprintf(configuration->name, root["name"]);
+      configuration->address = root["address"];
+      configuration->gpio = root["gpio"];
+      configuration->correction = root["correction"];
+      configuration->interval = root["interval"];
+      configuration->unit = root["unit"];
+      configuration->sendOnlyChanges = root["sendOnlyChanges"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration.mqtt.topic, root["mqttTopic"] | "");
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -2497,8 +2500,6 @@ DS18B20 AFEDataAccess::getDS18B20SensorConfiguration(uint8_t id) {
            << "ERROR: Configuration file: " << fileName << " not opened";
   }
 #endif
-
-  return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
@@ -4560,7 +4561,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["counter"] = data->counter;
 #else
-    
+
     last12h.copyFrom(data->last12h);
     root["index12h"] = data->index12h;
     root["last12h"] = last12h;

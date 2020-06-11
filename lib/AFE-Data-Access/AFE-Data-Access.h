@@ -116,7 +116,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  DS18B20 getDS18B20SensorConfiguration(uint8_t id);
+  void getConfiguration(uint8_t id, DS18B20 *);
   void saveConfiguration(uint8_t id, DS18B20 *);
   void createDS18B20SensorConfigurationFile(void);
 #endif
