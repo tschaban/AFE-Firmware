@@ -8,8 +8,18 @@ void analogInputEventsListener() {
     AnalogInput.listener();
     if (AnalogInput.isReady()) {
       MqttAPI.publishADCValues();
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+      MqttAPI.publishBatteryMeterValues();
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       HttpDomoticzAPI.publishADCValues();
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+      HttpDomoticzAPI.publishBatteryMeterValues();
+#endif
+
 #endif
     }
   }

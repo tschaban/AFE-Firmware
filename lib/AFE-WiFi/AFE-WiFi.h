@@ -19,6 +19,7 @@
 #endif
 
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -29,6 +30,7 @@ private:
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
   uint8_t WiFiMode;
+  HTTPClient http;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
@@ -63,6 +65,8 @@ public:
   /* Method checks if device is connected to WiFi - if it's not then it connects
    * to it */
   void listener();
+
+  uint16_t getJSON(const String& url, String& response);
 };
 
 #endif

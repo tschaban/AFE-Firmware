@@ -9,7 +9,7 @@ AFELED::AFELED(uint8_t id) { begin(id); }
 void AFELED::begin(uint8_t id) {
   AFEDevice Device;
   AFEDataAccess Data;
-  LEDConfiguration = Data.getLEDConfiguration(id);
+  Data.getConfiguration(id,&LEDConfiguration);
   Data = {};
   pinMode(LEDConfiguration.gpio, OUTPUT);
   LEDConfiguration.changeToOppositeValue

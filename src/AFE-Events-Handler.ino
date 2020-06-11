@@ -3,7 +3,7 @@ void eventsListener() {
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Connected to WiFi";
+    Serial << endl << F("INFO: Connected to WiFi");
 #endif
 
 /* ################## HTTP DOMOTICZ ################### */
@@ -13,7 +13,7 @@ void eventsListener() {
     if (Device.configuration.api.domoticz) {
 
 #ifdef DEBUG
-      Serial << endl << "INFO: Domoticz HTTP API boot actions triggering";
+      Serial << endl << F("INFO: Domoticz HTTP API boot actions triggering");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -22,7 +22,7 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #ifdef DEBUG
-      Serial << endl << "INFO: Sending current gate state to Domoticz";
+      Serial << endl << F("INFO: Sending current gate state to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         HttpDomoticzAPI.publishGateState(i);
@@ -32,7 +32,7 @@ void eventsListener() {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef DEBUG
       Serial << endl
-             << "INFO: Sending current state of contactrons to Domoticz";
+             << F("INFO: Sending current state of contactrons to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
         HttpDomoticzAPI.publishContactronState(i);
@@ -42,7 +42,7 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 #ifdef DEBUG
-      Serial << endl << "INFO: Sending current state of switches to Domoticz";
+      Serial << endl << F("INFO: Sending current state of switches to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
         HttpDomoticzAPI.publishSwitchState(i);
@@ -51,7 +51,7 @@ void eventsListener() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
-      Serial << endl << "INFO: Sending current state of relays to Domoticz";
+      Serial << endl << F("INFO: Sending current state of relays to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -67,8 +67,8 @@ void eventsListener() {
 #ifdef DEBUG
         else {
           Serial << endl
-                 << "INFO: Excluding relay: " << i
-                 << " as it's assigned to a Gate: " << Relay[i].gateId;
+                 << F("INFO: Excluding relay: ") << i
+                 << F(" as it's assigned to a Gate: ") << Relay[i].gateId;
         }
 #endif
 #endif
@@ -77,7 +77,7 @@ void eventsListener() {
 
 #if defined(T3_CONFIG)
 #ifdef DEBUG
-      Serial << endl << "INFO: Sending current state of PIRs to Domoticz";
+      Serial << endl << F("INFO: Sending current state of PIRs to Domoticz");
 #endif
       for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
         if (Device.configuration.isPIR[i]) {
@@ -95,7 +95,7 @@ void eventsListener() {
 #endif /* AFE_CONFIG_API_DOMOTICZ_ENABLED  */
 
 #ifdef DEBUG
-    Serial << endl << "INFO: Post WiFi Connection actions completed";
+    Serial << endl << F("INFO: Post WiFi Connection actions completed");
 #endif
 
   } /* End of Network.eventConnected() */

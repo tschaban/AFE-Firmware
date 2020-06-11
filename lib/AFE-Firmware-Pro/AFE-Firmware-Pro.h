@@ -10,9 +10,7 @@
 #endif
 
 #include <AFE-Data-Access.h>
-#include <ArduinoJson.h>
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <AFE-WiFi.h>
 
 #define AFE_WEBSERVICE_VALIDATE_KEY 0
 #define AFE_WEBSERVICE_ADD_KEY 1
@@ -27,6 +25,7 @@ private:
   AFEDataAccess Data;
   unsigned long miliseconds = 0;
   unsigned long minutes = 0;
+  AFEWiFi *Network;
 
 public:
   PRO_VERSION Pro;
@@ -34,10 +33,10 @@ public:
   /* Constructor */
   AFEFirmwarePro();
 
-  void begin();
+  void begin(AFEWiFi *);
 
   /* Validating if the key is valid */
-  boolean callService(uint8_t method);
+  void callService(uint8_t method);
 
   /* Checking if the key is still valid */
   void reValidateKey();

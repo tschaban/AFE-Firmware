@@ -51,6 +51,14 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-Sensor-Rainmeter.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 #endif
@@ -109,6 +117,14 @@ public:
   virtual void addClass(AFESensorAS3935 *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  virtual void addClass(AFESensorAnemometer *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  virtual void addClass(AFESensorRainmeter *);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
 #endif
@@ -152,6 +168,14 @@ protected:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  AFESensorAnemometer *_AnemometerSensor;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  AFESensorRainmeter *_RainmeterSensor;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
 #endif
@@ -159,7 +183,6 @@ protected:
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
-
 };
 
 #endif // _AFE_API_h

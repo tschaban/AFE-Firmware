@@ -6,7 +6,7 @@ AFESwitch::AFESwitch(){};
 
 void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   AFEDataAccess Data;
-  configuration = Data.getSwitchConfiguration(id);
+  Data.getConfiguration(id,&configuration);
 #ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
   pinMode(configuration.gpio, INPUT);
 #else
@@ -160,7 +160,7 @@ void AFESwitch::listener() {
         }
       }
 
-      //  Serial << endl << "press=" << pressed << " _press=" << _pressed;
+      //  Serial << endl << F("press=") << pressed << F(" _press=") << _pressed;
 
     } else if (currentState == previousState && startTime > 0 &&
                configuration.type == AFE_SWITCH_TYPE_MONO) {

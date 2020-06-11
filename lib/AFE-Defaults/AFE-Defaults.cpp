@@ -10,7 +10,7 @@ void AFEDefaults::set() {
 #ifdef AFE_CONFIG_HARDWARE_LED
 #ifdef DEBUG
   Serial << endl
-         << "Turning on system LED on GPIO "
+         << F("Turning on system LED on GPIO ")
          << AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
   pinMode(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, OUTPUT);
@@ -98,6 +98,15 @@ void AFEDefaults::set() {
     Data->createAS3935SensorConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    Data->createAnemometerSensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    Data->createRainmeterSensorConfigurationFile();
+    Data->createRainmeterSensorDataConfigurationFile();
+#endif
+
 /* DS18B20 presence */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     deviceConfiguration.isDS18B20 = false;
@@ -180,7 +189,7 @@ void AFEDefaults::set() {
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "ERROR: Formating failed";
+    Serial << endl << F("ERROR: Formating failed");
   }
 #endif
 }

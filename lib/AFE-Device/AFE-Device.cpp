@@ -6,7 +6,7 @@ AFEDevice::AFEDevice() {}
 
 void AFEDevice::begin() {
   deviceMode = Data.getDeviceMode();
-  configuration = Data.getDeviceConfiguration();
+  Data.getConfiguration(&configuration);
 }
 
 void AFEDevice::reboot(uint8_t mode) {

@@ -58,50 +58,60 @@ public:
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  /* Publishes switch state */
   boolean publishSwitchState(uint8_t id);
-  /* Processes MQTT Request related to Switch */
   void processSwitch(uint8_t *id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Publishes ADC data */
   void publishADCValues();
-  /* Processes ADC MQTT requests */
   void processADC();
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void processBatteryMeter();
+  boolean publishBatteryMeterValues();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void processBMEX80(uint8_t *id);
   boolean publishBMx80SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   void processHPMA115S0(uint8_t *id);
   boolean publishHPMA115S0SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   void processBH1750(uint8_t *id);
   boolean publishBH1750SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void processAS3935(uint8_t *id);
   boolean publishAS3935SensorData(uint8_t id);
-#endif
+#endif //  AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void processAnemometerSensor();
+  void publishAnemometerSensorData();
+
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void processRainSensor();
+  void publishRainSensorData();
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void processGate(uint8_t *id);
   boolean publishGateState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void processContactron(uint8_t *id);
   boolean publishContactronState(uint8_t id);
-#endif
-
-
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

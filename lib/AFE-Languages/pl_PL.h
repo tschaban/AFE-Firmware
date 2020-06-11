@@ -79,6 +79,11 @@
 #define L_YES "Tak"
 #define L_NO "Nie"
 #define L_SENSOR "Czujnik"
+#define L_DISTANCE_UNIT "Jednostka odległości"
+#define L_CM "Centrymetry"
+#define L_M "Metry"
+#define L_KM "Kilometry"
+#define L_MILES "Mile"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -210,7 +215,7 @@
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
 #define L_SENSITIVENESS "Czułość"
-#define L__SENSITIVENESS_HINT                                                         \
+#define L_SENSITIVENESS_HINT                                                         \
   "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie " \
   "przycisku podczas jego wciskania"
 #define L_SWITCH_BUTTON "Przycisk / Włącznik"
@@ -227,6 +232,13 @@
 #define L_VOLTAGE_CALCULATED "IDX Napięcie przeliczone"
 #define L_RESISTOR "Rezystor"
 #define L_VOLTAGE_DIVIDER "Dzielnik napięcia"
+#define L_ADC_MQTT_TOPIC "Temat MQTT dla informacji z ADC"
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define L_BATTERY_METER "Pomiar naładowania baterii"
+#define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
+#define L_BATTERY_MIN_LEVEL "Minimalny poziom baterii"
+#define L_BATTERY_MAX_LEVEL "Maksymalny poziom baterii"
+#endif
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"
@@ -351,21 +363,20 @@
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #define L_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
 #define L_AS3935_SENSOR "Czujnik AS3935"
-#define L_NOISE_FLOOR "Poziom hałasu"
+#define L_NOISE_FLOOR "Poziom hałasów"
 #define L_NOISE_FLOOR_HINT "(0-najmniejszy, 7-największy)"
-#define L_WATCHDOG_THRESHOLD "Jakość detekcji"
+#define L_WATCHDOG_THRESHOLD "Czułość"
 #define L_WATCHDOG_THRESHOLD_HINT "(1-najmniejsza, 10-największa)"
-#define L_SPIKES_REJECTION "Poziom odrzucenia detekcji piorunów"
-#define L_SPIKES_REJECTION_HINT "(1-najmniejsza, 11-największa)"
-#define L_MIN_SPIKES "Minimalna ilość piorunów, aby zaraportować detekcję burzy"
+#define L_SPIKES_REJECTION "Poziom odrzucenia skoków"
+#define L_SPIKES_REJECTION_HINT "(1-najmniejszy, 11-największy)"
+#define L_MIN_SPIKES "Minimalna ilość piorunów, aby zgłosić detekcję burzy"
 #define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu hałasu"
 #define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom hałasu, w przypadku wyłączonej opcji Inteligentnej kontroli hałasu"
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
 #define L_INDOOR "Wewnątrz budynku"
 #define L_OUTDOOR "Na zewnątrz"
-#define L_DISTANCE_UNIT "Jednostka odległości"
-#define L_KM "Kilometry"
-#define L_MILES "Mile"
+
+
 #define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif
 
@@ -373,6 +384,23 @@
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define L_ADDRESS "Adres"
 #endif
+
+/* Anemometer Sensor */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define L_ANEMOMETER_SENSOR "Czujnik siły wiatru"
+#define L_ANEMOMETER_SENSITIVENESS_HINT "Czułość czujnika należy ustawić metodą prób i błędów, aż do uzyskania zamierzonego efektu. Im wartość jest mniejsza tym czułość jest większa"
+#define L_ANEMOMETER_CALIBRATION "Kalibracja anemometru"
+#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Odległość jaką wiatr przebędzie w jednym impulsie anemometra"
+#define L_ANEMOMETER_IMPULSE_DISTANCE "Odległość"
+#endif
+
+/* Rainmeter Sensor */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define L_RAINMETER "Czujnik deszczu"
+#define L_RAINMETER_CALIBRATION "Rozdzielczość czujnika deszczu"
+#define L_RAINMETER_RESOLUTION "Rozdzielczość"
+#endif
+
 
 /* Generic Sensors */
 #ifdef AFE_CONFIG_TEMPERATURE

@@ -32,7 +32,7 @@ private:
 
 public:
   AFEDataAccess();
-  
+
   /* It formats SPIFFS */
   boolean formatFileSystem();
 
@@ -43,7 +43,7 @@ public:
   void saveDeviceUID(const char *);
   void createDeviceUIDFile();
 
-  DEVICE getDeviceConfiguration();
+  void getConfiguration(DEVICE *);
 #ifdef T0_CONFIG // Version 2.0.0 - 2 Device configuration. Method used only to
                  // upgrade to new version
   DEVICE_T0_200 getDeviceT0v200Configuration();
@@ -51,31 +51,30 @@ public:
   void saveConfiguration(DEVICE *);
   void createDeviceConfigurationFile();
 
-  FIRMWARE getFirmwareConfiguration();
+  void getConfiguration(FIRMWARE *);
   void saveConfiguration(FIRMWARE *);
   void createFirmwareConfigurationFile();
   void saveFirmwareVersion(const char *);
   void saveFirmwareAPIVersion();
 
-  NETWORK getNetworkConfiguration();
-  void saveConfiguration(NETWORK configuration);
+  void getConfiguration(NETWORK *);
+  void saveConfiguration(NETWORK *);
   void createNetworkConfigurationFile();
 
-  MQTT getMQTTConfiguration();
-  void saveConfiguration(MQTT configuration);
+  void getConfiguration(MQTT *);
+  void saveConfiguration(MQTT *);
   void createMQTTConfigurationFile();
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  DOMOTICZ getDomoticzConfiguration();
-  void saveConfiguration(DOMOTICZ configuration);
+  void getConfiguration(DOMOTICZ *);
+  void saveConfiguration(DOMOTICZ *);
   void createDomoticzConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  RELAY getRelayConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, RELAY configuration);
+  void getConfiguration(uint8_t id, RELAY *);
+  void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
-
 
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
@@ -83,32 +82,32 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  SWITCH getSwitchConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, SWITCH configuration);
+  void getConfiguration(uint8_t id, SWITCH *);
+  void saveConfiguration(uint8_t id, SWITCH *);
   void createSwitchConfigurationFile();
 #endif
 
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
-  PRO_VERSION getProVersionConfiguration();
-  void saveConfiguration(PRO_VERSION configuration);
+  void getConfiguration(PRO_VERSION *);
+  void saveConfiguration(PRO_VERSION *);
   void createProVersionConfigurationFile();
 
-  PASSWORD getPasswordConfiguration();
-  void saveConfiguration(PASSWORD configuration);
+  void getConfiguration(PASSWORD *);
+  void saveConfiguration(PASSWORD *);
   void createPasswordConfigurationFile();
 
 /* ADC Inout create/read/write methods */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  ADCINPUT getADCInputConfiguration();
-  void saveConfiguration(ADCINPUT configuration);
+  void getConfiguration(ADCINPUT *);
+  void saveConfiguration(ADCINPUT *);
   void createADCInputConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  LED getLEDConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, LED configuration);
+  void getConfiguration(uint8_t id, LED *);
+  void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
   /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
@@ -142,54 +141,70 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  CONTACTRON getContactronConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, CONTACTRON configuration);
+  void getConfiguration(uint8_t id, CONTACTRON *);
+  void saveConfiguration(uint8_t id, CONTACTRON *);
   void createContractonConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  GATE getGateConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, GATE configuration);
+  void getConfiguration(uint8_t id, GATE *);
+  void saveConfiguration(uint8_t id, GATE *);
   void createGateConfigurationFile();
   uint8_t getGateState(uint8_t id);
   void saveGateState(uint8_t id, uint8_t state);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  I2CPORT getI2CPortConfiguration();
-  void saveConfiguration(I2CPORT configuration);
+  void getConfiguration(I2CPORT *);
+  void saveConfiguration(I2CPORT *);
   void createI2CConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-  SERIALPORT getSerialPortConfiguration();
-  void saveConfiguration(SERIALPORT configuration);
+  void getConfiguration(SERIALPORT *);
+  void saveConfiguration(SERIALPORT *);
   void createSerialConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HPMA115S0 getHPMA115S0SensorConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, HPMA115S0 configuration);
+  void getConfiguration(uint8_t id, HPMA115S0 *);
+  void saveConfiguration(uint8_t id, HPMA115S0 *);
   void createHPMA115S0SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  BMEX80 getBMEX80SensorConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, BMEX80 configuration);
+  void getConfiguration(uint8_t id, BMEX80 *);
+  void saveConfiguration(uint8_t id, BMEX80 *);
   void createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  BH1750 getBH1750SensorConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, BH1750 configuration);
-       
+  void getConfiguration(uint8_t id, BH1750 *);
+  void saveConfiguration(uint8_t id, BH1750 *);
   void createBH1750SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  AS3935 getAS3935SensorConfiguration(uint8_t id);
-  void saveConfiguration(uint8_t id, AS3935 configuration);
+  void getConfiguration(uint8_t id, AS3935 *);
+  void saveConfiguration(uint8_t id, AS3935 *);
   void createAS3935SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void getConfiguration(ANEMOMETER *);
+  void saveConfiguration(ANEMOMETER *);
+  void createAnemometerSensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void getConfiguration(RAINMETER *);
+  void saveConfiguration(RAINMETER *);
+  void createRainmeterSensorConfigurationFile();
+
+  void get(RAINMETER_DATA *);
+  void save(RAINMETER_DATA *);
+  void createRainmeterSensorDataConfigurationFile();
+
 #endif
 
 /* Methods turns on / off APIs */

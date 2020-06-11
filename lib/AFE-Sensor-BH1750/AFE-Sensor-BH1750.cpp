@@ -8,8 +8,9 @@ AFESensorBH1750::AFESensorBH1750(){};
 
 void AFESensorBH1750::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getBH1750SensorConfiguration(id);
-  I2CPORT I2C = Data.getI2CPortConfiguration();
+  Data.getConfiguration(id,&configuration);
+  I2CPORT I2C;
+  Data.getConfiguration(&I2C);
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
@@ -20,24 +21,24 @@ void AFESensorBH1750::begin(uint8_t id) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << endl << "----- BH1750: Initializing -----";
+  Serial << endl << endl << F("----- BH1750: Initializing -----");
 #endif
   if (configuration.i2cAddress != 0) {
 
 #ifdef DEBUG
-    Serial << endl << "Checking if the sensor is connected";
+    Serial << endl << F("Checking if the sensor is connected");
 #endif
     AFEI2CScanner I2CScanner;
     I2CScanner.begin();
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
 #ifdef DEBUG
-      Serial << endl << "Setting I2C: SDA:" << I2C.SDA << ", SCL:" << I2C.SCL;
+      Serial << endl << F("Setting I2C: SDA:") << I2C.SDA << F(", SCL:") << I2C.SCL;
 #endif
 
       bh1750.setI2C(I2C.SDA, I2C.SCL);
 #ifdef DEBUG
-      Serial << endl << "Sensor address: 0x" << _HEX(configuration.i2cAddress);
+      Serial << endl << F("Sensor address: 0x") << _HEX(configuration.i2cAddress);
 #endif
       _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
                                   configuration.i2cAddress);
@@ -46,29 +47,29 @@ void AFESensorBH1750::begin(uint8_t id) {
 #ifdef DEBUG
     else {
       Serial << endl
-             << "Error: Device not found under I2C Address: 0x"
+             << F("Error: Device not found under I2C Address: 0x")
              << _HEX(configuration.i2cAddress);
     }
 #endif
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "Error: Address not set";
+    Serial << endl << F("Error: Address not set");
   }
 #endif
 
 #ifdef DEBUG
   if (_initialized) {
-     Serial << endl << "Name: " << configuration.name;
-    Serial << endl << "Mode: " << configuration.mode;
-    Serial << endl << "Interval: " << configuration.interval;
+     Serial << endl << F("Name: ") << configuration.name;
+    Serial << endl << F("Mode: ") << configuration.mode;
+    Serial << endl << F("Interval: ") << configuration.interval;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    Serial << endl << "IDX: " << configuration.domoticz.idx;
+    Serial << endl << F("IDX: ") << configuration.domoticz.idx;
 #endif
   }
   Serial << endl
-         << "Device: " << (_initialized ? "Found" : "Not found: check wiring");
-  Serial << endl << "---------------------------------";
+         << F("Device: ") << (_initialized ? F("Found") : F("Not found: check wiring"));
+  Serial << endl << F("---------------------------------");
 #endif
 }
 
@@ -87,8 +88,8 @@ void AFESensorBH1750::listener() {
     if (millis() - startTime >= configuration.interval * 1000) {
 
 #if defined(DEBUG)
-      Serial << endl << endl << "----- BH1750: Reading -----";
-      Serial << endl << "Time: " << (millis() - startTime) / 1000 << "s";
+      Serial << endl << endl << F("----- BH1750: Reading -----");
+      Serial << endl << F("Time: ") << (millis() - startTime) / 1000 << F("s");
 #endif
 
       data = bh1750.readLightLevel();
@@ -97,8 +98,8 @@ void AFESensorBH1750::listener() {
       }
 
 #if defined(DEBUG)
-      Serial << endl << "Lux: " << data << "lx";
-      Serial << endl << "---------------------------";
+      Serial << endl << F("Lux: ") << data << F("lx");
+      Serial << endl << F("---------------------------");
 #endif
 
       startTime = millis();

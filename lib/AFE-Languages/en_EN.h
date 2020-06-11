@@ -80,6 +80,11 @@
 #define L_YES "Yes"
 #define L_NO "No"
 #define L_SENSOR "Sensor"
+#define L_DISTANCE_UNIT "Distance unit"
+#define L_CM "Centimeter"
+#define L_M "Meter"
+#define L_KM "Kilometers"
+#define L_MILES "Miles"
 
 /* Form: index */
 #define L_WRONG_PASSWORD "Incorrect password"
@@ -202,7 +207,7 @@
 #define L_MONOSTABLE "Monostable"
 #define L_BISTABLE "Bistable"
 #define L_SENSITIVENESS "Sensitiveness"
-#define L__SENSITIVENESS_HINT                                                  \
+#define L_SENSITIVENESS_HINT                                                  \
   "Sensitiveness should be adjusted if switch didn't behave as expected "      \
   "while pressing it"
 #define L_SWITCH_BUTTON "Switch / Button"
@@ -219,6 +224,14 @@
 #define L_VOLTAGE_CALCULATED "IDX voltage calculated"
 #define L_RESISTOR "Resistor"
 #define L_VOLTAGE_DIVIDER "Voltage Divider"
+#define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define L_BATTERY_METER "Battery level"
+#define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
+#define L_BATTERY_MIN_LEVEL "Battery level: min"
+#define L_BATTERY_MAX_LEVEL "Battery level: max"
+#endif
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Select Firmware"
@@ -344,7 +357,7 @@
 #define L_AS3935_SENSOR "AS3935 Sensor"
 #define L_NOISE_FLOOR "Noise floor level"
 #define L_NOISE_FLOOR_HINT "(0-low, 7-high)"
-#define L_WATCHDOG_THRESHOLD "Detection quality"
+#define L_WATCHDOG_THRESHOLD "Sensitiveness"
 #define L_WATCHDOG_THRESHOLD_HINT "(1-low, 10-high)"
 #define L_SPIKES_REJECTION "Spikes rejections level"
 #define L_SPIKES_REJECTION_HINT "(1-low, 11-high)"
@@ -354,15 +367,29 @@
 #define L_SENSOR_INDOOR_OUTDOOR "Sensor localisation"
 #define L_INDOOR "Indoor"
 #define L_OUTDOOR "Outdoor"
-#define L_DISTANCE_UNIT "Distance unit"
-#define L_KM "Kilometers"
-#define L_MILES "Miles"
 #define L_MQTT_TOPIC_AS3935 "AS3935 Sensor's MQTT Topic"
 #endif
 
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define L_ADDRESS "Address"
+#endif
+
+/* Anemometer Sensor */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define L_ANEMOMETER_SENSOR "Anemometer speed sensor"
+#define L_ANEMOMETER_SENSITIVENESS_HINT "Sensitiveness should be adjusted experimentally until sensor behaves as "   \
+  "expected. Lower value more sensitive sensor"
+#define L_ANEMOMETER_CALIBRATION "Anemometer calibration"
+#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Wind distans per one anemometer impulse"
+#define L_ANEMOMETER_IMPULSE_DISTANCE "Distance"
+#endif
+
+/* Rainmeter Sensor */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define L_RAINMETER "Rainmeter"
+#define L_RAINMETER_CALIBRATION "Rainmeter resolution"
+#define L_RAINMETER_RESOLUTION "Resolution"
 #endif
 
 /* Generic Sensors */
