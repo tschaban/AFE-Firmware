@@ -45,12 +45,12 @@ void AFEAPIHTTP::listener() {
 void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 
 #ifdef DEBUG
-  Serial << endl << endl << "-------- Got HTTP Request --------";
-  Serial << endl << "Device: " << request->device;
-  Serial << endl << "Name: " << request->name;
-  Serial << endl << "Command: " << request->command;
-  Serial << endl << "Source: " << request->source;
-  Serial << endl << "----------------------------------" << endl;
+  Serial << endl << endl << F("-------- Got HTTP Request --------");
+  Serial << endl << F("Device: ") << request->device;
+  Serial << endl << F("Name: ") << request->name;
+  Serial << endl << F("Command: ") << request->command;
+  Serial << endl << F("Source: ") << request->source;
+  Serial << endl << F("----------------------------------") << endl;
 #endif
 
   if (false) {
@@ -60,7 +60,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   else if (strcmp(request->device, "relay") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing Relay HTTP requests";
+    Serial << endl << F("INFO: Processing Relay HTTP requests");
 #endif
     processRelay(request);
   }
@@ -69,9 +69,18 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   else if (strcmp(request->device, "ADC") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing ADC requests";
+    Serial << endl << F("INFO: Processing ADC requests");
 #endif
     processAnalogInput(request);
+  }
+#endif
+/* Checking if Battery Meter request */
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  else if (strcmp(request->device, "batterymeter") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing ADC requests");
+#endif
+    processBatteryMeter(request);
   }
 #endif
 /* Checking if BMx80 Input request */
@@ -80,7 +89,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   else if (strcmp(request->device, "BMEX80") == 0 ||
            strcmp(request->device, "BMX80") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing BMX80 requests";
+    Serial << endl << F("INFO: Processing BMX80 requests");
 #endif
     processBMEX80(request);
   }
@@ -88,7 +97,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   else if (strcmp(request->device, "BH1750") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing BH1750 requests";
+    Serial << endl << F("INFO: Processing BH1750 requests");
 #endif
     processBH1750(request);
   }
@@ -96,7 +105,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   else if (strcmp(request->device, "AS3935") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing AS3935 requests";
+    Serial << endl << F("INFO: Processing AS3935 requests");
 #endif
     processAS3935(request);
   }
@@ -104,15 +113,33 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   else if (strcmp(request->device, "HPMA115S0") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing HPMA115S0 requests";
+    Serial << endl << F("INFO: Processing HPMA115S0 requests");
 #endif
     processHPMA115S0(request);
   }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
+/* Checking if Anemometer request */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  else if (strcmp(request->device, "anemometer") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing Anemometer requests");
+#endif
+    processAnemometerSensor(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+/* Checking if Rain request */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  else if (strcmp(request->device, "rainmeter") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing Rainmeter requests");
+#endif
+    processRainSensor(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_GATE
   else if (strcmp(request->device, "gate") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing GATE requests";
+    Serial << endl << F("INFO: Processing GATE requests");
 #endif
     processGate(request);
   }
@@ -120,7 +147,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   else if (strcmp(request->device, "contactron") == 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Processing CONTACTRON requests";
+    Serial << endl << F("INFO: Processing CONTACTRON requests");
 #endif
     processContactron(request);
   }
@@ -131,7 +158,8 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     _Device->reboot(_Device->getMode());
     /* Checking if configurationMode commad */
   } else if (strcmp(request->command, "configurationMode") == 0) {
-    PASSWORD password = _Data->getPasswordConfiguration();
+    PASSWORD password;
+    _Data->getConfiguration(&password);
     if (!password.protect) {
       send(request, true);
       _Device->reboot(AFE_MODE_CONFIGURATION);
@@ -143,7 +171,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: HTTP requst processed";
+  Serial << endl << F("INFO: HTTP requst processed");
 #endif
 }
 
@@ -259,8 +287,8 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
 #ifdef DEBUG
     else {
       Serial << endl
-             << "Excluding relay: " << i
-             << " as it's assigned to a Gate: " << _Relay[i]->gateId;
+             << F("Excluding relay: ") << i
+             << F(" as it's assigned to a Gate: ") << _Relay[i]->gateId;
     }
 #endif
 #endif
@@ -294,6 +322,18 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
+  if (strcmp(request->command, "get") == 0) {
+    char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
+    _AnalogInput->getBatteryMeterJSON(json);
+    send(request, true, json);
+  } else {
+    send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+  }
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIHTTP::addClass(AFESensorBMEX80 *Sensor) {
@@ -403,6 +443,43 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+/* Processing Anemometer Input request */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+/* Adding pointer to Anemometer class */
+void AFEAPIHTTP::addClass(AFESensorAnemometer *AnemometerSensor) {
+  _AnemometerSensor = AnemometerSensor;
+}
+
+void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
+  if (strcmp(request->command, "get") == 0) {
+    char json[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
+    _AnemometerSensor->getJSON(json);
+    send(request, true, json);
+  } else {
+    send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+/* Processing Rain Input request */
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+/* Adding pointer to Rainclass */
+void AFEAPIHTTP::addClass(AFESensorRainmeter *RainmeterSensor) {
+  _RainmeterSensor = RainmeterSensor;
+}
+
+void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
+  if (strcmp(request->command, "get") == 0) {
+    char json[AFE_CONFIG_API_JSON_RAINMETER_DATA_LENGTH];
+    _RainmeterSensor->getJSON(json);
+    send(request, true, json);
+  } else {
+    send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTP::addClass(AFEGate *Item) {

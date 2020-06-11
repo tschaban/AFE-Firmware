@@ -33,7 +33,8 @@ void AFEAPI::addClass(AFERelay *Relay) {
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     _Relay[i] = Relay + i;
 #ifdef DEBUG
-    Serial << endl << "INFO: The reference to the relay: " << i + 1 << " added";
+    Serial << endl
+           << F("INFO: The reference to the relay: ") << i + 1 << F(" added");
 #endif
   }
 }
@@ -45,7 +46,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
     _Switch[i] = Switch + i;
 #ifdef DEBUG
     Serial << endl
-           << "INFO: The reference to the switche: " << i + 1 << " added";
+           << F("INFO: The reference to the switche: ") << i + 1 << F(" added");
 #endif
   }
 }
@@ -55,7 +56,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
 void AFEAPI::addClass(AFEAnalogInput *Analog) {
   _AnalogInput = Analog;
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the ADC added";
+  Serial << endl << F("INFO: The reference to the ADC added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
@@ -66,7 +67,7 @@ void AFEAPI::addClass(AFESensorBMEX80 *Sensor) {
     _BMx80Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the BMEX80 added";
+  Serial << endl << F("INFO: The reference to the BMEX80 added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BMEX80
@@ -77,7 +78,7 @@ void AFEAPI::addClass(AFESensorHPMA115S0 *Sensor) {
     _HPMA115S0Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the HPMA115S0 added";
+  Serial << endl << F("INFO: The reference to the HPMA115S0 added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
@@ -88,7 +89,7 @@ void AFEAPI::addClass(AFESensorBH1750 *Sensor) {
     _BH1750Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the BH1750 added";
+  Serial << endl << F("INFO: The reference to the BH1750 added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
@@ -99,17 +100,36 @@ void AFEAPI::addClass(AFESensorAS3935 *Sensor) {
     _AS3935Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: The reference to the AS3935 added";
+  Serial << endl << F("INFO: The reference to the AS3935 added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+void AFEAPI::addClass(AFESensorAnemometer *AnemometerSensor) {
+  _AnemometerSensor = AnemometerSensor;
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Anemometer added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+void AFEAPI::addClass(AFESensorRainmeter *RainmeterSensor) {
+  _RainmeterSensor = RainmeterSensor;
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Rain added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPI::addClass(AFEGate *Item) {
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
     _Gate[i] = Item + i;
 #ifdef DEBUG
-    Serial << endl << "INFO: The reference to the Gate: " << i + 1 << " added";
+    Serial << endl
+           << F("INFO: The reference to the Gate: ") << i + 1 << F(" added");
 #endif
   }
 }
@@ -121,7 +141,8 @@ void AFEAPI::addClass(AFEContactron *Item) {
     _Contactron[i] = Item + i;
 #ifdef DEBUG
     Serial << endl
-           << "INFO: The reference to the Contactron: " << i + 1 << " added";
+           << F("INFO: The reference to the Contactron: ") << i + 1
+           << F(" added");
 #endif
   }
 }

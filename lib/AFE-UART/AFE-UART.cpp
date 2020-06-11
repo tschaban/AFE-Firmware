@@ -8,14 +8,15 @@ AFEUART::AFEUART() {}
 
 void AFEUART::begin() {
   AFEDataAccess Data;
-  SERIALPORT configuration = Data.getSerialPortConfiguration();
+  SERIALPORT configuration;
+  Data.getConfiguration(&configuration);
   SerialBus.init(configuration.RXD, configuration.TXD, false, 64,9600);
   SerialBus.println();
 
 #ifdef DEBUG
   Serial << endl
-         << "UART: Initialized (RX=" << configuration.RXD
-         << ",TX=" << configuration.TXD << ")";
+         << F("UART: Initialized (RX=") << configuration.RXD
+         << F(",TX=") << configuration.TXD << F(")");
 #endif
 }
 
@@ -26,25 +27,25 @@ void AFEUART::send(const uint8_t *cmd) {
   delay(100);
 #ifdef DEBUG
   Serial << endl
-         << "UART: Push: "
+         << F("UART: Push: ")
          << (cmd[3] == 0X93
-                 ? "READ DATA"
+                 ? F("READ DATA")
                  : cmd[3] == 0x77
-                       ? "AUTO OFF"
+                       ? F("AUTO OFF")
                        : cmd[3] == 0x95
-                             ? "DEVICE OFF"
-                             : cmd[3] == 0x96 ? "DEVICE ON" : "ERROR");
+                             ? F("DEVICE OFF")
+                             : cmd[3] == 0x96 ? F("DEVICE ON") : F("ERROR"));
 #endif
 }
 
 void AFEUART::clean() {
 #ifdef DEBUG
-  Serial << endl << "UART: Cleaning ";
+  Serial << endl << F("UART: Cleaning ");
 #endif
   while (SerialBus.available()) {
     SerialBus.read();
 #if defined(DEBUG)
-    Serial << ".";
+    Serial << F(".");
 #endif
   }
 }

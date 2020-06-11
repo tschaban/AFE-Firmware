@@ -58,11 +58,10 @@
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
  * excluded */
 #include <AFE-ADC-INPUT-Structure.h>
+#include <AFE-AS3935-Sensor-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-HPMA115S0-Sensor-Structure.h>
-#include <AFE-AS3935-Sensor-Structure.h>
-
 
 #ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-SERIALPORT-Structure.h>
@@ -70,6 +69,14 @@
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-ANEMOMETER-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-RAINMETER-Sensor-Structure.h>
 #endif
 
 #endif

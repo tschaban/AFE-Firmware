@@ -13,6 +13,9 @@
 //#define AFE_CONFIG_SERIAL_SPEED 9600
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
+/* Max size of the configuration HTML page */
+#define AFE_MAX_PAGE_SIZE 7700
+
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
 #define AFE_UPGRADE_VERSION 1
@@ -32,7 +35,7 @@
 /* URLs to AFE WebService */
 #define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
 #define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
-#define AFE_KEY_FREQUENCY_VALIDATION 1440
+#define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
 
 /* Types of URL requests */
 #define AFE_SERVER_CMD_SAVE 1
@@ -41,7 +44,6 @@
 /* File system */
 #define AFE_FS_SPIFFS 0
 #define AFE_FS_LITTLEFS 1
-
 
 /* Not existing hardware item. Used as a default value */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
@@ -93,7 +95,6 @@
 #define AFE_FIRMWARE_VERSION "2.2.0"
 #define AFE_FIRMWARE_TYPE 0
 
-
 /* Define Hardware */
 #define AFE_CONFIG_HARDWARE_SWITCH
 
@@ -107,7 +108,6 @@
 #ifdef AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 #endif
-
 
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -133,15 +133,14 @@
 #elif defined(AFE_DEVICE_SHELLY_1)
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 1
-#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin to INPUT
+#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
+// to INPUT
 /* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 4
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 5
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 5
 #endif
-
-
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -168,7 +167,8 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 0
-#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin to INPUT
+#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
+// to INPUT
 /* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
@@ -184,7 +184,6 @@
 #ifndef AFE_DEVICE_SHELLY_1
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 #endif
-
 
 /* Basic Switch + DS18B20 */
 #elif defined(T1_CONFIG)
@@ -222,7 +221,6 @@
 //#define AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 
-
 /* Basic Switch + DTHxx */
 #elif defined(T2_CONFIG)
 #define AFE_FIRMWARE_VERSION "1.4.0"
@@ -246,7 +244,8 @@
 #define AFE_FIRMWARE_TYPE 4
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-/* Gate --------------------------------------------------------------------------*/
+/* Gate
+ * --------------------------------------------------------------------------*/
 #elif defined(T5_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.2.1"
 #define AFE_FIRMWARE_TYPE 5
@@ -295,7 +294,6 @@
 #endif
 #endif
 
-
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECSv20)
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 1
@@ -320,7 +318,6 @@
 #endif
 #endif
 
-
 /* Functionalities */
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
@@ -328,18 +325,16 @@
 #define AFE_CONFIG_FUNCTIONALITY_GATE
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 
-
 /* Wheater Station */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.2.2"
+#define AFE_FIRMWARE_VERSION "2.3.0"
 #define AFE_FIRMWARE_TYPE 6
-
-//#define AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Functionalities */
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #define AFE_CONFIG_FUNCTIONALITY_ADC
+#define AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
@@ -347,6 +342,8 @@
 #define AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_HARDWARE_AS3935
+#define AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 /* Max number of hardware items, per AFE version */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 1
@@ -356,9 +353,11 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935 1
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ANEMOMETER_SENSORS 1
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RAINMETER_SENSORS 1
 
 /* Max number of hardware items per specyfic hardware device */
-#if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
+#ifdef AFE_DEVICE_iECS_WHEATER_STATION_20
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 1
@@ -366,6 +365,8 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS 1
 #else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 3
@@ -374,10 +375,12 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935 1
-#endif
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS 1
+#endif // AFE_DEVICE_iECS_WHEATER_STATION_20
 
 /* Default values for hardware items per specyfic hardware device */
-#if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
+#ifdef AFE_DEVICE_iECS_WHEATER_STATION_20
 /* Whater Station V2 */
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
@@ -386,6 +389,8 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS 0
 #else
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
@@ -394,10 +399,11 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935 0
-#endif
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS 0
+#endif // AFE_DEVICE_iECS_WHEATER_STATION_20
 
-#endif
-
+#endif // defined(T6_CONFIG)
 
 /* Configs related to a relay functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
@@ -417,6 +423,13 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 #ifndef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #define AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#endif
+#endif
+
+/* Config releated to battery meter functionality */
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifndef AFE_CONFIG_HARDWARE_ADC_VCC
+#define AFE_CONFIG_HARDWARE_ADC_VCC
 #endif
 #endif
 
@@ -451,37 +464,41 @@
 #endif
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifndef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#define AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#endif
+#endif
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
-#define  AFE_CONFIG_HARDWARE_LED_1_DEFAULT_GPIO 14
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
+#define AFE_CONFIG_HARDWARE_LED_1_DEFAULT_GPIO 14
 #elif defined(AFE_DEVICE_SONOFF_4CH)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_DUAL_R2)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_TH10)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_TH16)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_3G)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  13
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 13
 #elif defined(AFE_DEVICE_iECSv20)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  2
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 2
 #elif defined(AFE_DEVICE_WHEATER_STATION_iECSv20)
-#define  AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  2
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 2
 #else
-#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO  2
+#define AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO 2
 #endif
 #endif // AFE_CONFIG_HARDWARE_LED
-
 
 /* SWITCH */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -498,7 +515,8 @@
 #define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay controll
 
 /* Switche bouncing */
-#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING 50 // Bouncing for switch in miliseconds
+#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING                                   \
+  50 // Bouncing for switch in miliseconds
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
@@ -506,71 +524,107 @@
 #define AFE_HARDWARE_SWITCH_2_DEFAULT_GPIO 1
 #define AFE_HARDWARE_SWITCH_3_DEFAULT_GPIO 3
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_BI     // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_BI // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+                                 // one
 #elif defined(AFE_DEVICE_SONOFF_4CH)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 9
 #define AFE_HARDWARE_SWITCH_2_DEFAULT_GPIO 10
 #define AFE_HARDWARE_SWITCH_3_DEFAULT_GPIO 14
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
 // actually below 2 doesn't matter, they're needed to pharse the firmware ;)
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO  // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 9
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_3G)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 9
 #define AFE_HARDWARE_SWITCH_2_DEFAULT_GPIO 10
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_SHELLY_1)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 5
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_BI
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY
 // actually below 2 doesn't matter, they're needed to pharse the firmware ;)
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO  // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_RELAY // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_iECSv20)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 1
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first
+// one
 #elif defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 14
 #define AFE_HARDWARE_SWITCH_2_DEFAULT_GPIO 13
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first one
-#else 
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_MONO // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first
+// one
+#else
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_1_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_2_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_3_DEFAULT_GPIO 0
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE AFE_SWITCH_TYPE_MONO
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE AFE_SWITCH_TYPE_BI // Default for all switches exlcuding the first one
-#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_MULTI
-#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE                                     \
+  AFE_SWITCH_TYPE_BI // Default for all switches exlcuding the first one
+#define AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_MULTI
+#define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY                            \
+  AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first
+// one
 #endif
 
 #endif
@@ -578,8 +632,8 @@
 /* RELAY */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-#define AFE_RELAY_ON 1        // Relay is ON
-#define AFE_RELAY_OFF 0       // Relay is OFF
+#define AFE_RELAY_ON 1  // Relay is ON
+#define AFE_RELAY_OFF 0 // Relay is OFF
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO 12
@@ -656,9 +710,6 @@
 #define AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_SENDING_ONLY_CHANGES 0
 #define AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_TEMPERATURE_CORRECTION 0
 
-
-
-
 #endif
 
 /* DHxx sesnors like DHT21,DHT22 */
@@ -700,8 +751,8 @@
 /* AS3935 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 
-#define  AFE_DISTANCE_KM 1
-#define  AFE_DISTANCE_MIL 2
+#define AFE_DISTANCE_KM 1
+#define AFE_DISTANCE_MIL 2
 
 #ifndef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C
@@ -722,12 +773,18 @@
 
 /* ADC Input */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-#define AFE_CONFIG_API_JSON_ADC_DATA_LENGTH 200                   
+#define AFE_CONFIG_API_JSON_ADC_DATA_LENGTH 200
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_GPIO 17
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL 60
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES 1
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC 1
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MIN_V 3
+#define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V 4.2
+#define AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH 200
+#endif
 
 /* PIR Sesnor */
 #ifdef AFE_CONFIG_HARDWARE_PIR
@@ -750,10 +807,10 @@
 #define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
 #define AFE_MQTT_GATE_UNKNOWN "unknown"
 
-#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked, used by HTTP API
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH                                   \
+  200 // Not checked, used by HTTP API
 
 #endif
-
 
 /* Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -770,7 +827,8 @@
 #define AFE_MQTT_CONTACTRON_OPEN "open"
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
 
-#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH  200 // Not checked. used by HTTP API
+#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH                             \
+  200 // Not checked. used by HTTP API
 #endif
 
 /* Temperature */
@@ -789,7 +847,6 @@ typedef enum {
   AFE_HUMIDITY_INADEQUATE = 5
 } afe_humidity_ratings_t;
 #endif
-
 
 /* Pressure */
 #ifdef AFE_CONFIG_PRESSURE
@@ -863,7 +920,45 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH 200
 #endif
 
+/* Anemometer Sensor Defaults */
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
+#define AFE_DISTANCE_CENTIMETER 0
+#define AFE_DISTANCE_METER 1
+#define AFE_DISTANCE_KILOMETER 2
+
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING 1
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL 60
+#if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO 14
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE 25
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT           \
+  AFE_DISTANCE_CENTIMETER
+#else
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO 14
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE 25
+#define AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT           \
+  AFE_DISTANCE_CENTIMETER
+#endif
+
+#define AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH 88 // Orginal 78 added 10
+
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_BOUNCING 1
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_INTERVAL 60
+#if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_GPIO 13
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_RESOLUTION 172.5
+#else
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_GPIO 13
+#define AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_RESOLUTION 172.5
+#endif
+
+#define AFE_CONFIG_API_JSON_RAINMETER_DATA_LENGTH 160 // Orginal 150 added 10
+#endif // FE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 /* Config sites IDs */
 #define AFE_CONFIG_SITE_INDEX 0
@@ -921,14 +1016,23 @@ typedef enum {
 #define AFE_CONFIG_SITE_DS18B20 27
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define AFE_CONFIG_SITE_ANEMOMETER_SENSOR 27
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define AFE_CONFIG_SITE_RAINMETER_SENSOR 28
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
 /* ***************** APIs: Config and defaults *********************/
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-#define AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED 0 // Default State of relay after connection to MQTT Broker is established.
+#define AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED                 \
+  0 // Default State of relay after connection to MQTT Broker is established.
 #ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables processing MQTT incoming messages.
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif // AFE_CONFIG_HARDWARE_RELAY
+#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables
+                                        // processing MQTT incoming messages.
+#endif                                  // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif                                  // AFE_CONFIG_HARDWARE_RELAY
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -936,43 +1040,70 @@ typedef enum {
 #define AFE_DOMOTICZ_VERSION_1 1 // 2020.x
 #define AFE_DOMOTICZ_VERSION_DEFAULT AFE_DOMOTICZ_VERSION_0
 
-#define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if Domoticz is Off, button is pressed and HTTP Domoticz API is on
+#define AFE_CONFIG_API_HTTP_TIMEOUT                                            \
+  200 // Time for HTTP response. If 5000 than device goes to config mode if
+      // Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-#define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
+#define AFE_DOMOTICZ_DEFAULT_IDX 0       // Default value for IDX
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in" // MQTT Topic for outgoing from AFE messages
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for messages that contains description
-#define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 55 // Outgoing MQTT message size for switch
-#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70  // Outgoing MQTT message size for custom sensor
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN                                       \
+  "domoticz/in" // MQTT Topic for outgoing from AFE messages
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT                                      \
+  "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE                                        \
+  380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
+      // messages that contains description
+#define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH                              \
+  55 // Outgoing MQTT message size for switch
+#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH                              \
+  70 // Outgoing MQTT message size for custom sensor
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
-
+#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH                                \
+  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH                          \
+  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
 #endif
 
-#define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190  // Outgoing url size for statuses updates to Domoticz
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#define AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH 100
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#define AFE_CONFIG_API_JSON_RAINMETER_COMMAND_LENGTH 100
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#define AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH 100 // to check
+#endif
+
+#define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH                                     \
+  190 // Outgoing url size for statuses updates to Domoticz
+
 #else
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
-#define AFE_CONFIG_API_MQTT_TOPICS_CACHE_LENGTH AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS+AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES+1 // Size of topics cache
+#define AFE_CONFIG_API_MQTT_TOPICS_CACHE_LENGTH                                \
+  AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS +                                       \
+      AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES + 1 // Size of topics cache
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT                                        \
+  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
+       // down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
 
 /* Config releated to LWT Functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS  // Configuration paramters which enables processing MQTT incoming messages.
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables
+                                        // processing MQTT incoming messages.
+#endif                                  // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif                                  // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
 /* Humidity Domoticz state*/
@@ -1000,36 +1131,48 @@ typedef enum {
 #define AFE_FILE_SYSTEM_LED_CONFIGURATION "cfg-system-led.json"
 #define AFE_FILE_ADC_CONFIGURATION "cfg-analog-input.json"
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
-
+#define AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION "cfg-anemometer-sensor-0.json"
+#define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
+#define AFE_FILE_RAINMETER_SENSOR_DATA_FILE "/cfg-rainmeter-data-0.json"
 
 /* Configuration files, JSON Buffers.  */
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_BH1750 230
-#define AFE_CONFIG_FILE_BUFFER_I2C 54 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 405 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_NETWORK 375 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_LED 76 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_RELAY 240
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_SWITCH 210
-#define AFE_CONFIG_FILE_BUFFER_ADC 300
-#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 240
-#define AFE_CONFIG_FILE_BUFFER_UART 54 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 570
-#define AFE_CONFIG_FILE_BUFFER_AS3935 240
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant 
-#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
-#define AFE_CONFIG_FILE_BUFFER_DS18B20 300 
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER                                     \
+  352                                     // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_BH1750 221 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_I2C 54     // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE                                     \
+  31 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION                                     \
+  78                                         // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72   // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 405    // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145  // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 375   // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_LED 76        // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_RELAY                                           \
+  287 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE                                     \
+  36 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_SWITCH                                          \
+  238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_ADC 489       // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_UART 54       // Verfied by ArduinoJson Assistant
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 984 // Verfied by ArduinoJson Assistant
+#else
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // Verfied by ArduinoJson Assistant
+#endif
 
+#define AFE_CONFIG_FILE_BUFFER_AS3935 439 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON                                      \
+  241                                   // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA 1100 // Not verfied
 
 #define AFE_RESPONSE_KEY_VALIDATION 135
-
 
 #endif // _AFE_Configuration_h

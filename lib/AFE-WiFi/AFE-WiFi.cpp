@@ -11,7 +11,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
   WiFiMode = mode;
 
   if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
-    networkConfiguration = Data.getNetworkConfiguration();
+    Data.getConfiguration(&networkConfiguration);
   }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -26,32 +26,32 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Device is in mode: " << WiFiMode;
+  Serial << endl << F("INFO: Device is in mode: ") << WiFiMode;
 #endif
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   if (WiFiMode == AFE_MODE_ACCESS_POINT ||
       WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Starting HotSpot: ";
+    Serial << endl << F("INFO: Starting HotSpot: ");
 #endif
     IPAddress apIP(192, 168, 5, 1);
     WiFi.mode(WIFI_AP);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     WiFi.softAP(Device->configuration.name);
 #ifdef DEBUG
-    Serial << "completed";
+    Serial << F("completed");
 #endif
   } else {
 #ifdef DEBUG
-    Serial << endl << "INFO: Starting WiFi: in WIFI_STA mode";
+    Serial << endl << F("INFO: Starting WiFi: in WIFI_STA mode");
 #endif
     if (!networkConfiguration.isDHCP) {
       IPAddress ip;
       if (!ip.fromString(networkConfiguration.ip)) {
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: Problem with WIFI IP address: "
+               << F("ERROR: Problem with WIFI IP address: ")
                << networkConfiguration.ip;
 #endif
       }
@@ -59,7 +59,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
       if (!gateway.fromString(networkConfiguration.gateway)) {
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: Problem with WIFI gateway address: "
+               << F("ERROR: Problem with WIFI gateway address: ")
                << networkConfiguration.gateway;
 #endif
       }
@@ -67,14 +67,14 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
       if (!subnet.fromString(networkConfiguration.subnet)) {
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: Problem with WIFI subnet address: "
+               << F("ERROR: Problem with WIFI subnet address: ")
                << networkConfiguration.subnet;
 #endif
       }
 
       WiFi.config(ip, gateway, subnet);
 #ifdef DEBUG
-      Serial << endl << "INFO: Settting fixed IP";
+      Serial << endl << F("INFO: Settting fixed IP");
 #endif
     }
 
@@ -102,9 +102,10 @@ void AFEWiFi::listener() {
             if (strlen(networkConfiguration.ssid) == 0 ||
                 strlen(networkConfiguration.password) == 0) {
 #ifdef DEBUG
-              Serial << endl
-                     << "ERROR: WiFI is not configured. Going to configuration "
-                        "mode";
+              Serial
+                  << endl
+                  << F("ERROR: WiFI is not configured. Going to configuration "
+                       "mode");
 #endif
               Device->reboot(AFE_MODE_NETWORK_NOT_SET);
             }
@@ -112,9 +113,9 @@ void AFEWiFi::listener() {
             WiFi.begin(networkConfiguration.ssid,
                        networkConfiguration.password);
 #ifdef DEBUG
-            Serial << endl << "INFO: Starting establishing WiFi connection ";
+            Serial << endl << F("INFO: Starting establishing WiFi connection ");
             Serial << endl
-                   << networkConfiguration.ssid << " - "
+                   << networkConfiguration.ssid << F(" - ")
                    << networkConfiguration.password;
 #endif
           }
@@ -137,10 +138,10 @@ void AFEWiFi::listener() {
           delay(10);
 #ifdef DEBUG
           Serial << endl
-                 << "INFO: WiFi connection attempt: " << connections << " from "
-                 << networkConfiguration.noConnectionAttempts << ", IP("
-                 << WiFi.localIP() << ")"
-                 << " WL-Status=" << WiFi.status();
+                 << F("INFO: WiFi connection attempt: ") << connections
+                 << F(" from ") << networkConfiguration.noConnectionAttempts
+                 << F(", IP(") << WiFi.localIP() << F(")") << F(" WL-Status=")
+                 << WiFi.status();
 #endif
           delayStartTime = 0;
         }
@@ -159,8 +160,8 @@ void AFEWiFi::listener() {
           connections = 0;
 #ifdef DEBUG
           Serial << endl
-                 << "WARN: Not able to connect.Going to sleep mode for "
-                 << networkConfiguration.waitTimeSeries << "sec.";
+                 << F("WARN: Not able to connect.Going to sleep mode for ")
+                 << networkConfiguration.waitTimeSeries << F("sec.");
 #endif
         }
       }
@@ -176,8 +177,8 @@ void AFEWiFi::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << "INFO: WiFi Connection established"
-               << ", MAC: " << WiFi.macAddress() << ", IP: " << WiFi.localIP();
+               << F("INFO: WiFi Connection established") << F(", MAC: ")
+               << WiFi.macAddress() << F(", IP: ") << WiFi.localIP();
 #endif
       }
     }
@@ -207,4 +208,16 @@ boolean AFEWiFi::eventConnected() {
   boolean returnValue = eventConnectionEstablished;
   eventConnectionEstablished = false;
   return returnValue;
+}
+
+uint16_t AFEWiFi::getJSON(const String &url, String &response) {
+  http.begin(url);
+  uint16_t httpCode = http.GET();
+  if (httpCode == 200) {
+    response = http.getString();
+  } else {
+    response = "";
+  }
+  http.end();
+  return httpCode;
 }

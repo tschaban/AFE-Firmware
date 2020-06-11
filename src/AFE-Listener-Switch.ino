@@ -8,7 +8,7 @@ void initializeSwitch() {
     Switch[i].begin(i, &Device);
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: Switch(es) initialized";
+  Serial << endl << F("INFO: Switch(es) initialized");
 #endif
 }
 
@@ -26,7 +26,7 @@ void processSwitchEvents() {
 
 #ifdef DEBUG
         Serial << endl
-               << "INFO: Switch pressed with assigned Relay: "
+               << F("INFO: Switch pressed with assigned Relay: ")
                << Switch[i].configuration.relayID;
 #endif
 
@@ -40,7 +40,7 @@ void processSwitchEvents() {
 
 #ifdef DEBUG
             Serial << endl
-                   << "INFO: Relay is assigned to a gate: "
+                   << F("INFO: Relay is assigned to a gate: ")
                    << Relay[Switch[i].configuration.relayID].gateId;
 #endif
             Gate[Relay[Switch[i].configuration.relayID].gateId].toggle();

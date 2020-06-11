@@ -9,7 +9,7 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-CSS.h>
+#include <AFE-Site-components.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
@@ -44,10 +44,10 @@
 class AFESitesGenerator {
 
 private:
-  AFEDataAccess Data;
+  AFEDataAccess *Data;
   AFEDevice *Device;
-  FIRMWARE firmware;
-  AFEFirmwarePro *Firmware;
+  FIRMWARE Firmware;
+  AFEFirmwarePro *FirmwarePro;
   char deviceID[17];
 
   void generateHeader(String &page, uint16_t redirect);
@@ -98,7 +98,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDevice *, AFEFirmwarePro *);
+  void begin(AFEDataAccess *,AFEDevice *, AFEFirmwarePro *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
@@ -174,6 +174,10 @@ public:
   void addAS3935Configuration(String &page, uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void addAnemometerSensorConfiguration(String &page);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   void addAnalogInputConfiguration(String &page);
 #endif
@@ -186,6 +190,10 @@ public:
   void addI2CPortConfiguration(String &page);
   // String addDeviceI2CAddressSelection(uint8_t address);
   void addDeviceI2CAddressSelection(String &page, uint8_t address);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void addRainmeterSensorConfiguration(String &page);
 #endif
 
   /* These methods generates firmware upgrade sections */

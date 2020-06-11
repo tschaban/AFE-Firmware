@@ -42,6 +42,10 @@ private:
   void upgradeToT5V220();
 #endif
 
+#ifdef T6_CONFIG
+  void upgradeToT6V230();
+#endif
+
 public:
   /* Constructor */
   AFEUpgrader(AFEDataAccess *, AFEDevice *);

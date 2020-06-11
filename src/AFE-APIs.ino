@@ -42,6 +42,14 @@ void initializeHTTPDomoticzAPI() {
     HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    HttpDomoticzAPI.addClass(&AnemometerSensor);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    HttpDomoticzAPI.addClass(&RainSensor);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     HttpDomoticzAPI.addClass(&Contactron[0]);
 #endif
@@ -51,7 +59,7 @@ void initializeHTTPDomoticzAPI() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << "API: MQTT init completed";
+    Serial << endl << F("INFO: API: MQTT init completed");
 #endif
   }
 }
@@ -64,7 +72,7 @@ void initializeMQTTAPI() {
       Device.configuration.api.mqtt) {
 
 #ifdef DEBUG
-    Serial << endl << "INFO: API: Initializing MQTT";
+    Serial << endl << F("INFO: API: Initializing MQTT");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -103,6 +111,14 @@ void initializeMQTTAPI() {
     MqttAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    MqttAPI.addClass(&AnemometerSensor);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    MqttAPI.addClass(&RainSensor);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
     MqttAPI.addClass(&Gate[0]);
 #endif
@@ -112,7 +128,7 @@ void initializeMQTTAPI() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << "INFO: API: MQTT init completed";
+    Serial << endl << F("INFO: API: MQTT init completed");
 #endif
   }
 }
@@ -122,7 +138,7 @@ void initializeHTTPAPI() {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT) {
 
 #ifdef DEBUG
-    Serial << endl << "INFO: API: Initializing MQTT";
+    Serial << endl << F("INFO: API: Initializing MQTT");
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -155,6 +171,14 @@ void initializeHTTPAPI() {
     HttpAPI.addClass(&AS3935Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    HttpAPI.addClass(&AnemometerSensor);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    HttpAPI.addClass(&RainSensor);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
     HttpAPI.addClass(&Gate[0]);
 #endif
@@ -164,7 +188,7 @@ void initializeHTTPAPI() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << "INFO: API: HTTP init completed";
+    Serial << endl << F("INFO: API: HTTP init completed");
 #endif
   }
 }

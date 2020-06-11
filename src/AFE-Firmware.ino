@@ -75,7 +75,7 @@ float humidity;
 #endif
 
 AFEDataAccess Data;
-AFEFirmwarePro Firmware;
+AFEFirmwarePro FirmwarePro;
 AFEDevice Device;
 AFEWiFi Network;
 AFEAPIHTTP HttpAPI;
@@ -144,6 +144,22 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 AFEAnalogInput AnalogInput;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
+AFESensorBinary WindImpulse;
+AFESensorAnemometer AnemometerSensor;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-Sensor-Rainmeter.h>
+AFESensorBinary RainImpulse;
+AFESensorRainmeter RainSensor;
+#endif
+
 void setup() {
 
 #ifdef DEBUG
@@ -155,19 +171,19 @@ void setup() {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << "################################ BOOTING "
-            "################################"
+         << F("################################ BOOTING "
+              "################################")
          << endl
-         << "INFO: All classes and global variables initialized" << endl
-         << "INFO: Initializing device" << endl;
+         << F("INFO: All classes and global variables initialized") << endl
+         << F("INFO: Initializing device") << endl;
 #endif
 
   /* Initializing SPIFFS file system */
   if (SPIFFS.begin()) {
 #ifdef DEBUG
-    Serial << "INFO: File system: mounted";
+    Serial << F("INFO: File system: mounted");
   } else {
-    Serial << "ERROR: File system not mounted";
+    Serial << F("ERROR: File system not mounted");
 #endif
     yield();
   }
@@ -177,19 +193,19 @@ void setup() {
 /* Checking if the device is launched for a first time. If so it loades
  * default configuration */
 #ifdef DEBUG
-  Serial << endl << "INFO: Checking if first time launch ... ";
+  Serial << endl << F("INFO: Checking if first time launch ... ");
 #endif
 
   if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
 #ifdef DEBUG
-    Serial << "YES";
+    Serial << F("YES");
 #endif
     Device.setDevice();
     Device.begin();
   }
 #ifdef DEBUG
   else {
-    Serial << "NO";
+    Serial << F("NO");
   }
 #endif
 
@@ -199,7 +215,7 @@ void setup() {
   yield();
 
 #ifdef DEBUG
-  Serial << endl << "INFO: System LED ID: " << systemLedID;
+  Serial << endl << F("INFO: System LED ID: ") << systemLedID;
 #endif
 
   if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -207,58 +223,61 @@ void setup() {
   }
   Led.on();
 #ifdef DEBUG
-  Serial << endl << "INFO: System LED initialized";
+  Serial << endl << F("INFO: System LED initialized");
 #endif
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Checking, if WiFi was configured: ";
+  Serial << endl << F("INFO: Checking, if WiFi was configured: ");
 #endif
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Serial << "YES";
+    Serial << F("YES");
 #endif
   } else {
 /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
-    Serial << "NO" << endl << "INFO: Checking if firmware should be upgraded?";
+    Serial << F("NO") << endl
+           << F("INFO: Checking if firmware should be upgraded?");
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
-      Serial << endl << "WARN: Firmware is not up2date. Upgrading...";
+      Serial << endl << F("WARN: Firmware is not up2date. Upgrading...");
 #endif
       Upgrader->upgrade();
 #ifdef DEBUG
-      Serial << endl << "INFO: Firmware upgraded";
+      Serial << endl << F("INFO: Firmware upgraded");
 #endif
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "INFO: Firmware is up2date";
+      Serial << endl << F("INFO: Firmware is up2date");
     }
 #endif
     delete Upgrader;
     Upgrader = NULL;
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-    /* Initializing relay */
-    initializeRelay();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      /* Initializing relay */
+      initializeRelay();
 #ifdef DEBUG
-    Serial << endl << "INFO: Relay(s) initialized";
+      Serial << endl << F("INFO: Relay(s) initialized");
 #endif
+    }
 #endif
   }
 
   /* Initialzing network */
   Network.begin(Device.getMode(), &Device);
 #ifdef DEBUG
-  Serial << endl << "INFO: Network initialized";
+  Serial << endl << F("INFO: Network initialized");
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Starting network";
+  Serial << endl << F("INFO: Starting network");
 #endif
   Network.listener();
 
@@ -271,14 +290,14 @@ void setup() {
   }
 
   /* Initializing Firmware: version PRO */
-  Firmware.begin();
-  WebServer.begin(&Device, &Firmware);
+  FirmwarePro.begin(&Network);
+  WebServer.begin(&Data, &Device, &FirmwarePro);
 #ifdef AFE_CONFIG_HARDWARE_LED
   WebServer.initSystemLED(&Led);
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: WebServer initialized";
+  Serial << endl << F("INFO: WebServer initialized");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -290,12 +309,16 @@ void setup() {
 
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    initializeContractons();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeContractons();
+    }
 #endif
 
 /* Initializing Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    initializeGate();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeGate();
+    }
 #endif
 
 /* Initializing DS18B20  */
@@ -304,31 +327,40 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    initializeHPMA115S0Sensor();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeHPMA115S0Sensor();
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-    initializeBMEX80Sensor();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeBMEX80Sensor();
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    initializeBH1750Sensor();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeBH1750Sensor();
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-    initializeAS3935Sensor();
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+      initializeAS3935Sensor();
+    }
 #endif
 
 #if defined(T3_CONFIG)
     /* Initializing PIRs */
     initPIR();
 #ifdef DEBUG
-    Serial << endl << "PIR initialized";
+    Serial << endl << F("PIR initialized");
 #endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    if (Device.configuration.isAnalogInput && Firmware.Pro.valid) {
+    if (Device.getMode() == AFE_MODE_NORMAL &&
+        Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
@@ -362,25 +394,37 @@ void setup() {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  if (Device.getMode() == AFE_MODE_NORMAL) {
+    initializeAnemometerSensor();
+  }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  if (Device.getMode() == AFE_MODE_NORMAL) {
+    initializeRainSensor();
+  }
+#endif
+
 #ifdef DEBUG
   Serial << endl
-         << "#############################################"
-            "###########################"
+         << F("################################################################"
+              "########")
          << endl
-         << "#                           BOOTING COMPLETED"
-            "                          #"
+         << F("#                           BOOTING COMPLETED                   "
+              "       #")
          << endl
-         << "#                            STARTING DEVICE "
-            "                          #";
+         << F("#                            STARTING DEVICE                    "
+              "       #");
   if (Device.getMode() != AFE_MODE_NORMAL) {
     Serial << endl
-           << "#                           CONFIGURATION MODE"
-              "                         #";
+           << F("#                           CONFIGURATION MODE                "
+                "         #");
   }
 
   Serial << endl
-         << "#############################################"
-            "###########################";
+         << F("################################################################"
+              "########");
 #endif
 }
 
@@ -416,7 +460,7 @@ void loop() {
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_DS18B20)
-        //DS18B20SensorEventsListener();
+        // DS18B20SensorEventsListener();
 #endif
 
 /* Sensor: HPMA115S0 related code  */
@@ -440,12 +484,20 @@ void loop() {
         analogInputEventsListener();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+        windSensorListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+        rainSensorListener();
+#endif
+
 #if defined(T3_CONFIG)
         mainPIR();
 #endif
 
         /* Checking if Key is still valid */
-        Firmware.listener();
+        FirmwarePro.listener();
 
       } else { /* Device runs in configuration mode over WiFi */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -488,7 +540,7 @@ void loop() {
 /* Debug information */
 #if defined(DEBUG)
   if (Device.getMode() == AFE_MODE_NORMAL) {
-    debugListener();
+    //  debugListener();
   }
 #endif
 }

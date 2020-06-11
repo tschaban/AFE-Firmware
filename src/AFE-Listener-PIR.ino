@@ -22,7 +22,7 @@ void mainPIR() {
       if (Pir[i].stateChanged()) {
 #ifdef DEBUG
         Serial << endl
-               << "PIR: " << (Pir[i].motionDetected() ? " Yes " : " No ");
+               << F("PIR: ") << (Pir[i].motionDetected() ? " Yes " : " No ");
 #endif
 
         MQTTPublishPIRState(i);

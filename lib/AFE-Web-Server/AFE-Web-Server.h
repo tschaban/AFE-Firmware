@@ -40,7 +40,10 @@ class AFEWebServer {
 private:
   ESP8266WebServer server;
   AFEDevice *Device;
-  AFEFirmwarePro *Firmware;
+  AFEFirmwarePro *FirmwarePro;
+  AFEDataAccess *Data;
+
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
 #endif
@@ -57,8 +60,7 @@ private:
   unsigned long howLongInConfigMode = 0;
 
   uint16_t uploadLED = 1023;
-
-  AFEDataAccess Data;
+  
   AFESitesGenerator Site;
 
   boolean upgradeFailed = false;
@@ -70,26 +72,29 @@ private:
   uint8_t getID();
 
   /* Generates HTML response (site) */
-  String generateSite(AFE_SITE_PARAMETERS *siteConfig);
+  String generateSite(AFE_SITE_PARAMETERS *siteConfig, String &page);
 
   /* Methods get POST data (for saveing) */
-  DEVICE getDeviceData();
-  NETWORK getNetworkData();
-  MQTT getMQTTData();
+  void getDeviceData(DEVICE *);
+  void getNetworkData(NETWORK *);
+  void getMQTTData(MQTT *);
+  void getPasswordData(PASSWORD *);
+  void getSerialNumberData(PRO_VERSION *);
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  DOMOTICZ getDomoticzServerData();
+  void getDomoticzServerData(DOMOTICZ *);
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  RELAY getRelayData(uint8_t id);
+  void getRelayData(uint8_t id, RELAY *);
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  SWITCH getSwitchData(uint8_t id);
+  void getSwitchData(uint8_t id, SWITCH *);
 #endif
-  PASSWORD getPasswordData();
-  PRO_VERSION getSerialNumberData();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  LED getLEDData(uint8_t id);
+  void getLEDData(uint8_t id, LED *);
   uint8_t getSystemLEDData();
 #endif
 
@@ -98,58 +103,69 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
-  DH getDHTData();
+  void getDHTData(DH *);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  REGULATOR getRegulatorData();
+  void getRegulatorData(REGULATOR *);
 #endif
 
 #if defined(T3_CONFIG)
-  PIR getPIRData(uint8_t id);
+  void getPIRData(uint8_t id, PIR *);
 #endif
 
-#if defined(T5_CONFIG)
-  CONTACTRON getContactronData(uint8_t id);
-  GATE getGateData();
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void getContactronData(uint8_t id, CONTACTRON *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void getGateData(GATE *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-  SERIALPORT getSerialPortData();
+  void getSerialPortData(SERIALPORT *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  I2CPORT getI2CPortData();
+  void getI2CPortData(I2CPORT *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  HPMA115S0 getHPMA115S0SensorData();
+  void getHPMA115S0SensorData(HPMA115S0 *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  BMEX80 getBMEX80SensorData();
+  void getBMEX80SensorData(BMEX80 *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  BH1750 getBH1750SensorData();
+  void getBH1750SensorData(BH1750 *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  AS3935 getAS3935SensorData();
+  void getAS3935SensorData(AS3935 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void getAnemometerSensorData(ANEMOMETER *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void getRainmeterSensorData(RAINMETER *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  ADCINPUT getAnalogInputData();
+  void getAnalogInputData(ADCINPUT *);
 #endif
 
 public:
   AFEWebServer();
 
   /* Method pushes HTML site from WebServer */
-  void publishHTML(String page);
+  void publishHTML(String &page);
 
   /* Method initialize WebServer and Updater server */
-  void begin(AFEDevice *, AFEFirmwarePro *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */
@@ -168,11 +184,13 @@ public:
                              ESP8266WebServer::THandlerFunction handlerUpgrade,
                              ESP8266WebServer::THandlerFunction handlerUpload);
 
-  /* Method generate HTML side. It reads also data from HTTP requests arguments
+  /* Method generate HTML side. It reads also data from HTTP requests
+   * arguments
    * and pass them to Configuration Panel class */
   void generate(boolean upload = false);
 
-  /* Method listens for HTTP API requests. If get True command is in httpCommand
+  /* Method listens for HTTP API requests. If get True command is in
+   * httpCommand
    */
   boolean httpAPIlistener();
 

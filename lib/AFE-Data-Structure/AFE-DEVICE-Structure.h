@@ -57,6 +57,14 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   uint8_t noOfDS18B20s;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  uint8_t noOfAnemometerSensors;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  uint8_t noOfRainmeterSensors;
+#endif
+
+
 };
 
 /* Custom DEVICE structure definition

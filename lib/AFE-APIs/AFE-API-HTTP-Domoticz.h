@@ -31,19 +31,19 @@ private:
   DOMOTICZ configuration;
 
   char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];
-/*
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-  uint8_t lastIDXChacheIndex = 0;
-  DOMOTICZ_IDX_CACHE idxCache[1
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-                              + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-                              + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-#endif
-  ];
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
-*/
+  /*
+  #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+    uint8_t lastIDXChacheIndex = 0;
+    DOMOTICZ_IDX_CACHE idxCache[1
+  #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
+                                + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
+  #endif
+  #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+                                + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+  #endif
+    ];
+  #endif // AFE_CONFIG_API_PROCESS_REQUESTS
+  */
 
   /* Invokes API setup */
   void init();
@@ -68,7 +68,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #else
-void begin(AFEDataAccess *, AFEDevice *);
+  void begin(AFEDataAccess *, AFEDevice *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -108,6 +108,16 @@ void begin(AFEDataAccess *, AFEDevice *);
   boolean publishAS3935SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  virtual void addClass(AFESensorAnemometer *);
+  void publishAnemometerSensorData();
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  virtual void addClass(AFESensorRainmeter *);
+  void publishRainSensorData();
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
   boolean publishGateState(uint8_t id);
@@ -117,6 +127,10 @@ void begin(AFEDataAccess *, AFEDevice *);
   virtual void addClass(AFEContactron *);
   boolean publishContactronState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  boolean publishBatteryMeterValues();
+#endif
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

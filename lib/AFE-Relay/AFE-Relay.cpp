@@ -8,7 +8,7 @@ AFERelay::AFERelay(uint8_t id) { begin(id); }
 
 void AFERelay::begin(uint8_t id) {
   _id = id;
-  configuration = Data.getRelayConfiguration(_id);
+   Data.getConfiguration(_id,&configuration);
 
   pinMode(configuration.gpio, OUTPUT);
 
@@ -56,7 +56,7 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Relay: ON, inverted: " << (invert ? "YES" : "NO");
+  Serial << endl << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_OFF) {
@@ -85,7 +85,7 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Relay: OFF, inverted: " << (invert ? "YES" : "NO");
+  Serial << endl << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_ON) {

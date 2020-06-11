@@ -95,38 +95,48 @@ public:
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  /* Adds global class for reference (passes it to base class)*/
   virtual void addClass(AFESwitch *);
-  /* Publishes MQTT Message with switch state */
   boolean publishSwitchState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Adds global class for reference (passes it to base class). */
   virtual void addClass(AFEAnalogInput *);
-  /* Publishes MQTT Message with Analog data */
   void publishADCValues();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void publishBatteryMeterValues();
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
   boolean publishBMx80SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   virtual void addClass(AFESensorHPMA115S0 *);
   boolean publishHPMA115S0SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   virtual void addClass(AFESensorBH1750 *);
   boolean publishBH1750SensorData(uint8_t id);
-#endif
+#endif //  AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   virtual void addClass(AFESensorAS3935 *);
   boolean publishAS3935SensorData(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  virtual void addClass(AFESensorAnemometer *);
+  void publishAnemometerSensorData();
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  virtual void addClass(AFESensorRainmeter *);
+  void publishRainSensorData();
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);

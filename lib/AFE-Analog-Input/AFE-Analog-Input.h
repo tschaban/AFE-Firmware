@@ -28,6 +28,10 @@ public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  float batteryPercentage = 0;
+#endif
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
@@ -49,6 +53,13 @@ public:
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
+
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  /* Returns the batter data in JSON format */
+  void getBatteryMeterJSON(char *json);
+#endif  
+
 };
 
 #endif

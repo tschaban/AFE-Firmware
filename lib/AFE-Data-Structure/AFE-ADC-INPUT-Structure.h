@@ -30,6 +30,18 @@ struct VOLTAGE_DIVIDER {
   double Rb;
 };
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+struct BATTERY_METER {
+  float maxVoltage;
+  float minVoltage;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  MQTT_BASIC_CONFIG mqtt;
+#else
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#endif
+};
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
 struct ADCINPUT {
   uint8_t gpio;
   uint32_t interval;
@@ -39,8 +51,11 @@ struct ADCINPUT {
   MQTT_BASIC_CONFIG mqtt;
 #else
   ADCINPUT_DOMOTICZ domoticz;
-#endif  
+#endif
   VOLTAGE_DIVIDER divider;
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  BATTERY_METER battery;
+#endif
 };
 
 #endif

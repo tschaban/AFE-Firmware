@@ -53,6 +53,14 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-Sensor-Rainmeter.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -98,6 +106,14 @@ private:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  AFESensorAnemometer *_AnemometerSensor;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  AFESensorRainmeter *_RainmeterSensor;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
 #endif
@@ -115,8 +131,11 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Processing HTTP request for ADC */
   void processAnalogInput(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void processBatteryMeter(HTTPCOMMAND *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -133,6 +152,14 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void processAS3935(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void processAnemometerSensor(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void processRainSensor(HTTPCOMMAND *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -193,6 +220,14 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void addClass(AFESensorAS3935 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void addClass(AFESensorAnemometer *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void addClass(AFESensorRainmeter *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
