@@ -25,6 +25,8 @@ recaptchacontact:
 > Stan na dzisiaj
 >* Obsługa [wejścia analogowo-cyfrowago](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-wejscie-analogowe)
 >* Obsługa [czujnika wykrywania burzy AS3935](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935)
+>* Obsługa czujników [BH1750](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bh1750) oraz czujników [Bosch s serii BMEx80](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/bosch-bmx) dla sterownika bramy (AFE T5)
+>* Pomiar naładowania stanu bateri w Stacji Pogody (AFE T6)
 
 
 ##### Mam klucz, co dalej?
