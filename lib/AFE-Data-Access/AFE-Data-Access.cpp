@@ -2268,7 +2268,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif
       configuration->divider.Ra = root["divider"]["Ra"];
       configuration->divider.Rb = root["divider"]["Rb"];
-#ifdef DEBUG
+
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
       configuration->battery.maxVoltage =
@@ -2284,6 +2284,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
+#ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_ADC
              << F(", actual JSON size: ") << jsonBuffer.size();
@@ -3907,7 +3908,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 void AFEDataAccess::createAS3935SensorConfigurationFile() {
   AS3935 configuration;
 
-  configuration.irqGPIO = 0;
+  configuration.irqGPIO = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_GPIO;
   configuration.setNoiseFloorAutomatically = true;
   configuration.noiseFloor = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
   configuration.minimumNumberOfLightningSpikes =
