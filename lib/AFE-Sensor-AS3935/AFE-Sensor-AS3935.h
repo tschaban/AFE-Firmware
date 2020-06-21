@@ -21,19 +21,13 @@
 class AFESensorAS3935 {
 
 private:
-  AS3935Sensor AS3935LightingSensor;
-
   boolean ready = false;
   
 
 public:
   AS3935 configuration;
-
-  uint8_t test = 0;
-
-  /* Stories information about the distance to the storm */
-  uint8_t distance;
-  uint8_t eventType;
+  AS3935Sensor AS3935LightingSensor;
+  AS3935_EVENT event;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
@@ -45,13 +39,8 @@ public:
   /* Turns On sensor, true if OK, False if failure */
   boolean begin(uint8_t id);
 
-  /* To call after strike has been detected. It reads information from the
-   * sensor about the event. It's called by the interaption handler attached to
-   * the GPIO  */
-  void interruptionReported();
-
   /* Returnes true if strike has been detected */
-  boolean strikeDetected();
+  boolean listener();
 
   /* Returns sensor data in a form of the JSON */
   void getJSON(char *json);

@@ -375,7 +375,7 @@
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
 #define L_INDOOR "Wewnątrz budynku"
 #define L_OUTDOOR "Na zewnątrz"
-
+#define L_TUNING_CAPACITOR "Dostrojenie wewnętrznego kondensatora"
 
 #define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif

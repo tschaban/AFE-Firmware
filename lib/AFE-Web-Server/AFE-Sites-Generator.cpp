@@ -2180,6 +2180,10 @@ void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
   addItem(page, "number", "s", L_SPIKES_REJECTION, _number, "?", "1", "11", "1",
           L_SPIKES_REJECTION_HINT);
 
+  sprintf(_number, "%d", configuration.tuningCapacitor);
+  addItem(page, "number", "tc", L_TUNING_CAPACITOR, _number, "?", "0", "15", "1",
+          "");          
+
   page += "<div class=\"cf\"><label>";
   page += F(L_MIN_SPIKES);
   page += "</label><select name=\"m\"><option value=\"1\"";

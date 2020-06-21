@@ -53,8 +53,22 @@ boolean AFESensorAS3935::begin(uint8_t id) {
       Serial << endl << F("INFO: Initializing IRQ GPIO");
 #endif
 
-      AS3935LightingSensor.begin(I2C.SDA, I2C.SCL, configuration.i2cAddress,
-                                 configuration.irqGPIO);
+      AS3935LightingSensor.configuration.ADDRESS = configuration.i2cAddress;
+      AS3935LightingSensor.configuration.SCL = I2C.SCL;
+      AS3935LightingSensor.configuration.SDA = I2C.SDA;
+      AS3935LightingSensor.configuration.IRQ = configuration.irqGPIO;
+      AS3935LightingSensor.configuration.AFE_GB =
+          configuration.indoor ? AFE_GAIN_INDOOR : AFE_GAIN_OUTDOOR;
+      AS3935LightingSensor.configuration.MIN_NUM_LIGH =
+          configuration.minimumNumberOfLightningSpikes;
+      AS3935LightingSensor.configuration.NF_LEV = configuration.noiseFloor;
+      AS3935LightingSensor.configuration.SREJ =
+          configuration.spikesRejectionLevel;
+      AS3935LightingSensor.configuration.TUN_CAP =
+          configuration.tuningCapacitor;
+      AS3935LightingSensor.configuration.WDTH = configuration.watchdogThreshold;
+
+      AS3935LightingSensor.begin();
 
 #ifdef DEBUG
       Serial << endl << F("INFO: AS3935 is initialized");
@@ -62,10 +76,12 @@ boolean AFESensorAS3935::begin(uint8_t id) {
 
       Serial << endl
              << F("INFO: AS3935: AFE Gain: ")
-             << (AS3935LightingSensor.isIndoor()
+             << (AS3935LightingSensor.readAFEGainBoost() == AFE_GAIN_INDOOR
                      ? "Indoor"
-                     : AS3935LightingSensor.isOutdoor() ? "Outdoor"
-                                                        : "Unknown");
+                     : AS3935LightingSensor.readAFEGainBoost() ==
+                               AFE_GAIN_OUTDOOR
+                           ? "Outdoor"
+                           : "Unknown");
 
       Serial << endl
              << "INFO: AS3935: Minimum Number Of Lightning: "
@@ -85,62 +101,13 @@ boolean AFESensorAS3935::begin(uint8_t id) {
       Serial << endl
              << "INFO: AS3935: Frequency division ration for antenna tuning: "
              << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
+      Serial << endl
+             << "INFO: AS3935: Tuning Capacitor: "
+             << AS3935LightingSensor.readTuningCapacitors() *
+                    AFE_CONFIG_HARDWARE_TUNING_CAPACITOR_STEP
+             << "pF";
 
       Serial << endl << endl << "INFO: AS3935 Configuring the sensor";
-
-#endif
-
-#ifdef DEBUG
-      Serial << endl << " - resetting to defalut values";
-#endif
-      AS3935LightingSensor.clearStatistics();
-      AS3935LightingSensor.setDefautSettings();
-
-      AS3935LightingSensor.setIndoor(configuration.indoor);
-
-      if (!configuration.setNoiseFloorAutomatically) {
-        AS3935LightingSensor.setNoiseFloorLevel(configuration.noiseFloor);
-      }
-
-      AS3935LightingSensor.setMinimumNumberOfLightning(
-          configuration.minimumNumberOfLightningSpikes);
-
-      AS3935LightingSensor.setSpikeRejection(
-          configuration.spikesRejectionLevel);
-
-      AS3935LightingSensor.setWatchdogThreshold(
-          configuration.watchdogThreshold);
-
-      AS3935LightingSensor.calibrateInternalRSOscillators();
-
-      AS3935LightingSensor.setFrequencyDivisionForAntennaTuning(16);
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: AS3935: AFE Gain: ")
-             << (AS3935LightingSensor.isIndoor()
-                     ? "Indoor"
-                     : AS3935LightingSensor.isOutdoor() ? "Outdoor"
-                                                        : "Unknown");
-
-      Serial << endl
-             << "INFO: AS3935: Minimum Number Of Lightning: "
-             << AS3935LightingSensor.readMinimumNumberOfLightning();
-      Serial << endl
-             << "INFO: AS3935: Noise Floor Level: "
-             << AS3935LightingSensor.readNoiseFloorLevel();
-      Serial << endl
-             << "INFO: AS3935: Spike rejection: "
-             << AS3935LightingSensor.readSpikeRejection();
-      Serial << endl
-             << "INFO: AS3935: Watchdog threshold: "
-             << AS3935LightingSensor.readWatchdogThreshold();
-      Serial << endl
-             << "INFO: AS3935: Mask Disturber: "
-             << AS3935LightingSensor.readMaskDisturber();
-      Serial << endl
-             << "INFO: AS3935: Frequency division ration for antenna tuning: "
-             << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
 
 #endif
 
@@ -159,7 +126,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
   }
 #endif
 }
-
+/*
 void AFESensorAS3935::interruptionReported() {
   ready = true;
   distance = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE;
@@ -205,40 +172,40 @@ void AFESensorAS3935::interruptionReported() {
 #endif
   }
 }
+*/
+boolean AFESensorAS3935::listener() {
+  if (AS3935LightingSensor.detected()) {
+    event = AS3935LightingSensor.get();
 
-boolean AFESensorAS3935::strikeDetected() {
-  /*
-  if (digitalRead(configuration.irqGPIO) == HIGH) {
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: AS3935: Event: " << event.reason
+           << ", distance: " << event.distance;
+#endif
 
-  #ifdef DEBUG
-  // Serial << endl << F("INFO: AS3935: Interuption");
-  #endif
-
-    interruptionReported();
-   }
-  */
-
-  // interruptionReported();
-
-  if (ready) {
-    ready = false;
-    return true;
+    ready = true;
   } else {
-    return false;
+    ready = false;
   }
+
+  return ready;
 }
 
 void AFESensorAS3935::getJSON(char *json) {
 
-  if (eventType == INT_STRIKE) {
-    sprintf(json, "{\"event\":{\"type\":\"lightning "
-                  "strike\",\"distance\":%d,\"unit\":\"%s\"}}",
-            distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
-  } else if (eventType == INT_NOISE) {
-    sprintf(json, "{\"event\":{\"type\":\"noise\"}}");
-  } else if (eventType == INT_DISTURBER) {
-    sprintf(json, "{\"event\":{\"type\":\"disruption\"}}");
-  } else {
-    sprintf(json, "{\"event\":{\"type\":\"unknown\"}}");
-  }
+  /*
+
+    if (eventType == INT_STRIKE) {
+      sprintf(json, "{\"event\":{\"type\":\"lightning "
+                    "strike\",\"distance\":%d,\"unit\":\"%s\"}}",
+              distance, configuration.unit == AFE_DISTANCE_KM ? "km" : "mil");
+    } else if (eventType == INT_NOISE) {
+      sprintf(json, "{\"event\":{\"type\":\"noise\"}}");
+    } else if (eventType == INT_DISTURBER) {
+      sprintf(json, "{\"event\":{\"type\":\"disruption\"}}");
+    } else {
+      sprintf(json, "{\"event\":{\"type\":\"unknown\"}}");
+    }
+
+    */
 }

@@ -432,6 +432,20 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
                                                            // size
         _AS3935Sensor[i]->getJSON(json);
         send(request, true, json);
+      } else if (strcmp(request->command, "getCapacitor") == 0) {
+        char json[AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH];
+        uint8_t _result =
+            _AS3935Sensor[i]->AS3935LightingSensor.getTuningCapacitor();
+        if (_result != AS3935_OUT_OF_RANGE) {
+          sprintf(
+              json, "{\"capacitor\": %d,\"frequency\":%d}",
+              _AS3935Sensor[i]->AS3935LightingSensor.getTuningCapacitor() * 8,
+              _AS3935Sensor[i]->AS3935LightingSensor.actualFrequency / 1000);
+        } else {
+          sprintf(json, "\"Check IRQ connection\"");
+        }
+        send(request, _result == AS3935_OUT_OF_RANGE ? false : true, json);
+
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
       }

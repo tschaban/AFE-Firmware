@@ -27,6 +27,7 @@ struct AS3935 {
                                           // - 5 spikes, 2 - 9 spikes, 3 -
                                           // 16spikes
   uint8_t spikesRejectionLevel;           // 0 - 11
+  uint8_t tuningCapacitor;               // 0 - 16
   bool indoor;
   uint8_t unit; // Distance
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  

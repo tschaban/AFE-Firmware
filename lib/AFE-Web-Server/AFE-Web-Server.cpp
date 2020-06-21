@@ -1529,6 +1529,11 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
           ? server.arg("s").toInt()
           : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
 
+  data->tuningCapacitor =
+      server.arg("tc").length() > 0
+          ? server.arg("tc").toInt()
+          : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_TUNING_CAPACITOR;          
+
   data->indoor = server.arg("w").length() > 0 && server.arg("w").toInt() == 1
                      ? true
                      : false;

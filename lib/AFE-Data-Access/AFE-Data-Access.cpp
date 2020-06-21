@@ -3805,16 +3805,17 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 
       sprintf(configuration->name, root["name"]);
       configuration->i2cAddress = root["i2cAddress"];
-      configuration->irqGPIO = root["irqGPIO"];
+      configuration->irqGPIO = root["irqGPIO"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_GPIO;
       configuration->setNoiseFloorAutomatically =
           root["setNoiseFloorAutomatically"];
-      configuration->noiseFloor = root["noiseFloor"];
-      configuration->watchdogThreshold = root["watchdogThreshold"];
+      configuration->noiseFloor = root["noiseFloor"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+      configuration->watchdogThreshold = root["watchdogThreshold"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_WATCHDOG_THRESHOLD;
       configuration->minimumNumberOfLightningSpikes =
-          root["minimumNumberOfLightningSpikes"];
-      configuration->spikesRejectionLevel = root["spikesRejectionLevel"];
+          root["minimumNumberOfLightningSpikes"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_MINIMUM_NO_OF_SPIKES;
+      configuration->spikesRejectionLevel = root["spikesRejectionLevel"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
+      configuration->tuningCapacitor = root["tuningCapacitor"] | AFE_CONFIG_HARDWARE_AS3935_DEFAULT_TUNING_CAPACITOR;
       configuration->indoor = root["indoor"];
-      configuration->unit = root["unit"];
+      configuration->unit = root["unit"] | AFE_DISTANCE_KM;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3876,6 +3877,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
     root["minimumNumberOfLightningSpikes"] =
         configuration->minimumNumberOfLightningSpikes;
     root["spikesRejectionLevel"] = configuration->spikesRejectionLevel;
+    root["tuningCapacitor"] = configuration->tuningCapacitor;
     root["indoor"] = configuration->indoor;
     root["unit"] = configuration->unit;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -3918,6 +3920,7 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
   configuration.spikesRejectionLevel =
       AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
   configuration.indoor = true;
+  configuration.tuningCapacitor = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_TUNING_CAPACITOR;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
