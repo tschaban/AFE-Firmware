@@ -141,6 +141,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   case AFE_CONFIG_SITE_DS18B20:
     Site.addDS18B20Configuration(page, siteConfig->deviceID);
+    break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:

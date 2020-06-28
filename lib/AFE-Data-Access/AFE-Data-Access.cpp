@@ -1559,6 +1559,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
+
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
@@ -1577,6 +1578,25 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
       configuration->ledID = root["ledID"];
 #ifdef DEBUG
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+      configuration->thermalProtection.temperature =
+          root["thermalProtection"]["temperature"];
+      configuration->thermalProtection.sensorId =
+          root["thermalProtection"]["sensorId"];
+
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+      configuration->thermostat.enabled = root["thermostat"]["enabled"];
+      configuration->thermostat.sensorId = root["thermostat"]["sensorId"];
+      configuration->thermostat.turnOn = root["thermostat"]["turnOn"];
+      configuration->thermostat.turnOff = root["thermostat"]["turnOff"];
+      configuration->thermostat.turnOnAbove = root["thermostat"]["turnOnAbove"];
+      configuration->thermostat.turnOffAbove =
+          root["thermostat"]["turnOffAbove"];
+#endif
+
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RELAY
              << F(", actual JSON size: ") << jsonBuffer.size();
@@ -1618,6 +1638,15 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+    JsonObject &thermalProtection =
+        root.createNestedObject("thermalProtection");
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+    JsonObject &thermostat = root.createNestedObject("thermostat");
+#endif
+
     root["gpio"] = configuration->gpio;
     root["name"] = configuration->name;
     root["timeToOff"] = configuration->timeToOff;
@@ -1629,6 +1658,22 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 #else
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+    thermalProtection["temperature"] =
+        configuration->thermalProtection.temperature;
+    thermalProtection["sensorId"] = configuration->thermalProtection.sensorId;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+    thermostat["enabled"] = configuration->thermostat.enabled;
+    thermostat["sensorId"] = configuration->thermostat.sensorId;
+    thermostat["turnOn"] = configuration->thermostat.turnOn;
+    thermostat["turnOff"] = configuration->thermostat.turnOff;
+    thermostat["turnOnAbove"] = configuration->thermostat.turnOnAbove;
+    thermostat["turnOffAbove"] = configuration->thermostat.turnOffAbove;
+#endif
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1650,113 +1695,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     Serial << endl << F("ERROR: failed to open file for writing");
   }
 #endif
-  /*
-  #if defined(T3_CONFIG)
-    uint8_t nextRelay = 21;
-  #elif defined(T4_CONFIG)
-    uint8_t nextRelay = 27;
-  #endif
-
-  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-    Eeprom.writeUInt8(370, configuration->gpio);
-  #elif defined(T1_CONFIG)
-    Eeprom.writeUInt8(397, configuration->gpio);
-  #elif defined(T2_CONFIG)
-    Eeprom.writeUInt8(405, configuration->gpio);
-  #elif defined(T3_CONFIG)
-    Eeprom.writeUInt8(382 + id * nextRelay, configuration->gpio);
-  #elif defined(T4_CONFIG)
-    Eeprom.writeUInt8(383 + id * nextRelay, configuration->gpio);
-  #elif defined(T5_CONFIG)
-    Eeprom.writeUInt8(462, configuration->gpio);
-  #elif defined(T6_CONFIG)
-    Eeprom.writeUInt8(374, configuration->gpio);
-  #endif
-
-  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-    Eeprom.write(372, 5, configuration->timeToOff);
-  #elif defined(T1_CONFIG)
-    Eeprom.write(399, 5, configuration->timeToOff);
-  #elif defined(T2_CONFIG)
-    Eeprom.write(407, 5, configuration->timeToOff);
-  #elif defined(T4_CONFIG)
-    Eeprom.write(385 + id * nextRelay, 5, configuration->timeToOff);
-  #elif defined(T5_CONFIG)
-    Eeprom.write(463, 4, configuration->timeToOff);
-  #endif
-
-  #if !defined(T5_CONFIG)
-
-  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-    Eeprom.writeUInt8(377, configuration->statePowerOn);
-  #elif defined(T1_CONFIG)
-    Eeprom.writeUInt8(404, configuration->statePowerOn);
-  #elif defined(T2_CONFIG)
-    Eeprom.writeUInt8(412, configuration->statePowerOn);
-  #elif defined(T3_CONFIG)
-    Eeprom.writeUInt8(384 + id * nextRelay, configuration->statePowerOn);
-  #elif defined(T4_CONFIG)
-    Eeprom.writeUInt8(390 + id * nextRelay, configuration->statePowerOn);
-  #elif defined(T6_CONFIG)
-    Eeprom.writeUInt8(376, configuration->statePowerOn);
-  #endif
-
-  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-    Eeprom.write(378, 16, configuration->name);
-  #elif defined(T1_CONFIG)
-    Eeprom.write(405, 16, configuration->name);
-  #elif defined(T2_CONFIG)
-    Eeprom.write(413, 16, configuration->name);
-  #elif defined(T3_CONFIG)
-    Eeprom.write(385 + id * nextRelay, 16, configuration->name);
-  #elif defined(T4_CONFIG)
-    Eeprom.write(391 + id * nextRelay, 16, configuration->name);
-  #elif defined(T6_CONFIG)
-    Eeprom.write(377, 16, configuration->name);
-  #endif
-
-  #if defined(T0_CONFIG) || defined(T0_SHELLY_1_CONFIG)
-    Eeprom.writeUInt8(394, configuration->stateMQTTConnected);
-  #elif defined(T1_CONFIG)
-    Eeprom.writeUInt8(421, configuration->stateMQTTConnected);
-  #elif defined(T2_CONFIG)
-    Eeprom.writeUInt8(429, configuration->stateMQTTConnected);
-  #elif defined(T3_CONFIG)
-    Eeprom.writeUInt8(401 + id * nextRelay, configuration->stateMQTTConnected);
-  #elif defined(T4_CONFIG)
-    Eeprom.writeUInt8(407 + id * nextRelay, configuration->stateMQTTConnected);
-  #elif defined(T6_CONFIG)
-    Eeprom.writeUInt8(393, configuration->stateMQTTConnected);
-  #endif
-
-  #if defined(T0_CONFIG)
-    Eeprom.writeUInt8(421, configuration->ledID);
-  #elif defined(T1_CONFIG)
-    Eeprom.writeUInt8(442, configuration->ledID);
-  #elif defined(T2_CONFIG)
-    Eeprom.writeUInt8(463, configuration->ledID);
-  #elif defined(T3_CONFIG)
-    Eeprom.writeUInt8(618 + id, configuration->ledID);
-  #elif defined(T4_CONFIG)
-    Eeprom.writeUInt8(531 + id, configuration->ledID);
-  #elif defined(T6_CONFIG)
-    Eeprom.writeUInt8(394, configuration->ledID);
-  #endif
-
-  #if !defined(T6_CONFIG)
-    Eeprom.write(930 + 6 * id, 6, (long)configuration->idx);
-  #else
-    Eeprom.write(920, 6, (long)configuration->idx);
-  #endif
-
-  #if defined(T1_CONFIG)
-    Eeprom.write(436, 3, configuration->thermalProtection);
-  #elif defined(T2_CONFIG)
-    Eeprom.write(457, 3, configuration->thermalProtection);
-  #endif
-
-  #endif
-  */
 }
 void AFEDataAccess::createRelayConfigurationFile() {
 
@@ -1780,8 +1718,18 @@ void AFEDataAccess::createRelayConfigurationFile() {
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
 #endif
 
-#if defined(T1_CONFIG) || defined(T2_CONFIG)
-  RelayConfiguration.thermalProtection = 0;
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  RelayConfiguration.thermalProtection.temperature = 0;
+  RelayConfiguration.thermalProtection.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+  RelayConfiguration.thermostat.enabled = false;
+  RelayConfiguration.thermostat.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  RelayConfiguration.thermostat.turnOn = 0;
+  RelayConfiguration.thermostat.turnOff = 0;
+  RelayConfiguration.thermostat.turnOnAbove = false;
+  RelayConfiguration.thermostat.turnOffAbove = true;
 #endif
 
 /* SONOFF Basic v1 */
@@ -2282,7 +2230,6 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif
       configuration->divider.Ra = root["divider"]["Ra"];
       configuration->divider.Rb = root["divider"]["Rb"];
-
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
       configuration->battery.maxVoltage =
@@ -3143,53 +3090,24 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEDataAccess::saveConfiguration(REGULATOR configuration, uint8_t type) {
+void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR_TYPE type,
+                                     REGULATOR *configuration) {
 
-  if (type == THERMOSTAT_REGULATOR) {
-    saveRegulatorState(configuration->enabled, THERMOSTAT_REGULATOR);
+  char fileName[21];
+  if (type == REGULATOR_THERMOSTAT) {
+    sprintf(fileName, "/cfg-thermostat-%d.json", id);
   } else {
-    saveRegulatorState(configuration->enabled, HUMIDISTAT_REGULATOR);
-  }
-
-#if defined(T1_CONFIG)
-  Eeprom.write(423, 5, configuration->turnOn);
-  Eeprom.write(428, 5, configuration->turnOff);
-  Eeprom.write(433, configuration->turnOnAbove);
-  Eeprom.write(434, configuration->turnOffAbove);
-#else
-  uint8_t index = type == THERMOSTAT_REGULATOR ? 0 : 13;
-  Eeprom.write(431 + index, 5, configuration->turnOn);
-  Eeprom.write(436 + index, 5, configuration->turnOff);
-  Eeprom.write(441 + index, configuration->turnOnAbove);
-  Eeprom.write(442 + index, configuration->turnOffAbove);
-
-#endif
-}
-
-boolean AFEDataAccess::isRegulatorEnabled(uint8_t type) {
-  if (type == THERMOSTAT_REGULATOR) {
-#if defined(T1_CONFIG)
-    return Eeprom.read(435);
-#else
-    return Eeprom.read(443);
-#endif
-  } else {
-    return Eeprom.read(456);
+    sprintf(fileName, "/cfg-humidistat-%d.json", id);
   }
 }
 
-void AFEDataAccess::saveRegulatorState(boolean state, uint8_t type) {
-  if (type == THERMOSTAT_REGULATOR) {
-#if defined(T1_CONFIG)
-    Eeprom.write(435, state);
-#else
-    Eeprom.write(443, state);
-#endif
-  } else {
-    Eeprom.write(456, state);
-  }
-}
-#endif
+void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR_TYPE type,
+                                      REGULATOR *configuration) {}
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+void AFEDataAccess::createThermostatConfigurationFile(void) {}
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {

@@ -19,7 +19,7 @@ void AFERelay::begin(uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   /* Initialzing thermal protection functionality for a relay */
-  ThermalProtection.begin(configuration.thermalProtection);
+  ThermalProtection.begin(configuration.thermalProtection.temperature);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT

@@ -9,12 +9,17 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-REGULATOR-Structure.h>
-
 struct RELAY_DEFAULTS {
   uint8_t powerOn;
   uint8_t MQTTConnected;
 };
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+struct THERMAL_PROTECTION {
+  float temperature;
+  uint8_t sensorId;
+};
+#endif
 
 struct RELAY {
   uint8_t gpio;
@@ -25,11 +30,11 @@ struct RELAY {
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_BASIC_CONFIG mqtt;
-#endif  
+#endif
   RELAY_DEFAULTS state;
-  REGULATOR thermostat;
-  REGULATOR humidistat;
-  float thermalProtection;
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  THERMAL_PROTECTION thermalProtection;
+#endif
 };
 
 #endif

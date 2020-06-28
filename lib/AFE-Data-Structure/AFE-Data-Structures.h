@@ -43,8 +43,12 @@
 #include <AFE-GATE-Structure.h>
 #endif
 
-#ifdef T1_CONFIG
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-DS18B20-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-REGULATOR-Structure.h>
 #endif
 
 #if defined(T2_CONFIG)
@@ -78,5 +82,8 @@
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #include <AFE-RAINMETER-Sensor-Structure.h>
 #endif
+
+
+
 
 #endif

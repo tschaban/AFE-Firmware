@@ -127,14 +127,13 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  /* Method saves regulator configuration */
-  void saveConfiguration(REGULATOR configuration,
-                         uint8_t type = THERMOSTAT_REGULATOR);
-  /* Methods read and save regulator state.
-  Regulator can be Thermostat or humidistat */
-  boolean isRegulatorEnabled(uint8_t type = THERMOSTAT_REGULATOR);
-  void saveRegulatorState(boolean state, uint8_t type = THERMOSTAT_REGULATOR);
-#endif
+  void getConfiguration(uint8_t id, REGULATOR_TYPE type, REGULATOR *);
+  void saveConfiguration(uint8_t id, REGULATOR_TYPE type, REGULATOR *);
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+  void createThermostatConfigurationFile(void);
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #if defined(T3_CONFIG)
   PIR getPIRConfiguration(uint8_t id);

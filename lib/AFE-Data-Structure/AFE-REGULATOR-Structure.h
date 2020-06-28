@@ -9,10 +9,15 @@
 #include "WProgram.h"
 #endif
 
-#define THERMOSTAT_REGULATOR 0
-#define HUMIDISTAT_REGULATOR 1
+
+enum REGULATOR_TYPE {
+  REGULATOR_THERMOSTAT = 0,
+  REGULATOR_HUMIDISTAT = 1
+} regulator_t;
 
 struct REGULATOR {
+  uint8_t relayId;
+  uint8_t sensorId;
   boolean enabled;
   float turnOn;
   boolean turnOnAbove;
