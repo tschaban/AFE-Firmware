@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 
 <head>
   <meta charset="utf-8">
-  <title>AFE Firmware 2.2.0.B1 [T5]</title>
+  <title>Firmware 1.0</title>
   <style>
     #l,
     #r {
@@ -198,93 +198,105 @@
   </style>
 </head>
 
-<body><img src="http://api.smartnydom.pl/logo/T5/2.2.0.B1/6889C6e8-3Ad6D63a/0" style="width: 100%;display: block"
-    alt="AFE Firmware">
+<body>
+  <h3 class="la">Firmware v1.0</h3>
   <div id="c">
     <div id="l">
-      <h4>to control gate controller</h4>
+      <h4>Firmware</h4>
       <ul class="lst">
-        <li class="itm"><a href="\?o=1">Device</a></li>
-        <li class="itm"><a href="\?o=2">Network</a></li>
-        <li class="itm"><a href="\?o=3">MQTT Broker</a></li>
-        <li class="itm"><a href="\?o=6">LEDs</a></li>
-        <li class="itm"><a><i>Gate/Door configuration</i></a></li>
-        <li class="itm"><a href="\?o=13&i=0">&#8227; Gate/Door: 1</a></li>
-        <li class="itm"><a><i>Relays configuration</i></a></li>
-        <li class="itm"><a href="\?o=7&i=0">&#8227; Relay: 1</a></li>
-        <li class="itm"><a><i>Button / Switches</i></a></li>
-        <li class="itm"><a href="\?o=8&i=0">&#8227; Switch: 1</a></li>
-        <li class="itm"><a><i>Magnetic's sensors</i></a></li>
-        <li class="itm"><a href="\?o=12&i=0">&#8227; Sensor: 1</a></li>
-        <li class="itm"><a href="\?o=12&i=1">&#8227; Sensor: 2</a></li>
-        <li class="itm"><br><a href="\?o=9">Set password</a><br></li>
-        <li class="itm"><a href="\?o=19">Firmware upgrade</a></li>
-        <li class="itm"><a href="\?o=15">Reset to orginal state</a></li>
-        <li class="itm"><a href="\?o=10">PRO Version</a></li>
-        <li class="itm"><br><a href="https://en.donate.afe-firmware.smartnydom.pl">&#128077; Donate if you found this
-            useful</a><br></li>
-        <li class="itm"><a href="\?o=14">Finish configuration</a></li>
+        <li class="itm"><a href="?o=9">Urządzenie</a></li>
+        <li class="itm"><a href="?o=10">Sieć WiFi</a></li>
+        <li class="itm"><a><i>I2C BUS</i></a></li>
+        <li class="itm"><a href="\?o=13&i=0">&#8227; I2C: 1</a></li>
+        <li class="itm"><a href="?o=7">Aktualizacja oprogramowania</a></li>
+        <li class="itm"><a href="?o=3">Ustawienia początkowe</a></li>
+        <li class="itm"><a href="?o=2">Zakoncz konfigurację</a></li>
       </ul>
     </div>
     <div id="r">
-      <form method="post" action="/?c=1&o=12&i=0">
+      <form method="post" action="/?c=1&o=13&i=0">
         <div class="ci">
-          <h1>Magnetic's sensor #1</h1>
+          <h1>I2C</h1>
           <p class="cd"></p>
           <fieldset>
-            <div class="cf">
-              <div class="cf"><label>GPIO</label><select name="g">
-                  <option value="0">0</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4" selected="selected">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                  <option value="11">11</option>
-                  <option value="12">12</option>
-                  <option value="13">13</option>
-                  <option value="14">14</option>
-                  <option value="15">15</option>
-                  <option value="16">16</option>
-                </select></div>
-            </div>
-            <div class="cf"><label>Name</label><input name="n" type="text" maxlength="16" value="C1"><span
-                class="hint">Max 16 chars</span></div>
-            <div class="cf"><label>Type</label><select name="y">
-                <option value="0">NO</option>
-                <option value="1" selected="selected">NC</option>
+            <div class="cf"><label>GPIO SDA</label><select name="sda">
+                <option value="255">Brak</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="21" selected="selected">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="39">39</option>
               </select></div>
-            <div class="cf"><label>LED assigned to the sensor</label><select name="l">
-                <option value="255">None</option>
-                <option value="0" selected="selected">1</option>
-              </select></div><br>
-            <p class="cm">Sensitiveness should be adjusted experimentally until sensor behaves as expected</p>
-            <div class="cf"><label>Sensitiveness</label><input name="b" type="number" min="0" max="2000" step="1"
-                value="200"><span class="hint"> Range 0 - 2000 milisekonds</span></div>
+            <div class="cf"><label>GPIO SCL</label><select name="scl">
+                <option value="255">Brak</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="21">21</option>
+                <option value="22" selected="selected">22</option>
+                <option value="23">23</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="39">39</option>
+              </select></div>
+            <div class="cf"><label>Częstotliwość</label><input name="frequency" type="number" min="100000" max="400000"
+                step="1" value="100000"><span class="hint"> Zakres 100000 - 400000 Hz</span></div>
           </fieldset>
-          <div class="ci">
-            <h1>Domoticz</h1>
-            <p class="cd">If IDX is set to 0 then a value won't be sent to Domoticz</p>
-            <fieldset>
-              <div class="cf"><label>IDX</label><input name="x" type="number" min="0" max="999999" step="1"
-                  value="1"><span class="hint"> Range 0 - 999999</span></div>
-            </fieldset><input type="submit" class="b bs" value="Save">
+        </div><input type="submit" class="b bs" value="Zapisz">
       </form>
     </div>
   </div>
-  <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
-        src="https://img.shields.io/badge/Help-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/en/"
-      target="_blank"><img src="https://img.shields.io/badge/Help-Documentation-green.svg" alt="Documentation" /></a> <a
-      href="https://afe.smartnydom.pl/en/pliki-to-pobrania/historia-zmian" target="_blank"><img
-        src="https://img.shields.io/badge/Version%20-%202.2.0.B1[T5]-blue.svg" alt="T5-2.2.0.B1" /></a> <img
-      src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 0" /> <img
-      src="https://img.shields.io/badge/API-Domoticz-yellow.svg" /> <img
-      src="https://img.shields.io/badge/PRO-No-orange.svg" alt="PRO" /></div>
+  <div style="padding: 5px 0"><img src="https://img.shields.io/badge/Wersja%20-%201.0-blue.svg" alt="1.0" /></div>
 </body>
 
 </html>
