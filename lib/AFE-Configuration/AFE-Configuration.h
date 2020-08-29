@@ -1056,6 +1056,7 @@ typedef enum {
 #define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
        // down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
+#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
 
 /* Config releated to LWT Functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT

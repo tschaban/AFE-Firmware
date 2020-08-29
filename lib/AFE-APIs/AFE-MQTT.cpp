@@ -19,6 +19,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
 
   esp.setTimeout(configuration.timeout);
   Broker.setClient(esp);
+  Broker.setBufferSize(AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE);
 
   if (strlen(configuration.ip) > 0) {
     IPAddress ip;
