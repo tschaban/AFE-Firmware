@@ -2,10 +2,22 @@
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 
+/* ---------Headers ---------*/
+
+void initializeSwitch(void);
+void processSwitchEvents(void);
+void switchEventsListener(void);
+
+/* --------- Body -----------*/
+
 /* Initializing Switches */
-void initializeSwitch() {
+void initializeSwitch(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
-    Switch[i].begin(i, &Device);
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Switch[i].begin(i, &Data, &Led);
+#else
+    Switch[i].begin(i, &Data);
+#endif
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: Switch(es) initialized");
@@ -13,7 +25,7 @@ void initializeSwitch() {
 }
 
 /* Method processes Switch related events */
-void processSwitchEvents() {
+void processSwitchEvents(void) {
   if (Device.getMode() == AFE_MODE_NORMAL) {
     for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
       /* One of the switches has been shortly pressed */
@@ -71,7 +83,7 @@ void processSwitchEvents() {
   }
 }
 
-void switchEventsListener() {
+void switchEventsListener(void) {
 
   /* Listens for switch events */
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {

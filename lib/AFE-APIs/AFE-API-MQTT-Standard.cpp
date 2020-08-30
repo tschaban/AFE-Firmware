@@ -73,7 +73,7 @@ void AFEAPIMQTTStandard::synchronize() {
 void AFEAPIMQTTStandard::subscribe() {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Subsribing to MQTT Topics ...");
+  Serial << endl << F("INFO: Subscribing to MQTT Topics ...");
 #endif
 
 /* Subscribe: Relay */
@@ -226,6 +226,21 @@ void AFEAPIMQTTStandard::subscribe() {
     }
   }
 #endif
+
+/* Subscribe: DS18B20 */
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+    Mqtt.subscribe(_DS18B20Sensor[i]->mqttCommandTopic);
+    if (strlen(_DS18B20Sensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _DS18B20Sensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DS18B20;
+      currentCacheSize++;
+    }
+  }
+
+#endif
 }
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -298,6 +313,11 @@ void AFEAPIMQTTStandard::processRequest() {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       case AFE_MQTT_DEVICE_CONTACTRON:
         processContactron(&mqttTopicsCache[i].id);
+        break;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+      case AFE_MQTT_DEVICE_DS18B20:
+        processDS18B20(&mqttTopicsCache[i].id);
         break;
 #endif
       default:
@@ -650,5 +670,32 @@ boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
   return publishStatus;
 }
 #endif //  AFE_CONFIG_HARDWARE_CONTACTRON
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+void AFEAPIMQTTStandard::processDS18B20(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing DS18B20 ID: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishDS18B20SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+
+boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
+    _DS18B20Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_DS18B20Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

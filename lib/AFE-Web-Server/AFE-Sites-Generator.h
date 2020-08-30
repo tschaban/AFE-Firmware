@@ -9,11 +9,12 @@
 #include "WProgram.h"
 #endif
 
-#include <AFE-Site-components.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
+#include <AFE-Site-components.h>
 #include <ESP8266WiFi.h>
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
@@ -57,6 +58,24 @@ private:
                                     uint8_t selected,
                                     const char *title = "GPIO");
 
+  /* Method generates GPIO selecton list */
+  void addListOfGPIOs(String &item, const char *field, uint8_t selected,
+                      const char *title = "GPIO");
+
+  /* Method addes configuration block to the site */
+  void openSection(String &page, const char *, const char *);
+  void closeSection(String &page);
+  void addInputFormItem(String &item, const char *type, const char *name,
+                        const char *label, const char *value,
+                        const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
+                        const char *min = AFE_FORM_ITEM_SKIP_PROPERTY,
+                        const char *max = AFE_FORM_ITEM_SKIP_PROPERTY,
+                        const char *step = AFE_FORM_ITEM_SKIP_PROPERTY,
+                        const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                        boolean readonly = false);
+  void addCheckboxFormItem(String &item, const char *name, const char *label,
+                           const char *value, boolean checked);
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
@@ -98,7 +117,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDataAccess *,AFEDevice *, AFEFirmwarePro *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)

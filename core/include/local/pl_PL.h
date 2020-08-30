@@ -386,6 +386,7 @@
 #define L_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
 #define L_DS18B20_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury zmieni się"
 #define L_DS18B20_TEMPERATURE_CORRECTION "Korekta wartości o"
+#define L_DS18B20_MQTT_TOPIC "MQTT Temat informacji z czujnika"
 #endif
 
 /* I2C or DS18B20 */

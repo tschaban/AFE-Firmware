@@ -3,23 +3,22 @@
 #ifndef _AFE_DS18B20_Structure_h
 #define _AFE_DS18B20_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+
+#include <DallasTemperature.h>
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
 
+typedef DeviceAddress DS18B20Addresses[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 
 struct DS18B20 {
   char name[17];
   uint8_t gpio;
-  uint8_t address;
+  DeviceAddress address;
   float correction;
   uint32_t interval;
   uint8_t unit;
@@ -29,7 +28,7 @@ struct DS18B20 {
 #else
   MQTT_BASIC_CONFIG mqtt;
 #endif
-
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+#endif // _AFE_DS18B20_Structure_h

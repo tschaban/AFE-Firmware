@@ -112,6 +112,13 @@ public:
   void processContactron(uint8_t *id);
   boolean publishContactronState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  void processDS18B20(uint8_t *id);
+  boolean publishDS18B20SensorData(uint8_t id);
+#endif // #ifdef AFE_CONFIG_HARDWARE_DS18B20
+
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

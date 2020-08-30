@@ -2,20 +2,20 @@
 
 #include "AFE-LED.h"
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+
 AFELED::AFELED() {}
 
-AFELED::AFELED(uint8_t id) { begin(id); }
-
-void AFELED::begin(uint8_t id) {
-  AFEDevice Device;
-  AFEDataAccess Data;
-  Data.getConfiguration(id,&LEDConfiguration);
-  Data = {};
-  pinMode(LEDConfiguration.gpio, OUTPUT);
-  LEDConfiguration.changeToOppositeValue
-      ? digitalWrite(LEDConfiguration.gpio, LOW)
-      : digitalWrite(LEDConfiguration.gpio, HIGH);
-  _initialized = true;
+boolean AFELED::begin(AFEDataAccess *_Data, uint8_t id) {
+  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    _Data->getConfiguration(id, &LEDConfiguration);
+    pinMode(LEDConfiguration.gpio, OUTPUT);
+    LEDConfiguration.changeToOppositeValue
+        ? digitalWrite(LEDConfiguration.gpio, LOW)
+        : digitalWrite(LEDConfiguration.gpio, HIGH);
+    _initialized = true;
+  }
+  return _initialized;
 }
 
 void AFELED::on() {
@@ -74,3 +74,5 @@ void AFELED::toggle() {
         : digitalWrite(LEDConfiguration.gpio, HIGH);
   }
 }
+
+#endif // AFE_CONFIG_HARDWARE_LED

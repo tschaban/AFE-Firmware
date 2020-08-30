@@ -4,26 +4,21 @@
 
 AFEWiFi::AFEWiFi() {}
 
-void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data,
+                    AFELED *_LED) {
+  Led = _LED;
+  begin(mode, _Device, _Data);
+}
+#endif
 
-  AFEDataAccess Data;
+void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Device = _Device;
   WiFiMode = mode;
 
   if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
-    Data.getConfiguration(&networkConfiguration);
+    _Data->getConfiguration(&networkConfiguration);
   }
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  // Init LED
-
-  uint8_t systeLedID = Data.getSystemLedID();
-  delay(0);
-
-  if (systeLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(systeLedID);
-  }
-#endif
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Device is in mode: ") << WiFiMode;
@@ -127,7 +122,7 @@ void AFEWiFi::listener() {
         }
 
         if (millis() > ledStartTime + 500) {
-          Led.toggle();
+          Led->toggle();
           ledStartTime = 0;
         }
 #endif
@@ -154,7 +149,7 @@ void AFEWiFi::listener() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
           ledStartTime = 0;
-          Led.off();
+          Led->off();
 #endif
 
           connections = 0;
@@ -172,7 +167,7 @@ void AFEWiFi::listener() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
         ledStartTime = 0;
-        Led.off();
+        Led->off();
 #endif
 
 #ifdef DEBUG

@@ -48,6 +48,8 @@ const char HTTP_FORM_FIELD_CLOUSRE[] PROGMEM = "</fieldset></div>";
 const char HTTP_FORM_BLOCK_HEADER[] PROGMEM =
     "<div class=\"ci\"><h1>{{title}}</h1><p class=\"cd\">{{description}}</p>";
 
+const char HTTP_FORM_BLOCK_CLOSURE[] PROGMEM = "</fieldset></div>";    
+
 const char HTTP_FOOTER_EXTENDED[] PROGMEM =
     "<div style=\"padding: 5px 0\"><a "
     "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
@@ -72,5 +74,65 @@ const char HTTP_FOOTER_EXTENDED[] PROGMEM =
     "alt=\"PRO\" /> <img "
     "src=\"https://img.shields.io/badge/Size-{{f.size}}-yellowgreen.svg\" "
     "/></div>";
+
+/* Fixed menu items */
+const char HTTP_MENU_ITEM[] PROGMEM =
+    "<li class=\"itm\"><a href=\"/?o={{site.id}}\">{{item.title}}</a></li>";
+
+const char HTTP_MENU_SUBITEMS_HEADER[] PROGMEM =
+    "<li class=\"itm\"><a><i>{{item.title}}</i></a></li>";
+
+const char HTTP_MENU_SUBITEM[] PROGMEM =
+    "<li class=\"itm\"><a href=\"/?o={{site.id}}&i={{item.id}}\">&#8227; "
+    "{{item.title}}: {{item.id.display}}</a></li>";
+
+const uint8_t GPIOS[] PROGMEM = {0,1,2,3,4,5,12,13,14,15};
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =
+    "<div class=\"cf\"><label>{{item.label}}: </label><select "
+    "name=\"address\"><option value=\"255\" "
+    "{{item.selected}}>{{L_NONE}}</option>";
+
+const char HTTP_ITEM_SCANNED_I2C_ADDRESSES[] PROGMEM =
+    "<option value=\"{{item.value}}\" {{item.selected}}>[0x{{device.address}}] "
+    ": {{device.name}}</option>";
+#endif // AFE_CONFIG_HARDWARE_I2C
+
+const char HTTP_ITEM_CHECKBOX[] PROGMEM =
+    "<div class=\"cc\"><label><input name=\"{{item.name}}\" type=\"checkbox\" "
+    "value=\"{{item.value}}\" {{item.checked}}>{{item.label}}</label></div>";
+
+const char HTTP_ITEM_SELECT_OPEN[] PROGMEM =
+    "<div class=\"cf\"><label>{{item.label}}</label><select "
+    "name=\"{{item.name}}\">";
+
+const char HTTP_ITEM_SELECT_OPTION[] PROGMEM =
+    "<option value=\"{{item.value}}\" "
+    "{{item.selected}}>{{item.label}}</option>";
+
+const char HTTP_ITEM_SELECT_CLOSE[] PROGMEM = "</select></div>";
+
+const char HTTP_ITEM_HINT[] PROGMEM = "<br><p class=\"cm\">{{item.hint}}</p>";
+
+const char HTTP_SITE_RESET_TO_DEFAULTS[] PROGMEM =
+    "<fieldset><p class=\"cm\"><strong>{{L_WARNING}}</strong>: </p><p "
+    "class=\"cm\">{{L_CONFIGURATION_WILL_BE_REMOVED}}: </p><input "
+    "type=\"submit\" class=\"b be\" "
+    "value=\"{{L_RESTORE_DEFAULT_SETTINGS}}\"></fieldset>";
+
+const char HTTP_SITE_POST_RESET[] PROGMEM =
+    "<fieldset><p class=\"cm\">{{L_UPGRADE_IN_PROGRESS}}</p><p "
+    "class=\"cm\">{{L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: </p><a "
+    "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset>";
+
+const char HTTP_SITE_UPGRADE[] PROGMEM =
+    "<fieldset><form method=\"post\" action=\"upgrade?o=8\" "
+    "enctype=\"multipart/form-data\"><div "
+    "class=\"cf\"><label>{{L_SELECT_FIRMWARE}}</label><input class=\"bs\" "
+    "name=\"update\" type=\"file\" accept=\".bin\"></div><p "
+    "class=\"cm\">{{L_UPGRADE_INFO}}.</p><button type=\"submit\" class=\"b "
+    "be\">{{L_UPGRADE}}</button></form></fieldset>";
+
 
 #endif

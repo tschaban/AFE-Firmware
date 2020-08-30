@@ -2,9 +2,23 @@
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-void initializeRelay() {
+/* ---------Headers ---------*/
+
+void initializeRelay(void);
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+void relayEventsListener(void);
+#endif
+
+/* --------- Body -----------*/
+
+void initializeRelay(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-    Relay[i].begin(i);
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Relay[i].begin(&Data, &Led, i);
+#else
+    Relay[i].begin(&Data, i);
+#endif // AFE_CONFIG_HARDWARE_LED
     // @TODO does not have to be set for Relay controlling a Gate
     Relay[i].setRelayAfterRestoringPower();
   }
@@ -12,7 +26,7 @@ void initializeRelay() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Method checks if any relay should be automatically turned off */
-void relayEventsListener() {
+void relayEventsListener(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
     /* For the Relay assigned to a gate listener is not needed. Skipping such

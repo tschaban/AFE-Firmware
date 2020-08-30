@@ -1,5 +1,12 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
-void eventsListener() {
+
+/* ---------Headers ---------*/
+
+void eventsListener(void);
+
+/* --------- Body -----------*/
+
+void eventsListener(void) {
   /* Event handler: connection to wireless network has been established */
   if (Network.eventConnected()) {
 #ifdef DEBUG

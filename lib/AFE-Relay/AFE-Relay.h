@@ -3,12 +3,11 @@
 #ifndef _AFE_Relay_h
 #define _AFE_Relay_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
+//#include <arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 
@@ -59,10 +58,13 @@ public:
 
   /* Constructors */
   AFERelay();
-  AFERelay(uint8_t id);
 
   /* Method: initiates relay */
-  void begin(uint8_t id);
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFELED *, uint8_t id);
+#else 
+  void begin(AFEDataAccess *, uint8_t id);
+#endif
 
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
@@ -93,7 +95,6 @@ public:
   boolean autoTurnOff(boolean invert = false);
 #endif
 
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
   void setTimer(float timer);
@@ -112,10 +113,11 @@ public:
 
 private:
   uint8_t _id;
-  AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
+  AFEDataAccess *Data; // @TODO nie jest konsekwentnie jak np. w switch
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+  AFELED *Led;
+  void begin(AFEDataAccess *, uint8_t id);
 #endif
 
   unsigned long turnOffCounter = 0;
@@ -129,4 +131,6 @@ private:
   void setRelayAfterRestore(uint8_t option);
 };
 
-#endif
+
+#endif // AFE_CONFIG_HARDWARE_RELAY
+#endif // _AFE_Relay_h

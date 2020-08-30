@@ -1,164 +1,4 @@
-/*
-AFE Firmware for smarthome devices based on ESP8266/ESP8285 chips
-
-This code combains AFE Firmware versions:
-   - T0 and T0 for Shelly-1
-   - T1 (DS18B20)
-   - T2 (DHTxx)
-   - T3 (PIRs)
-   - T4 - decommissioned, T0 took over 100% of it's functionality
-   - T5 Gate
-   - T6 Wheater station
-
-More info: https://afe.smartnydom.pl
-LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-*/
-
-#include <AFE-Configuration.h>
-
-/* Includes libraries for debugging in development compilation only */
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
-
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
-#include <AFE-Firmware-Pro.h>
-#include <AFE-Upgrader.h>
-#include <AFE-Web-Server.h>
-#include <AFE-WiFi.h>
-
-#include <AFE-API-HTTP.h>
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#include <AFE-API-HTTP-Domoticz.h>
-#include <AFE-API-MQTT-Domoticz.h>
-#else
-#include <AFE-API-MQTT-Standard.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#include <AFE-Relay.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-#include <AFE-Switch.h>
-#endif
-
-/* Shelly-1 device does not have LED. Excluding LED related code */
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-AFELED Led;
-#endif
-
-/* T1 Set up, DS18B20 sensor */
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-#include <AFE-Sensor-DS18B20.h>
-AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
-#endif
-
-/* T2 Setup, DHxx sensor */
-#ifdef AFE_CONFIG_HARDWARE_DHXX
-#include <AFE-Sensor-DHT.h>
-#include <PietteTech_DHT.h>
-void dht_wrapper();
-PietteTech_DHT dht;
-AFESensorDHT Sensor;
-#endif
-
-#ifdef AFE_CONFIG_TEMPERATURE
-float temperature;
-#endif
-
-#ifdef AFE_CONFIG_HUMIDITY
-float humidity;
-#endif
-
-AFEDataAccess Data;
-AFEFirmwarePro FirmwarePro;
-AFEDevice Device;
-AFEWiFi Network;
-AFEAPIHTTP HttpAPI;
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-AFEAPIMQTTDomoticz MqttAPI;
-AFEAPIHTTPDomoticz HttpDomoticzAPI;
-#else
-AFEAPIMQTTStandard MqttAPI;
-#endif
-
-AFEWebServer WebServer;
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
-#endif
-
-#if defined(T3_CONFIG)
-#include <AFE-PIR.h>
-AFEPIR Pir[sizeof(Device.configuration.isPIR)];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-#include <AFE-Gate.h>
-AFEGate Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
-GATES_CURRENT_STATE GatesCurrentStates;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#include <AFE-Contactron.h>
-AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-#endif
-
-#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
-#include <AFE-I2C-Scanner.h>
-AFEI2CScanner I2CScanner;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-#include <AFE-Sensor-BH1750.h>
-AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-#include <AFE-Sensor-BMEX80.h>
-AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-HPMA115S0.h>
-AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-#include <AFE-Sensor-AS3935.h>
-AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-#include <AFE-Analog-Input.h>
-AFEAnalogInput AnalogInput;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#include <AFE-Sensor-Binary.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#include <AFE-Sensor-Anemometer.h>
-AFESensorBinary WindImpulse;
-AFESensorAnemometer AnemometerSensor;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-#include <AFE-Sensor-Rainmeter.h>
-AFESensorBinary RainImpulse;
-AFESensorRainmeter RainSensor;
-#endif
+#include "AFE-Firmware.h"
 
 void setup() {
 
@@ -211,20 +51,7 @@ void setup() {
 
 /* Initializing system LED (if exists) and turning it on */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  uint8_t systemLedID = Data.getSystemLedID();
-  yield();
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: System LED ID: ") << systemLedID;
-#endif
-
-  if (systemLedID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(systemLedID);
-  }
-  Led.on();
-#ifdef DEBUG
-  Serial << endl << F("INFO: System LED initialized");
-#endif
+  initializeLED();
 #endif
 
 #ifdef DEBUG
@@ -270,8 +97,13 @@ void setup() {
 #endif
   }
 
-  /* Initialzing network */
-  Network.begin(Device.getMode(), &Device);
+/* Initialzing network */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Network.begin(Device.getMode(), &Device, &Data, &Led);
+#else
+  Network.begin(Device.getMode(), &Device, &Data);
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: Network initialized");
 #endif
@@ -281,24 +113,10 @@ void setup() {
 #endif
   Network.listener();
 
-  /* Initializing HTTP WebServer */
-  WebServer.handle("/", handleHTTPRequests);
-  WebServer.handle("/favicon.ico", handleFavicon);
-  WebServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
-  if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    WebServer.onNotFound(handleOnNotFound);
-  }
-
-  /* Initializing Firmware: version PRO */
   FirmwarePro.begin(&Network);
-  WebServer.begin(&Data, &Device, &FirmwarePro);
-#ifdef AFE_CONFIG_HARDWARE_LED
-  WebServer.initSystemLED(&Led);
-#endif
 
-#ifdef DEBUG
-  Serial << endl << F("INFO: WebServer initialized");
-#endif
+  /* Initializing HTTP WebServer */
+  initializeHTTPServer();
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
@@ -459,8 +277,8 @@ void loop() {
         gateEventsListener();
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_DS18B20)
-        // DS18B20SensorEventsListener();
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+        DS18B20SensorEventsListener();
 #endif
 
 /* Sensor: HPMA115S0 related code  */

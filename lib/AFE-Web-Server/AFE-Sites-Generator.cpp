@@ -228,23 +228,23 @@ if (Device->configuration.noOfContactrons > 0) {
 
 /* Sensor DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  if (Device->configuration.noOfDS18B20s > 0) {
-    page += "<li  class=\"itm\"><a><i>";
-    page += L_DS18B20_SENSORS;
-    page += "</i></a></li>";
+if (Device->configuration.noOfDS18B20s > 0) {
+  page += "<li  class=\"itm\"><a><i>";
+  page += L_DS18B20_SENSORS;
+  page += "</i></a></li>";
 
-    for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-      page += "<li class=\"itm\"><a href=\"\\?o=";
-      page += AFE_CONFIG_SITE_DS18B20;
-      page += "&i=";
-      page += i;
-      page += "\">&#8227; ";
-      page += L_SENSOR;
-      page += ": ";
-      page += i + 1;
-      page += "</a></li>";
-    }
+  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
+    page += "<li class=\"itm\"><a href=\"\\?o=";
+    page += AFE_CONFIG_SITE_DS18B20;
+    page += "&i=";
+    page += i;
+    page += "\">&#8227; ";
+    page += L_SENSOR;
+    page += ": ";
+    page += i + 1;
+    page += "</a></li>";
   }
+}
 #endif
 
 /* Sensor DHxx */
@@ -1251,84 +1251,105 @@ void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
+
+  AFESensorDS18B20 _Sensor;
+  DS18B20Addresses _addresses;
+  uint8_t numberOfFoundSensors;
   DS18B20 configuration;
-  Data->getConfiguration(id,&configuration);
+  Data->getConfiguration(id, &configuration);
+  char _number[13];
 
-  AFESensorDS18B20 DS18B20Sensor;
-  DS18B20Sensor.scan(configuration.gpio);
-   addConfigurationBlock(page, L_DS18B20_SENSOR, "");
-  page += "<fieldset>";
-  generateConfigParameter_GPIO(page, "g", configuration.gpio);
-  page += "<div class=\"cf\"><label>";
-  page += L_ADDRESS;
-  page += ": </label><select name=\"a\">";
-  page += "<option value=\"0\"";
-  page += configuration.address == 0 ? " selected=\"selected\"" : "";
-  page += ">";
-  page += L_NONE;
-  page += "</option>";
- /*
-  for (uint8_t index = 0; index < DS18B20Sensor.numberOfDevicesOnBus; index++) {
-    page += "<option value=\"";
-    page += DS18B20Sensor.addressesOfScannedItems[index];
-    page += "\"";
-    page += DS18B20Sensor.addressesOfScannedItems[index] == configuration.address
-                ? " selected=\"selected\""
-                : "";
-    page += ">0x";
-    page += String(DS18B20Sensor.addressesOfScannedItems[index], HEX);
-    page += "</option>";
+  openSection(page, L_DS18B20_SENSOR, "");
+
+  /* Item: GPIO */
+  addListOfGPIOs(page, "gpio", configuration.gpio, "GPIO");
+
+  /* Item: Sensor address */
+  numberOfFoundSensors = _Sensor.scan(configuration.gpio, _addresses);
+
+  if (numberOfFoundSensors > 0) {
+
+    page.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+    page.replace("{{item.label}}", L_ADDRESS);
+    page.replace("{{item.name}}", "a");
+
+    char _scannedAddressText[17];
+    char _configAddressText[17];
+    for (uint8_t i = 0; i < numberOfFoundSensors; i++) {
+      _Sensor.addressToChar(_addresses[i], _scannedAddressText);
+      _Sensor.addressToChar(configuration.address, _configAddressText);
+      page.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+      page.replace("{{item.label}}", _scannedAddressText);
+      page.replace("{{item.value}}", _scannedAddressText);
+      page.replace("{{item.selected}}",
+                   memcmp(_addresses[i], configuration.address,
+                          sizeof(_addresses[i])) == 0
+                       ? " selected=\"selected\""
+                       : "");
+    }
+    page.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
   }
-  */
-  page += "</select></div>";
 
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
 
-  addItem(page, "text", "n", L_NAME, configuration.name, "16");
-
-  char _number[7];
+  /* Item: Interval */
   sprintf(_number, "%d", configuration.interval);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "2", "86400", "1",
+                   L_SECONDS);
 
-  addItem(page, "number", "f", L_MEASURMENTS_INTERVAL, _number, "?", "5",
-          "86400", "1", L_SECONDS);
+  /* Item: Send only changes */
+  addCheckboxFormItem(page, "s", L_DS18B20_SENT_ONLY_CHANGES, "1",
+                      configuration.sendOnlyChanges);
 
-  page += "<div class=\"cc\"><label><input name=\"s\" type=\"checkbox\" "
-          "value=\"1\"";
-  page += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  page += ">";
-  page += L_DS18B20_SENT_ONLY_CHANGES;
-  page += "</label>";
-  page += "</div>";
+  /* Item: Correction */
+  sprintf(_number, "%-.3f", configuration.correction);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k",
+                   L_DS18B20_TEMPERATURE_CORRECTION, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999", "0.001");
 
-  sprintf(_number, "%-.2f", configuration.correction);
-  addItem(page, "number", "k", L_DS18B20_TEMPERATURE_CORRECTION, _number, "?",
-          "-100.99", "100.99", "0.01");
+  /* Item: Unit */
+  page.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  page.replace("{{item.label}}", L_UNITS);
+  page.replace("{{item.name}}", "u");
+  page.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  page.replace("{{item.label}}", "C");
+  page.replace("{{item.value}}", String(AFE_TEMPERATURE_UNIT_CELSIUS));
+  page.replace("{{item.selected}}",
+               configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                   ? " selected=\"selected\""
+                   : "");
+  page.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  page.replace("{{item.label}}", "F");
+  page.replace("{{item.value}}", String(AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+  page.replace("{{item.selected}}",
+               configuration.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT
+                   ? " selected=\"selected\""
+                   : "");
+  page.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 
-  page += "<div class=\"cf\"><label>";
-  page += L_UNITS;
-  page += "</label><select name=\"u\"><option value=\"0\"";
-  page += (configuration.unit == 0 ? " selected=\"selected\">" : ">");
-  page += "C";
-  page += "</option><option value=\"1\"";
-  page += (configuration.unit == 1 ? " selected=\"selected\"" : "");
-  page += ">F</option></select></div>";
-
-  page += "</fieldset></div>";
+  closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    addConfigurationBlock(page, "Domoticz", L_NO_IF_IDX_0);
-    page += "<fieldset>";
-    char _idx[7];
-    sprintf(_idx, "%d", configuration.domoticz.idx);
-    addItem(page, "number", "x", "IDX", _idx, "?", "0", "999999", "1");
-    page += "</fieldset></div>";
+    openSection(page, "Domoticz", L_NO_IF_IDX_0);
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    closeSection(page);
   }
 #else
   if (Device->configuration.api.mqtt) {
-    addConfigurationBlock(page, L_SWITCH_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
-    page += "<fieldset>";
-    addItem(page, "text", "t", L_MQTT_TOPIC, configuration.mqtt.topic, "64");
-    page += "</fieldset></div>";
+    openSection(page, L_DS18B20_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+
+    closeSection(page);
   }
 #endif
 }
@@ -2948,4 +2969,121 @@ void AFESitesGenerator::addItem(String &item, const char *type,
     }
   }
   item.concat("</div>");
+}
+
+void AFESitesGenerator::openSection(String &page, const char *title,
+                                    const char *description) {
+  page.concat(FPSTR(HTTP_FORM_BLOCK_HEADER));
+  page.replace("{{title}}", title);
+  page.replace("{{description}}", description);
+}
+
+void AFESitesGenerator::closeSection(String &page) {
+  page.concat(FPSTR(HTTP_FORM_BLOCK_CLOSURE));
+}
+
+void AFESitesGenerator::addListOfGPIOs(String &item, const char *field,
+                                       uint8_t selected, const char *title) {
+
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  item.replace("{{item.name}}", field);
+  item.replace("{{item.label}}", title);
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  item.replace("{{item.value}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{item.label}}", L_NONE);
+  item.replace("{{item.selected}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                                        ? " selected=\"selected\""
+                                        : "");
+
+  for (uint8_t i = 0; i < AFE_NUMBER_OF_GPIOS; i++) {
+    item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+
+    item.replace("{{item.value}}", String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{item.label}}", String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{item.selected}}", selected == pgm_read_byte(GPIOS + i)
+                                          ? " selected=\"selected\""
+                                          : "");
+  }
+  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
+}
+
+void AFESitesGenerator::addInputFormItem(String &item, const char *type,
+                                         const char *name, const char *label,
+                                         const char *value, const char *size,
+                                         const char *min, const char *max,
+                                         const char *step, const char *hint,
+                                         boolean readonly) {
+  item.concat("<div class=\"cf\"><label>");
+  item.concat(label);
+  item.concat("</label><input name=\"");
+  item.concat(name);
+  item.concat("\" type=\"");
+  item.concat(type);
+  item.concat("\" ");
+  if (readonly) {
+    item.concat("readonly=\"readonly\" ");
+  }
+  if (strcmp(size, "?") != 0) {
+    item.concat("maxlength=\"");
+    item.concat(size);
+    item.concat("\" ");
+  }
+  if (strcmp(type, "number") == 0) {
+    if (strcmp(min, "?") != 0) {
+      item.concat("min=\"");
+      item.concat(min);
+      item.concat("\" ");
+    }
+    if (strcmp(max, "?") != 0) {
+      item.concat("max=\"");
+      item.concat(max);
+      item.concat("\" ");
+    }
+    if (strcmp(step, "?") != 0) {
+      item.concat("step=\"");
+      item.concat(step);
+      item.concat("\" ");
+    }
+  }
+  item.concat("value=\"");
+  item.concat(value);
+  item.concat("\">");
+  if (strcmp(size, "?") != 0) {
+    item.concat("<span class=\"hint\">Max ");
+    item.concat(size);
+    item.concat(" ");
+    item.concat(F(L_NUMBER_OF_CHARS));
+    item.concat("</span>");
+  }
+  if (strcmp(type, "number") == 0) {
+    if (strcmp(min, "?") != 0 && strcmp(max, "?") != 0) {
+      item.concat("<span class=\"hint\"> ");
+      item.concat(F(L_RANGE));
+      item.concat(" ");
+      item.concat(min);
+      item.concat(" - ");
+      item.concat(max);
+      if (strcmp(hint, "?") != 0) {
+        item.concat(" ");
+        item.concat(hint);
+      }
+      item.concat("</span>");
+    } else if (strcmp(hint, "?") != 0) {
+      item.concat("<span class=\"hint\">");
+      item.concat(hint);
+      item.concat("</span>");
+    }
+  }
+  item.concat("</div>");
+}
+
+void AFESitesGenerator::addCheckboxFormItem(String &item, const char *name,
+                                            const char *label,
+                                            const char *value,
+                                            boolean checked) {
+  item.concat(FPSTR(HTTP_ITEM_CHECKBOX));
+  item.replace("{{item.name}}", name);
+  item.replace("{{item.label}}", label);
+  item.replace("{{item.value}}", value);
+  item.replace("{{item.checked}}", checked ? "checked=\"checked\"" : "");
 }

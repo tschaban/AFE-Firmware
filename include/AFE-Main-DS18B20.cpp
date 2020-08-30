@@ -1,33 +1,31 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 
+/* ---------Headers ---------*/
+
+void initializeDS18B20Sensor(void);
+void DS18B20SensorEventsListener(void);
+
+/* --------- Body -----------*/
+
 /* Initializing sensor */
-void initializeDS18B20Sensor() {
+void initializeDS18B20Sensor(void) {
   if (Device.configuration.noOfDS18B20s > 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfDS18B20s; i++) {
-#ifdef DEBUG
-      Serial << endl << "INFO: Initializing sensor DS18B20: " << i + 1;
-#endif
-      DS18B20Sensor[i].begin(i);
+      DS18B20Sensor[i].begin(&Data, i);
     }
-#ifdef DEBUG
-    Serial << endl << "INFO: Initializing of DS18B20 sensors: completed";
-#endif
   }
 }
 
 /* Main code for processing sesnor */
-void DS18B20SensorEventsListener() {
-  return;
+void DS18B20SensorEventsListener(void) {
 
   for (uint8_t i = 0; i < Device.configuration.noOfDS18B20s; i++) {
 
-    DS18B20Sensor[i].listener();
-
-    if (DS18B20Sensor[i].isReady()) {
+    if (DS18B20Sensor[i].listener()) {
       unsigned long idx = 0;
 
-      temperature = DS18B20Sensor[i].getTemperature();
+      float temperature = DS18B20Sensor[i].getTemperature();
 
 /* Thermostat */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -66,8 +64,10 @@ void DS18B20SensorEventsListener() {
       }
 #endif
 
-/* Publishing temperature to MQTT Broker and Domoticz if enabled */
-// MQTTPublishTemperature(temperature);
+      /* Publishing temperature to MQTT Broker and Domoticz if enabled */
+
+      MqttAPI.publishDS18B20SensorData(i);
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       idx = Sensor.getDomoticzIDX();
 // DomoticzPublishTemperature(idx, temperature);

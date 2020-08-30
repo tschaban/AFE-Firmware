@@ -534,74 +534,6 @@ void AFEWebServer::generate(boolean upload) {
 #endif
     Device->reboot(siteConfig.rebootMode);
   }
-
-  /*
-
-  #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  }
-  else if (optionName == "ds18b20") {
-    DS18B20 data = {};
-    if (command == AFE_SERVER_CMD_SAVE) {
-      data = getDS18B20Data();
-    }
-    publishHTML(ConfigurationPanel.getDS18B20ConfigurationSite(command,
-  data)); #endif #ifdef AFE_CONFIG_HARDWARE_DHXX
-  }
-  else if (optionName == "DHT") {
-    DH data = {};
-    if (command == AFE_SERVER_CMD_SAVE) {
-      data = getDHTData();
-    }
-    publishHTML(ConfigurationPanel.getDHTConfigurationSite(command, data));
-  #endif
-
-  #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  }
-  else if (optionName == "thermostat" || optionName == "humidistat") {
-    if (command == AFE_SERVER_CMD_SAVE) {
-        Data->saveConfiguration(getRegulatorData(optionName == "thermostat" ?
-  THERMOSTAT_REGULATOR : HUMIDISTAT_REGULATOR);
-    }
-    publishHTML(ConfigurationPanel.getRelayStatConfigurationSite());
-  #endif
-  }
-
-
-  #if defined(T3_CONFIG)
-    for (uint8_t i = 0; i < 4; i++) {
-      if (Device->configuration.isPIR[i]) {
-        if (getOptionName() == "pir" + String(i)) {
-          PIR data = {};
-          if (getCommand() == AFE_SERVER_CMD_SAVE) {
-            data = getPIRData(i);
-          }
-          publishHTML(ConfigurationPanel.getPIRConfigurationSite(
-              getOptionName(), getCommand(), data, i));
-        }
-      } else {
-        break;
-      }
-    }
-  #endif
-
-  #if defined(T5_CONFIG)
-    for (uint8_t i = 0; i < sizeof(Device->configuration.isContactron); i++) {
-      if (Device->configuration.isContactron[i]) {
-        if (optionName == "contactron" + String(i)) {
-          CONTACTRON data = {};
-          if (command == AFE_SERVER_CMD_SAVE) {
-            data = getContactronData(i);
-          }
-          publishHTML(ConfigurationPanel.getContactronConfigurationSite(
-              optionName, command, data, i));
-        }
-      } else {
-        break;
-      }
-    }
-
-
-  */
 }
 
 /* Methods related to the url request */
@@ -799,8 +731,8 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   data->noOfLEDs = server.arg("l").length() > 0
-                      ? server.arg("l").toInt()
-                      : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
+                       ? server.arg("l").toInt()
+                       : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -814,20 +746,20 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   data->noOfRelays = server.arg("r").length() > 0
-                        ? server.arg("r").toInt()
-                        : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
+                         ? server.arg("r").toInt()
+                         : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   data->noOfSwitches = server.arg("s").length() > 0
-                          ? server.arg("s").toInt()
-                          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
+                           ? server.arg("s").toInt()
+                           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   data->noOfDS18B20s = server.arg("ds").length() > 0
-                          ? server.arg("ds").toInt()
-                          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+                           ? server.arg("ds").toInt()
+                           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
@@ -1247,17 +1179,20 @@ uint8_t AFEWebServer::getSystemLEDData() {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEWebServer::get(DS18B20 &data) {
-
+  AFESensorDS18B20 _Sensor;
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
     data.name[0] = '\0';
   }
 
-  data.address = server.arg("a").length() > 0
-                     ? server.arg("a").toInt()
-                     : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_ADDRESS;
-
+  if (server.arg("a").length() > 0) {
+    char address[17];
+    server.arg("a").toCharArray(address, 17);
+    _Sensor.addressToInt(address, data.address);
+  } else {
+    _Sensor.addressNULL(data.address);
+  }
   data.gpio = server.arg("g").length() > 0
                   ? server.arg("g").toInt()
                   : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_GPIO;

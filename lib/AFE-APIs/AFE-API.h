@@ -67,6 +67,10 @@
 #include <AFE-Contactron.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#include <AFE-Sensor-DS18B20.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -133,6 +137,10 @@ public:
   virtual void addClass(AFEContactron *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  virtual void addClass(AFESensorDS18B20 *);
+#endif
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -183,6 +191,12 @@ protected:
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  AFESensorDS18B20 *_DS18B20Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20];
+#endif
+
+
 };
 
 #endif // _AFE_API_h

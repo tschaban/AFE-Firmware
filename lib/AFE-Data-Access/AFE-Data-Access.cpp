@@ -379,13 +379,19 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
         configuration->api.http = true;
       }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
       configuration->noOfLEDs =
           root["noOfLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH          
       configuration->noOfSwitches =
           root["noOfSwitches"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY          
       configuration->noOfRelays =
           root["noOfRelays"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
-
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       configuration->isAnalogInput = root["isAnalogInput"] | false;
 #endif
@@ -493,8 +499,13 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     jsonAPI["domoticz"] = configuration->api.domoticz;
     jsonAPI["domoticzVersion"] = configuration->api.domoticzVersion;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_LED
     root["noOfLEDs"] = configuration->noOfLEDs;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
     root["noOfSwitches"] = configuration->noOfSwitches;
+#endif 
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     root["noOfRelays"] = configuration->noOfRelays;
@@ -2412,7 +2423,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 
       sprintf(configuration->name, root["name"]);
-      configuration->address = root["address"];
       configuration->gpio = root["gpio"];
       configuration->correction = root["correction"];
       configuration->interval = root["interval"];
@@ -2423,6 +2433,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
+
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++) {
+        configuration->address[i] = root["address"][i].as<int>();
+      }
 
 #ifdef DEBUG
       Serial << endl
@@ -2467,9 +2481,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DS18B20> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-
+    JsonArray &address = jsonBuffer.createArray();
     root["name"] = configuration->name;
-    root["address"] = configuration->address;
+    address.copyFrom(configuration->address);
+    root["address"] = address;
     root["gpio"] = configuration->gpio;
     root["correction"] = configuration->correction;
     root["interval"] = configuration->interval;
@@ -2510,7 +2525,8 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
   configuration.correction =
       AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_TEMPERATURE_CORRECTION;
   configuration.interval = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_INTERVAL;
-  configuration.address = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_ADDRESS;
+  DeviceAddress _address = {0, 0, 0, 0, 0, 0, 0, 0};
+  memcpy(&configuration.address[0], _address, sizeof(_address[0]) * 8);
   configuration.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
   configuration.sendOnlyChanges =
       AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_SENDING_ONLY_CHANGES;
@@ -2533,111 +2549,6 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
-DH AFEDataAccess::getSensorConfiguration() {
-  DH configuration;
-#if defined(T2_CONFIG)
-  configuration->gpio = Eeprom.readUInt8(370);
-  configuration->type = Eeprom.readUInt8(371);
-  configuration->interval = Eeprom.read(372, 5).toInt();
-  configuration->temperature.unit = Eeprom.readUInt8(377);
-  configuration->temperature.correction = Eeprom.read(378, 4).toFloat();
-  configuration->humidity.correction = Eeprom.read(387, 3).toFloat();
-  configuration->temperatureIdx = Eeprom.read(936, 6).toInt();
-  configuration->humidityIdx = Eeprom.read(942, 6).toInt();
-  configuration->temperatureAndHumidityIdx = Eeprom.read(948, 6).toInt();
-  configuration->sendOnlyChanges = Eeprom.read(467);
-  configuration->publishHeatIndex = Eeprom.read(974);
-  configuration->publishDewPoint = Eeprom.read(382);
-#else
-  configuration->gpio = Eeprom.readUInt8(377);
-  configuration->type = Eeprom.readUInt8(378);
-  configuration->interval = Eeprom.read(379, 5).toInt();
-  configuration->temperature.unit = Eeprom.readUInt8(384);
-  configuration->temperature.correction = Eeprom.read(385, 4).toFloat();
-  configuration->humidity.correction = Eeprom.read(394, 3).toFloat();
-  configuration->temperatureIdx = Eeprom.read(954, 6).toInt();
-  configuration->humidityIdx = Eeprom.read(960, 6).toInt();
-  configuration->temperatureAndHumidityIdx = Eeprom.read(966, 6).toInt();
-  configuration->sendOnlyChanges = Eeprom.read(397);
-  configuration->publishHeatIndex = Eeprom.read(990);
-  configuration->publishDewPoint = Eeprom.read(389);
-#endif
-
-  return configuration;
-}
-void AFEDataAccess::saveConfiguration(DH configuration) {
-#if defined(T2_CONFIG)
-  Eeprom.writeUInt8(370, configuration->gpio);
-  Eeprom.writeUInt8(371, configuration->type);
-  Eeprom.write(372, 5, (long)configuration->interval);
-  Eeprom.writeUInt8(377, configuration->temperature.unit);
-  Eeprom.write(378, 4, (float)configuration->temperature.correction);
-  Eeprom.write(387, 3, (float)configuration->humidity.correction);
-  Eeprom.write(936, 6, (long)configuration->temperatureIdx);
-  Eeprom.write(942, 6, (long)configuration->humidityIdx);
-  Eeprom.write(948, 6, (long)configuration->temperatureAndHumidityIdx);
-  Eeprom.write(467, configuration->sendOnlyChanges);
-  Eeprom.write(974, configuration->publishHeatIndex);
-  Eeprom.write(382, configuration->publishDewPoint);
-#else
-  Eeprom.writeUInt8(377, configuration->gpio);
-  Eeprom.writeUInt8(378, configuration->type);
-  Eeprom.write(379, 5, (long)configuration->interval);
-  Eeprom.writeUInt8(384, configuration->temperature.unit);
-  Eeprom.write(385, 4, (float)configuration->temperature.correction);
-  Eeprom.write(394, 3, (float)configuration->humidity.correction);
-  Eeprom.write(954, 6, (long)configuration->temperatureIdx);
-  Eeprom.write(960, 6, (long)configuration->humidityIdx);
-  Eeprom.write(966, 6, (long)configuration->temperatureAndHumidityIdx);
-  Eeprom.write(397, configuration->sendOnlyChanges);
-  Eeprom.write(990, configuration->publishHeatIndex);
-  Eeprom.write(389, configuration->publishDewPoint);
-#endif
-}
-#endif
-
-/* T3: PIR */
-#if defined(T3_CONFIG)
-PIR AFEDataAccess::getPIRConfiguration(uint8_t id) {
-  PIR configuration;
-  MQTT configurationMQTT;
-  uint8_t nextPIR = 27;
-  configuration->gpio = Eeprom.readUInt8(506 + id * nextPIR);
-
-  Eeprom.read(507 + id * nextPIR, 16)
-      .toCharArray(configuration->name, sizeof(configuration->name));
-
-  configuration->ledId = Eeprom.readUInt8(524 + id * nextPIR);
-  configuration->relayId = Eeprom.readUInt8(525 + id * nextPIR);
-  configuration->howLongKeepRelayOn =
-      Eeprom.read(526 + id * nextPIR, 5).toInt();
-  configuration->invertRelayState = Eeprom.read(531 + id * nextPIR);
-
-  configuration->type = Eeprom.readUInt8(613 + id);
-  configuration->idx = Eeprom.read(954 + id * 6, 6).toInt();
-
-  Eeprom.read(334, 32).toCharArray(configurationMQTT.topic,
-                                   sizeof(configurationMQTT.topic));
-
-  sprintf(configuration->mqttTopic, "%s%s/", configurationMQTT.topic,
-          configuration->name);
-
-  return configuration;
-}
-void AFEDataAccess::saveConfiguration(uint8_t id, PIR configuration) {
-  uint8_t nextPIR = 27;
-  Eeprom.writeUInt8(506 + id * nextPIR, configuration->gpio);
-  Eeprom.write(507 + id * nextPIR, 16, configuration->name);
-  Eeprom.writeUInt8(524 + id * nextPIR, configuration->ledId);
-  Eeprom.writeUInt8(525 + id * nextPIR, configuration->relayId);
-  Eeprom.write(526 + id * nextPIR, 5, (long)configuration->howLongKeepRelayOn);
-  Eeprom.write(531 + id * nextPIR, configuration->invertRelayState);
-
-  Eeprom.writeUInt8(613 + id, configuration->type);
-  Eeprom.write(954 + id, 6, (long)configuration->idx);
-}
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {

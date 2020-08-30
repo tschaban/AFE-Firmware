@@ -2,13 +2,20 @@
 
 #include "AFE-Relay.h"
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
 AFERelay::AFERelay() {}
 
-AFERelay::AFERelay(uint8_t id) { begin(id); }
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFERelay::begin(AFEDataAccess *_Data, AFELED *_LED, uint8_t id) {
+  Led = _LED;
+  begin(_Data, id);
+}
+#endif // AFE_CONFIG_HARDWARE_LED
 
-void AFERelay::begin(uint8_t id) {
+void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
   _id = id;
-   Data.getConfiguration(_id,&configuration);
+  _Data->getConfiguration(_id, &configuration);
 
   pinMode(configuration.gpio, OUTPUT);
 
@@ -24,12 +31,6 @@ void AFERelay::begin(uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
   Humidistat.begin(configuration.humidistat);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(configuration.ledID);
-  }
 #endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -56,13 +57,14 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
+  Serial << endl
+         << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_OFF) {
     digitalWrite(configuration.gpio, HIGH);
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led.on();
+    Led->on();
 #endif
     if (!invert &&
         configuration.timeToOff >
@@ -74,10 +76,10 @@ void AFERelay::on(boolean invert) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data.saveRelayState(_id, AFE_RELAY_ON);
+    Data->saveRelayState(_id, AFE_RELAY_ON);
   };
 #else
-  Data.saveRelayState(_id, AFE_RELAY_ON);
+  Data->saveRelayState(_id, AFE_RELAY_ON);
 #endif
 }
 
@@ -85,13 +87,14 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
+  Serial << endl
+         << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_ON) {
     digitalWrite(configuration.gpio, LOW);
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led.off();
+    Led->off();
 #endif
     if (invert &&
         configuration.timeToOff >
@@ -102,10 +105,10 @@ void AFERelay::off(boolean invert) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data.saveRelayState(_id, AFE_RELAY_OFF);
+    Data->saveRelayState(_id, AFE_RELAY_OFF);
   };
 #else
-  Data.saveRelayState(_id, AFE_RELAY_OFF);
+  Data->saveRelayState(_id, AFE_RELAY_OFF);
 #endif
 }
 
@@ -141,9 +144,9 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 2) {
     on();
   } else if (option == 3) {
-    Data.getRelayState(_id) == AFE_RELAY_ON ? on() : off();
+    Data->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
   } else if (option == 4) {
-    Data.getRelayState(_id) == AFE_RELAY_ON ? off() : on();
+    Data->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
   }
 }
 
@@ -180,3 +183,5 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
 #endif
+
+#endif // AFE_CONFIG_HARDWARE_RELAY

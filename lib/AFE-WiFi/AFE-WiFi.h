@@ -1,15 +1,9 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_WiFi_h
 #define _AFE_WiFi_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+//#include <arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -18,8 +12,9 @@
 #include <AFE-LED.h>
 #endif
 
-#include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <ESP8266WiFi.h>
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -41,7 +36,8 @@ private:
   boolean sleepMode = false; // It's set to true after defined in configuration
                              // X number of connection failures
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+  AFELED *Led;
+  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
 #endif
 
   boolean eventConnectionEstablished = false;
@@ -51,9 +47,13 @@ public:
   /* Constructor: no actions */
   AFEWiFi();
 
-  /* Sets connection parameters and host name. Must be invoked before connect
-   * method */
-  void begin(uint8_t mode, AFEDevice *);
+/* Sets connection parameters and host name. Must be invoked before connect
+ * method */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *, AFELED *);
+#else
+  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);  
+#endif
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();
@@ -66,7 +66,7 @@ public:
    * to it */
   void listener();
 
-  uint16_t getJSON(const String& url, String& response);
+  uint16_t getJSON(const String &url, String &response);
 };
 
-#endif
+#endif // _AFE_WiFi_h

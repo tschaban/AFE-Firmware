@@ -2,8 +2,16 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
+
+
+/* ---------Headers ---------*/
+
+void analogInputEventsListener(void);
+
+/* --------- Body -----------*/
+
 /* Main code for analog input listener */
-void analogInputEventsListener() {
+void analogInputEventsListener(void) {
   if (Device.configuration.isAnalogInput) {
     AnalogInput.listener();
     if (AnalogInput.isReady()) {

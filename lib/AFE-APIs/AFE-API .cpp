@@ -147,3 +147,14 @@ void AFEAPI::addClass(AFEContactron *Item) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  void AFEAPI::addClass(AFESensorDS18B20 *Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+    _DS18B20Sensor[i] = Sensor + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the BH1750 added");
+#endif
+  }
+#endif // AFE_CONFIG_HARDWARE_DS18B20

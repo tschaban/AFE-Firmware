@@ -83,11 +83,13 @@ void AFEMQTT::disconnect() {
 boolean AFEMQTT::listener() {
   boolean _ret = false;
   if (Broker.connected()) {
-    _ret = Broker.loop();
+    _ret = Broker.listen();
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-    message.topic = Broker.topic;
-    message.content = Broker.payload;
-    message.length = Broker.length;
+    if (_ret) {
+      message.topic = Broker.topic;
+      message.content = Broker.payload;
+      message.length = Broker.length;
+    }
 #endif
   } else {
     connect();

@@ -63,6 +63,9 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   AFE_MQTT_DEVICE_RAINMETER = 10,
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  AFE_MQTT_DEVICE_DS18B20 = 11,
+#endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */
