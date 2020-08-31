@@ -152,6 +152,16 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processContactron(request);
   }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  else if (strcmp(request->device, "ds18b20") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing DS18B20 sensor requests");
+#endif
+    processDS18B20(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -540,6 +550,34 @@ void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+void AFEAPIHTTP::addClass(AFESensorDS18B20 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+    _DS18B20Sensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+    if (strcmp(request->name, _DS18B20Sensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
+        _DS18B20Sensor[i]->getJSON(json);
+
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 /* Method creates JSON respons after processing HTTP API request, and pushes
  * it.

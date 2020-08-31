@@ -342,8 +342,8 @@ void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
     char value[8];
     if (_AnalogInput->configuration.battery.domoticz.idx > 0) {
       sprintf(value, "%-.3f", _AnalogInput->batteryPercentage);
-      generateDeviceValue(json, _AnalogInput->configuration.battery.domoticz.idx,
-                          value);
+      generateDeviceValue(
+          json, _AnalogInput->configuration.battery.domoticz.idx, value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
   }
@@ -675,5 +675,24 @@ boolean AFEAPIMQTTDomoticz::publishContactronState(uint8_t id) {
   return true;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+void AFEAPIMQTTDomoticz::addClass(AFESensorDS18B20 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishDS18B20SensorData(uint8_t id) {
+  if (enabled) {
+    if (_DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
+      char value[9];
+      sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
+      generateDeviceValue(json, _DS18B20Sensor[id]->configuration.domoticz.idx,
+                          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

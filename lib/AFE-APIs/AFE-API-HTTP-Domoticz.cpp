@@ -436,4 +436,22 @@ boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+void AFEAPIHTTPDomoticz::addClass(AFESensorDS18B20 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIHTTPDomoticz::publishDS18B20SensorData(uint8_t id) {
+  boolean _ret = false;
+  if (enabled && _DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
+    char value[9]; // @TODO CHeck the max size
+    sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
+    sendCustomSensorCommand(_DS18B20Sensor[id]->configuration.domoticz.idx,
+                            value);
+    _ret = true;
+  }
+  return _ret;
+}
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

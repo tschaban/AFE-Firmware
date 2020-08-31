@@ -158,6 +158,10 @@ void initializeHTTPAPI(void) {
     HttpAPI.addClass(&Contactron[0]);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    HttpAPI.addClass(&DS18B20Sensor[0]);
+#endif
+
 #ifdef DEBUG
     Serial << endl << F("INFO: API: HTTP init completed");
 #endif
@@ -221,6 +225,10 @@ void initializeHTTPDomoticzAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
     HttpDomoticzAPI.addClass(&Gate[0]);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    HttpDomoticzAPI.addClass(&DS18B20Sensor[0]);
 #endif
 
 #ifdef DEBUG

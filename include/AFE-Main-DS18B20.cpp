@@ -63,14 +63,12 @@ void DS18B20SensorEventsListener(void) {
         }
       }
 #endif
-
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
 
       MqttAPI.publishDS18B20SensorData(i);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      idx = Sensor.getDomoticzIDX();
-// DomoticzPublishTemperature(idx, temperature);
+      HttpDomoticzAPI.publishDS18B20SensorData(i);
 #endif
     }
   }

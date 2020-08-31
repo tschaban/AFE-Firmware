@@ -3,16 +3,9 @@
 #ifndef _AFE_API_MQTT_DOMOTICZ_h
 #define _AFE_API_MQTT_DOMOTICZ_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED // Code excluded for firmware with
-                                       // standard API
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED 
 
 #include <AFE-API.h>
 #include <ArduinoJson.h>
@@ -147,6 +140,12 @@ public:
   virtual void addClass(AFEContactron *);
   boolean publishContactronState(uint8_t id);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  virtual void addClass(AFESensorDS18B20 *);
+  boolean publishDS18B20SensorData(uint8_t id);
+#endif
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

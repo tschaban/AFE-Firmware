@@ -61,6 +61,10 @@
 #include <AFE-Sensor-Rainmeter.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#include <AFE-Sensor-DS18B20.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -122,6 +126,10 @@ private:
   AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  AFESensorDS18B20 *_DS18B20Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20];
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -168,6 +176,10 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void processContactron(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  void processDS18B20(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -236,6 +248,10 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void addClass(AFEContactron *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  void addClass(AFESensorDS18B20 *);
 #endif
 
 

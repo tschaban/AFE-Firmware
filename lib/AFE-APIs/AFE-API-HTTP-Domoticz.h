@@ -131,6 +131,12 @@ public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   boolean publishBatteryMeterValues();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  virtual void addClass(AFESensorDS18B20 *);
+  boolean publishDS18B20SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
