@@ -77,6 +77,7 @@
 #define L_SAVE "Save"
 #define L_HELP "Help"
 #define L_VERSION "Version"
+#define L_DOMOTICZ_VERSION "Domoticz Version"
 #define L_YES "Yes"
 #define L_NO "No"
 #define L_SENSOR "Sensor"

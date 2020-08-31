@@ -15,7 +15,6 @@
 #include <AFE-Site-components.h>
 #include <ESP8266WiFi.h>
 
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #endif
@@ -73,8 +72,28 @@ private:
                         const char *step = AFE_FORM_ITEM_SKIP_PROPERTY,
                         const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                         boolean readonly = false);
+  
+  /* Type: true = checkbox, false = radio */
+  void addSelectionFormItem(String &item, boolean type, const char *name, const char *label,
+                           const char *value, boolean checked,
+                           const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                           boolean disabled = false);
+  
+
   void addCheckboxFormItem(String &item, const char *name, const char *label,
-                           const char *value, boolean checked);
+                           const char *value, boolean checked,
+                           const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                           boolean disabled = false);
+  
+  void addRadioButtonFormItem(String &item, const char *name, const char *label,
+                           const char *value, boolean checked,
+                           const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                           boolean disabled = false);                           
+
+  void addMenuItem(String &item, const char *title, uint8_t siteId);
+  void addMenuHeaderItem(String &item, const char *title);
+  void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
+                      uint8_t siteId);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */

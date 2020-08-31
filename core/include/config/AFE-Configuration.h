@@ -42,6 +42,9 @@
 /* Not existing hardware item. Used as a default value */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 
+/* Empty string */
+#define AFE_EMPTY_STRING '\0'
+
 /* Default time to auto-logout from config panel: in minutes */
 #define AFE_AUTOLOGOFF_DEFAULT_TIME 10
 
@@ -187,7 +190,7 @@
 
 /* Basic Switch + DS18B20 */
 #elif defined(T1_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.2.0.B1"
+#define AFE_FIRMWARE_VERSION "2.3.0.B2"
 #define AFE_FIRMWARE_TYPE 1
 
 /* File system used */
@@ -668,7 +671,7 @@
 
 /* DS18B20 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-#ifndef AFE_CONFIG_TEMPERATURE
+#ifndef AFE_CONFIG_TERATURE
 #define AFE_CONFIG_TEMPERATURE
 #endif
 
@@ -1135,7 +1138,9 @@ typedef enum {
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"
 #define AFE_FORM_ITEM_TYPE_TEXT "text"
+#define AFE_FORM_ITEM_TYPE_PASSWORD "password"
 #define AFE_FORM_ITEM_SKIP_PROPERTY "?"
+
 
 
 #define AFE_RESPONSE_KEY_VALIDATION 135

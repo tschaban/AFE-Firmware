@@ -100,8 +100,8 @@ const char HTTP_ITEM_SCANNED_I2C_ADDRESSES[] PROGMEM =
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 const char HTTP_ITEM_CHECKBOX[] PROGMEM =
-    "<div class=\"cc\"><label><input name=\"{{item.name}}\" type=\"checkbox\" "
-    "value=\"{{item.value}}\" {{item.checked}}>{{item.label}}</label></div>";
+    "<div class=\"cc\"><label><input name=\"{{item.name}}\" type=\"{{item.type}}\" "
+    "value=\"{{item.value}}\"{{item.checked}}{{item.disabled}}>{{item.label}}</label>{{item.hint}}</div>";
 
 const char HTTP_ITEM_SELECT_OPEN[] PROGMEM =
     "<div class=\"cf\"><label>{{item.label}}</label><select "
