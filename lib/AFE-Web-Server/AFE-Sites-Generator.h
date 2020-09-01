@@ -53,17 +53,13 @@ private:
   void generateHeader(String &page, uint16_t redirect);
 
   /* Method generates GPIO selecton list */
-  void generateConfigParameter_GPIO(String &item, const char *field,
-                                    uint8_t selected,
-                                    const char *title = "GPIO");
-
-  /* Method generates GPIO selecton list */
   void addListOfGPIOs(String &item, const char *field, uint8_t selected,
                       const char *title = "GPIO");
 
   /* Method addes configuration block to the site */
   void openSection(String &page, const char *, const char *);
   void closeSection(String &page);
+
   void addInputFormItem(String &item, const char *type, const char *name,
                         const char *label, const char *value,
                         const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -72,23 +68,28 @@ private:
                         const char *step = AFE_FORM_ITEM_SKIP_PROPERTY,
                         const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                         boolean readonly = false);
-  
+
   /* Type: true = checkbox, false = radio */
-  void addSelectionFormItem(String &item, boolean type, const char *name, const char *label,
-                           const char *value, boolean checked,
-                           const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
-                           boolean disabled = false);
-  
+  void addSelectionFormItem(String &item, boolean type, const char *name,
+                            const char *label, const char *value,
+                            boolean checked,
+                            const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                            boolean disabled = false);
 
   void addCheckboxFormItem(String &item, const char *name, const char *label,
                            const char *value, boolean checked,
                            const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                            boolean disabled = false);
-  
+
   void addRadioButtonFormItem(String &item, const char *name, const char *label,
-                           const char *value, boolean checked,
-                           const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
-                           boolean disabled = false);                           
+                              const char *value, boolean checked,
+                              const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                              boolean disabled = false);
+
+  void addSelectFormItemOpen(String &item, const char *name, const char *label);
+  void addSelectOptionFormItem(String &item, const char *label,
+                               const char *value, boolean selected);
+  void addSelectFormItemClose(String &item);
 
   void addMenuItem(String &item, const char *title, uint8_t siteId);
   void addMenuHeaderItem(String &item, const char *title);
@@ -114,11 +115,6 @@ private:
                                  uint8_t noOffConnected, const char *field,
                                  const char *label, boolean disabled = false);
 
-  void addItem(String &item, const char *type, const char *name,
-               const char *label, const char *value, const char *size = "?",
-               const char *min = "?", const char *max = "?",
-               const char *step = "?", const char *hint = "?",
-               boolean readonly = false);
 
 #if defined(T5_CONFIG)
   void generateGateStatesList(String &item, uint8_t id, byte state);

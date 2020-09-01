@@ -1022,7 +1022,10 @@ void AFEWebServer::getPasswordData(PASSWORD *data) {
 void AFEWebServer::getSerialNumberData(PRO_VERSION *data) {
   if (server.arg("k").length() > 0) {
     server.arg("k").toCharArray(data->serial, sizeof(data->serial));
+  } else {
+    data->serial[0]= '\0';
   }
+  
 
   if (server.arg("v").length() > 0) {
     data->valid = server.arg("v").toInt() == 0 ? false : true;
