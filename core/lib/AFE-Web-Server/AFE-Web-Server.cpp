@@ -958,9 +958,11 @@ void AFEWebServer::getRelayData(uint8_t id, RELAY *data) {
       server.arg("mc").length() > 0 ? server.arg("mc").toInt() : 0;
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  data->thermalProtection = server.arg("tp" + String(id)).length() > 0
-                                ? server.arg("tp" + String(id)).toInt()
-                                : 0;
+  data->thermalProtection.temperature =
+      server.arg("tt").length() > 0 ? server.arg("tt").toFloat() : 0;
+  data->thermalProtection.sensorId = server.arg("ti").length() > 0
+                                         ? server.arg("ti").toInt()
+                                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -1023,9 +1025,8 @@ void AFEWebServer::getSerialNumberData(PRO_VERSION *data) {
   if (server.arg("k").length() > 0) {
     server.arg("k").toCharArray(data->serial, sizeof(data->serial));
   } else {
-    data->serial[0]= '\0';
+    data->serial[0] = '\0';
   }
-  
 
   if (server.arg("v").length() > 0) {
     data->valid = server.arg("v").toInt() == 0 ? false : true;

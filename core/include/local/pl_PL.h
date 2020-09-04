@@ -199,8 +199,9 @@
 #define L_THERMAL_PROTECTION "Zabezpieczenie termiczne"
 #define L_SWITCH_OFF_ABOVE "Wyłącz powyżej"
 #define L_RANGE "Zakres"
-#define L_SELECT_LED_4_RELAY "Wybierz LED sygnalizujący stan przekaźnika"
+#define L_SELECT_LED_4_RELAY "LED sygnalizujący stan przekaźnika"
 #define L_RELAY_MQTT_TOPIC "Temat MQTT sterujący przekaźnikiem"
+#define L_SELECT_SENSOR "Wybierz czujnik"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"
