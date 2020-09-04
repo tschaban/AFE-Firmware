@@ -93,7 +93,10 @@
 #define AFE_DEVICE_TYPE_ID 0
 #endif
 
-/* Basic Switch */
+
+/* ##### AFE VERSIONS ##### */
+
+/* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.2.0"
 #define AFE_FIRMWARE_TYPE 0
@@ -188,7 +191,7 @@
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 #endif
 
-/* Basic Switch + DS18B20 */
+/* ---- Basic Switch + DS18B20 ---- */
 #elif defined(T1_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.3.0.B2"
 #define AFE_FIRMWARE_TYPE 1
@@ -220,11 +223,11 @@
 /* Functionalities */
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-//#define AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 //#define AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+//#define AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 
-/* Basic Switch + DTHxx */
+/* ---- Basic Switch + DTHxx ---- */
 #elif defined(T2_CONFIG)
 #define AFE_FIRMWARE_VERSION "1.4.0"
 #define AFE_FIRMWARE_TYPE 2
@@ -234,21 +237,20 @@
 #define AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 #define AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 #define AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-/* 4xRelay + PIR */
+/* ---- 4xRelay + PIR ---- */
 #elif defined(T3_CONFIG)
 #define AFE_FIRMWARE_TYPE 3
 #define AFE_FIRMWARE_VERSION "1.3.0"
 #define AFE_CONFIG_HARDWARE_PIR
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
-/* 4xRelay */
+/* ---- 4xRelay (VERSION OBSOLETE ---- */
 #elif defined(T4_CONFIG)
 #define AFE_FIRMWARE_VERSION "1.3.1"
 #define AFE_FIRMWARE_TYPE 4
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-/* Gate
- * --------------------------------------------------------------------------*/
+/* ---- Gate ----*/
 #elif defined(T5_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.2.1"
 #define AFE_FIRMWARE_TYPE 5
@@ -328,7 +330,7 @@
 #define AFE_CONFIG_FUNCTIONALITY_GATE
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 
-/* Wheater Station */
+/* ---- Wheater Station ---- */
 #elif defined(T6_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.3.1"
 #define AFE_FIRMWARE_TYPE 6

@@ -52,14 +52,11 @@ private:
 
   void generateHeader(String &page, uint16_t redirect);
 
-  /* Method generates GPIO selecton list */
-  void addListOfGPIOs(String &item, const char *field, uint8_t selected,
-                      const char *title = "GPIO");
-
   /* Method addes configuration block to the site */
   void openSection(String &page, const char *, const char *);
   void closeSection(String &page);
 
+  /* Item: HTML <input type=""> */
   void addInputFormItem(String &item, const char *type, const char *name,
                         const char *label, const char *value,
                         const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -69,52 +66,57 @@ private:
                         const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                         boolean readonly = false);
 
-  /* Type: true = checkbox, false = radio */
-  void addSelectionFormItem(String &item, boolean type, const char *name,
-                            const char *label, const char *value,
-                            boolean checked,
-                            const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
-                            boolean disabled = false);
+  /* Item: HTML input checkbox or radio */
+  void _addSelectionFormItem(String &item, boolean type, const char *name,
+                             const char *label, const char *value,
+                             boolean checked,
+                             const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
+                             boolean disabled = false);
 
+  /* Item: HTML <input type="checkbox" /> */
   void addCheckboxFormItem(String &item, const char *name, const char *label,
                            const char *value, boolean checked,
                            const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                            boolean disabled = false);
 
+  /* Item: HTML <input type="radio" /> */
   void addRadioButtonFormItem(String &item, const char *name, const char *label,
                               const char *value, boolean checked,
                               const char *hint = AFE_FORM_ITEM_SKIP_PROPERTY,
                               boolean disabled = false);
 
+  /* Item: HTML <select><option></option></select> */
   void addSelectFormItemOpen(String &item, const char *name, const char *label);
   void addSelectOptionFormItem(String &item, const char *label,
                                const char *value, boolean selected);
   void addSelectFormItemClose(String &item);
 
+  /* Item: Menu */
   void addMenuItem(String &item, const char *title, uint8_t siteId);
   void addMenuHeaderItem(String &item, const char *title);
   void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);
+
+  /* Item: HTML <select> populated with GPIOs */
+  void addListOfGPIOs(String &item, const char *field, uint8_t selected,
+                      const char *title = "GPIO");
+
+  /* Item: HTML <select> populated with <option> for number of items selection
+   */
+  void _addListOfHardware(String &item, uint8_t noOfItems,
+                          uint8_t noOffConnected, const char *field,
+                          const char *label, uint8_t index, uint8_t noneValue,
+                          boolean disabled = false);
+
+  void addListOfHardwareItem(String &item, uint8_t noOfItems,
+                             uint8_t noOffConnected, const char *field,
+                             const char *label, boolean disabled = false);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   /* These three methods generates checkboxes for Switch, Relay and LED */
   const String generateTwoValueController(REGULATOR configuration,
                                           uint8_t type);
 #endif
-
-  /* Method addes configuration block to the site */
-  void addConfigurationBlock(String &page, const char *, const char *);
-
-  /* It uses generateHardwareItemsList() */
-  void generateHardwareList(String &item, uint8_t noOfItems,
-                            uint8_t noOffConnected, const char *field,
-                            const char *label, uint8_t index, uint8_t noneValue,
-                            boolean disabled = false);
-
-  void generateHardwareItemsList(String &item, uint8_t noOfItems,
-                                 uint8_t noOffConnected, const char *field,
-                                 const char *label, boolean disabled = false);
-
 
 #if defined(T5_CONFIG)
   void generateGateStatesList(String &item, uint8_t id, byte state);
@@ -143,107 +145,107 @@ public:
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
 
-  /* All following methods generates configuration sections */
-  void addDeviceConfiguration(String &page);
-  void addNetworkConfiguration(String &page);
-  void addConnectingSite(String &page);
-  void addMQTTBrokerConfiguration(String &page);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  void addDomoticzServerConfiguration(String &page);
-#endif
-  void addPasswordConfigurationSite(String &page);
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  void addRelayConfiguration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void addSwitchConfiguration(String &page, uint8_t id);
-#endif
-
-  void addProVersionSite(String &page);
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void addLEDConfiguration(String &page, uint8_t id);
-  void addSystemLEDConfiguration(String &page);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-  void addDS18B20Configuration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHXX
-  String addDHTConfiguration();
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  String addRegulatorConfiguration(uint8_t type);
-#endif
-
-#if defined(T3_CONFIG)
-  String addPIRConfiguration(uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  void addGateConfiguration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  void addContactronConfiguration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  void addHPMA115S0Configuration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-  void addBMEX80Configuration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-  void addBH1750Configuration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-  void addAS3935Configuration(String &page, uint8_t id);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  void addAnemometerSensorConfiguration(String &page);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  void addAnalogInputConfiguration(String &page);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_UART
-  void addSerialPortConfiguration(String &page);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  void addI2CPortConfiguration(String &page);
-  // String addDeviceI2CAddressSelection(uint8_t address);
-  void addDeviceI2CAddressSelection(String &page, uint8_t address);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  void addRainmeterSensorConfiguration(String &page);
-#endif
-
   /* These methods generates firmware upgrade sections */
-  void addUpgradeSection(String &page);
-  void addPostUpgradeSection(String &page, boolean status);
+  void siteUpgrade(String &page);
+  void sitePostUpgrade(String &page, boolean status);
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */
-  void addResetSection(String &page);
-  void addPostResetSection(String &page);
+  void siteReset(String &page);
+  void sitePostReset(String &page);
 
   /* Method addes info that device is being reset */
-  void addExitSection(String &page, uint8_t command);
+  void siteExit(String &page, uint8_t command);
 
   /* Method generates section shown when device is in norma mode */
-  void addIndexSection(String &page, boolean authorized);
+  void siteIndex(String &page, boolean authorized);
+
+  /* All following methods generates configuration sections */
+  void siteDevice(String &page);
+  void siteNetwork(String &page);
+  void siteConnecting(String &page);
+  void siteMQTTBroker(String &page);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  void siteDomoticzServer(String &page);
+#endif
+  void sitePassword(String &page);
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  void siteRelay(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+  void siteSwitch(String &page, uint8_t id);
+#endif
+
+  void siteProKey(String &page);
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void siteLED(String &page, uint8_t id);
+  void siteSystemLED(String &page);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  void siteDS18B20Sensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHXX
+  String siteDHTSensor();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  String siteRegulator(uint8_t type);
+#endif
+
+#if defined(T3_CONFIG)
+  String sitePIR(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void siteGate(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void siteContactron(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  void siteHPMA115S0Sensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  void siteBMEX80Sensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  void siteBH1750Sensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+  void siteAS3935Sensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+  void siteAnemometerSensor(String &page);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  void siteADCInput(String &page);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_UART
+  void siteUARTBUS(String &page);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void siteI2CBUS(String &page);
+// String addDeviceI2CAddressSelection(uint8_t address);
+// void addDeviceI2CAddressSelection(String &page, uint8_t address);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+  void siteRainmeterSensor(String &page);
+#endif
 };
 
 #endif

@@ -40,125 +40,125 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 
   switch (siteConfig->ID) {
   case AFE_CONFIG_SITE_INDEX:
-    Site.addIndexSection(page, siteConfig->deviceID == -1 ? true : false);
+    Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
-    Site.addNetworkConfiguration(page);
+    Site.siteNetwork(page);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME_CONNECTING:
-    Site.addConnectingSite(page);
+    Site.siteConnecting(page);
     break;
   case AFE_CONFIG_SITE_DEVICE:
-    Site.addDeviceConfiguration(page);
+    Site.siteDevice(page);
     break;
   case AFE_CONFIG_SITE_NETWORK:
-    Site.addNetworkConfiguration(page);
+    Site.siteNetwork(page);
     break;
   case AFE_CONFIG_SITE_MQTT:
-    Site.addMQTTBrokerConfiguration(page);
+    Site.siteMQTTBroker(page);
     break;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   case AFE_CONFIG_SITE_DOMOTICZ:
-    Site.addDomoticzServerConfiguration(page);
+    Site.siteDomoticzServer(page);
     break;
 #endif
   case AFE_CONFIG_SITE_PASSWORD:
-    Site.addPasswordConfigurationSite(page);
+    Site.sitePassword(page);
     break;
   case AFE_CONFIG_SITE_PRO_VERSION:
-    Site.addProVersionSite(page);
+    Site.siteProKey(page);
     break;
   case AFE_CONFIG_SITE_EXIT:
-    Site.addExitSection(page, siteConfig->rebootMode);
+    Site.siteExit(page, siteConfig->rebootMode);
     break;
   case AFE_CONFIG_SITE_RESET:
-    Site.addResetSection(page);
+    Site.siteReset(page);
     break;
   case AFE_CONFIG_SITE_POST_RESET:
-    Site.addPostResetSection(page);
+    Site.sitePostReset(page);
     break;
   case AFE_CONFIG_SITE_UPGRADE:
-    Site.addUpgradeSection(page);
+    Site.siteUpgrade(page);
     break;
   case AFE_CONFIG_SITE_POST_UPGRADE:
-    Site.addPostUpgradeSection(page, upgradeFailed);
+    Site.sitePostUpgrade(page, upgradeFailed);
     break;
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   case AFE_CONFIG_SITE_RELAY:
-    Site.addRelayConfiguration(page, siteConfig->deviceID);
+    Site.siteRelay(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   case AFE_CONFIG_SITE_SWITCH:
-    Site.addSwitchConfiguration(page, siteConfig->deviceID);
+    Site.siteSwitch(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   case AFE_CONFIG_SITE_ANALOG_INPUT:
-    Site.addAnalogInputConfiguration(page);
+    Site.siteADCInput(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   case AFE_CONFIG_SITE_CONTACTRON:
-    Site.addContactronConfiguration(page, siteConfig->deviceID);
+    Site.siteContactron(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   case AFE_CONFIG_SITE_GATE:
-    Site.addGateConfiguration(page, siteConfig->deviceID);
+    Site.siteGate(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
   case AFE_CONFIG_SITE_UART:
-    Site.addSerialPortConfiguration(page);
+    Site.siteUARTBUS(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_I2C
   case AFE_CONFIG_SITE_I2C:
-    Site.addI2CPortConfiguration(page);
+    Site.siteI2CBUS(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   case AFE_CONFIG_SITE_BMEX80:
-    Site.addBMEX80Configuration(page, siteConfig->deviceID);
+    Site.siteBMEX80Sensor(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   case AFE_CONFIG_SITE_HPMA115S0:
-    Site.addHPMA115S0Configuration(page, siteConfig->deviceID);
+    Site.siteHPMA115S0Sensor(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   case AFE_CONFIG_SITE_BH1750:
-    Site.addBH1750Configuration(page, siteConfig->deviceID);
+    Site.siteBH1750Sensor(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   case AFE_CONFIG_SITE_AS3935:
-    Site.addAS3935Configuration(page, siteConfig->deviceID);
+    Site.siteAS3935Sensor(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   case AFE_CONFIG_SITE_DS18B20:
-    Site.addDS18B20Configuration(page, siteConfig->deviceID);
+    Site.siteDS18B20Sensor(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
-    Site.addAnemometerSensorConfiguration(page);
+    Site.siteAnemometerSensor(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   case AFE_CONFIG_SITE_RAINMETER_SENSOR:
-    Site.addRainmeterSensorConfiguration(page);
+    Site.siteRainmeterSensor(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-      Site.addLEDConfiguration(page, i);
+      Site.siteLED(page, i);
     }
-    Site.addSystemLEDConfiguration(page);
+    Site.siteSystemLED(page);
     break;
 #endif
   }

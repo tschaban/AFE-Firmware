@@ -343,7 +343,7 @@ addMenuItem(page, L_FINISH_CONFIGURATION, AFE_CONFIG_SITE_EXIT);
 page.concat("</ul></div><div id=\"r\">");
 }
 
-void AFESitesGenerator::addDeviceConfiguration(String &page) {
+void AFESitesGenerator::siteDevice(String &page) {
   DEVICE configuration = Device->configuration;
   boolean _itemDisabled = false;
 
@@ -372,14 +372,14 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                             Device->configuration.noOfLEDs, "l",
                             L_NUMBER_OF_LEDS);
 #endif
 
 /* Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
                             Device->configuration.noOfContactrons, "co",
                             L_NUMBER_OF_MAGNETIC_SENSORS);
 
@@ -387,21 +387,21 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /* Relay */
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
                             Device->configuration.noOfRelays, "r",
                             L_NUMBER_OF_RELAYS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Switch */
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
                             Device->configuration.noOfSwitches, "s",
                             L_NUMBER_OF_SWITCHES);
 #endif
 
 /* DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
                             Device->configuration.noOfDS18B20s, "ds",
                             L_NUMBER_OF_DS18B20_SENSORS);
 #endif
@@ -411,7 +411,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
                             Device->configuration.noOfHPMA115S0s, "hp",
                             L_NUMBER_OF_HPMA115S0_SENSORS);
 #endif
@@ -424,7 +424,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
   _itemDisabled = false;
 #endif
 
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                             Device->configuration.noOfBH1750s, "bh",
                             L_NUMBER_OF_BH1750_SENSORS, _itemDisabled);
 #endif
@@ -437,26 +437,26 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
   _itemDisabled = false;
 #endif
 
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
                             Device->configuration.noOfBMEX80s, "b6",
                             L_NUMBER_OF_BMEX80_SENSORS, _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
                             Device->configuration.noOfAS3935s, "a3",
                             L_NUMBER_OF_AS3935_SENSORS,
                             !FirmwarePro->Pro.valid);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  generateHardwareItemsList(
+  addListOfHardwareItem(
       page, AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS,
       Device->configuration.noOfAnemometerSensors, "w", L_ANEMOMETER_SENSOR);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  generateHardwareItemsList(
+  addListOfHardwareItem(
       page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
       Device->configuration.noOfRainmeterSensors, "d", L_RAINMETER);
 #endif
@@ -476,7 +476,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
     }
   }
 
-  body += generateHardwareItemsList(
+  body += addListOfHardwareItem(
       sizeof(Device->configuration.isPIR), itemsNumber, "p",
       language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
@@ -486,7 +486,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
   openSection(page, L_CONTROLLED_GATES, "");
-  generateHardwareItemsList(page, AFE_CONFIG_HARDWARE_NUMBER_OF_GATES,
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_GATES,
                             Device->configuration.noOfGates, "g",
                             L_NUMBER_OF_CONTROLLED_GATES);
 #endif
@@ -525,7 +525,7 @@ void AFESitesGenerator::addDeviceConfiguration(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addConnectingSite(String &page) {
+void AFESitesGenerator::siteConnecting(String &page) {
   NETWORK configuration;
   Data->getConfiguration(&configuration);
   page += "<p>";
@@ -547,7 +547,7 @@ void AFESitesGenerator::addConnectingSite(String &page) {
   page += "</li></ul>";
 }
 
-void AFESitesGenerator::addNetworkConfiguration(String &page) {
+void AFESitesGenerator::siteNetwork(String &page) {
   NETWORK configuration;
   Data->getConfiguration(&configuration);
 
@@ -627,7 +627,7 @@ void AFESitesGenerator::addNetworkConfiguration(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addMQTTBrokerConfiguration(String &page) {
+void AFESitesGenerator::siteMQTTBroker(String &page) {
   MQTT configuration;
   Data->getConfiguration(&configuration);
 
@@ -670,7 +670,7 @@ void AFESitesGenerator::addMQTTBrokerConfiguration(String &page) {
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-void AFESitesGenerator::addDomoticzServerConfiguration(String &page) {
+void AFESitesGenerator::siteDomoticzServer(String &page) {
   DOMOTICZ configuration;
   Data->getConfiguration(&configuration);
 
@@ -697,7 +697,7 @@ void AFESitesGenerator::addDomoticzServerConfiguration(String &page) {
 }
 #endif
 
-void AFESitesGenerator::addPasswordConfigurationSite(String &page) {
+void AFESitesGenerator::sitePassword(String &page) {
   PASSWORD configuration;
   Data->getConfiguration(&configuration);
   openSection(page, L_SET_PASSWORD_TO_PANEL, "");
@@ -711,7 +711,7 @@ void AFESitesGenerator::addPasswordConfigurationSite(String &page) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFESitesGenerator::addLEDConfiguration(String &page, uint8_t id) {
+void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   LED configuration;
   Data->getConfiguration(id, &configuration);
 
@@ -730,18 +730,18 @@ void AFESitesGenerator::addLEDConfiguration(String &page, uint8_t id) {
   page += "</label></div></fieldset></div>";
 }
 
-void AFESitesGenerator::addSystemLEDConfiguration(String &page) {
+void AFESitesGenerator::siteSystemLED(String &page) {
   uint8_t configuration = Data->getSystemLedID();
   openSection(page, L_SYSTEM_LED, L_SYSTEM_LED_INFO);
   page.concat("<fieldset>");
-  generateHardwareList(page, Device->configuration.noOfLEDs, configuration, "s",
+  _addListOfHardware(page, Device->configuration.noOfLEDs, configuration, "s",
                        "LED", 0, AFE_HARDWARE_ITEM_NOT_EXIST);
   closeSection(page);
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
+void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   RELAY configuration;
   Data->getConfiguration(id, &configuration);
 
@@ -882,7 +882,7 @@ void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
     page += F(L_SELECT_LED_4_RELAY);
     page += "</p>";
 
-    generateHardwareList(page, Device->configuration.noOfLEDs,
+    _addListOfHardware(page, Device->configuration.noOfLEDs,
                          configuration.ledID, "l", "LED", 0,
                          AFE_HARDWARE_ITEM_NOT_EXIST);
 
@@ -930,7 +930,7 @@ void AFESitesGenerator::addRelayConfiguration(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
+String AFESitesGenerator::siteRegulator(uint8_t type) {
   RELAY configuration = Data->getConfiguration(0);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -966,7 +966,7 @@ String AFESitesGenerator::addRegulatorConfiguration(uint8_t type) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
+void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   SWITCH configuration;
   Data->getConfiguration(id, &configuration);
 
@@ -1075,7 +1075,7 @@ void AFESitesGenerator::addSwitchConfiguration(String &page, uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
+void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 
   AFESensorDS18B20 _Sensor;
   DS18B20Addresses _addresses;
@@ -1165,7 +1165,7 @@ void AFESitesGenerator::addDS18B20Configuration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHXX
-String AFESitesGenerator::addDHTConfiguration() {
+String AFESitesGenerator::siteDHTSensor() {
 
   DH configuration = Data->getSensorConfiguration();
   DEVICE device = Data->getConfiguration();
@@ -1323,7 +1323,7 @@ String AFESitesGenerator::addHumidistatMenuItem() {
 #endif
 
 #if defined(T3_CONFIG)
-String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
+String AFESitesGenerator::sitePIR(uint8_t id) {
   PIR configuration = Data->getPIRConfiguration(id);
   DEVICE device = Data->getConfiguration();
 
@@ -1466,7 +1466,7 @@ String AFESitesGenerator::addPIRConfiguration(uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFESitesGenerator::addContactronConfiguration(String &page, uint8_t id) {
+void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   CONTACTRON configuration = Data->getConfiguration(id);
   char title[23];
   sprintf(title, "%s #%d", L_MAGNETIC_SENSOR, id + 1);
@@ -1487,7 +1487,7 @@ void AFESitesGenerator::addContactronConfiguration(String &page, uint8_t id) {
   page += (configuration.type == 1 ? " selected=\"selected\"" : "");
   page += ">NC</option></select></div>";
 
-  generateHardwareList(page, Device->configuration.noOfLEDs,
+  _addListOfHardware(page, Device->configuration.noOfLEDs,
                        configuration.ledID, "l", L_LED_ASSIGNED_TO_SENSOR, 0,
                        AFE_HARDWARE_ITEM_NOT_EXIST);
 
@@ -1530,7 +1530,7 @@ void AFESitesGenerator::addContactronConfiguration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
+void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   GATE gateConfiguration = Data->getConfiguration(id);
   CONTACTRON contactronConfiguration[2];
 
@@ -1540,12 +1540,12 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    gateConfiguration.name, "16");
 
-  generateHardwareList(
+  _addListOfHardware(
       page, Device->configuration.noOfRelays, gateConfiguration.relayId, "r",
       L_RELAY_ID_CONTROLLING_GATE, 0, AFE_HARDWARE_ITEM_NOT_EXIST);
 
   if (Device->configuration.noOfContactrons > 0) {
-    generateHardwareList(page, Device->configuration.noOfContactrons,
+    _addListOfHardware(page, Device->configuration.noOfContactrons,
                          gateConfiguration.contactron.id[0], "c1",
                          L_MAGNETIC_SENSOR, 0, AFE_HARDWARE_ITEM_NOT_EXIST);
   }
@@ -1555,7 +1555,7 @@ void AFESitesGenerator::addGateConfiguration(String &page, uint8_t id) {
 
   if (Device->configuration.noOfContactrons > 1) {
 
-    generateHardwareList(page, Device->configuration.noOfContactrons,
+    _addListOfHardware(page, Device->configuration.noOfContactrons,
                          gateConfiguration.contactron.id[1], "c2",
                          L_MAGNETIC_SENSOR, 0, AFE_HARDWARE_ITEM_NOT_EXIST);
   }
@@ -1740,7 +1740,7 @@ void AFESitesGenerator::generateGateStatesList(String &item, uint8_t id,
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
+void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
   HPMA115S0 configuration;
   Data->getConfiguration(id, &configuration);
   openSection(page, L_PARTICLE_SENSOR, "");
@@ -1794,7 +1794,7 @@ void AFESitesGenerator::addHPMA115S0Configuration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
+void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   BMEX80 configuration;
   Data->getConfiguration(id, &configuration);
 
@@ -1997,7 +1997,7 @@ void AFESitesGenerator::addBMEX80Configuration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFESitesGenerator::addBH1750Configuration(String &page, uint8_t id) {
+void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 
   BH1750 configuration;
   Data->getConfiguration(id, &configuration);
@@ -2046,8 +2046,8 @@ void AFESitesGenerator::addBH1750Configuration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-// String AFESitesGenerator::addAS3935Configuration(uint8_t id) {
-void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
+// String AFESitesGenerator::siteAS3935Sensor(uint8_t id) {
+void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
   AS3935 configuration;
   Data->getConfiguration(id, &configuration);
   char _number[2];
@@ -2160,7 +2160,7 @@ void AFESitesGenerator::addAS3935Configuration(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-void AFESitesGenerator::addAnemometerSensorConfiguration(String &page) {
+void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
   openSection(page, L_ANEMOMETER_SENSOR, "");
   page.concat("<fieldset>");
@@ -2255,7 +2255,7 @@ void AFESitesGenerator::addAnemometerSensorConfiguration(String &page) {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-void AFESitesGenerator::addRainmeterSensorConfiguration(String &page) {
+void AFESitesGenerator::siteRainmeterSensor(String &page) {
 
   openSection(page, L_RAINMETER, "");
   page.concat("<fieldset>");
@@ -2311,7 +2311,7 @@ void AFESitesGenerator::addRainmeterSensorConfiguration(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-void AFESitesGenerator::addAnalogInputConfiguration(String &page) {
+void AFESitesGenerator::siteADCInput(String &page) {
   ADCINPUT configuration;
   Data->getConfiguration(&configuration);
 
@@ -2423,7 +2423,7 @@ void AFESitesGenerator::addAnalogInputConfiguration(String &page) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-void AFESitesGenerator::addSerialPortConfiguration(String &page) {
+void AFESitesGenerator::siteUARTBUS(String &page) {
   SERIALPORT configuration;
   Data->getConfiguration(&configuration);
   openSection(page, "UART", "");
@@ -2435,7 +2435,7 @@ void AFESitesGenerator::addSerialPortConfiguration(String &page) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFESitesGenerator::addI2CPortConfiguration(String &page) {
+void AFESitesGenerator::siteI2CBUS(String &page) {
   I2CPORT configuration;
   Data->getConfiguration(&configuration);
   openSection(page, "I2C", "");
@@ -2476,7 +2476,7 @@ void AFESitesGenerator::addDeviceI2CAddressSelection(String &page,
 
 #endif
 
-void AFESitesGenerator::addUpgradeSection(String &page) {
+void AFESitesGenerator::siteUpgrade(String &page) {
   openSection(page, L_FIRMWARE_UPGRADE, L_DONT_PLUG_OFF);
   page.concat(FPSTR(HTTP_SITE_UPGRADE));
   page.replace("{{L_SELECT_FIRMWARE}}", L_SELECT_FIRMWARE);
@@ -2485,7 +2485,7 @@ void AFESitesGenerator::addUpgradeSection(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addPostUpgradeSection(String &page, boolean status) {
+void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
   openSection(page, L_FIRMWARE_UPGRADE, "");
   page.concat("<ul>");
   if (status) {
@@ -2501,7 +2501,7 @@ void AFESitesGenerator::addPostUpgradeSection(String &page, boolean status) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addResetSection(String &page) {
+void AFESitesGenerator::siteReset(String &page) {
   openSection(page, L_RESTORING_DEFAULT_SETTING, "");
   page.concat(FPSTR(HTTP_SITE_RESET_TO_DEFAULTS));
   page.replace("{{L_WARNING}}", L_WARNING);
@@ -2511,7 +2511,7 @@ void AFESitesGenerator::addResetSection(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addPostResetSection(String &page) {
+void AFESitesGenerator::sitePostReset(String &page) {
   openSection(page, L_RESTORING_DEFAULT_SETTING, "");
   page.concat(FPSTR(HTTP_SITE_POST_RESET));
   page.replace("{{L_UPGRADE_IN_PROGRESS}}", L_UPGRADE_IN_PROGRESS);
@@ -2520,7 +2520,7 @@ void AFESitesGenerator::addPostResetSection(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::addExitSection(String &page, uint8_t command) {
+void AFESitesGenerator::siteExit(String &page, uint8_t command) {
   openSection(page, L_REBOOT, "");
   page.concat("<fieldset>");
   page += "<div class=\"cf\"><ul><li>";
@@ -2535,7 +2535,7 @@ void AFESitesGenerator::addExitSection(String &page, uint8_t command) {
   page += "</li></ul></div></fieldset></div>";
 }
 
-void AFESitesGenerator::addIndexSection(String &page, boolean authorized) {
+void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   DEVICE configuration;
   configuration = Device->configuration;
   openSection(page, L_LAUNCH_CONFIGURATION_PANEL, "");
@@ -2561,7 +2561,7 @@ void AFESitesGenerator::addIndexSection(String &page, boolean authorized) {
   page += "\" /></div></form></fieldset></div>";
 }
 
-void AFESitesGenerator::addProVersionSite(String &page) {
+void AFESitesGenerator::siteProKey(String &page) {
   PRO_VERSION configuration;
   Data->getConfiguration(&configuration);
   openSection(page, L_PRO_VERSION, "");
@@ -2630,7 +2630,7 @@ void AFESitesGenerator::openSection(String &page, const char *title,
   page.replace("{{description}}", description);
 }
 
-void AFESitesGenerator::generateHardwareList(
+void AFESitesGenerator::_addListOfHardware(
     String &page, uint8_t noOfItems, uint8_t noOffConnected, const char *field,
     const char *label, uint8_t index, uint8_t noneValue, boolean disabled) {
   page.concat("<div class=\"cf\"><label>");
@@ -2671,10 +2671,10 @@ void AFESitesGenerator::generateHardwareList(
   page.concat("</div>");
 }
 
-void AFESitesGenerator::generateHardwareItemsList(
+void AFESitesGenerator::addListOfHardwareItem(
     String &page, uint8_t noOfItems, uint8_t noOffConnected, const char *field,
     const char *label, boolean disabled) {
-  generateHardwareList(page, noOfItems, noOffConnected, field, label, 1, 0,
+  _addListOfHardware(page, noOfItems, noOffConnected, field, label, 1, 0,
                        disabled);
 }
 
@@ -2875,7 +2875,7 @@ void AFESitesGenerator::addInputFormItem(String &item, const char *type,
   item.concat("</div>");
 }
 
-void AFESitesGenerator::addSelectionFormItem(
+void AFESitesGenerator::_addSelectionFormItem(
     String &item, boolean type, const char *name, const char *label,
     const char *value, boolean checked, const char *hint, boolean disabled) {
   item.concat(FPSTR(HTTP_ITEM_CHECKBOX));
@@ -2896,13 +2896,13 @@ void AFESitesGenerator::addCheckboxFormItem(String &item, const char *name,
                                             const char *value, boolean checked,
                                             const char *hint,
                                             boolean disabled) {
-  addSelectionFormItem(item, true, name, label, value, checked, hint, disabled);
+  _addSelectionFormItem(item, true, name, label, value, checked, hint, disabled);
 }
 
 void AFESitesGenerator::addRadioButtonFormItem(
     String &item, const char *name, const char *label, const char *value,
     boolean checked, const char *hint, boolean disabled) {
-  addSelectionFormItem(item, false, name, label, value, checked, hint,
+  _addSelectionFormItem(item, false, name, label, value, checked, hint,
                        disabled);
 }
 
