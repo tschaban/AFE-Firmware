@@ -495,10 +495,10 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   addSelectFormItemOpen(page, "v", L_DOMOTICZ_VERSION);
   addSelectOptionFormItem(
-      page, L_DOMOTICZ_VERSION_410, String(AFE_DOMOTICZ_VERSION_0),
+      page, L_DOMOTICZ_VERSION_410, "0",
       configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0);
   addSelectOptionFormItem(
-      page, L_DOMOTICZ_VERSION_2020, String(AFE_DOMOTICZ_VERSION_1),
+      page, L_DOMOTICZ_VERSION_2020, "1",
       configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_1);
   addSelectFormItemClose(page);
 #endif
@@ -883,7 +883,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
                             configuration.thermalProtection.sensorId == i);
   }
   addSelectFormItemClose(page);
-
+  sprintf(_number, "%-.3f", configuration.thermalProtection.temperature);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tt", L_SWITCH_OFF_ABOVE,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-67", "257", "0.001");
   closeSection(page);
