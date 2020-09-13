@@ -3,12 +3,6 @@
 #ifndef _AFE_DHT_Structure_h
 #define _AFE_DHT_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-HUMIDITY-Structure.h>
 #include <AFE-TEMPERATURE-Structure.h>
 

@@ -3,6 +3,8 @@
 #ifndef _AFE_CSS_h
 #define _AFE_CSS_h
 
+#include <AFE-Configuration.h>
+
 const char HTTP_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta "
     "charset=\"utf-8\">{{s.redirect}}<title>AFE "
@@ -43,11 +45,11 @@ const char HTTP_FOOTER_CONNECTED[] PROGMEM = "<a style=\"color:#0475b6;\" "
                                              "{{s.lang}}.donate.afe-firmware."
                                              "smartnydom.pl\">{{L_DONATE}}</a>";
 
-
 const char HTTP_FORM_BLOCK_HEADER[] PROGMEM =
-    "<div class=\"ci\"><h1>{{title}}</h1><p class=\"cd\">{{description}}</p><fieldset>";
+    "<div class=\"ci\"><h1>{{title}}</h1><p "
+    "class=\"cd\">{{description}}</p><fieldset>";
 
-const char HTTP_FORM_BLOCK_CLOSURE[] PROGMEM = "</fieldset></div>";    
+const char HTTP_FORM_BLOCK_CLOSURE[] PROGMEM = "</fieldset></div>";
 
 const char HTTP_FOOTER_EXTENDED[] PROGMEM =
     "<div style=\"padding: 5px 0\"><a "
@@ -85,7 +87,7 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}&i={{item.id}}\">&#8227; "
     "{{item.title}}: {{item.id.display}}</a></li>";
 
-const uint8_t GPIOS[] PROGMEM = {0,1,2,3,4,5,12,13,14,15};
+const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =
@@ -99,8 +101,10 @@ const char HTTP_ITEM_SCANNED_I2C_ADDRESSES[] PROGMEM =
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 const char HTTP_ITEM_CHECKBOX[] PROGMEM =
-    "<div class=\"cc\"><label><input name=\"{{item.name}}\" type=\"{{item.type}}\" "
-    "value=\"{{item.value}}\"{{item.checked}}{{item.disabled}}>{{item.label}}</label>{{item.hint}}</div>";
+    "<div class=\"cc\"><label><input name=\"{{item.name}}\" "
+    "type=\"{{item.type}}\" "
+    "value=\"{{item.value}}\"{{item.checked}}{{item.disabled}}>{{item.label}}</"
+    "label>{{item.hint}}</div>";
 
 const char HTTP_ITEM_SELECT_OPEN[] PROGMEM =
     "<div class=\"cf\"><label>{{item.label}}</label><select "
@@ -133,5 +137,13 @@ const char HTTP_SITE_UPGRADE[] PROGMEM =
     "class=\"cm\">{{L_UPGRADE_INFO}}.</p><button type=\"submit\" class=\"b "
     "be\">{{L_UPGRADE}}</button></form></fieldset>";
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+const char HTTP_ITEM_REGULATOR[] PROGMEM =
+    "<div class=\"cf\"><label>{{L_REGULATOR_TURN_IF}}</label><select "
+    "name=\"{{item.name}}\"><option "
+    "value=\"0\"{{item.selected-0}}>{{L_LOWER}}</option><option "
+    "value=\"1\"{{item.selected-1}}>{{L_HIGHER}}</option></select><input "
+    "name=\"{{item.input.name}}\" type=\"number\" value=\"{{item.value}}\" step=\"any\"></div>";
+#endif
 
 #endif

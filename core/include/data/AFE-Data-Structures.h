@@ -3,12 +3,6 @@
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-DEVICE-Structure.h>
 #include <AFE-FIRMWARE-Structure.h>
 #include <AFE-HTTP-COMMAND-Structure.h>

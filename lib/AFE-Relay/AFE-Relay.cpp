@@ -19,18 +19,11 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
 
   pinMode(configuration.gpio, OUTPUT);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  /* Initialzing Thermostat functionality for a relay */
-  Thermostat.begin(configuration.thermostat);
-#endif
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   /* Initialzing thermal protection functionality for a relay */
-  ThermalProtection.begin(configuration.thermalProtection.temperature);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  Humidistat.begin(configuration.humidistat);
+  if (configuration.thermalProtection.sensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    ThermalProtection.begin(configuration.thermalProtection.temperature);
+  }
 #endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

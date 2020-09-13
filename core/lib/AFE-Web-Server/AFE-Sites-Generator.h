@@ -113,21 +113,11 @@ private:
                              const char *label, boolean disabled = false);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  /* These three methods generates checkboxes for Switch, Relay and LED */
-  const String generateTwoValueController(REGULATOR configuration,
-                                          uint8_t type);
+  void addRegulatorControllerItem(String &item, REGULATOR *configuration);
 #endif
 
 #if defined(T5_CONFIG)
   void generateGateStatesList(String &item, uint8_t id, byte state);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  String addThermostateMenuItem();
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  String addHumidistatMenuItem();
 #endif
 
 public:
@@ -189,12 +179,12 @@ public:
   void siteDS18B20Sensor(String &page, uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
   String siteDHTSensor();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  String siteRegulator(uint8_t type);
+  void siteRegulator(String &page, uint8_t id);
 #endif
 
 #if defined(T3_CONFIG)

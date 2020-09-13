@@ -58,7 +58,7 @@ void AFEDefaults::set() {
     DS18B20 SensorConfiguration;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
     DH SensorConfiguration;
 #endif
 
@@ -110,6 +110,10 @@ void AFEDefaults::set() {
 /* DS18B20 presence */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     Data->createDS18B20SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    Data->createRegulatorConfigurationFile();
 #endif
 
 #if defined(T3_CONFIG)

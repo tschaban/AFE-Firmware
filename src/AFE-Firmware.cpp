@@ -139,6 +139,10 @@ void setup() {
     }
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    initializeRegulator();
+#endif
+
 /* Initializing DS18B20  */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     initializeDS18B20Sensor();

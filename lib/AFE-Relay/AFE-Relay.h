@@ -19,14 +19,6 @@
 #include <AFE-Thermal-Protection.h>
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-#include <AFE-Thermostat.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-#include <AFE-Humidistat.h>
-#endif
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -34,16 +26,10 @@
 class AFERelay {
 
 public:
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  AFEThermostat Thermostat;
-#endif
+
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   AFEThermalProtection ThermalProtection;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  AFEHumidistat Humidistat;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE

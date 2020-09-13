@@ -3,12 +3,6 @@
 #ifndef _AFE_AIR_ITEM_Structure_h
 #define _AFE_AIR_ITEM_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 struct AIR_ITEM_SETTING {
   float correction;
   uint8_t unit;

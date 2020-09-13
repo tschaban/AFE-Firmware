@@ -3,11 +3,6 @@
 #ifndef _AFE_RAINMETER_SENSOR_Structure_h
 #define _AFE_RAINMETER_SENSOR_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
 
 struct RAINMETER {
   uint8_t gpio;

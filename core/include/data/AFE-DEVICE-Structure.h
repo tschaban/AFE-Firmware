@@ -3,12 +3,6 @@
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 
 struct AFE_DEVICE_API {
@@ -62,6 +56,9 @@ struct DEVICE {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   uint8_t noOfRainmeterSensors;
+#endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  uint8_t noOfRegulators;
 #endif
 
 

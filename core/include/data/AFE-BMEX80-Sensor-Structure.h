@@ -3,11 +3,6 @@
 #ifndef _AFE_BMEX80_Structure_h
 #define _AFE_BMEX80_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
 
 #include <AFE-Air-Item-Structure.h>
 #include <AFE-Configuration.h>

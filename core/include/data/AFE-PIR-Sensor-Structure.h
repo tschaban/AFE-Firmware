@@ -3,12 +3,6 @@
 #ifndef _AFE_PIR_Structure_h
 #define _AFE_PIR_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 /* Relay states */
 #define PIR_OPEN 1
 #define PIR_CLOSE 0

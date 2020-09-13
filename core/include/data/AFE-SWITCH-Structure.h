@@ -3,12 +3,6 @@
 #ifndef _AFE_SWITCH_Structure_h
 #define _AFE_SWITCH_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 struct SWITCH {
   uint8_t gpio;
   uint8_t type;

@@ -102,12 +102,12 @@ private:
   void get(DS18B20 &data);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
   void getDHTData(DH *);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  void getRegulatorData(REGULATOR *);
+  void get(REGULATOR &data);
 #endif
 
 #if defined(T3_CONFIG)

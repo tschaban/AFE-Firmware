@@ -1,4 +1,7 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+# 1 "C:\\Users\\Adrian\\AppData\\Local\\Temp\\tmpnp3z6mn8"
+#include <Arduino.h>
+# 1 "C:/Users/Adrian/Development/AFE-Firmware/src/AFE-Sensor-DHT.ino"
+
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
 

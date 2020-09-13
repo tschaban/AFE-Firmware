@@ -3,12 +3,6 @@
 #ifndef _AFE_NETWORK_Structure_h
 #define _AFE_NETWORK_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 struct NETWORK {
   char ssid[33];
   char password[33];

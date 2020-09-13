@@ -121,18 +121,15 @@ public:
   void createDS18B20SensorConfigurationFile(void);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
   DH getSensorConfiguration();
   void saveConfiguration(DH configuration);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  void getConfiguration(uint8_t id, REGULATOR_TYPE type, REGULATOR *);
-  void saveConfiguration(uint8_t id, REGULATOR_TYPE type, REGULATOR *);
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  void createThermostatConfigurationFile(void);
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+  void getConfiguration(uint8_t id, REGULATOR *);
+  void saveConfiguration(uint8_t id, REGULATOR *);
+  void createRegulatorConfigurationFile(void);
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #if defined(T3_CONFIG)

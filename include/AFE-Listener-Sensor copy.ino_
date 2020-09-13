@@ -1,5 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHXX)
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
 
 /* Initializing sensor */
 void initalizeSensor() {
@@ -8,7 +8,7 @@ void initalizeSensor() {
     Sensor.begin();
   }
 #endif
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
   if (Device.configuration.isDHT) {
     AFEDataAccess Data;
     DH configuration = Data.getSensorConfiguration();
@@ -26,7 +26,7 @@ void initalizeSensor() {
 void mainSensor() {
 #if defined(AFE_CONFIG_HARDWARE_DS18B20)
   if (Device.configuration.isDS18B20)
-#elif defined(AFE_CONFIG_HARDWARE_DHXX)
+#elif defined(AFE_CONFIG_HARDWARE_DHT)
   if (Device.configuration.isDHT)
 #endif
   {
@@ -89,7 +89,7 @@ void mainSensor() {
 
       DomoticzPublishTemperature(idx, temperature);
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
       humidity = Sensor.getHumidity();
 
 /* Humidistat */
@@ -137,7 +137,7 @@ void mainSensor() {
   }
 }
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 void dht_wrapper() { dht.isrCallback(); }
 #endif
 

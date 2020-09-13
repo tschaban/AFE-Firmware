@@ -161,6 +161,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteSystemLED(page);
     break;
 #endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  case AFE_CONFIG_SITE_REGULATOR:
+    Site.siteRegulator(page, siteConfig->deviceID);
+    break;
+#endif
   }
 
   if (siteConfig->form) {
@@ -397,7 +402,14 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
-
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+      else if (siteConfig.ID == AFE_CONFIG_SITE_REGULATOR) {
+        REGULATOR configuration;
+        get(configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+        configuration = {0};
+      }
+#endif
     } else if (command == AFE_SERVER_CMD_NONE) {
       if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
         siteConfig.form = false;
@@ -762,7 +774,7 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
                            : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
   data->isDHT = server.arg("dh").length() > 0 ? true : false;
 #endif
 
@@ -800,6 +812,11 @@ void AFEWebServer::getDeviceData(DEVICE *data) {
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   data->noOfRainmeterSensors =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  data->noOfRegulators =
+      server.arg("re").length() > 0 ? server.arg("re").toInt() : 0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -1034,23 +1051,25 @@ void AFEWebServer::getSerialNumberData(PRO_VERSION *data) {
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-server.arg("te").length() > 0 ? data->enabled = true : data->enabled = false;
+void AFEWebServer::get(REGULATOR &data) {
 
-if (server.arg("tn").length() > 0) {
-  data->turnOn = server.arg("tn").toFloat();
-}
-
-if (server.arg("tf").length() > 0) {
-  data->turnOff = server.arg("tf").toFloat();
-}
-
-if (server.arg("ta").length() > 0) {
-  data->turnOnAbove = server.arg("ta").toInt() == 0 ? false : true;
-}
-
-if (server.arg("tb").length() > 0) {
-  data->turnOffAbove = server.arg("tb").toInt() == 0 ? false : true;
-}
+  data.enabled = server.arg("e").length() > 0 ? true : false;
+  data.turnOn = server.arg("on").length() > 0 ? server.arg("on").toFloat() : 0;
+  data.turnOff =
+      server.arg("off").length() > 0 ? server.arg("off").toFloat() : 0;
+  data.turnOnAbove =
+      server.arg("ta").length() > 0 && server.arg("ta").toInt() == 1 ? true
+                                                                     : false;
+  data.turnOffAbove =
+      server.arg("tb").length() > 0 && server.arg("tb").toInt() == 1 ? true
+                                                                     : false;
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
+                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.sensorHardware = server.arg("h").length() > 0
+                            ? server.arg("h").toInt()
+                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 }
 #endif
 
@@ -1230,7 +1249,7 @@ void AFEWebServer::get(DS18B20 &data) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 void AFEWebServer::getDHTData(DH *data) {
 
   if (server.arg("g").length() > 0) {

@@ -384,11 +384,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->noOfLEDs =
           root["noOfLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_SWITCH          
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
       configuration->noOfSwitches =
           root["noOfSwitches"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_RELAY          
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->noOfRelays =
           root["noOfRelays"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
@@ -443,6 +443,12 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->noOfRainmeterSensors =
           root["noOfRainmeterSensors"] |
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+      configuration->noOfRegulators =
+          root["noOfRegulators"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
 #ifdef DEBUG
@@ -505,7 +511,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
     root["noOfSwitches"] = configuration->noOfSwitches;
-#endif 
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     root["noOfRelays"] = configuration->noOfRelays;
@@ -549,6 +555,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
     root["noOfRainmeterSensors"] = configuration->noOfRainmeterSensors;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    root["noOfRegulators"] = configuration->noOfRegulators;
 #endif
 
     root.printTo(configFile);
@@ -676,6 +686,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   deviceConfiguration.noOfRainmeterSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  deviceConfiguration.noOfRegulators =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -1598,16 +1613,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-      configuration->thermostat.enabled = root["thermostat"]["enabled"];
-      configuration->thermostat.sensorId = root["thermostat"]["sensorId"];
-      configuration->thermostat.turnOn = root["thermostat"]["turnOn"];
-      configuration->thermostat.turnOff = root["thermostat"]["turnOff"];
-      configuration->thermostat.turnOnAbove = root["thermostat"]["turnOnAbove"];
-      configuration->thermostat.turnOffAbove =
-          root["thermostat"]["turnOffAbove"];
-#endif
-
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RELAY
              << F(", actual JSON size: ") << jsonBuffer.size();
@@ -1654,10 +1659,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
         root.createNestedObject("thermalProtection");
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-    JsonObject &thermostat = root.createNestedObject("thermostat");
-#endif
-
     root["gpio"] = configuration->gpio;
     root["name"] = configuration->name;
     root["timeToOff"] = configuration->timeToOff;
@@ -1674,15 +1675,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     thermalProtection["temperature"] =
         configuration->thermalProtection.temperature;
     thermalProtection["sensorId"] = configuration->thermalProtection.sensorId;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-    thermostat["enabled"] = configuration->thermostat.enabled;
-    thermostat["sensorId"] = configuration->thermostat.sensorId;
-    thermostat["turnOn"] = configuration->thermostat.turnOn;
-    thermostat["turnOff"] = configuration->thermostat.turnOff;
-    thermostat["turnOnAbove"] = configuration->thermostat.turnOnAbove;
-    thermostat["turnOffAbove"] = configuration->thermostat.turnOffAbove;
 #endif
 
     root.printTo(configFile);
@@ -1732,15 +1724,6 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   RelayConfiguration.thermalProtection.temperature = 0;
   RelayConfiguration.thermalProtection.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  RelayConfiguration.thermostat.enabled = false;
-  RelayConfiguration.thermostat.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
-  RelayConfiguration.thermostat.turnOn = 0;
-  RelayConfiguration.thermostat.turnOff = 0;
-  RelayConfiguration.thermostat.turnOnAbove = false;
-  RelayConfiguration.thermostat.turnOffAbove = true;
 #endif
 
 /* SONOFF Basic v1 */
@@ -2549,7 +2532,6 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
   char fileName[22];
@@ -3001,23 +2983,142 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR_TYPE type,
-                                     REGULATOR *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 
-  char fileName[21];
-  if (type == REGULATOR_THERMOSTAT) {
-    sprintf(fileName, "/cfg-thermostat-%d.json", id);
-  } else {
-    sprintf(fileName, "/cfg-humidistat-%d.json", id);
+  char fileName[23];
+  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION_FILE, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_REGULATOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->enabled =
+          root["enabled"] | AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ENABLED;
+      configuration->sensorId = root["sensorId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->sensorHardware =
+          root["sensorHardware"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->relayId = root["relayId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->turnOn = root["turnOn"];
+      configuration->turnOff = root["turnOff"];
+      configuration->turnOnAbove =
+          root["turnOnAbove"] |
+          AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
+      configuration->turnOffAbove =
+          root["turnOffAbove"] |
+          AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_REGULATOR << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_REGULATOR < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
   }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR_TYPE type,
-                                      REGULATOR *configuration) {}
+void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
+  char fileName[23];
+  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION_FILE, id);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-void AFEDataAccess::createThermostatConfigurationFile(void) {}
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_REGULATOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["enabled"] = configuration->enabled;
+    root["relayId"] = configuration->relayId;
+    root["sensorId"] = configuration->sensorId;
+    root["sensorHardware"] = configuration->sensorHardware;
+    root["turnOn"] = configuration->turnOn;
+    root["turnOff"] = configuration->turnOff;
+    root["turnOnAbove"] = configuration->turnOnAbove;
+    root["turnOffAbove"] = configuration->turnOffAbove;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_REGULATOR
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_REGULATOR < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createRegulatorConfigurationFile(void) {
+
+  REGULATOR configuration;
+  configuration.enabled = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ENABLED;
+  configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sensorHardware = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.turnOff = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF;
+  configuration.turnOn = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON;
+  configuration.turnOffAbove =
+      AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
+  configuration.turnOnAbove = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Creating regulator configuration file: ") << i;
+#endif
+    saveConfiguration(i, &configuration);
+  }
+}
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
@@ -3278,72 +3379,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #endif
 }
 
-void AFEDataAccess::createSerialConfigurationFile() {
-#ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_UART_CONFIGURATION;
-#endif
-  SERIALPORT configuration;
-  configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
-  configuration.TXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
-  saveConfiguration(&configuration);
-}
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_I2C_CONFIGURATION
-         << F(" ... ");
-#endif
-
-  File configFile = SPIFFS.open(AFE_FILE_I2C_CONFIGURATION, "r");
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: JSON: ");
-#endif
-
-    size_t size = configFile.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
-#ifdef DEBUG
-      root.printTo(Serial);
-#endif
-
-      configuration->SDA = root["SDA"];
-      configuration->SCL = root["SCL"];
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
-#endif
-    }
-#ifdef DEBUG
-    else {
-      Serial << F("ERROR: JSON not pharsed");
-    }
-#endif
-
-    configFile.close();
-  }
-
-#ifdef DEBUG
-  else {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
-           << F(" not opened");
-  }
-#endif
-}
+void AFEDataAccess::createSerialConfigurationFile() {}
 
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 #ifdef DEBUG

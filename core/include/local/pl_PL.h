@@ -37,7 +37,8 @@
 #define L_UPGRADED_TO_NEW_VERSION_TYPE                                         \
   "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna "        \
   "konfiguracja urządzenia."
-#define L_PASWORD_PROTECTED "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
+#define L_PASWORD_PROTECTED                                                    \
+  "\"Operacja niemożliwa. Konfiguracja zabezpieczona hasłem\""
 
 #define L_DONATE "&#128077; Wesprzyj jeśli soft Ci się przydał"
 
@@ -119,7 +120,9 @@
 #endif
 
 #define L_AUTOLOGOUT_TITLE "Automatyczne zakończenie konfiguracji"
-#define L_AUTOLOGOUT_DESCRIPTION "Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w panelu konfiguracyjnym"
+#define L_AUTOLOGOUT_DESCRIPTION                                                 \
+  "Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku " \
+  "akcji w panelu konfiguracyjnym"
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "Konfiguracja sieci WiFi"
@@ -166,7 +169,6 @@
   "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_NO_IF_IDX_0                                                          \
   "Jeśli IDX jest 0 to wartość nie będzie wysyłana do Domoticz"
-
 
 /* Form: Led configuration */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -217,7 +219,7 @@
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
 #define L_SENSITIVENESS "Czułość"
-#define L_SENSITIVENESS_HINT                                                         \
+#define L_SENSITIVENESS_HINT                                                          \
   "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie " \
   "przycisku podczas jego wciskania"
 #define L_SWITCH_BUTTON "Przycisk / Włącznik"
@@ -244,11 +246,12 @@
 
 /* Form: upgrade and post upgrade */
 #define L_SELECT_FIRMWARE "Wybierz Firmware"
-#define L_UPGRADE_INFO                                                             \
-  "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "               \
-  "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj "     \
-  "urządzenia przez co najmniej 1min.<br>Urządzenie formatuje pamięć i wgrywa " \
-  "domyślne ustawienia.<br><strong>Ten proces nie może zostać "                 \
+#define L_UPGRADE_INFO                                                         \
+  "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "           \
+  "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj " \
+  "urządzenia przez co najmniej 1min.<br>Urządzenie formatuje pamięć i "   \
+  "wgrywa "                                                                    \
+  "domyślne ustawienia.<br><strong>Ten proces nie może zostać "             \
   "przerwany</strong>"
 #define L_UPGRADE "Aktualizuj"
 #define L_DONT_PLUG_OFF                                                        \
@@ -348,7 +351,9 @@
 #define L_IDX_BVOC_EQUIVALENT "IDX BVOC"
 #define L_MQTT_TOPIC_BMEX80 "Temat MQTT czujnika BMEx80"
 #define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
-#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu czujnika"
+#define L_REFRESH_SETTINGS_FOR_BMEX80_SENSOR                                   \
+  "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu "     \
+  "czujnika"
 #define L_ALTITIDE "Wysokość nad poziomem morza"
 #define L_METERS "Metrów"
 #endif
@@ -373,11 +378,12 @@
 #define L_SPIKES_REJECTION_HINT "(1-najmniejszy, 11-największy)"
 #define L_MIN_SPIKES "Minimalna ilość piorunów, aby zgłosić detekcję burzy"
 #define L_AUTOMATIC_NOISE_FLOOR_CONTROL "Inteligentna kontrola poziomu hałasu"
-#define L_SET_LEVEL_OF_NOISE_FLOOR "Ustaw poziom hałasu, w przypadku wyłączonej opcji Inteligentnej kontroli hałasu"
+#define L_SET_LEVEL_OF_NOISE_FLOOR                                               \
+  "Ustaw poziom hałasu, w przypadku wyłączonej opcji Inteligentnej kontroli " \
+  "hałasu"
 #define L_SENSOR_INDOOR_OUTDOOR "Lokalizacja czujnika"
 #define L_INDOOR "Wewnątrz budynku"
 #define L_OUTDOOR "Na zewnątrz"
-
 
 #define L_MQTT_TOPIC_AS3935 "Temat MQTT czujnika AS3935"
 #endif
@@ -386,11 +392,14 @@
 #define L_DS18B20_SENSOR "Czujnik temperatury DS18B20"
 #define L_DS18B20_SENSORS "Czujniki DS18B20"
 #define L_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
-#define L_DS18B20_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury zmieni się"
+#define L_DS18B20_SENT_ONLY_CHANGES                                            \
+  "Wysyłać dane tylko, gdy wartość temperatury zmieni się"
 #define L_DS18B20_TEMPERATURE_CORRECTION "Korekta wartości o"
 #define L_DS18B20_MQTT_TOPIC "MQTT Temat informacji z czujnika"
 #define L_DS18B20_SEARCH "Skanuj GPIO"
-#define L_DS18B20_NO_SENSOR "Żaden czujnik nie został jeszcze znaleziony. Sprawdź, czy jest poprawnie podłączony, a następnie przeskanuj GPIO"
+#define L_DS18B20_NO_SENSOR                                                      \
+  "Żaden czujnik nie został jeszcze znaleziony. Sprawdź, czy jest poprawnie " \
+  "podłączony, a następnie przeskanuj GPIO"
 #endif
 
 /* I2C or DS18B20 */
@@ -401,9 +410,12 @@
 /* Anemometer Sensor */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #define L_ANEMOMETER_SENSOR "Czujnik siły wiatru"
-#define L_ANEMOMETER_SENSITIVENESS_HINT "Czułość czujnika należy ustawić metodą prób i błędów, aż do uzyskania zamierzonego efektu. Im wartość jest mniejsza tym czułość jest większa"
+#define L_ANEMOMETER_SENSITIVENESS_HINT                                               \
+  "Czułość czujnika należy ustawić metodą prób i błędów, aż do uzyskania " \
+  "zamierzonego efektu. Im wartość jest mniejsza tym czułość jest większa"
 #define L_ANEMOMETER_CALIBRATION "Kalibracja anemometru"
-#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Odległość jaką wiatr przebędzie w jednym impulsie anemometra"
+#define L_ANEMOMETER_IMPULSE_DISTANCE_HINT                                     \
+  "Odległość jaką wiatr przebędzie w jednym impulsie anemometra"
 #define L_ANEMOMETER_IMPULSE_DISTANCE "Odległość"
 #endif
 
@@ -413,7 +425,6 @@
 #define L_RAINMETER_CALIBRATION "Rozdzielczość czujnika deszczu"
 #define L_RAINMETER_RESOLUTION "Rozdzielczość"
 #endif
-
 
 /* Generic Sensors */
 #ifdef AFE_CONFIG_TEMPERATURE
@@ -461,7 +472,14 @@
 #endif
 #endif
 
-
-
+#define L_REGULATION "Regulacja"
+#define L_REGULATORS "Regulatory"
+#define L_REGULATOR "Regulator"
+#define L_NUMBER_OF_REGULATORS "Ilość regulatorów"
+#define L_REGULATOR_TURN_ON_IF "Włącz jeśli wartość jest"
+#define L_REGULATOR_TURN_OFF_IF "Wyłącz jeśli wartość jest"
+#define L_LOWER "mniejsza"
+#define L_HIGHER "większa"
+#define L_REGULATOR_ENABLED "Włączony po uruchomieniu"
 
 #endif

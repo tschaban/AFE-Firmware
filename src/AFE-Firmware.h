@@ -54,6 +54,11 @@ AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 AFEAnalogInput AnalogInput;
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Regulator.h>
+AFERegulator Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
 AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
@@ -78,6 +83,10 @@ AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #include <AFE-Main-ADC.cpp>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Main-Regulator.cpp>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Main-DS18B20.cpp>
 #endif
@@ -86,7 +95,7 @@ AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 
 
 /* T2 Setup, DHxx sensor */
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 #include <AFE-Sensor-DHT.h>
 #include <PietteTech_DHT.h>
 void dht_wrapper();

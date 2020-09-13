@@ -3,12 +3,6 @@
 #ifndef _AFE_RELAY_Structure_h
 #define _AFE_RELAY_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 struct RELAY_DEFAULTS {
   uint8_t powerOn;
   uint8_t MQTTConnected;

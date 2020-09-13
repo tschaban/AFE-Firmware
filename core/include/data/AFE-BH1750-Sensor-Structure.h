@@ -3,12 +3,6 @@
 #ifndef _AFE_BH1750_Structure_h
 #define _AFE_BH1750_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
 #include <AFE-DOMOTICZ-Structure.h>
 #endif

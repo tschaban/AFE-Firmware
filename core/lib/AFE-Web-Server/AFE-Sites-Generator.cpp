@@ -123,7 +123,7 @@ if (Device->configuration.noOfRelays > 0) {
 #endif
 
 /* Humidistat */
-#if defined(AFE_CONFIG_HARDWARE_DHXX) &&                                       \
+#if defined(AFE_CONFIG_HARDWARE_DHT) &&                                        \
     defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
   if (Device->configuration.isDHT) {
     page.concat(addThermostateMenuItem());
@@ -200,11 +200,21 @@ if (Device->configuration.noOfDS18B20s > 0) {
 #endif
 
 /* Sensor DHxx */
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 if (Device->configuration.isDHT) {
   page.concat("<li class=\"itm\"><a href=\"\\?o=DHT\">");
   page.concat(language == 0 ? "Czujnik DHT" : "DHT sensor");
   page.concat("</a></li>");
+}
+#endif
+
+/* Regulator */
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+if (Device->configuration.noOfRegulators > 0) {
+
+  addMenuHeaderItem(page, L_REGULATORS);
+  addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
+                 AFE_CONFIG_SITE_REGULATOR);
 }
 #endif
 
@@ -405,7 +415,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_NUMBER_OF_DS18B20_SENSORS);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 // TODO
 #endif
 
@@ -459,6 +469,11 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_RAINMETER);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
+                        Device->configuration.noOfRegulators, "re",
+                        L_NUMBER_OF_REGULATORS);
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   addCheckboxFormItem(
       page, "ad", L_DO_MEASURE_ADC, "1", configuration.isAnalogInput,
@@ -494,12 +509,12 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   addSelectFormItemOpen(page, "v", L_DOMOTICZ_VERSION);
-  addSelectOptionFormItem(
-      page, L_DOMOTICZ_VERSION_410, "0",
-      configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0);
-  addSelectOptionFormItem(
-      page, L_DOMOTICZ_VERSION_2020, "1",
-      configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_1);
+  addSelectOptionFormItem(page, L_DOMOTICZ_VERSION_410, "0",
+                          configuration.api.domoticzVersion ==
+                              AFE_DOMOTICZ_VERSION_0);
+  addSelectOptionFormItem(page, L_DOMOTICZ_VERSION_2020, "1",
+                          configuration.api.domoticzVersion ==
+                              AFE_DOMOTICZ_VERSION_1);
   addSelectFormItemClose(page);
 #endif
 
@@ -923,38 +938,54 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-String AFESitesGenerator::siteRegulator(uint8_t type) {
-  RELAY configuration = Data->getConfiguration(0);
+void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
+  REGULATOR configuration;
+  RELAY relayConfiguration;
+  char text[30];
+  char value[4];
+  Data->getConfiguration(id, &configuration);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  if (type == THERMOSTAT_REGULATOR)
-#endif
-  {
-    String body = generateTwoValueController(configuration.thermostat,
-                                             THERMOSTAT_REGULATOR);
+  openSection(page, L_REGULATOR, "");
 
-    return openSection(language == 0 ? "Termostat" : "Thermostat",
-                       language == 0 ? "Termostat kontroluje przekaźnik w "
-                                       "zależności od wartości temperatury"
-                                     : "Thermostat controlls the relay "
-                                       "depending on temperature value",
-                       body);
+  addSelectFormItemOpen(page, "r", L_RELAY);
+  sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(
+      page, L_NONE, value,
+      configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
 
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+    Data->getConfiguration(i, &relayConfiguration);
+    sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.relayId == i ? true : false);
   }
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  else {
-    String body = generateTwoValueController(configuration.humidistat,
-                                             HUMIDISTAT_REGULATOR);
+  addSelectFormItemClose(page);
 
-    return openSection(
-        language == 0 ? "Regulator wilgotności" : "Humidistat",
-        language == 0
-            ? "Regulator wilgotności kontroluje przekaźnik w "
-              "zależności od wartości wilgotności"
-            : "Humidistat controlls the relay depending on humidity value",
-        body);
+  addSelectFormItemOpen(page, "s", L_SENSOR);
+  sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(
+      page, L_NONE, value,
+      configuration.sensorId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  DS18B20 ds18b20Configuration;
+  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
+    Data->getConfiguration(i, &ds18b20Configuration);
+    sprintf(text, "DS18B20 %d: %s", i + 1, ds18b20Configuration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.sensorId == i ? true : false);
   }
 #endif
+  addSelectFormItemClose(page);
+
+  addCheckboxFormItem(page, "e", L_REGULATOR_ENABLED, "1",
+                      configuration.enabled);
+
+  closeSection(page);
+
+  addRegulatorControllerItem(page, &configuration);
 }
 #endif
 
@@ -1157,7 +1188,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 String AFESitesGenerator::siteDHTSensor() {
 
   DH configuration = Data->getSensorConfiguration();
@@ -2676,100 +2707,41 @@ void AFESitesGenerator::addListOfHardwareItem(String &page, uint8_t noOfItems,
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-const String
-AFESitesGenerator::generateTwoValueController(REGULATOR configuration,
-                                              uint8_t type) {
+void AFESitesGenerator::addRegulatorControllerItem(String &page,
+                                                   REGULATOR *configuration) {
 
-  String body = "<fieldset>";
+  char _value[20];
 
-  body += "<div class=\"cc\">";
-  body += "<label>";
-  body += "<input name=\"te\" type=\"checkbox\" value=\"1\"";
-  body += configuration.enabled ? " checked=\"checked\">" : ">";
+  openSection(page, L_REGULATION, "");
+  page.concat(FPSTR(HTTP_ITEM_REGULATOR));
+  page.replace("{{L_REGULATOR_TURN_IF}}", L_REGULATOR_TURN_ON_IF);
+  page.replace("{{item.selected-0}}",
+               configuration->turnOnAbove == 0 ? " selected=\"selected\"" : "");
+  page.replace("{{item.selected-1}}",
+               configuration->turnOnAbove == 1 ? " selected=\"selected\"" : "");
+               Serial << endl << "_____ " << configuration->turnOn;
+  sprintf(_value, "%-.4f", configuration->turnOn);
+  page.replace("{{item.value}}", _value);
+  page.replace("{{item.name}}", "ta");
+  page.replace("{{item.input.name}}", "on");
 
-  body += language == 0 ? " włączony" : "enabled";
+  page.concat(FPSTR(HTTP_ITEM_REGULATOR));
+  page.replace("{{L_REGULATOR_TURN_IF}}", L_REGULATOR_TURN_OFF_IF);
+  page.replace("{{item.selected-0}}", configuration->turnOffAbove == 0
+                                          ? " selected=\"selected\""
+                                          : "");
+  page.replace("{{item.selected-1}}", configuration->turnOffAbove == 1
+                                          ? " selected=\"selected\""
+                                          : "");
+  sprintf(_value, "%-.4f", configuration->turnOff);
+  page.replace("{{item.value}}", _value);
+  page.replace("{{item.name}}", "tb");
+  page.replace("{{item.input.name}}", "off");
 
-  body += "?</label>";
-  body += "</div>";
+  page.replace("{{L_LOWER}}", L_LOWER);
+  page.replace("{{L_HIGHER}}", L_HIGHER);
 
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Włącz jeśli" : "On if";
-  if (type == THERMOSTAT_REGULATOR) {
-    body += " temp.";
-  } else {
-    body += language == 0 ? " wilgo." : " Humidity ";
-  }
-  body += language == 0 ? "jest" : "is";
-  body += "</label>";
-
-  body += "<select name=\"ta\"><option value=\"0\"";
-  body += (configuration.turnOnAbove == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "mniejsza" : "below";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.turnOnAbove == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "większa" : "above";
-  body += "</option>";
-  body += "</select>";
-  body += "<input name=\"tn\" type=\"number\" value=\"";
-  body += configuration.turnOn;
-  if (type == THERMOSTAT_REGULATOR) {
-    body += "\" min=\"-55\" max=\"125\"";
-  } else {
-    body += "\" min=\"0\" max=\"100\"";
-  }
-  body += "step=\"any\"><span class=\"hint\">";
-  body += language == 0 ? "Zakres" : "Range";
-  if (type == THERMOSTAT_REGULATOR) {
-    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-  } else {
-    body += ": 0% : 100%";
-  }
-
-  body += "</span></div>";
-
-  body += "<div class=\"cf\">";
-  body += "<label>";
-  body += language == 0 ? "Wyłącz jeśli" : "Off if";
-  if (type == THERMOSTAT_REGULATOR) {
-    body += " temp.";
-  } else {
-    body += language == 0 ? " wilgo." : " Humidity ";
-  }
-  body += language == 0 ? "jest" : "is";
-  body += "</label>";
-  body += "<select name=\"tb\"><option value=\"0\"";
-  body += (configuration.turnOffAbove == 0 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "mniejsza" : "below";
-  body += "</option>";
-  body += "<option value=\"1\"";
-  body += (configuration.turnOffAbove == 1 ? " selected=\"selected\"" : "");
-  body += ">";
-  body += language == 0 ? "większa" : "above";
-  body += "</option>";
-  body += "</select>";
-  body += "<input name=\"tf\" type=\"number\" value=\"";
-  body += configuration.turnOff;
-  if (type == THERMOSTAT_REGULATOR) {
-    body += "\" min=\"-55\" max=\"125\"";
-  } else {
-    body += "\" min=\"0\" max=\"100\"";
-  }
-  body += "step=\"any\"><span class=\"hint\">";
-  body += language == 0 ? "Zakres" : "Range";
-  if (type == THERMOSTAT_REGULATOR) {
-    body += ": -55&deg;C : +125&deg;C (-67&deg;F : +260&deg;F)";
-  } else {
-    body += ": 0% : 100%";
-  }
-
-  body += "</div></fieldset>";
-
-  return body;
+  closeSection(page);
 }
 #endif
 

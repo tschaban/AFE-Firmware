@@ -3,11 +3,6 @@
 #ifndef _AFE_CONTACTRON_Structure_h
 #define _AFE_CONTACTRON_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
 
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  

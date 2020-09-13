@@ -3,12 +3,6 @@
 #ifndef _AFE_ADC_INPUT_Structure_h
 #define _AFE_ADC_INPUT_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct ADCINPUT_DOMOTICZ {
   uint32_t raw;
