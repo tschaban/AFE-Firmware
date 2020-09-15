@@ -281,10 +281,6 @@ void loop() {
         gateEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-        DS18B20SensorEventsListener();
-#endif
-
 /* Sensor: HPMA115S0 related code  */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
         HPMA115S0SensorEventsListener();
@@ -340,6 +336,20 @@ void loop() {
 #endif
     yield();
     Network.listener();
+
+    /** Here: Code that will be run no matter if connected or disconnected from
+     * Network / MQTT Broker 
+     * Device Mode: Normal of Configuration exluding: HotSpot mode*/
+    if (Device.getMode() == AFE_MODE_NORMAL) {
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+      DS18B20SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+      relayEventsListener();
+#endif
+    }
+
   } else { /* Deviced runs in Access Point mode */
     WebServer.listener();
   }
@@ -348,10 +358,6 @@ void loop() {
   /* Listens and processes switch events */
   switchEventsListener();
   processSwitchEvents();
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-  relayEventsListener();
 #endif
 
 /* Led listener */

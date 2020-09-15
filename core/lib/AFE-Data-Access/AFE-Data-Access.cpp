@@ -1980,7 +1980,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->gpio = root["gpio"];
+      configuration->gpio = root["gpio"].as<int>();
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
       configuration->functionality = root["functionality"];
@@ -3008,7 +3008,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
+      sprintf(configuration->name, root["name"]);
       configuration->enabled =
           root["enabled"] | AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ENABLED;
       configuration->sensorId = root["sensorId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -3068,6 +3068,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_REGULATOR> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration->name;
     root["enabled"] = configuration->enabled;
     root["relayId"] = configuration->relayId;
     root["sensorId"] = configuration->sensorId;
@@ -3113,6 +3114,7 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
   configuration.turnOnAbove = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++) {
+    sprintf(configuration.name, "regulator-%d", i + 1);
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating regulator configuration file: ") << i;
 #endif

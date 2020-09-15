@@ -15,7 +15,7 @@ const char HTTP_HEADER[] PROGMEM =
     "a,a{text-decoration:none}body{background:#ddd;padding:15px}#c{display:"
     "table;width:100%}#l{width:300px;background:#33363b;color:#eee}#r{"
     "background:#eee}a,button,h1,h3,h4,input,label,li,p,span{font-family:sans-"
-    "serif}.lst{list-style:none;margin:0;padding:0}.itm "
+    "serif}h4{margin-bottom:5px;}.lst{list-style:none;margin:0;padding:0}.itm "
     "a{display:block;white-space:nowrap;padding:.2em "
     "1em;color:#777;font-size:95%}a{color:#36f}.cf "
     "label,.hint,input,select{display:inline-block;vertical-align:middle}.itm "

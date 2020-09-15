@@ -75,22 +75,22 @@ private:
   String generateSite(AFE_SITE_PARAMETERS *siteConfig, String &page);
 
   /* Methods get POST data (for saveing) */
-  void getDeviceData(DEVICE *);
-  void getNetworkData(NETWORK *);
-  void getMQTTData(MQTT *);
-  void getPasswordData(PASSWORD *);
-  void getSerialNumberData(PRO_VERSION *);
+  void get(DEVICE &data);
+  void get(NETWORK &data);
+  void get(MQTT &data);
+  void get(PASSWORD &data);
+  void get(PRO_VERSION &data);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  void getDomoticzServerData(DOMOTICZ *);
+  void get(DOMOTICZ &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void getRelayData(uint8_t id, RELAY *);
+  void get(RELAY &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void getSwitchData(uint8_t id, SWITCH *);
+  void get(SWITCH &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -155,7 +155,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  void getAnalogInputData(ADCINPUT *);
+  void get(ADCINPUT &data);
 #endif
 
 public:

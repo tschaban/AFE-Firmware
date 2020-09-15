@@ -60,9 +60,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   if (Device->getMode() == AFE_MODE_ACCESS_POINT) {
     page.concat("<h3 class=\"ltit\">AFE FIRMWARE</h3>");
   }
-  page.concat("<h4>");
-  page.concat(L_FIRMWARE_NAME);
-  page.concat("</h4><ul class=\"lst\">");
+  page.concat("<h4>" L_FIRMWARE_NAME "</h4><ul class=\"lst\">");
 
   /* Gnerating Menu */
   addMenuItem(page, L_DEVICE, AFE_CONFIG_SITE_DEVICE);
@@ -77,6 +75,8 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
     addMenuItem(page, L_DOMOTICZ_SERVER, AFE_CONFIG_SITE_DOMOTICZ);
   }
 #endif
+
+  page.concat("</ul><h4>&#10150;" L_HARDWARE "</h4><ul class=\"lst\">");
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
@@ -208,16 +208,6 @@ if (Device->configuration.isDHT) {
 }
 #endif
 
-/* Regulator */
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-if (Device->configuration.noOfRegulators > 0) {
-
-  addMenuHeaderItem(page, L_REGULATORS);
-  addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
-                 AFE_CONFIG_SITE_REGULATOR);
-}
-#endif
-
 /* UART */
 #ifdef AFE_CONFIG_HARDWARE_UART
 
@@ -244,9 +234,8 @@ if (Device->configuration.noOfBMEX80s > 0 ||
     Device->configuration.noOfAS3935s > 0) {
 #endif
 
-  page.concat("<li class=\"itm\"><a href=\"\\?o=");
-  page.concat(AFE_CONFIG_SITE_I2C);
-  page.concat("\">I2C</a></li>");
+  page.concat("<li class=\"itm\"><a href=\"\\?o=" AFE_CONFIG_SITE_I2C
+              "\">I2C</a></li>");
 
 #ifdef T6_CONFIG
 }
@@ -257,11 +246,8 @@ if (Device->configuration.noOfBMEX80s > 0 ||
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 /* This is hardcoded for one sensor */
 if (Device->configuration.noOfHPMA115S0s > 0) {
-  page.concat("<li class=\"itm\"><a href=\"\\?i=0&o=");
-  page.concat(AFE_CONFIG_SITE_HPMA115S0);
-  page.concat("\">");
-  page.concat(L_PARTICLE_SENSOR);
-  page.concat("</a></li>");
+  page.concat("<li class=\"itm\"><a href=\"\\?i=0&o=" AFE_CONFIG_SITE_HPMA115S0
+              "\">" L_PARTICLE_SENSOR "</a></li>");
 }
 #endif
 
@@ -341,12 +327,27 @@ if (Device->configuration.isAnalogInput) {
 }
 #endif
 
-page.concat("<br />");
+page.concat("</ul><h4>&#10150;" L_FUNCTIONS "</h4><ul class=\"lst\">");
+
+/* Regulator */
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+if (Device->configuration.noOfRegulators > 0) {
+
+  addMenuHeaderItem(page, L_REGULATORS);
+  addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
+                 AFE_CONFIG_SITE_REGULATOR);
+}
+#endif
+
+page.concat("</ul><h4>&#10150;" L_FIRMWARE "</h4><ul class=\"lst\">");
 
 addMenuItem(page, L_SET_PASSWORD, AFE_CONFIG_SITE_PASSWORD);
 addMenuItem(page, L_FIRMWARE_UPGRADE, AFE_CONFIG_SITE_UPGRADE);
 addMenuItem(page, L_RESET_DEVICE, AFE_CONFIG_SITE_RESET);
 addMenuItem(page, L_PRO_VERSION, AFE_CONFIG_SITE_PRO_VERSION);
+
+page.concat("</ul><h4></h4><ul class=\"lst\">");
+
 addMenuItem(page, L_FINISH_CONFIGURATION, AFE_CONFIG_SITE_EXIT);
 
 /* Information section */
@@ -523,8 +524,8 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   addRadioButtonFormItem(page, "m", "Domoticz HTTP API", "1",
                          configuration.api.domoticz);
-  addCheckboxFormItem(page, "m", "Domoticz MQTT API", "2",
-                      configuration.api.mqtt);
+  addRadioButtonFormItem(page, "m", "Domoticz MQTT API", "2",
+                         configuration.api.mqtt);
 #else
   addCheckboxFormItem(page, "m", "MQTT API", "1", configuration.api.mqtt);
 #endif
@@ -947,6 +948,9 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
   openSection(page, L_REGULATOR, "");
 
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
   addSelectFormItemOpen(page, "r", L_RELAY);
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
@@ -993,14 +997,15 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   SWITCH configuration;
   Data->getConfiguration(id, &configuration);
+  char text[25];
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
 #endif
 
-  char title[23];
-  sprintf(title, "%s #%d", L_SWITCH_BUTTON, id + 1);
-  openSection(page, title, "");
+  sprintf(text, "%s #%d", L_SWITCH_BUTTON, id + 1);
+
+  openSection(page, text, "");
   addListOfGPIOs(page, "g", configuration.gpio);
 
   addSelectFormItemOpen(page, "f", L_FUNCTIONALITY);
@@ -1024,7 +1029,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t relayIsForGate;
 #endif
-
+  RELAY relayConfiguration;
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
     page += "<option value=\"";
     page += i;
@@ -1036,7 +1041,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
     for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
       gateConfiguration = Data->getConfiguration(j);
       if (i == gateConfiguration.relayId) {
-        page += F(L_GATE;
+        page += F(L_GATE);
         page += ": ";
         page += gateConfiguration.name;
         relayIsForGate = true;
@@ -1044,14 +1049,14 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
       }
     }
     if (!relayIsForGate) {
-      page += F(L_RELAY;
-      page += ": ";
-      page += i + 1;
+      Data->getConfiguration(i, &relayConfiguration);
+      sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+      page.concat(text);
     }
 #else
-    page += F(L_RELAY);
-    page += ": ";
-    page += i + 1;
+    Data->getConfiguration(i, &relayConfiguration);
+    sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+    page.concat(text);
 #endif
     page += "</option>";
   }
@@ -2719,7 +2724,7 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
                configuration->turnOnAbove == 0 ? " selected=\"selected\"" : "");
   page.replace("{{item.selected-1}}",
                configuration->turnOnAbove == 1 ? " selected=\"selected\"" : "");
-               Serial << endl << "_____ " << configuration->turnOn;
+  Serial << endl << "_____ " << configuration->turnOn;
   sprintf(_value, "%-.4f", configuration->turnOn);
   page.replace("{{item.value}}", _value);
   page.replace("{{item.name}}", "ta");

@@ -46,7 +46,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
     _Switch[i] = Switch + i;
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: The reference to the switche: ") << i + 1 << F(" added");
+           << F("INFO: The reference to the switch: ") << i + 1 << F(" added");
 #endif
   }
 }
@@ -154,7 +154,7 @@ void AFEAPI::addClass(AFEContactron *Item) {
     _DS18B20Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the BH1750 added");
+  Serial << endl << F("INFO: The reference to the DS18B20 added");
 #endif
   }
 #endif // AFE_CONFIG_HARDWARE_DS18B20

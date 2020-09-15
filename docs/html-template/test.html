@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Firmware 1.0</title>
+  <meta http-equiv="refresh" content="610; url=/">
+  <title>AFE Firmware 2.3.0.B4 [T1]</title>
   <style>
     #l,
     #r {
@@ -54,6 +55,8 @@
     span {
       font-family: sans-serif
     }
+
+    
 
     .lst {
       list-style: none;
@@ -198,31 +201,75 @@
   </style>
 </head>
 
-<body>
-  <h3 class="la">Firmware v1.0</h3>
+<body><img src="http://api.smartnydom.pl/logo/T1/2.3.0.B4/5CecCF93-7Fd3D37f/0" style="width: 100%;display: block"
+    alt="AFE Firmware">
   <div id="c">
     <div id="l">
-      <h4>Firmware</h4>
+      <h4>Włącznik z czujnikiem temperatury</h4>
       <ul class="lst">
-        <li class="itm"><a href="?o=9">Urządzenie</a></li>
-        <li class="itm"><a href="?o=10">Sieć WiFi</a></li>
-        <li class="itm"><a><i>I2C BUS</i></a></li>
-        <li class="itm"><a href="\?o=13&i=0">&#8227; I2C: 1</a></li>
-        <li class="itm"><a href="?o=7">Aktualizacja oprogramowania</a></li>
-        <li class="itm"><a href="?o=3">Ustawienia początkowe</a></li>
-        <li class="itm"><a href="?o=2">Zakoncz konfigurację</a></li>
+        <li class="itm"><a href="/?o=1">Urządzenie</a></li>
+        <li class="itm"><a href="/?o=2">Sieć WiFi</a></li>
+        <li class="itm"><a href="/?o=5">Serwer Domoticz</a></li>
+      </ul><span class="ltag">Sprzęt</span>
+      <ul class="lst">
+        <li class="itm"><a><i>LEDy</i></a></li>
+        <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
+        <li class="itm"><a><i>Konfiguracja przekaźników</i></a></li>
+        <li class="itm"><a href="/?o=7&i=0">&#8227; Przekaźnik: 1</a></li>
+        <li class="itm"><a><i>Przyciski</i></a></li>
+        <li class="itm"><a href="/?o=8&i=0">&#8227; Przycisk: 1</a></li>
+        <li class="itm"><a><i>Czujniki DS18B20</i></a></li>
+        <li class="itm"><a href="/?o=27&i=0">&#8227; Czujnik: 1</a></li>
+        <li class="itm"><a><i>Regulatory</i></a></li>
+        <li class="itm"><a href="/?o=29&i=0">&#8227; Regulator: 1</a></li><br />
+        <li class="itm"><a href="/?o=9">Ustaw hasło</a></li>
+        <li class="itm"><a href="/?o=19">Aktualizacja oprogramowania</a></li>
+        <li class="itm"><a href="/?o=15">Ustawienia początkowe</a></li>
+        <li class="itm"><a href="/?o=10">Wersja PRO</a></li>
+        <li class="itm"><a href="/?o=14">Zakoncz konfigurację</a></li>
       </ul>
     </div>
     <div id="r">
-      <form method="post" action="/?c=1&o=13&i=0">
+      <form method="post" action="/?c=1&o=1">
         <div class="ci">
-          <h1>I2C</h1>
-          <p class="cd"></p>
+          <h1>Urządzenie</h1>
+          <p class="cd">Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako nazwa
+            hotspot'a urządzenia</p>
           <fieldset>
-            <div class="cf"><label>GPIO SDA</label><select name="sda">
-                <option value="255">Brak</option>
-                <option value="0">0</option>
-                <option value="1">1</option>
+            <div class="cf"><label>Nazwa urządzenia</label><input name="n" type="text" maxlength="16" value="T1"><span
+                class="hint">Max 16 znaków</span></div>
+          </fieldset>
+        </div>
+        <div class="ci">
+          <h1>Konfiguracja urządzenia</h1>
+          <p class="cd">Wybierz podłączone elementy do urządzenia</p>
+          <fieldset>
+            <div class="cf"><label>Ilość Led'ów</label><select name="l">
+                <option value="0">Brak</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select></div>
+            <div class="cf"><label>Ilość przekaźników</label><select name="r">
+                <option value="0">Brak</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select></div>
+            <div class="cf"><label>Ilość przycisków</label><select name="s">
+                <option value="0">Brak</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select></div>
+            <div class="cf"><label>Liczba czujników DS18B20</label><select name="ds">
+                <option value="0">Brak</option>
+                <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
@@ -230,73 +277,53 @@
                 <option value="6">6</option>
                 <option value="7">7</option>
                 <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="21" selected="selected">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="32">32</option>
-                <option value="33">33</option>
-                <option value="34">34</option>
-                <option value="35">35</option>
-                <option value="36">36</option>
-                <option value="39">39</option>
               </select></div>
-            <div class="cf"><label>GPIO SCL</label><select name="scl">
-                <option value="255">Brak</option>
-                <option value="0">0</option>
-                <option value="1">1</option>
+            <div class="cf"><label>Ilość regulatorów</label><select name="re">
+                <option value="0">Brak</option>
+                <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="21">21</option>
-                <option value="22" selected="selected">22</option>
-                <option value="23">23</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="32">32</option>
-                <option value="33">33</option>
-                <option value="34">34</option>
-                <option value="35">35</option>
-                <option value="36">36</option>
-                <option value="39">39</option>
               </select></div>
-            <div class="cf"><label>Częstotliwość</label><input name="frequency" type="number" min="100000" max="400000"
-                step="1" value="100000"><span class="hint"> Zakres 100000 - 400000 Hz</span></div>
+            <div class="cc"><label><input name="ad" type="checkbox" value="1" disabled="disabled">Pomiary z wejścia
+                analogowego</label><span class="hint">(Wersja PRO)</span></div>
+          </fieldset>
+        </div>
+        <div class="ci">
+          <h1>Sterowanie urządzeniem</h1>
+          <p class="cd">Włączanie / Wyłączanie mechanizmów sterowania urządzeniem</p>
+          <fieldset>
+            <div class="cf"><label>Wersja Domoticz</label><select name="v">
+                <option value="0">4.10x i wcześniejsze</option>
+                <option value="1" selected="selected">2020.x i późniejsze</option>
+              </select></div>
+            <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP API</label></div>
+            <div class="cc"><label><input name="m" type="radio" value="1" checked="checked">Domoticz HTTP API</label>
+            </div>
+            <div class="cc"><label><input name="m" type="radio" value="2">Domoticz MQTT API</label></div>
+          </fieldset>
+        </div>
+        <div class="ci">
+          <h1>Automatyczne zakończenie konfiguracji</h1>
+          <p class="cd">Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w panelu
+            konfiguracyjnym</p>
+          <fieldset>
+            <div class="cc"><label><input name="al" type="checkbox" value="1" checked="checked">włączone</label></div>
           </fieldset>
         </div><input type="submit" class="b bs" value="Zapisz">
       </form>
     </div>
   </div>
-  <div style="padding: 5px 0"><img src="https://img.shields.io/badge/Wersja%20-%201.0-blue.svg" alt="1.0" /></div>
+  <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
+        src="https://img.shields.io/badge/Pomoc-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/pl"
+      target="_blank"><img src="https://img.shields.io/badge/Pomoc-Dokumentacja-green.svg" alt="Dokumentacja" /></a> <a
+      href="https://afe.smartnydom.pl/pl/pliki-to-pobrania/historia-zmian" target="_blank"><img
+        src="https://img.shields.io/badge/Wersja%20-%202.3.0.B4[T1]-blue.svg" alt="T1-2.3.0.B4" /></a> <img
+      src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 0" /> <img
+      src="https://img.shields.io/badge/API-Domoticz-yellow.svg" /> <img
+      src="https://img.shields.io/badge/PRO-Nie-orange.svg" alt="PRO" /> <img
+      src="https://img.shields.io/badge/Heap-24KB-9cf.svg" alt="PRO" /> <img
+      src="https://img.shields.io/badge/Size-1Mb-yellowgreen.svg" /></div>
 </body>
 
 </html>

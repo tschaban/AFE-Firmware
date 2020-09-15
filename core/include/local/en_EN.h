@@ -203,7 +203,7 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Controlling only the gate"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Controlling"
+#define L_RELAY_CONTROLLED_BY_SWITCH "controls relay"
 #define L_TYPE "Type"
 #define L_MONOSTABLE "Monostable"
 #define L_BISTABLE "Bistable"

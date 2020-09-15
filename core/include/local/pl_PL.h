@@ -43,6 +43,9 @@
 #define L_DONATE "&#128077; Wesprzyj jeśli soft Ci się przydał"
 
 /* Menu */
+#define L_HARDWARE "Sprzęt"
+#define L_FUNCTIONS "Funkcje"
+#define L_FIRMWARE "Firmware"
 #define L_DEVICE "Urządzenie"
 #define L_NETWORK "Sieć WiFi"
 #define L_MQTT_BROKER "MQTT Broker"
@@ -55,7 +58,7 @@
 #define L_ANALOG_INPUT "Wejście analogowe"
 #define L_FIRMWARE_UPGRADE "Aktualizacja oprogramowania"
 #define L_RESET_DEVICE "Ustawienia początkowe"
-#define L_FINISH_CONFIGURATION "Zakoncz konfigurację"
+#define L_FINISH_CONFIGURATION "&#10004; Zakończ konfigurację"
 //#define L_INFORMATION "INFORMACJE"
 #define L_DOCUMENTATION "Dokumentacja"
 #define L_SETTINGS "Ustawienia"
@@ -214,7 +217,7 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_GATE
 #define L_CONTROL_GATE "Tylko sterowanie bramą"
 #endif
-#define L_RELAY_CONTROLLED_BY_SWITCH "Sterowanie"
+#define L_RELAY_CONTROLLED_BY_SWITCH "Steruje przekaźnikiem"
 #define L_TYPE "Typ"
 #define L_MONOSTABLE "Monostabilny"
 #define L_BISTABLE "Bistabilny"
