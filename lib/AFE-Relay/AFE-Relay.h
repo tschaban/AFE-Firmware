@@ -15,10 +15,6 @@
 #include <AFE-LED.h>
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-#include <AFE-Thermal-Protection.h>
-#endif
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -26,11 +22,6 @@
 class AFERelay {
 
 public:
-
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  AFEThermalProtection ThermalProtection;
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;

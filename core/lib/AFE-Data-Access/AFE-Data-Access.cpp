@@ -3123,6 +3123,13 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  void AFEDataAccess::getConfiguration(uint8_t id, THERMAL_PROTECTION *configuration) {}
+  void AFEDataAccess::saveConfiguration(uint8_t id, THERMAL_PROTECTION *configuration) {}
+  void AFEDataAccess::createThermalProtectionConfigurationFile(void) {}
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
   DEVICE configuration;

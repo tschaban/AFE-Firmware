@@ -143,6 +143,10 @@ void setup() {
     initializeRegulator();
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    initializeThermalProtection();
+#endif
+
 /* Initializing DS18B20  */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     initializeDS18B20Sensor();
@@ -338,7 +342,7 @@ void loop() {
     Network.listener();
 
     /** Here: Code that will be run no matter if connected or disconnected from
-     * Network / MQTT Broker 
+     * Network / MQTT Broker
      * Device Mode: Normal of Configuration exluding: HotSpot mode*/
     if (Device.getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20

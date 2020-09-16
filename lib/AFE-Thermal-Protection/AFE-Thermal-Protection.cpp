@@ -6,27 +6,29 @@
 
 AFEThermalProtection::AFEThermalProtection(){};
 
-void AFEThermalProtection::begin(float temperature) {
-  maxTemperature = temperature;
+void AFEThermalProtection::begin(AFEDataAccess *_Data, uint8_t id) {
+
+  _Data->getConfiguration(id, &configuration);
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Thermal protection enabled. Max temp: " << maxTemperature;
+         << "INFO: Thermal protection enabled. Max temp: "
+         << configuration.temperature;
 #endif
 };
 
 bool AFEThermalProtection::listener(float currentTemperature) {
-  if (currentTemperature > maxTemperature && !protect) {
+  if (currentTemperature > configuration.temperature && !protect) {
     protect = true;
 
 #ifdef DEBUG
     Serial
         << endl
         << "INFO: Thermal protection. Temperature has exceeded the max value: "
-        << maxTemperature;
+        << configuration.temperature;
 #endif
 
-  } else if (currentTemperature <= maxTemperature && protect) {
+  } else if (currentTemperature <= configuration.temperature && protect) {
     protect = true;
   }
 

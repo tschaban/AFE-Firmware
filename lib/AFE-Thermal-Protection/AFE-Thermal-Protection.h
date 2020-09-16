@@ -6,6 +6,8 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 
+#include <AFE-Data-Access.h>
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -14,15 +16,16 @@
 class AFEThermalProtection {
 
 private:
-  float maxTemperature;
   bool protect = false;
 
 public:
+  THERMAL_PROTECTION configuration;
+
   /* Constructors */
   AFEThermalProtection();
 
   /* Method initialize protection */
-  void begin(float temperature);
+  void begin(AFEDataAccess *,uint8_t id);
 
   /* Method monitors current temeprature and allowed one */
   bool listener(float currentTemperature);

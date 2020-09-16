@@ -76,7 +76,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif
 
-  page.concat("</ul><h4>&#10150;" L_HARDWARE "</h4><ul class=\"lst\">");
+  page.concat("</ul><h4>&#10150; " L_HARDWARE "</h4><ul class=\"lst\">");
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
@@ -327,7 +327,7 @@ if (Device->configuration.isAnalogInput) {
 }
 #endif
 
-page.concat("</ul><h4>&#10150;" L_FUNCTIONS "</h4><ul class=\"lst\">");
+page.concat("</ul><h4>&#10150; " L_FUNCTIONS "</h4><ul class=\"lst\">");
 
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -339,7 +339,7 @@ if (Device->configuration.noOfRegulators > 0) {
 }
 #endif
 
-page.concat("</ul><h4>&#10150;" L_FIRMWARE "</h4><ul class=\"lst\">");
+page.concat("</ul><h4>&#10150; " L_FIRMWARE "</h4><ul class=\"lst\">");
 
 addMenuItem(page, L_SET_PASSWORD, AFE_CONFIG_SITE_PASSWORD);
 addMenuItem(page, L_FIRMWARE_UPGRADE, AFE_CONFIG_SITE_UPGRADE);
@@ -881,30 +881,6 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   }
 #endif
 
-/* Thermal protection */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  openSection(page, L_THERMAL_PROTECTION, "");
-
-  addSelectFormItemOpen(page, "ti", L_SELECT_SENSOR);
-
-  addSelectOptionFormItem(page, L_NONE, "255",
-                          configuration.thermalProtection.sensorId ==
-                              AFE_HARDWARE_ITEM_NOT_EXIST);
-  DS18B20 _DS18B20Configuration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-    Data->getConfiguration(i, &_DS18B20Configuration);
-    sprintf(_number, "%d", i);
-    sprintf(_text, "%d - %s", i + 1, _DS18B20Configuration.name);
-    addSelectOptionFormItem(page, _text, _number,
-                            configuration.thermalProtection.sensorId == i);
-  }
-  addSelectFormItemClose(page);
-  sprintf(_number, "%-.3f", configuration.thermalProtection.temperature);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tt", L_SWITCH_OFF_ABOVE,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-67", "257", "0.001");
-  closeSection(page);
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* Excluded code below for Gate functionality and the relay assigned to
    * the gate */
@@ -990,6 +966,35 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   closeSection(page);
 
   addRegulatorControllerItem(page, &configuration);
+}
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
+  THERMAL_PROTECTION configuration;
+/* Thermal protection */
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  openSection(page, L_THERMAL_PROTECTION, "");
+
+  addSelectFormItemOpen(page, "ti", L_SELECT_SENSOR);
+
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.thermalProtection.sensorId ==
+                              AFE_HARDWARE_ITEM_NOT_EXIST);
+  DS18B20 _DS18B20Configuration;
+  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
+    Data->getConfiguration(i, &_DS18B20Configuration);
+    sprintf(_number, "%d", i);
+    sprintf(_text, "%d - %s", i + 1, _DS18B20Configuration.name);
+    addSelectOptionFormItem(page, _text, _number,
+                            configuration.thermalProtection.sensorId == i);
+  }
+  addSelectFormItemClose(page);
+  sprintf(_number, "%-.3f", configuration.thermalProtection.temperature);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tt", L_SWITCH_OFF_ABOVE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-67", "257", "0.001");
+  closeSection(page);
+#endif
 }
 #endif
 

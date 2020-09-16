@@ -8,12 +8,7 @@ struct RELAY_DEFAULTS {
   uint8_t MQTTConnected;
 };
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-struct THERMAL_PROTECTION {
-  float temperature;
-  uint8_t sensorId;
-};
-#endif
+
 
 struct RELAY {
   uint8_t gpio;
@@ -26,9 +21,6 @@ struct RELAY {
   MQTT_BASIC_CONFIG mqtt;
 #endif
   RELAY_DEFAULTS state;
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  THERMAL_PROTECTION thermalProtection;
-#endif
 };
 
 #endif

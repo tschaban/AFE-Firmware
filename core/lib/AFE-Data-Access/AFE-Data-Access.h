@@ -132,6 +132,13 @@ public:
   void createRegulatorConfigurationFile(void);
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  void getConfiguration(uint8_t id, THERMAL_PROTECTION *);
+  void saveConfiguration(uint8_t id, THERMAL_PROTECTION *);
+  void createThermalProtectionConfigurationFile(void);
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+
+
 #if defined(T3_CONFIG)
   PIR getPIRConfiguration(uint8_t id);
   void saveConfiguration(uint8_t id, PIR configuration);

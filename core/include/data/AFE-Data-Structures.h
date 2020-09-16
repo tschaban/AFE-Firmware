@@ -45,6 +45,10 @@
 #include <AFE-REGULATOR-Structure.h>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#include <AFE-THERMAL-PROTECTION-Structure.h>
+#endif
+
 #if defined(T2_CONFIG)
 #include <AFE-DHT-Sensor-Structure.h>
 #endif

@@ -87,12 +87,13 @@ AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #include <AFE-Main-Regulator.cpp>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#include <AFE-Main-Thermal-Protection.cpp>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Main-DS18B20.cpp>
 #endif
-
-
-
 
 /* T2 Setup, DHxx sensor */
 #ifdef AFE_CONFIG_HARDWARE_DHT

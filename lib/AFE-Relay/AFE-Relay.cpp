@@ -19,13 +19,6 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
 
   pinMode(configuration.gpio, OUTPUT);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  /* Initialzing thermal protection functionality for a relay */
-  if (configuration.thermalProtection.sensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ThermalProtection.begin(configuration.thermalProtection.temperature);
-  }
-#endif
-
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Defining get and state MQTT Topics */
   if (strlen(configuration.mqtt.topic) > 0) {

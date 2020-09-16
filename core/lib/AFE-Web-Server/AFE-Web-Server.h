@@ -110,6 +110,10 @@ private:
   void get(REGULATOR &data);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  void get(THERMAL_PROTECTION &data);
+#endif
+
 #if defined(T3_CONFIG)
   void getPIRData(uint8_t id, PIR *);
 #endif
