@@ -987,14 +987,6 @@ void AFEWebServer::get(RELAY &data) {
   data.state.MQTTConnected =
       server.arg("mc").length() > 0 ? server.arg("mc").toInt() : 0;
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  data.thermalProtection.temperature =
-      server.arg("tt").length() > 0 ? server.arg("tt").toFloat() : 0;
-  data.thermalProtection.sensorId = server.arg("ti").length() > 0
-                                        ? server.arg("ti").toInt()
-                                        : AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif
-
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));

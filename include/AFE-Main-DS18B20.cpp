@@ -55,6 +55,7 @@ void DS18B20SensorEventsListener(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
       for (uint8_t k = 0; k < Device.configuration.noOfRelays; k++) {
         /* Thermal Protection listener */
+        /*
         if (Relay[k].configuration.thermalProtection.sensorId == i)
           if (Relay[k].get() == AFE_RELAY_ON &&
               Relay[k].ThermalProtection.listener(temperature)) {
@@ -64,6 +65,9 @@ void DS18B20SensorEventsListener(void) {
             HttpDomoticzAPI.publishRelayState(k);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
           }
+
+*/
+
       }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 

@@ -972,6 +972,11 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
   THERMAL_PROTECTION configuration;
+
+  char _number[0];
+  char _text[0];
+
+
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
   openSection(page, L_THERMAL_PROTECTION, "");
@@ -979,7 +984,7 @@ void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
   addSelectFormItemOpen(page, "ti", L_SELECT_SENSOR);
 
   addSelectOptionFormItem(page, L_NONE, "255",
-                          configuration.thermalProtection.sensorId ==
+                          configuration.sensorId ==
                               AFE_HARDWARE_ITEM_NOT_EXIST);
   DS18B20 _DS18B20Configuration;
   for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
@@ -987,10 +992,10 @@ void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
     sprintf(_number, "%d", i);
     sprintf(_text, "%d - %s", i + 1, _DS18B20Configuration.name);
     addSelectOptionFormItem(page, _text, _number,
-                            configuration.thermalProtection.sensorId == i);
+                            configuration.sensorId == i);
   }
   addSelectFormItemClose(page);
-  sprintf(_number, "%-.3f", configuration.thermalProtection.temperature);
+  sprintf(_number, "%-.3f", configuration.temperature);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tt", L_SWITCH_OFF_ABOVE,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-67", "257", "0.001");
   closeSection(page);

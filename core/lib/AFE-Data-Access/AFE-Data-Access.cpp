@@ -1605,14 +1605,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       configuration->ledID = root["ledID"];
 #ifdef DEBUG
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-      configuration->thermalProtection.temperature =
-          root["thermalProtection"]["temperature"];
-      configuration->thermalProtection.sensorId =
-          root["thermalProtection"]["sensorId"];
-
-#endif
-
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RELAY
              << F(", actual JSON size: ") << jsonBuffer.size();
@@ -1671,12 +1663,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-    thermalProtection["temperature"] =
-        configuration->thermalProtection.temperature;
-    thermalProtection["sensorId"] = configuration->thermalProtection.sensorId;
-#endif
-
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1719,11 +1705,6 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  RelayConfiguration.thermalProtection.temperature = 0;
-  RelayConfiguration.thermalProtection.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
 /* SONOFF Basic v1 */
