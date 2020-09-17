@@ -10,6 +10,7 @@ struct THERMAL_PROTECTION {
   char name[17];
   uint8_t relayId;
   uint8_t sensorId;
+  uint8_t sensorHardware;
   float temperature;
   boolean enabled;
 };

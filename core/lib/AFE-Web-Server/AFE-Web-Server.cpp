@@ -832,6 +832,11 @@ void AFEWebServer::get(DEVICE &data) {
       server.arg("re").length() > 0 ? server.arg("re").toInt() : 0;
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  data.noOfThermalProtectors =
+      server.arg("tp").length() > 0 ? server.arg("tp").toInt() : 0;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
@@ -1057,7 +1062,6 @@ void AFEWebServer::get(PRO_VERSION &data) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 void AFEWebServer::get(REGULATOR &data) {
-
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
@@ -1078,14 +1082,35 @@ void AFEWebServer::get(REGULATOR &data) {
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
   data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
+  /* Hardcoded 0 for DS18B20 */
   data.sensorHardware = server.arg("h").length() > 0
                             ? server.arg("h").toInt()
-                            : AFE_HARDWARE_ITEM_NOT_EXIST;
+                            : 0;
 }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-void AFEWebServer::get(THERMAL_PROTECTION &data) {}
+void AFEWebServer::get(THERMAL_PROTECTION &data) {
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+  data.enabled = server.arg("e").length() > 0 ? true : false;
+  data.temperature =
+      server.arg("t").length() > 0
+          ? server.arg("t").toFloat()
+          : AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
+                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+    /* Hardcoded 0 for DS18B20 */
+  data.sensorHardware = server.arg("h").length() > 0
+                            ? server.arg("h").toInt()
+                            : 0;
+}
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON

@@ -451,6 +451,12 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+      configuration->noOfThermalProtectors =
+          root["noOfThermalProtectors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -559,6 +565,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     root["noOfRegulators"] = configuration->noOfRegulators;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+    root["noOfThermalProtectors"] = configuration->noOfThermalProtectors;
 #endif
 
     root.printTo(configFile);
@@ -691,6 +701,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   deviceConfiguration.noOfRegulators =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  deviceConfiguration.noOfThermalProtectors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -1646,10 +1661,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-    JsonObject &thermalProtection =
-        root.createNestedObject("thermalProtection");
-#endif
 
     root["gpio"] = configuration->gpio;
     root["name"] = configuration->name;
@@ -3104,11 +3115,138 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  void AFEDataAccess::getConfiguration(uint8_t id, THERMAL_PROTECTION *configuration) {}
-  void AFEDataAccess::saveConfiguration(uint8_t id, THERMAL_PROTECTION *configuration) {}
-  void AFEDataAccess::createThermalProtectionConfigurationFile(void) {}
+void AFEDataAccess::getConfiguration(uint8_t id,
+                                     THERMAL_PROTECTION *configuration) {
+
+  char fileName[31];
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      sprintf(configuration->name, root["name"] | "");
+      configuration->enabled =
+          root["enabled"] |
+          AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_ENABLED;
+      configuration->sensorId = root["sensorId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->sensorHardware =
+          root["sensorHardware"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->relayId = root["relayId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->temperature =
+          root["temperature"] |
+          AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      THERMAL_PROTECTION *configuration) {
+  char fileName[31];
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration->name;
+    root["enabled"] = configuration->enabled;
+    root["relayId"] = configuration->relayId;
+    root["sensorId"] = configuration->sensorId;
+    root["sensorHardware"] = configuration->sensorHardware;
+    root["temperature"] = configuration->temperature;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createThermalProtectionConfigurationFile(void) {
+  THERMAL_PROTECTION configuration;
+  configuration.enabled = AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_ENABLED;
+  configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sensorHardware = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.temperature =
+      AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_THERMAL_PROTECTOR;
+       i++) {
+    sprintf(configuration.name, "protection-%d", i + 1);
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating thermal protection configuration file: ") << i;
+#endif
+    saveConfiguration(i, &configuration);
+  }
+}
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL

@@ -332,10 +332,19 @@ page.concat("</ul><h4>&#10150; " L_FUNCTIONS "</h4><ul class=\"lst\">");
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 if (Device->configuration.noOfRegulators > 0) {
-
   addMenuHeaderItem(page, L_REGULATORS);
   addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
                  AFE_CONFIG_SITE_REGULATOR);
+}
+#endif
+
+/* Thermal protection */
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+if (Device->configuration.noOfThermalProtectors > 0) {
+  addMenuHeaderItem(page, L_THERMAL_PROTECTIONS);
+  addMenuSubItem(page, L_THERMAL_PROTECTION,
+                 Device->configuration.noOfThermalProtectors,
+                 AFE_CONFIG_SITE_THERMAL_PROTECTION);
 }
 #endif
 
@@ -470,11 +479,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_RAINMETER);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
-                        Device->configuration.noOfRegulators, "re",
-                        L_NUMBER_OF_REGULATORS);
-#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   addCheckboxFormItem(
       page, "ad", L_DO_MEASURE_ADC, "1", configuration.isAnalogInput,
@@ -495,8 +500,6 @@ void AFESitesGenerator::siteDevice(String &page) {
       language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
 
-  closeSection(page);
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
   openSection(page, L_CONTROLLED_GATES, "");
@@ -504,6 +507,26 @@ void AFESitesGenerator::siteDevice(String &page) {
                         Device->configuration.noOfGates, "g",
                         L_NUMBER_OF_CONTROLLED_GATES);
 #endif
+
+  closeSection(page);
+
+  /* Additional functionalities */
+  openSection(page, L_ADDITIONAL_FUNCTIONALITIES, "");
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
+                        Device->configuration.noOfRegulators, "re",
+                        L_NUMBER_OF_REGULATORS);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS,
+                        Device->configuration.noOfThermalProtectors, "tp",
+                        L_NUMBER_OF_THERMAL_PROTECTORS);
+#endif
+
+
+  closeSection(page);
 
   /* Section: APIs */
   openSection(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
@@ -972,34 +995,57 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
 void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
   THERMAL_PROTECTION configuration;
+  RELAY relayConfiguration;
+  char text[30];
+  char value[4];
+  Data->getConfiguration(id, &configuration);
 
-  char _number[0];
-  char _text[0];
+  openSection(page, L_THERMAL_PROTECTIONS,
+              L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTION);
 
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
 
-/* Thermal protection */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  openSection(page, L_THERMAL_PROTECTION, "");
+  addSelectFormItemOpen(page, "r", L_RELAY);
+  sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(
+      page, L_NONE, value,
+      configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
 
-  addSelectFormItemOpen(page, "ti", L_SELECT_SENSOR);
-
-  addSelectOptionFormItem(page, L_NONE, "255",
-                          configuration.sensorId ==
-                              AFE_HARDWARE_ITEM_NOT_EXIST);
-  DS18B20 _DS18B20Configuration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-    Data->getConfiguration(i, &_DS18B20Configuration);
-    sprintf(_number, "%d", i);
-    sprintf(_text, "%d - %s", i + 1, _DS18B20Configuration.name);
-    addSelectOptionFormItem(page, _text, _number,
-                            configuration.sensorId == i);
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+    Data->getConfiguration(i, &relayConfiguration);
+    sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.relayId == i ? true : false);
   }
   addSelectFormItemClose(page);
-  sprintf(_number, "%-.3f", configuration.temperature);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tt", L_SWITCH_OFF_ABOVE,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-67", "257", "0.001");
-  closeSection(page);
+
+  addSelectFormItemOpen(page, "s", L_SENSOR);
+  sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(
+      page, L_NONE, value,
+      configuration.sensorId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  DS18B20 ds18b20Configuration;
+  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
+    Data->getConfiguration(i, &ds18b20Configuration);
+    sprintf(text, "DS18B20 %d: %s", i + 1, ds18b20Configuration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.sensorId == i ? true : false);
+  }
 #endif
+  addSelectFormItemClose(page);
+
+  addCheckboxFormItem(page, "e", L_THERMAL_PROTECTION_ENABLED, "1",
+                      configuration.enabled);
+  sprintf(text, "%-.3f", configuration.temperature);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_SWITCH_OFF_ABOVE,
+                   text, AFE_FORM_ITEM_SKIP_PROPERTY, "-999", "999", "0.001");
+
+  closeSection(page);
 }
 #endif
 

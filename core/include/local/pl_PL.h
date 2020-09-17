@@ -113,6 +113,8 @@
 #define L_DEVICE_CONTROLLING_INFO                                              \
   "Włączanie / Wyłączanie mechanizmów sterowania urządzeniem"
 
+#define L_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define L_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
 #endif
@@ -201,12 +203,18 @@
 #define L_IMPULSE_DURATION "Długośc impulsu"
 #define L_SWITCH_OFF_AFTER "Wyłącz po"
 #define L_NO_ACTION_IF_0 "Brak akcji jeśli jest 0"
-#define L_THERMAL_PROTECTION "Zabezpieczenie termiczne"
+
 #define L_SWITCH_OFF_ABOVE "Wyłącz powyżej"
 #define L_RANGE "Zakres"
 #define L_SELECT_LED_4_RELAY "LED sygnalizujący stan przekaźnika"
 #define L_RELAY_MQTT_TOPIC "Temat MQTT sterujący przekaźnikiem"
 #define L_SELECT_SENSOR "Wybierz czujnik"
+
+#define L_THERMAL_PROTECTION_ENABLED "Włączony przy uruchomieniu"
+#define L_THERMAL_PROTECTIONS "Zabezpieczenia termiczne"
+#define L_THERMAL_PROTECTION "Zabezpieczenie"
+#define L_NUMBER_OF_THERMAL_PROTECTORS "Ilość zabezpieczeń termicznych"
+#define L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTION "Automatyczne wyłączenie przekaźnika po przekroczeniu zadanej temperatury"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"

@@ -6,7 +6,9 @@
 
 AFERegulator::AFERegulator(){};
 
-void AFERegulator::begin(AFEDataAccess *_Data, uint8_t id) {
+void AFERegulator::begin(AFEDataAccess *Data, uint8_t id) {
+  _Data = Data;
+  _id = id;
   _Data->getConfiguration(id, &configuration);
 }
 
@@ -27,32 +29,27 @@ boolean AFERegulator::listener(float value) {
     }
     return true;
   } else {
-
-#ifdef DEBUG
-    Serial << endl << "INFO: Regulator is turned off";
+    #ifdef DEBUG
+    Serial << endl << "INFO: Regulator: disabled";
 #endif
     return false;
   }
 }
 
-void AFERegulator::on() {
+void AFERegulator::on(void) {
   configuration.enabled = true;
-  enable(configuration.enabled);
+  enable();
 }
-void AFERegulator::off() {
+void AFERegulator::off(void) {
   configuration.enabled = false;
-  enable(configuration.enabled);
+  enable();
 }
-void AFERegulator::toggle() {
+void AFERegulator::toggle(void) {
   configuration.enabled ? configuration.enabled = false
                         : configuration.enabled = true;
-  enable(configuration.enabled);
+  enable();
 }
-boolean AFERegulator::enabled() { return configuration.enabled; }
 
-void AFERegulator::enable(boolean state) {
-  AFEDataAccess Data;
-  // Data.saveRegulatorState(state, THERMOSTAT_REGULATOR);
-}
+void AFERegulator::enable(void) { _Data->saveConfiguration(_id, &configuration); }
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

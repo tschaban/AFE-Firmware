@@ -12,9 +12,11 @@ class AFERegulator {
 
 private:
   boolean ready = false;
+  AFEDataAccess *_Data;
+  uint8_t _id;
 
   /* Method enables / disables regulator */
-  void enable(boolean state);
+  void enable(void);
 
 public:
   REGULATOR configuration;
@@ -28,20 +30,17 @@ public:
   /* Method initialize regulator */
   void begin(AFEDataAccess *,uint8_t id);
 
-  /* Method returns true if regulator is enabled */
-  boolean enabled();
-
   /* Method rises event if thermostat themperatures have been exceeded */
   boolean listener(float value);
 
   /* Method turns on thermostat */
-  void on();
+  void on(void);
 
   /* Method turns off thermostat */
-  void off();
+  void off(void);
 
   /* Method turns thermostat to opposite to current state */
-  void toggle();
+  void toggle(void);
 };
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

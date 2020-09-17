@@ -1137,7 +1137,7 @@ typedef enum {
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_DATA_FILE "/cfg-rainmeter-data-0.json"
 #define AFE_FILE_REGULATOR_CONFIGURATION_FILE "/cfg-regulator-%d.json"
-#define AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE "/cfg-theremal-prot-%d.json"
+#define AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE "/cfg-theremal-protector-%d.json"
 
 
 /* Configuration files, JSON Buffers.  */

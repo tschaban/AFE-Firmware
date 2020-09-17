@@ -50,17 +50,6 @@ void AFEDefaults::set() {
     /* Setting device mode to Access Point */
     Data->saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    REGULATOR RegulatorConfiguration;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-    DS18B20 SensorConfiguration;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-    DH SensorConfiguration;
-#endif
 
 #if defined(T3_CONFIG)
     PIR PIRConfiguration;
