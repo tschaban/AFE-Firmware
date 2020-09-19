@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #include <AFE-API.h>
 #include <ArduinoJson.h>
@@ -40,6 +40,13 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
                               + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
 #endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS
+#endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+                              + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
+#endif
+
   ];
 #endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
@@ -155,8 +162,6 @@ public:
   virtual void addClass(AFEThermalProtector *);
   boolean publishThermalProtectorState(uint8_t id);
 #endif
-
-
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -31,19 +31,6 @@ private:
   DOMOTICZ configuration;
 
   char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];
-  /*
-  #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-    uint8_t lastIDXChacheIndex = 0;
-    DOMOTICZ_IDX_CACHE idxCache[1
-  #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-                                + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-  #endif
-  #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-                                + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-  #endif
-    ];
-  #endif // AFE_CONFIG_API_PROCESS_REQUESTS
-  */
 
   /* Invokes API setup */
   void init();
@@ -139,12 +126,12 @@ public:
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   virtual void addClass(AFERegulator *);
-  boolean publishRegulatorData(uint8_t id);
+  boolean publishRegulatorState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   virtual void addClass(AFEThermalProtector *);
-  boolean publishThermalProtectorData(uint8_t id);
+  boolean publishThermalProtectorState(uint8_t id);
 #endif
 
 };

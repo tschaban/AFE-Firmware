@@ -457,7 +457,7 @@ boolean AFEAPIHTTPDomoticz::publishDS18B20SensorData(uint8_t id) {
 void AFEAPIHTTPDomoticz::addClass(AFERegulator *Regulator) {
   AFEAPI::addClass(Regulator);
 }
-boolean AFEAPIHTTPDomoticz::publishRegulatorData(uint8_t id) {
+boolean AFEAPIHTTPDomoticz::publishRegulatorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _Regulator[id]->configuration.domoticz.idx > 0) {
     publishStatus =
@@ -472,7 +472,7 @@ boolean AFEAPIHTTPDomoticz::publishRegulatorData(uint8_t id) {
 void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
   AFEAPI::addClass(Protector);
 }
-boolean AFEAPIHTTPDomoticz::publishThermalProtectorData(uint8_t id) {
+boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
     publishStatus =

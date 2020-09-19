@@ -10,8 +10,8 @@
 #endif
 
 struct HTTPCOMMAND {
-  char device[16];
-  char name[16];
+  char device[32];
+  char name[17];
   char command[32];
   char source[9];
 };

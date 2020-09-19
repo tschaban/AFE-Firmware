@@ -3269,7 +3269,7 @@ void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_THERMAL_PROTECTOR;
        i++) {
-    sprintf(configuration.name, "protection-%d", i + 1);
+    sprintf(configuration.name, "protector-%d", i + 1);
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating thermal protection configuration file: ") << i;

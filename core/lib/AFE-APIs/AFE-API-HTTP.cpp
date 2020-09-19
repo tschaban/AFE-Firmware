@@ -613,9 +613,9 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
       boolean sendJSON = true;
       if (strcmp(request->command, "get") == 0) {
         yield(); // JSON is sent (code below)
-      } else if (strcmp(request->command, "enable") == 0) {
+      } else if (strcmp(request->command, "on") == 0) {
         _Regulator[i]->on();
-      } else if (strcmp(request->command, "disable") == 0) {
+      } else if (strcmp(request->command, "off") == 0) {
         _Regulator[i]->off();
       } else if (strcmp(request->command, "toggle") == 0) {
         _Regulator[i]->toggle();
@@ -623,6 +623,14 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
         sendJSON = false;
       }
       if (sendJSON) {
+        if (strcmp(request->command, "get") != 0) {
+          _MqttAPI->publishRegulatorState(i);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+          if (strcmp(request->source, "domoticz") != 0) {
+            _HttpAPIDomoticz->publishRegulatorState(i);
+          }
+#endif
+        }
         _Regulator[i]->getJSON(json);
         send(request, true, json);
       } else {
@@ -652,9 +660,9 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
       boolean sendJSON = true;
       if (strcmp(request->command, "get") == 0) {
         yield(); // JSON is sent (code below)
-      } else if (strcmp(request->command, "enable") == 0) {
+      } else if (strcmp(request->command, "on") == 0) {
         _ThermalProtector[i]->on();
-      } else if (strcmp(request->command, "disable") == 0) {
+      } else if (strcmp(request->command, "off") == 0) {
         _ThermalProtector[i]->off();
       } else if (strcmp(request->command, "toggle") == 0) {
         _ThermalProtector[i]->toggle();
@@ -662,6 +670,14 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
         sendJSON = false;
       }
       if (sendJSON) {
+        if (strcmp(request->command, "get") != 0) {
+          _MqttAPI->publishRegulatorState(i);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+          if (strcmp(request->source, "domoticz") != 0) {
+            _HttpAPIDomoticz->publishRegulatorState(i);
+          }
+#endif
+        }
         _ThermalProtector[i]->getJSON(json);
         send(request, true, json);
       } else {

@@ -56,6 +56,26 @@ void eventsListener(void) {
       }
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef DEBUG
+      Serial << endl << F("INFO: Sending current state of regulator to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Device.configuration.noOfRegulators; i++) {
+        HttpDomoticzAPI.publishRegulatorState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#ifdef DEBUG
+      Serial << endl << F("INFO: Sending current state of regulator to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Device.configuration.noOfThermalProtectors; i++) {
+        HttpDomoticzAPI.publishThermalProtectorState(i);
+      }
+#endif
+
+
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
       Serial << endl << F("INFO: Sending current state of relays to Domoticz");
