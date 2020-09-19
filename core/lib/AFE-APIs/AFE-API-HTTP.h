@@ -65,6 +65,14 @@
 #include <AFE-Sensor-DS18B20.h>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Regulator.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Thermal-Protector.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -130,6 +138,15 @@ private:
   AFESensorDS18B20 *_DS18B20Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20];
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  AFERegulator *_Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  AFEThermalProtector
+      *_ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -180,6 +197,14 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void processDS18B20(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void processRegulator(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void processThermalProtector(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -254,7 +279,16 @@ public:
   void addClass(AFESensorDS18B20 *);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void addClass(AFERegulator *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void addClass(AFEThermalProtector *);
+#endif
 
 };
+
+
 
 #endif

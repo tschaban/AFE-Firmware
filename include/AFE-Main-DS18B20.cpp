@@ -66,7 +66,7 @@ void DS18B20SensorEventsListener(void) {
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 /* Thermal protection */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       for (uint8_t j = 0; j < Device.configuration.noOfThermalProtectors; j++) {
         if (ThermalProtector[j].configuration.sensorId == i) {
           if (ThermalProtector[j].listener(temperature)) {
@@ -84,7 +84,7 @@ void DS18B20SensorEventsListener(void) {
           }
         }
       }
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
       MqttAPI.publishDS18B20SensorData(i);

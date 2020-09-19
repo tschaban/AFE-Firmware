@@ -105,8 +105,8 @@ void AFEDefaults::set() {
     Data->createRegulatorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-    Data->createThermalProtectionConfigurationFile();
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    Data->createThermalProtectorConfigurationFile();
 #endif
 
 #if defined(T3_CONFIG)

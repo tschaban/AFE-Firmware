@@ -1,12 +1,12 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#include "AFE-Thermal-protection.h"
+#include "AFE-Thermal-Protector.h"
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
-AFEThermalProtection::AFEThermalProtection(){};
+AFEThermalProtector::AFEThermalProtector(){};
 
-void AFEThermalProtection::begin(AFEDataAccess *Data, uint8_t id) {
+void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
   _Data = Data;
   _id = id;
   _Data->getConfiguration(id, &configuration);
@@ -17,7 +17,7 @@ void AFEThermalProtection::begin(AFEDataAccess *Data, uint8_t id) {
 #endif
 };
 
-bool AFEThermalProtection::listener(float currentTemperature) {
+bool AFEThermalProtector::listener(float currentTemperature) {
   if (configuration.enabled) {
     if (currentTemperature > configuration.temperature && !turnOff) {
       turnOff = true;
@@ -41,22 +41,28 @@ bool AFEThermalProtection::listener(float currentTemperature) {
   }
 };
 
-void AFEThermalProtection::on(void) {
+void AFEThermalProtector::on(void) {
   configuration.enabled = true;
   enable();
 }
-void AFEThermalProtection::off(void) {
+void AFEThermalProtector::off(void) {
   configuration.enabled = false;
   enable();
 }
-void AFEThermalProtection::toggle(void) {
+void AFEThermalProtector::toggle(void) {
   configuration.enabled ? configuration.enabled = false
                         : configuration.enabled = true;
   enable();
 }
 
-void AFEThermalProtection::enable(void) {
+void AFEThermalProtector::enable(void) {
   _Data->saveConfiguration(_id, &configuration);
 }
 
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+
+/* Returns Thermal Protector data in JSON format */
+void AFEThermalProtector::getJSON(char *json) {
+  sprintf(json, "{}");
+}
+
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR

@@ -59,17 +59,17 @@ void mainSensor() {
       }
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
         if (Device.configuration.isRelay[i]) {
 
           /* Thermal Protection listener */
-          Relay[i].ThermalProtection.listener(temperature);
+          Relay[i].ThermalProtector.listener(temperature);
 
           /* Checking if relay should be switched off based on device
            * thermal protection */
           if (Relay[i].get() == AFE_RELAY_ON &&
-              Relay[i].ThermalProtection.protectionOn()) {
+              Relay[i].ThermalProtector.protectionOn()) {
             Relay[i].off();
             MQTTPublishRelayState(i);
             DomoticzPublishRelayState(i);

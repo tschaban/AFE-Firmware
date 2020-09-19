@@ -59,9 +59,9 @@ AFEAnalogInput AnalogInput;
 AFERegulator Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-#include <AFE-Thermal-Protection.h>
-AFEThermalProtection ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Thermal-Protector.h>
+AFEThermalProtector ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
 
 #endif
 
@@ -93,8 +93,8 @@ AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #include <AFE-Main-Regulator.cpp>
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-#include <AFE-Main-Thermal-Protection.cpp>
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Main-Thermal-Protector.cpp>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20

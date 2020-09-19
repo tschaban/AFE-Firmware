@@ -146,6 +146,17 @@ public:
   boolean publishDS18B20SensorData(uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  virtual void addClass(AFERegulator *);
+  boolean publishRegulatorState(uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  virtual void addClass(AFEThermalProtector *);
+  boolean publishThermalProtectorState(uint8_t id);
+#endif
+
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

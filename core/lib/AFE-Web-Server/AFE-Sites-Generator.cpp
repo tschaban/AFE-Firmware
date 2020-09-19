@@ -113,25 +113,7 @@ if (Device->configuration.noOfRelays > 0) {
   addMenuHeaderItem(page, L_RELAYS_CONFIGURATION);
   addMenuSubItem(page, L_RELAY, Device->configuration.noOfRelays,
                  AFE_CONFIG_SITE_RELAY);
-
-/* Thermostat */
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) &&                                    \
-    defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT)
-  if (Device->configuration.isDS18B20) {
-    page.concat(addThermostateMenuItem());
-  }
-#endif
-
-/* Humidistat */
-#if defined(AFE_CONFIG_HARDWARE_DHT) &&                                        \
-    defined(AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT)
-  if (Device->configuration.isDHT) {
-    page.concat(addThermostateMenuItem());
-    page.concat(addHumidistatMenuItem());
-  }
-#endif
 }
-
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -329,6 +311,13 @@ if (Device->configuration.isAnalogInput) {
 
 page.concat("</ul><h4>&#10150; " L_FUNCTIONS "</h4><ul class=\"lst\">");
 
+/* System LED */
+#ifdef AFE_CONFIG_HARDWARE_LED
+if (Device->configuration.noOfLEDs > 0) {
+  addMenuItem(page, L_SYSTEM_LED, AFE_CONFIG_SITE_SYSTEM_LED);
+}
+#endif
+
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 if (Device->configuration.noOfRegulators > 0) {
@@ -339,12 +328,12 @@ if (Device->configuration.noOfRegulators > 0) {
 #endif
 
 /* Thermal protection */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 if (Device->configuration.noOfThermalProtectors > 0) {
-  addMenuHeaderItem(page, L_THERMAL_PROTECTIONS);
-  addMenuSubItem(page, L_THERMAL_PROTECTION,
+  addMenuHeaderItem(page, L_THERMAL_PROTECTORS);
+  addMenuSubItem(page, L_THERMAL_PROTECTOR,
                  Device->configuration.noOfThermalProtectors,
-                 AFE_CONFIG_SITE_THERMAL_PROTECTION);
+                 AFE_CONFIG_SITE_THERMAL_PROTECTOR);
 }
 #endif
 
@@ -479,7 +468,6 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_RAINMETER);
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   addCheckboxFormItem(
       page, "ad", L_DO_MEASURE_ADC, "1", configuration.isAnalogInput,
@@ -519,12 +507,11 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_NUMBER_OF_REGULATORS);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS,
                         Device->configuration.noOfThermalProtectors, "tp",
                         L_NUMBER_OF_THERMAL_PROTECTORS);
 #endif
-
 
   closeSection(page);
 
@@ -749,28 +736,20 @@ void AFESitesGenerator::sitePassword(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFESitesGenerator::siteLED(String &page, uint8_t id) {
+  char title[8];
   LED configuration;
   Data->getConfiguration(id, &configuration);
-
-  char title[7];
-  sprintf(title, "LED #%d", id + 1);
+  sprintf(title, "LED: #%d", id + 1);
   openSection(page, title, "");
-  char field[13];
-  sprintf(field, "g%d", id);
-  addListOfGPIOs(page, field, configuration.gpio);
-  page += "<label style=\"width: 300px;\"><input name=\"o";
-  page += id;
-  page += "\" type=\"checkbox\" value=\"1\"";
-  page += configuration.changeToOppositeValue ? " checked=\"checked\"" : "";
-  page += ">";
-  page += F(L_CHANGE_LED_INDICATION);
-  page += "</label></div></fieldset></div>";
+  addListOfGPIOs(page, "g", configuration.gpio);
+  addCheckboxFormItem(page, "o", L_CHANGE_LED_INDICATION, "1",
+                      configuration.changeToOppositeValue);
+  closeSection(page);
 }
 
 void AFESitesGenerator::siteSystemLED(String &page) {
   uint8_t configuration = Data->getSystemLedID();
   openSection(page, L_SYSTEM_LED, L_SYSTEM_LED_INFO);
-  page.concat("<fieldset>");
   _addListOfHardware(page, Device->configuration.noOfLEDs, configuration, "s",
                      "LED", 0, AFE_HARDWARE_ITEM_NOT_EXIST);
   closeSection(page);
@@ -892,7 +871,6 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-
     openSection(page, L_SELECT_LED_4_RELAY, "");
     addListOfHardwareItem(page, Device->configuration.noOfLEDs,
                           configuration.ledID, "l", "LED");
@@ -989,19 +967,41 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   closeSection(page);
 
   addRegulatorControllerItem(page, &configuration);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+      openSection(page, "Domoticz", L_NO_IF_IDX_0);
+      char _idx[7];
+      sprintf(_idx, "%d", configuration.domoticz.idx);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+      closeSection(page);
+    }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif
+
+
 }
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
-  THERMAL_PROTECTION configuration;
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
+  THERMAL_PROTECTOR configuration;
   RELAY relayConfiguration;
   char text[30];
   char value[4];
   Data->getConfiguration(id, &configuration);
 
-  openSection(page, L_THERMAL_PROTECTIONS,
-              L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTION);
+  openSection(page, L_THERMAL_PROTECTORS,
+              L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTOR);
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
@@ -1039,13 +1039,33 @@ void AFESitesGenerator::siteThermalProtection(String &page, uint8_t id) {
 #endif
   addSelectFormItemClose(page);
 
-  addCheckboxFormItem(page, "e", L_THERMAL_PROTECTION_ENABLED, "1",
+  addCheckboxFormItem(page, "e", L_THERMAL_PROTECTOR_ENABLED, "1",
                       configuration.enabled);
   sprintf(text, "%-.3f", configuration.temperature);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_SWITCH_OFF_ABOVE,
                    text, AFE_FORM_ITEM_SKIP_PROPERTY, "-999", "999", "0.001");
 
   closeSection(page);
+
+  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+      openSection(page, "Domoticz", L_NO_IF_IDX_0);
+      char _idx[7];
+      sprintf(_idx, "%d", configuration.domoticz.idx);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+      closeSection(page);
+    }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif
 }
 #endif
 

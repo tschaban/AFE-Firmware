@@ -116,8 +116,17 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void processDS18B20(uint8_t *id);
   boolean publishDS18B20SensorData(uint8_t id);
-#endif // #ifdef AFE_CONFIG_HARDWARE_DS18B20
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void processRegulator(uint8_t *id);
+  boolean publishRegulatorState(uint8_t id);
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void processThermalProtector(uint8_t *id);
+  boolean publishThermalProtectorState(uint8_t id);
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 };
 

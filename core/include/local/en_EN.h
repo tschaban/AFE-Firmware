@@ -188,7 +188,7 @@
 #define L_IMPULSE_DURATION "Impulse duration"
 #define L_SWITCH_OFF_AFTER "Switch off after"
 #define L_NO_ACTION_IF_0 "No action if it's set to 0"
-#define L_THERMAL_PROTECTION "Thermal protection"
+#define L_THERMAL_PROTECTOR "Thermal protection"
 #define L_SWITCH_OFF_ABOVE "Switch off above"
 #define L_RANGE "Range"
 #define L_SELECT_LED_4_RELAY "Select LED informing about relay state"

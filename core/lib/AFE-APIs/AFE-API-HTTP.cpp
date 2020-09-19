@@ -162,6 +162,24 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  else if (strcmp(request->device, "regulator") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing Regulator requests");
+#endif
+    processRegulator(request);
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  else if (strcmp(request->device, "thermalProtector") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing Thermal Protector requests");
+#endif
+    processThermalProtector(request);
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -577,7 +595,85 @@ void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_BH1750
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+void AFEAPIHTTP::addClass(AFERegulator *Regulator) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    _Regulator[i] = Regulator + i;
+  }
+}
+void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    if (strcmp(request->name, _Regulator[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      char json[AFE_CONFIG_API_JSON_REGULATOR_DATA_LENGTH];
+      boolean sendJSON = true;
+      if (strcmp(request->command, "get") == 0) {
+        yield(); // JSON is sent (code below)
+      } else if (strcmp(request->command, "enable") == 0) {
+        _Regulator[i]->on();
+      } else if (strcmp(request->command, "disable") == 0) {
+        _Regulator[i]->off();
+      } else if (strcmp(request->command, "toggle") == 0) {
+        _Regulator[i]->toggle();
+      } else {
+        sendJSON = false;
+      }
+      if (sendJSON) {
+        _Regulator[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFEAPIHTTP::addClass(AFEThermalProtector *Protector) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    _ThermalProtector[i] = Protector + i;
+  }
+}
+void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    if (strcmp(request->name, _ThermalProtector[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH];
+      boolean sendJSON = true;
+      if (strcmp(request->command, "get") == 0) {
+        yield(); // JSON is sent (code below)
+      } else if (strcmp(request->command, "enable") == 0) {
+        _ThermalProtector[i]->on();
+      } else if (strcmp(request->command, "disable") == 0) {
+        _ThermalProtector[i]->off();
+      } else if (strcmp(request->command, "toggle") == 0) {
+        _ThermalProtector[i]->toggle();
+      } else {
+        sendJSON = false;
+      }
+      if (sendJSON) {
+        _ThermalProtector[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif
 
 /* Method creates JSON respons after processing HTTP API request, and pushes
  * it.

@@ -29,7 +29,7 @@ boolean AFERegulator::listener(float value) {
     }
     return true;
   } else {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial << endl << "INFO: Regulator: disabled";
 #endif
     return false;
@@ -50,6 +50,13 @@ void AFERegulator::toggle(void) {
   enable();
 }
 
-void AFERegulator::enable(void) { _Data->saveConfiguration(_id, &configuration); }
+void AFERegulator::enable(void) {
+  _Data->saveConfiguration(_id, &configuration);
+}
+
+/* Returns Regulator data in JSON format */
+void AFERegulator::getJSON(char *json) {
+  sprintf(json, "{}");
+}
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

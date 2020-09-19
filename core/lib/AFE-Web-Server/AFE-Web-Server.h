@@ -94,7 +94,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void getLEDData(uint8_t id, LED *);
+  void get(LED &data);
   uint8_t getSystemLEDData();
 #endif
 
@@ -110,8 +110,8 @@ private:
   void get(REGULATOR &data);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  void get(THERMAL_PROTECTION &data);
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void get(THERMAL_PROTECTOR &data);
 #endif
 
 #if defined(T3_CONFIG)

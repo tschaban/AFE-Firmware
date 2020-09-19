@@ -41,6 +41,9 @@ public:
 
   /* Method turns thermostat to opposite to current state */
   void toggle(void);
+
+  /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 };
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

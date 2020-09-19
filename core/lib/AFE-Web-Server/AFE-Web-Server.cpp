@@ -155,9 +155,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
-    for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-      Site.siteLED(page, i);
-    }
+    Site.siteLED(page, siteConfig->deviceID);
+    break;
+  case AFE_CONFIG_SITE_SYSTEM_LED:
     Site.siteSystemLED(page);
     break;
 #endif
@@ -166,9 +166,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteRegulator(page, siteConfig->deviceID);
     break;
 #endif
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  case AFE_CONFIG_SITE_THERMAL_PROTECTION:
-    Site.siteThermalProtection(page, siteConfig->deviceID);
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  case AFE_CONFIG_SITE_THERMAL_PROTECTOR:
+    Site.siteThermalProtector(page, siteConfig->deviceID);
     break;
 #endif
   }
@@ -295,11 +295,10 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_LED
       else if (siteConfig.ID == AFE_CONFIG_SITE_LED) {
         LED configuration;
-        for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
-          getLEDData(i, &configuration);
-          Data->saveConfiguration(i, &configuration);
-        }
+        get(configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
+      } else if (siteConfig.ID == AFE_CONFIG_SITE_SYSTEM_LED) {
         Data->saveSystemLedID(getSystemLEDData());
       }
 #endif
@@ -415,9 +414,9 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-      else if (siteConfig.ID == AFE_CONFIG_SITE_THERMAL_PROTECTION) {
-        THERMAL_PROTECTION configuration;
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+      else if (siteConfig.ID == AFE_CONFIG_SITE_THERMAL_PROTECTOR) {
+        THERMAL_PROTECTOR configuration;
         get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
@@ -832,7 +831,7 @@ void AFEWebServer::get(DEVICE &data) {
       server.arg("re").length() > 0 ? server.arg("re").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   data.noOfThermalProtectors =
       server.arg("tp").length() > 0 ? server.arg("tp").toInt() : 0;
 #endif
@@ -1083,14 +1082,23 @@ void AFEWebServer::get(REGULATOR &data) {
   data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
   /* Hardcoded 0 for DS18B20 */
-  data.sensorHardware = server.arg("h").length() > 0
-                            ? server.arg("h").toInt()
-                            : 0;
+  data.sensorHardware =
+      server.arg("h").length() > 0 ? server.arg("h").toInt() : 0;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#else
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
 }
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-void AFEWebServer::get(THERMAL_PROTECTION &data) {
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFEWebServer::get(THERMAL_PROTECTOR &data) {
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
@@ -1101,15 +1109,24 @@ void AFEWebServer::get(THERMAL_PROTECTION &data) {
   data.temperature =
       server.arg("t").length() > 0
           ? server.arg("t").toFloat()
-          : AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+          : AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_TEMPERATURE;
   data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
   data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
-    /* Hardcoded 0 for DS18B20 */
-  data.sensorHardware = server.arg("h").length() > 0
-                            ? server.arg("h").toInt()
-                            : 0;
+  /* Hardcoded 0 for DS18B20 */
+  data.sensorHardware =
+      server.arg("h").length() > 0 ? server.arg("h").toInt() : 0;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#else
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
 }
 #endif
 
@@ -1225,13 +1242,12 @@ void AFEWebServer::getPIRData(uint8_t id, PIR *data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWebServer::getLEDData(uint8_t id, LED *data) {
-  data->gpio = server.arg("g" + String(id)).length() > 0
-                   ? server.arg("g" + String(id)).toInt()
-                   : 0;
+void AFEWebServer::get(LED &data) {
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
-  data->changeToOppositeValue =
-      server.arg("o" + String(id)).length() > 0 ? true : false;
+  data.changeToOppositeValue = server.arg("o").length() > 0 ? true : false;
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {

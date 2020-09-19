@@ -71,6 +71,14 @@
 #include <AFE-Sensor-DS18B20.h>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Regulator.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Thermal-Protector.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -141,6 +149,14 @@ public:
   virtual void addClass(AFESensorDS18B20 *);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  virtual void addClass(AFERegulator *);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  virtual void addClass(AFEThermalProtector *);
+#endif
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -196,7 +212,14 @@ protected:
   AFESensorDS18B20 *_DS18B20Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20];
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  AFERegulator *_Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
+#endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  AFEThermalProtector
+      *_ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
+#endif
 };
 
 #endif // _AFE_API_h

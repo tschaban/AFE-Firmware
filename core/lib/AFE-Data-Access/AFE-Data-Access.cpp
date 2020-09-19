@@ -451,7 +451,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       configuration->noOfThermalProtectors =
           root["noOfThermalProtectors"] |
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
@@ -567,7 +567,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfRegulators"] = configuration->noOfRegulators;
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     root["noOfThermalProtectors"] = configuration->noOfThermalProtectors;
 #endif
 
@@ -703,7 +703,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   deviceConfiguration.noOfThermalProtectors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
@@ -1705,8 +1705,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#else
   RelayConfiguration.mqtt.topic[0] = '\0';
 #endif
   RelayConfiguration.state.MQTTConnected =
@@ -3016,6 +3015,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
           root["turnOffAbove"] |
           AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ")
@@ -3069,6 +3074,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
     root["turnOff"] = configuration->turnOff;
     root["turnOnAbove"] = configuration->turnOnAbove;
     root["turnOffAbove"] = configuration->turnOffAbove;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration->domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -3104,6 +3115,11 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
   configuration.turnOffAbove =
       AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
   configuration.turnOnAbove = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = '\0';
+#endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++) {
     sprintf(configuration.name, "regulator-%d", i + 1);
@@ -3115,12 +3131,12 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 void AFEDataAccess::getConfiguration(uint8_t id,
-                                     THERMAL_PROTECTION *configuration) {
+                                     THERMAL_PROTECTOR *configuration) {
 
   char fileName[31];
-  sprintf(fileName, AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION_FILE, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3136,7 +3152,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -3144,22 +3160,26 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
       sprintf(configuration->name, root["name"] | "");
       configuration->enabled =
-          root["enabled"] |
-          AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_ENABLED;
+          root["enabled"] | AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_ENABLED;
       configuration->sensorId = root["sensorId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       configuration->sensorHardware =
           root["sensorHardware"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       configuration->relayId = root["relayId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       configuration->temperature =
           root["temperature"] |
-          AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+          AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_TEMPERATURE;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#endif
 
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION
+             << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION < jsonBuffer.size() + 10) {
+      if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: Too small buffer size");
       }
 #endif
@@ -3182,9 +3202,9 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      THERMAL_PROTECTION *configuration) {
+                                      THERMAL_PROTECTOR *configuration) {
   char fileName[31];
-  sprintf(fileName, AFE_FILE_THERMAL_PROTECTION_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION_FILE, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3197,7 +3217,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
 
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["name"] = configuration->name;
     root["enabled"] = configuration->enabled;
@@ -3205,6 +3225,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     root["sensorId"] = configuration->sensorId;
     root["sensorHardware"] = configuration->sensorHardware;
     root["temperature"] = configuration->temperature;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration->domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -3215,9 +3240,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     Serial << endl
            << F("INFO: Data saved") << endl
            << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION
+           << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR
            << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTION < jsonBuffer.size() + 10) {
+    if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR < jsonBuffer.size() + 10) {
       Serial << endl << F("WARN: Too small buffer size");
     }
 #endif
@@ -3228,14 +3253,19 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   }
 #endif
 }
-void AFEDataAccess::createThermalProtectionConfigurationFile(void) {
-  THERMAL_PROTECTION configuration;
-  configuration.enabled = AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_ENABLED;
+void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
+  THERMAL_PROTECTOR configuration;
+  configuration.enabled = AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_ENABLED;
   configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.sensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.sensorHardware = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.temperature =
-      AFE_FUNCTIONALITY_THERMAL_PROTECTION_DEFAULT_TEMPERATURE;
+      AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_TEMPERATURE;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = '\0';
+#endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_THERMAL_PROTECTOR;
        i++) {
@@ -3247,7 +3277,7 @@ void AFEDataAccess::createThermalProtectionConfigurationFile(void) {
     saveConfiguration(i, &configuration);
   }
 }
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {

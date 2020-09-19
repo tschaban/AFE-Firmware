@@ -4,7 +4,7 @@
 #define _AFE_Thermal_Protection_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #include <AFE-Data-Access.h>
 
@@ -12,7 +12,7 @@
 #include <Streaming.h>
 #endif
 
-class AFEThermalProtection {
+class AFEThermalProtector {
 
 private:
 
@@ -23,10 +23,10 @@ private:
   void enable(void);
 
 public:
-  THERMAL_PROTECTION configuration;
+  THERMAL_PROTECTOR configuration;
   boolean turnOff = false;
   /* Constructors */
-  AFEThermalProtection();
+  AFEThermalProtector();
 
   /* Method initialize protection */
   void begin(AFEDataAccess *, uint8_t id);
@@ -42,7 +42,10 @@ public:
 
   /* Method turns thermal protector  to opposite to current state */
   void toggle(void);
+
+  /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 };
 
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #endif // _AFE_Thermal_Protection_h

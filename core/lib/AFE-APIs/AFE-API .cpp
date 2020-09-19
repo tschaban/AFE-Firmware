@@ -158,3 +158,25 @@ void AFEAPI::addClass(AFEContactron *Item) {
 #endif
   }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void AFEAPI::addClass(AFERegulator *Regulator) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    _Regulator[i] = Regulator + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Regulator added");
+#endif
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void AFEAPI::addClass(AFEThermalProtector *Protector) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    _ThermalProtector[i] = Protector + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Thermal Protector added");
+#endif
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR

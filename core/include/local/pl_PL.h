@@ -210,11 +210,11 @@
 #define L_RELAY_MQTT_TOPIC "Temat MQTT sterujący przekaźnikiem"
 #define L_SELECT_SENSOR "Wybierz czujnik"
 
-#define L_THERMAL_PROTECTION_ENABLED "Włączony przy uruchomieniu"
-#define L_THERMAL_PROTECTIONS "Zabezpieczenia termiczne"
-#define L_THERMAL_PROTECTION "Zabezpieczenie"
+#define L_THERMAL_PROTECTOR_ENABLED "Włączony przy uruchomieniu"
+#define L_THERMAL_PROTECTORS "Zabezpieczenia termiczne"
+#define L_THERMAL_PROTECTOR "Zabezpieczenie"
 #define L_NUMBER_OF_THERMAL_PROTECTORS "Ilość zabezpieczeń termicznych"
-#define L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTION "Automatyczne wyłączenie przekaźnika po przekroczeniu zadanej temperatury"
+#define L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTOR "Automatyczne wyłączenie przekaźnika po przekroczeniu zadanej temperatury"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"

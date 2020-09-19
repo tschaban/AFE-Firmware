@@ -60,7 +60,7 @@ struct DEVICE {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   uint8_t noOfRegulators;
 #endif
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   uint8_t noOfThermalProtectors;
 #endif
 };

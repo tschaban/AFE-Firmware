@@ -144,7 +144,7 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    initializeThermalProtection();
+    initializeThermalProtector();
 #endif
 
 /* Initializing DS18B20  */

@@ -436,7 +436,6 @@ boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
-
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEAPIHTTPDomoticz::addClass(AFESensorDS18B20 *Sensor) {
   AFEAPI::addClass(Sensor);
@@ -453,5 +452,35 @@ boolean AFEAPIHTTPDomoticz::publishDS18B20SensorData(uint8_t id) {
   return _ret;
 }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+void AFEAPIHTTPDomoticz::addClass(AFERegulator *Regulator) {
+  AFEAPI::addClass(Regulator);
+}
+boolean AFEAPIHTTPDomoticz::publishRegulatorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled && _Regulator[id]->configuration.domoticz.idx > 0) {
+    publishStatus =
+        sendSwitchCommand(_Regulator[id]->configuration.domoticz.idx,
+                          _Regulator[id]->configuration.enabled ? "On" : "Off");
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
+  AFEAPI::addClass(Protector);
+}
+boolean AFEAPIHTTPDomoticz::publishThermalProtectorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
+    publishStatus =
+        sendSwitchCommand(_ThermalProtector[id]->configuration.domoticz.idx,
+                          _ThermalProtector[id]->configuration.enabled ? "On" : "Off");
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

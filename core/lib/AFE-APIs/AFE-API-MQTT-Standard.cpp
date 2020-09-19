@@ -68,6 +68,18 @@ void AFEAPIMQTTStandard::synchronize() {
     publishContactronState(i);
   }
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    publishRegulatorState(i);
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    publishThermalProtectorState(i);
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 }
 
 void AFEAPIMQTTStandard::subscribe() {
@@ -213,7 +225,7 @@ void AFEAPIMQTTStandard::subscribe() {
   }
 #endif
 
-/* Subscribe: Contactron */
+/* Subscribe: Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
     Mqtt.subscribe(_Gate[i]->mqttCommandTopic);
@@ -239,8 +251,34 @@ void AFEAPIMQTTStandard::subscribe() {
       currentCacheSize++;
     }
   }
-
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    Mqtt.subscribe(_Regulator[i]->mqttCommandTopic);
+    if (strlen(_Regulator[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _Regulator[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_REGULATOR;
+      currentCacheSize++;
+    }
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    Mqtt.subscribe(_ThermalProtector[i]->mqttCommandTopic);
+    if (strlen(_ThermalProtector[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _ThermalProtector[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type =
+          AFE_MQTT_DEVICE_THERMAL_PROTECTOR;
+      currentCacheSize++;
+    }
+  }
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 }
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
@@ -320,6 +358,18 @@ void AFEAPIMQTTStandard::processRequest() {
         processDS18B20(&mqttTopicsCache[i].id);
         break;
 #endif
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+      case AFE_MQTT_DEVICE_REGULATOR:
+        processRegulator(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+      case AFE_MQTT_DEVICE_THERMAL_PROTECTOR:
+        processThermalProtector(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
       default:
 #ifdef DEBUG
         Serial << endl
@@ -697,5 +747,77 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    publishStatus =
+        Mqtt.publish(_Regulator[id]->mqttStateTopic,
+                     _Regulator[id]->configuration.enabled ? "on" : "off");
+  }
+  return publishStatus;
+}
+
+void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
+  boolean publishState = true;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing Regulator ID: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 2) {
+    _Regulator[*id]->on();
+  } else if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 3) {
+    _Regulator[*id]->off();
+  } else if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
+    _Regulator[*id]->toggle();
+  } else if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+  } else {
+    publishState = false;
+#ifdef DEBUG
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+#endif
+  }
+  if (publishState) {
+    publishRegulatorState(*id);
+  }
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    publishStatus = Mqtt.publish(
+        _ThermalProtector[id]->mqttStateTopic,
+        _ThermalProtector[id]->configuration.enabled ? "on" : "off");
+  }
+  return publishStatus;
+}
+
+void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
+  boolean publishState = true;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing Themrnal Protector ID: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 2) {
+    _ThermalProtector[*id]->on();
+  } else if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 3) {
+    _ThermalProtector[*id]->off();
+  } else if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
+    _ThermalProtector[*id]->toggle();
+  } else if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+  } else {
+    publishState = false;
+#ifdef DEBUG
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+#endif
+  }
+  if (publishState) {
+    publishThermalProtectorState(*id);
+  }
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

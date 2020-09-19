@@ -130,7 +130,7 @@ const char HTTP_SITE_POST_RESET[] PROGMEM =
     "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset>";
 
 const char HTTP_SITE_UPGRADE[] PROGMEM =
-    "<fieldset><form method=\"post\" action=\"upgrade?o=20\" "
+    "<fieldset><form method=\"post\" action=\"upgrade?o=21\" "
     "enctype=\"multipart/form-data\"><div "
     "class=\"cf\"><label>{{L_SELECT_FIRMWARE}}</label><input class=\"bs\" "
     "name=\"update\" type=\"file\" accept=\".bin\"></div><p "

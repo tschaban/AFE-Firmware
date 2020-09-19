@@ -97,6 +97,13 @@ void initializeMQTTAPI(void) {
     MqttAPI.addClass(&DS18B20Sensor[0]);
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    MqttAPI.addClass(&Regulator[0]);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    MqttAPI.addClass(&ThermalProtector[0]);
+#endif
 
 #ifdef DEBUG
     Serial << endl << F("INFO: API: MQTT init completed");
@@ -160,6 +167,14 @@ void initializeHTTPAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     HttpAPI.addClass(&DS18B20Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    HttpAPI.addClass(&Regulator[0]);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    HttpAPI.addClass(&ThermalProtector[0]);
 #endif
 
 #ifdef DEBUG
@@ -229,6 +244,14 @@ void initializeHTTPDomoticzAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     HttpDomoticzAPI.addClass(&DS18B20Sensor[0]);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    HttpDomoticzAPI.addClass(&Regulator[0]);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    HttpDomoticzAPI.addClass(&ThermalProtector[0]);
 #endif
 
 #ifdef DEBUG

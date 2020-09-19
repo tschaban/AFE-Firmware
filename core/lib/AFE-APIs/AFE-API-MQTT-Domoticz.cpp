@@ -77,6 +77,26 @@ void AFEAPIMQTTDomoticz::synchronize() {
   }
 #endif
 
+/* Synchronize: Regulator */
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Synchronizing Regulator: ") << i;
+#endif
+    publishRegulatorState(i);
+  }
+#endif
+
+/* Synchronize: Regulator */
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Synchronizing Thermal Protector: ") << i;
+#endif
+    publishThermalProtectorState(i);
+  }
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: Sending message: device is connected ...");
 #endif
@@ -175,9 +195,58 @@ void AFEAPIMQTTDomoticz::processRequest() {
             Serial << endl << F("INFO: OFF Command, skipping";
           }
 #endif
-
-#endif // AFE_CONFIG_HARDWARE_GATE
           break;
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+        case AFE_DOMOTICZ_DEVICE_REGULATOR:
+#ifdef DEBUG
+          Serial << endl
+                 << F("INFO: Domoticz: Found Regulator ID: ") << idxCache[i].id;
+          _found = true;
+#endif
+          if (_Regulator[idxCache[i].id]->configuration.enabled !=
+              (byte)command.nvalue) {
+            if (command.nvalue == AFE_SWITCH_OFF) {
+              _Regulator[idxCache[i].id]->off();
+            } else {
+              _Regulator[idxCache[i].id]->on();
+            }
+            publishRegulatorState(idxCache[i].id);
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl << F("WARN: Domoticz: Same state. No change needed");
+          }
+#endif
+          break;
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+        case AFE_DOMOTICZ_DEVICE_THERMAL_PROTECTOR:
+#ifdef DEBUG
+          Serial << endl
+                 << F("INFO: Domoticz: Found Thermal Protector ID: ")
+                 << idxCache[i].id;
+          _found = true;
+#endif
+          if (_ThermalProtector[idxCache[i].id]->configuration.enabled !=
+              (byte)command.nvalue) {
+            if (command.nvalue == AFE_SWITCH_OFF) {
+              _ThermalProtector[idxCache[i].id]->off();
+            } else {
+              _ThermalProtector[idxCache[i].id]->on();
+            }
+            publishThermalProtectorState(idxCache[i].id);
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl << F("WARN: Domoticz: Same state. No change needed");
+          }
+#endif
+          break;
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
         /* Processing Unknown command*/
         default:
 #ifdef DEBUG
@@ -253,7 +322,7 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 
 #ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
-#ifdef DEBUG
+#ifdef DEBG
   Serial << endl
          << F("INFO: Publishing relay: ") << id << F(", IDX: ")
          << idxCache[id].domoticz.idx << F(" state");
@@ -694,5 +763,109 @@ boolean AFEAPIMQTTDomoticz::publishDS18B20SensorData(uint8_t id) {
   return true;
 }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+void AFEAPIMQTTDomoticz::addClass(AFERegulator *Regulator) {
+  AFEAPI::addClass(Regulator);
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Caching IDXs for Regulators");
+#endif
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+    if (_Regulator[i]->configuration.domoticz.idx > 0) {
+      idxCache[lastIDXChacheIndex].domoticz.idx =
+          _Regulator[i]->configuration.domoticz.idx;
+      idxCache[lastIDXChacheIndex].id = i;
+      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_REGULATOR;
+#ifdef DEBUG
+      Serial << endl
+             << F(" - added IDX: ")
+             << idxCache[lastIDXChacheIndex].domoticz.idx;
+#endif
+      lastIDXChacheIndex++;
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << F(" - IDX not set");
+    }
+#endif
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id) {
+#ifdef DEBG
+  Serial << endl
+         << F("INFO: Publishing regulator: ") << id << F(", IDX: ")
+         << idxCache[id].domoticz.idx << F(" state");
+#endif
+  boolean publishStatus = false;
+  if (enabled && _Regulator[id]->configuration.domoticz.idx > 0) {
+    char json[AFE_CONFIG_API_JSON_REGULATOR_COMMAND_LENGTH];
+    generateSwitchMessage(json, _Regulator[id]->configuration.domoticz.idx,
+                          _Regulator[id]->configuration.enabled);
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    bypassProcessing.idx = _Regulator[id]->configuration.domoticz.idx;
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("INFO: Not published");
+  }
+#endif
+  return publishStatus;
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFEAPIMQTTDomoticz::addClass(AFEThermalProtector *ThermalProtector) {
+  AFEAPI::addClass(ThermalProtector);
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Caching IDXs for Thermal Protector");
+#endif
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+    if (_ThermalProtector[i]->configuration.domoticz.idx > 0) {
+      idxCache[lastIDXChacheIndex].domoticz.idx =
+          _ThermalProtector[i]->configuration.domoticz.idx;
+      idxCache[lastIDXChacheIndex].id = i;
+      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_THERMAL_PROTECTOR;
+#ifdef DEBUG
+      Serial << endl
+             << F(" - added IDX: ")
+             << idxCache[lastIDXChacheIndex].domoticz.idx;
+#endif
+      lastIDXChacheIndex++;
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << F(" - IDX not set");
+    }
+#endif
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
+#ifdef DEBG
+  Serial << endl
+         << F("INFO: Publishing thermal protector: ") << id << F(", IDX: ")
+         << idxCache[id].domoticz.idx << F(" state");
+#endif
+  boolean publishStatus = false;
+  if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
+    char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH];
+    generateSwitchMessage(json, _ThermalProtector[id]->configuration.domoticz.idx,
+                          _ThermalProtector[id]->configuration.enabled);
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    bypassProcessing.idx = _ThermalProtector[id]->configuration.domoticz.idx;
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("INFO: Not published");
+  }
+#endif
+  return publishStatus;
+}
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

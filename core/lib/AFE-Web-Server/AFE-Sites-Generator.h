@@ -187,8 +187,8 @@ public:
   void siteRegulator(String &page, uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  void siteThermalProtection(String &page, uint8_t id);
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void siteThermalProtector(String &page, uint8_t id);
 #endif
 
 #if defined(T3_CONFIG)

@@ -132,11 +132,11 @@ public:
   void createRegulatorConfigurationFile(void);
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  void getConfiguration(uint8_t id, THERMAL_PROTECTION *);
-  void saveConfiguration(uint8_t id, THERMAL_PROTECTION *);
-  void createThermalProtectionConfigurationFile(void);
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  void getConfiguration(uint8_t id, THERMAL_PROTECTOR *);
+  void saveConfiguration(uint8_t id, THERMAL_PROTECTOR *);
+  void createThermalProtectorConfigurationFile(void);
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 
 #if defined(T3_CONFIG)
