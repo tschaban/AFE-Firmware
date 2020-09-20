@@ -24,6 +24,11 @@ public:
  * on */
   boolean deviceState = false;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructors */
   AFERegulator();
 

@@ -229,7 +229,7 @@ void AFEDataAccess::createProVersionConfigurationFile() {
          << F("INFO: Creating file: ") << AFE_FILE_PRO_VERSION_CONFIGURATION;
 #endif
   PRO_VERSION ProConfiguration;
-  ProConfiguration.serial[0] = '\0';
+  ProConfiguration.serial[0] = AFE_EMPTY_STRING;
   ProConfiguration.valid = false;
   saveConfiguration(&ProConfiguration);
 }
@@ -337,7 +337,7 @@ void AFEDataAccess::createPasswordConfigurationFile() {
 #endif
   PASSWORD PasswordConfiguration;
   PasswordConfiguration.protect = false;
-  PasswordConfiguration.password[0] = '\0';
+  PasswordConfiguration.password[0] = AFE_EMPTY_STRING;
   saveConfiguration(&PasswordConfiguration);
 }
 
@@ -823,7 +823,7 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
   firmwareConfiguration.api = AFE_FIRMARE_API;
   firmwareConfiguration.autoUpgrade = 0;
-  firmwareConfiguration.upgradeURL[0] = '\0';
+  firmwareConfiguration.upgradeURL[0] = AFE_EMPTY_STRING;
   saveConfiguration(&firmwareConfiguration);
 }
 
@@ -1053,12 +1053,12 @@ void AFEDataAccess::createNetworkConfigurationFile() {
 
   NETWORK networkConfiguration;
   /* Network default config */
-  networkConfiguration.ssid[0] = '\0';
-  networkConfiguration.password[0] = '\0';
+  networkConfiguration.ssid[0] = AFE_EMPTY_STRING;
+  networkConfiguration.password[0] = AFE_EMPTY_STRING;
   networkConfiguration.isDHCP = true;
-  networkConfiguration.ip[0] = '\0';
-  networkConfiguration.gateway[0] = '\0';
-  networkConfiguration.subnet[0] = '\0';
+  networkConfiguration.ip[0] = AFE_EMPTY_STRING;
+  networkConfiguration.gateway[0] = AFE_EMPTY_STRING;
+  networkConfiguration.subnet[0] = AFE_EMPTY_STRING;
   networkConfiguration.noConnectionAttempts = 30;
   networkConfiguration.waitTimeConnections = 1;
   networkConfiguration.waitTimeSeries = 20;
@@ -1191,15 +1191,15 @@ void AFEDataAccess::createMQTTConfigurationFile() {
 #endif
   MQTT MQTTConfiguration;
   /* MQTT Default config */
-  MQTTConfiguration.host[0] = '\0';
-  MQTTConfiguration.ip[0] = '\0';
-  MQTTConfiguration.user[0] = '\0';
-  MQTTConfiguration.password[0] = '\0';
+  MQTTConfiguration.host[0] = AFE_EMPTY_STRING;
+  MQTTConfiguration.ip[0] = AFE_EMPTY_STRING;
+  MQTTConfiguration.user[0] = AFE_EMPTY_STRING;
+  MQTTConfiguration.password[0] = AFE_EMPTY_STRING;
   MQTTConfiguration.port = AFE_CONFIG_MQTT_DEFAULT_PORT;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   MQTTConfiguration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  MQTTConfiguration.lwt.topic[0] = '\0';
+  MQTTConfiguration.lwt.topic[0] = AFE_EMPTY_STRING;
 #endif
   MQTTConfiguration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
   saveConfiguration(&MQTTConfiguration);
@@ -1317,9 +1317,9 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
 #endif
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration.protocol = 0;
-  DomoticzConfiguration.host[0] = '\0';
-  DomoticzConfiguration.user[0] = '\0';
-  DomoticzConfiguration.password[0] = '\0';
+  DomoticzConfiguration.host[0] = AFE_EMPTY_STRING;
+  DomoticzConfiguration.user[0] = AFE_EMPTY_STRING;
+  DomoticzConfiguration.password[0] = AFE_EMPTY_STRING;
   DomoticzConfiguration.port = 8080;
   saveConfiguration(&DomoticzConfiguration);
 }
@@ -1706,7 +1706,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  RelayConfiguration.mqtt.topic[0] = '\0';
+  RelayConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
@@ -2067,7 +2067,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.relayID = 0;
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  SwitchConfiguration.mqtt.topic[0] = '\0';
+  SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
@@ -2343,7 +2343,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
       AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_NUMBER_OF_SAMPLES;
   AnalogInputConfiguration.maxVCC = AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  AnalogInputConfiguration.mqtt.topic[0] = '\0';
+  AnalogInputConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
@@ -2359,7 +2359,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
   AnalogInputConfiguration.battery.maxVoltage =
       AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  AnalogInputConfiguration.battery.mqtt.topic[0] = '\0';
+  AnalogInputConfiguration.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
   AnalogInputConfiguration.battery.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
@@ -2514,7 +2514,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
     Serial << endl << "INFO: Creating file: /cfg-ds18b20-" << i << ".json";
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = '\0';
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "DS18B20-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -2650,7 +2650,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   ContactronConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  ContactronConfiguration.mqtt.topic[0] = '\0';
+  ContactronConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -2832,7 +2832,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   GateConfiguration.domoticzControl.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  GateConfiguration.mqtt.topic[0] = '\0';
+  GateConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   GateConfiguration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -3118,7 +3118,7 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  configuration.mqtt.topic[0] = '\0';
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++) {
@@ -3264,7 +3264,7 @@ void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  configuration.mqtt.topic[0] = '\0';
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_THERMAL_PROTECTOR;
@@ -4327,7 +4327,7 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
   configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
   configuration.interval = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.mqtt.topic[0] = '\0';
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
@@ -4473,7 +4473,7 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile() {
   configuration.sensitiveness = AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_BOUNCING;
   configuration.interval = AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_INTERVAL;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.mqtt.topic[0] = '\0';
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif

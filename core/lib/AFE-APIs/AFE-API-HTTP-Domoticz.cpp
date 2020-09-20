@@ -26,7 +26,7 @@ void AFEAPIHTTPDomoticz::init() {
   char _pass[45] = {0};
   char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
-  if (configuration.user[0] != '\0' && configuration.password[0] != '\0') {
+  if (configuration.user[0] != AFE_EMPTY_STRING && configuration.password[0] != AFE_EMPTY_STRING) {
     rbase64.encode(configuration.user);
     sprintf(_user, rbase64.result());
     rbase64.encode(configuration.password);

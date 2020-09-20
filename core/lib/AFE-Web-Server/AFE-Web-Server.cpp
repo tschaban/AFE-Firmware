@@ -1107,8 +1107,8 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
 
   data.enabled = server.arg("e").length() > 0 ? true : false;
   data.temperature =
-      server.arg("t").length() > 0
-          ? server.arg("t").toFloat()
+      server.arg("m").length() > 0
+          ? server.arg("m").toFloat()
           : AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_TEMPERATURE;
   data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;

@@ -10,6 +10,22 @@ void AFERegulator::begin(AFEDataAccess *Data, uint8_t id) {
   _Data = Data;
   _id = id;
   _Data->getConfiguration(id, &configuration);
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Defining get and state MQTT Topics */
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
+  }
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 }
 
 boolean AFERegulator::listener(float value) {
@@ -56,7 +72,7 @@ void AFERegulator::enable(void) {
 
 /* Returns Regulator data in JSON format */
 void AFERegulator::getJSON(char *json) {
-  sprintf(json, "{}");
+  sprintf(json, "{\"enabled\":%s}", configuration.enabled ? "true" : "false");
 }
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

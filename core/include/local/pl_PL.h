@@ -215,6 +215,7 @@
 #define L_THERMAL_PROTECTOR "Zabezpieczenie"
 #define L_NUMBER_OF_THERMAL_PROTECTORS "Ilość zabezpieczeń termicznych"
 #define L_AUTOMATIC_SWITCHING_OFF_THERMAL_PROTECTOR "Automatyczne wyłączenie przekaźnika po przekroczeniu zadanej temperatury"
+#define L_THERMAL_PROTECTOR_MQTT_TOPIC "Temat MQTT sterujący zabezpieczeniem termicznym"
 
 /* Form: Switch */
 #define L_FUNCTIONALITY "Funkcja"
@@ -492,5 +493,9 @@
 #define L_LOWER "mniejsza"
 #define L_HIGHER "większa"
 #define L_REGULATOR_ENABLED "Włączony po uruchomieniu"
+#define L_REGULATOR_MQTT_TOPIC "Temat MQTT sterujący regulatorem"
+
+
 
 #endif
+

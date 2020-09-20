@@ -981,7 +981,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
     }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    openSection(page, L_REGULATOR_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);
@@ -1042,8 +1042,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   addCheckboxFormItem(page, "e", L_THERMAL_PROTECTOR_ENABLED, "1",
                       configuration.enabled);
   sprintf(text, "%-.3f", configuration.temperature);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_SWITCH_OFF_ABOVE,
-                   text, AFE_FORM_ITEM_SKIP_PROPERTY, "-999", "999", "0.001");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", L_SWITCH_OFF_ABOVE,
+                   text, AFE_FORM_ITEM_SKIP_PROPERTY, "-999", "999", "any");
 
   closeSection(page);
 
@@ -1060,7 +1060,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
     }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, L_RELAY_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    openSection(page, L_THERMAL_PROTECTOR_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);

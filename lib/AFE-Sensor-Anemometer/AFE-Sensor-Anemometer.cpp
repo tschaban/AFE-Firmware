@@ -11,12 +11,11 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
   startTime = millis();
   Data->getConfiguration(&configuration);
 
-
-  #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
@@ -35,11 +34,11 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
   default:
     _initialized = true;
 #ifdef DEBUG
-    Serial
-        << endl
-        << F("ERROR: Anemometer sensor NOT initialized. Wrong distance unit for "
-           "impulse: ")
-        << configuration.impulseDistanceUnit;
+    Serial << endl
+           << F("ERROR: Anemometer sensor NOT initialized. Wrong distance unit "
+                "for "
+                "impulse: ")
+           << configuration.impulseDistanceUnit;
 #endif
     break;
   }
@@ -51,7 +50,8 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
            << F("INFO: Anemometer sensor initialized and working") << endl
            << F(" - GPIO: ") << configuration.gpio << endl
            << F(" - Interval: ") << configuration.interval << endl
-           << F(" - 1 impulse distance: ") << configuration.impulseDistance << endl
+           << F(" - 1 impulse distance: ") << configuration.impulseDistance
+           << endl
            << F(" - 1 impulse distance unit: ")
            << configuration.impulseDistanceUnit << endl
            << F(" - Boucing: ") << configuration.sensitiveness;
@@ -76,11 +76,11 @@ boolean AFESensorAnemometer::listener(void) {
 
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Anemometer speed: ") << lastSpeedMS << F("m/s, ") << lastSpeedKMH
-             << F("km/h") << endl
+             << F("INFO: Anemometer speed: ") << lastSpeedMS << F("m/s, ")
+             << lastSpeedKMH << F("km/h") << endl
              << F(" - no of impulses: ") << noOfImpulses << endl
-             << F(" - duration: ") << duration << F("msec. [") << duration / 1000
-             << F("sec]");
+             << F(" - duration: ") << duration << F("msec. [")
+             << duration / 1000 << F("sec]");
 #endif
       startTime = millis();
       _ret = true;

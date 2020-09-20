@@ -29,13 +29,13 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
-    mqttStateTopic[0] = '\0';
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 

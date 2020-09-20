@@ -10,6 +10,22 @@ void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
   _Data = Data;
   _id = id;
   _Data->getConfiguration(id, &configuration);
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Defining get and state MQTT Topics */
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
+  } else {
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
+  }
+
+  if (strlen(configuration.mqtt.topic) > 0) {
+    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
+  } else {
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
 #ifdef DEBUG
   Serial << endl
          << "INFO: Thermal protection initialized. Max temp: "
@@ -62,7 +78,7 @@ void AFEThermalProtector::enable(void) {
 
 /* Returns Thermal Protector data in JSON format */
 void AFEThermalProtector::getJSON(char *json) {
-  sprintf(json, "{}");
+  sprintf(json, "{\"enabled\":%s}", configuration.enabled ? "true" : "false");
 }
 
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
