@@ -30,7 +30,6 @@ private:
   void generateDeviceValue(char *json, uint32_t idx, char *svalue,
                            uint8_t nvalue = 0);
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Cache that stories IDXs */
   uint8_t lastIDXChacheIndex = 0;
   DOMOTICZ_IDX_CACHE idxCache[1
@@ -48,14 +47,12 @@ private:
 #endif
 
   ];
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /* It stories IDX of a device that should be excluded from processing */
   DOMOTICZ_BASIC_CONFIG bypassProcessing;
 #endif
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Get domoticz request/update command in formated form */
   DOMOTICZ_MQTT_COMMAND getCommand();
   /* Classfies and invokes code for processing the request */
@@ -63,7 +60,6 @@ private:
 
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();
@@ -87,10 +83,7 @@ public:
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Adds global class for reference (passes it to base class). Adds IDX to the
-   * cache. */
   virtual void addClass(AFERelay *);
-  /* Publishes MQTT Message with relay state */
   boolean publishRelayState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_RELAY
 

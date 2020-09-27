@@ -14,11 +14,7 @@ void relayEventsListener(void);
 
 void initializeRelay(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Relay[i].begin(&Data, &Led, i);
-#else
     Relay[i].begin(&Data, i);
-#endif // AFE_CONFIG_HARDWARE_LED
     // @TODO does not have to be set for Relay controlling a Gate
     Relay[i].setRelayAfterRestoringPower();
   }

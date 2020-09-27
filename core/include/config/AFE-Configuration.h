@@ -104,6 +104,7 @@
 /* Define Hardware */
 #define AFE_CONFIG_HARDWARE_SWITCH
 
+
 #ifndef AFE_DEVICE_SHELLY_1
 #define AFE_CONFIG_HARDWARE_LED
 #endif
@@ -139,8 +140,7 @@
 #elif defined(AFE_DEVICE_SHELLY_1)
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 1
-#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
-// to INPUT
+#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch Digitial PIN to INPUT
 /* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 4
@@ -173,8 +173,7 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 0
-#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin
-// to INPUT
+#define AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT // Sets switch DigitialPin to INPUT
 /* Generic version */
 #else
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
@@ -189,11 +188,11 @@
 /* ADC Is not applicable for Shelly-1 */
 #ifndef AFE_DEVICE_SHELLY_1
 #define AFE_CONFIG_FUNCTIONALITY_ADC
-#endif
+#endif // AFE_DEVICE_SHELLY_1
 
 /* ---- Basic Switch + DS18B20 ---- */
 #elif defined(T1_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.0.B4"
+#define AFE_FIRMWARE_VERSION "2.3.0.B6"
 #define AFE_FIRMWARE_TYPE 1
 
 /* File system used */
@@ -247,8 +246,6 @@
 #define AFE_CONFIG_HARDWARE_DHT
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-#define AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-#define AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 #define AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 /* ---- 4xRelay + PIR ---- */
 #elif defined(T3_CONFIG)
@@ -428,48 +425,26 @@
 #ifndef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY
 #endif
-#endif
-
-/* Configs related to thermostat functionality */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-#ifndef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#define AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#endif
-#endif
-
-/* Configs related to humidistat functionality */
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-#ifndef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#define AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#endif
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_RELAY
 
 /* Config releated to battery meter functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 #ifndef AFE_CONFIG_HARDWARE_ADC_VCC
 #define AFE_CONFIG_HARDWARE_ADC_VCC
 #endif
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 /* Configs related to analog input functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_ADC
 #ifndef AFE_CONFIG_HARDWARE_ADC_VCC
 #define AFE_CONFIG_HARDWARE_ADC_VCC
 #endif
-#endif
-
-/* Configs related to automatic relay switch off functionality */
-#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-/* Below three enables Relay.autoTurnOff */
-#ifndef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
-#define AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
-#endif
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_ADC
 
 /* Configs related to a gate functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_GATE
-#ifndef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
-#define AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifndef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #endif
 #ifndef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY
@@ -480,13 +455,13 @@
 #ifndef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_HARDWARE_CONTACTRON
 #endif
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #ifndef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #define AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
@@ -524,13 +499,14 @@
 #define AFE_SWITCH_TYPE_MONO 0 // Mono stable switch
 #define AFE_SWITCH_TYPE_BI 1   // Bistable switch
 
+/* Switch ON/OFF Values */
 #define AFE_SWITCH_ON 1
 #define AFE_SWITCH_OFF 0
 
 /* Switches functionalities */
 #define AFE_SWITCH_FUNCTIONALITY_NONE 0  // does nothibg
 #define AFE_SWITCH_FUNCTIONALITY_MULTI 1 // System switch and relay control
-#define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay controll
+#define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay control
 
 /* Switche bouncing */
 #define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING  50 // Bouncing for switch in miliseconds
@@ -608,13 +584,14 @@
 #define AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY AFE_SWITCH_FUNCTIONALITY_NONE // Default for all switches exlcuding the first one
 #endif
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 /* RELAY */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-#define AFE_RELAY_ON 1  // Relay is ON
-#define AFE_RELAY_OFF 0 // Relay is OFF
+/* Relay ON/OFF values */
+#define AFE_RELAY_ON 1 
+#define AFE_RELAY_OFF 0
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO 12
@@ -686,9 +663,9 @@
 
 /* DS18B20 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-#ifndef AFE_CONFIG_TERATURE
+#ifndef AFE_CONFIG_TEMPERATURE
 #define AFE_CONFIG_TEMPERATURE
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #define AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_GPIO 14
 #define AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_INTERVAL 60
@@ -707,7 +684,7 @@
 #ifndef AFE_CONFIG_HUMIDITY
 #define AFE_CONFIG_HUMIDITY
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 /* BMEX80 Sensors */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -726,25 +703,26 @@
 #ifndef AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #define AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 /* BH1750 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #ifndef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 /* AS3935 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 
+/* Distance units */
 #define AFE_DISTANCE_KM 1
 #define AFE_DISTANCE_MIL 2
 
 #ifndef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 /* HPMA115S0 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -756,7 +734,7 @@
 #ifndef AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #define AFE_CONFIG_DOMOTICZ_CUSTOME_SENSOR
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 /* ADC Input */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -771,14 +749,14 @@
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MIN_V 3
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V 4.2
 #define AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH 200
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 /* PIR Sesnor */
 #ifdef AFE_CONFIG_HARDWARE_PIR
-#ifndef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
-#define AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifndef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_PIR
 
 /* Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -796,7 +774,7 @@
 
 #define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH 200 // Not checked, used by HTTP API
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 /* Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -814,13 +792,13 @@
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
 
 #define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH 200 // Not checked. used by HTTP API
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Temperature */
 #ifdef AFE_CONFIG_TEMPERATURE
 #define AFE_TEMPERATURE_UNIT_CELSIUS 1
 #define AFE_TEMPERATURE_UNIT_FAHRENHEIT 2
-#endif
+#endif // AFE_CONFIG_TEMPERATURE
 
 /* Humidity */
 #ifdef AFE_CONFIG_HUMIDITY
@@ -831,32 +809,32 @@ typedef enum {
   AFE_HUMIDITY_POOR = 4,
   AFE_HUMIDITY_INADEQUATE = 5
 } afe_humidity_ratings_t;
-#endif
+#endif // AFE_CONFIG_HUMIDITY
 
 /* Pressure */
 #ifdef AFE_CONFIG_PRESSURE
 #define AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE 1013.25
 #define AFE_PRESSURE_UNIT_HPA 1
-#endif
+#endif // AFE_CONFIG_PRESSURE
 
 /* UART Defaults */
 #ifdef AFE_CONFIG_HARDWARE_UART
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD 3
 #define AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD 1
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 /* I2C Defaults */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA 4
 #define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL 5
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 /* HPMA115S0 Defaults */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL 300
 #define AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE 0
 #define AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH 220
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 /* BMx80 Defaults */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -885,14 +863,14 @@ typedef enum {
   AFE_CO2_INADEQUATE = 5
 } afe_co2_ratings_t;
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 /* BH1750 Defualts */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL 60
 #define AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE 0
 #define AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH 180
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 /* AS3935 Defaults */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
@@ -908,7 +886,7 @@ typedef enum {
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL 1
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE 255
 #define AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH 200 // @TODO check it
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 /* Anemometer Sensor Defaults */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
@@ -972,8 +950,10 @@ typedef enum {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #define AFE_CONFIG_SITE_DOMOTICZ 5
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#ifdef AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_SITE_LED 6
 #define AFE_CONFIG_SITE_SYSTEM_LED 7 
+#endif // AFE_CONFIG_HARDWARE_LED
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_SITE_RELAY 8
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1030,7 +1010,7 @@ typedef enum {
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #define AFE_CONFIG_SITE_THERMAL_PROTECTOR 32
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 
 
@@ -1038,28 +1018,19 @@ typedef enum {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED  0 // Default State of relay after connection to MQTT Broker is established.
-#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables
-                                        // processing MQTT incoming messages.
-#endif                                  // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif                                  // AFE_CONFIG_HARDWARE_RELAY
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Configs releated to Domoticz APIs */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #define AFE_DOMOTICZ_VERSION_0 0 // 4.10x
 #define AFE_DOMOTICZ_VERSION_1 1 // 2020.x
 #define AFE_DOMOTICZ_VERSION_DEFAULT AFE_DOMOTICZ_VERSION_0
-
 #define AFE_DOMOTICZ_IDX_NOT_PROCESSED 0
-
+#define AFE_DOMOTICZ_DEFAULT_IDX 0       // Default value for IDX
 #define AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT "0"
 #define AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT "999999"
-
-
 #define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if
-      // Domoticz is Off, button is pressed and HTTP Domoticz API is on
-#define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-#define AFE_DOMOTICZ_DEFAULT_IDX 0       // Default value for IDX
+                                        // Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in" // MQTT Topic for outgoing from AFE messages
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
@@ -1069,57 +1040,35 @@ typedef enum {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #define AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH 100 // @TODO to check
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #define AFE_CONFIG_API_JSON_RAINMETER_COMMAND_LENGTH 100 // @TODO to check
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 #define AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH 100 // @TODO to check
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #define AFE_CONFIG_API_JSON_REGULATOR_COMMAND_LENGTH 100 // @TODO to check
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH 100 // @TODO to check
-#endif
-
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190 // Outgoing url size for statuses updates to Domoticz
 
-#else
-
-#define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-#define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
-
-
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
-       // down
-#define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
-#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
-
-/* Config releated to LWT Functionality */
-#ifdef AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-#ifndef AFE_CONFIG_API_PROCESS_REQUESTS
-#define AFE_CONFIG_API_PROCESS_REQUESTS // Configuration paramters which enables
-                                        // processing MQTT incoming messages.
-#endif                                  // AFE_CONFIG_API_PROCESS_REQUESTS
-#endif                                  // AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
-
-#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
+#ifdef AFE_CONFIG_HUMIDITY
 /* Humidity Domoticz state*/
 typedef enum {
   AFE_HUMIDITY_NORMAL = 0,
@@ -1129,27 +1078,54 @@ typedef enum {
 } afe_humidity_domoticz_state_t;
 #endif
 
+
+#else // Defuals for None-Domotucz MQTT
+
+
+#define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
+
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+/* Defaults for each MQTT Version (standard and domoticz) */
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
+#define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
+#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
+#define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+
+
 /* ***************** Files: Config and defaults *********************/
 
 /* Configuration files names */
 #define AFE_FILE_DOMOTICZ_CONFIGURATION "cfg-domoticz-server.json"
 #define AFE_FILE_DEVICE_UID "cfg-device-uid.json"
 #define AFE_FILE_MQTT_BROKER_CONFIGURATION "cfg-mqtt-broker.json"
-#define AFE_FILE_I2C_CONFIGURATION "cfg-i2c.json"
 #define AFE_FILE_DEVICE_MODE "cfg-device-mode.json"
 #define AFE_FILE_PRO_VERSION_CONFIGURATION "cfg-pro-version.json"
 #define AFE_FILE_PASSWORD_CONFIGURATION "cfg-password.json"
 #define AFE_FILE_DEVICE_CONFIGURATION "cfg-device.json"
 #define AFE_FILE_FIRMWARE_CONFIGURATION "cfg-firmware.json"
 #define AFE_FILE_NETWORK_CONFIGURATION "cfg-network.json"
+#define AFE_FILE_I2C_CONFIGURATION "cfg-i2c.json"
+#define AFE_FILE_LED_CONFIGURATION "cfg-led-%d.json"
 #define AFE_FILE_SYSTEM_LED_CONFIGURATION "cfg-system-led.json"
+#define AFE_FILE_RELAY_CONFIGURATION "cfg-relay-%d.json"
+#define AFE_FILE_RELAY_STATE_CONFIGURATION "cfg-relay-state-%d.json"
+#define AFE_FILE_SWITCH_CONFIGURATION "cfg-switch-%d.json"
 #define AFE_FILE_ADC_CONFIGURATION "cfg-analog-input.json"
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
 #define AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION "cfg-anemometer-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
-#define AFE_FILE_RAINMETER_SENSOR_DATA_FILE "/cfg-rainmeter-data-0.json"
-#define AFE_FILE_REGULATOR_CONFIGURATION_FILE "/cfg-regulator-%d.json"
-#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION_FILE "/cfg-theremal-protector-%d.json"
+#define AFE_FILE_RAINMETER_SENSOR_DATA "/cfg-rainmeter-data-0.json"
+#define AFE_FILE_REGULATOR_CONFIGURATION "/cfg-regulator-%d.json"
+#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION "/cfg-theremal-protector-%d.json"
+#define AFE_FILE_DS18B20_SENSOR_CONFIGURATION "/cfg-ds18b20-%d.json"
+#define AFE_FILE_CONTACTRON_CONFIGURATION "cfg-contactron-%d.json"
+#define AFE_FILE_GATE_CONFIGURATION "cfg-gate-%d.json"
+#define AFE_FILE_GATE_STATE_CONFIGURATION "cfg-gate-state-%d.json"
+#define AFE_FILE_HPMA114S0_CONFIGURATION "cfg-hpma115s0-%d.json"
+#define AFE_FILE_BMX680_CONFIGURATION "cfg-BMEX80-%d.json"
+#define AFE_FILE_BH1750_CONFIGURATION "cfg-bh1750-%d.json"
+#define AFE_FILE_AS3935_CONFIGURATION "cfg-as3935-%d.json"
 
 
 /* Configuration files, JSON Buffers.  */
@@ -1181,9 +1157,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA 1100 // Not verfied
-#define AFE_CONFIG_FILE_BUFFER_DS18B20 400
-#define AFE_CONFIG_FILE_BUFFER_REGULATOR 200
-#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR 200
+#define AFE_CONFIG_FILE_BUFFER_DS18B20 407 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR 261 // Verfied by ArduinoJson Assistant
 
 
 /* Form constants */
@@ -1191,9 +1167,5 @@ typedef enum {
 #define AFE_FORM_ITEM_TYPE_TEXT "text"
 #define AFE_FORM_ITEM_TYPE_PASSWORD "password"
 #define AFE_FORM_ITEM_SKIP_PROPERTY "?"
-
-
-
-#define AFE_RESPONSE_KEY_VALIDATION 135
 
 #endif // _AFE_Configuration_h

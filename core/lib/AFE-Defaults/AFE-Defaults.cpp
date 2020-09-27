@@ -23,6 +23,11 @@ void AFEDefaults::set() {
     Data->createFirmwareConfigurationFile();
     Data->createNetworkConfigurationFile();
     Data->createMQTTConfigurationFile();
+    Data->createProVersionConfigurationFile();
+    Data->createPasswordConfigurationFile();
+    /* Setting device mode to Access Point */
+    Data->saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     Data->createDomoticzConfigurationFile();
 #endif
@@ -43,13 +48,6 @@ void AFEDefaults::set() {
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     Data->createADCInputConfigurationFile();
 #endif
-
-    Data->createProVersionConfigurationFile();
-    Data->createPasswordConfigurationFile();
-
-    /* Setting device mode to Access Point */
-    Data->saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
-
 
 #if defined(T3_CONFIG)
     PIR PIRConfiguration;
@@ -96,7 +94,6 @@ void AFEDefaults::set() {
     Data->createRainmeterSensorDataConfigurationFile();
 #endif
 
-/* DS18B20 presence */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     Data->createDS18B20SensorConfigurationFile();
 #endif
@@ -108,23 +105,6 @@ void AFEDefaults::set() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     Data->createThermalProtectorConfigurationFile();
 #endif
-
-#if defined(T3_CONFIG)
-    PIRConfiguration.gpio = 4;
-    PIRConfiguration.howLongKeepRelayOn = 10;
-    PIRConfiguration.invertRelayState = false;
-    PIRConfiguration.bouncing = 0;
-    PIRConfiguration.idx = 0;
-    PIRConfiguration.type = PIR_NO;
-    PIRConfiguration.ledId = 0;
-    for (uint8_t i = 0; i < sizeof(deviceConfiguration.isPIR); i++) {
-      sprintf(PIRConfiguration.name, "pir%d", i + 1);
-      PIRConfiguration.relayId = i + 1;
-
-      Data->saveConfiguration(i, PIRConfiguration);
-    }
-#endif
-
   }
 #ifdef DEBUG
   else {

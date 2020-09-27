@@ -3,12 +3,6 @@
 #ifndef _AFE_API_MQTT_STANDARD_h
 #define _AFE_API_MQTT_STANDARD_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -22,7 +16,6 @@
 class AFEAPIMQTTStandard : public AFEAPI {
 
 private:
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Classifies incomming MQTT Topics and invokes code for processing them */
   void processRequest();
   /* Size of the cache that stories MQTT Topics AFE has subsribed to */
@@ -48,7 +41,7 @@ private:
    + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
 #endif
   ];
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -70,9 +63,7 @@ public:
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Publishes relay state */
   boolean publishRelayState(uint8_t id);
-  /* Processes MQTT Request related to Relay */
   void processRelay(uint8_t *id);
 #endif // AFE_CONFIG_HARDWARE_RELAY
 

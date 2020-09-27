@@ -1328,7 +1328,7 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
   char fileName[15];
-  sprintf(fileName, "cfg-led-%d.json", id);
+  sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1382,7 +1382,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
   char fileName[15];
-  sprintf(fileName, "cfg-led-%d.json", id);
+  sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1583,7 +1583,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
   char fileName[17];
-  sprintf(fileName, "cfg-relay-%d.json", id);
+  sprintf(fileName,AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1646,7 +1646,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
   char fileName[17];
-  sprintf(fileName, "cfg-relay-%d.json", id);
+  sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1850,7 +1850,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
   char fileName[23];
-  sprintf(fileName, "cfg-relay-state-%d.json", id);
+  sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1902,7 +1902,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 }
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   char fileName[23];
-  sprintf(fileName, "cfg-relay-state-%d.json", id);
+  sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1948,7 +1948,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
   char fileName[18];
-  sprintf(fileName, "cfg-switch-%d.json", id);
+  sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2009,7 +2009,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
   char fileName[18];
-  sprintf(fileName, "cfg-switch-%d.json", id);
+  sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2373,7 +2373,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 
   char fileName[20];
-  sprintf(fileName, "/cfg-ds18b20-%d.json", id);
+  sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
@@ -2440,7 +2440,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
   char fileName[20];
-  sprintf(fileName, "/cfg-ds18b20-%d.json", id);
+  sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
@@ -2526,7 +2526,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
   char fileName[22];
-  sprintf(fileName, "cfg-contactron-%d.json", id);
+  sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2590,7 +2590,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
   char fileName[22];
-  sprintf(fileName, "cfg-contactron-%d.json", id);
+  sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2683,7 +2683,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 
 void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
   char fileName[16];
-  sprintf(fileName, "cfg-gate-%d.json", id);
+  sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2753,7 +2753,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 
   char fileName[16];
-  sprintf(fileName, "cfg-gate-%d.json", id);
+  sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2770,11 +2770,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     JsonArray &jsonContactron = root.createNestedArray("contactrons");
     JsonArray &jsonStates = root.createNestedArray("states");
-    /*
-    for (uint8_t i = 0; i < sizeof(configuration->state); i++) {
-      Eeprom.writeUInt8(467 + i, configuration->state[i]);
-    }
-    */
     root["relayId"] = configuration->relayId;
     root["name"] = configuration->name;
 
@@ -2871,7 +2866,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = AFE_GATE_CLOSED;
 
   char fileName[22];
-  sprintf(fileName, "cfg-gate-state-%d.json", id);
+  sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2926,7 +2921,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 
   char fileName[22];
-  sprintf(fileName, "cfg-gate-state-%d.json", id);
+  sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -2977,7 +2972,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 
   char fileName[23];
-  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3050,7 +3045,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
   char fileName[23];
-  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3136,7 +3131,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
                                      THERMAL_PROTECTOR *configuration) {
 
   char fileName[31];
-  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3204,7 +3199,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       THERMAL_PROTECTOR *configuration) {
   char fileName[31];
-  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION_FILE, id);
+  sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3300,7 +3295,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
   char fileName[21];
-  sprintf(fileName, "cfg-hpma115s0-%d.json", id);
+  sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3363,7 +3358,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
   char fileName[21];
-  sprintf(fileName, "cfg-hpma115s0-%d.json", id);
+  sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3594,7 +3589,7 @@ void AFEDataAccess::createI2CConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
   char fileName[17];
-  sprintf(fileName, "cfg-BMEX80-%d.json", id);
+  sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3686,7 +3681,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
   char fileName[17];
-  sprintf(fileName, "cfg-BMEX80-%d.json", id);
+  sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3811,7 +3806,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
   char fileName[18];
-  sprintf(fileName, "cfg-bh1750-%d.json", id);
+  sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3872,7 +3867,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
   char fileName[18];
-  sprintf(fileName, "cfg-bh1750-%d.json", id);
+  sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -3945,7 +3940,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
   char fileName[18];
-  sprintf(fileName, "cfg-as3935-%d.json", id);
+  sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -4015,7 +4010,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 
   char fileName[18];
-  sprintf(fileName, "cfg-as3935-%d.json", id);
+  sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -4490,11 +4485,11 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE
+         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
          << F(" ... ");
 #endif
 
-  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA_FILE, "r");
+  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
 
   if (configFile) {
 #ifdef DEBUG
@@ -4553,7 +4548,7 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_RAINMETER_SENSOR_DATA_FILE << F(" not opened");
+           << AFE_FILE_RAINMETER_SENSOR_DATA << F(" not opened");
   }
 #endif
 }
@@ -4561,11 +4556,11 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE
+         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
          << F(" ... ");
 #endif
 
-  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA_FILE, "w");
+  File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
 
   if (configFile) {
 #ifdef DEBUG
@@ -4621,7 +4616,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_RAINMETER_SENSOR_DATA_FILE;
+         << F("INFO: Creating file: ") << AFE_FILE_RAINMETER_SENSOR_DATA;
 #endif
   RAINMETER_DATA data;
   data.index1h = 0;

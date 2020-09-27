@@ -3,12 +3,15 @@
 #ifndef _AFE_RELAY_Structure_h
 #define _AFE_RELAY_Structure_h
 
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
+#include <arduino.h>
+
 struct RELAY_DEFAULTS {
   uint8_t powerOn;
   uint8_t MQTTConnected;
 };
-
-
 
 struct RELAY {
   uint8_t gpio;
@@ -23,4 +26,5 @@ struct RELAY {
   RELAY_DEFAULTS state;
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
+#endif // _AFE_RELAY_Structure_h

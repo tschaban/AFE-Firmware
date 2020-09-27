@@ -80,50 +80,52 @@ void AFEUpgrader::upgrade() {
 }
 
 void AFEUpgrader::upgradeFirmwarType() {
-  Data->createFirmwareConfigurationFile();
-  Data->createDeviceConfigurationFile();
-  Data->createSwitchConfigurationFile();
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  Data->createRelayConfigurationFile();
+  NETWORK networkConfiguration;
+  MQTT mqttConfiguration;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  DOMOTICZ domoticzCofiguration;
+#endif
+  PRO_VERSION proConfiguration;
+  PASSWORD passwordConiguration;
+  uint8_t deviceState;
+
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: upgrading firmware type." << endl
+         << "INFO: UPGRADE: Reading core configuration";
 #endif
 
-/* Configuration files specyfic to T5 */
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  Data->createContractonConfigurationFile();
+  /* Reading current data */
+  Data->getConfiguration(&networkConfiguration);
+  Data->getConfiguration(&mqttConfiguration);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  Data->getConfiguration(&domoticzCofiguration);
+#endif
+  Data->getConfiguration(&proConfiguration);
+  Data->getConfiguration(&passwordConiguration);
+  deviceState = Data->getDeviceMode();
+
+#ifdef DEBUG
+  Serial << endl << "INFO: UPGRADE: Creating default configuration";
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  Data->createGateConfigurationFile();
+  /* Setting the device from scratch */
+  AFEDefaults Defaults;
+  Defaults.set();
+
+#ifdef DEBUG
+  Serial << endl << "INFO: UPGRADE: Restoring core configuration";
 #endif
 
-/* Configuration files specyfic to T6 */
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  Data->createHPMA115S0SensorConfigurationFile();
+  /* Restoring core configuration */
+  Data->saveConfiguration(&networkConfiguration);
+  Data->saveConfiguration(&mqttConfiguration);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  Data->saveConfiguration(&domoticzCofiguration);
 #endif
-
-#ifdef AFE_CONFIG_HARDWARE_UART
-  Data->createSerialConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  Data->createI2CConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-  Data->createBMEX80SensorConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-  Data->createBH1750SensorConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-  Data->createAS3935SensorConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  Data->createAnemometerSensorConfigurationFile();
-#endif
+  Data->saveConfiguration(&proConfiguration);
+  Data->saveConfiguration(&passwordConiguration);
+  Data->saveDeviceMode(deviceState);
 }
 
 void AFEUpgrader::updateFirmwareVersion() {

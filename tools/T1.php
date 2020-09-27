@@ -4,8 +4,8 @@
 /* Set this before run */
 
 $type = "1";
-$version = "2.3.0.B4";
-$language = "PL";
+$version = "2.3.0.B6";
+$language = "EN";
 
 /******************/
 
@@ -24,9 +24,9 @@ $index = 0;
 
 $targetHardware[$index++] = "ESP Generic";
 $targetHardware[$index++] = "ESP Generic with debugger";
-$targetHardware[$index++] = "Sonoff 4CH and 4CH Pro";
-$targetHardware[$index++] = "Sonoff Basic";
-$targetHardware[$index++] = "Sonoff Touch";
+//$targetHardware[$index++] = "Sonoff 4CH and 4CH Pro";
+//$targetHardware[$index++] = "Sonoff Basic";
+//$targetHardware[$index++] = "Sonoff Touch";
 //$targetHardware[2] = "Shelly-1";
 
 
@@ -52,6 +52,19 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
+
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-development/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
 
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8285_1m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8285";
@@ -60,6 +73,7 @@ $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
+/*
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_1m_Sonoff-Basic-V1/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.SonoffBasic";
 $sourceFolder[$index]["size"] = "1Mb";
@@ -102,11 +116,6 @@ $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
-/*$sourceFolder[9]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_Shelly-1/firmware.bin";
-$sourceFolder[9]["chip"] = "ESP8266.Shelly1";
-$sourceFolder[9]["size"] = "2Mb";
-$sourceFolder[9]["hardware"] = 2;
-$sourceFolder[9]["api"] = $targetAPI[1];
 */
 // Domoticz API
 
@@ -124,6 +133,20 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
+
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-domoticz-development/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
+
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8285_1m-generic-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8285";
 $sourceFolder[$index]["size"] = "1Mb";
@@ -131,6 +154,7 @@ $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
+/*
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_1m_Sonoff-Basic-V1-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.SonoffBasic";
 $sourceFolder[$index]["size"] = "1Mb";
@@ -172,12 +196,7 @@ $sourceFolder[$index]["size"] = "1Mb";
 $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
-/*
-$sourceFolder[19]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_Shelly-1-domoticz/firmware.bin";
-$sourceFolder[19]["chip"] = "ESP8266.Shelly1";
-$sourceFolder[19]["size"] = "2Mb";
-$sourceFolder[19]["hardware"] = 2;
-$sourceFolder[19]["api"] = $targetAPI[0];
+
 */
 
 echo "\nCreating folders structure";

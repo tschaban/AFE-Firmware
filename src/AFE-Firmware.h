@@ -110,7 +110,6 @@ PietteTech_DHT dht;
 AFESensorDHT Sensor;
 #endif
 
-
 #if defined(T3_CONFIG)
 #include <AFE-PIR.h>
 AFEPIR Pir[sizeof(Device.configuration.isPIR)];
@@ -152,8 +151,6 @@ AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 #include <AFE-Sensor-AS3935.h>
 AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
-
-
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #include <AFE-Sensor-Binary.h>

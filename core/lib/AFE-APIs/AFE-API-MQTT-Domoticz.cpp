@@ -14,8 +14,8 @@ void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
   Serial << endl
          << F("INFO: Domoticz version: ")
          << (Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
-                 ? L_DOMOTICZ_VERSION_410
-                 : L_DOMOTICZ_VERSION_2020);
+                 ? L_DEVICE_DOMOTICZ_VERSION_410
+                 : L_DEVICE_DOMOTICZ_VERSION_2020);
 #endif
 }
 #else
@@ -26,9 +26,7 @@ void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
 
 void AFEAPIMQTTDomoticz::listener() {
   if (Mqtt.listener()) {
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
     processRequest();
-#endif
   }
 }
 
@@ -106,7 +104,7 @@ void AFEAPIMQTTDomoticz::synchronize() {
         lwtMessage,
         "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
         "\"Battery\":100,\"RSSI\":%d}",
-        Mqtt.configuration.lwt.idx, L_CONNECTED, getRSSI());
+        Mqtt.configuration.lwt.idx, L_NETWORK_CONNECTED, getRSSI());
     Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
   }
 }
@@ -118,7 +116,6 @@ void AFEAPIMQTTDomoticz::subscribe() {
   Mqtt.subscribe(AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT);
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   DOMOTICZ_MQTT_COMMAND command;
   char json[Mqtt.message.length];
@@ -145,9 +142,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 #endif
   return command;
 }
-#endif
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTDomoticz::processRequest() {
   DOMOTICZ_MQTT_COMMAND command = getCommand();
   if (command.domoticz.idx > 0 && idxForProcessing(command.domoticz.idx)) {
@@ -275,9 +270,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
   }
 #endif
 }
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
   // Returns true if Domoticz is in version 2020.x. All requests are processed
@@ -288,7 +281,6 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   }
   return _ret;
 }
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
@@ -318,9 +310,8 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 #endif
   }
 }
-#endif // AFE_CONFIG_HARDWARE_RELAY
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 #ifdef DEBG
   Serial << endl
@@ -342,7 +333,7 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 #endif
   return publishStatus;
 }
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIMQTTDomoticz::addClass(AFESwitch *Switch) {

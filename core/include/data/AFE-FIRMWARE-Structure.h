@@ -3,11 +3,7 @@
 #ifndef _AFE_FIRMWARE_Structure_h
 #define _AFE_FIRMWARE_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <arduino.h>
 
 struct FIRMWARE {
   char version[10];

@@ -3,6 +3,11 @@
 #ifndef _AFE_SWITCH_Structure_h
 #define _AFE_SWITCH_Structure_h
 
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+
+#include <arduino.h>
+
 struct SWITCH {
   uint8_t gpio;
   uint8_t type;
@@ -16,4 +21,5 @@ struct SWITCH {
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
+#endif // _AFE_SWITCH_Structure_h

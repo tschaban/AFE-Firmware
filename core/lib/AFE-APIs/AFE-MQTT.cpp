@@ -15,16 +15,16 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
   _Data = Data;
   _DeviceName = DeviceName;
   _Data->getConfiguration(&configuration);
-  _Data->getConfiguration(&NetworkConfiguration);
+  _Data->getConfiguration(&_NetworkConfiguration);
 
   esp.setTimeout(configuration.timeout);
-  Broker.setClient(esp);
-  Broker.setBufferSize(AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE);
+  _Broker.setClient(esp);
+  _Broker.setBufferSize(AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE);
 
   if (strlen(configuration.ip) > 0) {
     IPAddress ip;
     if (ip.fromString(configuration.ip)) {
-      Broker.setServer(configuration.ip, configuration.port);
+      _Broker.setServer(configuration.ip, configuration.port);
     }
 #ifdef DEBUG
     else {
@@ -33,9 +33,9 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
     }
 #endif
   } else if (strlen(configuration.host) > 0) {
-    Broker.setServer(configuration.host, configuration.port);
+    _Broker.setServer(configuration.host, configuration.port);
   } else {
-    isConfigured = false;
+    _isConfigured = false;
   }
 
   Data = {};
@@ -56,14 +56,13 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
 #endif
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
-void AFEMQTT::subscribe(const char *topic) {
 
+void AFEMQTT::subscribe(const char *topic) {
   if (strlen(topic) > 0) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->on();
 #endif
-    Broker.subscribe(topic);
+    _Broker.subscribe(topic);
 #ifdef DEBUG
     Serial << endl << F(" - ") << topic;
 #endif
@@ -72,25 +71,23 @@ void AFEMQTT::subscribe(const char *topic) {
 #endif
   }
 }
-#endif
+
 
 void AFEMQTT::disconnect() {
-  if (Broker.connected()) {
-    Broker.disconnect();
+  if (_Broker.connected()) {
+    _Broker.disconnect();
   }
 }
 
 boolean AFEMQTT::listener() {
   boolean _ret = false;
-  if (Broker.connected()) {
-    _ret = Broker.listen();
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+  if (_Broker.connected()) {
+    _ret = _Broker.listen();
     if (_ret) {
-      message.topic = Broker.topic;
-      message.content = Broker.payload;
-      message.length = Broker.length;
+      message.topic = _Broker.topic;
+      message.content = _Broker.payload;
+      message.length = _Broker.length;
     }
-#endif
   } else {
     connect();
   }
@@ -99,20 +96,20 @@ boolean AFEMQTT::listener() {
 
 void AFEMQTT::connect() {
 
-  if (isConfigured) {
-    if (sleepMode) {
-      if (millis() - sleepStartTime >=
-          NetworkConfiguration.waitTimeSeries * 1000) {
-        sleepMode = false;
+  if (_isConfigured) {
+    if (_sleepMode) {
+      if (millis() - _sleepStartTime >=
+          _NetworkConfiguration.waitTimeSeries * 1000) {
+        _sleepMode = false;
       }
     } else {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      if (ledStartTime == 0) {
-        ledStartTime = millis();
+      if (_ledStartTime == 0) {
+        _ledStartTime = millis();
       }
 #endif
-      if (delayStartTime == 0) {
-        delayStartTime = millis();
+      if (_delayStartTime == 0) {
+        _delayStartTime = millis();
         /* Connecing to MQTT Broker depending on LWT topics being set or no */
 
         boolean _connected;
@@ -125,78 +122,77 @@ void AFEMQTT::connect() {
                               "0,\"svalue\":\"%s\",\"Battery\":0,\"RSSI\":0}",
                   configuration.lwt.idx, L_DISCONNECTED);
 
-          _connected = Broker.connect(
+          _connected = _Broker.connect(
               _DeviceName, configuration.user, configuration.password,
               AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, 2, false, lwtMessage);
         } else {
-          _connected = Broker.connect(_DeviceName, configuration.user,
+          _connected = _Broker.connect(_DeviceName, configuration.user,
                                       configuration.password);
         }
 #else
         _connected = strlen(configuration.lwt.topic) > 0
-                         ? Broker.connect(_DeviceName, configuration.user,
+                         ? _Broker.connect(_DeviceName, configuration.user,
                                           configuration.password,
                                           configuration.lwt.topic, 2, false,
                                           "disconnected")
-                         : Broker.connect(_DeviceName, configuration.user,
+                         : _Broker.connect(_DeviceName, configuration.user,
                                           configuration.password);
 #endif
 
         if (_connected) {
-          eventConnectionEstablished = true;
-          delayStartTime = 0;
+          _eventConnectionEstablished = true;
+          _delayStartTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-          ledStartTime = 0;
+          _ledStartTime = 0;
           _Led->off();
 #endif
-          connections = 0;
+          _connections = 0;
 
 #ifdef DEBUG
           Serial << endl << F("INFO: Connected to MQTT Broker");
 #endif
-
           return;
         }
       }
 #ifdef AFE_CONFIG_HARDWARE_LED
-      if (millis() > ledStartTime + 500) {
+      if (millis() > _ledStartTime + 500) {
         _Led->toggle();
-        ledStartTime = 0;
+        _ledStartTime = 0;
       }
 #endif
       if (millis() >
-          delayStartTime + (NetworkConfiguration.waitTimeConnections * 1000)) {
+          _delayStartTime + (_NetworkConfiguration.waitTimeConnections * 1000)) {
 
-        connections++;
+        _connections++;
         yield();
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: MQTT Connection attempt: ") << connections + 1
-               << F(" from ") << NetworkConfiguration.noConnectionAttempts
-               << F(", connection status: ") << Broker.state()
-               << F(", connection time: ") << millis() - delayStartTime
+               << F("INFO: MQTT Connection attempt: ") << _connections + 1
+               << F(" from ") << _NetworkConfiguration.noConnectionAttempts
+               << F(", connection status: ") << _Broker.state()
+               << F(", connection time: ") << millis() - _delayStartTime
                << F("ms");
 
 #endif
-        delayStartTime = 0;
+        _delayStartTime = 0;
       }
 
-      if (connections >= NetworkConfiguration.noConnectionAttempts) {
-        sleepMode = true;
-        sleepStartTime = millis();
+      if (_connections >= _NetworkConfiguration.noConnectionAttempts) {
+        _sleepMode = true;
+        _sleepStartTime = millis();
 
-        delayStartTime = 0;
+        _delayStartTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-        ledStartTime = 0;
+        _ledStartTime = 0;
         _Led->off();
 #endif
-        connections = 0;
+        _connections = 0;
 
 #ifdef DEBUG
         Serial << endl
                << F("WARN: MQTT: Not able to connect to MQTT.Going to sleep "
                     "mode for ")
-               << NetworkConfiguration.waitTimeSeries << F("sec.");
+               << _NetworkConfiguration.waitTimeSeries << F("sec.");
 #endif
       }
     }
@@ -207,16 +203,16 @@ void AFEMQTT::setReconnectionParams(
     uint8_t no_connection_attempts,
     uint8_t duration_between_connection_attempts,
     uint8_t duration_between_next_connection_attempts_series) {
-  NetworkConfiguration.noConnectionAttempts = no_connection_attempts;
-  NetworkConfiguration.waitTimeConnections =
+  _NetworkConfiguration.noConnectionAttempts = no_connection_attempts;
+  _NetworkConfiguration.waitTimeConnections =
       duration_between_connection_attempts;
-  NetworkConfiguration.waitTimeSeries =
+  _NetworkConfiguration.waitTimeSeries =
       duration_between_next_connection_attempts_series;
 }
 
 boolean AFEMQTT::eventConnected() {
-  boolean returnValue = eventConnectionEstablished;
-  eventConnectionEstablished = false;
+  boolean returnValue = _eventConnectionEstablished;
+  _eventConnectionEstablished = false;
   return returnValue;
 }
 
@@ -224,7 +220,7 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
 
   boolean pubslishingStatus = false;
 
-  if (Broker.state() == MQTT_CONNECTED) {
+  if (_Broker.state() == MQTT_CONNECTED) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->on();
 #endif
@@ -234,7 +230,7 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
     Serial << endl << F("Message: ") << message;
 #endif
     if (strlen(topic) > 0) {
-      pubslishingStatus = Broker.publish(topic, message);
+      pubslishingStatus = _Broker.publish(topic, message);
     }
 #ifdef DEBUG
     else {

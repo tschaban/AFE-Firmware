@@ -3,6 +3,8 @@
 #ifndef _AFE_NETWORK_Structure_h
 #define _AFE_NETWORK_Structure_h
 
+#include <arduino.h>
+
 struct NETWORK {
   char ssid[33];
   char password[33];

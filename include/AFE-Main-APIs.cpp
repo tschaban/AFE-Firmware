@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#include <AFE-Configuration.h>
 #include <AFE-API-HTTP.h>
+#include <AFE-Configuration.h>
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLE
 #include <AFE-API-HTTP-Domoticz.h>
@@ -18,7 +18,6 @@ void initializeHTTPAPI(void);
 void initializeHTTPDomoticzAPI(void);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-
 /* --------- Body -----------*/
 
 AFEAPIHTTP HttpAPI;
@@ -28,9 +27,6 @@ AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
 AFEAPIMQTTStandard MqttAPI;
 #endif
-
-
-
 
 /* Initializing MQTT API */
 void initializeMQTTAPI(void) {
@@ -48,11 +44,15 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-    MqttAPI.addClass(&Relay[0]);
+    if (Device.configuration.noOfRelays > 0) {
+      MqttAPI.addClass(&Relay[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-    MqttAPI.addClass(&Switch[0]);
+    if (Device.configuration.noOfSwitches > 0) {
+      MqttAPI.addClass(&Switch[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -94,15 +94,21 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-    MqttAPI.addClass(&DS18B20Sensor[0]);
+    if (Device.configuration.noOfDS18B20s > 0) {
+      MqttAPI.addClass(&DS18B20Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    MqttAPI.addClass(&Regulator[0]);
+    if (Device.configuration.noOfRegulators > 0) {
+      MqttAPI.addClass(&Regulator[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-    MqttAPI.addClass(&ThermalProtector[0]);
+    if (Device.configuration.noOfThermalProtectors > 0) {
+      MqttAPI.addClass(&ThermalProtector[0]);
+    }
 #endif
 
 #ifdef DEBUG
@@ -126,11 +132,15 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-    HttpAPI.addClass(&Relay[0]);
+    if (Device.configuration.noOfRelays > 0) {
+      HttpAPI.addClass(&Relay[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    HttpAPI.addClass(&AnalogInput);
+    if (Device.configuration.isAnalogInput) {
+      HttpAPI.addClass(&AnalogInput);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -166,15 +176,21 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-    HttpAPI.addClass(&DS18B20Sensor[0]);
+    if (Device.configuration.noOfDS18B20s > 0) {
+      HttpAPI.addClass(&DS18B20Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    HttpAPI.addClass(&Regulator[0]);
+    if (Device.configuration.noOfRegulators > 0) {
+      HttpAPI.addClass(&Regulator[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-    HttpAPI.addClass(&ThermalProtector[0]);
+    if (Device.configuration.noOfThermalProtectors > 0) {
+      HttpAPI.addClass(&ThermalProtector[0]);
+    }
 #endif
 
 #ifdef DEBUG
@@ -197,11 +213,15 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-    HttpDomoticzAPI.addClass(&Relay[0]);
+    if (Device.configuration.noOfRelays > 0) {
+      HttpDomoticzAPI.addClass(&Relay[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-    HttpDomoticzAPI.addClass(&Switch[0]);
+    if (Device.configuration.noOfSwitches > 0) {
+      HttpDomoticzAPI.addClass(&Switch[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -243,15 +263,21 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-    HttpDomoticzAPI.addClass(&DS18B20Sensor[0]);
+    if (Device.configuration.noOfDS18B20s > 0) {
+      HttpDomoticzAPI.addClass(&DS18B20Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    HttpDomoticzAPI.addClass(&Regulator[0]);
+    if (Device.configuration.noOfRegulators > 0) {
+      HttpDomoticzAPI.addClass(&Regulator[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-    HttpDomoticzAPI.addClass(&ThermalProtector[0]);
+    if (Device.configuration.noOfThermalProtectors > 0) {
+      HttpDomoticzAPI.addClass(&ThermalProtector[0]);
+    }
 #endif
 
 #ifdef DEBUG

@@ -285,7 +285,6 @@ void loop() {
         gateEventsListener();
 #endif
 
-/* Sensor: HPMA115S0 related code  */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
         HPMA115S0SensorEventsListener();
 #endif
@@ -343,7 +342,9 @@ void loop() {
 
     /** Here: Code that will be run no matter if connected or disconnected from
      * Network / MQTT Broker
-     * Device Mode: Normal of Configuration exluding: HotSpot mode*/
+     * Works for device in Normal or Configuration mode: (excluding: HotSpot
+     * mode) */
+
     if (Device.getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();

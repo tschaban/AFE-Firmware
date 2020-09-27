@@ -3,6 +3,7 @@
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
 
+#include <arduino.h>
 #include <AFE-Configuration.h>
 
 struct AFE_DEVICE_API {

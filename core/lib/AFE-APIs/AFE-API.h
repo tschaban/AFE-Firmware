@@ -8,12 +8,6 @@
 #ifndef _AFE_API_h
 #define _AFE_API_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
 #include <AFE-MQTT-Structure.h>

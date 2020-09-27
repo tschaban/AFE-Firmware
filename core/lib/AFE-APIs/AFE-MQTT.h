@@ -28,24 +28,24 @@
 class AFEMQTT {
 
 private:
-  PubSubClient Broker;
+  PubSubClient _Broker;
   AFEDataAccess *_Data;
   char *_DeviceName;
-  NETWORK NetworkConfiguration;
+  NETWORK _NetworkConfiguration;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
-  unsigned long ledStartTime = 0;
+  unsigned long _ledStartTime = 0;
 #endif
 
-  unsigned long sleepStartTime = 0;
-  boolean sleepMode = false;
-  boolean isConfigured =
+  unsigned long _sleepStartTime = 0;
+  boolean _sleepMode = false;
+  boolean _isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
 
-  uint8_t connections = 0;
-  unsigned long delayStartTime = 0;
-  boolean eventConnectionEstablished = false;
+  uint8_t _connections = 0;
+  unsigned long _delayStartTime = 0;
+  boolean _eventConnectionEstablished = false;
 
   /* Sets parameters related to reconnection to MQTT Broker if there was
    * problems to connect to it */
@@ -61,9 +61,7 @@ private:
   void disconnect();
 
 public:
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   MQTT_MESSAGE message;
-#endif
   WiFiClient esp;
   MQTT configuration;
 
@@ -74,7 +72,6 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, char *, AFELED *);
 #endif
-
   void begin(AFEDataAccess *, char *);
 
 
@@ -88,10 +85,8 @@ public:
   /* Methods publishes a message to MQTT Broker */
   boolean publish(const char *topic, const char *message);
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
   /* Methods subsribes to topic in the MQTT Broker */
   void subscribe(const char *);
-#endif
 
 };
 

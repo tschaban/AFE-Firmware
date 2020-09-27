@@ -26,7 +26,8 @@ void AFEAPIHTTPDomoticz::init() {
   char _pass[45] = {0};
   char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
-  if (configuration.user[0] != AFE_EMPTY_STRING && configuration.password[0] != AFE_EMPTY_STRING) {
+  if (configuration.user[0] != AFE_EMPTY_STRING &&
+      configuration.password[0] != AFE_EMPTY_STRING) {
     rbase64.encode(configuration.user);
     sprintf(_user, rbase64.result());
     rbase64.encode(configuration.password);
@@ -95,30 +96,7 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) {
-  AFEAPI::addClass(Relay);
-  /*
-  #ifdef DEBUG
-    Serial << endl << F("INFO: Caching IDXs for Relays";
-  #endif
-    uint8_t index = 0;
-    for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-      if (_Relay[i]->configuration.domoticz.idx > 0) {
-        idxCache[index].domoticz.idx = _Relay[i]->configuration.domoticz.idx;
-        idxCache[index].id = i;
-        idxCache[index].type = AFE_DOMOTICZ_DEVICE_RELAY;
-  #ifdef DEBUG
-        Serial << endl << F(" - added IDX: ") << idxCache[index].domoticz.idx;
-  #endif
-        index++;
-      }
-  #ifdef DEBUG
-      else {
-        Serial << endl << F(" - IDX not set";
-      }
-  #endif
-    }*/
-}
+void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) { AFEAPI::addClass(Relay); }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -475,9 +453,9 @@ void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
 boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
-    publishStatus =
-        sendSwitchCommand(_ThermalProtector[id]->configuration.domoticz.idx,
-                          _ThermalProtector[id]->configuration.enabled ? "On" : "Off");
+    publishStatus = sendSwitchCommand(
+        _ThermalProtector[id]->configuration.domoticz.idx,
+        _ThermalProtector[id]->configuration.enabled ? "On" : "Off");
   }
   return publishStatus;
 }

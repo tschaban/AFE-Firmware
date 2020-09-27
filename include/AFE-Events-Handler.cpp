@@ -74,8 +74,6 @@ void eventsListener(void) {
       }
 #endif
 
-
-
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
       Serial << endl << F("INFO: Sending current state of relays to Domoticz");

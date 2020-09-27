@@ -3,12 +3,6 @@
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Defaults.h>
 #include <AFE-Data-Access.h>
 #include <FS.h>

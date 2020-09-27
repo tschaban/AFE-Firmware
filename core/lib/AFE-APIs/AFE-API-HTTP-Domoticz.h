@@ -3,12 +3,6 @@
 #ifndef _AFE_API_HTTP_DOMOTICZ_h
 #define _AFE_API_HTTP_DOMOTICZ_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED // Code excluded for not Standard API

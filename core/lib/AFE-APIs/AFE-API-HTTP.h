@@ -3,12 +3,6 @@
 #ifndef _AFE_API_HTTP_h
 #define _AFE_API_HTTP_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -24,7 +18,6 @@
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
-
 #else
 #include <AFE-API-MQTT-Standard.h>
 #endif
@@ -151,7 +144,6 @@ private:
   void processRequest(HTTPCOMMAND *);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Processing HTTP request for Relay */
   void processRelay(HTTPCOMMAND *);
 #endif
 
@@ -235,7 +227,6 @@ public:
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Adds global class for reference */
   void addClass(AFERelay *);
 #endif
 
@@ -286,9 +277,6 @@ public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void addClass(AFEThermalProtector *);
 #endif
-
 };
-
-
 
 #endif

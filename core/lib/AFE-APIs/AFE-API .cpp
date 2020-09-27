@@ -5,7 +5,6 @@
 AFEAPI::AFEAPI(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-
 void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device, AFELED *Led) {
   _Data = Data;
   _Device = Device;
@@ -15,9 +14,7 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device, AFELED *Led) {
   }
   enabled = true;
 }
-
 #else
-
 void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Data = Data;
   _Device = Device;

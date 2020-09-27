@@ -6,13 +6,6 @@
 
 AFERelay::AFERelay() {}
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFERelay::begin(AFEDataAccess *_Data, AFELED *_LED, uint8_t id) {
-  Led = _LED;
-  begin(_Data, id);
-}
-#endif // AFE_CONFIG_HARDWARE_LED
-
 void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
   _id = id;
   _Data->getConfiguration(_id, &configuration);
@@ -33,6 +26,14 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
     mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    // @TODO this code doesn't check if the LED is actually set in Device config
+    Led.begin(_Data, configuration.ledID);
+  }
+
+#endif
 }
 
 byte AFERelay::get() {
@@ -50,7 +51,7 @@ void AFERelay::on(boolean invert) {
   if (get() == AFE_RELAY_OFF) {
     digitalWrite(configuration.gpio, HIGH);
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led->on();
+    Led.on();
 #endif
     if (!invert &&
         configuration.timeToOff >
@@ -80,7 +81,7 @@ void AFERelay::off(boolean invert) {
   if (get() == AFE_RELAY_ON) {
     digitalWrite(configuration.gpio, LOW);
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led->off();
+    Led.off();
 #endif
     if (invert &&
         configuration.timeToOff >
@@ -136,7 +137,7 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   }
 }
 
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 boolean AFERelay::autoTurnOff(boolean invert) {
   if (configuration.timeToOff > 0 && ((invert && get() == AFE_RELAY_OFF) ||
                                       (!invert && get() == AFE_RELAY_ON)) &&

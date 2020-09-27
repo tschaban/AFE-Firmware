@@ -119,20 +119,20 @@ const char HTTP_ITEM_SELECT_CLOSE[] PROGMEM = "</select></div>";
 const char HTTP_ITEM_HINT[] PROGMEM = "<br><p class=\"cm\">{{item.hint}}</p>";
 
 const char HTTP_SITE_RESET_TO_DEFAULTS[] PROGMEM =
-    "<fieldset><p class=\"cm\"><strong>{{L_WARNING}}</strong>: </p><p "
-    "class=\"cm\">{{L_CONFIGURATION_WILL_BE_REMOVED}}: </p><input "
+    "<fieldset><p class=\"cm\"><strong>{{L_UPGRADE_WARNING}}</strong>: </p><p "
+    "class=\"cm\">{{L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED}}: </p><input "
     "type=\"submit\" class=\"b be\" "
-    "value=\"{{L_RESTORE_DEFAULT_SETTINGS}}\"></fieldset>";
+    "value=\"{{L_UPGRADE_RESTORE_DEFAULT_SETTINGS}}\"></fieldset>";
 
 const char HTTP_SITE_POST_RESET[] PROGMEM =
     "<fieldset><p class=\"cm\">{{L_UPGRADE_IN_PROGRESS}}</p><p "
-    "class=\"cm\">{{L_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: </p><a "
+    "class=\"cm\">{{L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: </p><a "
     "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset>";
 
 const char HTTP_SITE_UPGRADE[] PROGMEM =
     "<fieldset><form method=\"post\" action=\"upgrade?o=21\" "
     "enctype=\"multipart/form-data\"><div "
-    "class=\"cf\"><label>{{L_SELECT_FIRMWARE}}</label><input class=\"bs\" "
+    "class=\"cf\"><label>{{L_UPGRADE_SELECT_FIRMWARE}}</label><input class=\"bs\" "
     "name=\"update\" type=\"file\" accept=\".bin\"></div><p "
     "class=\"cm\">{{L_UPGRADE_INFO}}.</p><button type=\"submit\" class=\"b "
     "be\">{{L_UPGRADE}}</button></form></fieldset>";
@@ -141,8 +141,8 @@ const char HTTP_SITE_UPGRADE[] PROGMEM =
 const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "<div class=\"cf\"><label>{{L_REGULATOR_TURN_IF}}</label><select "
     "name=\"{{item.name}}\"><option "
-    "value=\"0\"{{item.selected-0}}>{{L_LOWER}}</option><option "
-    "value=\"1\"{{item.selected-1}}>{{L_HIGHER}}</option></select><input "
+    "value=\"0\"{{item.selected-0}}>{{L_REGULATOR_LOWER}}</option><option "
+    "value=\"1\"{{item.selected-1}}>{{L_REGULATOR_HIGHER}}</option></select><input "
     "name=\"{{item.input.name}}\" type=\"number\" value=\"{{item.value}}\" step=\"any\"></div>";
 #endif
 

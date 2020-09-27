@@ -9,13 +9,13 @@
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
+#include <arduino.h>
+
 struct MQTT_MESSAGE {
   char *topic;
   byte *content;
   uint16_t length;
 };
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct MQTT_BASIC_CONFIG {
@@ -74,7 +74,7 @@ struct MQTT_TOPICS_CACHE {
   uint8_t id;
   afe_mqtt_standard_device_type_t type;
 };
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 struct MQTT {
   char host[33];

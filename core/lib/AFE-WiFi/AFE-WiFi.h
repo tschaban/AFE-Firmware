@@ -3,8 +3,6 @@
 #ifndef _AFE_WiFi_h
 #define _AFE_WiFi_h
 
-//#include <arduino.h>
-
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 

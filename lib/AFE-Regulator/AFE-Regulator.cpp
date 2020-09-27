@@ -28,8 +28,13 @@ void AFERegulator::begin(AFEDataAccess *Data, uint8_t id) {
 
 }
 
+void AFERegulator::setInitialState(boolean state) {
+  deviceState = state;
+  initialized = true;
+}
+
 boolean AFERegulator::listener(float value) {
-  if (configuration.enabled) {
+  if (configuration.enabled && initialized) {
 #ifdef DEBUG
     Serial << endl << "INFO: Executing regulator check ...";
 #endif

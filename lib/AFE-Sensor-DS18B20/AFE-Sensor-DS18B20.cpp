@@ -120,8 +120,8 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
 #ifdef DEBUG
   Serial << endl << "INFO: Scanning for DS18B20 sensors on GPIO: " << gpio;
   Serial << endl << " - Wire Bus initialized";
+#endif  
   Sensor.setOneWire(&WireBUS);
-#endif
   WireBUS.begin(gpio);
   Sensor.begin();
   numberOfDevicesOnBus = Sensor.getDS18Count();

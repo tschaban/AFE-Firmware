@@ -39,6 +39,9 @@ void DS18B20SensorEventsListener(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       relayStateChanged = false;
       for (uint8_t j = 0; j < Device.configuration.noOfRegulators; j++) {
+        if (!Regulator[j].initialized) {
+          Regulator[j].setInitialState(Relay[Regulator[j].configuration.relayId].get());
+        }
         if (Regulator[j].configuration.sensorId == i) {
           if (Regulator[j].listener(temperature)) {
             if (Regulator[j].deviceState &&

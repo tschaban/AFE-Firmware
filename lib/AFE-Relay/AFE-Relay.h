@@ -37,11 +37,7 @@ public:
   AFERelay();
 
   /* Method: initiates relay */
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFELED *, uint8_t id);
-#else 
   void begin(AFEDataAccess *, uint8_t id);
-#endif
 
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
@@ -67,7 +63,7 @@ public:
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   /* Methods automatically turns off/on relay */
   boolean autoTurnOff(boolean invert = false);
 #endif
@@ -93,12 +89,11 @@ private:
   AFEDataAccess *Data; // @TODO nie jest konsekwentnie jak np. w switch
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *Led;
-  void begin(AFEDataAccess *, uint8_t id);
+  AFELED Led;
 #endif
 
   unsigned long turnOffCounter = 0;
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   boolean timerUnitInSeconds = true;
 #endif
 

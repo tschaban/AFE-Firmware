@@ -20,9 +20,7 @@ void AFEAPIMQTTStandard::begin(AFEDataAccess *Data, AFEDevice *Device) {
 
 void AFEAPIMQTTStandard::listener() {
   if (Mqtt.listener()) {
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
     processRequest();
-#endif
   }
 }
 
@@ -281,7 +279,6 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 }
 
-#ifdef AFE_CONFIG_API_PROCESS_REQUESTS
 void AFEAPIMQTTStandard::processRequest() {
 #ifdef DEBUG
   Serial << endl
@@ -383,7 +380,7 @@ void AFEAPIMQTTStandard::processRequest() {
     }
   }
 }
-#endif // AFE_CONFIG_API_PROCESS_REQUESTS
+
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
@@ -397,8 +394,7 @@ boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
-#if defined(AFE_CONFIG_HARDWARE_RELAY) &&                                      \
-    defined(AFE_CONFIG_API_PROCESS_REQUESTS)
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
   boolean publishState = true;
 
@@ -422,7 +418,7 @@ void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
     publishRelayState(*id);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_RELAY && AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
@@ -462,8 +458,7 @@ void AFEAPIMQTTStandard::publishADCValues() {
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
-#if defined(AFE_CONFIG_HARDWARE_ADC_VCC) &&                                    \
-    defined(AFE_CONFIG_API_PROCESS_REQUESTS)
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIMQTTStandard::processADC() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing ADC: ");
@@ -477,7 +472,7 @@ void AFEAPIMQTTStandard::processADC() {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC && AFE_CONFIG_API_PROCESS_REQUESTS
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 

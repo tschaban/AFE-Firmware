@@ -1247,7 +1247,7 @@ void AFEWebServer::get(LED &data) {
                   ? server.arg("g").toInt()
                   : AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
-  data.changeToOppositeValue = server.arg("o").length() > 0 ? true : false;
+  data.changeToOppositeValue = server.arg("w").length() > 0 ? true : false;
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {

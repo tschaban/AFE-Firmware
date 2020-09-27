@@ -3,14 +3,10 @@
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-Defaults.h>
 
 #ifdef DEBUG
 #include <Streaming.h>

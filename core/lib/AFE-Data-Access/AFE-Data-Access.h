@@ -3,12 +3,6 @@
 #ifndef _AFE_Data_Access_h
 #define _AFE_Data_Access_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
 #include <ESP8266WiFi.h>
@@ -69,23 +63,7 @@ public:
   void getConfiguration(DOMOTICZ *);
   void saveConfiguration(DOMOTICZ *);
   void createDomoticzConfigurationFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  void getConfiguration(uint8_t id, RELAY *);
-  void saveConfiguration(uint8_t id, RELAY *);
-  void createRelayConfigurationFile();
-
-  boolean getRelayState(uint8_t id);
-  void saveRelayState(uint8_t id, boolean state);
-  void createRelayStateFile();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void getConfiguration(uint8_t id, SWITCH *);
-  void saveConfiguration(uint8_t id, SWITCH *);
-  void createSwitchConfigurationFile();
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
@@ -98,33 +76,47 @@ public:
   void saveConfiguration(PASSWORD *);
   void createPasswordConfigurationFile();
 
-/* ADC Inout create/read/write methods */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  void getConfiguration(ADCINPUT *);
-  void saveConfiguration(ADCINPUT *);
-  void createADCInputConfigurationFile();
-#endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  void getConfiguration(uint8_t id, RELAY *);
+  void saveConfiguration(uint8_t id, RELAY *);
+  void createRelayConfigurationFile();
+  boolean getRelayState(uint8_t id);
+  void saveRelayState(uint8_t id, boolean state);
+  void createRelayStateFile();
+#endif // AFE_CONFIG_HARDWARE_RELAY
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+  void getConfiguration(uint8_t id, SWITCH *);
+  void saveConfiguration(uint8_t id, SWITCH *);
+  void createSwitchConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
-  /* Methods read and save ID of system led */
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+  void getConfiguration(ADCINPUT *);
+  void saveConfiguration(ADCINPUT *);
+  void createADCInputConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void getConfiguration(uint8_t id, DS18B20 *);
   void saveConfiguration(uint8_t id, DS18B20 *);
   void createDS18B20SensorConfigurationFile(void);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   DH getSensorConfiguration();
   void saveConfiguration(DH configuration);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void getConfiguration(uint8_t id, REGULATOR *);
@@ -148,7 +140,7 @@ public:
   void getConfiguration(uint8_t id, CONTACTRON *);
   void saveConfiguration(uint8_t id, CONTACTRON *);
   void createContractonConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void getConfiguration(uint8_t id, GATE *);
@@ -156,64 +148,62 @@ public:
   void createGateConfigurationFile();
   uint8_t getGateState(uint8_t id);
   void saveGateState(uint8_t id, uint8_t state);
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   void getConfiguration(I2CPORT *);
   void saveConfiguration(I2CPORT *);
   void createI2CConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_UART
   void getConfiguration(SERIALPORT *);
   void saveConfiguration(SERIALPORT *);
   void createSerialConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   void getConfiguration(uint8_t id, HPMA115S0 *);
   void saveConfiguration(uint8_t id, HPMA115S0 *);
   void createHPMA115S0SensorConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void getConfiguration(uint8_t id, BMEX80 *);
   void saveConfiguration(uint8_t id, BMEX80 *);
   void createBMEX80SensorConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   void getConfiguration(uint8_t id, BH1750 *);
   void saveConfiguration(uint8_t id, BH1750 *);
   void createBH1750SensorConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void getConfiguration(uint8_t id, AS3935 *);
   void saveConfiguration(uint8_t id, AS3935 *);
   void createAS3935SensorConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   void getConfiguration(ANEMOMETER *);
   void saveConfiguration(ANEMOMETER *);
   void createAnemometerSensorConfigurationFile();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   void getConfiguration(RAINMETER *);
   void saveConfiguration(RAINMETER *);
   void createRainmeterSensorConfigurationFile();
-
   void get(RAINMETER_DATA *);
   void save(RAINMETER_DATA *);
   void createRainmeterSensorDataConfigurationFile();
-
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 /* Methods turns on / off APIs */
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 };
 #endif

@@ -22,7 +22,8 @@ public:
   REGULATOR configuration;
   /* Keeps what should be the state of controlled device: false = off, true =
  * on */
-  boolean deviceState = false;
+  boolean deviceState;
+  boolean initialized = false;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
@@ -33,7 +34,12 @@ public:
   AFERegulator();
 
   /* Method initialize regulator */
-  void begin(AFEDataAccess *,uint8_t id);
+  void begin(AFEDataAccess *, uint8_t id);
+
+  /** Set the initial state of a regulator. It must be executed to start the
+   * regulator
+  */
+  void setInitialState(boolean state);
 
   /* Method rises event if thermostat themperatures have been exceeded */
   boolean listener(float value);

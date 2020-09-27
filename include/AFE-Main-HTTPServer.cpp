@@ -22,7 +22,7 @@ void handleUpload(void) { WebServer.generate(true); }
 void handleOnNotFound(void) {
   String page = "<head><meta http-equiv=\"refresh\" content=\"0; "
                 "url=http://192.168.5.1/\" /></head><body><p>";
-  page += L_OPENING_CONFIG_PANEL;
+  page += L_INDEX_OPENING_CONFIG_PANEL;
   page += "</p></body>";
   WebServer.publishHTML(page);
 }
