@@ -3,11 +3,9 @@
 #ifndef _AFE_Sensor_ADC_VCC_h
 #define _AFE_Sensor_ADC_VCC_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
 #include <AFE-Data-Access.h>
 
@@ -27,6 +25,10 @@ private:
 public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  float batteryPercentage = 0;
+#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
@@ -49,6 +51,14 @@ public:
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
+
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  /* Returns the batter data in JSON format */
+  void getBatteryMeterJSON(char *json);
+#endif  
+
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // _AFE_Sensor_ADC_VCC_h

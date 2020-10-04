@@ -14,7 +14,6 @@
 #include <AFE-UART.h>
 
 #ifdef DEBUG
-
 #include <Streaming.h>
 #endif
 

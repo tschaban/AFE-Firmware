@@ -1,0 +1,144 @@
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
+
+/* Initializing sensor */
+void initalizeSensor() {
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  if (Device.configuration.noOfDS18B20s > 0) {
+    Sensor.begin();
+  }
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  if (Device.configuration.isDHT) {
+    AFEDataAccess Data;
+    DH configuration = Data.getSensorConfiguration();
+
+    dht.begin(configuration.gpio,
+              (uint8_t)configuration.type == 1
+                  ? DHT11
+                  : configuration.type == 2 ? DHT21 : DHT22,
+              dht_wrapper);
+  }
+#endif
+}
+
+/* Main code for processing sesnor */
+void mainSensor() {
+#if defined(AFE_CONFIG_HARDWARE_DS18B20)
+  if (Device.configuration.isDS18B20)
+#elif defined(AFE_CONFIG_HARDWARE_DHT)
+  if (Device.configuration.isDHT)
+#endif
+  {
+    /* Sensor: listener */
+    Sensor.listener();
+    if (Sensor.isReady()) {
+      unsigned long idx = 0;
+
+      temperature = Sensor.getTemperature();
+
+/* Thermostat */
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+        if (Device.configuration.isRelay[i]) {
+
+          /* Thermostat listener */
+          Relay[i].Thermostat.listener(temperature);
+
+          /* Relay control by thermostat code */
+          if (Relay[i].Thermostat.isReady()) {
+            if (Relay[i].Thermostat.getRelayState() == AFE_RELAY_ON) {
+              Relay[i].on();
+            } else {
+              Relay[i].off();
+            }
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          }
+        }
+      }
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+        if (Device.configuration.isRelay[i]) {
+
+          /* Thermal Protection listener */
+          Relay[i].ThermalProtector.listener(temperature);
+
+          /* Checking if relay should be switched off based on device
+           * thermal protection */
+          if (Relay[i].get() == AFE_RELAY_ON &&
+              Relay[i].ThermalProtector.protectionOn()) {
+            Relay[i].off();
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          }
+        }
+      }
+#endif
+
+      /* Publishing temperature to MQTT Broker and Domoticz if enabled */
+      MQTTPublishTemperature(temperature);
+
+#if defined(T1_CONFIG)
+      idx = Sensor.getDomoticzIDX();
+#elif (defined(T2_CONFIG) || defined(T5_CONFIG))
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE);
+#endif
+
+      DomoticzPublishTemperature(idx, temperature);
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      humidity = Sensor.getHumidity();
+
+/* Humidistat */
+#if !defined(T5_CONFIG)
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
+        if (Device.configuration.isRelay[i]) {
+
+          /* Humiditstat listener */
+          Relay[i].Humidistat.listener(humidity);
+
+          /* Relay control by thermostat code */
+          if (Relay[i].Humidistat.isReady()) {
+            if (Relay[i].Humidistat.getRelayState() == AFE_RELAY_ON) {
+              Relay[i].on();
+            } else {
+              Relay[i].off();
+            }
+            MQTTPublishRelayState(i);
+            DomoticzPublishRelayState(i);
+          }
+        }
+      }
+#endif
+
+#ifdef AFE_CONFIG_HUMIDITY
+      /* Publishing temperature to MQTT Broker and Domoticz if enabled */
+      MQTTPublishHumidity(humidity);
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_HUMIDITY);
+      DomoticzPublishHumidity(idx, humidity);
+#endif
+
+#if (defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY))
+      idx = Sensor.getDomoticzIDX(IDX_TYPE_TEMPERATURE_AND_HUMIDITY);
+      DomoticzPublishTemperatureAndHumidity(idx, temperature, humidity);
+      if (Sensor.publishHeatIndex()) {
+        MQTTPublishHeatIndex(Sensor.getHeatIndex());
+      }
+      if (Sensor.publishDewPoint()) {
+        MQTTPublishDewPoint(Sensor.getDewPoint());
+      }
+#endif
+
+#endif
+    }
+  }
+}
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void dht_wrapper() { dht.isrCallback(); }
+#endif
+
+#endif

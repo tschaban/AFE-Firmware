@@ -39,6 +39,22 @@ recaptchacontact:
 
 ---
 
+### AFE Firmware T1: Włącznik WiFi z czujnikami DS18B20
+* Wersja obsługująca do czterech przekaźników oraz do ośmiu czujników D18B20 z termostatem oraz zabezieczeniem termicznym
+* Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t1-wlacznik-i-ds18b20) dotyczące AFE Firmware T1
+* Paczka do ściągnięcia 
+	* zawiera wersje 1Mb oraz 4Mb
+	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+
+
+##### [Pobierz najnowszą wersję 2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
+
+**Poprzednie wersje**
+* Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t1-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t1-esp8285-1mb/?target=_blank)
+
+---
+
 ### AFE Firmware T5: Sterowanie kontrolerem bramy/drzwi/furtki
 * Sterowanie max dwoma bramami, furtkami oraz monitorowanie stanu otwarcia bramy z wykorzystaniem czujników magnetycznych
 * Idealnie pasuje do urządzeń jak [Sterowniki Furtki iECS](https://www.smartnydom.pl/sterownik-bramy-wersja-v2/)
@@ -71,9 +87,11 @@ recaptchacontact:
 	* pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
-##### [Pobierz najnowszą wersję 2.2.2](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-2/?target=_blank)
+##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-0/?target=_blank)
+* Wersja [2.2.2](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-2/?target=_blank)
 * Wersja [2.2.1](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-1/?target=_blank)
 * Wersja [2.2.0](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-0/?target=_blank)
 * Wersja [2.1.0](https://www.smartnydom.pl/download/afe-firmware-t6-2-1-0/?target=_blank)

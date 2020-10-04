@@ -8,17 +8,17 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
   configuration = _configuration;
 
 #if defined(DEBUG)
-  Serial << endl << "INFO: Sensor type: BME280";
+  Serial << endl << F("INFO: Sensor type: BME280");
 #endif
 
   if (configuration->i2cAddress != 0) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Setting I2C: SDA:" << I2C->SDA << ", SCL:" << I2C->SCL;
+    Serial << endl << F("INFO: Setting I2C: SDA:") << I2C->SDA << F(", SCL:") << I2C->SCL;
 #endif
     Wire.begin(I2C->SDA,I2C->SCL);
 
 #ifdef DEBUG
-    Serial << endl << "INFO: Address: 0x" << _HEX(configuration->i2cAddress);
+    Serial << endl << F("INFO: Address: 0x") << _HEX(configuration->i2cAddress);
 #endif
     if (!bme.begin(configuration->i2cAddress,&Wire)) {
       return false;
@@ -32,7 +32,7 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
     }
   } else {
 #ifdef DEBUG
-    Serial << endl << "ERROR: Address not set";
+    Serial << endl << F("ERROR: Address not set");
 #endif
     return false;
   }
@@ -41,7 +41,7 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 boolean AFESensorBME280::read() {
 
 #ifdef DEBUG
-  Serial << endl << "INFO :Sensor: BME280";
+  Serial << endl << F("INFO :Sensor: BME280");
 #endif
 
   bme.takeForcedMeasurement();

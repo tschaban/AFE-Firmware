@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 
 #ifndef _AFE_Sensor_DHT_h
 #define _AFE_Sensor_DHT_h

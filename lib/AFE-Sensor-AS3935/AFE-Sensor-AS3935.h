@@ -11,9 +11,8 @@
 
 #include <AFE-Data-Access.h>
 #include <AFE-I2C-Scanner.h>
-#include <SparkFun_AS3935.h>
-#include <Wire.h>
 
+#include <AS3935.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -22,13 +21,15 @@
 class AFESensorAS3935 {
 
 private:
-  SparkFun_AS3935 AS3935Sensor;
+  AS3935Sensor AS3935LightingSensor;
 
   boolean ready = false;
-  void increaseNoiseLevel();
+  
 
 public:
   AS3935 configuration;
+
+  uint8_t test = 0;
 
   /* Stories information about the distance to the storm */
   uint8_t distance;

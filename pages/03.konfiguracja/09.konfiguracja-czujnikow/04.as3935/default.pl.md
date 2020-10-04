@@ -12,6 +12,9 @@ recaptchacontact:
 
 !!!! Obsługa czujnika dostępna jest w [wersji PRO AFE Firmware](/postawowe-informacje/wersja-pro).
 
+!! Obsługa czujnika jest w fazie experymentalnej i jak na razie jest sporo problemów, żeby go uruchomić.. [Wątek](https://www.smartnydom.pl/forum/wszystko-o-sprzecie/podlaczenie-czujnika-as3935-z-esp8266-sprwadzone-dzialajace/paged/2/#post-14555) poświęcony aktualnemu stanowi pracy nad jego obsługą.
+
+
 **AS3935** to czujnik wykrywający pioruny oraz potrafiący oszacować odległość od czoła burzy w promieniu do 40 km. 
 
 ---
