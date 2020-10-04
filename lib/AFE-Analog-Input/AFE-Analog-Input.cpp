@@ -13,7 +13,7 @@ void AFEAnalogInput::begin() {
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 #endif
 

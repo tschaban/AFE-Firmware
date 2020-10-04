@@ -1,54 +1,69 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #ifndef _AFE_Sensor_DS18B20_h
 #define _AFE_Sensor_DS18B20_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
 
 #include <AFE-Data-Access.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
 class AFESensorDS18B20 {
 
 private:
-  DS18B20 configuration;
-  float currentTemperature = -127;
-  boolean ready = false;
-  unsigned long startTime = 0;
+  AFEDataAccess *Data;
+  OneWire WireBUS;
+  DallasTemperature Sensor;
   boolean _initialized = false;
+  unsigned long startTime = 0;
+  unsigned long readTimeOut = 0;
+  float currentTemperature = DEVICE_DISCONNECTED_C;
 
 public:
-  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
+  DS18B20 configuration;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   AFESensorDS18B20();
 
-  void begin();
+  void begin(AFEDataAccess *, uint8_t id);
 
-  /* Get current temp in Celsius (default) possible options:
-     - UNIT_CELCIUS
-    - UNIT_FAHRENHEIT
-  */
+  /* Read and returns current temperature from the sensor */
+  float getCurrentTemperature();
 
-  // @TODO I think reading temp should be made in the listener, issue to solve
-  // how to get temperature but publish only changes
+  /* Return temperature stored in the buffer, it's the latest */
   float getTemperature();
-
-  float getLatestTemperature();
-
-  boolean isReady();
 
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
-  void listener();
+  boolean listener();
 
+  uint8_t scan(uint8_t gpio, DS18B20Addresses &addresses);
+  /* Converts DeviceAddress to Char */
+  void addressToChar(DeviceAddress &address, char *addressString);
+  /* Converts Char to DeviceAddress */
+  void addressToInt(char *addressString, DeviceAddress &address);
+  /* Returns {0,0,0,0,0,0,0,0} Device address */
+  void addressNULL(DeviceAddress &address);
+
+  /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Return relay IDX in Domoticz */
   unsigned long getDomoticzIDX();
+#endif
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+#endif // _AFE_Sensor_DS18B20_h

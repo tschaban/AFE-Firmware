@@ -3,11 +3,9 @@
 #ifndef _AFE_LED_h
 #define _AFE_LED_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_LED
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -28,12 +26,7 @@ private:
 public:
   /* Constructor */
   AFELED();
-
-  /* Constructor with GPIO init. GPIO is GPIO to where LED is connected to */
-  AFELED(uint8_t id);
-
-  /* Constructor: gpio is GPIO to where LED is connected to */
-  void begin(uint8_t id);
+  boolean begin(AFEDataAccess *, uint8_t id);
 
   /* Turns on LED */
   void on();
@@ -63,4 +56,5 @@ public:
   void loop();
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
+#endif // _AFE_LED_h

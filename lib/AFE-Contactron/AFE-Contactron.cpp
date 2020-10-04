@@ -19,8 +19,8 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
-    mqttStateTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif
 

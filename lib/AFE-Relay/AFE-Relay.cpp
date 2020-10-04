@@ -2,50 +2,39 @@
 
 #include "AFE-Relay.h"
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
 AFERelay::AFERelay() {}
 
-AFERelay::AFERelay(uint8_t id) { begin(id); }
-
-void AFERelay::begin(uint8_t id) {
+void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
   _id = id;
-   Data.getConfiguration(_id,&configuration);
+  _Data->getConfiguration(_id, &configuration);
 
   pinMode(configuration.gpio, OUTPUT);
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  /* Initialzing Thermostat functionality for a relay */
-  Thermostat.begin(configuration.thermostat);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  /* Initialzing thermal protection functionality for a relay */
-  ThermalProtection.begin(configuration.thermalProtection);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  Humidistat.begin(configuration.humidistat);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Led.begin(configuration.ledID);
-  }
-#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Defining get and state MQTT Topics */
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
-    mqttStateTopic[0] = '\0';
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    // @TODO this code doesn't check if the LED is actually set in Device config
+    // https://github.com/tschaban/AFE-Firmware/issues/606
+    Led.begin(_Data, configuration.ledID);
+  }
+
+#endif
 }
 
 byte AFERelay::get() {
@@ -56,7 +45,8 @@ byte AFERelay::get() {
 void AFERelay::on(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
+  Serial << endl
+         << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_OFF) {
@@ -74,10 +64,10 @@ void AFERelay::on(boolean invert) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data.saveRelayState(_id, AFE_RELAY_ON);
+    Data->saveRelayState(_id, AFE_RELAY_ON);
   };
 #else
-  Data.saveRelayState(_id, AFE_RELAY_ON);
+  Data->saveRelayState(_id, AFE_RELAY_ON);
 #endif
 }
 
@@ -85,7 +75,8 @@ void AFERelay::on(boolean invert) {
 void AFERelay::off(boolean invert) {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
+  Serial << endl
+         << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
 #endif
 
   if (get() == AFE_RELAY_ON) {
@@ -102,10 +93,10 @@ void AFERelay::off(boolean invert) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data.saveRelayState(_id, AFE_RELAY_OFF);
+    Data->saveRelayState(_id, AFE_RELAY_OFF);
   };
 #else
-  Data.saveRelayState(_id, AFE_RELAY_OFF);
+  Data->saveRelayState(_id, AFE_RELAY_OFF);
 #endif
 }
 
@@ -141,13 +132,13 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 2) {
     on();
   } else if (option == 3) {
-    Data.getRelayState(_id) == AFE_RELAY_ON ? on() : off();
+    Data->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
   } else if (option == 4) {
-    Data.getRelayState(_id) == AFE_RELAY_ON ? off() : on();
+    Data->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
   }
 }
 
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 boolean AFERelay::autoTurnOff(boolean invert) {
   if (configuration.timeToOff > 0 && ((invert && get() == AFE_RELAY_OFF) ||
                                       (!invert && get() == AFE_RELAY_ON)) &&
@@ -180,3 +171,5 @@ void AFERelay::setTimerUnitToSeconds(boolean value) {
   timerUnitInSeconds = value;
 }
 #endif
+
+#endif // AFE_CONFIG_HARDWARE_RELAY

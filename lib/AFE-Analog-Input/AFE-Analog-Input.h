@@ -3,11 +3,9 @@
 #ifndef _AFE_Sensor_ADC_VCC_h
 #define _AFE_Sensor_ADC_VCC_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
 #include <AFE-Data-Access.h>
 
@@ -62,4 +60,5 @@ public:
 
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // _AFE_Sensor_ADC_VCC_h
