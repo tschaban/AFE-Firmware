@@ -8,7 +8,7 @@ recaptchacontact:
 **Firmware umożliwia**
 
 * sterowanie bezprzewodowo do czterech urządzeń / układów elektrycznych
-* obsługa do ośmiu czujników DS18B20
+* obsługę do ośmiu czujników DS18B20
 
 **Sprzęt:**
 * ESP8286/8285
@@ -39,9 +39,6 @@ recaptchacontact:
 * Konfiguracja przez przeglądarkę w języku PL lub EN
 * Możliwość nadania stałego adresu IP dla urządzenia
 * Aktualizacja oprogramowania przez przeglądarkę
-
-
-!! Wersja 2.0 nie obsługuje ESP8266 1MB, ESP8285 ze względu na ograniczone rozmiary pamięci Flash. Jest możliwość wgrania AFE T6 2.x do ESP z rozmiarem pamięći 1MB natomiast nie będzie możliwa aktualizacja firmware przez przeglądarkę www
 
 
 
