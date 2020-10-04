@@ -743,7 +743,7 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorDS18B20 *Sensor) {
 boolean AFEAPIMQTTDomoticz::publishDS18B20SensorData(uint8_t id) {
   if (enabled) {
     if (_DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
-      char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
+      char json[AFE_CONFIG_API_JSON_DS18B20_COMMAND_LENGTH];
       char value[9];
       sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
       generateDeviceValue(json, _DS18B20Sensor[id]->configuration.domoticz.idx,

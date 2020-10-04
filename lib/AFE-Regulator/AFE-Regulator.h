@@ -7,12 +7,14 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #include <AFE-Data-Access.h>
+#include <AFE-Relay.h>
 
 class AFERegulator {
 
 private:
   boolean ready = false;
   AFEDataAccess *_Data;
+  AFERelay *_Relay;
   uint8_t _id;
 
   /* Method enables / disables regulator */
@@ -22,7 +24,7 @@ public:
   REGULATOR configuration;
   /* Keeps what should be the state of controlled device: false = off, true =
  * on */
-  boolean deviceState;
+  byte deviceState;
   boolean initialized = false;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -36,10 +38,11 @@ public:
   /* Method initialize regulator */
   void begin(AFEDataAccess *, uint8_t id);
 
-  /** Set the initial state of a regulator. It must be executed to start the
-   * regulator
-  */
-  void setInitialState(boolean state);
+  /* Add reference to the global instance of Relay class. Required for regulator
+   * to work. It's implemented like that to save the device resources. More
+   * clean would be to initialize it directly within this class. For later
+   * consideration */
+  void addRelayReference(AFERelay *);
 
   /* Method rises event if thermostat themperatures have been exceeded */
   boolean listener(float value);

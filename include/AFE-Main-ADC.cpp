@@ -2,8 +2,6 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
-
-
 /* ---------Headers ---------*/
 
 void analogInputEventsListener(void);
@@ -32,4 +30,5 @@ void analogInputEventsListener(void) {
     }
   }
 }
-#endif
+
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC

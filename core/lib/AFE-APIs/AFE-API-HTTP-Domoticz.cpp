@@ -421,7 +421,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorDS18B20 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishDS18B20SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled && _DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[9]; // @TODO CHeck the max size
+    char value[9]; //Max size: -999.999
     sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
     sendCustomSensorCommand(_DS18B20Sensor[id]->configuration.domoticz.idx,
                             value);

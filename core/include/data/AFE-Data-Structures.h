@@ -57,9 +57,13 @@
 #include <AFE-PIR-Sensor-Structure.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#include <AFE-ADC-INPUT-Structure.h>
+#endif 
+
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
  * excluded */
-#include <AFE-ADC-INPUT-Structure.h>
+
 #include <AFE-AS3935-Sensor-Structure.h>
 #include <AFE-BH1750-Sensor-Structure.h>
 #include <AFE-BMEX80-Sensor-Structure.h>

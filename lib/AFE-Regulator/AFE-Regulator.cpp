@@ -25,12 +25,14 @@ void AFERegulator::begin(AFEDataAccess *Data, uint8_t id) {
     mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
 }
 
-void AFERegulator::setInitialState(boolean state) {
-  deviceState = state;
+void AFERegulator::addRelayReference(AFERelay *Relay) {
+  _Relay = Relay;
   initialized = true;
+#ifdef DEBUG
+    Serial << endl << "INFO: Regulator initialized";
+#endif  
 }
 
 boolean AFERegulator::listener(float value) {
@@ -38,15 +40,15 @@ boolean AFERegulator::listener(float value) {
 #ifdef DEBUG
     Serial << endl << "INFO: Executing regulator check ...";
 #endif
-
+    deviceState = _Relay->get();
     if (configuration.turnOnAbove && value > configuration.turnOn) {
-      deviceState = true;
+      deviceState = AFE_RELAY_ON;
     } else if (!configuration.turnOnAbove && value < configuration.turnOn) {
-      deviceState = true;
+      deviceState = AFE_RELAY_ON;
     } else if (configuration.turnOffAbove && value > configuration.turnOff) {
-      deviceState = false;
+      deviceState = AFE_RELAY_OFF;
     } else if (!configuration.turnOffAbove && value < configuration.turnOff) {
-      deviceState = false;
+      deviceState = AFE_RELAY_OFF;
     }
     return true;
   } else {

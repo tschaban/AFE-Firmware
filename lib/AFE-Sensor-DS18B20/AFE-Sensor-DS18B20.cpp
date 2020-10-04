@@ -52,10 +52,8 @@ float AFESensorDS18B20::getCurrentTemperature() {
   float temperature = DEVICE_DISCONNECTED_C;
   if (_initialized) {
 #ifdef DEBUG
-    char addressTxt[17];
-    addressToChar(configuration.address, addressTxt);
     Serial << endl
-           << "INFO: Reading temperature from DS18B20[" << addressTxt << "] ";
+           << "INFO: Reading temperature from DS18B20[" << configuration.name << "] ";
 #endif
 
     if (readTimeOut == 0) {
@@ -222,3 +220,4 @@ unsigned long AFESensorDS18B20::getDomoticzIDX() {
 #endif
 
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+

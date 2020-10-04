@@ -30,6 +30,7 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
     // @TODO this code doesn't check if the LED is actually set in Device config
+    // https://github.com/tschaban/AFE-Firmware/issues/606
     Led.begin(_Data, configuration.ledID);
   }
 
