@@ -8,7 +8,7 @@
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Max size of the configuration HTML page */
-#define AFE_MAX_PAGE_SIZE 7800
+#define AFE_MAX_PAGE_SIZE 12000
 
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
@@ -48,8 +48,13 @@
 /* Default time to auto-logout from config panel: in minutes */
 #define AFE_AUTOLOGOFF_DEFAULT_TIME 10
 
-/* Number of GPIOs available in ESP8266, used in the conjunction with AFE-Site-components.h table */
+/* Number of GPIOs available in ESP8266, used in the conjunction with AFE-Site-components.h table
+   AFE_CONFIG_USE_MAX_HARDWARE is set in platformio.ini */
+#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+#define AFE_NUMBER_OF_GPIOS 13
+#else
 #define AFE_NUMBER_OF_GPIOS 10
+#endif
 
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -192,7 +197,7 @@
 
 /* ---- Basic Switch + DS18B20 ---- */
 #elif defined(T1_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.0"
+#define AFE_FIRMWARE_VERSION "2.3.1"
 #define AFE_FIRMWARE_TYPE 1
 
 /* File system used */
@@ -211,10 +216,18 @@
 #define AFE_CONFIG_HARDWARE_LED
 
 /* Max number of hardware items, per AFE version */
+#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 8
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 8
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 8
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20 8
+#else
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 4
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 5
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20 8
+#endif
+
 
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES
