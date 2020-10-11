@@ -50,7 +50,7 @@ recaptchacontact:
 
 !!! Uwagi dotyczące wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłaczanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
-##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-1/?target=_blank)
 
 **Poprzednie wersje**
 ** Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
