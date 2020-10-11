@@ -2726,7 +2726,14 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
                            : page.replace("{{f.Pro}}", L_NO);
   }
 
-  page.replace("{{f.version}}", Firmware.version);
+
+#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+  char _version[sizeof(Firmware.version)+6];
+  sprintf(_version, "%s %s", Firmware.version,"MEGA");
+  page.replace("{{f.version}}", _version);
+#else
+  page.replace("{{f.version}}", Firmware.version);  
+#endif
   page.replace("{{f.type}}", String(Firmware.type));
 
   page.concat("</body></html>");

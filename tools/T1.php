@@ -4,8 +4,8 @@
 /* Set this before run */
 
 $type = "1";
-$version = "2.3.0";
-$language = "PL";
+$version = "2.3.1";
+$language = "EN";
 
 /******************/
 
@@ -52,6 +52,13 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_1m-generic-mega/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.MEGA";
+$sourceFolder[$index]["size"] = "1Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
+
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266";
 $sourceFolder[$index]["size"] = "4Mb";
@@ -63,6 +70,13 @@ $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/b
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "4Mb";
 $sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
+
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-mega/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.MEGA";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
@@ -133,6 +147,13 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_1m-generic-domoticz-mega/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.MEGA";
+$sourceFolder[$index]["size"] = "1Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
+
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266";
 $sourceFolder[$index]["size"] = "4Mb";
@@ -144,6 +165,13 @@ $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/b
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "4Mb";
 $sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
+
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic-domoticz-mega/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.MEGA";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
