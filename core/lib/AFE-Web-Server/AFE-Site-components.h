@@ -87,7 +87,11 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}&i={{item.id}}\">&#8227; "
     "{{item.title}}: {{item.id.display}}</a></li>";
 
+#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
+#else
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =
@@ -126,13 +130,15 @@ const char HTTP_SITE_RESET_TO_DEFAULTS[] PROGMEM =
 
 const char HTTP_SITE_POST_RESET[] PROGMEM =
     "<fieldset><p class=\"cm\">{{L_UPGRADE_IN_PROGRESS}}</p><p "
-    "class=\"cm\">{{L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: </p><a "
+    "class=\"cm\">{{L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: "
+    "</p><a "
     "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset>";
 
 const char HTTP_SITE_UPGRADE[] PROGMEM =
     "<fieldset><form method=\"post\" action=\"upgrade?o=21\" "
     "enctype=\"multipart/form-data\"><div "
-    "class=\"cf\"><label>{{L_UPGRADE_SELECT_FIRMWARE}}</label><input class=\"bs\" "
+    "class=\"cf\"><label>{{L_UPGRADE_SELECT_FIRMWARE}}</label><input "
+    "class=\"bs\" "
     "name=\"update\" type=\"file\" accept=\".bin\"></div><p "
     "class=\"cm\">{{L_UPGRADE_INFO}}.</p><button type=\"submit\" class=\"b "
     "be\">{{L_UPGRADE}}</button></form></fieldset>";
@@ -142,8 +148,10 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "<div class=\"cf\"><label>{{L_REGULATOR_TURN_IF}}</label><select "
     "name=\"{{item.name}}\"><option "
     "value=\"0\"{{item.selected-0}}>{{L_REGULATOR_LOWER}}</option><option "
-    "value=\"1\"{{item.selected-1}}>{{L_REGULATOR_HIGHER}}</option></select><input "
-    "name=\"{{item.input.name}}\" type=\"number\" value=\"{{item.value}}\" step=\"any\"></div>";
+    "value=\"1\"{{item.selected-1}}>{{L_REGULATOR_HIGHER}}</option></"
+    "select><input "
+    "name=\"{{item.input.name}}\" type=\"number\" value=\"{{item.value}}\" "
+    "step=\"any\"></div>";
 #endif
 
 #endif

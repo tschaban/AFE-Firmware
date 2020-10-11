@@ -31,9 +31,9 @@ recaptchacontact:
 ##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-2-0/?target=_blank)
 
 **Poprzednie wersje**
-* [Wersje 2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1/?target=_blank)
-* [Wersje 2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
-* [Wersje 2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
+* Wersja [2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1/?target=_blank)
+* Wersja [2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
+* Wersja [2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
 * Wersje 2.0.0 - 2.0.1: [Archiwum](https://drive.google.com/drive/folders/1dKf5vOTjD53RPvnlTQLNaxTWL-N3hKNC/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t0-esp8266-1mb/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t0-esp8285-1mb/?target=_blank)
 
@@ -46,11 +46,14 @@ recaptchacontact:
 * Paczka do ściągnięcia 
 	* zawiera wersje 1Mb oraz 4Mb
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
 
+!!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
-##### [Pobierz najnowszą wersję 2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-1/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t1-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t1-esp8285-1mb/?target=_blank)
 
 ---
