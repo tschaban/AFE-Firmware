@@ -18,6 +18,8 @@ recaptchacontact:
 * do 8 czujników DS18B20
 * 1 wejście do przetwarzania sygnałów analogowo-cyfrowych - [w wersji PRO](/postawowe-informacje/wersja-pro)
 
+! W wersji MEGA, dostępnych jest 8 przkaźników, 8 przycisków oraz diod LED. Natomiast nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
+
 **API**
 * HTTP
 * MQTT
