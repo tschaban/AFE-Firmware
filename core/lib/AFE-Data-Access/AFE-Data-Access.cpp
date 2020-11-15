@@ -1583,7 +1583,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
   char fileName[17];
-  sprintf(fileName,AFE_FILE_RELAY_CONFIGURATION, id);
+  sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
@@ -1612,12 +1612,21 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       configuration->state.MQTTConnected =
           root["stateMQTTConnected"] |
           AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
+
+      configuration->triggerSignal =
+          root["triggerSignal"] |
+          AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
       configuration->ledID = root["ledID"];
+#endif
+
 #ifdef DEBUG
 
       Serial << endl
@@ -1667,7 +1676,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     root["timeToOff"] = configuration->timeToOff;
     root["statePowerOn"] = configuration->state.powerOn;
     root["stateMQTTConnected"] = configuration->state.MQTTConnected;
+    root["triggerSignal"] = configuration->triggerSignal;
+#ifdef AFE_CONFIG_HARDWARE_LED
     root["ledID"] = configuration->ledID;
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -1700,9 +1712,11 @@ void AFEDataAccess::createRelayConfigurationFile() {
 
   RELAY RelayConfiguration;
   uint8_t index = 0;
-  /* Relay config */
-
+/* Relay config */
+#ifdef AFE_CONFIG_HARDWARE_LED
   RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -1717,6 +1731,9 @@ void AFEDataAccess::createRelayConfigurationFile() {
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
 #endif
 
+  RelayConfiguration.triggerSignal =
+      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
 /* SONOFF Basic v1 */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
@@ -1724,7 +1741,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF 4CH */
 #elif defined(AFE_DEVICE_SONOFF_4CH)
@@ -1733,26 +1750,26 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
-  saveConfiguration(1, RelayConfiguration);
+  saveConfiguration(1, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_2_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_2_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(2, false);
 #endif
-  saveConfiguration(2, RelayConfiguration);
+  saveConfiguration(2, &RelayConfiguration);
 
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_3_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_3_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(3, false);
 #endif
-  saveConfiguration(3, RelayConfiguration);
+  saveConfiguration(3, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 1G */
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
@@ -1761,7 +1778,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 2G */
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
@@ -1770,13 +1787,13 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
-  saveConfiguration(1, RelayConfiguration);
+  saveConfiguration(1, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 3G */
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_3G)
@@ -1785,19 +1802,19 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(1, false);
 #endif
-  saveConfiguration(1, RelayConfiguration);
+  saveConfiguration(1, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_2_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_2_DEFAULT_NAME);
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(2, false);
 #endif
-  saveConfiguration(2, RelayConfiguration);
+  saveConfiguration(2, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* Shelly-1 */
 #elif defined(AFE_DEVICE_SHELLY_1)
@@ -1806,20 +1823,20 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
   saveRelayState(0, false);
 #endif
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(AFE_DEVICE_iECSv20)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
   saveRelayState(1, false);
-  saveConfiguration(1, RelayConfiguration);
+  saveConfiguration(1, &RelayConfiguration);
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_1_DEFAULT_NAME);
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
   saveRelayState(0, false);
-  saveConfiguration(0, RelayConfiguration);
+  saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 #elif defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
@@ -4547,8 +4564,8 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ")
-           << AFE_FILE_RAINMETER_SENSOR_DATA << F(" not opened");
+           << F("ERROR: Configuration file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
+           << F(" not opened");
   }
 #endif
 }

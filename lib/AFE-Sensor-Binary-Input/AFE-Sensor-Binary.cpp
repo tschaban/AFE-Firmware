@@ -2,6 +2,8 @@
 
 #include "AFE-Sensor-Binary.h"
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 AFESensorBinary::AFESensorBinary(){};
 
 void AFESensorBinary::begin(uint16_t _bouncing) {
@@ -38,3 +40,5 @@ void AFESensorBinary::get(uint32_t &noOfImpulses, uint32_t &duration) {
          << F(", during: ") << (duration / 1000) << F("sec.");
 #endif
 }
+
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

@@ -3,11 +3,9 @@
 #ifndef _AFE_Sensor_Binary_h
 #define _AFE_Sensor_Binary_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -23,13 +21,13 @@
 class AFESensorBinary {
 
 public:
-  uint16_t bouncing = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
+  uint16_t bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
 
   /* Constructors */
   AFESensorBinary();
 
   /* Init switch */
-  void begin(uint16_t _bouncing = AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING);
+  void begin(uint16_t _bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING);
 
   void newImpulse(void);
   void get(uint32_t &noOfImpulses, uint32_t &duration);
@@ -47,4 +45,5 @@ private:
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#endif // _AFE_Sensor_Binary_h

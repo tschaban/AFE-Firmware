@@ -498,6 +498,8 @@ void AFESitesGenerator::siteDevice(String &page) {
 
   closeSection(page);
 
+
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
   /* Additional functionalities */
   openSection(page, L_DEVICE_ADDITIONAL_FUNCTIONALITIES, "");
 
@@ -512,8 +514,8 @@ void AFESitesGenerator::siteDevice(String &page) {
                         Device->configuration.noOfThermalProtectors, "tp",
                         L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS);
 #endif
-
   closeSection(page);
+#endif // defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
 
   /* Section: APIs */
   openSection(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
@@ -775,6 +777,15 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 #endif
 
   addListOfGPIOs(page, "g", configuration.gpio);
+
+  addSelectFormItemOpen(page, "ts", L_RELAY_TRIGGERED);
+  addSelectOptionFormItem(
+      page, L_RELAY_TRIGGERED_HIGH_SIGNAL, "1",
+      configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH);
+  addSelectOptionFormItem(page, L_RELAY_TRIGGERED_LOW_SIGNAL, "0",
+                          configuration.triggerSignal ==
+                              AFE_RELAY_SIGNAL_TRIGGER_LOW);
+  addSelectFormItemClose(page);
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not
@@ -1202,7 +1213,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
 
   /* Item: Sensor address */
-  
+
   numberOfFoundSensors = _Sensor.scan(configuration.gpio, _addresses);
 
   if (numberOfFoundSensors > 0) {
@@ -2666,7 +2677,8 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
       "<fieldset><form method=\"post\"><div class=\"cf\"><input name=\"p\" "
       "type=\"password\" "
       "placeholder=\"" L_PASSWORD
-      "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" value=\"" L_INDEX_NORMAL_MODE "\" formaction=\"/?o=0&i=");
+      "\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "
+      "value=\"" L_INDEX_NORMAL_MODE "\" formaction=\"/?o=0&i=");
   page += AFE_MODE_CONFIGURATION;
   page.concat("\" /> <input type=\"submit\" class=\"b be\" "
               "value=\"" L_INDEX_HOTSPOT_MODE "\" formaction=\"/?o=0&i=");
@@ -2726,13 +2738,12 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
                            : page.replace("{{f.Pro}}", L_NO);
   }
 
-
 #ifdef AFE_CONFIG_USE_MAX_HARDWARE
-  char _version[sizeof(Firmware.version)+6];
-  sprintf(_version, "%s %s", Firmware.version,"MEGA");
+  char _version[sizeof(Firmware.version) + 6];
+  sprintf(_version, "%s %s", Firmware.version, "MEGA");
   page.replace("{{f.version}}", _version);
 #else
-  page.replace("{{f.version}}", Firmware.version);  
+  page.replace("{{f.version}}", Firmware.version);
 #endif
   page.replace("{{f.type}}", String(Firmware.type));
 

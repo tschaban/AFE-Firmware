@@ -55,17 +55,18 @@ public:
   byte get();
 
   /* Turns on relay */
-  void on(boolean invert = false);
+  void on();
 
   /* Turns off relay */
-  void off(boolean invert = false);
+  void off();
+
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   /* Methods automatically turns off/on relay */
-  boolean autoTurnOff(boolean invert = false);
+  boolean autoTurnOff();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME

@@ -38,25 +38,37 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
 }
 
 byte AFERelay::get() {
-  return digitalRead(configuration.gpio) == HIGH ? AFE_RELAY_ON : AFE_RELAY_OFF;
+  return digitalRead(configuration.gpio) == HIGH
+             ? (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                    ? AFE_RELAY_ON
+                    : AFE_RELAY_OFF)
+             : (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                    ? AFE_RELAY_OFF
+                    : AFE_RELAY_ON);
 }
 
 /* Set relay to ON */
-void AFERelay::on(boolean invert) {
-
+void AFERelay::on() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Relay: ON, inverted: ") << (invert ? F("YES") : F("NO"));
+         << "INFO: Relay: ON, Trigger by "
+         << (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                 ? "HIGH"
+                 : "LOW")
+         << " signal";
 #endif
 
   if (get() == AFE_RELAY_OFF) {
-    digitalWrite(configuration.gpio, HIGH);
+    digitalWrite(configuration.gpio,
+                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                     ? HIGH
+                     : LOW);
+
 #ifdef AFE_CONFIG_HARDWARE_LED
     Led.on();
 #endif
-    if (!invert &&
-        configuration.timeToOff >
-            0) { // Start counter if relay should be automatically turned off
+    if (configuration.timeToOff >
+        0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
   }
@@ -72,20 +84,26 @@ void AFERelay::on(boolean invert) {
 }
 
 /* Set relay to OFF */
-void AFERelay::off(boolean invert) {
-
+void AFERelay::off() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Relay: OFF, inverted: ") << (invert ? F("YES") : F("NO"));
+         << "INFO: Relay: OFF, Trigger by "
+         << (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                 ? "HIGH"
+                 : "LOW")
+         << " signal";
 #endif
 
   if (get() == AFE_RELAY_ON) {
-    digitalWrite(configuration.gpio, LOW);
+    digitalWrite(configuration.gpio,
+                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                     ? LOW
+                     : HIGH);
+
 #ifdef AFE_CONFIG_HARDWARE_LED
     Led.off();
 #endif
-    if (invert &&
-        configuration.timeToOff >
+    if (configuration.timeToOff >
             0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
@@ -102,7 +120,7 @@ void AFERelay::off(boolean invert) {
 
 /* Toggle relay */
 void AFERelay::toggle() {
-  if (digitalRead(configuration.gpio) == LOW) {
+  if (get() == AFE_RELAY_OFF) {
     on();
   } else {
     off();
@@ -139,12 +157,12 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-boolean AFERelay::autoTurnOff(boolean invert) {
-  if (configuration.timeToOff > 0 && ((invert && get() == AFE_RELAY_OFF) ||
-                                      (!invert && get() == AFE_RELAY_ON)) &&
+boolean AFERelay::autoTurnOff() {
+  if (configuration.timeToOff > 0 &&
       millis() - turnOffCounter >=
-          configuration.timeToOff * (timerUnitInSeconds ? 1000 : 1)) {
-    invert ? on(invert) : off(invert);
+          configuration.timeToOff * (timerUnitInSeconds ? 1000 : 1) &&
+      get() == AFE_RELAY_ON) {
+    off();
     return true;
   } else {
     return false;

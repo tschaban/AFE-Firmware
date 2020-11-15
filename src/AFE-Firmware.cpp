@@ -8,6 +8,7 @@ void setup() {
   delay(10);
 #endif
 
+
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -16,6 +17,12 @@ void setup() {
          << endl
          << F("INFO: All classes and global variables initialized") << endl
          << F("INFO: Initializing device") << endl;
+#endif
+
+// Erase all config
+ESP.eraseConfig();
+#ifdef DEBUG
+    Serial << F("INFO: ESP Config erased");
 #endif
 
   /* Initializing SPIFFS file system */
