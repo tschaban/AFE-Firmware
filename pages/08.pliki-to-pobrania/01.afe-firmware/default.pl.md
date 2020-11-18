@@ -28,9 +28,10 @@ recaptchacontact:
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
 
-##### [Pobierz najnowszą wersję 2.2.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-2-0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-4-0/)
 
 **Poprzednie wersje**
+* Wersja [2.2.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-2-0/?target=_blank)
 * Wersja [2.1.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-1-1/?target=_blank)
 * Wersja [2.1.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-1/?target=_blank)
 * Wersja [2.0.2](https://www.smartnydom.pl/download/afe-firmware-t0/?target=_blank)
