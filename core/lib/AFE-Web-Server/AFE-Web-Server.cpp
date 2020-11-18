@@ -1002,8 +1002,15 @@ void AFEWebServer::get(RELAY &data) {
                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_LED
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
                                             : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+
+data.triggerSignal =  server.arg("ts").length() > 0 ? server.arg("ts").toInt()
+                                            : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 

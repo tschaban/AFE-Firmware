@@ -181,6 +181,10 @@
 #define L_RELAY_SELECT_LED_4_RELAY "LED sygnalizujący stan przekaźnika"
 #define L_RELAY_MQTT_TOPIC "Temat MQTT sterujący przekaźnikiem"
 #define L_RELAY_SELECT_SENSOR "Wybierz czujnik"
+#define L_RELAY_TRIGGERED "Wyzwalany"
+#define L_RELAY_TRIGGERED_HIGH_SIGNAL "Sygnałem HIGH"
+#define L_RELAY_TRIGGERED_LOW_SIGNAL "Sygnałem LOW"
+
 
 /* Form: Thermal protection */
 #define L_THERMAL_PROTECTOR_ENABLED "Włączony przy uruchomieniu"

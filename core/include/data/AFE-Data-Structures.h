@@ -64,10 +64,21 @@
 /* @TODO BUG For unknown reason non T5 version can't be compiled if these are
  * excluded */
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-AS3935-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
 #include <AFE-BH1750-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 #include <AFE-BMEX80-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-HPMA115S0-Sensor-Structure.h>
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
 #include <AFE-SERIALPORT-Structure.h>

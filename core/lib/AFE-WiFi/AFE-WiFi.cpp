@@ -25,6 +25,12 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
   WiFi.hostname(Device->configuration.name);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  //WiFi.setOutputPower(10.0);
+  //WiFi.setPhyMode(WIFI_PHY_MODE_11B);
+#ifdef DEBUG
+  Serial << endl << "INFO: WiFi Phisical mode mode (1:B 2:G 3:N): " << WiFi.getPhyMode();
+#endif
+
   if (WiFiMode == AFE_MODE_ACCESS_POINT ||
       WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -74,6 +80,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
     }
 
     WiFi.persistent(false);
+    WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA);
   }

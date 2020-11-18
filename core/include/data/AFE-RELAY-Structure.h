@@ -17,7 +17,10 @@ struct RELAY {
   uint8_t gpio;
   char name[17];
   float timeToOff;
+ #ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t ledID;
+#endif
+  uint8_t triggerSignal;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

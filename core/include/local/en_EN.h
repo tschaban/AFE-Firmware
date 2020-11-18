@@ -179,6 +179,10 @@
 #define L_RELAY_SWITCH_OFF_ABOVE "Switch off above"
 #define L_RELAY_SELECT_LED_4_RELAY "Select LED informing about relay state"
 #define L_RELAY_MQTT_TOPIC "MQTT Topic to control the relay"
+#define L_RELAY_TRIGGERED "Triggered by"
+#define L_RELAY_TRIGGERED_HIGH_SIGNAL "HIGH Signal"
+#define L_RELAY_TRIGGERED_LOW_SIGNAL "LOW Signal"
+
 
 
 /* Form: Thermal protection */
@@ -194,7 +198,7 @@
 #define L_SWITCH_SYSTEM_BUTTON "System button"
 #define L_SWITCH_CONTROL_RELAY "Controlling only the relay"
 #define L_SWITCH_CONTROL_GATE "Controlling only the gate"
-#define L_SWITCH_RELAY_CONTROLLED "controls relay"
+#define L_SWITCH_RELAY_CONTROLLED "Controls relay"
 #define L_SWITCH_TYPE "Type"
 #define L_SWITCH_MONOSTABLE "Monostable"
 #define L_SWITCH_BISTABLE "Bistable"
