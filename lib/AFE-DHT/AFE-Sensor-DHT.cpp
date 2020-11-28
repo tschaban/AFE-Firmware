@@ -1,14 +1,13 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+#include "AFE-Sensor-DHT.h"
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
 
-#include "AFE-Sensor-DHT.h"
+AFESensorDHT::AFESensorDHT(){}
 
-AFESensorDHT::AFESensorDHT(){};
-
-boid AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
+void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Data = _Data;
-  Data->get(configuration, id);
+  Data->getConfiguration(id,&configuration);
   dht.begin(configuration.gpio, configuration.type);
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -37,7 +36,9 @@ float AFESensorDHT::getDewPoint() { return currentDewPoint; }
 
 float AFESensorDHT::getHeatIndex() { return currentHeatIndex; }
 
-void AFESensorDHT::listener() {
+boolean AFESensorDHT::listener() {
+
+  boolean _ready = false;
 
   if (_initialized) {
     unsigned long time = millis();
@@ -48,7 +49,7 @@ void AFESensorDHT::listener() {
 
     if (time - startTime >= configuration.interval * 1000) {
 
-      readResult = dht.acquireAndWait(1000);
+      boolean readResult = dht.acquireAndWait(1000);
 
       if (readResult == DHTLIB_OK) {
         float _temperature =
@@ -62,9 +63,9 @@ void AFESensorDHT::listener() {
         float _heatIndex =
             configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
                 ? dht.getHeatIndexCelsius()
-                : dht.getHeatIndexFahrenhei();
+                : dht.getHeatIndexFahrenheit();
 
-        boolean _ready = true;
+        _ready = true;
         if (configuration.sendOnlyChanges) {
           if (_temperature == currentTemperature &&
               _humidity == currentHumidity && _dewPoint == currentDewPoint &&
@@ -82,7 +83,7 @@ void AFESensorDHT::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000 << F("sec, "
+               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000 << F("sec, ")
                << F(", Temp: ") << currentTemperature
                << F(", Humi: ") << currentHumidity << F(", DewPoint: ") << currentDewPoint
                << F(", HeatIndex: ") << currentHeatIndex;
@@ -96,26 +97,15 @@ void AFESensorDHT::listener() {
       startTime = 0;
     }
   }
-}
 
-unsigned long AFESensorDHT::getDomoticzIDX(uint8_t type) {
-  unsigned long idx;
-  if (type == IDX_TYPE_TEMPERATURE) {
-    idx = configuration.temperatureIdx;
-  } else if (type == IDX_TYPE_HUMIDITY) {
-    idx = configuration.humidityIdx;
-  } else {
-    idx = configuration.temperatureAndHumidityIdx;
-  }
-  return idx;
+  return _ready;
 }
-
 
 void AFESensorDHT::getJSON(char *json) {
   sprintf(json, "{\"temperature\":{\"value\":%.3f,\"unit\":\"%s\"}}",
           currentTemperature,
-          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
+          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+                                                                         : "F");
 }
-
 
 #endif // AFE_CONFIG_HARDWARE_DHT
