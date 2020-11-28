@@ -1353,6 +1353,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 
       configuration->gpio = root["gpio"];
       configuration->changeToOppositeValue = root["changeToOppositeValue"];
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -1397,8 +1401,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_LED> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+
     root["gpio"] = configuration->gpio;
     root["changeToOppositeValue"] = configuration->changeToOppositeValue;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    JsonObject &mcp23017 = root.createNestedObject("mcp23017");
+    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["gpio"] = configuration->mcp23017.gpio;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1466,6 +1478,11 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.changeToOppositeValue = false;
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  LEDConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
 #ifdef DEBUG
@@ -1627,6 +1644,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       configuration->ledID = root["ledID"];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
+#endif
+
 #ifdef DEBUG
 
       Serial << endl
@@ -1686,6 +1708,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    JsonObject &mcp23017 = root.createNestedObject("mcp23017");
+    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["gpio"] = configuration->mcp23017.gpio;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1733,6 +1761,12 @@ void AFEDataAccess::createRelayConfigurationFile() {
 
   RelayConfiguration.triggerSignal =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  RelayConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 /* SONOFF Basic v1 */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -3453,7 +3487,6 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-
 void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3507,7 +3540,6 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3548,8 +3580,72 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
   }
 #endif
 }
+void AFEDataAccess::createSerialConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_UART_CONFIGURATION;
+#endif
+  SERIALPORT configuration;
+  configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
+  configuration.TXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
+  saveConfiguration(&configuration);
+}
+#endif
 
-void AFEDataAccess::createSerialConfigurationFile() {}
+#ifdef AFE_CONFIG_HARDWARE_I2C
+void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_I2C_CONFIGURATION
+         << F(" ... ");
+#endif
+
+  File configFile = SPIFFS.open(AFE_FILE_I2C_CONFIGURATION, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->SDA = root["SDA"];
+      configuration->SCL = root["SCL"];
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
+           << F(" not opened");
+  }
+#endif
+}
 
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 #ifdef DEBUG

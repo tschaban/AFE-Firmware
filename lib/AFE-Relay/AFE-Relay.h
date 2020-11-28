@@ -15,6 +15,11 @@
 #include <AFE-LED.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-I2C-Scanner.h>
+#include <Adafruit_MCP23017.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -96,6 +101,11 @@ private:
   unsigned long turnOffCounter = 0;
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   boolean timerUnitInSeconds = true;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  Adafruit_MCP23017 mcp;
+  boolean expanderUsed = false;
 #endif
 
   /* Method set relay state after power restore or connection to MQTT is

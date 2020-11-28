@@ -213,8 +213,9 @@ if (Device->configuration.noOfBMEX80s > 0 ||
     Device->configuration.noOfAS3935s > 0) {
 #endif
 
-  page.concat("<li class=\"itm\"><a href=\"\\?o=" AFE_CONFIG_SITE_I2C
-              "\">I2C</a></li>");
+  page.concat("<li class=\"itm\"><a href=\"\\?o=");
+  page.concat(AFE_CONFIG_SITE_I2C);
+  page.concat("\">I2C</a></li>");
 
 #ifdef T6_CONFIG
 }
@@ -498,8 +499,8 @@ void AFESitesGenerator::siteDevice(String &page) {
 
   closeSection(page);
 
-
-#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||                             \
+    defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
   /* Additional functionalities */
   openSection(page, L_DEVICE_ADDITIONAL_FUNCTIONALITIES, "");
 
@@ -515,7 +516,8 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS);
 #endif
   closeSection(page);
-#endif // defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
+#endif // defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||
+       // defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
 
   /* Section: APIs */
   openSection(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
@@ -735,8 +737,26 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   LED configuration;
   Data->getConfiguration(id, &configuration);
   sprintf(title, "LED: #%d", id + 1);
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  openSection(page, title, "LED może zostać podłączony bezpośrednio do GPIO "
+                           "lub przez ekspander MCP23017");
+#else
   openSection(page, title, "");
+#endif
+
   addListOfGPIOs(page, "g", configuration.gpio);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace(
+      "{{item.value}}",
+      "Podłączenie przez MCP23017 (GPIO powyżej musi zostac ustawione na BRAK");
+  addDeviceI2CAddressSelection(page, configuration.mcp23017.address);
+  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+  closeSection(page);
+  openSection(page, "Dodatkowe ustawienia", "");
+#endif
+
   addCheckboxFormItem(page, "w", L_LED_CHANGE_INDICATION, "1",
                       configuration.changeToOppositeValue);
   closeSection(page);
@@ -758,11 +778,9 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 
   char _number[9];
   char _text[23];
-  sprintf(_text, "%s #%d", L_RELAY, id + 1);
-
-  openSection(page, _text, "");
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
+/* Reading gate configuration */
   GATE gateConfiguration;
   boolean isGateRelay = false;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
@@ -776,12 +794,48 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   }
 #endif
 
+
+  sprintf(_text, "%s #%d", L_RELAY, id + 1);
+  openSection(page, _text, "");
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  /* Below code is conditioned for the Gate functionality only. It's not
+   * shown if the relay is assigned to the Gate */
+  if (!isGateRelay) {
+#endif
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                     configuration.name, "16");
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  }
+#endif
+
+
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  closeSection(page);
+  openSection(page, "Podłączenie", "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017");
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
   addListOfGPIOs(page, "g", configuration.gpio);
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace(
+      "{{item.value}}",
+      "Podłączenie przez expander MCP23017 (GPIO powyżej musi zostac ustawione na BRAK)");
+  addDeviceI2CAddressSelection(page, configuration.mcp23017.address);
+  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+
+  closeSection(page);
+  openSection(page, "Wyzwalanie przekaźnika", "");
+
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
   addSelectFormItemOpen(page, "ts", L_RELAY_TRIGGERED);
-  addSelectOptionFormItem(
-      page, L_RELAY_TRIGGERED_HIGH_SIGNAL, "1",
-      configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH);
+  addSelectOptionFormItem(page, L_RELAY_TRIGGERED_HIGH_SIGNAL, "1",
+                          configuration.triggerSignal ==
+                              AFE_RELAY_SIGNAL_TRIGGER_HIGH);
   addSelectOptionFormItem(page, L_RELAY_TRIGGERED_LOW_SIGNAL, "0",
                           configuration.triggerSignal ==
                               AFE_RELAY_SIGNAL_TRIGGER_LOW);
@@ -793,8 +847,6 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                     configuration.name, "16");
     closeSection(page);
 
     openSection(page, L_RELAY_DEFAULT_VALUES, "");
@@ -1163,9 +1215,8 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                           configuration.type == 1);
   addSelectFormItemClose(page);
 
-  page += "<br><p class=\"cm\">";
-  page += F(L_SWITCH_SENSITIVENESS_HINT);
-  page += "</p>";
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", L_SWITCH_SENSITIVENESS_HINT);
 
   char _number[4];
   sprintf(_number, "%d", configuration.sensitiveness);
@@ -2871,6 +2922,39 @@ void AFESitesGenerator::addListOfGPIOs(String &item, const char *field,
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+void AFESitesGenerator::addListOfMCP23017GPIOs(String &item, const char *field,
+                                               uint8_t selected,
+                                               const char *title) {
+
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  item.replace("{{item.name}}", field);
+  item.replace("{{item.label}}", title);
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  item.replace("{{item.value}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{item.label}}", L_NONE);
+  item.replace("{{item.selected}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                                        ? " selected=\"selected\""
+                                        : "");
+  char gpioName[3];
+
+  for (uint8_t i = 0; i < AFE_NUMBER_OF_MCP23017_GPIOS; i++) {
+
+    sprintf(gpioName, "%s%d", i < 8 ? "A" : "B",
+            pgm_read_byte(MCP23017_GPIOS_ID + i) - (i < 8 ? 0 : 8));
+    item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+    item.replace("{{item.value}}",
+                 String(pgm_read_byte(MCP23017_GPIOS_ID + i)));
+    item.replace("{{item.label}}", gpioName);
+    item.replace("{{item.selected}}",
+                 selected == pgm_read_byte(MCP23017_GPIOS_ID + i)
+                     ? " selected=\"selected\""
+                     : "");
+  }
+  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
+}
+#endif
 
 void AFESitesGenerator::addInputFormItem(String &item, const char *type,
                                          const char *name, const char *label,

@@ -1007,9 +1007,20 @@ void AFEWebServer::get(RELAY &data) {
                                             : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
+  data.triggerSignal = server.arg("ts").length() > 0
+                           ? server.arg("ts").toInt()
+                           : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
-data.triggerSignal =  server.arg("ts").length() > 0 ? server.arg("ts").toInt()
-                                            : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1255,6 +1266,16 @@ void AFEWebServer::get(LED &data) {
                   : AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
   data.changeToOppositeValue = server.arg("w").length() > 0 ? true : false;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
@@ -1423,7 +1444,9 @@ void AFEWebServer::getBMEX80SensorData(BMEX80 *data) {
   data->type = server.arg("b").length() > 0 ? server.arg("b").toInt()
                                             : AFE_BMX_UNKNOWN_SENSOR;
 
-  data->i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+  data->i2cAddress = server.arg("a").length() > 0
+                         ? server.arg("a").toInt()
+                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
 
   data->interval = server.arg("f").length() > 0
                        ? server.arg("f").toInt()
@@ -1523,7 +1546,9 @@ void AFEWebServer::getBMEX80SensorData(BMEX80 *data) {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEWebServer::getBH1750SensorData(BH1750 *data) {
-  data->i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+  data->i2cAddress = server.arg("a").length() > 0
+                         ? server.arg("a").toInt()
+                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
 
   data->interval = server.arg("f").length() > 0
                        ? server.arg("f").toInt()
@@ -1560,7 +1585,9 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
     data->name[0] = AFE_EMPTY_STRING;
   }
 
-  data->i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+  data->i2cAddress = server.arg("a").length() > 0
+                         ? server.arg("a").toInt()
+                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
 
   data->irqGPIO = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 

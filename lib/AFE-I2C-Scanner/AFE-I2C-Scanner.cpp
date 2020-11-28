@@ -2,7 +2,7 @@
 
 
 #include "AFE-I2C-Scanner.h"
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#ifdef AFE_CONFIG_HARDWARE_I2C
 
 AFEI2CScanner::AFEI2CScanner() {};
 
@@ -94,22 +94,29 @@ const char *AFEI2CScanner::getName(byte deviceAddress) {
   else if (deviceAddress == 0x1E)
     return "LSM303D,HMC5883L,FXOS8700,LIS3DSH";
   else if (deviceAddress == 0x20)
-    return "MCP23017,MCP23008,PCF8574,FXAS21002,SoilMoisture";
+    //return "MCP23017,MCP23008,PCF8574,FXAS21002,SoilMoisture";
+    return "MCP23017";
   else if (deviceAddress == 0x21)
-    return "MCP23017,MCP23008,PCF8574";
+    //return "MCP23017,MCP23008,PCF8574";
+    return "MCP23017";
   else if (deviceAddress == 0x22)
-    return "MCP23017,MCP23008,PCF8574";
+    //return "MCP23017,MCP23008,PCF8574";
+    return "MCP23017";
   else if (deviceAddress == 0x23)
-    return "BH1750";
+    return "BH1750, MCP23017";
     //return "BH1750,MCP23017,MCP23008,PCF8574";
   else if (deviceAddress == 0x24)
-    return "MCP23017,MCP23008,PCF8574";
+    //return "MCP23017,MCP23008,PCF8574";
+    return "MCP23017";
   else if (deviceAddress == 0x25)
-    return "MCP23017,MCP23008,PCF8574";
+    //return "MCP23017,MCP23008,PCF8574";
+    return "MCP23017";
   else if (deviceAddress == 0x26)
-    return "MCP23017,MCP23008,PCF8574";
+    //return "MCP23017,MCP23008,PCF8574";
+    return "MCP23017";
   else if (deviceAddress == 0x27)
-    return "MCP23017,MCP23008,PCF8574,LCD16x2,DigoleDisplay";
+    //return "MCP23017,MCP23008,PCF8574,LCD16x2,DigoleDisplay";
+    return "MCP23017";
   else if (deviceAddress == 0x28)
     return "BNO055,EM7180,CAP1188";
   else if (deviceAddress == 0x29)

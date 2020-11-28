@@ -11,6 +11,15 @@
 #include <AFE-Device.h>
 #include <AFE-LED-Structure.h>
 
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-I2C-Scanner.h>
+#include <Adafruit_MCP23017.h>
+#endif
+
 class AFELED {
 
 private:
@@ -19,6 +28,11 @@ private:
   boolean blinking = false;
   unsigned long interval;
   unsigned long previousMillis = 0;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  Adafruit_MCP23017 mcp;
+  boolean expanderUsed = false;
+#endif
 
   /* Method turns on/off LED */
   void set(uint8_t state);

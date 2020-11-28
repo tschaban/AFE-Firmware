@@ -10,7 +10,54 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
   _id = id;
   _Data->getConfiguration(_id, &configuration);
 
-  pinMode(configuration.gpio, OUTPUT);
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  // If MCP23017 available in the HW, checking if LED connected using MCP23017
+  if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+        configuration.mcp23017.address !=
+            AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS) {
+
+      I2CPORT I2C;
+      _Data->getConfiguration(&I2C);
+
+#ifdef DEBUG
+      Serial
+          << endl
+          << F("INFO: RELAY: Checking if the expander MCP23017 is connected");
+#endif
+      AFEI2CScanner I2CScanner;
+      I2CScanner.begin();
+      if (I2CScanner.scan(configuration.mcp23017.address)) {
+
+#ifdef DEBUG
+        Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
+#endif
+
+        mcp.begin(configuration.mcp23017.address, I2C.SDA, I2C.SCL);
+        mcp.pinMode(configuration.mcp23017.gpio, OUTPUT);
+        expanderUsed = true;
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << F("WARN: RELAY: MCP23017 not found om I2C Address: 0x")
+               << _HEX(configuration.mcp23017.address);
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << F("WARN: RELAY: GPIO and MCP23017 not set");
+    }
+#endif
+  } else {
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+    pinMode(configuration.gpio, OUTPUT);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  }
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Defining get and state MQTT Topics */
@@ -38,7 +85,21 @@ void AFERelay::begin(AFEDataAccess *_Data, uint8_t id) {
 }
 
 byte AFERelay::get() {
-  return digitalRead(configuration.gpio) == HIGH
+  byte state;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  if (expanderUsed) {
+    state = mcp.digitalRead(configuration.mcp23017.gpio);
+  } else {
+#endif
+
+    state = digitalRead(configuration.gpio);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  }
+#endif
+
+  return state == HIGH
              ? (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                     ? AFE_RELAY_ON
                     : AFE_RELAY_OFF)
@@ -58,20 +119,31 @@ void AFERelay::on() {
          << " signal";
 #endif
 
-  if (get() == AFE_RELAY_OFF) {
-    digitalWrite(configuration.gpio,
-                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
-                     ? HIGH
-                     : LOW);
+  //if (get() == AFE_RELAY_OFF) {
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Led.on();
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    if (expanderUsed) {
+      mcp.digitalWrite(
+          configuration.mcp23017.gpio,
+          configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
+                                                                       : LOW);
+    } else {
 #endif
+
+      digitalWrite(configuration.gpio,
+                   configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                       ? HIGH
+                       : LOW);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    }
+#endif
+
     if (configuration.timeToOff >
         0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
-  }
+  //}
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
@@ -80,6 +152,10 @@ void AFERelay::on() {
   };
 #else
   Data->saveRelayState(_id, AFE_RELAY_ON);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.toggle();
 #endif
 }
 
@@ -94,20 +170,31 @@ void AFERelay::off() {
          << " signal";
 #endif
 
-  if (get() == AFE_RELAY_ON) {
-    digitalWrite(configuration.gpio,
-                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
-                     ? LOW
-                     : HIGH);
+  //if (get() == AFE_RELAY_ON) {
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Led.off();
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    if (expanderUsed) {
+      mcp.digitalWrite(
+          configuration.mcp23017.gpio,
+          configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
+                                                                       : HIGH);
+    } else {
 #endif
+
+      digitalWrite(configuration.gpio,
+                   configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+                       ? LOW
+                       : HIGH);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    }
+#endif
+
     if (configuration.timeToOff >
-            0) { // Start counter if relay should be automatically turned off
+        0) { // Start counter if relay should be automatically turned off
       turnOffCounter = millis();
     }
-  }
+ // }
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -115,6 +202,10 @@ void AFERelay::off() {
   };
 #else
   Data->saveRelayState(_id, AFE_RELAY_OFF);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.toggle();
 #endif
 }
 

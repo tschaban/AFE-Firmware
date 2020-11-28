@@ -101,12 +101,18 @@ private:
   void addListOfGPIOs(String &item, const char *field, uint8_t selected,
                       const char *title = "GPIO");
 
-  /* Item: HTML <select> populated with <option> for number of items selection
-   */
-  void _addListOfHardware(String &item, uint8_t noOfItems,
-                          uint8_t noOffConnected, const char *field,
-                          const char *label, uint8_t index, uint8_t noneValue,
-                          boolean disabled = false);
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
+                              const char *title = "GPIO");
+#endif
+
+      /* Item: HTML <select> populated with <option> for number of items
+       * selection
+       */
+      void _addListOfHardware(String &item, uint8_t noOfItems,
+                              uint8_t noOffConnected, const char *field,
+                              const char *label, uint8_t index,
+                              uint8_t noneValue, boolean disabled = false);
 
   void addListOfHardwareItem(String &item, uint8_t noOfItems,
                              uint8_t noOffConnected, const char *field,
@@ -233,8 +239,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   void siteI2CBUS(String &page);
-// String addDeviceI2CAddressSelection(uint8_t address);
-// void addDeviceI2CAddressSelection(String &page, uint8_t address);
+  void addDeviceI2CAddressSelection(String &page, uint8_t address);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR

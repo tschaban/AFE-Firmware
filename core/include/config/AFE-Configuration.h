@@ -103,7 +103,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.4.0"
+#define AFE_FIRMWARE_VERSION "2.4.0.B1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -119,6 +119,8 @@
 #ifdef AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 #endif
+
+#define AFE_CONFIG_HARDWARE_MCP23017
 
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -477,6 +479,18 @@
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
+
+/* MCP23017 GPIO extension board */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifndef AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_HARDWARE_I2C
+#endif
+
+#define AFE_NUMBER_OF_MCP23017_GPIOS 16
+
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -767,11 +781,13 @@
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_MAX_VCC 1
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
+/* Baterymeter */
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MIN_V 3
 #define AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_BATTER_MAX_V 4.2
 #define AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH 200
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
 
 /* PIR Sesnor */
 #ifdef AFE_CONFIG_HARDWARE_PIR
@@ -849,6 +865,7 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA 4
 #define AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL 5
+#define AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS 0
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 /* HPMA115S0 Defaults */
@@ -1165,7 +1182,11 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 405    // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_NETWORK 375   // Verfied by ArduinoJson Assistant
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_FILE_BUFFER_LED 124 //  Verfied by ArduinoJson Assistant
+#else
 #define AFE_CONFIG_FILE_BUFFER_LED 76        // Verfied by ArduinoJson Assistant
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_RELAY 287 // Verfied by ArduinoJson Assistant for T6 only
 #define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // Verfied by ArduinoJson Assistant
