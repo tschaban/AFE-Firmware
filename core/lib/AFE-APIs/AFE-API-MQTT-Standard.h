@@ -40,6 +40,9 @@ private:
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
    + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
 #endif
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
+   + AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
+#endif
   ];
 
 
@@ -137,6 +140,11 @@ public:
   void processThermalProtector(uint8_t *id);
   boolean publishThermalProtectorState(uint8_t id);
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  void processDHT(uint8_t *id);
+  boolean publishDHTSensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 };
 

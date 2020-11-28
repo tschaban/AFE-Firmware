@@ -2,7 +2,7 @@
 
 
 #include "AFE-I2C-Scanner.h"
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#ifdef AFE_CONFIG_HARDWARE_I2C
 
 AFEI2CScanner::AFEI2CScanner() {};
 

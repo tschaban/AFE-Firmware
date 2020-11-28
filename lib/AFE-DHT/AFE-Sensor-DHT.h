@@ -1,47 +1,46 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-
 #ifndef _AFE_Sensor_DHT_h
 #define _AFE_Sensor_DHT_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_DHT
 
+//#include <arduino.h>
 #include <AFE-Data-Access.h>
+#include <PietteTech_DHT.h>
 
-#if defined(DEBUG)
+
+#ifdef DEBUG
 #include <Streaming.h>
 #endif
-
-#define IDX_TYPE_TEMPERATURE 0
-#define IDX_TYPE_HUMIDITY 1
-#define IDX_TYPE_TEMPERATURE_AND_HUMIDITY 2
 
 class AFESensorDHT {
 
 private:
-  DH configuration;
-
+  AFEDataAccess *Data;
   float currentTemperature;
   float currentHumidity;
   float currentDewPoint;
   float currentHeatIndex;
 
-  boolean dataInMemory = false;
   boolean _initialized = false;
 
-  int readResult;
   unsigned long startTime = 0;
 
+  PietteTech_DHT dht;
+
 public:
+  DHT configuration;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
+  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
+#endif
+
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorDHT();
 
-  void dht_wrapper();
+  /* Initializing method */
+  void begin(AFEDataAccess *, uint8_t id);
 
   /* Method returns temperature */
   float getTemperature();
@@ -55,23 +54,14 @@ public:
   /* Method returns Dew Point */
   float getDewPoint();
 
-  /* It returns true if data has been read from the sensor */
-  boolean isReady();
-
   /* Method should be added to the main loop to check temperature / humidity in
    * defined time frame */
-  void listener();
+  boolean listener();
 
-  /* Method returns sensor IDX for temperature, humidity, temperature and
-   * humidity */
-  unsigned long getDomoticzIDX(uint8_t type);
+    /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 
-  /* Get HeatIndex publishing configuration item */
-  boolean publishHeatIndex();
-
-  /* True if dew point should be published */
-  boolean publishDewPoint();
 };
 
-#endif
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
+#endif // _AFE_Sensor_DHT_h

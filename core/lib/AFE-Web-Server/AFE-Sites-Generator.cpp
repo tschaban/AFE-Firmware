@@ -178,14 +178,17 @@ if (Device->configuration.noOfDS18B20s > 0) {
 }
 #endif
 
-/* Sensor DHxx */
+
+
+/* Sensor DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
-if (Device->configuration.isDHT) {
-  page.concat("<li class=\"itm\"><a href=\"\\?o=DHT\">");
-  page.concat(language == 0 ? "Czujnik DHT" : "DHT sensor");
-  page.concat("</a></li>");
+if (Device->configuration.noOfDHTs > 0) {
+  addMenuHeaderItem(page, "DHT");
+  addMenuSubItem(page, L_SENSOR, Device->configuration.noOfDHTs,
+                 AFE_CONFIG_SITE_DHT);
 }
 #endif
+
 
 /* UART */
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -411,6 +414,14 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
                         Device->configuration.noOfDS18B20s, "ds",
                         L_DEVICE_NUMBER_OF_DS18B20_SENSORS);
+#endif
+
+
+/* DHT */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DHT,
+                        Device->configuration.noOfDHTs, "dh",
+                        "LICZBA DHT");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
@@ -1288,145 +1299,53 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 }
 #endif
 
+
 #ifdef AFE_CONFIG_HARDWARE_DHT
-String AFESitesGenerator::siteDHTSensor() {
+void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
-  DH configuration = Data->getSensorConfiguration();
-  DEVICE device = Data->getConfiguration();
+  AFESensorDHT _Sensor;
+  DHT configuration;
+  Data->getConfiguration(id, &configuration);
+  char _number[13];
 
-  String body = "<fieldset>";
-  body += addListOfGPIOs("g", configuration.gpio);
+  openSection(page, "DHT", "");
 
-  body += "<div class=\"cf\"><label>Typ";
-  body += language == 1 ? "e" : "";
-  body += "</label><select name=\"t\"><option value=\"1\"";
-  body += (configuration.type == 1 ? " selected=\"selected\"" : "");
-  body += ">DH11</option><option value=\"2\"";
-  body += (configuration.type == 2 ? " selected=\"selected\"" : "");
-  body += ">DH21</option><option value=\"3\"";
-  body += (configuration.type == 3 ? " selected=\"selected\"" : "");
-  body += ">DH22</option></select></div>";
+  /* Item: GPIO */
+  addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
 
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Odczyty co" : "Read every";
-  body += "</label><input name=\"in\" min=\"10\" max=\"86400\" step=\"1\" "
-          "type=\"number\" "
-          "value=\"";
-  body += configuration.interval;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "sekund. Zakres: 10 do 86400sek"
-                        : "seconds. Range: 10 to 86400sec";
-  body += " (24h)</span></div><div class=\"cc\"><label><input name=\"o\" "
-          "type=\"checkbox\" value=\"1\"";
-  body += configuration.sendOnlyChanges ? " checked=\"checked\"" : "";
-  body += language == 0
-              ? ">Wysyłać dane tylko, gdy wartość temperatury lub wilgotności "
-                "zmieni się"
-              : ">Send data only if value of temperature or humidity has "
-                "changed";
-  body += "</label></div>";
 
-  if (device.api.mqtt) {
-    body += "<div class=\"cc\"><label><input name=\"p\" type=\"checkbox\" "
-            "value=\"1\"";
-    body += configuration.publishHeatIndex ? " checked=\"checked\"" : "";
-    body += language == 0 ? ">Wysyłać temperaturę odczuwalną"
-                          : ">Publish Heat Index";
-    body += "?</label></div><div class=\"cc\"><label><input name=\"j\" "
-            "type=\"checkbox\" value=\"1\"";
-    body += configuration.publishDewPoint ? " checked=\"checked\"" : "";
-    body += language == 0 ? ">Wysyłać punkt rosy" : ">Publish Dew Point";
-    body += "?</label></div>";
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: Interval */
+  sprintf(_number, "%d", configuration.interval);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "2", "86400", "1",
+                   L_SECONDS);
+
+  /* Item: Send only changes */
+  addCheckboxFormItem(page, "s", L_DS18B20_SENT_ONLY_CHANGES, "1",
+                      configuration.sendOnlyChanges);
+
+  addSelectFormItemClose(page);
+
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, L_DS18B20_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+
+    closeSection(page);
   }
-
-  body += "<br><p class=\"cm\">Temperatur";
-  body += language == 0 ? "y" : "e";
-  body += "</p>";
-
-  body += "<div class=\"cf\"><label>";
-  body += language == 0 ? "Korekta wartości o" : "Value to correct";
-  body += "</label><input name=\"c\" type=\"number\" min=\"-9.99\" "
-          "max=\"9.99\" "
-          "step=\"0.01\" value=\"";
-  body += configuration.temperature.correction;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "stopni. Zakres" : "degrees. Range";
-  body += ": -9.99 - +9.99</span></div><div class=\"cf\"><label>";
-  body += language == 0 ? "Jednostka" : "Unit";
-  body += "</label><select  name=\"u\"><option value=\"0\"";
-  body +=
-      (configuration.temperature.unit == 0 ? " selected=\"selected\">" : ">");
-  body += language == 0 ? "Celsjusz" : "Celsius";
-  body += "</option><option value=\"1\"";
-  body += (configuration.temperature.unit == 1 ? " selected=\"selected\"" : "");
-  body += ">Fahrenheit</option></select></div><br><p class=\"cm\">";
-  body += language == 0 ? "Wilgotnośc" : "Humidity";
-  body += "</p><div class=\"cf\"><label>";
-  body += language == 0 ? "Korekta wartości o" : "Value to correct";
-  body += "</label><input name=\"d\" type=\"number\" min=\"-99.9\" "
-          "max=\"99.9\" "
-          "step=\"0.1\" value=\"";
-  body += configuration.humidity.correction;
-  body += "\"><span class=\"hint\">";
-  body += language == 0 ? "Zakres" : "Range";
-  body += ": -99.9 - +99.9</span></div>";
-
-  body += "</fieldset>";
-
-  String page =
-      openSection(language == 0 ? "Czujnik temperatury i wilgotności DHT"
-                                : "DHT temperature and humidity sensor",
-                  "", body);
-
-  if (Device->configuration.api.domoticz) {
-    body = "<fieldset>";
-    body += "<div class=\"cf\"><label> ";
-    body +=
-        language == 0 ? "IDX czujnika temperatury" : "Temperature sensor IDX";
-    body += " </label>";
-    body += "<input name=\"xt\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.temperatureIdx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-
-    body += "<div class=\"cf\"><label>";
-    body += language == 0 ? "IDX czujnika wilgotności" : "Humidity sensor IDX";
-    body += "</label><input name=\"xh\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.humidityIdx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-
-    body += "<div class=\"cf\"><label>";
-    body += language == 0 ? "IDX czujnika temperatury i wilgotności"
-                          : "Temperature and humidity sensor IDX";
-    body += "</label><input name=\"xth\" type=\"number\" step=\"1\" min=\"0\" "
-            "max=\"999999\"  value=\"";
-    body += configuration.temperatureAndHumidityIdx;
-    body += "\">";
-    body += "<span class=\"hint\">";
-    body += language == 0 ? "Zakres: " : "Range: ";
-    body += "0 - 999999</span>";
-    body += "</div>";
-    body += "</fieldset>";
-    page += openSection(
-        "Domoticz",
-        language == 0
-            ? "Jeśli IDX jest 0 to wartośc nie będzie wysyłana do Domoticz"
-            : "If IDX is set to 0 then a value won't be sent to Domoticz",
-        body);
-  }
-
-  return page;
+#endif
 }
 #endif
+
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
 String AFESitesGenerator::addThermostateMenuItem() {

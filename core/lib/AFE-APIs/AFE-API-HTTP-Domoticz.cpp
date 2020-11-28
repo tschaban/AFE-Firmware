@@ -461,4 +461,22 @@ boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEAPIHTTPDomoticz::addClass(AFESensorDHT *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
+  boolean _ret = false;
+  if (enabled && _DHTSensor[id]->configuration.domoticz.temperature.idx > 0) {
+    char value[9]; //Max size: -999.999
+    sprintf(value, "%-.3f", _DHTSensor[id]->currentTemperature());
+    sendCustomSensorCommand(_DS18B20Sensor[id]->configuration.domoticz.temperature.idx,
+                            value);
+    _ret = true;
+  }
+  return _ret;
+}
+#endif // AFE_CONFIG_HARDWARE_DHT
+
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -159,6 +159,12 @@ ESP.eraseConfig();
     initializeDS18B20Sensor();
 #endif
 
+/* Initializing DHT  */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    initializeDHTSensor();
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     if (Device.getMode() == AFE_MODE_NORMAL) {
       initializeHPMA115S0Sensor();
@@ -355,6 +361,10 @@ void loop() {
     if (Device.getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      DHTSensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF

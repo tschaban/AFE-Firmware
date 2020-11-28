@@ -66,6 +66,9 @@ typedef enum {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   AFE_MQTT_DEVICE_THERMAL_PROTECTOR = 13,
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  AFE_MQTT_DEVICE_DHT = 14,
+#endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */

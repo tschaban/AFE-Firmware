@@ -277,6 +277,22 @@ void AFEAPIMQTTStandard::subscribe() {
     }
   }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+/* Subscribe: DHT */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+    Mqtt.subscribe(_DHTSensor[i]->mqttCommandTopic);
+    if (strlen(_DHTSensor[i]->mqttCommandTopic) > 0) {
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              _DHTSensor[i]->mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DHT;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+
 }
 
 void AFEAPIMQTTStandard::processRequest() {
@@ -814,5 +830,36 @@ void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
   }
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEAPIMQTTStandard::processDHT(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing DHT ID: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishDHTSensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+
+boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
+    _DHTSensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_DHTSensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_DHT
+
+
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

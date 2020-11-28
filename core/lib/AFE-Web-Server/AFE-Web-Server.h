@@ -97,7 +97,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  void getDHTData(DH *);
+  void get(DHT &data);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR

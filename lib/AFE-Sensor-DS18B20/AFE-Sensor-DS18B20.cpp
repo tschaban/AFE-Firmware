@@ -25,8 +25,6 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   } else {
     mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
-
-
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   if (Sensor.isConnected(configuration.address)) {

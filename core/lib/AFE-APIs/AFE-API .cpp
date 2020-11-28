@@ -177,3 +177,14 @@ void AFEAPI::addClass(AFEContactron *Item) {
 #endif
   }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  void AFEAPI::addClass(AFESensorDHT *Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+    _DHTSensor[i] = Sensor + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the DHT added");
+#endif
+  }
+#endif // AFE_CONFIG_HARDWARE_DHT

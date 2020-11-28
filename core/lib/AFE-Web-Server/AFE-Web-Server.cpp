@@ -787,7 +787,9 @@ void AFEWebServer::get(DEVICE &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  data.isDHT = server.arg("dh").length() > 0 ? true : false;
+  data.noOfDHTs = server.arg("dh").length() > 0
+                          ? server.arg("dh").toInt()
+                          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #if defined(T3_CONFIG)
@@ -1313,52 +1315,36 @@ void AFEWebServer::get(DS18B20 &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEWebServer::getDHTData(DH *data) {
+void AFEWebServer::get(DHT &data) {
 
   if (server.arg("g").length() > 0) {
-    data->gpio = server.arg("g").toInt();
+    data.gpio = server.arg("g").toInt();
   }
 
   if (server.arg("t").length() > 0) {
-    data->type = server.arg("t").toInt();
+    data.type = server.arg("t").toInt();
   }
 
-  if (server.arg("c").length() > 0) {
-    data->temperature.correction = server.arg("c").toFloat();
+    if (server.arg("f").length() > 0) {
+    data.interval = server.arg("f").toInt();
   }
 
-  if (server.arg("i").length() > 0) {
-    data->interval = server.arg("i").toInt();
+  if (server.arg("tc").length() > 0) {
+    data.temperature.correction = server.arg("tc").toFloat();
   }
 
-  if (server.arg("u").length() > 0) {
-    data->temperature.unit = server.arg("u").toInt();
+  if (server.arg("tu").length() > 0) {
+    data.temperature.unit = server.arg("tu").toInt();
   }
 
-  if (server.arg("d").length() > 0) {
-    data->humidity.correction = server.arg("d").toFloat();
+  if (server.arg("hc").length() > 0) {
+    data.humidity.correction = server.arg("hc").toFloat();
   }
 
-  server.arg("j").length() > 0 ? data->publishDewPoint = true
-                               : data->publishDewPoint = false;
-
-  server.arg("o").length() > 0 ? data->sendOnlyChanges = true
-                               : data->sendOnlyChanges = false;
-
-  server.arg("p").length() > 0 ? data->publishHeatIndex = true
-                               : data->publishHeatIndex = false;
-
-  if (server.arg("xt").length() > 0) {
-    data->temperatureIdx = server.arg("xt").toInt();
+  if (server.arg("hu").length() > 0) {
+    data.humidity.unit = server.arg("hu").toInt();
   }
 
-  if (server.arg("xh").length() > 0) {
-    data->humidityIdx = server.arg("xh").toInt();
-  }
-
-  if (server.arg("xth").length() > 0) {
-    data->temperatureAndHumidityIdx = server.arg("xth").toInt();
-  }
 }
 #endif
 

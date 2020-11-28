@@ -70,6 +70,12 @@ AFEThermalProtector ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTE
 AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+AFESensorDHT DHTSensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT];
+#endif
+
+
 
 #include <AFE-Main-APIs.cpp>
 
@@ -101,13 +107,8 @@ AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
 #include <AFE-Main-DS18B20.cpp>
 #endif
 
-/* T2 Setup, DHxx sensor */
 #ifdef AFE_CONFIG_HARDWARE_DHT
-#include <AFE-Sensor-DHT.h>
-#include <PietteTech_DHT.h>
-void dht_wrapper();
-PietteTech_DHT dht;
-AFESensorDHT Sensor;
+#include <AFE-Main-DHT.cpp>
 #endif
 
 #if defined(T3_CONFIG)

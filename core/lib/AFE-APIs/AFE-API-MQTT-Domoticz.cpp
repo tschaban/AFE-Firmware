@@ -859,4 +859,25 @@ boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEAPIMQTTDomoticz::addClass(AFESensorDHT *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
+  if (enabled) {
+    if (_DHTSensor[id]->configuration.domoticz.temperature.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_DHT_COMMAND_LENGTH];
+      char value[9];
+      sprintf(value, "%-.3f", _DHTSensor[id]->currentTemperature());
+      generateDeviceValue(json, _DHTSensor[id]->configuration.domoticz.temperature.idx,
+                          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

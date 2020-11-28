@@ -31,6 +31,10 @@
 #include <AFE-Sensor-DS18B20.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -180,7 +184,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  String siteDHTSensor();
+  void siteDHTSensor(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
