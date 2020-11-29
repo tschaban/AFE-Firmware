@@ -87,11 +87,8 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}&i={{item.id}}\">&#8227; "
     "{{item.title}}: {{item.id.display}}</a></li>";
 
-#ifdef AFE_CONFIG_USE_MAX_HARDWARE
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
-#else
-const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15};
-#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =

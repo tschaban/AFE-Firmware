@@ -48,13 +48,9 @@
 /* Default time to auto-logout from config panel: in minutes */
 #define AFE_AUTOLOGOFF_DEFAULT_TIME 10
 
-/* Number of GPIOs available in ESP8266, used in the conjunction with AFE-Site-components.h table
-   AFE_CONFIG_USE_MAX_HARDWARE is set in platformio.ini */
-#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+/* Number of GPIOs available in ESP8266, used in the conjunction with AFE-Site-components.h table */
 #define AFE_NUMBER_OF_GPIOS 13
-#else
-#define AFE_NUMBER_OF_GPIOS 10
-#endif
+
 
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -103,7 +99,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.4.0"
+#define AFE_FIRMWARE_VERSION "2.4.1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
