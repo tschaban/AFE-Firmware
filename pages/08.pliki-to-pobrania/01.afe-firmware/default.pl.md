@@ -76,7 +76,7 @@ recaptchacontact:
 !! Przeczytaj koniecznie: [Aktualizacjia do wersji 4Mb](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi/aktualizacja-afe-t5-z-wersji-2-0-x-do-2-2-x) 
 
 **Poprzednie wersje**
-* Wersja [2.2.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-1/?target=_blank)
+* Wersja [2.2.1](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-1/?target=_blank)
 * Wersja [2.2.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-0/?target=_blank)
 * Wersja [2.0.1](https://www.smartnydom.pl/download/afe-firmware-t5-v2/?target=_blank)
 * Wersje 1.3.3 - 2.0.0: [Archiwum](https://drive.google.com/drive/folders/10RpEzzgYVWdH9vvdMTF1w1KjRRnwsEv_/?target=_blank)
