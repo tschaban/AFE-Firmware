@@ -266,8 +266,12 @@ if (Device->configuration.noOfHPMA115S0s > 0) {
  * T6 only*/
 #ifdef T6_CONFIG
 if (Device->configuration.noOfBMEX80s > 0 ||
-    Device->configuration.noOfBH1750s > 0 ||
-    Device->configuration.noOfAS3935s > 0) {
+    Device->configuration.noOfBH1750s > 0
+    
+#ifdef AFE_CONFIG_HARDWARE_AS3935    
+    || Device->configuration.noOfAS3935s > 0
+#endif 
+    ) {
 #endif
 
   page.concat("<li class=\"itm\"><a href=\"\\?o=");

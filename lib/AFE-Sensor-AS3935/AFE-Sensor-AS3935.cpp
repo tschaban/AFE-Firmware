@@ -2,6 +2,8 @@
 
 #include "AFE-Sensor-AS3935.h"
 
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+
 AFESensorAS3935::AFESensorAS3935(){};
 
 boolean AFESensorAS3935::begin(uint8_t id) {
@@ -242,3 +244,5 @@ void AFESensorAS3935::getJSON(char *json) {
     sprintf(json, "{\"event\":{\"type\":\"unknown\"}}");
   }
 }
+
+#endif
