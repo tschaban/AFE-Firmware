@@ -1163,7 +1163,7 @@ void AFEWebServer::get(CONTACTRON &data) {
                                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
