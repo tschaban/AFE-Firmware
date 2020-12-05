@@ -2,15 +2,23 @@
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 
+/* ---------Headers ---------*/
+
+void initializeContracton(void);
+void contractonEventsListener(void);
+
+/* --------- Body -----------*/
+
+
 /* Method initialize contactrons */
-void initializeContractons() {
+void initializeContracton() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Initializing contractons";
+  Serial << endl << F("INFO: Initializing contractons");
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
     Contactron[i].begin(i, &Device, &Data);
 #ifdef DEBUG
-    Serial << endl << F("INFO: Contactron: ") << i << F(" initialized";
+    Serial << endl << F("INFO: Contactron: ") << i << F(" initialized");
 #endif
   }
 }
@@ -21,7 +29,7 @@ void contractonEventsListener() {
     Contactron[i].listener();
     if (Contactron[i].changed()) {
 #ifdef DEBUG
-      Serial << endl << F("INFO: Contactron: ") << i << F(" has changed the state";
+      Serial << endl << F("INFO: Contactron: ") << i << F(" has changed the state");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -43,4 +51,4 @@ void contractonEventsListener() {
   }
 }
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON

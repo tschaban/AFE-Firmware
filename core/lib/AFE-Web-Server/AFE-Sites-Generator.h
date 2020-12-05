@@ -116,8 +116,12 @@ private:
   void addRegulatorControllerItem(String &item, REGULATOR *configuration);
 #endif
 
-#if defined(T5_CONFIG)
+#ifdef AFE_CONFIG_HARDWARE_GATE
   void generateGateStatesList(String &item, uint8_t id, byte state);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void addDeviceI2CAddressSelectionItem(String &page, uint8_t address);
 #endif
 
 public:

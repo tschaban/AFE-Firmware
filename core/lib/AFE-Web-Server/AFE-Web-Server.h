@@ -113,11 +113,11 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  void getContactronData(uint8_t id, CONTACTRON *);
+  void get(CONTACTRON &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  void getGateData(GATE *);
+  void get(GATE &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART

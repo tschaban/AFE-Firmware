@@ -2,6 +2,8 @@
 
 #include "AFE-Sensor-Anemometer.h"
 
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+
 AFESensorAnemometer::AFESensorAnemometer(){};
 
 boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
@@ -94,3 +96,5 @@ void AFESensorAnemometer::getJSON(char *json) {
                 "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
           lastSpeedMS, lastSpeedKMH);
 }
+
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER

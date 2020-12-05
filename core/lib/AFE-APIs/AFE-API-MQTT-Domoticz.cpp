@@ -187,7 +187,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #ifdef DEBUG
           else {
-            Serial << endl << F("INFO: OFF Command, skipping";
+            Serial << endl << F("INFO: OFF Command, skipping");
           }
 #endif
           break;
@@ -685,7 +685,7 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
   AFEAPI::addClass(Item);
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Caching IDXs for Gates";
+  Serial << endl << F("INFO: Caching IDXs for Gates");
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
@@ -703,7 +703,7 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << F(" - IDX not set";
+      Serial << endl << F(" - IDX not set");
     }
 #endif
   }
