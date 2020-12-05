@@ -26,6 +26,7 @@ recaptchacontact:
 * Ustawienie stany przekaźników po podłączeniu się do brokera MQTT
 * Obsługa wiadomości LWT
 * Automatyczne wyłączanie przekaźników po zadanym czasie
+* Przekaźnik ustawiany sygnałem LOW lub HIGH
 * Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 * LED może informwać o stanie przekaźnika
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]

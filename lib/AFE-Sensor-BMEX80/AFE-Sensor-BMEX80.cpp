@@ -7,19 +7,20 @@ AFESensorBMEX80::AFESensorBMEX80(){};
 
 void AFESensorBMEX80::begin(uint8_t id) {
   AFEDataAccess Data;
-  configuration = Data.getBMEX80SensorConfiguration(id);
-  I2CPORT I2C = Data.getI2CPortConfiguration();
+  Data.getConfiguration(id,&configuration);
+  I2CPORT I2C;
+  Data.getConfiguration(&I2C);
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
 #if defined(DEBUG)
-  Serial << endl << endl << "-------- BMEX80: Initializing --------";
+  Serial << endl << endl << F("-------- BMEX80: Initializing --------");
 #endif
 
   switch (configuration.type) {
@@ -39,9 +40,9 @@ void AFESensorBMEX80::begin(uint8_t id) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Device: "
+         << F("INFO: Device: ")
          << (_initialized ? "Found" : "Not found: check wiring");
-  Serial << endl << "--------------------------------------" << endl;
+  Serial << endl << F("--------------------------------------") << endl;
 #endif
 }
 
@@ -72,9 +73,9 @@ void AFESensorBMEX80::listener() {
 #if defined(DEBUG)
       Serial << endl
              << endl
-             << "--------"
-             << " Reading sensor data "
-             << "--------";
+             << F("--------")
+             << F(" Reading sensor data ")
+             << F("--------");
 #endif
 
       if (configuration.type != AFE_BME680_SENSOR) {
@@ -94,36 +95,36 @@ void AFESensorBMEX80::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << " - Temperature = " << data.temperature.value << endl
-               << " - Pressure = " << data.pressure.value
-               << ", Relative = " << data.relativePressure.value;
+               << F(" - Temperature = ") << data.temperature.value << endl
+               << F(" - Pressure = ") << data.pressure.value
+               << F(", Relative = ") << data.relativePressure.value;
         if (configuration.type != AFE_BMP180_SENSOR) {
-          Serial << endl << " - Humidity = " << data.humidity.value;
-          Serial << endl << " - Dew Point = " << data.dewPoint.value;
+          Serial << endl << F(" - Humidity = ") << data.humidity.value;
+          Serial << endl << F(" - Dew Point = ") << data.dewPoint.value;
         }
         if (configuration.type == AFE_BME680_SENSOR) {
-          Serial << endl << " - Gas Resistance = " << data.gasResistance.value;
-          Serial << endl << " - IAQ = " << data.iaq.value;
-          Serial << endl << " - IAQ Accuracy = " << data.iaq.accuracy;
-          Serial << endl << " - Static IAQ = " << data.staticIaq.value;
+          Serial << endl << F(" - Gas Resistance = ") << data.gasResistance.value;
+          Serial << endl << F(" - IAQ = ") << data.iaq.value;
+          Serial << endl << F(" - IAQ Accuracy = ") << data.iaq.accuracy;
+          Serial << endl << F(" - Static IAQ = ") << data.staticIaq.value;
           Serial << endl
-                 << " - Static IAQ Accuracy = " << data.staticIaq.accuracy;
+                 << F(" - Static IAQ Accuracy = ") << data.staticIaq.accuracy;
           Serial << endl
-                 << " - Breath VOC = " << data.breathVocEquivalent.value;
+                 << F(" - Breath VOC = ") << data.breathVocEquivalent.value;
           Serial << endl
-                 << " - Breath VOC Accuracy = "
+                 << F(" - Breath VOC Accuracy = ")
                  << data.breathVocEquivalent.accuracy;
-          Serial << endl << " - CO2 = " << data.co2Equivalent.value;
-          Serial << endl << " - CO2 Accuracy = " << data.co2Equivalent.accuracy;
+          Serial << endl << F(" - CO2 = ") << data.co2Equivalent.value;
+          Serial << endl << F(" - CO2 Accuracy = ") << data.co2Equivalent.accuracy;
         }
 
       } else {
-        Serial << endl << "WARN: No data found";
+        Serial << endl << F("WARN: No data found");
 #endif
       }
       startTime = 0;
 #ifdef DEBUG
-      Serial << endl << "------------------------------------" << endl;
+      Serial << endl << F("------------------------------------") << endl;
 #endif
     }
   }
@@ -205,7 +206,7 @@ void AFESensorBMEX80::getJSON(char *json) {
 
 void AFESensorBMEX80::applyCorrections() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Applying correction to values";
+  Serial << endl << F("INFO: Applying correction to values");
 #endif
 
   AFESensorsCommon calculation;

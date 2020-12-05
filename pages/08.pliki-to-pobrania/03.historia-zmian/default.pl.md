@@ -5,6 +5,8 @@ recaptchacontact:
 ---
 
 ##### AFE Firmware T0
+* [Wersja 2.4.1](https://github.com/tschaban/AFE-Firmware/milestone/75?closed=1)
+* [Wersja 2.4.0](https://github.com/tschaban/AFE-Firmware/milestone/71?closed=1)
 * [Wersja 2.2.0](https://github.com/tschaban/AFE-Firmware/milestone/62?closed=1)
 * [Wersja 2.1.1](https://github.com/tschaban/AFE-Firmware/milestone/60?closed=1)
 * [Wersja 2.1.0](https://github.com/tschaban/AFE-Firmware/milestone/56?closed=1)
@@ -16,8 +18,20 @@ recaptchacontact:
 * [Wersja 1.2.0](https://github.com/tschaban/AFE-Firmware/milestone/11?closed=1)
 * [Wersja 1.0.1](https://github.com/tschaban/AFE-Firmware/milestone/1?closed=1)
 
+##### AFE Firmware T1
+* [Wersja 2.3.0](https://github.com/tschaban/AFE-Firmware/milestone/70?closed=1)
+* [Wersja 1.4.0](https://github.com/tschaban/AFE-Firmware/milestone/50?closed=1)
+* [Wersja 1.2.5](https://github.com/tschaban/AFE-Firmware/milestone/26?closed=1)
+* [Wersja 1.2.4](https://github.com/tschaban/AFE-Firmware/milestone/23?closed=1)
+* [Wersja 1.1.0](https://github.com/tschaban/AFE-Firmware/milestone/14?closed=1)
+* [Wersja 1.0.2](https://github.com/tschaban/AFE-Firmware/milestone/10?closed=1)
+* [Wersja 1.0.0](https://github.com/tschaban/AFE-Firmware/milestone/6?closed=1)
+
+
 
 ##### AFE Firmware T5
+* [Wersja 2.2.2](https://github.com/tschaban/AFE-Firmware/milestone/77?closed=1)
+* [Wersja 2.2.1](https://github.com/tschaban/AFE-Firmware/milestone/67?closed=1)
 * [Wersja 2.2.0](https://github.com/tschaban/AFE-Firmware/milestone/64?closed=1)
 * [Wersja 2.0.1](https://github.com/tschaban/AFE-Firmware/milestone/58?closed=1)
 * [Wersja 2.0.0](https://github.com/tschaban/AFE-Firmware/milestone/53?closed=1)
@@ -27,6 +41,8 @@ recaptchacontact:
 * [Wersja 1.0.0](https://github.com/tschaban/AFE-Firmware/milestone/20?closed=1)
 
 ##### AFE Firmware T6
+* [Wersja 2.3.1](https://github.com/tschaban/AFE-Firmware/milestone/69?closed=1)
+* [Wersja 2.3.0](https://github.com/tschaban/AFE-Firmware/milestone/68?closed=1)
 * [Wersja 2.2.2](https://github.com/tschaban/AFE-Firmware/milestone/66?closed=1)
 * [Wersja 2.2.1](https://github.com/tschaban/AFE-Firmware/milestone/65?closed=1)
 * [Wersja 2.2.0](https://github.com/tschaban/AFE-Firmware/milestone/62?closed=1)

@@ -2,11 +2,19 @@
 
 #include "AFE-Switch.h"
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+
 AFESwitch::AFESwitch(){};
 
-void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
-  AFEDataAccess Data;
-  configuration = Data.getSwitchConfiguration(id);
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data, AFELED *_LED) {
+  Led = _LED;
+  begin(id, _Data);
+}
+#endif // AFE_CONFIG_HARDWARE_LED
+
+void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
+  _Data->getConfiguration(id, &configuration);
 #ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
   pinMode(configuration.gpio, INPUT);
 #else
@@ -15,25 +23,19 @@ void AFESwitch::begin(uint8_t id, AFEDevice *_Device) {
   state = digitalRead(configuration.gpio);
   previousState = state;
   phisicallyState = state;
-#ifdef AFE_CONFIG_HARDWARE_LED
-  uint8_t systeLedID = Data.getSystemLedID();
-  if (systeLedID > 0 && _Device->configuration.noOfLEDs >= systeLedID) {
-    Led.begin(systeLedID - 1);
-  }
-#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Defining get and state MQTT Topics */
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
   }
 
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
-    mqttStateTopic[0] = '\0';
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
@@ -120,14 +122,14 @@ void AFESwitch::listener() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
             if (time - startTime >= 35000) {
-              Led.blink(50);
+              Led->blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 3; i++) {
-                Led.blink(200);
+                Led->blink(200);
                 delay(200);
               }
 #endif
@@ -137,7 +139,7 @@ void AFESwitch::listener() {
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 2; i++) {
-                Led.blink(200);
+                Led->blink(200);
                 delay(200);
               }
 #endif
@@ -146,7 +148,7 @@ void AFESwitch::listener() {
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-              Led.blink(200);
+              Led->blink(200);
 #endif
               _pressed4fiveSeconds = true;
             }
@@ -160,7 +162,7 @@ void AFESwitch::listener() {
         }
       }
 
-      //  Serial << endl << "press=" << pressed << " _press=" << _pressed;
+      //  Serial << endl << F("press=") << pressed << F(" _press=") << _pressed;
 
     } else if (currentState == previousState && startTime > 0 &&
                configuration.type == AFE_SWITCH_TYPE_MONO) {
@@ -192,3 +194,5 @@ void AFESwitch::listener() {
     }
   }
 }
+
+#endif // AFE_CONFIG_HARDWARE_SWITCH

@@ -3,29 +3,16 @@
 #ifndef _AFE_Relay_h
 #define _AFE_Relay_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
+//#include <arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-#include <AFE-Thermal-Protection.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-#include <AFE-Thermostat.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-#include <AFE-Humidistat.h>
 #endif
 
 #ifdef DEBUG
@@ -35,17 +22,6 @@
 class AFERelay {
 
 public:
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-  AFEThermostat Thermostat;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTION
-  AFEThermalProtection ThermalProtection;
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-  AFEHumidistat Humidistat;
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -59,10 +35,9 @@ public:
 
   /* Constructors */
   AFERelay();
-  AFERelay(uint8_t id);
 
   /* Method: initiates relay */
-  void begin(uint8_t id);
+  void begin(AFEDataAccess *, uint8_t id);
 
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
@@ -80,19 +55,19 @@ public:
   byte get();
 
   /* Turns on relay */
-  void on(boolean invert = false);
+  void on();
 
   /* Turns off relay */
-  void off(boolean invert = false);
+  void off();
+
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
 
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   /* Methods automatically turns off/on relay */
-  boolean autoTurnOff(boolean invert = false);
+  boolean autoTurnOff();
 #endif
-
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
   /* It sets timer to auto-switch of the relay */
@@ -112,14 +87,14 @@ public:
 
 private:
   uint8_t _id;
-  AFEDataAccess Data; // @TODO nie jest konsekwentnie jak np. w switch
+  AFEDataAccess *Data; // @TODO nie jest konsekwentnie jak np. w switch
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 
   unsigned long turnOffCounter = 0;
-#ifdef AFE_CONFIG_RELAY_AUTOONOFF_LISTENER
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
   boolean timerUnitInSeconds = true;
 #endif
 
@@ -129,4 +104,6 @@ private:
   void setRelayAfterRestore(uint8_t option);
 };
 
-#endif
+
+#endif // AFE_CONFIG_HARDWARE_RELAY
+#endif // _AFE_Relay_h

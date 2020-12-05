@@ -7,17 +7,17 @@ AFEGate::AFEGate(){};
 void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Initializing the Gate: " << id;
+  Serial << endl << F("INFO: Initializing the Gate: ") << id;
 #endif
 
   Device = _Device;
   Data = _Data;
 
   gateId = id;
-  configuration = Data->getGateConfiguration(gateId);
+  Data->getConfiguration(gateId,&configuration);
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Initializing the gate's relay: " << configuration.relayId;
+         << F("INFO: Initializing the gate's relay: ") << configuration.relayId;
 #endif
   if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
     GateRelay.begin(configuration.relayId);
@@ -25,7 +25,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
     GateRelay.gateId = id;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: Initializing the gate's " << id << ", contactrons";
+  Serial << endl << F("INFO: Initializing the gate's ") << id << F(", contactrons");
 #endif
 
   /* How many contactrons monitors the gate. Default 0 set in class init
@@ -39,7 +39,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Number of contactrons to initialize: "
+         << F("INFO: Number of contactrons to initialize: ")
          << numberOfContractons;
 #endif
 
@@ -52,19 +52,19 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
     sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
   } else {
-    mqttCommandTopic[0] = '\0';
-    mqttStateTopic[0] = '\0';
+    mqttCommandTopic[0] = AFE_EMPTY_STRING;
+    mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Gate Initialization completed";
+  Serial << endl << F("INFO: Gate Initialization completed");
 #endif
 }
 
 void AFEGate::toggle() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Toggling gate";
+  Serial << endl << F("INFO: Toggling gate");
 #endif
   GateRelay.on();
   // Setting Gate state manually is possible only if there is no contactrons
@@ -132,7 +132,7 @@ boolean AFEGate::event() {
 
 void AFEGate::triggerEvent() {
 #ifdef DEBUG
-  Serial << endl << "INFO: Gate event triggered externally";
+  Serial << endl << F("INFO: Gate event triggered externally");
 #endif
 
   _event = true;

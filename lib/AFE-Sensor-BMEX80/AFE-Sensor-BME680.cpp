@@ -6,13 +6,13 @@ AFESensorBME680::AFESensorBME680(){};
 
 boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 #ifdef DEBUG
-  Serial << endl << "INFO: Initializing: Sensor type: BME680";
+  Serial << endl << F("INFO: Initializing: Sensor type: BME680");
 #endif
 
   EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
 #ifdef DEBUG
   Serial << endl
-         << "INFO: EEPROM initialized: Size reserved: "
+         << F("INFO: EEPROM initialized: Size reserved: ")
          << BSEC_MAX_STATE_BLOB_SIZE + 1;
 #endif
 
@@ -20,23 +20,23 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
   if (configuration->i2cAddress != 0) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Setting I2C: SDA:" << I2C->SDA << ", SCL:" << I2C->SCL;
+           << F("INFO: Setting I2C: SDA:") << I2C->SDA << F(", SCL:") << I2C->SCL;
 #endif
     Wire.begin(I2C->SDA, I2C->SCL);
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Sensor address: 0x" << _HEX(configuration->i2cAddress);
+           << F("INFO: Sensor address: 0x") << _HEX(configuration->i2cAddress);
 #endif
     Bme.begin(configuration->i2cAddress, Wire);
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Bosch BSEC library version " << Bme.version.major << "."
-           << Bme.version.minor << "." << Bme.version.major_bugfix << "."
+           << F("INFO: Bosch BSEC library version ") << Bme.version.major << F(".")
+           << Bme.version.minor << F(".") << Bme.version.major_bugfix << F(".")
            << Bme.version.minor_bugfix;
 
     checkBmeStatus();
-    Serial << endl << "INFO: Bosch: Setting config";
+    Serial << endl << F("INFO: Bosch: Setting config");
 
 #endif
 
@@ -48,8 +48,8 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
     loadState();
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Bosch: Stated loaded from the EEPROM" << endl
-           << "INFO: Bosch: Updating subscription";
+           << F("INFO: Bosch: Stated loaded from the EEPROM") << endl
+           << F("INFO: Bosch: Updating subscription");
 #endif
 
     bsec_virtual_sensor_t sensorList[10] = {
@@ -76,7 +76,7 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 
 boolean AFESensorBME680::read() {
 #ifdef DEBUG
-// Serial << endl << "INFO: Reading sensor data: BME680";
+// Serial << endl << F("INFO: Reading sensor data: BME680");
 #endif
 
   if (Bme.run()) {
@@ -96,16 +96,16 @@ boolean AFESensorBME680::read() {
     #ifdef DEBUG
         Serial << endl
                << endl
-               << "INFO: Unused BME sensor data:" << endl
-               << " - rawTemperature: " << Bme.rawTemperature << endl
-               << " - rawHumidity: " << Bme.rawTemperature << endl
-               << " - stabStatus: " << Bme.stabStatus << endl
-               << " - runInStatus: " << Bme.runInStatus << endl
-               << " - rawTemperature: " << Bme.rawTemperature << endl
-               << " - gasPercentage: " << Bme.gasPercentage << endl
-               << " - compGasValue: " << Bme.compGasValue << endl
-               << " - compGasAccuracy: " << Bme.compGasAccuracy << endl
-               << " - gasPercentageAcccuracy: " << Bme.gasPercentageAcccuracy
+               << F("INFO: Unused BME sensor data:") << endl
+               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
+               << F(" - rawHumidity: ") << Bme.rawTemperature << endl
+               << F(" - stabStatus: ") << Bme.stabStatus << endl
+               << F(" - runInStatus: ") << Bme.runInStatus << endl
+               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
+               << F(" - gasPercentage: ") << Bme.gasPercentage << endl
+               << F(" - compGasValue: ") << Bme.compGasValue << endl
+               << F(" - compGasAccuracy: ") << Bme.compGasAccuracy << endl
+               << F(" - gasPercentageAcccuracy: ") << Bme.gasPercentageAcccuracy
                << endl;
 
     #endif
@@ -131,24 +131,24 @@ void AFESensorBME680::checkBmeStatus() {
 
   if (Bme.status != BSEC_OK) {
     if (Bme.status < BSEC_OK) {
-      Serial << endl << "ERROR: Bosch: BSEC error code : " << Bme.status;
+      Serial << endl << F("ERROR: Bosch: BSEC error code : ") << Bme.status;
     } else {
-      Serial << endl << "WARN: Bosch: BSEC warning code : " << Bme.status;
+      Serial << endl << F("WARN: Bosch: BSEC warning code : ") << Bme.status;
     }
   } else {
-    // Serial << endl << "INFO: Bosch: Health: OK";
+    // Serial << endl << F("INFO: Bosch: Health: OK");
   }
 
   if (Bme.bme680Status != BME680_OK) {
     if (Bme.bme680Status < BME680_OK) {
       Serial << endl
-             << "ERROR: Bosch: BME680 error code : " << Bme.bme680Status;
+             << F("ERROR: Bosch: BME680 error code : ") << Bme.bme680Status;
     } else {
       Serial << endl
-             << "WARN: Bosch: BME680 warning code : " << Bme.bme680Status;
+             << F("WARN: Bosch: BME680 warning code : ") << Bme.bme680Status;
     }
   } else {
-    //  Serial << endl << "INFO: Bosch: Health: OK";
+    //  Serial << endl << F("INFO: Bosch: Health: OK");
   }
 }
 #endif
@@ -156,7 +156,7 @@ void AFESensorBME680::checkBmeStatus() {
 void AFESensorBME680::loadState(void) {
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Bosch: Reading state from EEPROM: ";
+    Serial << endl << F("INFO: Bosch: Reading state from EEPROM: ");
 #endif
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++) {
       bsecState[i] = EEPROM.read(i + 1);
@@ -170,7 +170,7 @@ void AFESensorBME680::loadState(void) {
 #endif
   } else {
 #ifdef DEBUG
-    Serial << endl << "INFO: Bosch: Erasing EEPROM";
+    Serial << endl << F("INFO: Bosch: Erasing EEPROM");
 #endif
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
       EEPROM.write(i, 0);
@@ -201,7 +201,7 @@ void AFESensorBME680::updateState(void) {
     Bme.getState(bsecState);
 #ifdef DEBUG
     checkBmeStatus();
-    Serial << endl << "INFO: Bosch: Writing state to EEPROM: ";
+    Serial << endl << F("INFO: Bosch: Writing state to EEPROM: ");
 #endif
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++) {

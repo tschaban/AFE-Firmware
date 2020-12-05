@@ -1,6 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifdef AFE_CONFIG_HARDWARE_DHXX
+#ifdef AFE_CONFIG_HARDWARE_DHT
 
 #include "AFE-Sensor-DHT.h"
 
@@ -71,12 +71,12 @@ void AFESensorDHT::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << "DH: Time =  " << (time - startTime) / 1000 << "sec, "
-               << ", readResult=" << readResult << ", T=" << currentTemperature
-               << ", H=" << currentHumidity << ", D=" << currentDewPoint
-               << ", HI=" << currentHeatIndex;
+               << F("DH: Time =  ") << (time - startTime) / 1000 << F("sec, "
+               << F(", readResult=") << readResult << F(", T=") << currentTemperature
+               << F(", H=") << currentHumidity << F(", D=") << currentDewPoint
+               << F(", HI=") << currentHeatIndex;
       } else {
-        Serial << endl << "DH: ReadResult = " << readResult;
+        Serial << endl << F("DH: ReadResult = ") << readResult;
 #endif
       }
       startTime = 0;

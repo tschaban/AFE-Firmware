@@ -21,7 +21,9 @@ recaptchacontact:
 	* BME680 - temperatura, wilgotność, ciśnienie, ciśnienie względne, Punkt Rosy, Temperatura Odczuwalna, IAQ, Statyczne IAQ, Ekwiwalent CO2, Breath VOC Ekwiwalent 
 * 1 czujnik BH1750 (natężenia światła)
 * 1 czujnik Honeywell HPMA115S0 (pyłów zawieszonych 2.5 oraz 10)
-* 1 czujnik AS3935 (odległości od burzy) - [w wersji PRO](/postawowe-informacje/wersja-pro)
+* 1 czujnik AS3935 (odległości od burzy) - [w wersji PRO: dodane do testów](/postawowe-informacje/wersja-pro)
+* 1 czujnik deszczu
+* 1 czujnik wiatru
 * 1 wejście do przetwarzania sygnałów analogowo-cyfrowych - [w wersji PRO](/postawowe-informacje/wersja-pro)
 
 **API**
@@ -44,6 +46,7 @@ recaptchacontact:
 * Sterowanie przekaźnikiem zewnętrznym włącznikiem/przyciskiem mono (dzwonkowym) lub bistabilnymi
 * LED może informwać o stanie przekaźnika
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
+* Pomiar stanu naładowania baterii [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Obsługa wiadomości LWT (dla MQTT)
 * Konfiguracja przez przeglądarkę w języku PL lub EN
 * Możliwość nadania stałego adresu IP dla urządzenia
