@@ -321,15 +321,15 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       else if (siteConfig.ID == AFE_CONFIG_SITE_CONTACTRON) {
         CONTACTRON configuration;
-        getContactronData(siteConfig.deviceID, &configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
-        configuration = {0};
+      //  configuration = {0};
       }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
-      else if (configuration.ID == AFE_CONFIG_SITE_GATE) {
+      else if (siteConfig.ID == AFE_CONFIG_SITE_GATE) {
         GATE configuration;
-        getGateData(&configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
@@ -1138,75 +1138,75 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEWebServer::getContactronData(uint8_t id, CONTACTRON *data) {
-  data->type = server.arg("y").length() > 0
+void AFEWebServer::get(CONTACTRON &data) {
+  data.type = server.arg("y").length() > 0
                    ? server.arg("y").toInt()
                    : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
 
-  data->ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->bouncing = server.arg("b").length() > 0
+  data.bouncing = server.arg("b").length() > 0
                        ? server.arg("b").toInt()
                        : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
 
-  data->gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
                                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEWebServer::getGateData(GATE *data) {
+void AFEWebServer::get(GATE &data) {
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 
-  data->relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->contactron.id[0] = server.arg("c1").length() > 0
+  data.contactron.id[0] = server.arg("c1").length() > 0
                                ? server.arg("c1").toInt()
                                : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->contactron.id[1] = server.arg("c2").length() > 0
+  data.contactron.id[1] = server.arg("c2").length() > 0
                                ? server.arg("c2").toInt()
                                : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  for (uint8_t i = 0; i < sizeof(data->states.state); i++) {
-    data->states.state[i] = server.arg("s" + String(i)).length() > 0
+  for (uint8_t i = 0; i < sizeof(data.states.state); i++) {
+    data.states.state[i] = server.arg("s" + String(i)).length() > 0
                                 ? server.arg("s" + String(i)).toInt()
                                 : AFE_GATE_UNKNOWN;
   }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
                                                     : AFE_DOMOTICZ_DEFAULT_IDX;
-  data->domoticzControl.idx = server.arg("z").length() > 0
+  data.domoticzControl.idx = server.arg("z").length() > 0
                                   ? server.arg("z").toInt()
                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
@@ -1216,7 +1216,7 @@ void AFEWebServer::getGateData(GATE *data) {
 void AFEWebServer::getPIRData(uint8_t id, PIR *data) {
 
   if (server.arg("g" + String(id)).length() > 0) {
-    data->gpio = server.arg("g" + String(id)).toInt();
+    data.gpio = server.arg("g" + String(id)).toInt();
   }
 
   if (server.arg("n" + String(id)).length() > 0) {

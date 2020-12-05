@@ -11,7 +11,7 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
   Data->getConfiguration(id,&configuration);
   pinMode(configuration.gpio, INPUT_PULLUP);
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed.begin(configuration.ledID);
+    ContactronLed.begin(Data,configuration.ledID);
   }
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

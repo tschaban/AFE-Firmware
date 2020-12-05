@@ -3,8 +3,10 @@
 #ifndef _AFE_CONTACTRON_Structure_h
 #define _AFE_CONTACTRON_Structure_h
 
-
 #include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#include <arduino.h>
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
@@ -23,4 +25,5 @@ struct CONTACTRON {
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
+#endif // _AFE_CONTACTRON_Structure_h

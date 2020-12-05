@@ -20,7 +20,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
          << F("INFO: Initializing the gate's relay: ") << configuration.relayId;
 #endif
   if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    GateRelay.begin(configuration.relayId);
+    GateRelay.begin(Data,configuration.relayId);
     GateRelay.setTimerUnitToSeconds(false);
     GateRelay.gateId = id;
   }

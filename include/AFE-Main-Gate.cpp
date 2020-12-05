@@ -2,8 +2,14 @@
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
-void initializeGate() {
-#ifdef AFE_CONFIG_HARDWARE_GATE
+/* ---------Headers ---------*/
+
+void initializeGate(void);
+void gateEventsListener(void);
+
+/* --------- Body -----------*/
+
+void initializeGate(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
     Gate[i].begin(i, &Device, &Data);
     GatesCurrentStates.state[i] = AFE_GATE_UNKNOWN;
@@ -29,14 +35,13 @@ void initializeGate() {
     }
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: Gate: ") << i << F(" initialized";
+    Serial << endl << F("INFO: Gate: ") << i << F(" initialized");
 #endif
   }
-#endif
 }
 
 /* Method processes gate related events */
-void gateEventsListener() {
+void gateEventsListener(void) {
   uint8_t _gateState;
   for (uint8_t gateId = 0; gateId < Device.configuration.noOfGates; gateId++) {
     if (Gate[gateId].event()) {
