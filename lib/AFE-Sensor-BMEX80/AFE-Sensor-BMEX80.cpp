@@ -272,5 +272,5 @@ AFESensorBMEX80::getDomoticzHumidityState(float value) {
     return AFE_HUMIDITY_NORMAL;
   }
 }
+#endif 
 #endif // AFE_CONFIG_HARDWARE_BMEX80
-#endif

@@ -3,12 +3,10 @@
 #ifndef _AFE_Sensor_BME680_h
 #define _AFE_Sensor_BME680_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 
+#include <arduino.h>
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-I2C-Structure.h>
 #include <EEPROM.h>
@@ -55,4 +53,5 @@ public:
   void get(BMEX80_DATA &_data);
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+#endif // _AFE_Sensor_BME680_h

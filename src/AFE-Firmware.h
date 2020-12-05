@@ -54,8 +54,6 @@ AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 AFEAnalogInput AnalogInput;
 #endif
 
-
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 AFEGate Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];

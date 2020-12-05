@@ -3,11 +3,7 @@
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -103,11 +99,6 @@ private:
 
   /* Item: HTML <select> populated with <option> for number of items selection
    */
-  void _addListOfHardware(String &item, uint8_t noOfItems,
-                          uint8_t noOffConnected, const char *field,
-                          const char *label, uint8_t index, uint8_t noneValue,
-                          boolean disabled = false);
-
   void addListOfHardwareItem(String &item, uint8_t noOfItems,
                              uint8_t noOffConnected, const char *field,
                              const char *label, boolean disabled = false);
@@ -116,12 +107,25 @@ private:
   void addRegulatorControllerItem(String &item, REGULATOR *configuration);
 #endif
 
+/* Item: list of gate states */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  void generateGateStatesList(String &item, uint8_t id, byte state);
+  void addGateStatesListItem(String &item, uint8_t id, byte state);
 #endif
 
+/* Item: list of contactrons */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void addGateContactronsListItem(String &item, const char *name,
+                                  uint8_t contactronId);
+#endif
+
+/* Item: list discovered IIC devices */
 #ifdef AFE_CONFIG_HARDWARE_I2C
   void addDeviceI2CAddressSelectionItem(String &page, uint8_t address);
+#endif
+
+/* Item: list of LEDs */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void addLEDSelectionItem(String &page, uint8_t id);
 #endif
 
 public:
