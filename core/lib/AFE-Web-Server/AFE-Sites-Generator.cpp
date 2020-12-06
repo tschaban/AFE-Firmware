@@ -182,15 +182,18 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 #ifdef AFE_CONFIG_HARDWARE_I2C
 /* Don't show it if I2C sensor is not added to the device, this is check for AFE
  * T6 only*/
-#ifdef T6_CONFIG
+#if defined(T6_CONFIG)
   if (Device->configuration.noOfBMEX80s > 0 ||
       Device->configuration.noOfBH1750s > 0 ||
       Device->configuration.noOfAS3935s > 0) {
+#elif defined(T5_CONFIG)
+  if (Device->configuration.noOfBMEX80s > 0 ||
+      Device->configuration.noOfBH1750s > 0) {
 #endif
 
     addMenuItem(page, "I2C", AFE_CONFIG_SITE_I2C);
 
-#ifdef T6_CONFIG
+#if  defined(T6_CONFIG) || defined(T5_CONFIG)
   }
 #endif // T6_CONFIG
 

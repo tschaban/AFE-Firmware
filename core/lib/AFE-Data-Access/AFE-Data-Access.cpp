@@ -2672,13 +2672,13 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #if defined(AFE_DEVICE_iECSv20)
   ContactronConfiguration.gpio = 14;
   sprintf(ContactronConfiguration.name, "C1");
-  saveConfiguration(0, ContactronConfiguration);
+  saveConfiguration(0, &ContactronConfiguration);
   ContactronConfiguration.gpio = 13;
   sprintf(ContactronConfiguration.name, "C2");
-  saveConfiguration(1, ContactronConfiguration);
+  saveConfiguration(1, &ContactronConfiguration);
   ContactronConfiguration.gpio = 3;
   sprintf(ContactronConfiguration.name, "C3");
-  saveConfiguration(2, ContactronConfiguration);
+  saveConfiguration(2, &ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
 #endif
   ContactronConfiguration.gpio = 0;
@@ -2853,7 +2853,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.states.state[2] = AFE_GATE_UNKNOWN;
   GateConfiguration.states.state[3] = AFE_GATE_CLOSED;
   sprintf(GateConfiguration.name, "G1");
-  saveConfiguration(0, GateConfiguration);
+  saveConfiguration(0, &GateConfiguration);
   saveGateState(0, AFE_GATE_UNKNOWN);
 #endif
 
