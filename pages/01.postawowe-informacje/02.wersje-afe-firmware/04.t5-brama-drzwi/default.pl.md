@@ -36,7 +36,8 @@ recaptchacontact:
 	*  Długość podtrzymania przekaźnika (długość impulsu) ustawiany jest w zakresie od 1 milisekundy do 100 sekundy
 	*  Stan bramy/drzwi jest wysyałany do systemu automatyki
 	*  Stan każdego kontaktronu może być wysyałany do systemu automatyki
-	*  Stan kontraktonu może być sygnalizowany przed diodę LED  
+	*  Stan kontraktonu może być sygnalizowany przed diodę LED
+	*  Przekaźnik ustawiany sygnałem LOW lub HIGH
 * Funkcje przekaźnika
 	* Ustawiania stanu początkowego przekaźników po uruchomieniu
 	* Ustawienie stany przekaźników po podłączeniu się do brokera MQTT
