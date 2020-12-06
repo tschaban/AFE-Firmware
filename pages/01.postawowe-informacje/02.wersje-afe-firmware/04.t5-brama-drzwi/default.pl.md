@@ -43,6 +43,7 @@ recaptchacontact:
 	* Automatyczne wyłączanie przekaźników po zadanym czasie
 	* Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 	* LED może informwać o stanie przekaźnika
+	* Przekaźnik ustawiany sygnałem LOW lub HIGH
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Pomiar temperatury, wilgotności, ciśnienia względnego i bezwzględnego, punktu rosy, IAQ, BVOC - w zależności od zainstalowanego czujnika Bosch [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Pomiar natężeni światła (lux) [[W wersji PRO](/postawowe-informacje/wersja-pro)]
