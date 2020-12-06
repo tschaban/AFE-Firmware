@@ -2,6 +2,8 @@
 
 #include "AFE-Contactron.h"
 
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+
 AFEContactron::AFEContactron(){};
 
 void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
@@ -86,3 +88,5 @@ void AFEContactron::getJSON(char *json) {
   sprintf(json, "{\"state\":\":%s\"}",
           (get() == AFE_CONTACTRON_OPEN ? "open" : "closed"));
 }
+
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON

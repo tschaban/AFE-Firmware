@@ -125,7 +125,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  void getI2CPortData(I2CPORT *);
+  void get(I2CPORT &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -133,11 +133,11 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  void getBMEX80SensorData(BMEX80 *);
+  void get(BMEX80 &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  void getBH1750SensorData(BH1750 *);
+  void get(BH1750 &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935

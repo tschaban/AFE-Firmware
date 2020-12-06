@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Gate.h"
+#ifdef AFE_CONFIG_HARDWARE_GATE
 
 AFEGate::AFEGate(){};
 
@@ -148,3 +149,4 @@ void AFEGate::getJSON(char *json) {
                       : (_state == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen"
                                                            : "unknown"))));
 }
+#endif // AFE_CONFIG_HARDWARE_GATE
