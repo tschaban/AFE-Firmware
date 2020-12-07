@@ -192,7 +192,7 @@
 
 /* ---- Basic Switch + DS18B20 ---- */
 #elif defined(T1_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.1"
+#define AFE_FIRMWARE_VERSION "2.4.0"
 #define AFE_FIRMWARE_TYPE 1
 
 /* File system used */
