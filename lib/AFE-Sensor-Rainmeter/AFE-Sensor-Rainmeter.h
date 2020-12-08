@@ -10,7 +10,6 @@
 #endif
 
 #include <AFE-Configuration.h>
-
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 

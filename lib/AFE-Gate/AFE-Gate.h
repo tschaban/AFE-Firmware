@@ -3,13 +3,11 @@
 #ifndef _AFE_Gate_h
 #define _AFE_Gate_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_GATE
+
+#include <arduino.h>
+
 #include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -72,4 +70,5 @@ private:
   uint8_t getGateStateBasedOnContractons();
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
+#endif // _AFE_Gate_h

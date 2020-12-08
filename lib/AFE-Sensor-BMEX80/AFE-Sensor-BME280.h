@@ -3,12 +3,10 @@
 #ifndef _AFE_Sensor_BME280_h
 #define _AFE_Sensor_BME280_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 
+#include <arduino.h>
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-I2C-Structure.h>
 #include <Adafruit_BME280.h>
@@ -33,4 +31,6 @@ public:
 
   boolean read();
 };
-#endif
+
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+#endif // _AFE_Sensor_BME280_h

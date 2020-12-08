@@ -7,9 +7,9 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
-#include <arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-Binary.h>
+#include <arduino.h>
 
 #ifdef DEBUG
 #include <Streaming.h>

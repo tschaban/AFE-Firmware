@@ -25,6 +25,7 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   } else {
     mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   if (Sensor.isConnected(configuration.address)) {
@@ -51,7 +52,8 @@ float AFESensorDS18B20::getCurrentTemperature() {
   if (_initialized) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Reading temperature from DS18B20[" << configuration.name << "] ";
+           << "INFO: Reading temperature from DS18B20[" << configuration.name
+           << "] ";
 #endif
 
     if (readTimeOut == 0) {
@@ -80,7 +82,6 @@ float AFESensorDS18B20::getCurrentTemperature() {
   Serial << ": " << temperature
          << ", read duration: " << (millis() - readTimeOut) << "msec.";
 #endif
-  currentTemperature = temperature;
   readTimeOut = 0;
   return temperature;
 }
@@ -98,12 +99,24 @@ boolean AFESensorDS18B20::listener() {
 
     if (time - startTime >= configuration.interval * 1000) {
       float newTemperature = getCurrentTemperature();
-      if (!configuration.sendOnlyChanges ||
-          newTemperature != currentTemperature) {
-        currentTemperature = newTemperature;
-        ready = true;
-        startTime = 0;
+
+      if (newTemperature != DEVICE_DISCONNECTED_C) {
+        if ((configuration.sendOnlyChanges &&
+             newTemperature != currentTemperature) ||
+            !configuration.sendOnlyChanges) {
+          currentTemperature = newTemperature;
+          ready = true;
+        }
       }
+#ifdef DEBUG
+      else {
+        Serial
+            << endl
+            << "WARN: DS18B20: Sensor returned -127: means it's disconnected";
+      }
+#endif
+
+      startTime = 0;
     }
   }
 
@@ -116,7 +129,7 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
 #ifdef DEBUG
   Serial << endl << "INFO: Scanning for DS18B20 sensors on GPIO: " << gpio;
   Serial << endl << " - Wire Bus initialized";
-#endif  
+#endif
   Sensor.setOneWire(&WireBUS);
   WireBUS.begin(gpio);
   Sensor.begin();
@@ -218,4 +231,3 @@ unsigned long AFESensorDS18B20::getDomoticzIDX() {
 #endif
 
 #endif // AFE_CONFIG_HARDWARE_DS18B20
-

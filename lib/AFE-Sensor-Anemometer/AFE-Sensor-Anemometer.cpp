@@ -92,8 +92,9 @@ boolean AFESensorAnemometer::listener(void) {
 }
 
 void AFESensorAnemometer::getJSON(char *json) {
-  sprintf(json, "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
-                "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
+  sprintf(json,
+          "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
+          "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
           lastSpeedMS, lastSpeedKMH);
 }
 

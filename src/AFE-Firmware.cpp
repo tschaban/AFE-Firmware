@@ -135,7 +135,7 @@ ESP.eraseConfig();
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeContractons();
+      initializeContracton();
     }
 #endif
 
@@ -173,7 +173,7 @@ ESP.eraseConfig();
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeBMEX80Sensor();
+      initializeBMX80Sensor();
     }
 #endif
 
@@ -303,7 +303,7 @@ void loop() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-        BMEX80SensorEventsListener();
+        BMX80SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

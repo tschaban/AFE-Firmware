@@ -599,13 +599,13 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     for (uint8_t i = configuration->noOfGates;
          i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
 #ifdef DEBUG
-      Serial << endl << F("INFO: Update of Gate configuration";
+      Serial << endl << F("INFO: Update of Gate configuration");
 
 #endif
-      _Gate = getConfiguration(i);
+      getConfiguration(i, &_Gate);
       if (_Gate.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
         _Gate.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
-        saveConfiguration(i, _Gate);
+        saveConfiguration(i, &_Gate);
       }
 #ifdef DEBUG
       else {
@@ -2596,8 +2596,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
-
-  return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
@@ -2669,13 +2667,13 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #if defined(AFE_DEVICE_iECSv20)
   ContactronConfiguration.gpio = 14;
   sprintf(ContactronConfiguration.name, "C1");
-  saveConfiguration(0, ContactronConfiguration);
+  saveConfiguration(0, &ContactronConfiguration);
   ContactronConfiguration.gpio = 13;
   sprintf(ContactronConfiguration.name, "C2");
-  saveConfiguration(1, ContactronConfiguration);
+  saveConfiguration(1, &ContactronConfiguration);
   ContactronConfiguration.gpio = 3;
   sprintf(ContactronConfiguration.name, "C3");
-  saveConfiguration(2, ContactronConfiguration);
+  saveConfiguration(2, &ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
 #endif
   ContactronConfiguration.gpio = 0;
@@ -2686,7 +2684,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
            << F("INFO: Creating file: cfg-contactron-") << i << F(".json");
 #endif
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
-    saveConfiguration(i, ContactronConfiguration);
+    saveConfiguration(i, &ContactronConfiguration);
   }
 }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
@@ -2759,8 +2757,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
-
-  return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 
@@ -2852,7 +2848,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.states.state[2] = AFE_GATE_UNKNOWN;
   GateConfiguration.states.state[3] = AFE_GATE_CLOSED;
   sprintf(GateConfiguration.name, "G1");
-  saveConfiguration(0, GateConfiguration);
+  saveConfiguration(0, &GateConfiguration);
   saveGateState(0, AFE_GATE_UNKNOWN);
 #endif
 
@@ -2869,7 +2865,7 @@ void AFEDataAccess::createGateConfigurationFile() {
     Serial << endl << F("INFO: Creating file: cfg-gate-") << i << F(".json");
 #endif
     sprintf(GateConfiguration.name, "G%d", i + 1);
-    saveConfiguration(i, GateConfiguration);
+    saveConfiguration(i, &GateConfiguration);
     saveGateState(i, AFE_GATE_UNKNOWN);
   }
 }
@@ -3448,7 +3444,6 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-
 void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3502,7 +3497,6 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3543,9 +3537,72 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
   }
 #endif
 }
+void AFEDataAccess::createSerialConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_UART_CONFIGURATION;
+#endif
+  SERIALPORT configuration;
+  configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
+  configuration.TXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
+  saveConfiguration(&configuration);
+}
+#endif // AFE_CONFIG_HARDWARE_UART
 
-void AFEDataAccess::createSerialConfigurationFile() {}
+#ifdef AFE_CONFIG_HARDWARE_I2C
+void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_I2C_CONFIGURATION
+         << F(" ... ");
+#endif
 
+  File configFile = SPIFFS.open(AFE_FILE_I2C_CONFIGURATION, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->SDA = root["SDA"];
+      configuration->SCL = root["SCL"];
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
+           << F(" not opened");
+  }
+#endif
+}
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3596,7 +3653,7 @@ void AFEDataAccess::createI2CConfigurationFile() {
   configuration.SCL = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
   saveConfiguration(&configuration);
 }
-#endif // AFE_CONFIG_HARDWARE_UART
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
@@ -4137,13 +4194,20 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 
       sprintf(configuration->name, root["name"]);
       configuration->gpio = root["gpio"];
-      configuration->interval = root["interval"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;
-      configuration->sendOnlyChanges = root["sendOnlyChanges"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
+      configuration->interval =
+          root["interval"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;
+      configuration->sendOnlyChanges =
+          root["sendOnlyChanges"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
       configuration->type = root["type"];
       configuration->temperature.unit = root["temperature"]["unit"];
-      configuration->temperature.correction = root["temperature"]["correction"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
+      configuration->temperature.correction =
+          root["temperature"]["correction"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
       configuration->humidity.unit = root["humidity"]["unit"];
-      configuration->humidity.correction = root["humidity"]["correction"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
+      configuration->humidity.correction =
+          root["humidity"]["correction"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.temperature.idx =
@@ -4199,9 +4263,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &temperature = root.createNestedObject("temperature");
     JsonObject &humidity = root.createNestedObject("humidity");
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     JsonObject &domoticz = root.createNestedObject("idx");
-#endif    
+#endif
     root["name"] = configuration->name;
     root["gpio"] = configuration->gpio;
     root["type"] = configuration->type;
@@ -4249,9 +4313,11 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
       AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
   configuration.type = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
-  configuration.temperature.correction = AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
+  configuration.temperature.correction =
+      AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
   configuration.humidity.unit = AFE_HUMIDITY_UNIT;
-  configuration.humidity.correction = AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
+  configuration.humidity.correction =
+      AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.temperature.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.hunidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;

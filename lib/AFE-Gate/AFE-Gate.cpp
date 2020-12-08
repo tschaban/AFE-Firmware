@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Gate.h"
+#ifdef AFE_CONFIG_HARDWARE_GATE
 
 AFEGate::AFEGate(){};
 
@@ -20,7 +21,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
          << F("INFO: Initializing the gate's relay: ") << configuration.relayId;
 #endif
   if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    GateRelay.begin(configuration.relayId);
+    GateRelay.begin(Data,configuration.relayId);
     GateRelay.setTimerUnitToSeconds(false);
     GateRelay.gateId = id;
   }
@@ -148,3 +149,4 @@ void AFEGate::getJSON(char *json) {
                       : (_state == AFE_GATE_PARTIALLY_OPEN ? "partiallyOpen"
                                                            : "unknown"))));
 }
+#endif // AFE_CONFIG_HARDWARE_GATE

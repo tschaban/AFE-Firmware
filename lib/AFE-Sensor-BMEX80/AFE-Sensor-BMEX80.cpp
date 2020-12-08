@@ -32,6 +32,7 @@ void AFESensorBMEX80::begin(uint8_t id) {
     break;
   case AFE_BMP180_SENSOR:
     _initialized = s1.begin(&configuration, &I2C);
+    break;
   default:
     _initialized = false;
     break;
@@ -271,5 +272,5 @@ AFESensorBMEX80::getDomoticzHumidityState(float value) {
     return AFE_HUMIDITY_NORMAL;
   }
 }
+#endif 
 #endif // AFE_CONFIG_HARDWARE_BMEX80
-#endif
