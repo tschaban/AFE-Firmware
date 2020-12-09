@@ -16,9 +16,13 @@
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 struct DHT_DOMOTICZ {
-  uint32_t temperature;
-  uint32_t humidity;
+  DOMOTICZ_BASIC_CONFIG temperature;
+  DOMOTICZ_BASIC_CONFIG humidity;
+  DOMOTICZ_BASIC_CONFIG dewPoint;
+  DOMOTICZ_BASIC_CONFIG heatIndex;
+  DOMOTICZ_BASIC_CONFIG temperatureHumidity;
 };
+
 #endif
 
 

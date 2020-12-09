@@ -1049,9 +1049,8 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   addListOfGPIOs(page, "g", configuration.gpio);
 
   addSelectFormItemOpen(page, "f", L_SWITCH_FUNCTIONALITY);
-  addSelectOptionFormItem(page, L_NONE, "0",
-                          configuration.functionality ==
-                              AFE_SWITCH_FUNCTIONALITY_NONE);
+  addSelectOptionFormItem(page, L_NONE, "0", configuration.functionality ==
+                                                 AFE_SWITCH_FUNCTIONALITY_NONE);
   addSelectOptionFormItem(page, L_SWITCH_SYSTEM_BUTTON, "1",
                           configuration.functionality ==
                               AFE_SWITCH_FUNCTIONALITY_MULTI);
@@ -1208,8 +1207,8 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   addSelectFormItemOpen(page, "u", L_UNITS);
   addSelectOptionFormItem(page, "C", "1",
                           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS);
-  addSelectOptionFormItem(
-      page, "F", "2", configuration.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+  addSelectOptionFormItem(page, "F", "2", configuration.unit ==
+                                              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
   addSelectFormItemClose(page);
 
   closeSection(page);
@@ -1244,8 +1243,10 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   DHT configuration;
   Data->getConfiguration(id, &configuration);
   char _number[13];
+  char _text[13];
 
-  openSection(page, "DHT", "");
+  sprintf(_text, "DHT: #%d", id + 1);
+  openSection(page, _text, "");
 
   /* Item: GPIO */
   addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
@@ -1254,6 +1255,21 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
+  /* Item: type of the sensor */
+  addSelectFormItemOpen(page, "t", L_DHT_SENSOR_TYPE);
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.type == AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, "DHT11", "11",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11);
+  addSelectOptionFormItem(page, "DHT21/AM2301", "21",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_DHT21);
+  addSelectOptionFormItem(page, "DHT22/AM2302", "22",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22);
+  addSelectFormItemClose(page);
+
   /* Item: Interval */
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
@@ -1261,19 +1277,75 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
                    L_SECONDS);
 
   /* Item: Send only changes */
-  addCheckboxFormItem(page, "s", L_DS18B20_SENT_ONLY_CHANGES, "1",
+  addCheckboxFormItem(page, "s", L_DHT_SENT_ONLY_CHANGES, "1",
                       configuration.sendOnlyChanges);
 
+  closeSection(page);
+
+  /* Item: Unit */
+  openSection(page, L_UNITS, "");
+  addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
+  addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
+                                              AFE_TEMPERATURE_UNIT_CELSIUS);
+  addSelectOptionFormItem(page, "F", "2", configuration.temperature.unit ==
+                                              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
   addSelectFormItemClose(page);
+  closeSection(page);
+
+  /* Item: Corrections of sensor values */
+  openSection(page, L_CORRECTIONS, "");
+  sprintf(_number, "%-.3f", configuration.temperature.correction);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tc", L_TEMPERATURE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999",
+                   "0.001");
+
+  /* Item: humidity correction */
+  sprintf(_number, "%-.3f", configuration.humidity.correction);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "hc", L_HUMIDITY, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999", "0.001");
 
   closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, "Domoticz", L_DOMOTICZ_NO_IF_IDX_0);
 
+    sprintf(_number, "%d", configuration.domoticz.temperature.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i1", L_TEMPERATURE_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.humidity.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i2", L_HUMIDITY_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_HUMIDITY_IDX_DEW_POINT,
+        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i4", L_HUMIDITY_IDX_HEAT_INDEX,
+        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i5", L_HUMIDITY_IDX_TEMP_HUM, _number,
+        AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    closeSection(page);
+  }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, L_DS18B20_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
-      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+      openSection(page, L_DHT_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "m", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
 
       closeSection(page);
@@ -1803,9 +1875,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
     /* Item: Unit */
     openSection(page, L_UNITS, "");
     addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
-    addSelectOptionFormItem(page, "C", "1",
-                            configuration.temperature.unit ==
-                                AFE_TEMPERATURE_UNIT_CELSIUS);
+    addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
+                                                AFE_TEMPERATURE_UNIT_CELSIUS);
     addSelectOptionFormItem(page, "F", "2",
                             configuration.temperature.unit ==
                                 AFE_TEMPERATURE_UNIT_FAHRENHEIT);

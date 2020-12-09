@@ -3,12 +3,22 @@
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
 
-AFESensorDHT::AFESensorDHT(){}
+AFESensorDHT::AFESensorDHT() {}
 
 void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Data = _Data;
-  Data->getConfiguration(id,&configuration);
+
+  Data->getConfiguration(id, &configuration);
+
+#ifdef DEBUG
+  Serial << endl << "INFO: DHT: Initializing...";
+#endif
+
   dht.begin(configuration.gpio, configuration.type);
+
+#ifdef DEBUG
+  Serial << "DONE";
+#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Defining get and state MQTT Topics */
@@ -23,6 +33,13 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   } else {
     mqttStateTopic[0] = AFE_EMPTY_STRING;
   }
+
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: DHT: MQTT Topic [state]: " << mqttStateTopic
+         << ", [cmd]:" << mqttCommandTopic;
+#endif
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   _initialized = true;
@@ -49,7 +66,7 @@ boolean AFESensorDHT::listener() {
 
     if (time - startTime >= configuration.interval * 1000) {
 
-      boolean readResult = dht.acquireAndWait(1000);
+      boolean readResult = dht.acquireAndWait(3000);
 
       if (readResult == DHTLIB_OK) {
         float _temperature =
@@ -83,10 +100,10 @@ boolean AFESensorDHT::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000 << F("sec, ")
-               << F(", Temp: ") << currentTemperature
-               << F(", Humi: ") << currentHumidity << F(", DewPoint: ") << currentDewPoint
-               << F(", HeatIndex: ") << currentHeatIndex;
+               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
+               << F("sec, ") << F(", Temp: ") << currentTemperature
+               << F(", Humi: ") << currentHumidity << F(", DewPoint: ")
+               << currentDewPoint << F(", HeatIndex: ") << currentHeatIndex;
       } else {
         Serial << endl
                << F("ERROR: DHT: Problem with reading data from the sensor. "

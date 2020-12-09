@@ -455,6 +455,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      configuration->noOfDHTs =
+          root["noOfDHTs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -550,6 +555,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     root["noOfDS18B20s"] = configuration->noOfDS18B20s;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    root["noOfDHTs"] = configuration->noOfDHTs;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
@@ -682,6 +691,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   deviceConfiguration.noOfDS18B20s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  deviceConfiguration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
@@ -4210,10 +4223,16 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
           AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration->domoticz.temperature.idx =
-          root["domoticz"]["temperature"]["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.temperatureHumidity.idx =
+          root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.gasResistance.idx =
+          root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.humidity.idx =
-          root["domoticz"]["humidity"]["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+          root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.pressure.idx =
+          root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.heatIndex.idx =
+          root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -4280,6 +4299,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
 #else
     domoticz["temperature"] = configuration->domoticz.temperature.idx;
     domoticz["humidity"] = configuration->domoticz.humidity.idx;
+    domoticz["dewPoint"] = configuration->domoticz.dewPoint.idx;
+    domoticz["heatIndex"] = configuration->domoticz.heatIndex.idx;
+    domoticz["temperatureHumidity"] =
+        configuration->domoticz.temperatureHumidity.idx;
+
 #endif
     root.printTo(configFile);
 #ifdef DEBUG
@@ -4318,17 +4342,22 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
   configuration.humidity.unit = AFE_HUMIDITY_UNIT;
   configuration.humidity.correction =
       AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.temperatureHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.temperature.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-  configuration.domoticz.hunidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.humidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.dewPoint.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.heatIndex.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
+
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
 #ifdef DEBUG
     Serial << endl << "INFO: Creating file: /cfg-dht-" << i << ".json";
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+    sprintf(configuration.mqtt.topic, "DHT/%d", i + 1);
 #endif
     sprintf(configuration.name, "DHT-%d", i + 1);
     saveConfiguration(i, &configuration);

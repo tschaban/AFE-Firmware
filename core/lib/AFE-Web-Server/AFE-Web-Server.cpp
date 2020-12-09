@@ -143,6 +143,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteDS18B20Sensor(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  case AFE_CONFIG_SITE_DHT:
+    Site.siteDHTSensor(page, siteConfig->deviceID);
+    break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
     Site.siteAnemometerSensor(page);
@@ -388,6 +393,14 @@ void AFEWebServer::generate(boolean upload) {
         get(ds18B20Configuration);
         Data->saveConfiguration(siteConfig.deviceID, &ds18B20Configuration);
         ds18B20Configuration = {0};
+      }
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      else if (siteConfig.ID == AFE_CONFIG_SITE_DHT) {
+        DHT dhtConfiguration;
+        get(dhtConfiguration);
+        Data->saveConfiguration(siteConfig.deviceID, &dhtConfiguration);
+        dhtConfiguration = {0};
       }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
@@ -1317,6 +1330,12 @@ void AFEWebServer::get(DS18B20 &data) {
 #ifdef AFE_CONFIG_HARDWARE_DHT
 void AFEWebServer::get(DHT &data) {
 
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
   if (server.arg("g").length() > 0) {
     data.gpio = server.arg("g").toInt();
   }
@@ -1344,6 +1363,35 @@ void AFEWebServer::get(DHT &data) {
   if (server.arg("hu").length() > 0) {
     data.humidity.unit = server.arg("hu").toInt();
   }
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.temperature.idx = server.arg("i1").length() > 0
+                                       ? server.arg("i1").toInt()
+                                       : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.humidity.idx = server.arg("i2").length() > 0
+                                    ? server.arg("i2").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.dewPoint.idx = server.arg("i3").length() > 0
+                                    ? server.arg("i3").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.heatIndex.idx = server.arg("i4").length() > 0
+                                     ? server.arg("i4").toInt()
+                                     : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.temperatureHumidity.idx = server.arg("i5").length() > 0
+                                               ? server.arg("i5").toInt()
+                                               : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg("m").length() > 0) {
+    server.arg("m").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+
 
 }
 #endif // AFE_CONFIG_HARDWARE_DHT

@@ -344,10 +344,14 @@
 #define L_DS18B20_SENSORS "Czujniki DS18B20"
 #define L_DS18B20_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury zmieni się"
 #define L_DS18B20_TEMPERATURE_CORRECTION "Korekta wartości o"
-#define L_DS18B20_MQTT_TOPIC "MQTT Temat informacji z czujnika"
+#define L_DS18B20_MQTT_TOPIC "MQTT Temat informacji z czujnika DS18B20"
 #define L_DS18B20_SEARCH "Skanuj GPIO"
 #define L_DS18B20_NO_SENSOR "Żaden czujnik nie został jeszcze znaleziony. Sprawdź, czy jest poprawnie podłączony, a następnie przeskanuj GPIO"
 
+/* DHT */
+#define L_DHT_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury lub wilgotności zmieniły się"
+#define L_DHT_MQTT_TOPIC "MQTT Temat informacji z czujnika DHT"
+#define L_DHT_SENSOR_TYPE "Typ czujnika"
 
 /* Anemometer Sensor */
 #define L_ANEMOMETER_SENSOR "Czujnik siły wiatru"
