@@ -11,10 +11,14 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Data->getConfiguration(id, &configuration);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: DHT: Initializing...";
+  Serial << endl
+         << "INFO: DHT: Initializing...GPIO: " << configuration.gpio
+         << ", Type: DHT" << configuration.type;
 #endif
 
-  dht.begin(configuration.gpio, configuration.type);
+  // dht.begin(configuration.gpio, configuration.type);
+
+  dht.setup(configuration.gpio, DHTesp::DHT22);
 
 #ifdef DEBUG
   Serial << "DONE";
@@ -66,51 +70,62 @@ boolean AFESensorDHT::listener() {
 
     if (time - startTime >= configuration.interval * 1000) {
 
-      boolean readResult = dht.acquireAndWait(3000);
+#ifdef DEBUG
+      Serial << endl << "INFO: DHT: Reading data from the sensor...";
+#endif
 
-      if (readResult == DHTLIB_OK) {
-        float _temperature =
-            (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                 ? dht.getCelsius()
-                 : dht.getFahrenheit()) +
-            configuration.temperature.correction;
+      float _humidity = dht.getHumidity();
+      float _temperature = dht.getTemperature();
+      if (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
+        _temperature = dht.toFahrenheit(_temperature);
+      }
 
-        float _humidity = dht.getHumidity() + configuration.humidity.correction;
-        float _dewPoint = dht.getDewPoint();
-        float _heatIndex =
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                ? dht.getHeatIndexCelsius()
-                : dht.getHeatIndexFahrenheit();
+      // applying corrections
+      _temperature += configuration.temperature.correction;
+      _humidity += configuration.humidity.correction;
 
-        _ready = true;
-        if (configuration.sendOnlyChanges) {
-          if (_temperature == currentTemperature &&
-              _humidity == currentHumidity && _dewPoint == currentDewPoint &&
-              _heatIndex == currentHeatIndex) {
-            _ready = false;
-          }
+      byte _ready = true;
+      if (configuration.sendOnlyChanges) {
+        if (_temperature == currentTemperature &&
+            _humidity == currentHumidity) {
+          _ready = false;
         }
+      }
 
-        if (_ready) {
-          currentTemperature = _temperature;
-          currentHumidity = _humidity;
-          currentDewPoint = _dewPoint;
-          currentHeatIndex = _heatIndex;
-        }
+      if (_ready) {
+        currentTemperature = _temperature;
+        currentHumidity = _humidity;
+        currentAbsoluteHumidity = dht.computeAbsoluteHumidity(
+            currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        currentDewPoint = dht.computeDewPoint(
+            currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        currentDewPoint = dht.computeDewPoint(
+            currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        currentHeatIndex = dht.computeHeatIndex(
+            currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        currentPerception = dht.computePerception(
+            currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        ComfortState comfortState;
+        currentComfortRatio = dht.getComfortRatio(
+            comfortState, currentTemperature, currentHumidity,
+            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+      }
 
 #ifdef DEBUG
-        Serial << endl
-               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
-               << F("sec, ") << F(", Temp: ") << currentTemperature
-               << F(", Humi: ") << currentHumidity << F(", DewPoint: ")
-               << currentDewPoint << F(", HeatIndex: ") << currentHeatIndex;
-      } else {
-        Serial << endl
-               << F("ERROR: DHT: Problem with reading data from the sensor. "
-                    "ErrorID: ")
-               << readResult;
+      Serial << endl
+             << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
+             << F("sec, ") << F(", Temperature: ") << currentTemperature
+             << F(", Humidity: ") << currentHumidity
+             << F(", Absolute Humidity: ") << currentAbsoluteHumidity
+             << F(", DewPoint: ") << currentDewPoint << F(", HeatIndex: ")
+             << currentHeatIndex << F(", Perception: ") << currentPerception
+             << F(", Comfort Ratio: ") << currentComfortRatio;
 #endif
-      }
       startTime = 0;
     }
   }

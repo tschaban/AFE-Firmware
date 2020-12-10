@@ -7,7 +7,7 @@
 
 //#include <arduino.h>
 #include <AFE-Data-Access.h>
-#include <PietteTech_DHT.h>
+#include <DHTesp.h>
 
 
 #ifdef DEBUG
@@ -20,14 +20,17 @@ private:
   AFEDataAccess *Data;
   float currentTemperature;
   float currentHumidity;
+  float currentAbsoluteHumidity;
   float currentDewPoint;
   float currentHeatIndex;
+  byte currentPerception;
+  float currentComfortRatio;
 
   boolean _initialized = false;
 
   unsigned long startTime = 0;
 
-  PietteTech_DHT dht;
+  DHTesp dht;
 
 public:
   DHT configuration;
