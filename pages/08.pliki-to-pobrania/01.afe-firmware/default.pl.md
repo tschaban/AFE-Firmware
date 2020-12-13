@@ -61,6 +61,21 @@ recaptchacontact:
 
 ---
 
+### AFE Firmware T1: Włącznik WiFi z czujnikami z serii DHT
+* Wersja obsługująca do czterech przekaźników oraz do czterech czujników DHT z termostatem, higrostatem, x-statem oraz zabezieczeniem termicznym
+* Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
+~~* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t1-wlacznik-i-ds18b20) dotyczące AFE Firmware T2~~
+* Paczka do ściągnięcia 
+	* zawiera wersje 1Mb oraz 4Mb
+	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+
+
+##### [Pobierz najnowszą wersję 2.4.0 BETA](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
+
+**Poprzednie wersje**
+
+
+---
 ### AFE Firmware T5: Sterowanie kontrolerem bramy/drzwi/furtki
 * Sterowanie max dwoma bramami, furtkami oraz monitorowanie stanu otwarcia bramy z wykorzystaniem czujników magnetycznych
 * Idealnie pasuje do urządzeń jak [Sterowniki Furtki iECS](https://www.smartnydom.pl/sterownik-bramy-wersja-v2/)
