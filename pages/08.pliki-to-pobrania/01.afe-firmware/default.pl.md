@@ -68,6 +68,9 @@ recaptchacontact:
 * Paczka do ściągnięcia 
 	* zawiera wersje 1Mb oraz 4Mb
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
+	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
+
+!!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
 
 ##### [Pobierz najnowszą wersję 2.4.0 BETA](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
