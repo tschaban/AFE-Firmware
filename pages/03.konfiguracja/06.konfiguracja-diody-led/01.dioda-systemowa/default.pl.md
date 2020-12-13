@@ -20,5 +20,6 @@ Jeśli w module skonfigurowany jes przycisk systemowy to:
 
 > AFE Firmware umożliwia odwrócenie sygnalizacji LED tzn. że dioda LED świeci kiedy urządzenie jest w trybie normalnego działania i gaśnie kiedy wystąpi jakieś zdarznie.
 
-https://www.youtube.com/watch?v=byy56ObY7-4
+[plugin:youtube](https://www.youtube.com/watch?v=byy56ObY7-4)
+
 
