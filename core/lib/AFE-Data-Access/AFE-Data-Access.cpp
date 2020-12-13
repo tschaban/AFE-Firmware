@@ -3031,6 +3031,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
           root["turnOffAbove"] |
           AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      configuration->controllingParameter =
+          root["controllingParameter"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3090,6 +3095,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
     root["turnOff"] = configuration->turnOff;
     root["turnOnAbove"] = configuration->turnOnAbove;
     root["turnOffAbove"] = configuration->turnOffAbove;
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    root["controllingParameter"] = configuration->controllingParameter;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -3131,6 +3141,11 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
   configuration.turnOffAbove =
       AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
   configuration.turnOnAbove = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  configuration.controllingParameter = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -4225,14 +4240,28 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.temperatureHumidity.idx =
           root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration->domoticz.gasResistance.idx =
+
+      configuration->domoticz.temperature.idx =
           root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
       configuration->domoticz.humidity.idx =
           root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration->domoticz.pressure.idx =
+
+      configuration->domoticz.dewPoint.idx =
           root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
       configuration->domoticz.heatIndex.idx =
           root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.absoluteHumidity.idx =
+          root["idx"]["absoluteHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.perception.idx =
+          root["idx"]["perception"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.comfort.idx =
+          root["idx"]["comfort"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -4303,6 +4332,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
     domoticz["heatIndex"] = configuration->domoticz.heatIndex.idx;
     domoticz["temperatureHumidity"] =
         configuration->domoticz.temperatureHumidity.idx;
+    domoticz["absoluteHumidity"] = configuration->domoticz.absoluteHumidity.idx;
+    domoticz["perception"] = configuration->domoticz.perception.idx;
+    domoticz["comfort"] = configuration->domoticz.comfort.idx;
 
 #endif
     root.printTo(configFile);
@@ -4349,8 +4381,10 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
   configuration.domoticz.humidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.dewPoint.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.heatIndex.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.comfort.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.perception.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.absoluteHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
-
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
 #ifdef DEBUG

@@ -371,7 +371,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 /* DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DHT,
-                        Device->configuration.noOfDHTs, "dh", "LICZBA DHT");
+                        Device->configuration.noOfDHTs, "dh", L_DHT_SENSORS);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
@@ -459,25 +459,34 @@ void AFESitesGenerator::siteDevice(String &page) {
 
   closeSection(page);
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+
+  if (Device->configuration.noOfRelays > 0) {
+
 #if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||                             \
     defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
-  /* Additional functionalities */
-  openSection(page, L_DEVICE_ADDITIONAL_FUNCTIONALITIES, "");
+    /* Additional functionalities */
+    openSection(page, L_DEVICE_ADDITIONAL_FUNCTIONALITIES, "");
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
-                        Device->configuration.noOfRegulators, "re",
-                        L_DEVICE_NUMBER_OF_REGULATORS);
+    addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
+                          Device->configuration.noOfRegulators, "re",
+                          L_DEVICE_NUMBER_OF_REGULATORS);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS,
-                        Device->configuration.noOfThermalProtectors, "tp",
-                        L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS);
+    addListOfHardwareItem(page,
+                          AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS,
+                          Device->configuration.noOfThermalProtectors, "tp",
+                          L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS);
 #endif
-  closeSection(page);
+    closeSection(page);
 #endif // defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||
        // defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
+
+  } // noOfRelays > 0
+
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
   /* Section: APIs */
   openSection(page, L_DEVICE_CONTROLLING, L_DEVICE_CONTROLLING_INFO);
@@ -890,9 +899,11 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
   openSection(page, L_REGULATOR, "");
 
+  /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
+  /* Item: relay */
   addSelectFormItemOpen(page, "r", L_RELAY);
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
@@ -908,6 +919,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   }
   addSelectFormItemClose(page);
 
+  /* Item: sensor */
   addSelectFormItemOpen(page, "s", L_SENSOR);
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
@@ -923,9 +935,69 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
     addSelectOptionFormItem(page, text, value,
                             configuration.sensorId == i ? true : false);
   }
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  DHT DHTConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
+    Data->getConfiguration(i, &DHTConfiguration);
+    sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.sensorId == i ? true : false);
+  }
   addSelectFormItemClose(page);
 
+  /* Item: controlling parameter */
+  addSelectFormItemOpen(page, "cp", L_DHT_CONTROLLING_PARAMETER);
+  sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, L_NONE, value,
+                          configuration.controllingParameter ==
+                                  AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? true
+                              : false);
+
+  sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE);
+  addSelectOptionFormItem(page, L_REGULATOR_CP_TEMPERATURE, value,
+                          configuration.controllingParameter ==
+                                  AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE
+                              ? true
+                              : false);
+
+  sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX);
+  addSelectOptionFormItem(page, L_REGULATOR_CP_HEAT_INDEX, value,
+                          configuration.controllingParameter ==
+                                  AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX
+                              ? true
+                              : false);
+
+  sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY);
+  addSelectOptionFormItem(page, L_REGULATOR_CP_HUMIDITY, value,
+                          configuration.controllingParameter ==
+                                  AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY
+                              ? true
+                              : false);
+
+  sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY);
+  addSelectOptionFormItem(
+      page, L_REGULATOR_CP_ABSOLOUTE_HUMIDITY, value,
+      configuration.controllingParameter ==
+              AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY
+          ? true
+          : false);
+
+  sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT);
+  addSelectOptionFormItem(page, L_REGULATOR_CP_DEW_POINT, value,
+                          configuration.controllingParameter ==
+                                  AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT
+                              ? true
+                              : false);
+
+#endif // AFE_CONFIG_HARDWARE_DHT
+
+  addSelectFormItemClose(page);
+
+  /* Item: regulator enabled? */
   addCheckboxFormItem(page, "e", L_REGULATOR_ENABLED, "1",
                       configuration.enabled);
 
@@ -1000,6 +1072,18 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
                             configuration.sensorId == i ? true : false);
   }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  DHT DHTConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
+    Data->getConfiguration(i, &DHTConfiguration);
+    sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
+    sprintf(value, "%d", i);
+    addSelectOptionFormItem(page, text, value,
+                            configuration.sensorId == i ? true : false);
+  }
+#endif
+
   addSelectFormItemClose(page);
 
   addCheckboxFormItem(page, "e", L_THERMAL_PROTECTOR_ENABLED, "1",
@@ -1259,15 +1343,21 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   addSelectFormItemOpen(page, "t", L_DHT_SENSOR_TYPE);
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_HARDWARE_ITEM_NOT_EXIST);
-  addSelectOptionFormItem(page, "DHT11", "11",
+  addSelectOptionFormItem(page, L_DHT_AUTO_DETECT, "0",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO);
+  addSelectOptionFormItem(page, "DHT11", "1",
                           configuration.type ==
                               AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11);
-  addSelectOptionFormItem(page, "DHT21/AM2301", "21",
-                          configuration.type ==
-                              AFE_CONFIG_HARDWARE_DHT_TYPE_DHT21);
-  addSelectOptionFormItem(page, "DHT22/AM2302", "22",
+  addSelectOptionFormItem(page, "DHT22", "2",
                           configuration.type ==
                               AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22);
+  addSelectOptionFormItem(page, "AM2302", "3",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_AM2302);
+  addSelectOptionFormItem(page, "RHT03", "4",
+                          configuration.type ==
+                              AFE_CONFIG_HARDWARE_DHT_TYPE_RHT03);
   addSelectFormItemClose(page);
 
   /* Item: Interval */
@@ -1322,6 +1412,18 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
+    sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i5", L_HUMIDITY_IDX_TEMP_HUM, _number,
+        AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.absoluteHumidity.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i8", L_HUMIDITY_IDX_ABSOLUTE, _number,
+        AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
     sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
     addInputFormItem(
         page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_HUMIDITY_IDX_DEW_POINT,
@@ -1334,11 +1436,17 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
         _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
-    sprintf(_number, "%d", configuration.domoticz.temperatureHumidity.idx);
-    addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i5", L_HUMIDITY_IDX_TEMP_HUM, _number,
-        AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.perception.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i6", L_PERCEPTION_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.domoticz.comfort.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i7", L_COMFORT_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     closeSection(page);
   }
@@ -1353,24 +1461,6 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_DHT
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
-String AFESitesGenerator::addThermostateMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?o=thermostat\">&#8227; ";
-  page += language == 0 ? "Termostat" : "Thermostat";
-  page += "</a></li>";
-  return page;
-}
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
-String AFESitesGenerator::addHumidistatMenuItem() {
-  String page = "<li class=\"itm\"><a href=\"\\?o=humidistat\">&#8227; ";
-  page += language == 0 ? "Regulator wilgotności" : "Humidistat";
-  page += "</a></li>";
-  return page;
-}
-#endif // AFE_CONFIG_FUNCTIONALITY_HUMIDISTAT
 
 #if defined(T3_CONFIG)
 String AFESitesGenerator::sitePIR(uint8_t id) {

@@ -22,7 +22,6 @@ void DHTSensorEventsListener(void) {
 
 #if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||                            \
     defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
-  float temperature;
   boolean relayStateChanged;
 #endif
 
@@ -30,17 +29,45 @@ void DHTSensorEventsListener(void) {
 
     if (DHTSensor[i].listener()) {
 
-#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||                            \
-    defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
-      temperature = DHTSensor[i].getTemperature();
-#endif
-
 /* Thermostat */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       relayStateChanged = false;
       for (uint8_t j = 0; j < Device.configuration.noOfRegulators; j++) {
         if (Regulator[j].configuration.sensorId == i) {
-          if (Regulator[j].listener(temperature)) {
+
+          float _value = 0;
+
+          switch (Regulator[j].configuration.controllingParameter) {
+          case AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE:
+            _value = DHTSensor[i].currentTemperature;
+            break;
+          case AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX:
+            _value = DHTSensor[i].heatIndex(
+                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
+                DHTSensor[i].configuration.temperature.unit ==
+                    AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+            break;
+          case AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY:
+            _value = DHTSensor[i].currentHumidity;
+            break;
+          case AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY:
+            _value = DHTSensor[i].absoluteHumidity(
+                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
+                DHTSensor[i].configuration.temperature.unit ==
+                    AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+            break;
+          case AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT:
+            _value = DHTSensor[i].dewPoint(
+                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
+                DHTSensor[i].configuration.temperature.unit ==
+                    AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+            break;
+          default:
+            _value = DHTSensor[i].currentTemperature;
+            break;
+          }
+
+          if (Regulator[j].listener(_value)) {
             if (Regulator[j].deviceState &&
                 Relay[Regulator[j].configuration.relayId].get() ==
                     AFE_RELAY_OFF) {
@@ -69,7 +96,7 @@ void DHTSensorEventsListener(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       for (uint8_t j = 0; j < Device.configuration.noOfThermalProtectors; j++) {
         if (ThermalProtector[j].configuration.sensorId == i) {
-          if (ThermalProtector[j].listener(temperature)) {
+          if (ThermalProtector[j].listener(DHTSensor[i].currentTemperature)) {
             if (ThermalProtector[j].turnOff &&
                 Relay[ThermalProtector[j].configuration.relayId].get() ==
                     AFE_RELAY_ON) {

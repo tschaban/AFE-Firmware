@@ -5,26 +5,22 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_DHT
 
-//#include <arduino.h>
+#include <arduino.h>
 #include <AFE-Data-Access.h>
+#include <AFE-Sensors-Common.h>
 #include <DHTesp.h>
+#include <pl_PL.h>
+
 
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFESensorDHT {
+class AFESensorDHT : public AFESensorsCommon {
 
 private:
   AFEDataAccess *Data;
-  float currentTemperature;
-  float currentHumidity;
-  float currentAbsoluteHumidity;
-  float currentDewPoint;
-  float currentHeatIndex;
-  byte currentPerception;
-  float currentComfortRatio;
 
   boolean _initialized = false;
 
@@ -39,23 +35,23 @@ public:
   char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
 #endif
 
+  float currentTemperature;
+  float currentHumidity;
+/*
+  float currentAbsoluteHumidity;
+  float currentDewPoint;
+  float currentHeatIndex;
+  byte currentPerception;
+  float currentComfortRatio;
+  ComfortState currentComfortState;
+*/
+
+
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorDHT();
 
   /* Initializing method */
   void begin(AFEDataAccess *, uint8_t id);
-
-  /* Method returns temperature */
-  float getTemperature();
-
-  /* Method returns humidity */
-  float getHumidity();
-
-  /* Method returns heat index */
-  float getHeatIndex();
-
-  /* Method returns Dew Point */
-  float getDewPoint();
 
   /* Method should be added to the main loop to check temperature / humidity in
    * defined time frame */

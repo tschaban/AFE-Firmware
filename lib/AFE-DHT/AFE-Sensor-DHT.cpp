@@ -16,10 +16,20 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
          << ", Type: DHT" << configuration.type;
 #endif
 
-  // dht.begin(configuration.gpio, configuration.type);
-
-  dht.setup(configuration.gpio, DHTesp::DHT22);
-
+  dht.setup(configuration.gpio,
+            configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO
+                ? DHTesp::AUTO_DETECT
+                : configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11
+                      ? DHTesp::DHT11
+                      : configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22
+                            ? DHTesp::DHT22
+                            : configuration.type ==
+                                      AFE_CONFIG_HARDWARE_DHT_TYPE_AM2302
+                                  ? DHTesp::AM2302
+                                  : configuration.type ==
+                                            AFE_CONFIG_HARDWARE_DHT_TYPE_RHT03
+                                        ? DHTesp::RHT03
+                                        : DHTesp::AUTO_DETECT);
 #ifdef DEBUG
   Serial << "DONE";
 #endif
@@ -49,14 +59,6 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   _initialized = true;
 }
 
-float AFESensorDHT::getTemperature() { return currentTemperature; }
-
-float AFESensorDHT::getHumidity() { return currentHumidity; }
-
-float AFESensorDHT::getDewPoint() { return currentDewPoint; }
-
-float AFESensorDHT::getHeatIndex() { return currentHeatIndex; }
-
 boolean AFESensorDHT::listener() {
 
   boolean _ready = false;
@@ -84,7 +86,8 @@ boolean AFESensorDHT::listener() {
       _temperature += configuration.temperature.correction;
       _humidity += configuration.humidity.correction;
 
-      byte _ready = true;
+      _ready = true;
+
       if (configuration.sendOnlyChanges) {
         if (_temperature == currentTemperature &&
             _humidity == currentHumidity) {
@@ -95,36 +98,16 @@ boolean AFESensorDHT::listener() {
       if (_ready) {
         currentTemperature = _temperature;
         currentHumidity = _humidity;
-        currentAbsoluteHumidity = dht.computeAbsoluteHumidity(
-            currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-        currentDewPoint = dht.computeDewPoint(
-            currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-        currentDewPoint = dht.computeDewPoint(
-            currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-        currentHeatIndex = dht.computeHeatIndex(
-            currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-        currentPerception = dht.computePerception(
-            currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-        ComfortState comfortState;
-        currentComfortRatio = dht.getComfortRatio(
-            comfortState, currentTemperature, currentHumidity,
-            configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       }
 
 #ifdef DEBUG
+
+
       Serial << endl
              << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
              << F("sec, ") << F(", Temperature: ") << currentTemperature
-             << F(", Humidity: ") << currentHumidity
-             << F(", Absolute Humidity: ") << currentAbsoluteHumidity
-             << F(", DewPoint: ") << currentDewPoint << F(", HeatIndex: ")
-             << currentHeatIndex << F(", Perception: ") << currentPerception
-             << F(", Comfort Ratio: ") << currentComfortRatio;
+             << F(", Humidity: ") << currentHumidity;
+
 #endif
       startTime = 0;
     }
@@ -134,10 +117,48 @@ boolean AFESensorDHT::listener() {
 }
 
 void AFESensorDHT::getJSON(char *json) {
-  sprintf(json, "{\"temperature\":{\"value\":%.3f,\"unit\":\"%s\"}}",
+
+  char _perception[22]; // Max size of dewPointPerception from lang.pack
+  strcpy_P(_perception, (char *)pgm_read_dword(&(dewPointPerception[perception(
+                            currentTemperature, currentHumidity,
+                            configuration.temperature.unit ==
+                                AFE_TEMPERATURE_UNIT_FAHRENHEIT)])));
+
+  char _comfort[18]; // Max size of dewPointPerception from lang.pack
+  ComfortState comfortStatus;
+  float _comfortRatio = comfort(
+      comfortStatus, currentTemperature, currentHumidity,
+      configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+  strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+
+  sprintf(json, "{\"temperature\":{\"value\":%.1f,\"unit\":\"%s\"},"
+                "\"humidity\":{\"value\":%.1f,\"unit\":\"%%\"},"
+                "\"absoluteHumidity\":{\"value\":%.2f,\"unit\":\"%%\"},"
+                "\"heatIndex\":{\"value\":%.2f,\"unit\":\"%s\"},\"dewPoint\":{"
+                "\"value\":%.2f,\"unit\":\"%s\"},\"perception\":{\"value\":%d,"
+                "\"description\":\"%s\"},\"comfort\":{\"value\":%d,\"ratio\":%.2f,\"unit\":"
+                "\"%%\",\"description\":\"%s\"}}",
           currentTemperature,
           configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
-                                                                         : "F");
+                                                                         : "F",
+          currentHumidity,
+          absoluteHumidity(currentTemperature, currentHumidity,
+                           configuration.temperature.unit ==
+                               AFE_TEMPERATURE_UNIT_FAHRENHEIT),
+          heatIndex(currentTemperature, currentHumidity,
+                    configuration.temperature.unit ==
+                        AFE_TEMPERATURE_UNIT_FAHRENHEIT),
+          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+                                                                         : "F",
+          dewPoint(currentTemperature, currentHumidity,
+                   configuration.temperature.unit ==
+                       AFE_TEMPERATURE_UNIT_FAHRENHEIT),
+          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+                                                                         : "F",
+          perception(currentTemperature, currentHumidity,
+                     configuration.temperature.unit ==
+                         AFE_TEMPERATURE_UNIT_FAHRENHEIT),
+          _perception, comfortStatus, _comfortRatio, _comfort);
 }
 
 #endif // AFE_CONFIG_HARDWARE_DHT

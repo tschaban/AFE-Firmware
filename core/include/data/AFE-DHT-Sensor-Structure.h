@@ -18,9 +18,12 @@
 struct DHT_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG temperature;
   DOMOTICZ_BASIC_CONFIG humidity;
+  DOMOTICZ_BASIC_CONFIG absoluteHumidity;
   DOMOTICZ_BASIC_CONFIG dewPoint;
   DOMOTICZ_BASIC_CONFIG heatIndex;
   DOMOTICZ_BASIC_CONFIG temperatureHumidity;
+  DOMOTICZ_BASIC_CONFIG perception;
+  DOMOTICZ_BASIC_CONFIG comfort;
 };
 
 #endif

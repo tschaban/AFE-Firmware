@@ -315,62 +315,62 @@ void AFEAPIMQTTStandard::processRequest() {
       case AFE_MQTT_DEVICE_RELAY: // RELAY
         processRelay(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
       case AFE_MQTT_DEVICE_SWITCH:
         processSwitch(&mqttTopicsCache[i].id);
-        break;
-#endif
+        break; 
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
         processADC();
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_CONFIG_HARDWARE_BH1750
       case AFE_MQTT_DEVICE_BH1750:
         processBH1750(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
       case AFE_MQTT_DEVICE_BMX80:
         processBMEX80(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 #ifdef AFE_CONFIG_HARDWARE_AS3935
       case AFE_MQTT_DEVICE_AS3935:
         processAS3935(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
       case AFE_MQTT_DEVICE_ANEMOMETER:
         processAnemometerSensor();
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
       case AFE_MQTT_DEVICE_RAINMETER:
         processRainSensor();
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       case AFE_MQTT_DEVICE_HPMA115S0:
         processHPMA115S0(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #ifdef AFE_CONFIG_HARDWARE_GATE
       case AFE_MQTT_DEVICE_GATE:
         processGate(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       case AFE_MQTT_DEVICE_CONTACTRON:
         processContactron(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       case AFE_MQTT_DEVICE_DS18B20:
         processDS18B20(&mqttTopicsCache[i].id);
         break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       case AFE_MQTT_DEVICE_REGULATOR:
         processRegulator(&mqttTopicsCache[i].id);
@@ -382,7 +382,11 @@ void AFEAPIMQTTStandard::processRequest() {
         processThermalProtector(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      case AFE_MQTT_DEVICE_DHT:
+        processDHT(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_HARDWARE_DHT
       default:
 #ifdef DEBUG
         Serial << endl
@@ -850,7 +854,9 @@ void AFEAPIMQTTStandard::processDHT(uint8_t *id) {
 
 boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
   boolean publishStatus = false;
+      Serial << endl << "publishing";
   if (enabled) {
+    Serial << endl << "done";
     char message[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
     _DHTSensor[id]->getJSON(message);
     publishStatus =
