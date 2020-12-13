@@ -1,5 +1,7 @@
 ---
 title: 'Dioda systemowa'
+recaptchacontact:
+    enabled: false
 ---
 
 Systemowa dioda LED w AFE Firmware sygnalizuje:
@@ -17,4 +19,6 @@ Jeśli w module skonfigurowany jes przycisk systemowy to:
 * dioda LED będzie migać bardzo szybko po wciśnięciu i trzymaniu przycisku przez 35 sekund - puszczenie przycisku uniemożliwi wejście w jedną z powyższych opcji
 
 > AFE Firmware umożliwia odwrócenie sygnalizacji LED tzn. że dioda LED świeci kiedy urządzenie jest w trybie normalnego działania i gaśnie kiedy wystąpi jakieś zdarznie.
+
+https://www.youtube.com/watch?v=byy56ObY7-4
 
