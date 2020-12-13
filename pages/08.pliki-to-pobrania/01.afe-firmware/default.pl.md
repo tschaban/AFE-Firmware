@@ -61,7 +61,7 @@ recaptchacontact:
 
 ---
 
-### AFE Firmware T1: Włącznik WiFi z czujnikami z serii DHT
+### AFE Firmware T2: Włącznik WiFi z czujnikami z serii DHT
 * Wersja obsługująca do czterech przekaźników oraz do czterech czujników DHT z termostatem, higrostatem, x-statem oraz zabezieczeniem termicznym
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
 ~~* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t1-wlacznik-i-ds18b20) dotyczące AFE Firmware T2~~
