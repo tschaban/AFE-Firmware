@@ -356,25 +356,16 @@
 #define L_DHT_SENSOR_TYPE "Typ czujnika"
 #define L_DHT_AUTO_DETECT "Wykryj automatycznie"
 
-const char dewPointPerception_Dry[] PROGMEM = "Sucho";
+const char dewPointPerception_Dry[] PROGMEM = "Dla niektórych trochę sucho";
 const char dewPointPerception_VeryComfy[] PROGMEM = "Bardzo komfortowo";
 const char dewPointPerception_Comfy[] PROGMEM = "Komfortowo";
-const char dewPointPerception_Ok[] PROGMEM = "OK";
-const char dewPointPerception_UnComfy[] PROGMEM = "Trochę niekomfortowo";
-const char dewPointPerception_QuiteUnComfy[] PROGMEM = "Niekomfortowo";
-const char dewPointPerception_VeryUnComfy[] PROGMEM = "Bardzo niekomfortowo";
-const char dewPointPerception_SevereUnComfy[] PROGMEM = "Silnie! niekomfortowo";
+const char dewPointPerception_Ok[] PROGMEM = "W porządku dla większości, ale wszyscy odczuwają wilgoć przy górnej krawędzi";
+const char dewPointPerception_UnComfy[] PROGMEM = "Trochę niekomfortowo dla większości ludzi na górnej krawędzi";
+const char dewPointPerception_QuiteUnComfy[] PROGMEM = "Bardzo wilgotne, dość niekomfortowo";
+const char dewPointPerception_VeryUnComfy[] PROGMEM = "Niezwykle niekomfortowo, przytłaczająco";
+const char dewPointPerception_SevereUnComfy[] PROGMEM = "Groźnie, nawet śmiertelny w przypadku chorób związanych z astmą";
 const char* const dewPointPerception[] PROGMEM = { dewPointPerception_Dry, dewPointPerception_VeryComfy,dewPointPerception_Comfy,dewPointPerception_Ok,dewPointPerception_UnComfy,dewPointPerception_QuiteUnComfy,dewPointPerception_VeryUnComfy,dewPointPerception_SevereUnComfy};
 
-
-	//    7         Over 26 °C   Severely high, even deadly for asthma related illnesses
-	//    6         24–26 °C     Extremely uncomfortable, oppressive
-	//    5         21–24 °C     Very humid, quite uncomfortable
-	//    4         18–21 °C     Somewhat uncomfortable for most people at upper edge
-	//    3         16–18 °C     OK for most, but all perceive the humidity at upper edge
-	//    2         13–16 °C     Comfortable
-	//    1         10–12 °C     Very comfortable
-	//    0         Under 10 °C  A bit dry for some
 
 
 const char comfort_OK[] PROGMEM           = "OK";

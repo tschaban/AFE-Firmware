@@ -68,6 +68,13 @@ boolean AFEAPIHTTPDomoticz::callURL(const String url) {
   return _return;
 }
 
+/*
+void AFEAPIHTTPDomoticz::replaceSpaceinUrl(const char *inputString,
+                                           const char &outputString); {}
+*/
+
+
+
 boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
                                               const char *value) {
   boolean _return = false;
@@ -540,15 +547,13 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Comfort */
     if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
-      char _comfort[18]; // Max size of Comfort from lang.pack
+      char _comfort[80]; // Max size of Comfort from lang.pack
       ComfortState comfortStatus;
       _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
                               _DHTSensor[id]->currentHumidity,
                               _DHTSensor[id]->configuration.temperature.unit ==
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
-
-      _comfort = strcpy();
 
       sendCustomSensorCommand(
           _DHTSensor[id]->configuration.domoticz.comfort.idx, _comfort,

@@ -854,9 +854,7 @@ void AFEAPIMQTTStandard::processDHT(uint8_t *id) {
 
 boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
   boolean publishStatus = false;
-      Serial << endl << "publishing";
   if (enabled) {
-    Serial << endl << "done";
     char message[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
     _DHTSensor[id]->getJSON(message);
     publishStatus =

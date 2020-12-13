@@ -124,7 +124,7 @@ void AFESensorDHT::getJSON(char *json) {
                             configuration.temperature.unit ==
                                 AFE_TEMPERATURE_UNIT_FAHRENHEIT)])));
 
-  char _comfort[18]; // Max size of dewPointPerception from lang.pack
+  char _comfort[80]; // Max size of dewPointPerception from lang.pack
   ComfortState comfortStatus;
   float _comfortRatio = comfort(
       comfortStatus, currentTemperature, currentHumidity,

@@ -954,7 +954,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Comfort */
     if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
-      char _comfort[18]; // Max size of Comfort from lang.pack
+      char _comfort[80]; // Max size of Comfort from lang.pack
       ComfortState comfortStatus;
       _DHTSensor[id]->comfort(
           comfortStatus, _DHTSensor[id]->currentTemperature,
