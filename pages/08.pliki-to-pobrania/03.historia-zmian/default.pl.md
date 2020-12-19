@@ -28,6 +28,16 @@ recaptchacontact:
 * [Wersja 1.0.2](https://github.com/tschaban/AFE-Firmware/milestone/10?closed=1)
 * [Wersja 1.0.0](https://github.com/tschaban/AFE-Firmware/milestone/6?closed=1)
 
+##### AFE Firmware T2
+* [Wersja 2.4.0](https://github.com/tschaban/AFE-Firmware/milestone/74?closed=1)
+* [Wersja 1.4.0](https://github.com/tschaban/AFE-Firmware/milestone/51?closed=1)
+* [Wersja 1.3.3](https://github.com/tschaban/AFE-Firmware/milestone/44?closed=1)
+* [Wersja 1.3.1](https://github.com/tschaban/AFE-Firmware/milestone/39?closed=1)
+* [Wersja 1.2.3](https://github.com/tschaban/AFE-Firmware/milestone/29?closed=1)
+* [Wersja 1.2.2](https://github.com/tschaban/AFE-Firmware/milestone/25?closed=1)
+* [Wersja 1.2.1](https://github.com/tschaban/AFE-Firmware/milestone/12?closed=1)
+* [Wersja 1.0.0](https://github.com/tschaban/AFE-Firmware/milestone/9?closed=1)
+
 ##### AFE Firmware T5
 * [Wersja 2.4.0](https://github.com/tschaban/AFE-Firmware/milestone/78?closed=1)
 * [Wersja 2.2.2](https://github.com/tschaban/AFE-Firmware/milestone/77?closed=1)
