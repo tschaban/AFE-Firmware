@@ -230,45 +230,60 @@ float AFESensorsCommon::comfort(ComfortState &destComfortStatus,
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 byte AFESensorsCommon::convertPerceptionDomoticz(byte perception) {
   if (perception == Perception_Dry) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (perception == Perception_VeryComfy) {
-    return alertGreen;
+    return domoticzAlertGreen;
   } else if (perception == Perception_Comfy) {
-    return alertGreen;
+    return domoticzAlertGreen;
   } else if (perception == Perception_Ok) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (perception == Perception_UnComfy) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (perception == Perception_QuiteUnComfy) {
-    return alertOrange;
+    return domoticzAlertOrange;
   } else if (perception == Perception_VeryUnComfy) {
-    return alertRed;
+    return domoticzAlertRed;
   } else {
-    return alertGray;
+    return domoticzAlertGray;
   }
 }
 
 byte AFESensorsCommon::convertComfortDomoticz(byte comfort) {
   if (comfort == Comfort_OK) {
-    return alertGreen;
+    return domoticzAlertGreen;
   } else if (comfort == Comfort_TooHot) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (comfort == Comfort_TooCold) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (comfort == Comfort_TooDry) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (comfort == Comfort_TooHumid) {
-    return alertYellow;
+    return domoticzAlertYellow;
   } else if (comfort == Comfort_HotAndHumid) {
-    return alertRed;
+    return domoticzAlertRed;
   } else if (comfort == Comfort_HotAndDry) {
-    return alertRed;
+    return domoticzAlertRed;
   } else if (comfort == Comfort_ColdAndHumid) {
-    return alertRed;
+    return domoticzAlertRed;
   } else if (comfort == Comfort_ColdAndDry) {
-    return alertRed;
+    return domoticzAlertRed;
   } else {
-    return alertGray;
+    return domoticzAlertGray;
+  }
+}
+
+byte AFESensorsCommon::convertHumidyStatusDomoticz(float humidity) {
+  // https://www.airthings.com/resources/everything-you-need-to-know-about-humidity
+  if (humidity >= 70) {
+    return domoticzHumidityWet;
+  } else if (humidity >= 60) {
+    return domoticzHumidityNormal;
+  } else if (humidity >= 30) {
+    return domoticzHumidityComfortable;
+  } else if (humidity >= 25) {
+    return domoticzHumidityNormal;
+  } else {
+    return domoticzHumidityDry;
   }
 }
 

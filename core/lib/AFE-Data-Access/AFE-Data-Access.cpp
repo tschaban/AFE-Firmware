@@ -4227,6 +4227,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
       configuration->sendOnlyChanges =
           root["sendOnlyChanges"] |
           AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
+
       configuration->type = root["type"];
       configuration->temperature.unit = root["temperature"]["unit"];
       configuration->temperature.correction =

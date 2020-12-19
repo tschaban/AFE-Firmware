@@ -78,37 +78,48 @@ boolean AFESensorDHT::listener() {
 
       float _humidity = dht.getHumidity();
       float _temperature = dht.getTemperature();
-      if (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
-        _temperature = dht.toFahrenheit(_temperature);
-      }
 
-      // applying corrections
-      _temperature += configuration.temperature.correction;
-      _humidity += configuration.humidity.correction;
+      if (!isnan(_humidity) && !isnan(_temperature)) {
 
-      _ready = true;
-
-      if (configuration.sendOnlyChanges) {
-        if (_temperature == currentTemperature &&
-            _humidity == currentHumidity) {
-          _ready = false;
+        if (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
+          _temperature = dht.toFahrenheit(_temperature);
         }
-      }
 
-      if (_ready) {
-        currentTemperature = _temperature;
-        currentHumidity = _humidity;
-      }
+        // applying corrections
+        _temperature += configuration.temperature.correction;
+        _humidity += configuration.humidity.correction;
+
+        _ready = true;
+
+        if (configuration.sendOnlyChanges) {
+          if (_temperature == currentTemperature &&
+              _humidity == currentHumidity) {
+            _ready = false;
+          }
+        }
+
+        if (_ready) {
+          currentTemperature = _temperature;
+          currentHumidity = _humidity;
+        }
 
 #ifdef DEBUG
-
-
-      Serial << endl
-             << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
-             << F("sec, ") << F(", Temperature: ") << currentTemperature
-             << F(", Humidity: ") << currentHumidity;
+        Serial << endl
+               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
+               << F("sec, ") << F(", Temperature: ") << currentTemperature
+               << F(", Humidity: ") << currentHumidity;
 
 #endif
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << F("INFO: DHT: Time:   ") << (time - startTime) / 1000
+               << F("sec, ")
+               << F("Returned NaN: check if the sensor is connected");
+      }
+#endif
+
       startTime = 0;
     }
   }
@@ -136,7 +147,8 @@ void AFESensorDHT::getJSON(char *json) {
                 "\"absoluteHumidity\":{\"value\":%.2f,\"unit\":\"%%\"},"
                 "\"heatIndex\":{\"value\":%.2f,\"unit\":\"%s\"},\"dewPoint\":{"
                 "\"value\":%.2f,\"unit\":\"%s\"},\"perception\":{\"value\":%d,"
-                "\"description\":\"%s\"},\"comfort\":{\"value\":%d,\"ratio\":%.2f,\"unit\":"
+                "\"description\":\"%s\"},\"comfort\":{\"value\":%d,\"ratio\":%."
+                "2f,\"unit\":"
                 "\"%%\",\"description\":\"%s\"}}",
           currentTemperature,
           configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"

@@ -51,12 +51,20 @@ enum PerceptionState {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 enum DomoticzAlert {
-  alertRed = 4,
-  alertOrange = 3,
-  alertYellow = 2,
-  alertGreen = 1,
-  alertGray = 0
+  domoticzAlertRed = 4,
+  domoticzAlertOrange = 3,
+  domoticzAlertYellow = 2,
+  domoticzAlertGreen = 1,
+  domoticzAlertGray = 0
 };
+
+enum DomoticzHumidity {
+  domoticzHumidityNormal = 0,
+  domoticzHumidityComfortable = 1,
+  domoticzHumidityDry = 2,
+  domoticzHumidityWet = 3
+};
+
 #endif
 
 struct ComfortProfile {
@@ -128,6 +136,7 @@ public:
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   byte convertPerceptionDomoticz(byte perception);
   byte convertComfortDomoticz(byte comfort);
+  byte convertHumidyStatusDomoticz(float humidity);
 #endif
 
   float comfort(ComfortState &destComfortStatus, float temperature,

@@ -9,7 +9,12 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Sensors-Common.h>
 #include <DHTesp.h>
+
+#if AFE_LANGUAGE == 0
 #include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
 
 
 

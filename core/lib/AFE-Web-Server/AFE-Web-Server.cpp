@@ -1322,8 +1322,7 @@ void AFEWebServer::get(DS18B20 &data) {
   data.unit = server.arg("u").length() > 0 ? server.arg("u").toInt()
                                            : AFE_TEMPERATURE_UNIT_CELSIUS;
 
-  server.arg("s").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
+  data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
@@ -1375,6 +1374,8 @@ void AFEWebServer::get(DHT &data) {
   if (server.arg("hu").length() > 0) {
     data.humidity.unit = server.arg("hu").toInt();
   }
+
+  data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.temperature.idx = server.arg("i1").length() > 0

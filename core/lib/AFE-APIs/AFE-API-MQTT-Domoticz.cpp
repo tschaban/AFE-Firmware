@@ -873,15 +873,15 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
       generateDeviceValue(
           json, _DHTSensor[id]->configuration.domoticz.temperature.idx, value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-      
     }
     /* Humidity */
     if (_DHTSensor[id]->configuration.domoticz.humidity.idx > 0) {
-      sprintf(value, "%d",
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
       generateDeviceValue(json,
                           _DHTSensor[id]->configuration.domoticz.humidity.idx,
                           value, (uint8_t)_DHTSensor[id]->currentHumidity);
+
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
 
@@ -889,7 +889,8 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
     if (_DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx > 0) {
       sprintf(value, "%-.1f;%-.1f;%-d", _DHTSensor[id]->currentTemperature,
               _DHTSensor[id]->currentHumidity,
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+              _DHTSensor[id]->convertHumidyStatusDomoticz(
+                  _DHTSensor[id]->currentHumidity));
       generateDeviceValue(
           json, _DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx,
           value);
@@ -898,8 +899,8 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Absolute Humidity */
     if (_DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
-      sprintf(value, "%d",
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
       generateDeviceValue(
           json, _DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx,
           value, (uint8_t)_DHTSensor[id]->absoluteHumidity(
@@ -956,11 +957,10 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
     if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
       char _comfort[80]; // Max size of Comfort from lang.pack
       ComfortState comfortStatus;
-      _DHTSensor[id]->comfort(
-          comfortStatus, _DHTSensor[id]->currentTemperature,
-          _DHTSensor[id]->currentHumidity,
-          _DHTSensor[id]->configuration.temperature.unit ==
-              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+      _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
+                              _DHTSensor[id]->currentHumidity,
+                              _DHTSensor[id]->configuration.temperature.unit ==
+                                  AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
       generateDeviceValue(
           json, _DHTSensor[id]->configuration.domoticz.comfort.idx, _comfort,

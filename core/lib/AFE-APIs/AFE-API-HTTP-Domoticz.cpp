@@ -73,8 +73,6 @@ void AFEAPIHTTPDomoticz::replaceSpaceinUrl(const char *inputString,
                                            const char &outputString); {}
 */
 
-
-
 boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
                                               const char *value) {
   boolean _return = false;
@@ -486,8 +484,8 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Humidity */
     if (_DHTSensor[id]->configuration.domoticz.humidity.idx > 0) {
-      sprintf(value, "%d",
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
           _DHTSensor[id]->configuration.domoticz.humidity.idx, value,
           (uint8_t)_DHTSensor[id]->currentHumidity);
@@ -496,8 +494,8 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Absolute Humidity */
     if (_DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
-      sprintf(value, "%d",
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
           _DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx, value,
           (uint8_t)_DHTSensor[id]->absoluteHumidity(
@@ -538,7 +536,8 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
     if (_DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx > 0) {
       sprintf(value, "%-.1f;%-.1f;%-d", _DHTSensor[id]->currentTemperature,
               _DHTSensor[id]->currentHumidity,
-              _DHTSensor[id]->humidityRating(_DHTSensor[id]->currentHumidity));
+              _DHTSensor[id]->convertHumidyStatusDomoticz(
+                  _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
           _DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx,
           value);
@@ -547,31 +546,46 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 
     /* Comfort */
     if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
-      char _comfort[80]; // Max size of Comfort from lang.pack
       ComfortState comfortStatus;
+      char _charText[100]; // Max size of Comfort,Perception from lang.pack +
+                           // %20 instead of space
+      String _stringText;
       _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
                               _DHTSensor[id]->currentHumidity,
                               _DHTSensor[id]->configuration.temperature.unit ==
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-      strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+      strcpy_P(_charText, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+
+      // @TODO is there a better one?
+      _stringText = _charText;
+      _stringText.replace(" ", "%20");
+      _stringText.toCharArray(_charText, sizeof(_charText));
 
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.comfort.idx, _comfort,
+          _DHTSensor[id]->configuration.domoticz.comfort.idx, _charText,
           _DHTSensor[id]->convertComfortDomoticz(comfortStatus));
       _ret = true;
     }
 
     /* Perception */
     if (_DHTSensor[id]->configuration.domoticz.perception.idx > 0) {
-      char _perception[22]; // Max size of Perception from lang.pack
+      char _charText[100]; // Max size of Comfort,Perception from lang.pack +
+                           // %20 instead of space
+      String _stringText;
       byte _perceptionId = _DHTSensor[id]->perception(
           _DHTSensor[id]->currentTemperature, _DHTSensor[id]->currentHumidity,
           _DHTSensor[id]->configuration.temperature.unit ==
               AFE_TEMPERATURE_UNIT_FAHRENHEIT);
-      strcpy_P(_perception,
+      strcpy_P(_charText,
                (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
+
+      // @TODO is there a better one?
+      _stringText = _charText;
+      _stringText.replace(" ", "%20");
+      _stringText.toCharArray(_charText, sizeof(_charText));
+
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.perception.idx, _perception,
+          _DHTSensor[id]->configuration.domoticz.perception.idx, _charText,
           _DHTSensor[id]->convertPerceptionDomoticz(_perceptionId));
       _ret = true;
     }

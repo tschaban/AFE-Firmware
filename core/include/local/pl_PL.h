@@ -349,6 +349,7 @@
 #define L_DS18B20_NO_SENSOR "Żaden czujnik nie został jeszcze znaleziony. Sprawdź, czy jest poprawnie podłączony, a następnie przeskanuj GPIO"
 
 /* DHT */
+#ifdef AFE_CONFIG_HARDWARE_DHT
 #define L_DHT_SENSORS "Czujniki DHT"
 #define L_DHT_CONTROLLING_PARAMETER "Parametr sterujący"
 #define L_DHT_SENT_ONLY_CHANGES "Wysyłać dane tylko, gdy wartość temperatury lub wilgotności zmieniły się"
@@ -366,8 +367,6 @@ const char dewPointPerception_VeryUnComfy[] PROGMEM = "Niezwykle niekomfortowo, 
 const char dewPointPerception_SevereUnComfy[] PROGMEM = "Groźnie, nawet śmiertelny w przypadku chorób związanych z astmą";
 const char* const dewPointPerception[] PROGMEM = { dewPointPerception_Dry, dewPointPerception_VeryComfy,dewPointPerception_Comfy,dewPointPerception_Ok,dewPointPerception_UnComfy,dewPointPerception_QuiteUnComfy,dewPointPerception_VeryUnComfy,dewPointPerception_SevereUnComfy};
 
-
-
 const char comfort_OK[] PROGMEM           = "OK";
 const char comfort_TooHot[] PROGMEM       = "Za gorąco";
 const char comfort_TooCold[] PROGMEM      = "Za zimno";
@@ -379,7 +378,7 @@ const char comfort_TooHumid[] PROGMEM     = "Za wilgotno";
 const char comfort_HotAndHumid[] PROGMEM  = "Gorąco i wilgotno";
 const char comfort_ColdAndHumid[] PROGMEM = "Zimno i wilgotno";
 const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
-
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 
 /* Anemometer Sensor */

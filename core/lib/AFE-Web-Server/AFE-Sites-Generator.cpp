@@ -1367,6 +1367,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
                    L_SECONDS);
 
   /* Item: Send only changes */
+
   addCheckboxFormItem(page, "s", L_DHT_SENT_ONLY_CHANGES, "1",
                       configuration.sendOnlyChanges);
 
