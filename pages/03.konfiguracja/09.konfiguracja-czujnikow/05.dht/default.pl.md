@@ -2,7 +2,10 @@
 title: DHT
 recaptchacontact:
     enabled: false
-media_order: AFE-Konfiguracja-DHT-menu.png
+media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png'
+process:
+    markdown: true
+    twig: true
 ---
 
 ---
