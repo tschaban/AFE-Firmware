@@ -288,3 +288,31 @@ Przykładowe JSON dla czujnika AS3935
 
 
 > AFE Firmware wysyła automatycznie dane z czujnika, z wykorzystaniem MQTT, po wykryciu zdarzenia.
+
+
+##### Tematy do odczytu danych z czujnika [DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/dht)
+
+* Temat definiowany jest osobno da każdego czujnika w formularzu do [konfiguracji czujnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/dht#sekcja-temat-mqtt-czujnikadht)
+
+Przykład:
+`podworko/czujnik/dht`
+
+! Temat nie może kończyć się znakiem / ponieważ do tematu dodawany jest sufix **cmd** dla komend sterujących
+
+Używając przykładu tematu powyżej, aby odczytać dane z czujnika, do MQTT Brokera należy wysłać następujący temat
+
+`podworko/czujnik/dht/cmd`
+
+z wiadomością:
+
+* get
+
+AFE Firmware wysła następujący temat z z wiadomością w formacie JSON z danymi odczytanymi przez czujnik
+
+`podworko/czujnik/dht`
+
+Przykładowy JSON dla czujnika DHT
+
+`
+{temperature: {value: 24,unit: "C"},humidity: {value: 39.9,unit: "%"},absoluteHumidity: {value: 8.68,unit: "%"},heatIndex: {value: 23.5,unit: "C"},dewPoint: {value: 9.55,unit: "C"},perception: {value: 0,description: "Dla niektórych trochę "},comfort: {value: 0,ratio: 100,unit: "%",description: "OK"}
+`
