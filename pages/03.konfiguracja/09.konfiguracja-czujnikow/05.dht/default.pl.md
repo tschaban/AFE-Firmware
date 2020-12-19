@@ -65,19 +65,14 @@ Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT ->
 
 ![](AFE-Konfiguracja-DHT-menu.png)
 
-#### Sekcja Czujnik BMEx80
+#### Sekcja Czujnik DHT
 
 ![](AFE-Konfiguracja-DHT.png)
 
-##### I²C Adres
+##### GPIO
 * Adres czujnika w magistrali I²C
 
 > Jeśli adres czujnika nie jest widoczny w liście sprawdź podłączenie czujnika lub konfigurację [I²C](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-portow/i2c/?target=_blank)
-
-##### Typ czujnika BMEx80
-* Lista obsługiwanych czujników Bosch
-
-> Po wybraniu typu czujnka konieczne jest wciśnięcie przycisku: _**Pokaż parametery konfiguracyjne po wybraniu typu czujnia**_ Po wciśnięciu przycisku na ekranie konfiguracyjnym wyświetlą się specyficzne parametery konfiguracyjne dla wybranego typu czujnika Bosch
 
 ##### Nazwa
 * Nazwa czujnika
@@ -85,13 +80,18 @@ Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT ->
 * Maksymalna długość nazwy to do 16 znaków
 * Nie należy używać znaków spacji
 
+
+##### Typ czujnika
+* Lista obsługiwanych czujników DHT
+
+
 ##### Interwał odczytów
 * Częstotliwość odczytów oraz przesyłania daych do systemu automatyki
-* Wartość z zakresu od 5 sekundy do 24 godzin. Wartość wprowadza się w sekundach
+* Wartość z zakresu od 2 sekundy do 24 godzin. Wartość wprowadza się w sekundach
 
 #### Sekcja jednostki
 
-![](afe-firmware-bmx80-jednostki.png)
+![](AFE-Konfiguracja-DHT-jednostka.png)
 
 ##### Temperatura
 * Wybór jednostki, w której mają być wyświetlane wartości związane z temperaturą: np. temperatura, Punkt rosy, Head Index
@@ -101,7 +101,7 @@ Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT ->
 
 W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych pomiarów
 
-![](afe-firmware-bmx80-korekty.png)
+![](AFE-Konfiguracja-DHT-korekty.png)
 
 ##### Temperatura
 * Wartość korekty temperatury odczytanej przez czujnik
@@ -111,13 +111,7 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 * Wartość korekty wilgotności odczytanej przez czujnik
 * Wartośc minimalna to -99.999 wartośc maksymalna korekty to 99.999
 
-##### Ciśnienie
-* Wartość korekty ciśnienia atmosferycznego odczytanego przez czujnik
-* Wartośc minimalna to -999.999 wartośc maksymalna korekty to 999.999
 
-##### Wysokość nad poziomem morza
-* Wysokość, na której położony jest czujnik. Wykorzystywane do wyliczenia atmosferycznego ciśnienia bezwzględnego.
-* Zakres wartości od -431 do 8850 metrów
 
 #### Sekcja: Domoticz
 
@@ -129,13 +123,13 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 * Wartość z zakresu 1 do 999999
 * W przypadku wprowadzenia 0, wartość danego pomiaru, nie będzie wysyłana do Domoticz
 
-#### Sekcja: Temat MQTT Czujnika BMEx80
+#### Sekcja: Temat MQTT CzujnikaDHT
 
 Aby było możliwe przysłanie wartości do systemu automatyki z wykorzytaniem MQTT API, konieczne jest ustawienie Tematu MQTT dla czujnika
 
 ! Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [MQTT API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
-![](afe-firmware-bmx80-mqtt.png)
+![](AFE-Konfiguracja-DHT-mqtt.png)
 
 ##### Temat
 * Temat wiadomości w formacie MQTT
