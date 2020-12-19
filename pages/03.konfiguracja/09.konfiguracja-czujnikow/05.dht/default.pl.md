@@ -26,6 +26,17 @@ process:
 
 Czujniki DHT to zintegrowany czujnik temperatury oraz wilgotności. 
 
+##### Specyfikacja DHT11
+
+* Zakres pomiaru temperatury: -20 do 60 °C
+* Dokładność pomiaru temperatury: ± 2 °C
+* Zakres pomiaru wilgotności powietrza: 5 - 95 % RH
+* Dokładność pomiaru wilgotności powietrza: ±4 %RH
+* Pobór prądu: 0,2 mA
+* Napięcie zasilania: 3,3 V do 5,5 V
+
+! Czujnik DHT11 ma dość słabe parametry, sugeruję stosować czujniki DHT22. Ponado nie zalecam kupować czujników z nadrukiem ANSRI - są z nimi problemy
+
 ##### Specyfikacja DHT22/AM2302
 
 * Zakres pomiaru temperatury: -40 do 80 °C
@@ -36,14 +47,6 @@ Czujniki DHT to zintegrowany czujnik temperatury oraz wilgotności.
 * Pobór prądu: 0,2 mA
 * Napięcie zasilania: 3,3 V do 6 V
 
-##### Specyfikacja DHT11
-
-* Zakres pomiaru temperatury: -20 do 60 °C
-* Dokładność pomiaru temperatury: ± 2 °C
-* Zakres pomiaru wilgotności powietrza: 5 - 95 % RH
-* Dokładność pomiaru wilgotności powietrza: ±4 %RH
-* Pobór prądu: 0,2 mA
-* Napięcie zasilania: 3,3 V do 5,5 V
 
 ##### Specyfikacja RHT03
 
