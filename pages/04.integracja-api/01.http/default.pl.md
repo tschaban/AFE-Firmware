@@ -249,7 +249,7 @@ STATUS_WYKONANIA
 
 ---
 
-##### Odczyt danych z czujnika [DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935)
+##### Odczyt danych z czujnika [DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/dht)
 
 **Format komendy**
 
@@ -257,7 +257,7 @@ STATUS_WYKONANIA
 
 **Parametery:**
 * NAZWA_CZUJNIKA
-	* Nazwa czujnika wprowadzona w [konfiguracji czujnika DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935#sekcja-czujnik-as3935)
+	* Nazwa czujnika wprowadzona w [konfiguracji czujnika DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/dht)
 * KOMENDA
 	* get - uzyskanie informacji z czujnika
 
