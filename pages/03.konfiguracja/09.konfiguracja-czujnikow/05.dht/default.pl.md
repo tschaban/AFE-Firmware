@@ -2,7 +2,7 @@
 title: DHT
 recaptchacontact:
     enabled: false
-media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png'
+media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png,Zrzut ekranu 2020-12-19 223112.png'
 process:
     markdown: true
     twig: true
@@ -70,9 +70,9 @@ Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT ->
 ![](AFE-Konfiguracja-DHT.png)
 
 ##### GPIO
-* Adres czujnika w magistrali I²C
-
-> Jeśli adres czujnika nie jest widoczny w liście sprawdź podłączenie czujnika lub konfigurację [I²C](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-portow/i2c/?target=_blank)
+* Numer GPIO do którego podłączony jest przekaźnik
+* Zakres od 0 do 16
+* Wartość musi zostać wybrana
 
 ##### Nazwa
 * Nazwa czujnika
@@ -117,7 +117,7 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 
 ! Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [Domoticz API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
-![](afe-firmware-bmx80-domoticz.png)
+![](Zrzut%20ekranu%202020-12-19%20223112.png)
 
 * Każdy pomiar odczytywany, przez czujnik może być wysyłany do Domoticz
 * Wartość z zakresu 1 do 999999
