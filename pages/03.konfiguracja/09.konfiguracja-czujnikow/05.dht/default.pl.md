@@ -2,7 +2,7 @@
 title: DHT
 recaptchacontact:
     enabled: false
-media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png,Zrzut ekranu 2020-12-19 223112.png'
+media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png,AFE-Konfiguracja-DHT-domoticz.png'
 process:
     markdown: true
     twig: true
@@ -117,7 +117,7 @@ W tym miejscu można dokonać kalibracji wartości czujnika dla poszczególnych 
 
 ! Sekcja konfiguracyjna widoczna jest tylko, gdy włączone jest [Domoticz API](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-urzadzenia)
 
-![](Zrzut%20ekranu%202020-12-19%20223112.png)
+![](AFE-Konfiguracja-DHT-domoticz.png)
 
 * Każdy pomiar odczytywany, przez czujnik może być wysyłany do Domoticz
 * Wartość z zakresu 1 do 999999
