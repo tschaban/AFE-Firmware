@@ -2,11 +2,13 @@
 title: DHT
 recaptchacontact:
     enabled: false
-media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png,AFE-Konfiguracja-DHT-domoticz.png'
+media_order: 'AFE-Konfiguracja-DHT.png,AFE-Konfiguracja-DHT-jednostka.png,AFE-Konfiguracja-DHT-korekty.png,AFE-Konfiguracja-DHT-menu.png,AFE-Konfiguracja-DHT-mqtt.png,AFE-Konfiguracja-DHT-domoticz.png,dht22.png'
 process:
     markdown: true
     twig: true
 ---
+
+![](dht22.png)
 
 ---
 
