@@ -246,3 +246,33 @@ STATUS_WYKONANIA
 **Przykłady:**
 
 * http://192.168.1.2/?device=AS3935&name=Burza&command=get
+
+---
+
+##### Odczyt danych z czujnika [DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935)
+
+**Format komendy**
+
+`http://adres-ip-urzadzenia/?device=dht&name=NAZWA_CZUJNIKA&command=KOMENDA`
+
+**Parametery:**
+* NAZWA_CZUJNIKA
+	* Nazwa czujnika wprowadzona w [konfiguracji czujnika DHT](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/as3935#sekcja-czujnik-as3935)
+* KOMENDA
+	* get - uzyskanie informacji z czujnika
+
+
+**Wywołanie komendy zwraca odpowiedź w postaci JSON:**
+
+`{"device":"dht", "name":"NAZWA_CZUJNIKA","command":"KOMENDA","data":{JSON_STRING},"status":"STATUS_WYKONANIA"}`
+
+gdzie JSON_STRING
+* zawiera dane odczytane z czujnika w formacie JSON
+
+STATUS_WYKONANIA
+* success
+* error
+
+**Przykłady:**
+
+* http://192.168.1.2/?device=dht&name=CzujnikAM3202&command=get
