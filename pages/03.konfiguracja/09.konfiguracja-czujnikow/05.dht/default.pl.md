@@ -67,7 +67,7 @@ Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT ->
 
 #### Sekcja Czujnik BMEx80
 
-![](afe-firmware-bmx80-czujnik.png)
+![](AFE-Konfiguracja-DHT-mqtt.png)
 
 ##### I²C Adres
 * Adres czujnika w magistrali I²C
