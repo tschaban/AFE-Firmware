@@ -2,8 +2,8 @@
 title: DHT
 recaptchacontact:
     enabled: false
+media_order: AFE-Konfiguracja-DHT-menu.png
 ---
-
 
 ---
 
@@ -60,7 +60,7 @@ Czujniki DHT to zintegrowany czujnik temperatury oraz wilgotności.
 
 Ekran do konfiguracji czujnka DHT otwiera się wybierając opcję Czujnik DHT -> Czujnik w menu Panelu Konfiguracyjnego AFE Firmware.
 
-
+![](AFE-Konfiguracja-DHT-menu.png)
 
 #### Sekcja Czujnik BMEx80
 
