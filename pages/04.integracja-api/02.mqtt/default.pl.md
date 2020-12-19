@@ -314,5 +314,5 @@ AFE Firmware wysła następujący temat z z wiadomością w formacie JSON z dany
 Przykładowy JSON dla czujnika DHT
 
 `
-{temperature: {value: 24,unit: "C"},humidity: {value: 39.9,unit: "%"},absoluteHumidity: {value: 8.68,unit: "%"},heatIndex: {value: 23.5,unit: "C"},dewPoint: {value: 9.55,unit: "C"},perception: {value: 0,description: "Dla niektórych trochę "},comfort: {value: 0,ratio: 100,unit: "%",description: "OK"}
+{temperature: {value:24,unit:"C"},humidity:{value:39.9,unit:"%"},absoluteHumidity:{value:8.68,unit:"%"},heatIndex:{value:23.5,unit:"C"},dewPoint:{value:9.55,unit:"C"},perception:{value:0,description:"Dla niektórych trochę "},comfort:{value:0,ratio:100,unit:"%",description:"OK"}
 `
