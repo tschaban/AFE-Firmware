@@ -2,7 +2,7 @@
 
 #include "AFE-Sensor-Anemometer.h"
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 AFESensorAnemometer::AFESensorAnemometer(){};
 
@@ -92,9 +92,10 @@ boolean AFESensorAnemometer::listener(void) {
 }
 
 void AFESensorAnemometer::getJSON(char *json) {
-  sprintf(json, "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
-                "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
+  sprintf(json,
+          "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
+          "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
           lastSpeedMS, lastSpeedKMH);
 }
 
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR

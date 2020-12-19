@@ -180,6 +180,16 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  else if (strcmp(request->device, "dht") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing DHT sensor requests");
+#endif
+    processDHT(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -689,6 +699,36 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
   }
 }
 #endif
+
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEAPIHTTP::addClass(AFESensorDHT *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+    _DHTSensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+    if (strcmp(request->name, _DHTSensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
+        _DHTSensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_DHT
+
+
 
 /* Method creates JSON respons after processing HTTP API request, and pushes
  * it.

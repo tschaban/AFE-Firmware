@@ -4,11 +4,12 @@
 #define _AFE_Sensor_Wind_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#include <arduino.h>
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-Binary.h>
+#include <arduino.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -46,5 +47,5 @@ private:
   float oneImpulseDistanceCM = 0;
 };
 
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #endif // _AFE_Sensor_Wind_h

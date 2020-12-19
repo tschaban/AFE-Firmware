@@ -23,6 +23,9 @@ struct REGULATOR {
   uint8_t relayId;
   uint8_t sensorId;
   uint8_t sensorHardware;
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  uint8_t controllingParameter;
+#endif
   boolean enabled;
   float turnOn;
   boolean turnOnAbove;

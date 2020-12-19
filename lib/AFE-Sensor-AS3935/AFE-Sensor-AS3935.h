@@ -3,11 +3,10 @@
 #ifndef _AFE_Sensor_AS3935_h
 #define _AFE_Sensor_AS3935_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+
+#include <arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-I2C-Scanner.h>
@@ -57,4 +56,5 @@ public:
   void getJSON(char *json);
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
+#endif // _AFE_Sensor_AS3935_h

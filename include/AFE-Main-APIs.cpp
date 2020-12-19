@@ -62,6 +62,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
+// @TODO Missing noOf check
     MqttAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -70,6 +71,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
+// @TODO Missing noOf check
     MqttAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -86,10 +88,12 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
+// @TODO Missing noOf check
     MqttAPI.addClass(&Gate[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+
     MqttAPI.addClass(&Contactron[0]);
 #endif
 
@@ -98,6 +102,13 @@ void initializeMQTTAPI(void) {
       MqttAPI.addClass(&DS18B20Sensor[0]);
     }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    if (Device.configuration.noOfDHTs > 0) {
+      MqttAPI.addClass(&DHTSensor[0]);
+    }
+#endif
+
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     if (Device.configuration.noOfRegulators > 0) {
@@ -144,6 +155,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
+// @TODO Missing noOf check
     HttpAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -152,6 +164,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
+// @TODO Missing noOf check
     HttpAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -168,16 +181,24 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
+// @TODO Missing noOf check
     HttpAPI.addClass(&Gate[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+// @TODO Missing noOf check
     HttpAPI.addClass(&Contactron[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     if (Device.configuration.noOfDS18B20s > 0) {
       HttpAPI.addClass(&DS18B20Sensor[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    if (Device.configuration.noOfDHTs > 0) {
+      HttpAPI.addClass(&DHTSensor[0]);
     }
 #endif
 
@@ -231,6 +252,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
+// @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -239,6 +261,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
+// @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -255,16 +278,24 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+// @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&Contactron[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
+// @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&Gate[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     if (Device.configuration.noOfDS18B20s > 0) {
       HttpDomoticzAPI.addClass(&DS18B20Sensor[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    if (Device.configuration.noOfDHTs > 0) {
+      HttpDomoticzAPI.addClass(&DHTSensor[0]);
     }
 #endif
 

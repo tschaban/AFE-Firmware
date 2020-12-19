@@ -64,6 +64,9 @@ struct DEVICE {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   uint8_t noOfThermalProtectors;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  uint8_t noOfDHTs;
+#endif
 };
 
 /* Custom DEVICE structure definition
