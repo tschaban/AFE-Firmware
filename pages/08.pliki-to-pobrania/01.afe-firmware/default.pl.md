@@ -50,8 +50,6 @@ recaptchacontact:
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
 
-!!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
-
 ##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-0/?target=_blank)
 
 **Poprzednie wersje**
@@ -64,13 +62,11 @@ recaptchacontact:
 ### AFE Firmware T2: Włącznik WiFi z czujnikami z serii DHT
 * Wersja obsługująca do czterech przekaźników oraz do czterech czujników DHT z termostatem, higrostatem, x-statem oraz zabezieczeniem termicznym
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
-~~* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/afe-firmware-t1-wlacznik-i-ds18b20) dotyczące AFE Firmware T2~~
+* [Informacje szczegółowe](/postawowe-informacje/wersje-afe-firmware/t2-wlacznik-i-dhtxx) dotyczące AFE Firmware T2
 * Paczka do ściągnięcia 
 	* zawiera wersje 1Mb oraz 4Mb
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
-
-!!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
 
 ##### [Pobierz najnowszą wersję 2.4.0 BETA](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
@@ -125,6 +121,8 @@ recaptchacontact:
 * Wersja [1.0.1](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
 
 ---
+
+!!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
 ! Jeśli znajdziesz jakiś błąd / problem z oprogramowaniem, zgłoś go [tutaj](https://www.smartnydom.pl/forum/zglaszanie-problemow/?target=_blank). Bez tego ciężko będzie zrobić firmware lepszym. Dzięki.
 
