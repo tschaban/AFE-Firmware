@@ -135,7 +135,7 @@ ESP.eraseConfig();
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeContractons();
+      initializeContracton();
     }
 #endif
 
@@ -159,6 +159,12 @@ ESP.eraseConfig();
     initializeDS18B20Sensor();
 #endif
 
+/* Initializing DHT  */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    initializeDHTSensor();
+#endif
+
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     if (Device.getMode() == AFE_MODE_NORMAL) {
       initializeHPMA115S0Sensor();
@@ -167,7 +173,7 @@ ESP.eraseConfig();
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeBMEX80Sensor();
+      initializeBMX80Sensor();
     }
 #endif
 
@@ -297,7 +303,7 @@ void loop() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-        BMEX80SensorEventsListener();
+        BMX80SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -355,6 +361,10 @@ void loop() {
     if (Device.getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      DHTSensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF

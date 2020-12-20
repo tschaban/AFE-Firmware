@@ -66,6 +66,10 @@
 #include <AFE-Thermal-Protector.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -140,6 +144,10 @@ private:
       *_ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  AFESensorDHT *_DHTSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DHT];
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -199,10 +207,14 @@ private:
   void processThermalProtector(HTTPCOMMAND *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  void processDHT(HTTPCOMMAND *);
+#endif
+
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
-  /* @TODO Check if it's still used 
-    void send(HTTPCOMMAND *request, boolean status, double value,
-            uint8_t width = 2, uint8_t precision = 2);
+/* @TODO Check if it's still used
+  void send(HTTPCOMMAND *request, boolean status, double value,
+          uint8_t width = 2, uint8_t precision = 2);
 */
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -278,6 +290,11 @@ public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void addClass(AFEThermalProtector *);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  void addClass(AFESensorDHT *);
+#endif
+
 };
 
 #endif

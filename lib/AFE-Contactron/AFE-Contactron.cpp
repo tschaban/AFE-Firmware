@@ -2,6 +2,8 @@
 
 #include "AFE-Contactron.h"
 
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+
 AFEContactron::AFEContactron(){};
 
 void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
@@ -11,7 +13,7 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
   Data->getConfiguration(id,&configuration);
   pinMode(configuration.gpio, INPUT_PULLUP);
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed.begin(configuration.ledID);
+    ContactronLed.begin(Data,configuration.ledID);
   }
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -86,3 +88,5 @@ void AFEContactron::getJSON(char *json) {
   sprintf(json, "{\"state\":\":%s\"}",
           (get() == AFE_CONTACTRON_OPEN ? "open" : "closed"));
 }
+
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON

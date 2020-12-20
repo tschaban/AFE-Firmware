@@ -42,6 +42,9 @@ private:
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
                                   uint8_t nvalue = 0);
 
+  /* Replace space with %20 */
+//  void replaceSpaceinUrl(const char *inputString, const char &outputString);
+
 public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIHTTPDomoticz();
@@ -128,6 +131,10 @@ public:
   boolean publishThermalProtectorState(uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  virtual void addClass(AFESensorDHT *);
+  boolean publishDHTSensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_DHT
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

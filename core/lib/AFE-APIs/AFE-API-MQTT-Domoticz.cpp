@@ -187,7 +187,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #ifdef DEBUG
           else {
-            Serial << endl << F("INFO: OFF Command, skipping";
+            Serial << endl << F("INFO: OFF Command, skipping");
           }
 #endif
           break;
@@ -310,7 +310,6 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 #endif
   }
 }
-
 
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 #ifdef DEBG
@@ -685,7 +684,7 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
   AFEAPI::addClass(Item);
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Caching IDXs for Gates";
+  Serial << endl << F("INFO: Caching IDXs for Gates");
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
@@ -703,7 +702,7 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
     }
 #ifdef DEBUG
     else {
-      Serial << endl << F(" - IDX not set";
+      Serial << endl << F(" - IDX not set");
     }
 #endif
   }
@@ -845,7 +844,8 @@ boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
     char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH];
-    generateSwitchMessage(json, _ThermalProtector[id]->configuration.domoticz.idx,
+    generateSwitchMessage(json,
+                          _ThermalProtector[id]->configuration.domoticz.idx,
                           _ThermalProtector[id]->configuration.enabled);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     bypassProcessing.idx = _ThermalProtector[id]->configuration.domoticz.idx;
@@ -858,5 +858,118 @@ boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEAPIMQTTDomoticz::addClass(AFESensorDHT *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_DHT_COMMAND_LENGTH];
+    char value[15];
+    /* Temperature */
+    if (_DHTSensor[id]->configuration.domoticz.temperature.idx > 0) {
+      sprintf(value, "%-.1f", _DHTSensor[id]->currentTemperature);
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.temperature.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    /* Humidity */
+    if (_DHTSensor[id]->configuration.domoticz.humidity.idx > 0) {
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
+      generateDeviceValue(json,
+                          _DHTSensor[id]->configuration.domoticz.humidity.idx,
+                          value, (uint8_t)_DHTSensor[id]->currentHumidity);
+
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* Temperature and Humidity */
+    if (_DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx > 0) {
+      sprintf(value, "%-.1f;%-.1f;%-d", _DHTSensor[id]->currentTemperature,
+              _DHTSensor[id]->currentHumidity,
+              _DHTSensor[id]->convertHumidyStatusDomoticz(
+                  _DHTSensor[id]->currentHumidity));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx,
+          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* Absolute Humidity */
+    if (_DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
+      sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
+                               _DHTSensor[id]->currentHumidity));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx,
+          value, (uint8_t)_DHTSensor[id]->absoluteHumidity(
+                     _DHTSensor[id]->currentTemperature,
+                     _DHTSensor[id]->currentHumidity,
+                     _DHTSensor[id]->configuration.temperature.unit ==
+                         AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* HeatIndex */
+    if (_DHTSensor[id]->configuration.domoticz.heatIndex.idx > 0) {
+      sprintf(value, "%-.2f",
+              _DHTSensor[id]->heatIndex(
+                  _DHTSensor[id]->currentTemperature,
+                  _DHTSensor[id]->currentHumidity,
+                  _DHTSensor[id]->configuration.temperature.unit ==
+                      AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.heatIndex.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* DewPoint */
+    if (_DHTSensor[id]->configuration.domoticz.dewPoint.idx > 0) {
+      sprintf(value, "%-.2f",
+              _DHTSensor[id]->dewPoint(
+                  _DHTSensor[id]->currentTemperature,
+                  _DHTSensor[id]->currentHumidity,
+                  _DHTSensor[id]->configuration.temperature.unit ==
+                      AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.dewPoint.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* Perception */
+    if (_DHTSensor[id]->configuration.domoticz.perception.idx > 0) {
+      char _perception[22]; // Max size of Perception from lang.pack
+      byte _perceptionId = _DHTSensor[id]->perception(
+          _DHTSensor[id]->currentTemperature, _DHTSensor[id]->currentHumidity,
+          _DHTSensor[id]->configuration.temperature.unit ==
+              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+      strcpy_P(_perception,
+               (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.perception.idx,
+          _perception,
+          _DHTSensor[id]->convertPerceptionDomoticz(_perceptionId));
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
+    /* Comfort */
+    if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
+      char _comfort[80]; // Max size of Comfort from lang.pack
+      ComfortState comfortStatus;
+      _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
+                              _DHTSensor[id]->currentHumidity,
+                              _DHTSensor[id]->configuration.temperature.unit ==
+                                  AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+      strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+      generateDeviceValue(
+          json, _DHTSensor[id]->configuration.domoticz.comfort.idx, _comfort,
+          _DHTSensor[id]->convertComfortDomoticz(comfortStatus));
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -3,11 +3,7 @@
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -29,6 +25,10 @@
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
 #endif
 
 #ifdef DEBUG
@@ -101,29 +101,40 @@ private:
   void addListOfGPIOs(String &item, const char *field, uint8_t selected,
                       const char *title = "GPIO");
 
+  /* Item: HTML <select> populated with <option> for number of items selection
+   */
+  void addListOfHardwareItem(String &item, uint8_t noOfItems,
+                             uint8_t noOffConnected, const char *field,
+                             const char *label, boolean disabled = false);
+
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
                               const char *title = "GPIO");
 #endif
 
-      /* Item: HTML <select> populated with <option> for number of items
-       * selection
-       */
-      void _addListOfHardware(String &item, uint8_t noOfItems,
-                              uint8_t noOffConnected, const char *field,
-                              const char *label, uint8_t index,
-                              uint8_t noneValue, boolean disabled = false);
-
-  void addListOfHardwareItem(String &item, uint8_t noOfItems,
-                             uint8_t noOffConnected, const char *field,
-                             const char *label, boolean disabled = false);
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void addRegulatorControllerItem(String &item, REGULATOR *configuration);
 #endif
 
-#if defined(T5_CONFIG)
-  void generateGateStatesList(String &item, uint8_t id, byte state);
+/* Item: list of gate states */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void addGateStatesListItem(String &item, uint8_t id, byte state);
+#endif
+
+/* Item: list of contactrons */
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  void addGateContactronsListItem(String &item, const char *name,
+                                  uint8_t contactronId);
+#endif
+
+/* Item: list discovered IIC devices */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void addDeviceI2CAddressSelectionItem(String &page, uint8_t address);
+#endif
+
+/* Item: list of LEDs */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void addLEDSelectionItem(String &page, uint8_t id);
 #endif
 
 public:
@@ -186,7 +197,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  String siteDHTSensor();
+  void siteDHTSensor(String &page, uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR

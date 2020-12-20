@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sensor-AS3935.h"
+#ifdef AFE_CONFIG_HARDWARE_AS3935
 
 AFESensorAS3935::AFESensorAS3935(){};
 
@@ -242,3 +243,5 @@ void AFESensorAS3935::getJSON(char *json) {
     sprintf(json, "{\"event\":{\"type\":\"unknown\"}}");
   }
 }
+
+#endif // AFE_CONFIG_HARDWARE_AS3935

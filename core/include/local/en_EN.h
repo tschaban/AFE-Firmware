@@ -340,7 +340,7 @@
 #define L_AS3935_OUTDOOR "Outdoor"
 #define L_AS3935_MQTT_TOPIC "AS3935 Sensor's MQTT Topic"
 
-/* Ds18B20 */
+/* DS18B20 */
 #define L_DS18B20_SENSOR "DS18B20 temperature sensor"
 #define L_DS18B20_SENSORS "DS18B20 Sensors"
 #define L_DS18B20_SENT_ONLY_CHANGES "Send data only if value of temperature has changed"
@@ -349,6 +349,37 @@
 #define L_DS18B20_SEARCH "Scan GPIO"
 #define L_DS18B20_NO_SENSOR "No sensor found. Check if it is properly connected and then scan the GPIO agai"
 
+/* DHT */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#define L_DHT_SENSORS "Sensor DHT"
+#define L_DHT_CONTROLLING_PARAMETER "Controlled by"
+#define L_DHT_SENT_ONLY_CHANGES "Send data only if value of temperature or humidity has changed"
+#define L_DHT_MQTT_TOPIC "DHT Sensor's MQTT Topic"
+#define L_DHT_SENSOR_TYPE "Type"
+#define L_DHT_AUTO_DETECT "Detect automatically"
+
+const char dewPointPerception_Dry[] PROGMEM = "A bit dry for some";
+const char dewPointPerception_VeryComfy[] PROGMEM = "Very comfortable";
+const char dewPointPerception_Comfy[] PROGMEM = "Comfortable";
+const char dewPointPerception_Ok[] PROGMEM = "OK for most, but all perceive the humidity at upper edge";
+const char dewPointPerception_UnComfy[] PROGMEM = "Somewhat uncomfortable for most people at upper edge";
+const char dewPointPerception_QuiteUnComfy[] PROGMEM = "Very humid, quite uncomfortable";
+const char dewPointPerception_VeryUnComfy[] PROGMEM = "Extremely uncomfortable, oppressive";
+const char dewPointPerception_SevereUnComfy[] PROGMEM = "Severely high, even deadly for asthma related illnesses";
+const char* const dewPointPerception[] PROGMEM = { dewPointPerception_Dry, dewPointPerception_VeryComfy,dewPointPerception_Comfy,dewPointPerception_Ok,dewPointPerception_UnComfy,dewPointPerception_QuiteUnComfy,dewPointPerception_VeryUnComfy,dewPointPerception_SevereUnComfy};
+
+const char comfort_OK[] PROGMEM           = "OK";
+const char comfort_TooHot[] PROGMEM       = "Too hot";
+const char comfort_TooCold[] PROGMEM      = "Too cold";
+const char comfort_TooDry[] PROGMEM       = "Too dry";
+const char comfort_HotAndDry[] PROGMEM    = "Hot and dry";
+const char comfort_ColdAndDry[] PROGMEM   = "Cold and dry";
+const char comfort_Unknown[] PROGMEM      = "?";
+const char comfort_TooHumid[] PROGMEM     = "Too humid";
+const char comfort_HotAndHumid[] PROGMEM  = "Hot and humid";
+const char comfort_ColdAndHumid[] PROGMEM = "Cold and humid";
+const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 /* Anemometer Sensor */
 #define L_ANEMOMETER_SENSOR "Anemometer speed sensor"
@@ -373,6 +404,12 @@
 #define L_REGULATOR_ENABLED "Enabled after startup"
 #define L_REGULATOR_MQTT_TOPIC "MQTT topic controlling the regulator"
 
+#define L_REGULATOR_CP_TEMPERATURE "Temperature"
+#define L_REGULATOR_CP_HEAT_INDEX "Heat Index"
+#define L_REGULATOR_CP_HUMIDITY "Humidity"
+#define L_REGULATOR_CP_ABSOLOUTE_HUMIDITY "Absolute humidity"
+#define L_REGULATOR_CP_DEW_POINT "Dew Point"
+
 /* Generic Sensors: temperature */
 #define L_TEMPERATURE "Temperature"
 #define L_TEMPERATURE_IDX "IDX Temperature"
@@ -382,10 +419,15 @@
 /* Generic Sensors: humidity */
 #define L_HUMIDITY "Humidity"
 #define L_HUMIDITY_IDX "IDX Humidity"
-#define L_HUMIDITY_IDX_DEW_POINT "IDX Dew Point"
-#define L_HUMIDITY_IDX_HEAT_INDEX "IDX Heat Index"
 #define L_HUMIDITY_IDX_TEMP_HUM "IDX Temp/Humidity"
 #define L_HUMIDITY_IDX_TEMP_HUM_BAR "IDX Temp/Humi/Bar"
+#define L_HUMIDITY_IDX_ABSOLUTE "IDX Absolute humidity"
+#define L_HUMIDITY_IDX_DEW_POINT "IDX Dew Point"
+#define L_HUMIDITY_IDX_HEAT_INDEX "IDX Heat Index"
+
+#define L_COMFORT_IDX "IDX Comfort"
+#define L_PERCEPTION_IDX "IDX Perception"
+
 
 /* Generic Sensors: pressure */
 #define L_PRESSURE "Pressure"

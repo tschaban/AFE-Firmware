@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sensor-BME280.h"
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 AFESensorBME280::AFESensorBME280(){};
 
@@ -52,3 +53,4 @@ boolean AFESensorBME280::read() {
 
   return true;
 }
+#endif // AFE_CONFIG_HARDWARE_BMEX80

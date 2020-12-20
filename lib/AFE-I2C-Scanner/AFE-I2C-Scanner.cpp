@@ -61,6 +61,7 @@ boolean AFEI2CScanner::scan(byte address) {
 }
 
 const char *AFEI2CScanner::getName(byte deviceAddress) {
+  /* WARN: Description can't be longer than 70chars, used by addDeviceI2CAddressSelectionItem in AFE-Site-Gnerator.h */
   if (deviceAddress == 0x00)
     return "AS3935";
   else if (deviceAddress == 0x01)

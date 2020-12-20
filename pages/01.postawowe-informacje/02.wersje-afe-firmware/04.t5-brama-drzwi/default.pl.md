@@ -36,13 +36,15 @@ recaptchacontact:
 	*  Długość podtrzymania przekaźnika (długość impulsu) ustawiany jest w zakresie od 1 milisekundy do 100 sekundy
 	*  Stan bramy/drzwi jest wysyałany do systemu automatyki
 	*  Stan każdego kontaktronu może być wysyałany do systemu automatyki
-	*  Stan kontraktonu może być sygnalizowany przed diodę LED  
+	*  Stan kontraktonu może być sygnalizowany przed diodę LED
+	*  Przekaźnik ustawiany sygnałem LOW lub HIGH
 * Funkcje przekaźnika
 	* Ustawiania stanu początkowego przekaźników po uruchomieniu
 	* Ustawienie stany przekaźników po podłączeniu się do brokera MQTT
 	* Automatyczne wyłączanie przekaźników po zadanym czasie
 	* Sterowanie przekaźnikami zewnętrznymi włącznikami/przyciskami mono (dzwonkowym) lub bistabilnymi
 	* LED może informwać o stanie przekaźnika
+	* Przekaźnik ustawiany sygnałem LOW lub HIGH
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Pomiar temperatury, wilgotności, ciśnienia względnego i bezwzględnego, punktu rosy, IAQ, BVOC - w zależności od zainstalowanego czujnika Bosch [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Pomiar natężeni światła (lux) [[W wersji PRO](/postawowe-informacje/wersja-pro)]

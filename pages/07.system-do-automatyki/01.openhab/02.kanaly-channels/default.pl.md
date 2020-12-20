@@ -431,3 +431,143 @@ recaptchacontact:
 | **Outgoing value transformation** | |
 | **On/Open value** | |
 | **Off/Closed value** | |
+
+### Kanały dotyczące czujnika DHT
+
+**_mqttTopic_** - MQTT Temat definiowany w [Konfiguracji czujnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-czujnikow/dht#temat)
+
+#### Pobierz dane z czujnika
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | On/Off Switch  |
+| **MQTT State topic** |  |
+| **MQTT Command topic** | mqttTopic/cmd |
+| **Incomming value transformation** | |
+| **Outgoing value transformation** | |
+| **On/Open value** | get |
+| **Off/Closed value** | get |
+
+#### Temperatura
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.temperature.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Punkt rosy
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.dewPoint.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Wilgotność
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.humidity.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Wilgotność absolutna
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.absoluteHumidity.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Temperatura odczuwalna
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.heatIndex.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Percepcja
+
+##### Percepcja wartość
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.perception.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+##### Percepcja opis
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | 	Text value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.perception.description |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+#### Komfort
+
+##### Komfort wartość
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.comfort.value |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+##### Komfort stosunek
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Number value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.comfort.ratio |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |
+
+##### Komfort opis
+
+| Parameter | Wartość |
+|-|-|
+| **Channel Type** | Text value |
+| **MQTT State topic** | mqttTopic |
+| **MQTT Command topic** | |
+| **Incomming value transformation** | JSONPATH:$.comfort.description |
+| **Outgoing value transformation** | |
+| **On/Open value** | |
+| **Off/Closed value** | |

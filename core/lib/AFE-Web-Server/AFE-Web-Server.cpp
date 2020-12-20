@@ -143,6 +143,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteDS18B20Sensor(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  case AFE_CONFIG_SITE_DHT:
+    Site.siteDHTSensor(page, siteConfig->deviceID);
+    break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
     Site.siteAnemometerSensor(page);
@@ -321,15 +326,15 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       else if (siteConfig.ID == AFE_CONFIG_SITE_CONTACTRON) {
         CONTACTRON configuration;
-        getContactronData(siteConfig.deviceID, &configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
-        configuration = {0};
+        // @TODO why this doesn't work here? => configuration = {0};
       }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
-      else if (configuration.ID == AFE_CONFIG_SITE_GATE) {
+      else if (siteConfig.ID == AFE_CONFIG_SITE_GATE) {
         GATE configuration;
-        getGateData(&configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
@@ -345,7 +350,7 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
       else if (siteConfig.ID == AFE_CONFIG_SITE_BMEX80) {
         BMEX80 configuration;
-        getBMEX80SensorData(&configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
@@ -353,7 +358,7 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
       else if (siteConfig.ID == AFE_CONFIG_SITE_BH1750) {
         BH1750 configuration;
-        getBH1750SensorData(&configuration);
+        get(configuration);
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
@@ -390,6 +395,14 @@ void AFEWebServer::generate(boolean upload) {
         ds18B20Configuration = {0};
       }
 #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      else if (siteConfig.ID == AFE_CONFIG_SITE_DHT) {
+        DHT dhtConfiguration;
+        get(dhtConfiguration);
+        Data->saveConfiguration(siteConfig.deviceID, &dhtConfiguration);
+        dhtConfiguration = {0};
+      }
+#endif
 #ifdef AFE_CONFIG_HARDWARE_UART
       else if (siteConfig.ID == AFE_CONFIG_SITE_UART) {
         SERIALPORT configuration;
@@ -401,7 +414,7 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_I2C
       else if (siteConfig.ID == AFE_CONFIG_SITE_I2C) {
         I2CPORT configuration;
-        getI2CPortData(&configuration);
+        get(configuration);
         Data->saveConfiguration(&configuration);
         configuration = {0};
       }
@@ -787,7 +800,9 @@ void AFEWebServer::get(DEVICE &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  data.isDHT = server.arg("dh").length() > 0 ? true : false;
+  data.noOfDHTs = server.arg("dh").length() > 0
+                      ? server.arg("dh").toInt()
+                      : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #if defined(T3_CONFIG)
@@ -967,7 +982,7 @@ void AFEWebServer::get(DOMOTICZ &data) {
     data.password[0] = AFE_EMPTY_STRING;
   }
 }
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEWebServer::get(RELAY &data) {
@@ -1011,7 +1026,6 @@ void AFEWebServer::get(RELAY &data) {
                            ? server.arg("ts").toInt()
                            : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
-
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   data.mcp23017.gpio = server.arg("mg").length() > 0
                            ? server.arg("mg").toInt()
@@ -1021,7 +1035,6 @@ void AFEWebServer::get(RELAY &data) {
                               ? server.arg("a").toInt()
                               : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
-
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -1099,9 +1112,22 @@ void AFEWebServer::get(REGULATOR &data) {
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
   data.sensorId = server.arg("s").length() > 0 ? server.arg("s").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
-  /* Hardcoded 0 for DS18B20 */
+/* Hardcoded 0 for DS18B20, 1 for DHT */
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
   data.sensorHardware =
       server.arg("h").length() > 0 ? server.arg("h").toInt() : 0;
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  data.sensorHardware =
+      server.arg("h").length() > 0 ? server.arg("h").toInt() : 1;
+
+  data.controllingParameter = server.arg("cp").length() > 0
+                                  ? server.arg("cp").toInt()
+                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#endif // AFE_CONFIG_HARDWARE_DHT
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -1113,7 +1139,7 @@ void AFEWebServer::get(REGULATOR &data) {
                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 }
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 void AFEWebServer::get(THERMAL_PROTECTOR &data) {
@@ -1146,88 +1172,88 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 }
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEWebServer::getContactronData(uint8_t id, CONTACTRON *data) {
-  data->type = server.arg("y").length() > 0
-                   ? server.arg("y").toInt()
-                   : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
+void AFEWebServer::get(CONTACTRON &data) {
+  data.type = server.arg("y").length() > 0
+                  ? server.arg("y").toInt()
+                  : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
 
-  data->ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
-                                             : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->bouncing = server.arg("b").length() > 0
-                       ? server.arg("b").toInt()
-                       : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
+  data.bouncing = server.arg("b").length() > 0
+                      ? server.arg("b").toInt()
+                      : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
 
-  data->gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
-                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEWebServer::getGateData(GATE *data) {
+void AFEWebServer::get(GATE &data) {
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 
-  data->relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
-                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->contactron.id[0] = server.arg("c1").length() > 0
-                               ? server.arg("c1").toInt()
-                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.contactron.id[0] = server.arg("c1").length() > 0
+                              ? server.arg("c1").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data->contactron.id[1] = server.arg("c2").length() > 0
-                               ? server.arg("c2").toInt()
-                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.contactron.id[1] = server.arg("c2").length() > 0
+                              ? server.arg("c2").toInt()
+                              : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  for (uint8_t i = 0; i < sizeof(data->states.state); i++) {
-    data->states.state[i] = server.arg("s" + String(i)).length() > 0
-                                ? server.arg("s" + String(i)).toInt()
-                                : AFE_GATE_UNKNOWN;
+  for (uint8_t i = 0; i < sizeof(data.states.state); i++) {
+    data.states.state[i] = server.arg("s" + String(i)).length() > 0
+                               ? server.arg("s" + String(i)).toInt()
+                               : AFE_GATE_UNKNOWN;
   }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
-                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
-  data->domoticzControl.idx = server.arg("z").length() > 0
-                                  ? server.arg("z").toInt()
-                                  : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticzControl.idx = server.arg("z").length() > 0
+                                 ? server.arg("z").toInt()
+                                 : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #if defined(T3_CONFIG)
 void AFEWebServer::getPIRData(uint8_t id, PIR *data) {
 
   if (server.arg("g" + String(id)).length() > 0) {
-    data->gpio = server.arg("g" + String(id)).toInt();
+    data.gpio = server.arg("g" + String(id)).toInt();
   }
 
   if (server.arg("n" + String(id)).length() > 0) {
@@ -1279,10 +1305,10 @@ void AFEWebServer::get(LED &data) {
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
-  return server.arg("s").length() > 0 ? server.arg("s").toInt()
+  return server.arg("l").length() > 0 ? server.arg("l").toInt()
                                       : AFE_HARDWARE_ITEM_NOT_EXIST;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEWebServer::get(DS18B20 &data) {
@@ -1316,8 +1342,7 @@ void AFEWebServer::get(DS18B20 &data) {
   data.unit = server.arg("u").length() > 0 ? server.arg("u").toInt()
                                            : AFE_TEMPERATURE_UNIT_CELSIUS;
 
-  server.arg("s").length() > 0 ? data.sendOnlyChanges = true
-                               : data.sendOnlyChanges = false;
+  data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()
@@ -1331,57 +1356,89 @@ void AFEWebServer::get(DS18B20 &data) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEWebServer::getDHTData(DH *data) {
+void AFEWebServer::get(DHT &data) {
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
 
   if (server.arg("g").length() > 0) {
-    data->gpio = server.arg("g").toInt();
+    data.gpio = server.arg("g").toInt();
   }
 
   if (server.arg("t").length() > 0) {
-    data->type = server.arg("t").toInt();
+    data.type = server.arg("t").toInt();
   }
 
-  if (server.arg("c").length() > 0) {
-    data->temperature.correction = server.arg("c").toFloat();
+  if (server.arg("f").length() > 0) {
+    data.interval = server.arg("f").toInt();
   }
 
-  if (server.arg("i").length() > 0) {
-    data->interval = server.arg("i").toInt();
+  if (server.arg("tc").length() > 0) {
+    data.temperature.correction = server.arg("tc").toFloat();
   }
 
-  if (server.arg("u").length() > 0) {
-    data->temperature.unit = server.arg("u").toInt();
+  if (server.arg("tu").length() > 0) {
+    data.temperature.unit = server.arg("tu").toInt();
   }
 
-  if (server.arg("d").length() > 0) {
-    data->humidity.correction = server.arg("d").toFloat();
+  if (server.arg("hc").length() > 0) {
+    data.humidity.correction = server.arg("hc").toFloat();
   }
 
-  server.arg("j").length() > 0 ? data->publishDewPoint = true
-                               : data->publishDewPoint = false;
-
-  server.arg("o").length() > 0 ? data->sendOnlyChanges = true
-                               : data->sendOnlyChanges = false;
-
-  server.arg("p").length() > 0 ? data->publishHeatIndex = true
-                               : data->publishHeatIndex = false;
-
-  if (server.arg("xt").length() > 0) {
-    data->temperatureIdx = server.arg("xt").toInt();
+  if (server.arg("hu").length() > 0) {
+    data.humidity.unit = server.arg("hu").toInt();
   }
 
-  if (server.arg("xh").length() > 0) {
-    data->humidityIdx = server.arg("xh").toInt();
-  }
+  data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
 
-  if (server.arg("xth").length() > 0) {
-    data->temperatureAndHumidityIdx = server.arg("xth").toInt();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.temperature.idx = server.arg("i1").length() > 0
+                                      ? server.arg("i1").toInt()
+                                      : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.humidity.idx = server.arg("i2").length() > 0
+                                   ? server.arg("i2").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.dewPoint.idx = server.arg("i3").length() > 0
+                                   ? server.arg("i3").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.heatIndex.idx = server.arg("i4").length() > 0
+                                    ? server.arg("i4").toInt()
+                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.temperatureHumidity.idx = server.arg("i5").length() > 0
+                                              ? server.arg("i5").toInt()
+                                              : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.perception.idx = server.arg("i6").length() > 0
+                                     ? server.arg("i6").toInt()
+                                     : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.comfort.idx = server.arg("i7").length() > 0
+                                  ? server.arg("i7").toInt()
+                                  : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.absoluteHumidity.idx = server.arg("i8").length() > 0
+                                           ? server.arg("i8").toInt()
+                                           : AFE_DOMOTICZ_DEFAULT_IDX;
+
+#else
+  if (server.arg("m").length() > 0) {
+    server.arg("m").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
-}
 #endif
+}
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_UART
 void AFEWebServer::getSerialPortData(SERIALPORT *data) {
@@ -1393,18 +1450,16 @@ void AFEWebServer::getSerialPortData(SERIALPORT *data) {
                   ? server.arg("t").toInt()
                   : AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEWebServer::getI2CPortData(I2CPORT *data) {
-  data->SDA = server.arg("a").length() > 0
-                  ? server.arg("a").toInt()
-                  : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
-  data->SCL = server.arg("l").length() > 0
-                  ? server.arg("l").toInt()
-                  : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+void AFEWebServer::get(I2CPORT &data) {
+  data.SDA = server.arg("a").length() > 0 ? server.arg("a").toInt()
+                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
+  data.SCL = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
@@ -1437,144 +1492,140 @@ void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
     data->name[0] = AFE_EMPTY_STRING;
   }
 };
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEWebServer::getBMEX80SensorData(BMEX80 *data) {
-  data->type = server.arg("b").length() > 0 ? server.arg("b").toInt()
-                                            : AFE_BMX_UNKNOWN_SENSOR;
+void AFEWebServer::get(BMEX80 &data) {
+  data.type = server.arg("b").length() > 0 ? server.arg("b").toInt()
+                                           : AFE_BMX_UNKNOWN_SENSOR;
 
-  data->i2cAddress = server.arg("a").length() > 0
-                         ? server.arg("a").toInt()
-                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
-  data->interval = server.arg("f").length() > 0
-                       ? server.arg("f").toInt()
-                       : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
 
-  data->resolution = server.arg("r").length() > 0 ? server.arg("r").toInt()
-                                                  : BMP085_ULTRAHIGHRES;
+  data.resolution = server.arg("r").length() > 0 ? server.arg("r").toInt()
+                                                 : BMP085_ULTRAHIGHRES;
 
-  data->seaLevelPressure = server.arg("s").length() > 0
-                               ? server.arg("s").toInt()
-                               : AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
+  data.seaLevelPressure = server.arg("s").length() > 0
+                              ? server.arg("s").toInt()
+                              : AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
 
-  data->altitude = server.arg("hi").length() > 0 ? server.arg("hi").toInt() : 0;
+  data.altitude = server.arg("hi").length() > 0 ? server.arg("hi").toInt() : 0;
 
-  data->temperature.unit = server.arg("tu").length() > 0
-                               ? server.arg("tu").toInt()
-                               : AFE_TEMPERATURE_UNIT_CELSIUS;
+  data.temperature.unit = server.arg("tu").length() > 0
+                              ? server.arg("tu").toInt()
+                              : AFE_TEMPERATURE_UNIT_CELSIUS;
 
-  data->temperature.correction =
+  data.temperature.correction =
       server.arg("tc").length() > 0 ? server.arg("tc").toFloat() : 0;
 
-  data->humidity.correction =
+  data.humidity.correction =
       server.arg("hc").length() > 0 ? server.arg("hc").toFloat() : 0;
 
-  data->pressure.unit = server.arg("pu").length() > 0 ? server.arg("pu").toInt()
-                                                      : AFE_PRESSURE_UNIT_HPA;
-  data->pressure.correction =
+  data.pressure.unit = server.arg("pu").length() > 0 ? server.arg("pu").toInt()
+                                                     : AFE_PRESSURE_UNIT_HPA;
+  data.pressure.correction =
       server.arg("pc").length() > 0 ? server.arg("pc").toFloat() : 0;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.temperatureHumidityPressure.idx =
+  data.domoticz.temperatureHumidityPressure.idx =
       server.arg("i0").length() > 0 ? server.arg("i0").toInt()
                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.temperature.idx = server.arg("i1").length() > 0
-                                       ? server.arg("i1").toInt()
-                                       : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.temperature.idx = server.arg("i1").length() > 0
+                                      ? server.arg("i1").toInt()
+                                      : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.humidity.idx = server.arg("i2").length() > 0
-                                    ? server.arg("i2").toInt()
+  data.domoticz.humidity.idx = server.arg("i2").length() > 0
+                                   ? server.arg("i2").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.dewPoint.idx = server.arg("i3").length() > 0
+                                   ? server.arg("i3").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.heatIndex.idx = server.arg("i4").length() > 0
+                                    ? server.arg("i4").toInt()
                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.dewPoint.idx = server.arg("i3").length() > 0
-                                    ? server.arg("i3").toInt()
+  data.domoticz.pressure.idx = server.arg("i5").length() > 0
+                                   ? server.arg("i5").toInt()
+                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.relativePressure.idx = server.arg("i6").length() > 0
+                                           ? server.arg("i6").toInt()
+                                           : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.iaq.idx = server.arg("i7").length() > 0
+                              ? server.arg("i7").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.staticIaq.idx = server.arg("i8").length() > 0
+                                    ? server.arg("i8").toInt()
                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.heatIndex.idx = server.arg("i4").length() > 0
-                                     ? server.arg("i4").toInt()
-                                     : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.co2Equivalent.idx = server.arg("i9").length() > 0
+                                        ? server.arg("i9").toInt()
+                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.pressure.idx = server.arg("i5").length() > 0
-                                    ? server.arg("i5").toInt()
-                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.breathVocEquivalent.idx = server.arg("i10").length() > 0
+                                              ? server.arg("i10").toInt()
+                                              : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.relativePressure.idx = server.arg("i6").length() > 0
-                                            ? server.arg("i6").toInt()
-                                            : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.gasResistance.idx = server.arg("i11").length() > 0
+                                        ? server.arg("i11").toInt()
+                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data->domoticz.iaq.idx = server.arg("i7").length() > 0
-                               ? server.arg("i7").toInt()
-                               : AFE_DOMOTICZ_DEFAULT_IDX;
-
-  data->domoticz.staticIaq.idx = server.arg("i8").length() > 0
-                                     ? server.arg("i8").toInt()
-                                     : AFE_DOMOTICZ_DEFAULT_IDX;
-
-  data->domoticz.co2Equivalent.idx = server.arg("i9").length() > 0
-                                         ? server.arg("i9").toInt()
-                                         : AFE_DOMOTICZ_DEFAULT_IDX;
-
-  data->domoticz.breathVocEquivalent.idx = server.arg("i10").length() > 0
-                                               ? server.arg("i10").toInt()
-                                               : AFE_DOMOTICZ_DEFAULT_IDX;
-
-  data->domoticz.gasResistance.idx = server.arg("i11").length() > 0
-                                         ? server.arg("i11").toInt()
-                                         : AFE_DOMOTICZ_DEFAULT_IDX;
-
-  data->domoticz.temperatureHumidity.idx = server.arg("i12").length() > 0
-                                               ? server.arg("i12").toInt()
-                                               : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.temperatureHumidity.idx = server.arg("i12").length() > 0
+                                              ? server.arg("i12").toInt()
+                                              : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEWebServer::getBH1750SensorData(BH1750 *data) {
-  data->i2cAddress = server.arg("a").length() > 0
-                         ? server.arg("a").toInt()
-                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+void AFEWebServer::get(BH1750 &data) {
+  data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
-  data->interval = server.arg("f").length() > 0
-                       ? server.arg("f").toInt()
-                       : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
 
-  data->mode = server.arg("m").length() > 0
-                   ? server.arg("m").toInt()
-                   : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
+  data.mode = server.arg("m").length() > 0
+                  ? server.arg("m").toInt()
+                  : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data->domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
-                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
-    data->mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
   if (server.arg("n").length() > 0) {
-    server.arg("n").toCharArray(data->name, sizeof(data->name));
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
   } else {
-    data->name[0] = AFE_EMPTY_STRING;
+    data.name[0] = AFE_EMPTY_STRING;
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEWebServer::getAS3935SensorData(AS3935 *data) {
@@ -1630,7 +1681,7 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 void AFEWebServer::getAnemometerSensorData(ANEMOMETER *data) {

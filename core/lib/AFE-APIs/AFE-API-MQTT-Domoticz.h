@@ -155,6 +155,12 @@ public:
   virtual void addClass(AFEThermalProtector *);
   boolean publishThermalProtectorState(uint8_t id);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  virtual void addClass(AFESensorDHT *);
+  boolean publishDHTSensorData(uint8_t id);
+#endif
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

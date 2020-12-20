@@ -178,7 +178,6 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -222,7 +221,6 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createProVersionConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
@@ -457,6 +455,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      configuration->noOfDHTs =
+          root["noOfDHTs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -483,7 +486,6 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef DEBUG
@@ -555,6 +557,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfDS18B20s"] = configuration->noOfDS18B20s;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    root["noOfDHTs"] = configuration->noOfDHTs;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
     root["noOfAnemometerSensors"] = configuration->noOfAnemometerSensors;
 #endif
@@ -602,13 +608,13 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     for (uint8_t i = configuration->noOfGates;
          i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
 #ifdef DEBUG
-      Serial << endl << F("INFO: Update of Gate configuration";
+      Serial << endl << F("INFO: Update of Gate configuration");
 
 #endif
-      _Gate = getConfiguration(i);
+      getConfiguration(i, &_Gate);
       if (_Gate.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
         _Gate.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
-        saveConfiguration(i, _Gate);
+        saveConfiguration(i, &_Gate);
       }
 #ifdef DEBUG
       else {
@@ -620,7 +626,6 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #endif
 }
-
 void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_CONFIGURATION;
@@ -686,6 +691,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   deviceConfiguration.noOfDS18B20s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  deviceConfiguration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
@@ -768,7 +777,6 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -1323,7 +1331,7 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
   DomoticzConfiguration.port = 8080;
   saveConfiguration(&DomoticzConfiguration);
 }
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
@@ -1594,7 +1602,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #endif
   saveSystemLedID(0);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
@@ -1761,7 +1769,6 @@ void AFEDataAccess::createRelayConfigurationFile() {
 
   RelayConfiguration.triggerSignal =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
-
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   RelayConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
@@ -1994,7 +2001,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   }
 #endif
 }
-#endif /* End: Relay */
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
@@ -2220,7 +2227,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
     }
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
@@ -2572,7 +2579,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
   }
 }
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
@@ -2635,8 +2642,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
-
-  return configuration;
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
@@ -2708,13 +2713,13 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #if defined(AFE_DEVICE_iECSv20)
   ContactronConfiguration.gpio = 14;
   sprintf(ContactronConfiguration.name, "C1");
-  saveConfiguration(0, ContactronConfiguration);
+  saveConfiguration(0, &ContactronConfiguration);
   ContactronConfiguration.gpio = 13;
   sprintf(ContactronConfiguration.name, "C2");
-  saveConfiguration(1, ContactronConfiguration);
+  saveConfiguration(1, &ContactronConfiguration);
   ContactronConfiguration.gpio = 3;
   sprintf(ContactronConfiguration.name, "C3");
-  saveConfiguration(2, ContactronConfiguration);
+  saveConfiguration(2, &ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
 #endif
   ContactronConfiguration.gpio = 0;
@@ -2725,10 +2730,10 @@ void AFEDataAccess::createContractonConfigurationFile() {
            << F("INFO: Creating file: cfg-contactron-") << i << F(".json");
 #endif
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
-    saveConfiguration(i, ContactronConfiguration);
+    saveConfiguration(i, &ContactronConfiguration);
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
@@ -2798,8 +2803,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
-
-  return configuration;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 
@@ -2891,7 +2894,7 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.states.state[2] = AFE_GATE_UNKNOWN;
   GateConfiguration.states.state[3] = AFE_GATE_CLOSED;
   sprintf(GateConfiguration.name, "G1");
-  saveConfiguration(0, GateConfiguration);
+  saveConfiguration(0, &GateConfiguration);
   saveGateState(0, AFE_GATE_UNKNOWN);
 #endif
 
@@ -2908,7 +2911,7 @@ void AFEDataAccess::createGateConfigurationFile() {
     Serial << endl << F("INFO: Creating file: cfg-gate-") << i << F(".json");
 #endif
     sprintf(GateConfiguration.name, "G%d", i + 1);
-    saveConfiguration(i, GateConfiguration);
+    saveConfiguration(i, &GateConfiguration);
     saveGateState(i, AFE_GATE_UNKNOWN);
   }
 }
@@ -3017,7 +3020,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
   }
 #endif
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
@@ -3060,6 +3063,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
       configuration->turnOffAbove =
           root["turnOffAbove"] |
           AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      configuration->controllingParameter =
+          root["controllingParameter"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -3120,6 +3128,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
     root["turnOff"] = configuration->turnOff;
     root["turnOnAbove"] = configuration->turnOnAbove;
     root["turnOffAbove"] = configuration->turnOffAbove;
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    root["controllingParameter"] = configuration->controllingParameter;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -3161,6 +3174,11 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
   configuration.turnOffAbove =
       AFE_FUNCTIONALITY_REGULATOR_DEFAULT_OFF_INDICATOR;
   configuration.turnOnAbove = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ON_INDICATOR;
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  configuration.controllingParameter = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3341,7 +3359,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
   }
   saveConfiguration(configuration);
 }
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
@@ -3484,7 +3502,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_UART
 void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
@@ -3589,7 +3607,7 @@ void AFEDataAccess::createSerialConfigurationFile() {
   configuration.TXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_TXD;
   saveConfiguration(&configuration);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
@@ -3647,6 +3665,35 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
 #endif
 }
 
+configuration->SDA = root["SDA"];
+configuration->SCL = root["SCL"];
+
+#ifdef DEBUG
+Serial << endl
+       << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
+       << F(", actual JSON size: ") << jsonBuffer.size();
+if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
+  Serial << endl << F("WARN: Too small buffer size");
+}
+#endif
+}
+#ifdef DEBUG
+else {
+  Serial << F("ERROR: JSON not pharsed");
+}
+#endif
+
+configFile.close();
+}
+
+#ifdef DEBUG
+else {
+  Serial << endl
+         << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
+         << F(" not opened");
+}
+#endif
+}
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -3697,7 +3744,7 @@ void AFEDataAccess::createI2CConfigurationFile() {
   configuration.SCL = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
   saveConfiguration(&configuration);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
@@ -3914,7 +3961,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
@@ -4048,7 +4095,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
@@ -4207,7 +4254,215 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
+#endif // AFE_CONFIG_HARDWARE_AS3935
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
+
+  char fileName[16];
+  sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
 #endif
+
+  File configFile = SPIFFS.open(fileName, "r");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: JSON: ";
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DHT> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["name"]);
+      configuration->gpio = root["gpio"];
+      configuration->interval =
+          root["interval"] | AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;
+      configuration->sendOnlyChanges =
+          root["sendOnlyChanges"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
+
+      configuration->type = root["type"];
+      configuration->temperature.unit = root["temperature"]["unit"];
+      configuration->temperature.correction =
+          root["temperature"]["correction"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
+      configuration->humidity.unit = root["humidity"]["unit"];
+      configuration->humidity.correction =
+          root["humidity"]["correction"] |
+          AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.temperatureHumidity.idx =
+          root["idx"]["temperatureHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.temperature.idx =
+          root["idx"]["temperature"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.humidity.idx =
+          root["idx"]["humidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.dewPoint.idx =
+          root["idx"]["dewPoint"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.heatIndex.idx =
+          root["idx"]["heatIndex"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.absoluteHumidity.idx =
+          root["idx"]["absoluteHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.perception.idx =
+          root["idx"]["perception"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      configuration->domoticz.comfort.idx =
+          root["idx"]["comfort"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DHT
+             << ", actual JSON size: " << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_DHT < jsonBuffer.size() + 10) {
+        Serial << endl << "WARN: Too small buffer size";
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << "ERROR: JSON not pharsed";
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << "ERROR: Configuration file: " << fileName << " not opened";
+  }
+#endif
+}
+void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
+
+  char fileName[16];
+  sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+#endif
+
+  File configFile = SPIFFS.open(fileName, "w");
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << "success" << endl << "INFO: Writing JSON: ";
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DHT> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &temperature = root.createNestedObject("temperature");
+    JsonObject &humidity = root.createNestedObject("humidity");
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    JsonObject &domoticz = root.createNestedObject("idx");
+#endif
+    root["name"] = configuration->name;
+    root["gpio"] = configuration->gpio;
+    root["type"] = configuration->type;
+    root["interval"] = configuration->interval;
+    root["sendOnlyChanges"] = configuration->sendOnlyChanges;
+    temperature["unit"] = configuration->temperature.unit;
+    temperature["correction"] = configuration->temperature.correction;
+    humidity["unit"] = configuration->humidity.unit;
+    humidity["correction"] = configuration->humidity.correction;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    domoticz["temperature"] = configuration->domoticz.temperature.idx;
+    domoticz["humidity"] = configuration->domoticz.humidity.idx;
+    domoticz["dewPoint"] = configuration->domoticz.dewPoint.idx;
+    domoticz["heatIndex"] = configuration->domoticz.heatIndex.idx;
+    domoticz["temperatureHumidity"] =
+        configuration->domoticz.temperatureHumidity.idx;
+    domoticz["absoluteHumidity"] = configuration->domoticz.absoluteHumidity.idx;
+    domoticz["perception"] = configuration->domoticz.perception.idx;
+    domoticz["comfort"] = configuration->domoticz.comfort.idx;
+
+#endif
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: Data saved" << endl
+           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DHT
+           << ", actual JSON size: " << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_DHT < jsonBuffer.size() + 10) {
+      Serial << endl << "WARN: Too small buffer size";
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << "ERROR: failed to open file for writing";
+  }
+#endif
+}
+
+void AFEDataAccess::createDHTSensorConfigurationFile(void) {
+  DHT configuration;
+
+  configuration.gpio = AFE_CONFIG_HARDWARE_DHT_DEFAULT_GPIO;
+  configuration.interval = AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;
+  configuration.sendOnlyChanges =
+      AFE_CONFIG_HARDWARE_DHT_DEFAULT_SENDING_ONLY_CHANGES;
+  configuration.type = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
+  configuration.temperature.correction =
+      AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
+  configuration.humidity.unit = AFE_HUMIDITY_UNIT;
+  configuration.humidity.correction =
+      AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.temperatureHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.temperature.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.humidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.dewPoint.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.heatIndex.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.comfort.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.perception.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.absoluteHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
+#ifdef DEBUG
+    Serial << endl << "INFO: Creating file: /cfg-dht-" << i << ".json";
+#endif
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    sprintf(configuration.mqtt.topic, "DHT/%d", i + 1);
+#endif
+    sprintf(configuration.name, "DHT-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 IPAddress AFEDataAccess::IPfromString(const char *address) {
   IPAddress ip;

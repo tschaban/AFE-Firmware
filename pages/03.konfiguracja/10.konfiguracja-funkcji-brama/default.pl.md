@@ -12,6 +12,8 @@ recaptchacontact:
 
 Funkcja sterowania bramą/drzwiami dostępna jest w [AFE Firmware T5](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi).
 
+[plugin:youtube](https://www.youtube.com/watch?v=M6xa71GIU6U)
+
 Poniżej przedstwiony jest przykład konfiguracji bramy, która posiada dwa czujniki magnetyczne, które monitorują stan otwarcia/zamknięcia bramy.
 
 ---
