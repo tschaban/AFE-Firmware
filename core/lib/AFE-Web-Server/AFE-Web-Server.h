@@ -52,9 +52,7 @@ private:
 
   /* Used to auto-logoff from the config panel */
   unsigned long howLongInConfigMode = 0;
-
-  uint16_t uploadLED = 1023;
-  
+ 
   AFESitesGenerator Site;
 
   boolean upgradeFailed = false;

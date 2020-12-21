@@ -16,7 +16,7 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-#include <Adafruit_MCP23017.h>
+#include <AFE-MCP23017-Broker.h>
 #endif
 
 #ifdef DEBUG
@@ -39,9 +39,10 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  Adafruit_MCP23017 *mcp;
+  AFEMCP23017Broker *_MCP23017Broker;
   boolean _MCP23017ReferenceAdded = false;
   boolean _expanderUsed = false;
+  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   /* Method set relay state after power restore or connection to MQTT is
@@ -64,11 +65,10 @@ public:
   AFERelay();
 
   /* Method: initiates relay */
-  void initialize(AFEDataAccess *, uint8_t id);
-  void begin();
+  void begin(AFEDataAccess *, uint8_t id);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  void addMCP23017Reference(Adafruit_MCP23017 *);
+  void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 
   /* Method sets relay state after device is turned on / power is restored / or

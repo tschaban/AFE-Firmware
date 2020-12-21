@@ -21,7 +21,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef AFE_CONFIG_HARDWARE_LED
 #ifdef DEBUG
   Serial << endl
-         << "INFO: MCP23017 Broker: Caching MCP23017s ID's used by LEDs";
+         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by LEDs");
 #endif
   for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
     LED LEDConfiguration;
@@ -34,9 +34,9 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef DEBUG
       else {
         Serial << endl
-               << "INFO: MCP23017 Broker: MCP23017[0x"
+               << F("INFO: MCP23017 Broker: MCP23017[0x")
                << _HEX(LEDConfiguration.mcp23017.address)
-               << "] already in cache";
+               << F("] already in cache");
       }
 #endif
     }
@@ -46,7 +46,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
   Serial << endl
-         << "INFO: MCP23017 Broker: Caching MCP23017s ID's used by Relays";
+         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by Relays");
 #endif
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
     RELAY RelayConfiguration;
@@ -59,15 +59,39 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef DEBUG
       else {
         Serial << endl
-               << "INFO: MCP23017 Broker: MCP23017[0x"
+               << F("INFO: MCP23017 Broker: MCP23017[0x")
                << _HEX(RelayConfiguration.mcp23017.address)
-               << "] already in cache";
+               << F("] already in cache");
       }
 #endif
     }
   }
-#endif // AFE_CONFIG_HARDWARE_LED
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by Relays");
+#endif
+  for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
+    SWITCH SwitchConfiguration;
+    Data->getConfiguration(i, &SwitchConfiguration);
+    if (SwitchConfiguration.mcp23017.address != AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (getId(SwitchConfiguration.mcp23017.address) ==
+          AFE_HARDWARE_ITEM_NOT_EXIST) {
+        add(SwitchConfiguration.mcp23017.address);
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << F("INFO: MCP23017 Broker: MCP23017[0x")
+               << _HEX(SwitchConfiguration.mcp23017.address)
+               << F("] already in cache");
+      }
+#endif
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 }
 
 uint8_t AFEMCP23017Broker::getId(uint8_t address) {

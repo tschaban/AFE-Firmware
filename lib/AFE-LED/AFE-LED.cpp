@@ -6,17 +6,9 @@
 
 AFELED::AFELED() {}
 
-void AFELED::initialize(AFEDataAccess *Data, uint8_t id) {
-  _id = id;
-  if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data->getConfiguration(_id, &configuration);
-  }  
-}
-
-
-boolean AFELED::begin(AFEDataAccess *_Data, uint8_t id) {
-  if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-
+boolean AFELED::begin(AFEDataAccess *Data, uint8_t id) {
+  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    Data->getConfiguration(id, &configuration);
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     // If MCP23017 available in the HW, checking if LED connected using MCP23017
     if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -25,16 +17,31 @@ boolean AFELED::begin(AFEDataAccess *_Data, uint8_t id) {
               AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS) {
 
         if (_MCP23017ReferenceAdded) {
+
+          _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
+          if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+
 #ifdef DEBUG
-          Serial << endl << F("INFO: LED: Initializing with MCP23017");
+            Serial << endl << F("INFO: LED: Initializing with MCP23017");
 #endif
-          mcp->pinMode(configuration.mcp23017.gpio, OUTPUT);
-          _expanderUsed = true;
-          _initialized = true;
+            _MCP23017Broker->MCP[_MCP23017Id].pinMode(
+                configuration.mcp23017.gpio, OUTPUT);
+            _expanderUsed = true;
+            _initialized = true;
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl
+                   << F("WARN: LED: MCP23017[0x")
+                   << _HEX(configuration.mcp23017.address)
+                   << F("] not found in cache");
+          }
+#endif
         }
 #ifdef DEBUG
         else {
-          Serial << endl << F("WARN: Reference to MCP23017 has not been added");
+          Serial << endl
+                 << F("WARN: LED: Reference to MCP23017 has not been added");
         }
 #endif
       }
@@ -61,8 +68,8 @@ boolean AFELED::begin(AFEDataAccess *_Data, uint8_t id) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-void AFELED::addMCP23017Reference(Adafruit_MCP23017 *_mcp) {
-  mcp = _mcp;
+void AFELED::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
+  _MCP23017Broker = MCP23017Broker;
   _MCP23017ReferenceAdded = true;
 }
 #endif
@@ -90,19 +97,19 @@ void AFELED::blink(unsigned int duration) {
 }
 
 void AFELED::blinkingOn(unsigned long blinking_interval) {
-  interval = blinking_interval;
-  blinking = true;
+  _interval = blinking_interval;
+  _blinking = true;
 }
 
-void AFELED::blinkingOff() { blinking = false; }
+void AFELED::blinkingOff() { _blinking = false; }
 
-boolean AFELED::isBlinking() { return blinking; }
+boolean AFELED::isBlinking() { return _blinking; }
 
 void AFELED::loop() {
-  if (_initialized && blinking) {
+  if (_initialized && _blinking) {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-      previousMillis = currentMillis;
+    if (currentMillis - _previousMillis >= _interval) {
+      _previousMillis = currentMillis;
       toggle();
     }
   }
@@ -113,8 +120,10 @@ void AFELED::set(uint8_t state) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     if (_expanderUsed) {
-      if (mcp->digitalRead(configuration.mcp23017.gpio) != state) {
-        mcp->digitalWrite(configuration.mcp23017.gpio, state);
+      if (_MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+              configuration.mcp23017.gpio) != state) {
+        _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+            configuration.mcp23017.gpio, state);
       }
     } else {
 #endif
@@ -134,9 +143,12 @@ void AFELED::toggle() {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     if (_expanderUsed) {
-      mcp->digitalRead(configuration.mcp23017.gpio) == HIGH
-          ? mcp->digitalWrite(configuration.mcp23017.gpio, LOW)
-          : mcp->digitalWrite(configuration.mcp23017.gpio, HIGH);
+      _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+          configuration.mcp23017.gpio) == HIGH
+          ? _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+                configuration.mcp23017.gpio, LOW)
+          : _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+                configuration.mcp23017.gpio, HIGH);
     } else {
 #endif
 

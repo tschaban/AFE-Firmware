@@ -2040,6 +2040,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_SWITCH
@@ -2092,6 +2097,14 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 #else
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    JsonObject &mcp23017 = root.createNestedObject("mcp23017");
+    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["gpio"] = configuration->mcp23017.gpio;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -2134,6 +2147,12 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE;
   SwitchConfiguration.functionality =
       AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  SwitchConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
   saveConfiguration(0, &SwitchConfiguration);
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)

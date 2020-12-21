@@ -1179,8 +1179,11 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   sprintf(text, "%s #%d", L_SWITCH_BUTTON, id + 1);
 
   openSection(page, text, "");
-  addListOfGPIOs(page, "g", configuration.gpio);
 
+  #ifndef AFE_CONFIG_HARDWARE_MCP23017
+  addListOfGPIOs(page, "g", configuration.gpio);
+  #endif
+  
   addSelectFormItemOpen(page, "f", L_SWITCH_FUNCTIONALITY);
   addSelectOptionFormItem(page, L_NONE, "0",
                           configuration.functionality ==
@@ -1255,6 +1258,23 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999", "1",
                    L_MILISECONDS);
   closeSection(page);
+
+
+  #ifdef AFE_CONFIG_HARDWARE_MCP23017
+  openSection(page, "Podłączenie",
+              "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub "
+              "przez ekspander MCP23017");  
+  addListOfGPIOs(page, "g", configuration.gpio);
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", "Podłączenie przez expander MCP23017 (GPIO "
+                                 "powyżej musi zostac ustawione na BRAK)");
+  addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+
+  closeSection(page);
+  #endif // AFE_CONFIG_HARDWARE_MCP23017
+
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {

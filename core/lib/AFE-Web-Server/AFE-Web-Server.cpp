@@ -1065,6 +1065,17 @@ void AFEWebServer::get(SWITCH &data) {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
