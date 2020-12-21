@@ -250,7 +250,6 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   void siteI2CBUS(String &page);
-  void addDeviceI2CAddressSelection(String &page, uint8_t address);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR

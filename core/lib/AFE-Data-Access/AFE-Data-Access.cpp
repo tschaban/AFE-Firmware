@@ -3664,36 +3664,6 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
   }
 #endif
 }
-
-configuration->SDA = root["SDA"];
-configuration->SCL = root["SCL"];
-
-#ifdef DEBUG
-Serial << endl
-       << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
-       << F(", actual JSON size: ") << jsonBuffer.size();
-if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
-  Serial << endl << F("WARN: Too small buffer size");
-}
-#endif
-}
-#ifdef DEBUG
-else {
-  Serial << F("ERROR: JSON not pharsed");
-}
-#endif
-
-configFile.close();
-}
-
-#ifdef DEBUG
-else {
-  Serial << endl
-         << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
-         << F(" not opened");
-}
-#endif
-}
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 #ifdef DEBUG
   Serial << endl

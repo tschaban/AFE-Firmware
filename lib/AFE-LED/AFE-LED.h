@@ -16,31 +16,37 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-#include <AFE-I2C-Scanner.h>
 #include <Adafruit_MCP23017.h>
 #endif
 
 class AFELED {
 
 private:
-  LED LEDConfiguration;
+  uint8_t _id;
   boolean _initialized = false;
   boolean blinking = false;
   unsigned long interval;
   unsigned long previousMillis = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  Adafruit_MCP23017 mcp;
-  boolean expanderUsed = false;
+  Adafruit_MCP23017 *mcp;
+  boolean _MCP23017ReferenceAdded = false;
+  boolean _expanderUsed = false;
 #endif
 
   /* Method turns on/off LED */
   void set(uint8_t state);
 
 public:
+  LED configuration;
   /* Constructor */
   AFELED();
+  void initialize(AFEDataAccess *, uint8_t id);
   boolean begin(AFEDataAccess *, uint8_t id);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addMCP23017Reference(Adafruit_MCP23017 *);
+#endif
 
   /* Turns on LED */
   void on();

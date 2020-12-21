@@ -721,7 +721,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   page.replace(
       "{{item.value}}",
       "Podłączenie przez MCP23017 (GPIO powyżej musi zostac ustawione na BRAK");
-  addDeviceI2CAddressSelection(page, configuration.mcp23017.address);
+  addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
   closeSection(page);
   openSection(page, "Dodatkowe ustawienia", "");
@@ -765,9 +765,6 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   }
 #endif
 
-  sprintf(_text, "%s #%d", L_RELAY, id + 1);
-  openSection(page, _text, "");
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* Below code is conditioned for the Gate functionality only. It's not
    * shown if the relay is assigned to the Gate */
@@ -793,7 +790,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   page.concat(FPSTR(HTTP_INFO_TEXT));
   page.replace("{{item.value}}", "Podłączenie przez expander MCP23017 (GPIO "
                                  "powyżej musi zostac ustawione na BRAK)");
-  addDeviceI2CAddressSelection(page, configuration.mcp23017.address);
+  addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
   closeSection(page);
@@ -2226,7 +2223,7 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
 
   openSection(page, L_AS3935_SENSOR, "");
   page.concat("<fieldset>");
-  addDeviceI2CAddressSelection(page, configuration.i2cAddress);
+  addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
   page += "<div class=\"cf\">";

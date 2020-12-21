@@ -117,6 +117,11 @@
 
 #define AFE_CONFIG_HARDWARE_MCP23017
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017 8
+#endif
+
+
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
