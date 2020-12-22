@@ -27,6 +27,9 @@ struct RELAY {
   MQTT_BASIC_CONFIG mqtt;
 #endif
   RELAY_DEFAULTS state;
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  MCP23017 mcp23017;
+#endif  
 };
 
 #endif // AFE_CONFIG_HARDWARE_RELAY

@@ -1025,6 +1025,16 @@ void AFEWebServer::get(RELAY &data) {
   data.triggerSignal = server.arg("ts").length() > 0
                            ? server.arg("ts").toInt()
                            : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -1055,6 +1065,17 @@ void AFEWebServer::get(SWITCH &data) {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1282,6 +1303,16 @@ void AFEWebServer::get(LED &data) {
                   : AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
   data.changeToOppositeValue = server.arg("w").length() > 0 ? true : false;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address = server.arg("a").length() > 0
+                              ? server.arg("a").toInt()
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
@@ -1616,7 +1647,9 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
     data->name[0] = AFE_EMPTY_STRING;
   }
 
-  data->i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+  data->i2cAddress = server.arg("a").length() > 0
+                         ? server.arg("a").toInt()
+                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 
   data->irqGPIO = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 

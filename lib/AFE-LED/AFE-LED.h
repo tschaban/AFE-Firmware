@@ -11,22 +11,41 @@
 #include <AFE-Device.h>
 #include <AFE-LED-Structure.h>
 
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
+#endif
+
 class AFELED {
 
 private:
-  LED LEDConfiguration;
   boolean _initialized = false;
-  boolean blinking = false;
-  unsigned long interval;
-  unsigned long previousMillis = 0;
+  boolean _blinking = false;
+  unsigned long _interval;
+  unsigned long _previousMillis = 0;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  AFEMCP23017Broker *_MCP23017Broker;
+  boolean _MCP23017ReferenceAdded = false;
+  boolean _expanderUsed = false;
+  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
   /* Method turns on/off LED */
   void set(uint8_t state);
 
 public:
+  LED configuration;
   /* Constructor */
   AFELED();
   boolean begin(AFEDataAccess *, uint8_t id);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addMCP23017Reference(AFEMCP23017Broker *);
+#endif
 
   /* Turns on LED */
   void on();

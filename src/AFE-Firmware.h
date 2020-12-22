@@ -34,6 +34,11 @@ AFEDevice Device;
 AFEWiFi Network;
 AFEWebServer WebServer;
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
+AFEMCP23017Broker MCP23017Broker;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 AFELED Led;
@@ -98,6 +103,10 @@ AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
 #include <AFE-Main-APIs.cpp>
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-Main-MCP23017.cpp>
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-Main-LED.cpp>

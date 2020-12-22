@@ -15,14 +15,42 @@
 #include <AFE-LED.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
 class AFERelay {
 
-public:
+private:
+  uint8_t _id;
+  AFEDataAccess *_Data; // @TODO nie jest konsekwentnie jak np. w switch
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED Led;
+#endif
+
+  unsigned long turnOffCounter = 0;
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+  boolean timerUnitInSeconds = true;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  AFEMCP23017Broker *_MCP23017Broker;
+  boolean _MCP23017ReferenceAdded = false;
+  boolean _expanderUsed = false;
+  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+  /* Method set relay state after power restore or connection to MQTT is
+   * established */
+
+  void setRelayAfterRestore(uint8_t option);
+
+public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
@@ -38,6 +66,10 @@ public:
 
   /* Method: initiates relay */
   void begin(AFEDataAccess *, uint8_t id);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addMCP23017Reference(AFEMCP23017Broker *);
+#endif
 
   /* Method sets relay state after device is turned on / power is restored / or
    * after device has been crash */
@@ -59,7 +91,6 @@ public:
 
   /* Turns off relay */
   void off();
-
 
   /* Toggles relay state from ON to OFF or from OFF to ON */
   void toggle();
@@ -84,26 +115,7 @@ public:
    * secods, false - miliseconds */
   void setTimerUnitToSeconds(boolean value);
 #endif
-
-private:
-  uint8_t _id;
-  AFEDataAccess *Data; // @TODO nie jest konsekwentnie jak np. w switch
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
-#endif
-
-  unsigned long turnOffCounter = 0;
-#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-  boolean timerUnitInSeconds = true;
-#endif
-
-  /* Method set relay state after power restore or connection to MQTT is
-   * established */
-
-  void setRelayAfterRestore(uint8_t option);
 };
-
 
 #endif // AFE_CONFIG_HARDWARE_RELAY
 #endif // _AFE_Relay_h
