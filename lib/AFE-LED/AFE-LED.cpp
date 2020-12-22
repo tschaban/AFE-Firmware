@@ -14,7 +14,7 @@ boolean AFELED::begin(AFEDataAccess *Data, uint8_t id) {
     if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
       if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
           configuration.mcp23017.address !=
-              AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS) {
+              AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
 
         if (_MCP23017ReferenceAdded) {
 

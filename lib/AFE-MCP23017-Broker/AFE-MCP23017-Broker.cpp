@@ -26,7 +26,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
     LED LEDConfiguration;
     Data->getConfiguration(i, &LEDConfiguration);
-    if (LEDConfiguration.mcp23017.address != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (LEDConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(LEDConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(LEDConfiguration.mcp23017.address);
@@ -51,7 +51,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
     RELAY RelayConfiguration;
     Data->getConfiguration(i, &RelayConfiguration);
-    if (RelayConfiguration.mcp23017.address != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (RelayConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(RelayConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(RelayConfiguration.mcp23017.address);
@@ -76,7 +76,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
     SWITCH SwitchConfiguration;
     Data->getConfiguration(i, &SwitchConfiguration);
-    if (SwitchConfiguration.mcp23017.address != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (SwitchConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(SwitchConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(SwitchConfiguration.mcp23017.address);

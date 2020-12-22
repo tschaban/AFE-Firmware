@@ -1488,7 +1488,7 @@ void AFEDataAccess::createLEDConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  LEDConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  LEDConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -1771,7 +1771,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  RelayConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  RelayConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -2149,7 +2149,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
       AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  SwitchConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+  SwitchConfiguration.mcp23017.address = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 

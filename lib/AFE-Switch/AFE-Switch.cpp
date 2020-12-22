@@ -21,7 +21,7 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
   if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
         configuration.mcp23017.address !=
-            AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS) {
+            AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
 
       if (_MCP23017ReferenceAdded) {
 
@@ -31,15 +31,20 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
           Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
           _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
                                                     INPUT);
-#else
-          _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
-                                                    INPUT_PULLUP);
-#endif
+          _MCP23017Broker->MCP[_MCP23017Id].pullUp(configuration.mcp23017.gpio,
+                                                   HIGH);
+
           state =
               _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.gpio);
+
+#ifdef DEBUG
+          Serial
+              << endl
+              << F("INFO: SWITCH: initial state of MCP23017 connecte switch: ")
+              << state;
+#endif
 
           _expanderUsed = true;
 
@@ -162,8 +167,8 @@ void AFESwitch::listener() {
     boolean currentState;
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     if (_expanderUsed) {
-      currentState =
-          _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.gpio);
+      currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+          configuration.mcp23017.gpio);
     } else {
 #endif
       currentState = digitalRead(configuration.gpio);

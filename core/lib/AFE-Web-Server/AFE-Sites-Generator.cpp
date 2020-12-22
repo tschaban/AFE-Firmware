@@ -707,9 +707,8 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   Data->getConfiguration(id, &configuration);
   sprintf(title, "LED: #%d", id + 1);
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  openSection(page, title,
-              "LED może zostać podłączony bezpośrednio do GPIO "
-              "lub przez ekspander MCP23017");
+  openSection(page, title, "LED może zostać podłączony bezpośrednio do GPIO "
+                           "lub przez ekspander MCP23017");
 #else
     openSection(page, title, "");
 #endif
@@ -1180,14 +1179,13 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
   openSection(page, text, "");
 
-  #ifndef AFE_CONFIG_HARDWARE_MCP23017
+#ifndef AFE_CONFIG_HARDWARE_MCP23017
   addListOfGPIOs(page, "g", configuration.gpio);
-  #endif
-  
+#endif
+
   addSelectFormItemOpen(page, "f", L_SWITCH_FUNCTIONALITY);
-  addSelectOptionFormItem(page, L_NONE, "0",
-                          configuration.functionality ==
-                              AFE_SWITCH_FUNCTIONALITY_NONE);
+  addSelectOptionFormItem(page, L_NONE, "0", configuration.functionality ==
+                                                 AFE_SWITCH_FUNCTIONALITY_NONE);
   addSelectOptionFormItem(page, L_SWITCH_SYSTEM_BUTTON, "1",
                           configuration.functionality ==
                               AFE_SWITCH_FUNCTIONALITY_MULTI);
@@ -1259,22 +1257,19 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                    L_MILISECONDS);
   closeSection(page);
 
-
-  #ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
   openSection(page, "Podłączenie",
               "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub "
-              "przez ekspander MCP23017");  
+              "przez ekspander MCP23017");
   addListOfGPIOs(page, "g", configuration.gpio);
-    page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.concat(FPSTR(HTTP_INFO_TEXT));
   page.replace("{{item.value}}", "Podłączenie przez expander MCP23017 (GPIO "
                                  "powyżej musi zostac ustawione na BRAK)");
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
   closeSection(page);
-  #endif // AFE_CONFIG_HARDWARE_MCP23017
-
-
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
@@ -1360,8 +1355,8 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   addSelectFormItemOpen(page, "u", L_UNITS);
   addSelectOptionFormItem(page, "C", "1",
                           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS);
-  addSelectOptionFormItem(
-      page, "F", "2", configuration.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+  addSelectOptionFormItem(page, "F", "2", configuration.unit ==
+                                              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
   addSelectFormItemClose(page);
 
   closeSection(page);
@@ -1445,12 +1440,10 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   /* Item: Unit */
   openSection(page, L_UNITS, "");
   addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
-  addSelectOptionFormItem(page, "C", "1",
-                          configuration.temperature.unit ==
-                              AFE_TEMPERATURE_UNIT_CELSIUS);
-  addSelectOptionFormItem(page, "F", "2",
-                          configuration.temperature.unit ==
-                              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+  addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
+                                              AFE_TEMPERATURE_UNIT_CELSIUS);
+  addSelectOptionFormItem(page, "F", "2", configuration.temperature.unit ==
+                                              AFE_TEMPERATURE_UNIT_FAHRENHEIT);
   addSelectFormItemClose(page);
   closeSection(page);
 
@@ -2037,9 +2030,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
     /* Item: Unit */
     openSection(page, L_UNITS, "");
     addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
-    addSelectOptionFormItem(page, "C", "1",
-                            configuration.temperature.unit ==
-                                AFE_TEMPERATURE_UNIT_CELSIUS);
+    addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
+                                                AFE_TEMPERATURE_UNIT_CELSIUS);
     addSelectOptionFormItem(page, "F", "2",
                             configuration.temperature.unit ==
                                 AFE_TEMPERATURE_UNIT_FAHRENHEIT);

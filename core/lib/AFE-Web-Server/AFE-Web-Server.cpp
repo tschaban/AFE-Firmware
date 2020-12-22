@@ -1033,7 +1033,7 @@ void AFEWebServer::get(RELAY &data) {
 
   data.mcp23017.address = server.arg("a").length() > 0
                               ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1073,7 +1073,7 @@ void AFEWebServer::get(SWITCH &data) {
 
   data.mcp23017.address = server.arg("a").length() > 0
                               ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
 }
@@ -1311,7 +1311,7 @@ void AFEWebServer::get(LED &data) {
 
   data.mcp23017.address = server.arg("a").length() > 0
                               ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 
@@ -1649,7 +1649,7 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
 
   data->i2cAddress = server.arg("a").length() > 0
                          ? server.arg("a").toInt()
-                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_ADDRESS;
+                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 
   data->irqGPIO = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
