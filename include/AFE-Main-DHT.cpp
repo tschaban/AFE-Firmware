@@ -95,18 +95,20 @@ void DHTSensorEventsListener(void) {
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       for (uint8_t j = 0; j < Device.configuration.noOfThermalProtectors; j++) {
-        if (ThermalProtector[j].configuration.sensorId == i) {
-          if (ThermalProtector[j].listener(DHTSensor[i].currentTemperature)) {
-            if (ThermalProtector[j].turnOff &&
-                Relay[ThermalProtector[j].configuration.relayId].get() ==
-                    AFE_RELAY_ON) {
-              Relay[ThermalProtector[j].configuration.relayId].off();
-              MqttAPI.publishRelayState(
-                  ThermalProtector[j].configuration.relayId);
+        if (ThermalProtector[j].configuration.enabled) {
+          if (ThermalProtector[j].configuration.sensorId == i) {
+            if (ThermalProtector[j].listener(DHTSensor[i].currentTemperature)) {
+              if (ThermalProtector[j].turnOff &&
+                  Relay[ThermalProtector[j].configuration.relayId].get() ==
+                      AFE_RELAY_ON) {
+                Relay[ThermalProtector[j].configuration.relayId].off();
+                MqttAPI.publishRelayState(
+                    ThermalProtector[j].configuration.relayId);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-              HttpDomoticzAPI.publishRelayState(
-                  ThermalProtector[j].configuration.relayId);
+                HttpDomoticzAPI.publishRelayState(
+                    ThermalProtector[j].configuration.relayId);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+              }
             }
           }
         }
