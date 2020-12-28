@@ -20,7 +20,7 @@
 #elif defined(T3_CONFIG)
 #define L_FIRMWARE_NAME "for 4 WiFi switches and PIR sensors"
 #elif defined(T4_CONFIG)
-#define L_FIRMWARE_NAME "for 4 WiFi switches"
+#define L_FIRMWARE_NAME "with MCP23017 expander"
 #elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "to control gate controller"
 #elif defined(T6_CONFIG)

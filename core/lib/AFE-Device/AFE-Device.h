@@ -5,7 +5,6 @@
 
 #include <AFE-Defaults.h>
 #include <AFE-Data-Access.h>
-#include <FS.h>
 
 #ifdef DEBUG
 #include <Streaming.h>

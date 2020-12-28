@@ -53,7 +53,10 @@ private:
   void generateHeader(String &page, uint16_t redirect);
 
   /* Method addes configuration block to the site */
-  void openSection(String &page, const char *, const char *);
+  void openSection(String &page, const char *title, const __FlashStringHelper *description);
+  void openSection(String &page, const __FlashStringHelper *title,
+                   const __FlashStringHelper *description);
+
   void closeSection(String &page);
 
   /* Item: HTML <input type=""> */
@@ -109,7 +112,7 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
-                              const char *title = "GPIO");
+                              const char *title = "MCP23017 GPIO");
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR

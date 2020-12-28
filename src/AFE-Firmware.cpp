@@ -24,8 +24,15 @@ void setup() {
   Serial << F("INFO: ESP Config erased");
 #endif
 
-  /* Initializing SPIFFS file system */
-  if (SPIFFS.begin()) {
+/* Initializing SPIFFS file system */
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  bool _fileSystemReady = LittleFS.begin();
+#else
+  bool _fileSystemReady = SPIFFS.begin();
+#endif
+
+  if (_fileSystemReady) {
 #ifdef DEBUG
     Serial << F("INFO: File system: mounted");
   } else {

@@ -5,11 +5,9 @@
 #ifndef _AFE_UART_h
 #define _AFE_UART_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_UART
+
 
 #include <AFE-Data-Access.h>
 #include <AFE-SoftwareSerial.h>
@@ -37,4 +35,5 @@ public:
   void clean();
 };
 
+#endif // AFE_CONFIG_HARDWARE_UART
 #endif

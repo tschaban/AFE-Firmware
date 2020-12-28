@@ -71,7 +71,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by Relays");
+         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by Switches");
 #endif
   for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
     SWITCH SwitchConfiguration;

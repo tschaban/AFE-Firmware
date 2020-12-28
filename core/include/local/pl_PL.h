@@ -20,7 +20,7 @@
 #elif defined(T3_CONFIG)
 #define L_FIRMWARE_NAME "dla 4 włączników i czujników ruchu"
 #elif defined(T4_CONFIG)
-#define L_FIRMWARE_NAME "dla 4 włączników WiFi"
+#define L_FIRMWARE_NAME "z expanderem MCP23017"
 #elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "do kontrolowania sterownika bramy"
 #elif defined(T6_CONFIG)
@@ -435,5 +435,13 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Ciśnienie względne"
 
 
+/* MCP32017 */
+#define L_MCP23017_CONNECTION "Podłączenie"
+#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23107_LED_ADDITIONAL_SETTINGS "Dodatkowe ustawienia"
+#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
+#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
 #endif
 

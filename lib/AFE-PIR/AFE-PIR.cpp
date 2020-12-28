@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-PIR.h"
+#ifdef AFE_CONFIG_HARDWARE_PIR
 
 AFEPIR::AFEPIR(){};
 
@@ -49,3 +50,5 @@ void AFEPIR::listener() {
 const char *AFEPIR::getName() { return configuration.name; }
 
 unsigned long AFEPIR::getDomoticzIDX() { return configuration.idx; }
+
+#endif // AFE_CONFIG_HARDWARE_PIR

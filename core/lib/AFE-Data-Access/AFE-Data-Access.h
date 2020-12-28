@@ -9,7 +9,13 @@
 #include <IPAddress.h>
 
 #include <ArduinoJson.h>
+
+
+
 #include <FS.h>
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#include <LittleFS.h>
+#endif
 
 // Disabled with T0 as it was added to the parsher, is it required for T6?
 //#ifdef AFE_CONFIG_HARDWARE_BMEX80
