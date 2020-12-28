@@ -263,7 +263,7 @@
 
 /* ---- Basic Switch + DTHxx ---- */
 #elif defined(T2_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.4.0"
+#define AFE_FIRMWARE_VERSION "2.4.1"
 #define AFE_FIRMWARE_TYPE 2
 
 /* File system used */
@@ -842,7 +842,7 @@
 #define AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION 0
 //#define AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT 10000
 #define AFE_CONFIG_API_JSON_DHT_DATA_LENGTH                                    \
-  355 // {"temperature":{"value":-999.9,"unit":"C"},"humidity":{"value":100.0,"unit":"%"},"absoluteHumidity":{"value":100.0,"unit":"%"},"heatIndex":{"value":-999.99,"unit":"C"},"dewPoint":{"value":-999.9,"unit":"C"},"perception":{"value":99,"description":"123456789012345678901234567890"},"comfort":{"ratio":100.00,"unit":"%","description":"123456789012345678901234567890"}}
+  420 // {"temperature":{"value":218.4,"unit":"C"},"humidity":{"value":317.0,"unit":"%"},"absoluteHumidity":{"value":110.29,"unit":"%"},"heatIndex":{"value":217.81,"unit":"C"},"dewPoint":{"value":112.33,"unit":"C"},"perception":{"value":1,"description":"W porządku dla większości, ale wszyscy odczuwają wilgoć przy górnej krawędzi"},"comfort":{"value":0,"ratio":100.00,"unit":"%","description":"Gorąco i wilgotno"}} 
 
 #endif // AFE_CONFIG_HARDWARE_DHT
 
