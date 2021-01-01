@@ -13,7 +13,9 @@ struct SWITCH {
   uint8_t type;
   uint16_t sensitiveness;
   uint8_t functionality;
+#ifdef AFE_CONFIG_HARDWARE_RELAY  
   uint8_t relayID;
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

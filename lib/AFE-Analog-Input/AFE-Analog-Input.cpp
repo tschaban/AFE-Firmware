@@ -2,6 +2,8 @@
 
 #include "AFE-Analog-Input.h"
 
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+
 AFEAnalogInput::AFEAnalogInput(){};
 
 void AFEAnalogInput::begin() {
@@ -126,3 +128,5 @@ void AFEAnalogInput::getBatteryMeterJSON(char *json) {
           batteryPercentage,  (float)data.voltageCalculated);
 }
 #endif
+
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
