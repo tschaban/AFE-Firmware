@@ -53,6 +53,10 @@ recaptchacontact:
 
 ##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-0/?target=_blank)
 
+**Wersje specjalne**
+* Wersja [2.4.1.E1](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-1-e1/?target=_blank)
+	* obsługa do 30 czujników DS18B20, 1 dioda LED, 1 przycisk, 0 przekaźników 
+
 **Poprzednie wersje**
 * Wersja [2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-1/?target=_blank)
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
@@ -113,6 +117,10 @@ recaptchacontact:
 
 
 ##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1/?target=_blank)
+
+**Wersje specjalne**
+* Wersja [2.3.1.E1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1-1mb/?target=_blank)
+	* Wersja dla ESP 1MB, brak możliwości aktuaizacji przez przeglądarke internetową
 
 **Poprzednie wersje**
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-0/?target=_blank)
