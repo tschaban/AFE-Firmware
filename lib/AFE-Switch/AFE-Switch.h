@@ -13,6 +13,10 @@
 #include <AFE-LED.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
+#endif
+
 class AFESwitch {
 
 private:
@@ -43,6 +47,13 @@ private:
   void begin(uint8_t id, AFEDataAccess *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  AFEMCP23017Broker *_MCP23017Broker;
+  boolean _MCP23017ReferenceAdded = false;
+  boolean _expanderUsed = false;
+  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 public:
   SWITCH configuration;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -59,6 +70,11 @@ public:
 #else
   void begin(uint8_t id, AFEDataAccess *);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addMCP23017Reference(AFEMCP23017Broker *);
+#endif
+
 
   /* Method: returns TRUE if state of the switch is pressed. It does not mean it
    * has to be pressed physically (applicable for BiStable switch types */

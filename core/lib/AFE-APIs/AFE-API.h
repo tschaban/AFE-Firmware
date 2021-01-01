@@ -73,6 +73,10 @@
 #include <AFE-Thermal-Protector.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -151,6 +155,10 @@ public:
   virtual void addClass(AFEThermalProtector *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  virtual void addClass(AFESensorDHT *);
+#endif
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -214,6 +222,13 @@ protected:
   AFEThermalProtector
       *_ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  AFESensorDHT *_DHTSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DHT];
+#endif
+
+
+
 };
 
 #endif // _AFE_API_h

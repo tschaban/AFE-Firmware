@@ -25,14 +25,19 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Upgrader.h>
-#include <AFE-WiFi.h>
 #include <AFE-Web-Server.h>
+#include <AFE-WiFi.h>
 
 AFEDataAccess Data;
 AFEFirmwarePro FirmwarePro;
 AFEDevice Device;
 AFEWiFi Network;
 AFEWebServer WebServer;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
+AFEMCP23017Broker MCP23017Broker;
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -73,12 +78,18 @@ AFERegulator Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <AFE-Thermal-Protector.h>
-AFEThermalProtector ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
+AFEThermalProtector
+    ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
 AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+AFESensorDHT DHTSensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -91,8 +102,11 @@ AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
-
 #include <AFE-Main-APIs.cpp>
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-Main-MCP23017.cpp>
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-Main-LED.cpp>
@@ -139,12 +153,9 @@ AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
 /* T2 Setup, DHxx sensor */
+
 #ifdef AFE_CONFIG_HARDWARE_DHT
-#include <AFE-Sensor-DHT.h>
-#include <PietteTech_DHT.h>
-void dht_wrapper();
-PietteTech_DHT dht;
-AFESensorDHT Sensor;
+#include <AFE-Main-DHT.cpp>
 #endif
 
 #if defined(T3_CONFIG)
@@ -152,12 +163,10 @@ AFESensorDHT Sensor;
 AFEPIR Pir[sizeof(Device.configuration.isPIR)];
 #endif
 
-
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Sensor-HPMA115S0.h>
@@ -185,5 +194,5 @@ AFESensorBinary RainImpulse;
 AFESensorRainmeter RainSensor;
 #endif
 
-#include <AFE-Main-HTTPServer.cpp>
 #include <AFE-Events-Handler.cpp>
+#include <AFE-Main-HTTPServer.cpp>

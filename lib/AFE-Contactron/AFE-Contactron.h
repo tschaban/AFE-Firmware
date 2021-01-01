@@ -6,10 +6,10 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 
-#include <arduino.h>
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-Data-Access.h>
 #include <AFE-LED.h>
+#include <arduino.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -43,7 +43,7 @@ public:
   /* Method has to be added to the loop in order to listen for switch changes */
   void listener();
 
-      /* Returns the sensor data in JSON format */
+  /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 
 private:

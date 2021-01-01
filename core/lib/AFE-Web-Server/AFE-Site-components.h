@@ -90,6 +90,11 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
 
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+const uint8_t MCP23017_GPIOS_ID[] PROGMEM = {0, 1, 2,  3,  4,  5,  6,  7,
+                                             8, 9, 10, 11, 12, 13, 14, 15};
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_I2C
 const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =
     "<div class=\"cf\"><label>{{item.label}}: </label><select "
@@ -100,6 +105,8 @@ const char HTTP_ITEM_SCANNED_I2C_ADDRESSES[] PROGMEM =
     "<option value=\"{{item.value}}\" {{item.selected}}>[0x{{device.address}}] "
     ": {{device.name}}</option>";
 #endif // AFE_CONFIG_HARDWARE_I2C
+
+const char HTTP_INFO_TEXT[] PROGMEM = "<br><p class=\"cm\">{{item.value}}</p>";
 
 const char HTTP_ITEM_CHECKBOX[] PROGMEM =
     "<div class=\"cc\"><label><input name=\"{{item.name}}\" "
@@ -151,4 +158,4 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "step=\"any\"></div>";
 #endif
 
-#endif
+#endif // _AFE_CSS_h

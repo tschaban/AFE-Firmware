@@ -8,7 +8,6 @@ void setup() {
   delay(10);
 #endif
 
-
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -19,10 +18,10 @@ void setup() {
          << F("INFO: Initializing device") << endl;
 #endif
 
-// Erase all config
-ESP.eraseConfig();
+  // Erase all config
+  ESP.eraseConfig();
 #ifdef DEBUG
-    Serial << F("INFO: ESP Config erased");
+  Serial << F("INFO: ESP Config erased");
 #endif
 
   /* Initializing SPIFFS file system */
@@ -54,6 +53,11 @@ ESP.eraseConfig();
   else {
     Serial << F("NO");
   }
+#endif
+
+/* Initializing MCP23017 expanders */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  initializeMCP23017();
 #endif
 
 /* Initializing system LED (if exists) and turning it on */
@@ -157,6 +161,11 @@ ESP.eraseConfig();
 /* Initializing DS18B20  */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     initializeDS18B20Sensor();
+#endif
+
+/* Initializing DHT  */
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    initializeDHTSensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -355,6 +364,10 @@ void loop() {
     if (Device.getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+      DHTSensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF

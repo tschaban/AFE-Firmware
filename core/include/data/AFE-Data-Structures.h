@@ -17,6 +17,10 @@
 #include <AFE-PASSWORD-Structure.h>
 #include <AFE-PRO-VERSION-Structure.h>
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Structure.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-RELAY-Structure.h>
 #endif
@@ -49,7 +53,7 @@
 #include <AFE-THERMAL-PROTECTION-Structure.h>
 #endif
 
-#if defined(T2_CONFIG)
+#ifdef AFE_CONFIG_HARDWARE_DHT
 #include <AFE-DHT-Sensor-Structure.h>
 #endif
 

@@ -13,6 +13,11 @@ void switchEventsListener(void);
 /* Initializing Switches */
 void initializeSwitch(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    Switch[i].addMCP23017Reference(&MCP23017Broker);
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
 #ifdef AFE_CONFIG_HARDWARE_LED
     Switch[i].begin(i, &Data, &Led);
 #else

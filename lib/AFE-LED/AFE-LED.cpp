@@ -6,20 +6,76 @@
 
 AFELED::AFELED() {}
 
-boolean AFELED::begin(AFEDataAccess *_Data, uint8_t id) {
+boolean AFELED::begin(AFEDataAccess *Data, uint8_t id) {
   if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    _Data->getConfiguration(id, &LEDConfiguration);
-    pinMode(LEDConfiguration.gpio, OUTPUT);
-    LEDConfiguration.changeToOppositeValue
-        ? digitalWrite(LEDConfiguration.gpio, LOW)
-        : digitalWrite(LEDConfiguration.gpio, HIGH);
-    _initialized = true;
+    Data->getConfiguration(id, &configuration);
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    // If MCP23017 available in the HW, checking if LED connected using MCP23017
+    if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          configuration.mcp23017.address !=
+              AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+
+        if (_MCP23017ReferenceAdded) {
+
+          _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
+          if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+
+#ifdef DEBUG
+            Serial << endl << F("INFO: LED: Initializing with MCP23017");
+#endif
+            _MCP23017Broker->MCP[_MCP23017Id].pinMode(
+                configuration.mcp23017.gpio, OUTPUT);
+            _expanderUsed = true;
+            _initialized = true;
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl
+                   << F("WARN: LED: MCP23017[0x")
+                   << _HEX(configuration.mcp23017.address)
+                   << F("] not found in cache");
+          }
+#endif
+        }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << F("WARN: LED: Reference to MCP23017 has not been added");
+        }
+#endif
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl << F("WARN: LED: GPIO and MCP23017 not set");
+      }
+#endif
+    } else {
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+      pinMode(configuration.gpio, OUTPUT);
+      configuration.changeToOppositeValue
+          ? digitalWrite(configuration.gpio, LOW)
+          : digitalWrite(configuration.gpio, HIGH);
+
+      _initialized = true;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    }
+#endif // AFE_CONFIG_HARDWARE_MCP23017
   }
   return _initialized;
 }
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+void AFELED::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
+  _MCP23017Broker = MCP23017Broker;
+  _MCP23017ReferenceAdded = true;
+}
+#endif
+
 void AFELED::on() {
-  if (LEDConfiguration.changeToOppositeValue) {
+  if (configuration.changeToOppositeValue) {
     set(HIGH);
   } else {
     set(LOW);
@@ -27,7 +83,7 @@ void AFELED::on() {
 }
 
 void AFELED::off() {
-  if (LEDConfiguration.changeToOppositeValue) {
+  if (configuration.changeToOppositeValue) {
     set(LOW);
   } else {
     set(HIGH);
@@ -41,19 +97,19 @@ void AFELED::blink(unsigned int duration) {
 }
 
 void AFELED::blinkingOn(unsigned long blinking_interval) {
-  interval = blinking_interval;
-  blinking = true;
+  _interval = blinking_interval;
+  _blinking = true;
 }
 
-void AFELED::blinkingOff() { blinking = false; }
+void AFELED::blinkingOff() { _blinking = false; }
 
-boolean AFELED::isBlinking() { return blinking; }
+boolean AFELED::isBlinking() { return _blinking; }
 
 void AFELED::loop() {
-  if (_initialized && blinking) {
+  if (_initialized && _blinking) {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillis >= interval) {
-      previousMillis = currentMillis;
+    if (currentMillis - _previousMillis >= _interval) {
+      _previousMillis = currentMillis;
       toggle();
     }
   }
@@ -61,17 +117,48 @@ void AFELED::loop() {
 
 void AFELED::set(uint8_t state) {
   if (_initialized) {
-    if (digitalRead(LEDConfiguration.gpio) != state) {
-      digitalWrite(LEDConfiguration.gpio, state);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    if (_expanderUsed) {
+      if (_MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+              configuration.mcp23017.gpio) != state) {
+        _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+            configuration.mcp23017.gpio, state);
+      }
+    } else {
+#endif
+
+      if (digitalRead(configuration.gpio) != state) {
+        digitalWrite(configuration.gpio, state);
+      }
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
     }
+#endif
   }
 }
 
 void AFELED::toggle() {
   if (_initialized) {
-    digitalRead(LEDConfiguration.gpio) == HIGH
-        ? digitalWrite(LEDConfiguration.gpio, LOW)
-        : digitalWrite(LEDConfiguration.gpio, HIGH);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    if (_expanderUsed) {
+      _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+          configuration.mcp23017.gpio) == HIGH
+          ? _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+                configuration.mcp23017.gpio, LOW)
+          : _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+                configuration.mcp23017.gpio, HIGH);
+    } else {
+#endif
+
+      digitalRead(configuration.gpio) == HIGH
+          ? digitalWrite(configuration.gpio, LOW)
+          : digitalWrite(configuration.gpio, HIGH);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    }
+#endif
   }
 }
 

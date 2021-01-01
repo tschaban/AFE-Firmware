@@ -52,9 +52,7 @@ private:
 
   /* Used to auto-logoff from the config panel */
   unsigned long howLongInConfigMode = 0;
-
-  uint16_t uploadLED = 1023;
-  
+ 
   AFESitesGenerator Site;
 
   boolean upgradeFailed = false;
@@ -97,7 +95,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  void getDHTData(DH *);
+  void get(DHT &data);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR

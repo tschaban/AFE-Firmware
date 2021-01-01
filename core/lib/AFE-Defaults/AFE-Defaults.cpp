@@ -105,6 +105,11 @@ void AFEDefaults::set() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     Data->createThermalProtectorConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    Data->createDHTSensorConfigurationFile();
+#endif
+
   }
 #ifdef DEBUG
   else {
