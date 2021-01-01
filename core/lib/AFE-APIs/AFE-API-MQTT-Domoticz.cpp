@@ -153,6 +153,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
       if (idxCache[i].domoticz.idx == command.domoticz.idx) {
         switch (idxCache[i].type) {
         /* Processing Relay command*/
+#ifdef AFE_CONFIG_HARDWARE_RELAY        
         case AFE_DOMOTICZ_DEVICE_RELAY:
 #ifdef DEBUG
           Serial << endl
@@ -173,6 +174,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #endif
           break;
+#endif // AFE_CONFIG_HARDWARE_RELAY      
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* Processing Gate command*/
         case AFE_DOMOTICZ_DEVICE_GATE:
@@ -270,6 +272,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
   }
 #endif
 }
+
 
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;

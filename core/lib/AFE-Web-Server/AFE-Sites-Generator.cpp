@@ -1195,7 +1195,12 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   addSelectOptionFormItem(page, L_SWITCH_CONTROL_RELAY, "2",
                           configuration.functionality ==
                               AFE_SWITCH_FUNCTIONALITY_RELAY);
+#endif // defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
+
   addSelectFormItemClose(page);
+
+
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
 
   addSelectFormItemOpen(page, "r", L_SWITCH_RELAY_CONTROLLED);
   addSelectOptionFormItem(page, L_NONE, "255",
@@ -1237,7 +1242,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   }
   addSelectFormItemClose(page);
 
-#endif
+#endif // // defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
 
   addSelectFormItemOpen(page, "m", L_SWITCH_TYPE);
   addSelectOptionFormItem(page, L_SWITCH_MONOSTABLE, "0",
