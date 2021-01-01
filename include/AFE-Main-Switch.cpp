@@ -26,6 +26,7 @@ void initializeSwitch(void) {
 
 /* Method processes Switch related events */
 void processSwitchEvents(void) {
+  #ifdef AFE_CONFIG_HARDWARE_RELAY
   if (Device.getMode() == AFE_MODE_NORMAL) {
     for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
       /* One of the switches has been shortly pressed */
@@ -81,6 +82,7 @@ void processSwitchEvents(void) {
       }
     }
   }
+  #endif // AFE_CONFIG_HARDWARE_RELAY
 }
 
 void switchEventsListener(void) {
