@@ -253,6 +253,17 @@ boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
 #endif
 
 void AFERelay::setRelayAfterRestore(uint8_t option) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: RELAY: Restoring relay stay after power ON: Option: "
+         << (option == 1
+                 ? "Always off"
+                 : option == 2
+                       ? "Always on"
+                       : option == 3 ? "Last know state"
+                                     : option == 4 ? "State from MQTT Broker"
+                                                   : "ERROR unknow mode");
+#endif
 
   if (option == 1) {
     off();
