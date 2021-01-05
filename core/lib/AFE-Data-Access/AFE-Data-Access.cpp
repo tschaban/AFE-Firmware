@@ -2159,7 +2159,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
       configuration->functionality = root["functionality"];
+#ifdef AFE_CONFIG_HARDWARE_RELAY      
       configuration->relayID = root["relayID"];
+#endif      
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #else
@@ -2221,7 +2223,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     root["type"] = configuration->type;
     root["sensitiveness"] = configuration->sensitiveness;
     root["functionality"] = configuration->functionality;
+#ifdef AFE_CONFIG_HARDWARE_RELAY    
     root["relayID"] = configuration->relayID;
+#endif    
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -2261,11 +2265,13 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   uint8_t index = 0;
 
   SwitchConfiguration.sensitiveness = AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
+#ifdef AFE_CONFIG_HARDWARE_RELAY  
 #if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
   SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #else
   SwitchConfiguration.relayID = 0;
 #endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else
@@ -2361,7 +2367,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   index = 1; // First switch created already
 #endif
   if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
-    SwitchConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
+    SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
     SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
     SwitchConfiguration.functionality =
         AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY;
@@ -2371,7 +2377,9 @@ void AFEDataAccess::createSwitchConfigurationFile() {
       Serial << endl
              << F("INFO: Creating file: cfg-switch-") << i << F(".json");
 #endif
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif      
       saveConfiguration(i, &SwitchConfiguration);
     }
   }

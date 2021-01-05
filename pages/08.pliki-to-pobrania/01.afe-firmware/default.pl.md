@@ -39,7 +39,7 @@ recaptchacontact:
 * Wersje 2.0.0 - 2.0.1: [Archiwum](https://drive.google.com/drive/folders/1dKf5vOTjD53RPvnlTQLNaxTWL-N3hKNC/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t0-esp8266-1mb/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t0-esp8285-1mb/?target=_blank)
 * Wersje 1.0.0 - 1.4.0: [Archiwum](https://drive.google.com/drive/u/0/folders/1_xkxqvlopXSXCp8ozFVcXR2DgseymGp0/?target=_blank)
-* 
+
 ---
 
 ### AFE Firmware T1: Włącznik WiFi z czujnikami DS18B20
@@ -53,13 +53,17 @@ recaptchacontact:
 
 ##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-0/?target=_blank)
 
+**Wersje specjalne**
+* Wersja [2.4.1.E1](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-1-e1/?target=_blank)
+	* obsługa do 30 czujników DS18B20, 1 dioda LED, 1 przycisk, 0 przekaźników 
+
 **Poprzednie wersje**
 * Wersja [2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-1/?target=_blank)
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
 * Wersja 1.4.0 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t1-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t1-esp8285-1mb/?target=_blank)
 * Wersje 1.0.0 - 1.4.0: [Archiwum](https://drive.google.com/drive/u/0/folders/1B6952c_XL89GEBQmXtXGdEzslyYVpEZ5/?target=_blank)
----
 
+---
 ### AFE Firmware T2: Włącznik WiFi z czujnikami z serii DHT
 * Wersja obsługująca do czterech przekaźników oraz do czterech czujników DHT z termostatem, higrostatem, x-statem oraz zabezieczeniem termicznym
 * Idealnie pasuje do urządzeń jak Sonoff Basic, 4CH, 4CH Pro, GeekCreit, Shelly-1, itp.
@@ -70,9 +74,10 @@ recaptchacontact:
 	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
 
 
-##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
+##### [Pobierz najnowszą wersję 2.4.1](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-1/)
 
 **Poprzednie wersje**
+* Wersja [2.4.0](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
 * Wersje 1.0.0 - 1.4.0: [Archiwum](https://drive.google.com/drive/u/0/folders/1fAypOyCr1LRCL7Kr7N5C_hqR-yO_stb4/?target=_blank)
 
 ---
@@ -99,9 +104,8 @@ recaptchacontact:
 * Wersje 1.3.3 - 2.0.0: [Archiwum](https://drive.google.com/drive/folders/10RpEzzgYVWdH9vvdMTF1w1KjRRnwsEv_/?target=_blank)
 * Wersja 1.3.2 [ESP8266](https://www.smartnydom.pl/download/afe-firmware-t5-esp8266/?target=_blank), [ESP8285](https://www.smartnydom.pl/download/afe-firmware-t5-esp8285/?target=_blank)
 * Wersje 1.0.0 - 1.3.2: [Archiwum](https://drive.google.com/drive/u/0/folders/1mwtz0zba8jH_ZBEnByfxwGzCGyQbe5Fw/?target=_blank)
-* 
----
 
+---
 ### AFE Firmware T6: Stacja pogody
 * Odczyt i przesyłanie do systemu automatyki szeregu parametrów atmosferycznych
 * Idealnie pasuje do urządzeń jak [Stacja Pogody](https://www.smartnydom.pl/weather-station-stacja-pogodowa-v2/)
@@ -112,6 +116,10 @@ recaptchacontact:
 
 
 ##### [Pobierz najnowszą wersję 2.3.1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1/?target=_blank)
+
+**Wersje specjalne**
+* Wersja [2.3.1.E1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1-1mb/?target=_blank)
+	* Wersja dla ESP 1MB, brak możliwości aktuaizacji przez przeglądarke internetową
 
 **Poprzednie wersje**
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-0/?target=_blank)

@@ -1052,9 +1052,10 @@ void AFEWebServer::get(SWITCH &data) {
                            : AFE_SWITCH_FUNCTIONALITY_NONE;
 
   data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
-
+#ifdef AFE_CONFIG_HARDWARE_RELAY
   data.relayID = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
       server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;

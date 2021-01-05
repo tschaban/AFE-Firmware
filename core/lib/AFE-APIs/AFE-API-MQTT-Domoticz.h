@@ -48,18 +48,20 @@ private:
 
   ];
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
+
   /* It stories IDX of a device that should be excluded from processing */
   DOMOTICZ_BASIC_CONFIG bypassProcessing;
-#endif
+
 
   /* Get domoticz request/update command in formated form */
   DOMOTICZ_MQTT_COMMAND getCommand();
   /* Classfies and invokes code for processing the request */
   void processRequest();
 
+
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
+
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();

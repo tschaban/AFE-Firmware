@@ -129,13 +129,14 @@ boolean AFESensorDHT::listener() {
 
 void AFESensorDHT::getJSON(char *json) {
 
-  char _perception[22]; // Max size of dewPointPerception from lang.pack
+  char _perception[90]; // Max size of dewPointPerception from lang.pack
   strcpy_P(_perception, (char *)pgm_read_dword(&(dewPointPerception[perception(
                             currentTemperature, currentHumidity,
                             configuration.temperature.unit ==
                                 AFE_TEMPERATURE_UNIT_FAHRENHEIT)])));
 
-  char _comfort[80]; // Max size of dewPointPerception from lang.pack
+
+  char _comfort[30]; // Max size of dewPointPerception from lang.pack
   ComfortState comfortStatus;
   float _comfortRatio = comfort(
       comfortStatus, currentTemperature, currentHumidity,
@@ -171,6 +172,7 @@ void AFESensorDHT::getJSON(char *json) {
                      configuration.temperature.unit ==
                          AFE_TEMPERATURE_UNIT_FAHRENHEIT),
           _perception, comfortStatus, _comfortRatio, _comfort);
+
 }
 
 #endif // AFE_CONFIG_HARDWARE_DHT

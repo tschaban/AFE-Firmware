@@ -31,6 +31,17 @@ void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
          << "INFO: Thermal protection initialized. Max temp: "
          << configuration.temperature;
 #endif
+
+  if (configuration.enabled &&
+      (configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST ||
+       configuration.sensorId == AFE_HARDWARE_ITEM_NOT_EXIST)) {
+    configuration.enabled = false;
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: Thermal protection: has been disabled becuase Relay ID "
+              "and/or Sensor ID is missing ";
+#endif
+  }
 };
 
 bool AFEThermalProtector::listener(float currentTemperature) {
@@ -74,7 +85,6 @@ void AFEThermalProtector::toggle(void) {
 void AFEThermalProtector::enable(void) {
   _Data->saveConfiguration(_id, &configuration);
 }
-
 
 /* Returns Thermal Protector data in JSON format */
 void AFEThermalProtector::getJSON(char *json) {
