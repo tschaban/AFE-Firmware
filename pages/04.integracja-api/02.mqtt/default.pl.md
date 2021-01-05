@@ -78,6 +78,9 @@ z jedną z wiadomości
 
 * on
 * off
+* get
+
+! Urządzenie z AFE Firmware wysyła wiadomość **get**, jeśli stan przekaźnika ma zostać ustawiony przez system sterujący urządzeniem. Wiecej info o[ konfiguracji przekaźnika](/konfiguracja/konfiguracja-urzadzenia/konfiguracja-przekaznika#po-podlaczeniu-do-brokera-mqtt)
 
 ---
 
