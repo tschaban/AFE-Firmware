@@ -30,7 +30,11 @@ void AFEAPIMQTTStandard::synchronize() {
   Serial << endl << F("INFO: Sending current device state to MQTT Broker  ...");
 #endif
 
+  // workaround for LWT retain flag
+  boolean _retainAll = Mqtt.configuration.retainAll;
+  Mqtt.configuration.retainAll = Mqtt.configuration.retainLWT;
   Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
+  Mqtt.configuration.retainAll = _retainAll;
 
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -291,8 +295,6 @@ void AFEAPIMQTTStandard::subscribe() {
     }
   }
 #endif
-
-
 }
 
 void AFEAPIMQTTStandard::processRequest() {
@@ -319,7 +321,7 @@ void AFEAPIMQTTStandard::processRequest() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
       case AFE_MQTT_DEVICE_SWITCH:
         processSwitch(&mqttTopicsCache[i].id);
-        break; 
+        break;
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
@@ -400,7 +402,6 @@ void AFEAPIMQTTStandard::processRequest() {
     }
   }
 }
-
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
@@ -835,8 +836,6 @@ void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
-
-
 #ifdef AFE_CONFIG_HARDWARE_DHT
 void AFEAPIMQTTStandard::processDHT(uint8_t *id) {
 #ifdef DEBUG
@@ -863,7 +862,5 @@ boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_DHT
-
-
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

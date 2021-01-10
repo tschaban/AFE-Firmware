@@ -105,7 +105,12 @@ void AFEAPIMQTTDomoticz::synchronize() {
         "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
         "\"Battery\":100,\"RSSI\":%d}",
         Mqtt.configuration.lwt.idx, L_NETWORK_CONNECTED, getRSSI());
+
+    // Workaround for retainLWT
+    boolean _retainAll = Mqtt.configuration.retainAll;
+    Mqtt.configuration.retainAll = Mqtt.configuration.retainLWT;
     Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
+    Mqtt.configuration.retainAll = _retainAll;
   }
 }
 

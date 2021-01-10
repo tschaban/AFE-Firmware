@@ -674,6 +674,14 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
                    configuration.lwt.topic, "64");
   closeSection(page);
 #endif
+
+  openSection(page, F(L_MQTT_RETAIN_SECTION), F(L_MQTT_RETAIN_SECTION_INFO));
+
+  addCheckboxFormItem(page, "rl", L_MQTT_RETAIN_LWT, "1",
+                      configuration.retainLWT);
+  addCheckboxFormItem(page, "ra", L_MQTT_RETAIN_ALL, "1",
+                      configuration.retainAll);
+  closeSection(page);
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -1207,10 +1215,10 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   addSelectOptionFormItem(page, L_SWITCH_CONTROL_RELAY, "2",
                           configuration.functionality ==
                               AFE_SWITCH_FUNCTIONALITY_RELAY);
-#endif // defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
+#endif // defined(AFE_CONFIG_HARDWARE_RELAY) ||
+       // defined(AFE_CONFIG_HARDWARE_GATE)
 
   addSelectFormItemClose(page);
-
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
 
@@ -1254,7 +1262,8 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   }
   addSelectFormItemClose(page);
 
-#endif // // defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
+#endif // // defined(AFE_CONFIG_HARDWARE_RELAY) ||
+       // defined(AFE_CONFIG_HARDWARE_GATE)
 
   addSelectFormItemOpen(page, "m", L_SWITCH_TYPE);
   addSelectOptionFormItem(page, L_SWITCH_MONOSTABLE, "0",

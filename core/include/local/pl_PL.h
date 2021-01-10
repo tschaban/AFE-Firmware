@@ -150,6 +150,10 @@
 #define L_MQTT_CONFIGURATION_INFO "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
 #define L_MQTT_TIMEOUT "Limit czasu odpowiedzi"
+#define L_MQTT_RETAIN_SECTION "Zapamiętywanie wiadomości w MQTT Broker"
+#define L_MQTT_RETAIN_SECTION_INFO "Wysłane wiadomości zostaną zapamiętana przez serwer i będą automatycznie wysłana do każdego kto zasubskrybuje dany temat."
+#define L_MQTT_RETAIN_LWT "Pamiętaj LWT"
+#define L_MQTT_RETAIN_ALL "Pamiętaj wszystkie wiadomości"
 
 /* Form: Domoticz server configuration */
 #define L_DOMOTICZ_PROTOCOL "Protokół"

@@ -1173,6 +1173,10 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #endif
       configuration->timeout =
           root["timeout"] | AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
+      configuration->retainLWT =
+          root["retainLWT"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
+      configuration->retainAll =
+          root["retainAll"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;          
 
 #ifdef DEBUG
       Serial << endl
@@ -1235,6 +1239,8 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
     root["timeout"] = configuration->timeout;
+    root["retainAll"] = configuration->retainAll;
+    root["retainLWT"] = configuration->retainLWT;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1277,6 +1283,8 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   MQTTConfiguration.lwt.topic[0] = AFE_EMPTY_STRING;
 #endif
   MQTTConfiguration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
+  MQTTConfiguration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
+  MQTTConfiguration.retainLWT = AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
   saveConfiguration(&MQTTConfiguration);
 }
 
@@ -1416,13 +1424,15 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  // if (!LittleFS.exists(fileName)) {
+  //  createLEDConfigurationFile(id);
+  // }
   File configFile = LittleFS.open(fileName, "r");
 #else
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
-#else
+  //  if (!SPIFFS.exists(fileName)) {
+  //    createLEDConfigurationFile(id);
+  //  }
   File configFile = SPIFFS.open(fileName, "r");
-#endif
 #endif
 
   if (configFile) {
@@ -1589,6 +1599,25 @@ void AFEDataAccess::createLEDConfigurationFile() {
     saveConfiguration(i, &LEDConfiguration);
   }
 }
+/*
+void AFEDataAccess::createLEDConfigurationFile(uint8_t id) {
+  LED LEDConfiguration;
+
+  LEDConfiguration.changeToOppositeValue = false;
+  LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  LEDConfiguration.mcp23017.address =
+      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: cfg-led-") << id << F(".json");
+#endif
+  saveConfiguration(id, &LEDConfiguration);
+}
+*/
 uint8_t AFEDataAccess::getSystemLedID() {
   uint8_t id = 0;
 #ifdef DEBUG
@@ -1710,14 +1739,21 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
+
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+
+  // if (!LittleFS.exists(fileName)) {
+  //    createRelayConfigurationFile(id);
+  // }
+
   File configFile = LittleFS.open(fileName, "r");
 #else
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
-#else
+
+  //  if (!SPIFFS.exists(fileName)) {
+  //    createRelayConfigurationFile(id);
+  //  }
+
   File configFile = SPIFFS.open(fileName, "r");
-#endif
 #endif
 
   if (configFile) {
@@ -1799,11 +1835,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(fileName, "w");
 #else
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
-#else
   File configFile = SPIFFS.open(fileName, "w");
-#endif
 #endif
 
   if (configFile) {
@@ -2017,7 +2049,48 @@ void AFEDataAccess::createRelayConfigurationFile() {
     saveConfiguration(i, &RelayConfiguration);
   }
 }
+/*
+void AFEDataAccess::createRelayConfigurationFile(uint8_t id) {
+  RELAY RelayConfiguration;
+// Relay config
+#ifdef AFE_CONFIG_HARDWARE_LED
+  RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  RelayConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+  RelayConfiguration.state.MQTTConnected =
+      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
+
+  RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
+  RelayConfiguration.state.powerOn =
+      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
+
+  RelayConfiguration.triggerSignal =
+      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  RelayConfiguration.mcp23017.address =
+      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+  // Adding config files for remaining relays
+  RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: cfg-relay-") << id << F(".json");
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(id, false);
+#endif
+  sprintf(RelayConfiguration.name, "R%d", id + 1);
+  saveConfiguration(id, &RelayConfiguration);
+}
+*/
 /* Relay state methods*/
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
@@ -2135,8 +2208,14 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  //  if (!LittleFS.exists(fileName)) {
+  //  createSwitchConfigurationFile(id);
+  // }
   File configFile = LittleFS.open(fileName, "r");
 #else
+  // if (!SPIFFS.exists(fileName)) {
+  // createSwitchConfigurationFile(id);
+  // }
   File configFile = SPIFFS.open(fileName, "r");
 #endif
 
@@ -2159,9 +2238,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
       configuration->functionality = root["functionality"];
-#ifdef AFE_CONFIG_HARDWARE_RELAY      
+#ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->relayID = root["relayID"];
-#endif      
+#endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #else
@@ -2223,9 +2302,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     root["type"] = configuration->type;
     root["sensitiveness"] = configuration->sensitiveness;
     root["functionality"] = configuration->functionality;
-#ifdef AFE_CONFIG_HARDWARE_RELAY    
+#ifdef AFE_CONFIG_HARDWARE_RELAY
     root["relayID"] = configuration->relayID;
-#endif    
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -2265,7 +2344,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   uint8_t index = 0;
 
   SwitchConfiguration.sensitiveness = AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
-#ifdef AFE_CONFIG_HARDWARE_RELAY  
+#ifdef AFE_CONFIG_HARDWARE_RELAY
 #if defined(AFE_DEVICE_iECS_WHEATER_STATION_20)
   SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #else
@@ -2379,11 +2458,43 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif      
+#endif
       saveConfiguration(i, &SwitchConfiguration);
     }
   }
 }
+/*
+void AFEDataAccess::createSwitchConfigurationFile(uint8_t id) {
+  SWITCH SwitchConfiguration;
+  SwitchConfiguration.sensitiveness = AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#else
+  SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  // Saving first switch. Common for all devices
+  SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
+  SwitchConfiguration.type = AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE;
+  SwitchConfiguration.functionality =
+      AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  SwitchConfiguration.mcp23017.address =
+      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: cfg-switch-") << id << F(".json");
+#endif
+  saveConfiguration(id, &SwitchConfiguration);
+}
+*/
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

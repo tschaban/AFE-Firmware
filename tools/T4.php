@@ -4,7 +4,7 @@
 /* Set this before run */
 
 $type = "4";
-$version = "2.4.0.B1";
+$version = "2.4.0.B2";
 $language = "PL";
 
 /******************/
@@ -34,6 +34,7 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 
 $index = 0;
 
+
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266";
 $sourceFolder[$index]["size"] = "1Mb";
@@ -41,7 +42,7 @@ $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-development/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "1Mb";
 $sourceFolder[$index]["hardware"] = 1;
@@ -55,7 +56,7 @@ $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 $index++;
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-development/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "4Mb";
 $sourceFolder[$index]["hardware"] = 1;
@@ -79,7 +80,7 @@ $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-generic-domoticz-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-development-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "1Mb";
 $sourceFolder[$index]["hardware"] = 1;

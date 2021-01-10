@@ -86,6 +86,7 @@ public:
   void getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
+//  void createRelayConfigurationFile(uint8_t id);
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -95,12 +96,14 @@ public:
   void getConfiguration(uint8_t id, SWITCH *);
   void saveConfiguration(uint8_t id, SWITCH *);
   void createSwitchConfigurationFile();
+//  void createSwitchConfigurationFile(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
+//  void createLEDConfigurationFile(uint8_t id);
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();

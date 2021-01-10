@@ -34,11 +34,12 @@ void setup() {
 
   if (_fileSystemReady) {
 #ifdef DEBUG
-    Serial << F("INFO: File system: mounted");
+    Serial << F("INFO: File system: mounted. Performs a quick garbage collection operation on SPIFFS");
   } else {
     Serial << F("ERROR: File system not mounted");
 #endif
     yield();
+    SPIFFS.gc();
   }
 
   Device.begin();

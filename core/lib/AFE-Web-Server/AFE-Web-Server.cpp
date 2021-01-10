@@ -952,6 +952,9 @@ void AFEWebServer::get(MQTT &data) {
     data.lwt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
+
+  data.retainLWT = server.arg("rl").length() > 0 ? true : false;
+  data.retainAll = server.arg("ra").length() > 0 ? true : false;
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -1031,9 +1034,10 @@ void AFEWebServer::get(RELAY &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1072,11 +1076,11 @@ void AFEWebServer::get(SWITCH &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
-
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1310,9 +1314,10 @@ void AFEWebServer::get(LED &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 

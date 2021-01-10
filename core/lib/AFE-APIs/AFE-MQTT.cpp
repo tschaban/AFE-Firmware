@@ -124,7 +124,7 @@ void AFEMQTT::connect() {
 
           _connected = _Broker.connect(
               _DeviceName, configuration.user, configuration.password,
-              AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, 2, false, lwtMessage);
+              AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, 1, configuration.retainLWT, lwtMessage);
         } else {
           _connected = _Broker.connect(_DeviceName, configuration.user,
                                       configuration.password);
@@ -133,7 +133,7 @@ void AFEMQTT::connect() {
         _connected = strlen(configuration.lwt.topic) > 0
                          ? _Broker.connect(_DeviceName, configuration.user,
                                           configuration.password,
-                                          configuration.lwt.topic, 2, false,
+                                          configuration.lwt.topic, 1, configuration.retainLWT,
                                           "disconnected")
                          : _Broker.connect(_DeviceName, configuration.user,
                                           configuration.password);
@@ -228,9 +228,10 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
     Serial << endl << F("----------- Publish MQTT -----------");
     Serial << endl << F("Topic: ") << topic;
     Serial << endl << F("Message: ") << message;
+    Serial << endl << F("Retain: ") << (configuration.retainAll?"YES":"NO");
 #endif
     if (strlen(topic) > 0) {
-      pubslishingStatus = _Broker.publish(topic, message);
+      pubslishingStatus = _Broker.publish(topic, message, configuration.retainAll);
     }
 #ifdef DEBUG
     else {
