@@ -26,7 +26,8 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
     LED LEDConfiguration;
     Data->getConfiguration(i, &LEDConfiguration);
-    if (LEDConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+    if (LEDConfiguration.mcp23017.address !=
+        AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(LEDConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(LEDConfiguration.mcp23017.address);
@@ -51,7 +52,8 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
     RELAY RelayConfiguration;
     Data->getConfiguration(i, &RelayConfiguration);
-    if (RelayConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+    if (RelayConfiguration.mcp23017.address !=
+        AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(RelayConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(RelayConfiguration.mcp23017.address);
@@ -76,7 +78,8 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
   for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
     SWITCH SwitchConfiguration;
     Data->getConfiguration(i, &SwitchConfiguration);
-    if (SwitchConfiguration.mcp23017.address != AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+    if (SwitchConfiguration.mcp23017.address !=
+        AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
       if (getId(SwitchConfiguration.mcp23017.address) ==
           AFE_HARDWARE_ITEM_NOT_EXIST) {
         add(SwitchConfiguration.mcp23017.address);
@@ -92,6 +95,33 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
     }
   }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MCP23017 Broker: Caching MCP23017s ID's used by Binary "
+              "sensors");
+#endif
+  for (uint8_t i = 0; i < Device->configuration.noOfBinarySensors; i++) {
+    BINARY_SENSOR BinarySensorConfiguration;
+    Data->getConfiguration(i, &BinarySensorConfiguration);
+    if (BinarySensorConfiguration.mcp23017.address !=
+        AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+      if (getId(BinarySensorConfiguration.mcp23017.address) ==
+          AFE_HARDWARE_ITEM_NOT_EXIST) {
+        add(BinarySensorConfiguration.mcp23017.address);
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl
+               << F("INFO: MCP23017 Broker: MCP23017[0x")
+               << _HEX(BinarySensorConfiguration.mcp23017.address)
+               << F("] already in cache");
+      }
+#endif
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSORS
 }
 
 uint8_t AFEMCP23017Broker::getId(uint8_t address) {
@@ -110,7 +140,6 @@ void AFEMCP23017Broker::add(uint8_t address) {
   Serial << endl
          << F("INFO: MCP23017 Broker: Initializing MCP23017[0x")
          << _HEX(address) << F("]");
-
 #endif
 
   if (_I2CScanner.scan(address)) {
@@ -122,7 +151,6 @@ void AFEMCP23017Broker::add(uint8_t address) {
     Serial << endl
            << F("INFO: MCP23017 Broker: MCP23017[0x") << _HEX(address)
            << F("] added to the cache");
-
 #endif
   }
 #ifdef DEBUG

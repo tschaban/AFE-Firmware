@@ -62,20 +62,6 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
     }
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    /* Defining get and state MQTT Topics */
-    if (strlen(configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-    } else {
-      mqttCommandTopic[0] = AFE_EMPTY_STRING;
-    }
-
-    if (strlen(configuration.mqtt.topic) > 0) {
-      sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-    } else {
-      mqttStateTopic[0] = AFE_EMPTY_STRING;
-    }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -255,14 +241,15 @@ boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
 void AFERelay::setRelayAfterRestore(uint8_t option) {
 #ifdef DEBUG
   Serial << endl
-         << "INFO: RELAY: Restoring relay stay after power ON: Option: "
+         << F("INFO: RELAY: Restoring relay stay after power ON: Option[")
+         << option << F("]: ")
          << (option == 1
-                 ? "Always off"
+                 ? F("Always off")
                  : option == 2
-                       ? "Always on"
-                       : option == 3 ? "Last know state"
-                                     : option == 4 ? "State from MQTT Broker"
-                                                   : "ERROR unknow mode");
+                       ? F("Always on")
+                       : option == 3 ? F("Last know state")
+                                     : option == 4 ? F("State from MQTT Broker")
+                                                   : F("No action "));
 #endif
 
   if (option == 1) {

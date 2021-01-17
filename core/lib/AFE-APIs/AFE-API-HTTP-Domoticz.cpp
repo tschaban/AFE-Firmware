@@ -120,9 +120,6 @@ boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
 void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
   AFEAPI::addClass(Switch);
 }
-#endif // AFE_CONFIG_HARDWARE_SWITCH
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
 boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _Switch[id]->configuration.domoticz.idx) {
@@ -594,5 +591,21 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
   return _ret;
 }
 #endif // AFE_CONFIG_HARDWARE_DHT
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPIHTTPDomoticz::addClass(AFESensorBinary *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
+    publishStatus =
+        sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
+                          _BinarySensor[id]->get()==1 ? "Off" : "On");
+  }
+  return publishStatus;
+}
+
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

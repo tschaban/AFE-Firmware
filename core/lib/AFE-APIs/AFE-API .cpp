@@ -146,45 +146,56 @@ void AFEAPI::addClass(AFEContactron *Item) {
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  void AFEAPI::addClass(AFESensorDS18B20 *Sensor) {
-    for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+void AFEAPI::addClass(AFESensorDS18B20 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
     _DS18B20Sensor[i] = Sensor + i;
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: The reference to the DS18B20 added");
 #endif
-  }
+}
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  void AFEAPI::addClass(AFERegulator *Regulator) {
-    for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+void AFEAPI::addClass(AFERegulator *Regulator) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
     _Regulator[i] = Regulator + i;
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: The reference to the Regulator added");
 #endif
-  }
+}
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  void AFEAPI::addClass(AFEThermalProtector *Protector) {
-    for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+void AFEAPI::addClass(AFEThermalProtector *Protector) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
     _ThermalProtector[i] = Protector + i;
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: The reference to the Thermal Protector added");
 #endif
-  }
+}
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  void AFEAPI::addClass(AFESensorDHT *Sensor) {
-    for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+void AFEAPI::addClass(AFESensorDHT *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
     _DHTSensor[i] = Sensor + i;
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: The reference to the DHT added");
 #endif
-  }
+}
 #endif // AFE_CONFIG_HARDWARE_DHT
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPI::addClass(AFESensorBinary *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+    _BinarySensor[i] = Sensor + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Binary sensor added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

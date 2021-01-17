@@ -114,30 +114,13 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-/* Pir */
-#if defined(T3_CONFIG)
-  itemPresent = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
-    if (Device->configuration.isPIR[i]) {
-      itemPresent++;
-    } else {
-      break;
-    }
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  if (Device->configuration.noOfBinarySensors > 0) {
+    addMenuHeaderItem(page, L_BINARY_SENSORS);
+    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBinarySensors,
+                   AFE_CONFIG_SITE_BINARY_SENSOR);
   }
-  if (itemPresent > 0) {
-    page.concat("<li class=\"itm\"><a><i>Konfiguracja czujników ruchu "
-                "(PIR)</i></a></li>");
-    for (uint8_t i = 0; i < 4; i++) {
-      if (Device->configuration.isPIR[i]) {
-        page.concat("<li class=\"itm\"><a href=\"\\?o=pir");
-        page.concat(i);
-        page.concat("\">&#8227; Czujnik: ");
-        page.concat(i + 1);
-        page.concat("</a></li>");
-      }
-    }
-  }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 /* Contactrons and Gate */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -181,27 +164,6 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #endif // AFE_CONFIG_HARDWARE_UART
-
-/* I2C */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-/* Don't show it if I2C sensor is not added to the device, this is check for AFE
- * T6 only*/
-#if defined(T6_CONFIG)
-  if (Device->configuration.noOfBMEX80s > 0 ||
-      Device->configuration.noOfBH1750s > 0 ||
-      Device->configuration.noOfAS3935s > 0) {
-#elif defined(T5_CONFIG)
-  if (Device->configuration.noOfBMEX80s > 0 ||
-      Device->configuration.noOfBH1750s > 0) {
-#endif
-
-    addMenuItem(page, "I2C", AFE_CONFIG_SITE_I2C);
-
-#if defined(T6_CONFIG) || defined(T5_CONFIG)
-  }
-#endif // T6_CONFIG
-
-#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
@@ -265,7 +227,34 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   }
 #endif
 
-  page.concat("</ul><h4>&#10150; " L_FUNCTIONS "</h4><ul class=\"lst\">");
+  page.concat(F("</ul><h4>&#10150; "));
+  page.concat(F(L_INTERFACE));
+  page.concat(F("</h4><ul class=\"lst\">"));
+
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+/* Don't show it if I2C sensor is not added to the device, this is check for AFE
+ * T6 only*/
+#if defined(T6_CONFIG)
+  if (Device->configuration.noOfBMEX80s > 0 ||
+      Device->configuration.noOfBH1750s > 0 ||
+      Device->configuration.noOfAS3935s > 0) {
+#elif defined(T5_CONFIG)
+  if (Device->configuration.noOfBMEX80s > 0 ||
+      Device->configuration.noOfBH1750s > 0) {
+#endif
+
+    addMenuItem(page, "I2C", AFE_CONFIG_SITE_I2C);
+
+#if defined(T6_CONFIG) || defined(T5_CONFIG)
+  }
+#endif // T6_CONFIG
+
+#endif // AFE_CONFIG_HARDWARE_I2C
+
+  page.concat(F("</ul><h4>&#10150; "));
+  page.concat(F(L_FUNCTIONS));
+  page.concat(F("</h4><ul class=\"lst\">"));
 
 /* System LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -367,11 +356,25 @@ void AFESitesGenerator::siteDevice(String &page) {
                         L_DEVICE_NUMBER_OF_SWITCHES);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  /* Binary sensor */
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS,
+                        Device->configuration.noOfBinarySensors, "b",
+                        L_DEVICE_NUMBER_OF_BINARY_SENSORS);
+#endif
+
 /* DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef T4_CONFIG // Functionality is PRO for T4
+  _itemDisabled = !FirmwarePro->Pro.valid;
+#else
+    _itemDisabled = false;
+#endif
+
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
                         Device->configuration.noOfDS18B20s, "ds",
-                        L_DEVICE_NUMBER_OF_DS18B20_SENSORS);
+                        L_DEVICE_NUMBER_OF_DS18B20_SENSORS, _itemDisabled);
 #endif
 
 /* DHT */
@@ -1326,7 +1329,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   Data->getConfiguration(id, &configuration);
   char _number[13];
 
-  openSection(page, L_DS18B20_SENSOR, "");
+  openSection(page, F(L_DS18B20_SENSOR), F(""));
 
   /* Item: GPIO */
   addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
@@ -1386,7 +1389,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, "Domoticz", L_DOMOTICZ_NO_IF_IDX_0);
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _number,
                      AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -1397,7 +1400,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, L_DS18B20_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+      openSection(page, F(L_DS18B20_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
 
@@ -2761,6 +2764,87 @@ void AFESitesGenerator::siteProKey(String &page) {
   closeSection(page);
 }
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
+  BINARY_SENSOR configuration;
+  Data->getConfiguration(id, &configuration);
+  char text[19];
+
+  sprintf(text, "%s #%d", L_BINARY_SENSOR, id + 1);
+
+  openSection(page, text, F(""));
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);
+
+  closeSection(page);
+
+  openSection(page, F(L_MCP23017_CONNECTION),
+              F(L_BINARY_SENSOR_MCP23017_CONNECTION));
+
+  /* Item: GPIO */
+  addListOfGPIOs(page, "g", configuration.gpio);
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  /* Item: GPIO from expander */
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+  closeSection(page);
+
+  openSection(page, F(L_NETWORK_ADVANCED), F(""));
+
+  /* Item: internal pull-up */
+  addCheckboxFormItem(page, "pr", L_BINARY_PULLUP_RESISTOR, "1",
+                      configuration.internalPullUp);
+
+  /* Item: revert signal */
+  addCheckboxFormItem(page, "rs", L_BINARY_SENSOR_SENT_REVERTED_STATE, "1",
+                      configuration.revertSignal);
+
+  /* Item: Bouncing */
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", F(L_SWITCH_SENSITIVENESS_HINT));
+
+  char _number[4];
+  sprintf(_number, "%d", configuration.bouncing);
+
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b", L_SENSITIVENESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+#else
+    if (Device->configuration.api.mqtt) {
+      openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                       configuration.mqtt.topic, "64");
+      closeSection(page);
+    }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL) {
     page.concat(FPSTR(HTTP_FOOTER_CONNECTED));
@@ -2769,9 +2853,7 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.concat(F("</div></div>"));
 
   if (extended) {
-
     page.concat(FPSTR(HTTP_FOOTER_EXTENDED));
-
     page.replace("{{L_HELP}}", F(L_HELP));
     page.replace("{{L_DOCUMENTATION}}", F(L_DOCUMENTATION));
     page.replace("{{L_VERSION}}", F(L_VERSION));

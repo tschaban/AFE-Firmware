@@ -163,6 +163,11 @@ public:
   boolean publishDHTSensorData(uint8_t id);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  virtual void addClass(AFESensorBinary *);
+  boolean publishBinarySensorState(uint8_t id);
+#endif
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

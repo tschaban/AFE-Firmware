@@ -100,7 +100,9 @@
 #include <AFE-RAINMETER-Sensor-Structure.h>
 #endif
 
-
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-BINARY-Sensor-Structure.h>
+#endif
 
 
 #endif

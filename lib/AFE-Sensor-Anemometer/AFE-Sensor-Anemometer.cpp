@@ -46,7 +46,6 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
   }
 
   if (_initialized) {
-    _Sensor->begin(configuration.sensitiveness);
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Anemometer sensor initialized and working") << endl
@@ -70,7 +69,7 @@ boolean AFESensorAnemometer::listener(void) {
 
       uint32_t noOfImpulses;
       uint32_t duration;
-      _Sensor->get(noOfImpulses, duration);
+      get(noOfImpulses, duration);
 
       lastSpeedMS =
           ((noOfImpulses * (oneImpulseDistanceCM / 100) * 1000) / duration);
@@ -91,6 +90,30 @@ boolean AFESensorAnemometer::listener(void) {
   return _ret;
 }
 
+void AFESensorAnemometer::newImpulse(void) {
+    impulseCounter++;
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: New impulse. Total: ") << impulseCounter
+           << F(", during: ") << ((millis() - counterStarted) / 1000) << F("sec.");
+#endif
+}
+
+void AFESensorAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
+  duration = millis() - counterStarted;
+  if (duration < 0) { // used previous duration if timer rollouts
+    duration = _previousDuration;
+  }
+  noOfImpulses = impulseCounter;
+  _previousDuration = duration;
+  impulseCounter = 0;
+  counterStarted = millis();
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: Reading data from Binary sensor: Impulses: ") << noOfImpulses
+         << F(", during: ") << (duration / 1000) << F("sec.");
+#endif
+}
 void AFESensorAnemometer::getJSON(char *json) {
   sprintf(json,
           "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"

@@ -494,6 +494,12 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfDHTs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+      configuration->noOfBinarySensors =
+          root["noOfBinarySensors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -613,6 +619,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     root["noOfThermalProtectors"] = configuration->noOfThermalProtectors;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    root["noOfBinarySensors"] = configuration->noOfBinarySensors;
 #endif
 
     root.printTo(configFile);
@@ -755,6 +765,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  deviceConfiguration.noOfBinarySensors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
+#endif
   saveConfiguration(&deviceConfiguration);
 }
 
@@ -1176,7 +1190,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
       configuration->retainLWT =
           root["retainLWT"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
       configuration->retainAll =
-          root["retainAll"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;          
+          root["retainAll"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
 
 #ifdef DEBUG
       Serial << endl
@@ -2036,7 +2050,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
 
   /* Adding config files for remaining relays */
-  RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
+  RelayConfiguration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating file: cfg-relay-") << i << F(".json");
@@ -2208,14 +2222,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  //  if (!LittleFS.exists(fileName)) {
-  //  createSwitchConfigurationFile(id);
-  // }
   File configFile = LittleFS.open(fileName, "r");
 #else
-  // if (!SPIFFS.exists(fileName)) {
-  // createSwitchConfigurationFile(id);
-  // }
   File configFile = SPIFFS.open(fileName, "r");
 #endif
 
@@ -2446,7 +2454,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   index = 1; // First switch created already
 #endif
   if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
-    SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
+    SwitchConfiguration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
     SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
     SwitchConfiguration.functionality =
         AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY;
@@ -5382,4 +5390,190 @@ void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
   save(&data);
 }
 
-#endif // #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      sprintf(configuration->name, root["name"]);
+      configuration->gpio = root["gpio"].as<int>();
+      configuration->revertSignal =
+          root["revertSignal"] |
+          AFE_HARDWARE_BINARY_SENSOR_DEFAULT_REVERT_SIGNAL;
+      configuration->internalPullUp =
+          root["internalPullUp"] |
+          AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR;
+      configuration->sendAsSwitch =
+          root["sendAsSwitch"] |
+          AFE_HARDWARE_BINARY_SENSOR_DEFAULT_SENT_AS_SWITCH;
+      configuration->bouncing =
+          root["bouncing"] | AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#else
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      BINARY_SENSOR *configuration) {
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration->name;
+    root["gpio"] = configuration->gpio;
+    root["revertSignal"] = configuration->revertSignal;
+    root["internalPullUp"] = configuration->internalPullUp;
+    root["sendAsSwitch"] = configuration->sendAsSwitch;
+    root["bouncing"] = configuration->bouncing;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration->domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    JsonObject &mcp23017 = root.createNestedObject("mcp23017");
+    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["gpio"] = configuration->mcp23017.gpio;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createBinarySensorConfigurationFile() {
+  BINARY_SENSOR configuration;
+  configuration.bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#else
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  configuration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.revertSignal = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_REVERT_SIGNAL;
+  configuration.sendAsSwitch =
+      AFE_HARDWARE_BINARY_SENSOR_DEFAULT_SENT_AS_SWITCH;
+  configuration.internalPullUp =
+      AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  configuration.mcp23017.address =
+      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  configuration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BINARY_SENSORS;
+       i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-binary-sensor-") << i << F(".json");
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    sprintf(configuration.mqtt.topic, "binary/%d", i + 1);
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+    sprintf(configuration.name, "binary-%d", i + 1);
+
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif

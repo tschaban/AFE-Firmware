@@ -215,5 +215,13 @@ public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);
 #endif // AFE_CONFIG_FUNCTIONALITY_API_CONTROL
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void getConfiguration(uint8_t id, BINARY_SENSOR *);
+  void saveConfiguration(uint8_t id, BINARY_SENSOR *);
+  void createBinarySensorConfigurationFile();
+#endif
+
+
 };
 #endif

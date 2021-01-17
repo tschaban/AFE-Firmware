@@ -43,6 +43,9 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
    + AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
 #endif
+#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
+   + AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
+#endif
   ];
 
 
@@ -74,6 +77,12 @@ public:
   boolean publishSwitchState(uint8_t id);
   void processSwitch(uint8_t *id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  boolean publishBinarySensorState(uint8_t id);
+  void processBinarySensor(uint8_t *id);
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSORS
+
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   void publishADCValues();

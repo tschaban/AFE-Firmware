@@ -53,7 +53,8 @@ private:
   void generateHeader(String &page, uint16_t redirect);
 
   /* Method addes configuration block to the site */
-  void openSection(String &page, const char *title, const __FlashStringHelper *description);
+  void openSection(String &page, const char *title,
+                   const __FlashStringHelper *description);
   void openSection(String &page, const __FlashStringHelper *title,
                    const __FlashStringHelper *description);
 
@@ -257,6 +258,10 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   void siteRainmeterSensor(String &page);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void siteBinarySensor(String &page, uint8_t id);
 #endif
 };
 

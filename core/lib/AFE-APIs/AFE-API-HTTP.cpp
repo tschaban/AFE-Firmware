@@ -189,6 +189,14 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  else if (strcmp(request->device, "binary") == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing Binary sensor requests");
+#endif
+    processBinarySensor(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
@@ -700,7 +708,6 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
 }
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_DHT
 void AFEAPIHTTP::addClass(AFESensorDHT *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
@@ -728,7 +735,33 @@ void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
 }
 #endif // AFE_CONFIG_HARDWARE_DHT
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPIHTTP::addClass(AFESensorBinary *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+    _BinarySensor[i] = Sensor + i;
+  }
+}
+void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
 
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+    if (strcmp(request->name, _BinarySensor[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];
+        _BinarySensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 /* Method creates JSON respons after processing HTTP API request, and pushes
  * it.
@@ -736,21 +769,14 @@ void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
  */
 void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   String respond;
-  respond = "{\"device\":{";
-  respond += "\"type\":\"" + String(request->device) + "\"";
-  if (strlen(request->name) > 0) {
-    respond += ",\"name\":\"" + String(request->name) + "\"";
-  }
-  respond += "},\"command\":\"" + String(request->command) + "\",";
-
-  if (!strlen(value) == 0) {
-    respond += "\"data\":";
-    respond += value;
-    respond += ",";
-  }
-  respond += "\"status\":\"";
-  respond += status ? "success" : "error";
-  respond += "\"}";
+  respond.concat(FPSTR(JSON_RESPONSE));
+  respond.replace("{{device.type}}", request->device);
+  respond.replace("{{device.name}}",
+                  strlen(request->name) > 0 ? request->name : "\"\"");
+  respond.replace("{{request.command}}",
+                  strlen(request->command) > 0 ? request->command : "\"\"");
+  respond.replace("{{response.data}}", strlen(value) > 0 ? value : "\"\"");
+  respond.replace("{{response.status}}", status ? "success" : "error");
   _HTTP->sendJSON(respond);
 }
 

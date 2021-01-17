@@ -37,7 +37,6 @@ private:
   AFEFirmwarePro *FirmwarePro;
   AFEDataAccess *Data;
 
-
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
 #endif
@@ -52,7 +51,7 @@ private:
 
   /* Used to auto-logoff from the config panel */
   unsigned long howLongInConfigMode = 0;
- 
+
   AFESitesGenerator Site;
 
   boolean upgradeFailed = false;
@@ -154,11 +153,15 @@ private:
   void get(ADCINPUT &data);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void get(BINARY_SENSOR &data);
+#endif
+
 public:
   AFEWebServer();
 
   /* Method pushes HTML site from WebServer */
-  void publishHTML(String &page);
+  void publishHTML(const String &page);
 
   /* Method initialize WebServer and Updater server */
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
@@ -194,7 +197,8 @@ public:
   HTTPCOMMAND getHTTPCommand();
 
   /* Method pushes JSON response to HTTP API request */
-  void sendJSON(String json);
+  // void sendJSON(String json);
+  void sendJSON(const String &json);
 };
 
 #endif

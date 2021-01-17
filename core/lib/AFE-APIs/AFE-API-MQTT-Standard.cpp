@@ -38,14 +38,20 @@ void AFEAPIMQTTStandard::synchronize() {
 
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+  char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    if (!_Relay[i]->setRelayAfterRestoringMQTTConnection()) {
-      /* Requesting state from MQTT Broker / service */
-      Mqtt.publish(_Relay[i]->mqttStateTopic, "get");
-    } else {
-      /* Updating relay state after setting default value after MQTT connected
-       */
-      publishRelayState(i);
+    if (strlen(_Relay[i]->configuration.mqtt.topic) > 0) {
+
+      sprintf(mqttStateTopic, "%s/state", _Relay[i]->configuration.mqtt.topic);
+
+      if (!_Relay[i]->setRelayAfterRestoringMQTTConnection()) {
+        /* Requesting state from MQTT Broker / service */
+        Mqtt.publish(mqttStateTopic, "get");
+      } else {
+        /* Updating relay state after setting default value after MQTT connected
+         */
+        publishRelayState(i);
+      }
     }
   }
 #endif
@@ -54,6 +60,13 @@ void AFEAPIMQTTStandard::synchronize() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
     publishSwitchState(i);
+  }
+#endif
+
+/* Synchronize: Binary sensor */
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+    publishBinarySensorState(i);
   }
 #endif
 
@@ -90,13 +103,17 @@ void AFEAPIMQTTStandard::subscribe() {
   Serial << endl << F("INFO: Subscribing to MQTT Topics ...");
 #endif
 
+  char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+
 /* Subscribe: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
+
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    Mqtt.subscribe(_Relay[i]->mqttCommandTopic);
-    if (strlen(_Relay[i]->mqttCommandTopic) > 0) {
+    if (strlen(_Relay[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd", _Relay[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _Relay[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RELAY;
       currentCacheSize++;
@@ -107,12 +124,29 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: Switch */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
-    Mqtt.subscribe(_Switch[i]->mqttCommandTopic);
-    if (strlen(_Switch[i]->mqttCommandTopic) > 0) {
+    if (strlen(_Switch[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd", _Switch[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _Switch[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_SWITCH;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+/* Subscribe: Binary sensors */
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+    if (strlen(_BinarySensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _BinarySensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BINARY_SENSOR;
       currentCacheSize++;
     }
   }
@@ -121,10 +155,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: ADC */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (_Device->configuration.isAnalogInput) {
-    Mqtt.subscribe(_AnalogInput->mqttCommandTopic);
-    if (strlen(_AnalogInput->mqttCommandTopic) > 0) {
+    if (strlen(_AnalogInput->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _AnalogInput->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _AnalogInput->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ADC;
       currentCacheSize++;
     }
@@ -323,6 +359,11 @@ void AFEAPIMQTTStandard::processRequest() {
         processSwitch(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_HARDWARE_SWITCH
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+      case AFE_MQTT_DEVICE_BINARY_SENSOR:
+        processBinarySensor(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
         processADC();
@@ -407,9 +448,12 @@ void AFEAPIMQTTStandard::processRequest() {
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    publishStatus =
-        Mqtt.publish(_Relay[id]->mqttStateTopic,
-                     _Relay[id]->get() == AFE_RELAY_ON ? "on" : "off");
+    if (strlen(_Relay[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state", _Relay[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic, _Relay[id]->get() == AFE_RELAY_ON ? "on" : "off");
+    }
   }
   return publishStatus;
 }
@@ -455,15 +499,16 @@ void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_SWITCH
-
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
 boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    publishStatus =
-        Mqtt.publish(_Switch[id]->mqttStateTopic,
-                     _Switch[id]->getPhisicalState() ? "open" : "closed");
+    if (strlen(_Switch[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _Switch[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic, _Switch[id]->getPhisicalState() ? "open" : "closed");
+    }
   }
   return publishStatus;
 }
@@ -862,5 +907,39 @@ boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_DHT
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPIMQTTStandard::processBinarySensor(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing Binary Sensor ID: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishBinarySensorState(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+
+boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    if (strlen(_BinarySensor[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _BinarySensor[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic,
+          _BinarySensor[id]->get() == 1
+              ? _BinarySensor[id]->configuration.sendAsSwitch ? "off" : "open"
+              : _BinarySensor[id]->configuration.sendAsSwitch ? "on"
+                                                              : "closed");
+    }
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
