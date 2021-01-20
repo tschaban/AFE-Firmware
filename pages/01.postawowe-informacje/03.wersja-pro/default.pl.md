@@ -18,7 +18,7 @@ recaptchacontact:
 ##### Dla kogo dostępny jest klucz AFE Pro?
 >* zasłużonych użytkownków [Forum Smart'ny Dom](https://forum.smartnydom.pl?target=_blank). Od 5 gwiazdek na Forum. 
 >	* _Uwaga: jeśli masz 5 gwiadek, a nie masz klucza to daj znać._
->* osób wspierających [Stronę oraz Forum Smart'ny Dom lub projekt AFE Firmware](https://pl.donate.afe-firmware.smartnydom.pl?target=_blank)
+>* osób [wspierających](https://pl.donate.afe-firmware.smartnydom.pl?target=_blank) Stronę oraz Forum Smart'ny Dom lub projekt AFE Firmware
 >* aktywnych testerów oprogramownia AFE Firmware
 
 ##### Jakie są funkcjonalności w AFE Pro?
