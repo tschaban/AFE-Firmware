@@ -4,14 +4,12 @@
 #define _AFE_Sensor_Binary_h
 
 #include <AFE-Configuration.h>
-
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #include <AFE-Data-Access.h>
-#include <AFE-Device.h>
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <AFE-MCP23017-Broker.h>
 #endif
 
 #ifdef DEBUG
@@ -20,29 +18,38 @@
 
 class AFESensorBinary {
 
+private:
+  boolean _initialized = false;
+  boolean _detected = false;
+  unsigned long startTime = 0;
+  byte state;
+
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  AFEMCP23017Broker *_MCP23017Broker;
+  boolean _MCP23017ReferenceAdded = false;
+  boolean _expanderUsed = false;
+  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 public:
-  uint16_t bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
+  BINARY_SENSOR configuration;
+
 
   /* Constructors */
   AFESensorBinary();
 
   /* Init switch */
-  void begin(uint16_t _bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING);
+  void begin(uint8_t id, AFEDataAccess *);
 
-  void newImpulse(void);
-  void get(uint32_t &noOfImpulses, uint32_t &duration);
-
-private:
-  boolean  active = false;
-  uint32_t impulseCounter = 0;
-  uint32_t counterStarted = 0;
-
-  uint32_t _previousDuration = 0; // Used in case of time rollout
-  
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
+
+  byte get(void);
+  boolean listener(void);
+    /* Returns the sensor data in JSON format */
+  void getJSON(char *json);
 };
 
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

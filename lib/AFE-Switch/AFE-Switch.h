@@ -22,7 +22,7 @@ class AFESwitch {
 private:
   boolean _initialized = false;
   boolean state;
-  boolean previousState; // Actually this stores current switch state
+  boolean previousState; // Actually this keeps current switch state
 
   unsigned long startTime = 0;
 
@@ -56,10 +56,6 @@ private:
 
 public:
   SWITCH configuration;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-#endif
 
   /* Constructors */
   AFESwitch();

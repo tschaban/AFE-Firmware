@@ -3,11 +3,8 @@
 #ifndef _AFE_Sensor_HPMA115S0_h
 #define _AFE_Sensor_HPMA115S0_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 
 #include <AFE-Data-Access.h>
 #include <AFE-SoftwareSerial.h>
@@ -77,4 +74,5 @@ public:
   void getJSON(char *json);
 };
 
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #endif

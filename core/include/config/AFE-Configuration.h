@@ -115,13 +115,6 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 #endif
 
-#define AFE_CONFIG_HARDWARE_MCP23017
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017 8
-#endif
-
-
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS 1
@@ -337,12 +330,50 @@
 #define AFE_CONFIG_HARDWARE_PIR
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
-/* ---- 4xRelay (VERSION OBSOLETE ---- */
+
+/* ---- 4xRelay MCP23017 ---- */
 #elif defined(T4_CONFIG)
-#define AFE_FIRMWARE_VERSION "1.3.1"
+#define AFE_FIRMWARE_VERSION "2.4.0.B4"
 #define AFE_FIRMWARE_TYPE 4
+
+#define AFE_FILE_SYSTEM AFE_FS_SPIFFS
+
+/* Define Hardware */
+#define AFE_CONFIG_HARDWARE_SWITCH
+#define AFE_CONFIG_HARDWARE_LED
+#define AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#define AFE_CONFIG_HARDWARE_DS18B20
+
+/* Max number of hardware items, per AFE version */
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 32
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 32
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 32
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BINARY_SENSORS 32
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017 2
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20 1
+
+/* Max number of hardware items per specyfic hardware device */
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017 AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BINARY_SENSORS
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20 AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20
+
+/* Generic version */
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20 0
+
+/* Functionalities */
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
+#define AFE_CONFIG_FUNCTIONALITY_ADC
+
+
 /* ---- Gate ----*/
 #elif defined(T5_CONFIG)
 #define AFE_FIRMWARE_VERSION "2.4.0"
@@ -445,7 +476,7 @@
 #define AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_BH1750
-#define AFE_CONFIG_HARDWARE_AS3935
+//#define AFE_CONFIG_HARDWARE_AS3935
 #define AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #define AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
@@ -511,6 +542,12 @@
 
 #endif // defined(T6_CONFIG)
 
+/* File system */
+#ifndef AFE_FILE_SYSTEM_USED
+#define AFE_FILE_SYSTEM_USED AFE_FS_SPIFFS
+#endif
+ 
+
 /* Configs related to a relay functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #ifndef AFE_CONFIG_HARDWARE_RELAY
@@ -549,9 +586,6 @@
 #endif // AFE_CONFIG_FUNCTIONALITY_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#ifndef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#define AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#endif
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 /* ***************** HARDWARE: Config and defaults *********************/
@@ -611,8 +645,7 @@
 #define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay control
 
 /* Switche bouncing */
-#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING                                   \
-  50 // Bouncing for switch in miliseconds
+#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING 50 // Bouncing for switch in miliseconds
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
@@ -808,7 +841,11 @@
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING 1
+#define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING 10
+#define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_REVERT_SIGNAL false
+#define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_SENT_AS_SWITCH false
+#define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR true
+#define AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH 200
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 /* DS18B20 Sensor */
@@ -960,8 +997,7 @@
 #define AFE_MQTT_CONTACTRON_OPEN "open"
 #define AFE_MQTT_CONTACTRON_CLOSED "closed"
 
-#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH                             \
-  200  // Not checked. used by HTTP API
+#define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH 200  // Not checked. used by HTTP API
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Temperature */
@@ -1122,8 +1158,7 @@ typedef enum {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #define AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_ENABLED true
 #define AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_TEMPERATURE 0
-#define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH                      \
-  18   // {"enabled":false}
+#define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH 18   // {"enabled":false}
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 /* Config sites IDs */
@@ -1199,6 +1234,10 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_DHT
 #define AFE_CONFIG_SITE_DHT 33
 #endif // AFE_CONFIG_HARDWARE_DHT
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#define AFE_CONFIG_SITE_BINARY_SENSOR 34
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 
 /* ***************** APIs: Config and defaults *********************/
 
@@ -1285,20 +1324,23 @@ typedef enum {
 } afe_humidity_domoticz_state_t;
 #endif
 
-#else // Defuals for None-Domotucz MQTT
+#else // Defauals for None-Domotucz MQTT
 
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH 69 // Size of a Command topic: MQTT_BASIC_CONFIG + 4
+#define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH 71 // Size of a State topic: MQTT_BASIC_CONFIG + 6
+ 
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Defaults for each MQTT Version (standard and domoticz) */
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT                                        \
-  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
        // down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
-#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE                                    \
-  768 // Default MQTT Buffer size - must handle entire message
+#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
+#define AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT false
+#define AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL false
 
 /* ***************** Files: Config and defaults *********************/
 
@@ -1335,17 +1377,15 @@ typedef enum {
 #define AFE_FILE_BH1750_CONFIGURATION "cfg-bh1750-%d.json"
 #define AFE_FILE_AS3935_CONFIGURATION "cfg-as3935-%d.json"
 #define AFE_FILE_DHT_SENSOR_CONFIGURATION "/cfg-dht-%d.json"
+#define AFE_FILE_BINARY_SENSOR_CONFIGURATION "/cfg-binary-sensor-%d.json"
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER                                     \
-  352                                     // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352                                     // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_BH1750 221 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_I2C 54     // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE                                     \
-  31 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION                                     \
-  78                                        // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78                                        // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 405   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // Verfied by ArduinoJson Assistant
@@ -1356,12 +1396,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_LED 76        // Verfied by ArduinoJson Assistant
 #endif                                       // AFE_CONFIG_HARDWARE_MCP23017
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_RELAY                                           \
-  287 // Verfied by ArduinoJson Assistant for T6 only
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE                                     \
-  36 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_SWITCH                                          \
-  238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY  287 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE  36 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_SWITCH  238 // Verfied by ArduinoJson Assistant for T6 only
 #define AFE_CONFIG_FILE_BUFFER_ADC 489       // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_UART 54       // Verfied by ArduinoJson Assistant
@@ -1371,16 +1408,15 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // Verfied by ArduinoJson Assistant
 #endif
 #define AFE_CONFIG_FILE_BUFFER_AS3935 439 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON                                      \
-  241                                   // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON  241                                   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_SENSOR_DATA 1100 // Not verfied
 #define AFE_CONFIG_FILE_BUFFER_DS18B20 407   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR                               \
-  261                                  // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR 261                                  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_DHT 643 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR 238 // Verfied by ArduinoJson Assistant for T6 only
 
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"

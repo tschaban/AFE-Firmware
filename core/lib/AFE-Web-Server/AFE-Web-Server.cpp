@@ -176,6 +176,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteThermalProtector(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  case AFE_CONFIG_SITE_BINARY_SENSOR:
+    Site.siteBinarySensor(page, siteConfig->deviceID);
+    break;
+#endif
   }
 
   if (siteConfig->form) {
@@ -203,10 +208,6 @@ void AFEWebServer::generate(boolean upload) {
   if (getOptionName()) {
     return;
   }
-
-  String page;
-
-  page.reserve(AFE_MAX_PAGE_SIZE);
 
   if (_refreshConfiguration) {
     _refreshConfiguration = false;
@@ -435,6 +436,14 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+      else if (siteConfig.ID == AFE_CONFIG_SITE_BINARY_SENSOR) {
+        BINARY_SENSOR configuration;
+        get(configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+        configuration = {0};
+      }
+#endif
     } else if (command == AFE_SERVER_CMD_NONE) {
       if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
         siteConfig.form = false;
@@ -559,9 +568,36 @@ void AFEWebServer::generate(boolean upload) {
     Serial << F(", Time: ") << siteConfig.rebootTime;
 #endif
 
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Starting generating HTTP-Response. ") << endl
+           << F("INFO: HEAP: Available: ") << system_get_free_heap_size() / 1024
+           << F("kB");
+#endif
+
+    String page;
+// page.reserve(AFE_MAX_PAGE_SIZE);
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: HEAP: After mem allocation for HTTP response : ")
+           << system_get_free_heap_size() / 1024 << F("kB");
+#endif
     generateSite(&siteConfig, page);
 
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: HEAP: Post HTTP response generation : ")
+           << system_get_free_heap_size() / 1024 << F("kB");
+#endif
+
     publishHTML(page);
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: HEAP: After HTTP response published : ")
+           << system_get_free_heap_size() / 1024 << F("kB");
+#endif
   }
 
   /* Rebooting device */
@@ -665,29 +701,38 @@ void AFEWebServer::listener() {
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
-void AFEWebServer::publishHTML(String &page) {
+void AFEWebServer::publishHTML(const String &page) {
   uint16_t pageSize = page.length();
-  uint16_t size = 64;
+// uint16_t size = 1024;
 
 #ifdef DEBUG
   Serial << endl
-         << endl
-         << F("INFO: Site streaming started. Size : ") << pageSize
-         << F(" ... ");
+         << F("INFO: Site streaming started. To transfer: ")
+         << (pageSize / 1024) << F("kB");
 
   if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
     Serial << endl
-           << endl
            << F("ERROR: Page size buffor ") << AFE_MAX_PAGE_SIZE
            << F("B too small : ") << pageSize << F(" ... ");
   }
 #endif
   server.sendHeader("Content-Length", String(page.length()));
   server.setContentLength(pageSize);
+
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MEMORY: Free :  size after sending Header: ")
+         << system_get_free_heap_size() / 1024 << F("kB") << endl
+         << F("INFO: Transfering site over TCP.");
+#endif
+
+  server.send(200, "text/html", page);
+
+/*
   if (pageSize > size) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Heap size after sending Header: ")
+           << F("INFO: MEMORY: Free :  size after sending Header: ")
            << system_get_free_heap_size() / 1024 << F("kB") << endl
            << F("INFO: Transfering site over TCP: ");
 #endif
@@ -706,6 +751,7 @@ void AFEWebServer::publishHTML(String &page) {
   } else {
     server.send(200, "text/html", page);
   }
+*/
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Site published");
@@ -718,7 +764,7 @@ void AFEWebServer::publishHTML(String &page) {
   }
 }
 
-void AFEWebServer::sendJSON(String json) {
+void AFEWebServer::sendJSON(const String &json) {
   server.send(200, "application/json", json);
 }
 
@@ -855,6 +901,11 @@ void AFEWebServer::get(DEVICE &data) {
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  data.noOfBinarySensors =
+      server.arg("b").length() > 0 ? server.arg("b").toInt() : 0;
+#endif
+
   data.timeToAutoLogOff =
       server.arg("al").length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 }
@@ -903,11 +954,7 @@ void AFEWebServer::get(NETWORK &data) {
     data.waitTimeSeries = server.arg("ws").toInt();
   }
 
-  if (server.arg("d").length() > 0) {
-    data.isDHCP = true;
-  } else {
-    data.isDHCP = false;
-  }
+  data.isDHCP = server.arg("d").length() > 0 ? true : false;
 }
 
 void AFEWebServer::get(MQTT &data) {
@@ -952,6 +999,9 @@ void AFEWebServer::get(MQTT &data) {
     data.lwt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
+
+  data.retainLWT = server.arg("rl").length() > 0 ? true : false;
+  data.retainAll = server.arg("ra").length() > 0 ? true : false;
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -1031,9 +1081,10 @@ void AFEWebServer::get(RELAY &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1072,11 +1123,11 @@ void AFEWebServer::get(SWITCH &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
-
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1310,9 +1361,10 @@ void AFEWebServer::get(LED &data) {
                            ? server.arg("mg").toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address = server.arg("a").length() > 0
-                              ? server.arg("a").toInt()
-                              : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 
@@ -1849,3 +1901,45 @@ void AFEWebServer::getRainmeterSensorData(RAINMETER *data) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEWebServer::get(BINARY_SENSOR &data) {
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+  data.bouncing = server.arg("b").length() > 0
+                      ? server.arg("b").toInt()
+                      : AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
+
+  data.revertSignal = server.arg("rs").length() > 0 ? true : false;
+  data.internalPullUp = server.arg("pr").length() > 0 ? true : false;
+  data.sendAsSwitch = server.arg("ss").length() > 0 ? true : false;
+
+  data.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  data.mcp23017.gpio = server.arg("mg").length() > 0
+                           ? server.arg("mg").toInt()
+                           : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.mcp23017.address =
+      server.arg("a").length() > 0
+          ? server.arg("a").toInt()
+          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

@@ -24,14 +24,23 @@ void setup() {
   Serial << F("INFO: ESP Config erased");
 #endif
 
-  /* Initializing SPIFFS file system */
-  if (SPIFFS.begin()) {
+/* Initializing SPIFFS file system */
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  bool _fileSystemReady = LittleFS.begin();
+#else
+  bool _fileSystemReady = SPIFFS.begin();
+#endif
+
+  if (_fileSystemReady) {
 #ifdef DEBUG
-    Serial << F("INFO: File system: mounted");
+    Serial << F("INFO: File system: mounted. Performs a quick garbage "
+                "collection operation on SPIFFS");
   } else {
     Serial << F("ERROR: File system not mounted");
 #endif
     yield();
+    SPIFFS.gc();
   }
 
   Device.begin();
@@ -138,16 +147,12 @@ void setup() {
 
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeContracton();
-    }
+    initializeContracton();
 #endif
 
 /* Initializing Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeGate();
-    }
+    initializeGate();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -169,27 +174,23 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeHPMA115S0Sensor();
-    }
+    initializeHPMA115S0Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeBMX80Sensor();
-    }
+    initializeBMX80Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeBH1750Sensor();
-    }
+    initializeBH1750Sensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-    if (Device.getMode() == AFE_MODE_NORMAL) {
-      initializeAS3935Sensor();
-    }
+    initializeAS3935Sensor();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    initializeBinarySensor();
 #endif
 
 #if defined(T3_CONFIG)
@@ -267,7 +268,13 @@ void setup() {
   Serial << endl
          << F("################################################################"
               "########");
+
+  Serial << endl
+         << "INFO: MEMORY: Free: [Boot end] : "
+         << String(system_get_free_heap_size() / 1024) << "kB";              
 #endif
+
+
 }
 
 void loop() {
@@ -329,8 +336,8 @@ void loop() {
         rainSensorListener();
 #endif
 
-#if defined(T3_CONFIG)
-        mainPIR();
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+        binarySensorEventsListener();
 #endif
 
         /* Checking if Key is still valid */

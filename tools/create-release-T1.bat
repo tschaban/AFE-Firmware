@@ -1,1 +1,1 @@
-php "C:\Users\Adrian\Development\AFE-Firmware\tools\T1.php"
+php "C:\Users\Adrian\Development\AFE-Firmware\tools\T.php"

@@ -11,14 +11,6 @@ void AFEAnalogInput::begin() {
   Data.getConfiguration(&configuration);
   _initialized = true;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
-
 #ifdef DEBUG
   Serial << endl << endl << F("------------ AC VCC Input ------------");
   Serial << endl

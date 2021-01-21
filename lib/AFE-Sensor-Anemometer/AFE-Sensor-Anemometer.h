@@ -8,7 +8,6 @@
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 #include <AFE-Data-Access.h>
-#include <AFE-Sensor-Binary.h>
 #include <arduino.h>
 
 #ifdef DEBUG
@@ -45,6 +44,17 @@ private:
   boolean _initialized = false;
   uint32_t startTime = 0;
   float oneImpulseDistanceCM = 0;
+
+
+  boolean  active = false;
+  uint32_t impulseCounter = 0;
+  uint32_t counterStarted = 0;
+  uint32_t _previousDuration = 0; // Used in case of time rollout
+
+  void newImpulse(void);
+  void get(uint32_t &noOfImpulses, uint32_t &duration);
+
+
 };
 
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR

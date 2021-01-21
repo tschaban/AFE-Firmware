@@ -110,6 +110,10 @@ void AFEDefaults::set() {
     Data->createDHTSensorConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    Data->createBinarySensorConfigurationFile();
+#endif
+
   }
 #ifdef DEBUG
   else {

@@ -95,6 +95,16 @@ void AFEAPIMQTTDomoticz::synchronize() {
   }
 #endif
 
+/* Synchronize: Binary sensor */
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Synchronizing Binary sensor: ") << i;
+#endif
+    publishBinarySensorState(i);
+  }
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: Sending message: device is connected ...");
 #endif
@@ -105,7 +115,12 @@ void AFEAPIMQTTDomoticz::synchronize() {
         "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
         "\"Battery\":100,\"RSSI\":%d}",
         Mqtt.configuration.lwt.idx, L_NETWORK_CONNECTED, getRSSI());
+
+    // Workaround for retainLWT
+    boolean _retainAll = Mqtt.configuration.retainAll;
+    Mqtt.configuration.retainAll = Mqtt.configuration.retainLWT;
     Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
+    Mqtt.configuration.retainAll = _retainAll;
   }
 }
 
@@ -152,8 +167,8 @@ void AFEAPIMQTTDomoticz::processRequest() {
     for (uint8_t i = 0; i < lastIDXChacheIndex; i++) {
       if (idxCache[i].domoticz.idx == command.domoticz.idx) {
         switch (idxCache[i].type) {
-        /* Processing Relay command*/
-#ifdef AFE_CONFIG_HARDWARE_RELAY        
+/* Processing Relay command*/
+#ifdef AFE_CONFIG_HARDWARE_RELAY
         case AFE_DOMOTICZ_DEVICE_RELAY:
 #ifdef DEBUG
           Serial << endl
@@ -174,7 +189,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #endif
           break;
-#endif // AFE_CONFIG_HARDWARE_RELAY      
+#endif // AFE_CONFIG_HARDWARE_RELAY
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* Processing Gate command*/
         case AFE_DOMOTICZ_DEVICE_GATE:
@@ -273,7 +288,6 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif
 }
 
-
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
   // Returns true if Domoticz is in version 2020.x. All requests are processed
@@ -341,9 +355,7 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
 void AFEAPIMQTTDomoticz::addClass(AFESwitch *Switch) {
   AFEAPI::addClass(Switch);
 }
-#endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
 boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _Switch[id]->configuration.domoticz.idx) {
@@ -974,5 +986,24 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
   return true;
 }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+boolean AFEAPIMQTTDomoticz::publishBinarySensorState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
+    char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];
+
+    generateSwitchMessage(json, _BinarySensor[id]->configuration.domoticz.idx,
+                          _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF
+                                                        : AFE_SWITCH_ON);
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

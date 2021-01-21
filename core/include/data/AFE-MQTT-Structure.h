@@ -69,6 +69,9 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_DHT
   AFE_MQTT_DEVICE_DHT = 14,
 #endif
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  AFE_MQTT_DEVICE_BINARY_SENSOR = 15,
+#endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */
@@ -91,6 +94,8 @@ struct MQTT {
   MQTT_BASIC_CONFIG lwt;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   uint16_t timeout;
+  boolean retainLWT;
+  boolean retainAll;
 };
 
 #endif

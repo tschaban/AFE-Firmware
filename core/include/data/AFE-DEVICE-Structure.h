@@ -3,8 +3,9 @@
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
 
-#include <arduino.h>
 #include <AFE-Configuration.h>
+#include <arduino.h>
+
 
 struct AFE_DEVICE_API {
   boolean http;
@@ -66,6 +67,9 @@ struct DEVICE {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DHT
   uint8_t noOfDHTs;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  uint8_t noOfBinarySensors;
 #endif
 };
 

@@ -77,6 +77,10 @@
 #include <AFE-Sensor-DHT.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -159,6 +163,11 @@ public:
   virtual void addClass(AFESensorDHT *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  virtual void addClass(AFESensorBinary *);
+#endif
+
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -227,6 +236,9 @@ protected:
   AFESensorDHT *_DHTSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DHT];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+#endif
 
 
 };

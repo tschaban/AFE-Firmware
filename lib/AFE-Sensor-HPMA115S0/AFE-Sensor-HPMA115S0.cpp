@@ -1,6 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sensor-HPMA115S0.h"
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 
 AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
@@ -334,3 +335,5 @@ void AFESensorHPMA115S0::getJSON(char *json) {
           "%d,\"unit\":\"µg/m3\"}}",
           data.pm25, data.pm10);
 }
+
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0

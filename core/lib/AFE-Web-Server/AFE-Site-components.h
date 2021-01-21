@@ -5,40 +5,16 @@
 
 #include <AFE-Configuration.h>
 
+const char JSON_RESPONSE[] PROGMEM =
+    "{\"device\":{\"type\":\"{{device.type}}\",\"name\":\"{{device.name}}\"},\"command\":\"{{"
+    "request.command}}\",\"data\":{{response.data}},\"status\":\"{{response.status}}\"}";
+
 const char HTTP_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta "
     "charset=\"utf-8\">{{s.redirect}}<title>AFE "
     "Firmware {{f.version}} "
     "[T{{f.type}}]</"
-    "title><style>#l,#r{padding:20px;display:table-cell}.ltit,body{margin:0}.b,"
-    ".itm "
-    "a,a{text-decoration:none}body{background:#ddd;padding:15px}#c{display:"
-    "table;width:100%}#l{width:300px;background:#33363b;color:#eee}#r{"
-    "background:#eee}a,button,h1,h3,h4,input,label,li,p,span{font-family:sans-"
-    "serif}h4{margin-bottom:5px;}.lst{list-style:none;margin:0;padding:0}.itm "
-    "a{display:block;white-space:nowrap;padding:.2em "
-    "1em;color:#777;font-size:95%}a{color:#36f}.cf "
-    "label,.hint,input,select{display:inline-block;vertical-align:middle}.itm "
-    "a:focus,.itm "
-    "a:hover{background-color:#eee;text-decoration:none;padding:.2em "
-    "1.5em;color:#000}.ci{margin-bottom:2em}.ci "
-    "h1{color:#aaa;border-bottom:1px solid "
-    "#ddd;font-size:110%;font-weight:500;letter-spacing:.1em}.ci "
-    ".cd{color:#444;line-height:1.8em;font-size:80%;font-style:italic}.cm{"
-    "color:#999;font-size:90%;margin:0 0 20px}.la{margin:0 .1em;padding:.3em "
-    "1em;color:#fff;background:#999;font-size:80%}.cc label,.cf "
-    "label{font-size:.875em}.lr{background:#ca3c3c}.bs,.lg{background:#2fb548}"
-    "fieldset{margin:0;padding:.35em 0 "
-    ".75em;border:0}.cf{margin-bottom:.5em}.cc{margin:1em 0 .5em 9.4em}.cf "
-    "label{text-align:right;width:10em;margin:0 1em 0 "
-    "0}input,select{padding:.5em .6em;border:1px solid "
-    "#ccc;box-sizing:border-box}.hint{padding-left:.3em;color:#aaa;font-size:"
-    "80%}.b{font-size:100%;padding:.5em 1em;border:1px solid "
-    "#999;border:transparent;color:#fff}.be{background:#ca3c3c}.bw{background:#"
-    "df7514}.bc{background:#42b8dd}.b:focus,.b:hover{filter:alpha(opacity=90);"
-    "background-image:-webkit-linear-gradient(transparent,rgba(0,0,0,.05) "
-    "40%,rgba(0,0,0,.1));background-image:linear-gradient(transparent,rgba(0,0,"
-    "0,.05) 40%,rgba(0,0,0,.1))}</style></head><body>";
+    "title><link href=\"https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap\" rel=\"stylesheet\"><style>#l,#r{padding:20px;display:table-cell}.ltit,body{margin:0}.b,.itm a,a{text-decoration:none}body{background:#ddd;padding:15px}#c{display:table;width:100%}#l{width:200px;background:#33363b;color:#eee}#r{background:#eee}a,button,h1,h3,h4,input,label,li,p,span{font-family:'Titillium Web',sans-serif}h4{font-size:80%;margin-bottom:1px}.lst{list-style:none;margin:0;padding:0}.itm a,.itm i{display:block;white-space:nowrap;padding:0 1em;color:#777;font-size:80%}.itm i{font-weight:700;padding-top:.5em}.cf label,.hint,input,select{display:inline-block;vertical-align:middle}.itm a:focus,.itm a:hover{background-color:#aaa;text-decoration:none;padding:0 1.5em;color:#000}.ci{margin-bottom:1em}.ci h1{color:#999;border-bottom:1px solid #ddd;font-size:110%;font-weight:500}.ci .cd{color:#aaa;line-height:0;font-size:80%;font-style:italic;margin-bottom:2em}.cm{color:#999;font-size:90%;margin:0 0 20px}.la{margin:0 .1em;padding:.3em 1em;color:#fff;background:#999;font-size:80%}.cc label,.cf label{font-size:.875em}.lr{background:#ca3c3c}.bs,.lg{background:#2fb548}fieldset{margin:0;padding:.35em 0 .75em;border:0}.cf{margin-bottom:.3em}.cc{margin:0 0 .1em 9.4em}.cf label{text-align:right;width:10em;margin:0 1em 0 0}input,select{padding:.4em .6em;border:1px solid #ccc;box-sizing:border-box}.hint{padding-left:.5em;color:#aaa;font-size:80%}.b{font-size:100%;padding:.2em 1em;border:1px solid #999;border:transparent;color:#fff}.be{background:#ca3c3c}.bw{background:#df7514}.bc{background:#42b8dd}.b:focus,.b:hover{filter:alpha(opacity=90);background-image:-webkit-linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1));background-image:linear-gradient(transparent,rgba(0,0,0,.05) 40%,rgba(0,0,0,.1))}</style></head><body>";
 
 const char HTTP_FOOTER_CONNECTED[] PROGMEM = "<a style=\"color:#0475b6;\" "
                                              "href=\"https://"
@@ -71,7 +47,7 @@ const char HTTP_FOOTER_EXTENDED[] PROGMEM =
     "/> <img src=\"https://img.shields.io/badge/API-{{f.API}}-yellow.svg\" "
     "/> <img src=\"https://img.shields.io/badge/PRO-{{f.Pro}}-orange.svg\" "
     "alt=\"PRO\" /> <img "
-    "src=\"https://img.shields.io/badge/Heap-{{freeHeap}}KB-9cf.svg\" "
+    "src=\"https://img.shields.io/badge/Mem-{{freeHeap}}KB-9cf.svg\" "
     "alt=\"PRO\" /> <img "
     "src=\"https://img.shields.io/badge/Size-{{f.size}}-yellowgreen.svg\" "
     "/></div>";
@@ -81,14 +57,13 @@ const char HTTP_MENU_ITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}\">{{item.title}}</a></li>";
 
 const char HTTP_MENU_SUBITEMS_HEADER[] PROGMEM =
-    "<li class=\"itm\"><a><i>{{item.title}}</i></a></li>";
+    "<li class=\"itm\"><i>{{item.title}}</i></li>";
 
 const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}&i={{item.id}}\">&#8227; "
     "{{item.title}}: {{item.id.display}}</a></li>";
 
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
-
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 const uint8_t MCP23017_GPIOS_ID[] PROGMEM = {0, 1, 2,  3,  4,  5,  6,  7,

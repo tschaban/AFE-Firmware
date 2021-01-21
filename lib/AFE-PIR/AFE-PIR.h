@@ -3,11 +3,9 @@
 #ifndef _AFE_PIR_h
 #define _AFE_PIR_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_PIR
 
 #include <AFE-Data-Access.h>
 #include <AFE-LED.h>
@@ -56,4 +54,5 @@ public:
   unsigned long getDomoticzIDX();
 };
 
+#endif // AFE_CONFIG_HARDWARE_PIR
 #endif

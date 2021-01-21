@@ -102,6 +102,11 @@ AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+#endif
+
 #include <AFE-Main-APIs.cpp>
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -152,16 +157,14 @@ AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 #include <AFE-Main-BH1750.cpp>
 #endif
 
-/* T2 Setup, DHxx sensor */
-
 #ifdef AFE_CONFIG_HARDWARE_DHT
 #include <AFE-Main-DHT.cpp>
 #endif
 
-#if defined(T3_CONFIG)
-#include <AFE-PIR.h>
-AFEPIR Pir[sizeof(Device.configuration.isPIR)];
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Main-Binary-Sensor.cpp>
 #endif
+
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>

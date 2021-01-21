@@ -20,7 +20,7 @@
 #elif defined(T3_CONFIG)
 #define L_FIRMWARE_NAME "dla 4 włączników i czujników ruchu"
 #elif defined(T4_CONFIG)
-#define L_FIRMWARE_NAME "dla 4 włączników WiFi"
+#define L_FIRMWARE_NAME "z expanderem MCP23017"
 #elif defined(T5_CONFIG)
 #define L_FIRMWARE_NAME "do kontrolowania sterownika bramy"
 #elif defined(T6_CONFIG)
@@ -60,6 +60,7 @@
 #define L_PRO_VERSION "Wersja PRO"
 #define L_NETWORK_CONNECTED "Podłączony"
 #define L_DISCONNECTED "Odłączony"
+#define L_INTERFACE "Interface'y"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -113,6 +114,8 @@
 #define L_DEVICE_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
 #define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
 #define L_DEVICE_NUMBER_OF_REGULATORS "Ilość regulatorów"
+#define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarny"
+
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
 #define L_DEVICE_CONTROLLED_GATES "Kontrolowane bramy/drzwi"
@@ -150,6 +153,10 @@
 #define L_MQTT_CONFIGURATION_INFO "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
 #define L_MQTT_TIMEOUT "Limit czasu odpowiedzi"
+#define L_MQTT_RETAIN_SECTION "Zapamiętywanie wiadomości w MQTT Broker"
+#define L_MQTT_RETAIN_SECTION_INFO "Wysłane wiadomości zostaną zapamiętana przez serwer i będą automatycznie wysłana do każdego kto zasubskrybuje dany temat."
+#define L_MQTT_RETAIN_LWT "Pamiętaj LWT"
+#define L_MQTT_RETAIN_ALL "Pamiętaj wszystkie wiadomości"
 
 /* Form: Domoticz server configuration */
 #define L_DOMOTICZ_PROTOCOL "Protokół"
@@ -205,6 +212,18 @@
 #define L_SWITCH_SENSITIVENESS_HINT "Czułość należy ustawić metodą prób, aż uzyska się pożądane działanie przycisku podczas jego wciskania"
 #define L_SWITCH_BUTTON "Przycisk / Włącznik"
 #define L_SWITCH_MQTT_TOPIC "Temat MQTT do monitorowania stanu przycisku"
+
+/* Form: Binary sensor */
+#define L_BINARY_SENSOR "Czujnik binarny"
+#define L_BINARY_SENSORS "Czujniki binarne"
+#define L_BINARY_SENSOR_MCP23017_CONNECTION "Czujnik może zostać podłączony bezpośrednio do GPIO ESP lub przez ekspander MCP23017"
+#define L_BINARY_SENSOR_MQTT_TOPIC "Temat MQTT do monitorowania stanu czujnika binarnego"
+#define L_BINARY_SENSOR_SENT_REVERTED_STATE "Odwróć sygnał na wejściu"
+#define L_BINARY_PULLUP_RESISTOR "Włącz wewnętrzny rezystor (PULLUP)"
+#define L_BINARY_SEND_AS_SWITCH "Wysyłaj stan czujnika wartościami: ON/OFF"
+#define L_BINARY_SEND_AS_SWITCH_HINT "Domyślnie: OPEN/CLOSED"
+
+
 
 /* Form: Analog Input */
 #define L_ADC_CANT_CHANGE "brak możliwości zmiany"
@@ -435,5 +454,13 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Ciśnienie względne"
 
 
+/* MCP32017 */
+#define L_MCP23017_CONNECTION "Podłączenie"
+#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23107_LED_ADDITIONAL_SETTINGS "Dodatkowe ustawienia"
+#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
+#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
 #endif
 

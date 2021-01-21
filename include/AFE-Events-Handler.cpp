@@ -56,6 +56,15 @@ void eventsListener(void) {
       }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#ifdef DEBUG
+      Serial << endl << F("INFO: Sending current state of binary sensors to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
+        HttpDomoticzAPI.publishBinarySensorState(i);
+      }
+#endif
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef DEBUG
       Serial << endl << F("INFO: Sending current state of regulator to Domoticz");
@@ -100,18 +109,6 @@ void eventsListener(void) {
       }
 #endif
 
-#if defined(T3_CONFIG)
-#ifdef DEBUG
-      Serial << endl << F("INFO: Sending current state of PIRs to Domoticz");
-#endif
-      for (uint8_t i = 0; i < sizeof(Device.configuration.isPIR); i++) {
-        if (Device.configuration.isPIR[i]) {
-          //  DomoticzPublishPirState(i);
-        } else {
-          break;
-        }
-      }
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
       Led.off();

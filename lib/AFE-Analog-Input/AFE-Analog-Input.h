@@ -30,10 +30,6 @@ public:
   float batteryPercentage = 0;
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructor */
   AFEAnalogInput();
 

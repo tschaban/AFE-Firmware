@@ -9,7 +9,13 @@
 #include <IPAddress.h>
 
 #include <ArduinoJson.h>
+
+
+
 #include <FS.h>
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#include <LittleFS.h>
+#endif
 
 // Disabled with T0 as it was added to the parsher, is it required for T6?
 //#ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -80,6 +86,7 @@ public:
   void getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
+//  void createRelayConfigurationFile(uint8_t id);
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -89,12 +96,14 @@ public:
   void getConfiguration(uint8_t id, SWITCH *);
   void saveConfiguration(uint8_t id, SWITCH *);
   void createSwitchConfigurationFile();
+//  void createSwitchConfigurationFile(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
+//  void createLEDConfigurationFile(uint8_t id);
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();
@@ -206,5 +215,13 @@ public:
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
   void saveAPI(uint8_t apiID, boolean state);
 #endif // AFE_CONFIG_FUNCTIONALITY_API_CONTROL
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void getConfiguration(uint8_t id, BINARY_SENSOR *);
+  void saveConfiguration(uint8_t id, BINARY_SENSOR *);
+  void createBinarySensorConfigurationFile();
+#endif
+
+
 };
 #endif

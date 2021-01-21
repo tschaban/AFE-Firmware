@@ -1,8 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-  
-
 #include "AFE-UART.h"
+#ifdef AFE_CONFIG_HARDWARE_UART
 
 AFEUART::AFEUART() {}
 
@@ -49,3 +48,4 @@ void AFEUART::clean() {
 #endif
   }
 }
+#endif //AFE_CONFIG_HARDWARE_UART

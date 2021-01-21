@@ -62,7 +62,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     MqttAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -71,7 +71,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     MqttAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -88,7 +88,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     MqttAPI.addClass(&Gate[0]);
 #endif
 
@@ -109,7 +109,6 @@ void initializeMQTTAPI(void) {
     }
 #endif
 
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     if (Device.configuration.noOfRegulators > 0) {
       MqttAPI.addClass(&Regulator[0]);
@@ -119,6 +118,12 @@ void initializeMQTTAPI(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     if (Device.configuration.noOfThermalProtectors > 0) {
       MqttAPI.addClass(&ThermalProtector[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    if (Device.configuration.noOfBinarySensors > 0) {
+      MqttAPI.addClass(&BinarySensor[0]);
     }
 #endif
 
@@ -155,7 +160,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -164,7 +169,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -181,12 +186,12 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpAPI.addClass(&Gate[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpAPI.addClass(&Contactron[0]);
 #endif
 
@@ -211,6 +216,12 @@ void initializeHTTPAPI(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     if (Device.configuration.noOfThermalProtectors > 0) {
       HttpAPI.addClass(&ThermalProtector[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    if (Device.configuration.noOfBinarySensors > 0) {
+      HttpAPI.addClass(&BinarySensor[0]);
     }
 #endif
 
@@ -252,7 +263,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
 #endif
 
@@ -261,7 +272,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
 #endif
 
@@ -278,12 +289,12 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&Contactron[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-// @TODO Missing noOf check
+    // @TODO Missing noOf check
     HttpDomoticzAPI.addClass(&Gate[0]);
 #endif
 
@@ -310,6 +321,13 @@ void initializeHTTPDomoticzAPI(void) {
       HttpDomoticzAPI.addClass(&ThermalProtector[0]);
     }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    if (Device.configuration.noOfBinarySensors > 0) {
+      HttpDomoticzAPI.addClass(&BinarySensor[0]);
+    }
+#endif
+
 
 #ifdef DEBUG
     Serial << endl << F("INFO: API: MQTT init completed");

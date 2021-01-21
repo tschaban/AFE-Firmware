@@ -37,7 +37,7 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
                                                    HIGH);
 
           state =
-              _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.gpio);
+              _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.mcp23017.gpio);
 
 #ifdef DEBUG
           Serial
@@ -75,11 +75,13 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
-    pinMode(configuration.gpio, INPUT);
+  pinMode(configuration.gpio, INPUT);
 #else
   pinMode(configuration.gpio, INPUT_PULLUP);
 #endif
-    state = digitalRead(configuration.gpio);
+  state = digitalRead(configuration.gpio);
+
+
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   }
@@ -87,21 +89,6 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
 
   previousState = state;
   phisicallyState = state;
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Defining get and state MQTT Topics */
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   _initialized = true;
 }
@@ -171,6 +158,7 @@ void AFESwitch::listener() {
           configuration.mcp23017.gpio);
     } else {
 #endif
+
       currentState = digitalRead(configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017

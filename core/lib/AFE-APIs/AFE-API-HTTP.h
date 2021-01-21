@@ -70,6 +70,10 @@
 #include <AFE-Sensor-DHT.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -148,8 +152,13 @@ private:
   AFESensorDHT *_DHTSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DHT];
 #endif
 
-  /* Classifies and invokes code for HTTP request processing */
-  void processRequest(HTTPCOMMAND *);
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+#endif
+
+      /* Classifies and invokes code for HTTP request processing */
+      void
+      processRequest(HTTPCOMMAND *);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void processRelay(HTTPCOMMAND *);
@@ -205,6 +214,10 @@ private:
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void processThermalProtector(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void processBinarySensor(HTTPCOMMAND *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
@@ -295,6 +308,9 @@ public:
   void addClass(AFESensorDHT *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  void addClass(AFESensorBinary *);
+#endif
 };
 
 #endif
