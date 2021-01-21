@@ -193,17 +193,16 @@ void setup() {
     initializeBinarySensor();
 #endif
 
-#if defined(T3_CONFIG)
-    /* Initializing PIRs */
-    initPIR();
-#ifdef DEBUG
-    Serial << endl << F("PIR initialized");
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    initializeAnemometerSensor();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    initializeRainSensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    if (Device.getMode() == AFE_MODE_NORMAL &&
-        Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
+    if (Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
@@ -237,18 +236,6 @@ void setup() {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    initializeAnemometerSensor();
-  }
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    initializeRainSensor();
-  }
-#endif
-
 #ifdef DEBUG
   Serial << endl
          << F("################################################################"
@@ -271,10 +258,8 @@ void setup() {
 
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
-         << String(system_get_free_heap_size() / 1024) << "kB";              
+         << String(system_get_free_heap_size() / 1024) << "kB";
 #endif
-
-
 }
 
 void loop() {

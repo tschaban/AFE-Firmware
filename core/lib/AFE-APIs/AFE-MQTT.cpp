@@ -46,8 +46,8 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
          << F("INFO: Host: ") << configuration.host << endl
          << F("INFO: IP: ") << configuration.ip << endl
          << F("INFO: Port: ") << configuration.port << endl
-         << F("INFO: User: ") << configuration.user << endl
-         << F("INFO: Password: ") << configuration.password << endl
+//         << F("INFO: User: ") << configuration.user << endl
+//         << F("INFO: Password: ") << configuration.password << endl
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
          << F("INFO: LWT IDX: ") << configuration.lwt.idx;
 #else
@@ -115,7 +115,7 @@ void AFEMQTT::connect() {
         boolean _connected;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        char lwtMessage[100];
+        char lwtMessage[100]; // {"command":"udevice","idx":999999,"nvalue":"0,"svalue":"disconnected","Battery":100,"RSSI":1000}
 
         if (configuration.lwt.idx > 0) {
           sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":"

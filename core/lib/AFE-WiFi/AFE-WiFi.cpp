@@ -91,7 +91,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
     }
 
-    //WiFi.persistent(false);
+    // WiFi.persistent(false);
     // WiFi.disconnect(true);
     // WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA);
@@ -127,11 +127,10 @@ void AFEWiFi::listener() {
             WiFi.begin(networkConfiguration.ssid,
                        networkConfiguration.password);
 #ifdef DEBUG
-            Serial << endl
-                   << F("INFO: WIFI: Starting establishing WiFi connection ");
-            Serial << endl
-                   << networkConfiguration.ssid << F(" - ")
-                   << networkConfiguration.password;
+            Serial
+                << endl
+                << F("INFO: WIFI: Starting establishing WiFi connection to: ")
+                << networkConfiguration.ssid;
 #endif
           }
         }

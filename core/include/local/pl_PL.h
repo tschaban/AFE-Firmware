@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _LANG_PL_h
-#define _LANG_PL_h
+#define Connecting via MCP23017 (GPIO above must be set to NONE)
 
 #define L_LANGUAGE "pl-PL"
 #define L_LANGUAGE_SHORT "pl"
@@ -35,7 +35,7 @@
 #define L_UPGRADED_TO_NEW_VERSION  "Została zainstalowana nowa wersja AFE Firmware"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna konfiguracja urządzenia."
 
-#define L_DONATE "&#128077; Wesprzyj jeśli soft Ci się przydał"
+#define L_DONATE "&#128077; Używasz AFE?<br>Rozważ wsparcie kilku tysięcy godzin, które poświęciłem, żeby zrobić to oprogramowanie dla Ciebie. Dzięki."
 
 /* Menu */
 #define L_HARDWARE "Sprzęt"
@@ -94,8 +94,10 @@
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
 #define L_INDEX_NORMAL_MODE "Tryb normalny"
 #define L_INDEX_HOTSPOT_MODE "Tryb HotSpot"
-#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Uruchom: Panel Konfiguracyjny"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Urządzenie jest w trybie operacyjnym"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
 #define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
+
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
@@ -248,9 +250,7 @@
 #define L_UPGRADE_INFO                                                         \
   "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "           \
   "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj " \
-  "urządzenia przez co najmniej 1min.<br>Urządzenie formatuje pamięć i "   \
-  "wgrywa "                                                                    \
-  "domyślne ustawienia.<br><strong>Ten proces nie może zostać "             \
+  "urządzenia przez co najmniej 1min.<br>Ustawienia urządzenia będą aktualizowane<br><strong>Ten proces nie może zostać "             \
   "przerwany</strong>"
 #define L_UPGRADE "Aktualizuj"
 #define L_UPGRADE_DONT_PLUG_OFF                                                        \
@@ -462,5 +462,6 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
 #define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
 #define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
-#endif
+
+#endif // _LANG_PL_h
 

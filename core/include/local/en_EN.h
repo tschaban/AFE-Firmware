@@ -35,7 +35,7 @@
 #define L_UPGRADED_TO_NEW_VERSION  "Firmware has been upgraded to a newer version"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE "Firmware has been upgraded to a new type. Device reconfiguration is required."
 
-#define L_DONATE "&#128077; Donate if you found this useful"
+#define L_DONATE "&#128077; Like it? Consider supporting thousands of hours I've spent on developing it so far. thx"
 
 /* Menu */
 #define L_HARDWARE "Hardware"
@@ -53,7 +53,7 @@
 #define L_ANALOG_INPUT "Analog Input"
 #define L_FIRMWARE_UPGRADE "Firmware upgrade"
 #define L_RESET_DEVICE "Reset to orginal state"
-#define L_FINISH_CONFIGURATION "Finish configuration"
+#define L_FINISH_CONFIGURATION "&#10004; Finish configuration"
 #define L_INFORMATION "INFORMATION"
 #define L_DOCUMENTATION "Documentation"
 #define L_SETTINGS "Settings"
@@ -62,6 +62,8 @@
 #define L_NETWORK_CONNECTED "Connected"
 #define L_DISCONNECTED "Disconnected"
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
+#define L_INTERFACE "Interfaces"
+
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "chars"
@@ -93,7 +95,8 @@
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
 #define L_INDEX_NORMAL_MODE "Normal mode"
 #define L_INDEX_HOTSPOT_MODE "HotSpot Mode"
-#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Launch: Configuration Panel"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Device is in operations mode"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
 
 /* Form: device coniguration */
@@ -106,13 +109,15 @@
 #define L_DEVICE_NUMBER_OF_SWITCHES "Number of switches"
 #define L_DEVICE_NUMBER_OF_CONTACTRONS "Number of magnetic's sensors"
 #define L_DEVICE_NUMBER_OF_CONTROLLED_GATES "Number of controlled gates/doors"
-#define L_DEVICE_NUMBER_OF_HPMA115S0_SENSORS "HPMA115S0 Sensor"
-#define L_DEVICE_NUMBER_OF_BMEX80_SENSORS "Number of BMEx80 Sensors"
-#define L_DEVICE_NUMBER_OF_BH1750_SENSORS "Number of BH1750 Sensors"
-#define L_DEVICE_NUMBER_OF_AS3935_SENSORS "Number of AS3935 Sensors"
-#define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Number of DS18B20 sensors"
+#define L_DEVICE_NUMBER_OF_HPMA115S0_SENSORS "HPMA115S0 sensor"
+#define L_DEVICE_NUMBER_OF_BMEX80_SENSORS "Number of BMEx80's sensors"
+#define L_DEVICE_NUMBER_OF_BH1750_SENSORS "Number of BH1750's sensors"
+#define L_DEVICE_NUMBER_OF_AS3935_SENSORS "Number of AS3935's sensors"
+#define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Number of DS18B20's sensors"
 #define L_DEVICE_NUMBER_OF_REGULATORS "Number of regulators"
 #define L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS "Number of thermal protectors"
+#define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Number of binary's sensors"
+
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
 #define L_DEVICE_CONTROLLING "Device controlling mechanism"
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
@@ -122,6 +127,7 @@
 #define L_DEVICE_DOMOTICZ_VERSION_410 "4.10x or older"
 #define L_DEVICE_DOMOTICZ_VERSION_2020 "2020.x or newer"
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
+
 
 /* Form: network configuration */
 #define L_NETWORK_CONFIGURATION "WiFi Configuration"
@@ -150,6 +156,11 @@
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 #define L_MQTT_TIMEOUT "Timeout"
+#define L_MQTT_RETAIN_SECTION "MQTT Topics retain settings"
+#define L_MQTT_RETAIN_SECTION_INFO "Sent messages will be retian by the MQTT Broker and automatically published to every client subscribing to them"
+#define L_MQTT_RETAIN_LWT "Retain LWT messsage"
+#define L_MQTT_RETAIN_ALL "Retain all messages"
+
 
 /* Form: Domoticz server configuration */
 #define L_DOMOTICZ_PROTOCOL "Protocol"
@@ -183,8 +194,6 @@
 #define L_RELAY_TRIGGERED_HIGH_SIGNAL "HIGH Signal"
 #define L_RELAY_TRIGGERED_LOW_SIGNAL "LOW Signal"
 
-
-
 /* Form: Thermal protection */
 #define L_THERMAL_PROTECTOR "Thermal protection"
 #define L_THERMAL_PROTECTOR_ENABLED "Enabled at startup"
@@ -205,6 +214,16 @@
 #define L_SWITCH_SENSITIVENESS_HINT "Sensitiveness should be adjusted if switch didn't behave as expected while pressing it"
 #define L_SWITCH_BUTTON "Switch / Button"
 #define L_SWITCH_MQTT_TOPIC "MQTT Topic to monitor the state of the switch"
+
+/* Form: Binary sensor */
+#define L_BINARY_SENSOR "Binary sensor"
+#define L_BINARY_SENSORS "Binary sensors"
+#define L_BINARY_SENSOR_MCP23017_CONNECTION "Sensor can be connected directly to the ESP's GPIO or through MCP23017 expander"
+#define L_BINARY_SENSOR_MQTT_TOPIC "MQTT topic to monitor binary's sensor status"
+#define L_BINARY_SENSOR_SENT_REVERTED_STATE "Invert the input signal"
+#define L_BINARY_PULLUP_RESISTOR "Turn on the internal resistor (PULLUP)"
+#define L_BINARY_SEND_AS_SWITCH "Send sensor state using ON/OFF values"
+#define L_BINARY_SEND_AS_SWITCH_HINT "Default: OPEN/CLOSED"
 
 /* Form: Analog Input */
 #define L_ADC_CANT_CHANGE "can't be set"
@@ -228,8 +247,7 @@
 #define L_UPGRADE_INFO                                                         \
   "Device will be automatically rebooted after "                               \
   "upgrade<br><br><strong>Warning</strong>: after upgrade do not plug off "    \
-  "the device from power source for around a minute.<br>Device's memory will " \
-  "be formatted and default settings will be uploaded.<br><strong>This "       \
+  "the device from power source for around a minute.<br>Device configuration requires an update<br><strong>This "       \
   "process cannot be interrupted</strong>"
 #define L_UPGRADE "Upgrade"
 #define L_UPGRADE_DONT_PLUG_OFF                                                        \
@@ -251,7 +269,7 @@
 #define L_UPGRADE_RESTORING_DEFAULT_SETTING "Restoring to default settings"
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
-#define L_UPGRADE_REBOOT "Device reboot"
+#define L_UPGRADE_REBOOT "Rebooting"
 
 /* Form: password */
 #define L_PASSWORD_SET_PASSWORD "Set password"
@@ -435,4 +453,14 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PRESSURE_IDX_ALT "Sensor: altitude"
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Relative pressure"
 
-#endif
+/* MCP32017 */
+#define L_MCP23017_CONNECTION "Connection"
+#define L_MCP23017_LED_CONNECTION "LED can be connected directly to ESP's GPIO or through MCP23017 expander"
+#define L_MCP23107_LED_ADDITIONAL_SETTINGS "Additional settings"
+#define L_MCP23017_RELAY_CONNECTION "Relay can be connected directly to ESP's GPIO or through MCP23017 expander"
+#define L_MCP23017_RELAY_TRIGGERED "Relay triggered by"
+#define L_MCP23017_SWITCH_CONNECTION "Switch can be connected directly to ESP's GPIO or through MCP23017 expander"
+#define L_MCP23017_CONNECTION_VIA_MCP "If connection is made via MCP23017 (GPIO above must be set to NONE)"
+
+#endif // _LANG_EN_h
+

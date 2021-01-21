@@ -333,7 +333,7 @@
 
 /* ---- 4xRelay MCP23017 ---- */
 #elif defined(T4_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.4.0.B4"
+#define AFE_FIRMWARE_VERSION "2.5.0"
 #define AFE_FIRMWARE_TYPE 4
 
 #define AFE_FILE_SYSTEM AFE_FS_SPIFFS
@@ -845,7 +845,7 @@
 #define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_REVERT_SIGNAL false
 #define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_SENT_AS_SWITCH false
 #define AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR true
-#define AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH 200
+#define AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH 19 // {"state":"closed"}
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 /* DS18B20 Sensor */
@@ -860,8 +860,7 @@
 #define AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_TEMPERATURE_CORRECTION 0
 #define AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH 8
 #define AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT 10000
-#define AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH                                \
-  46 // {"temperature":{"value":-999.999,"unit":"C"}}
+#define AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH 46 // {"temperature":{"value":-999.999,"unit":"C"}}
 #endif
 
 /* DHxx sesnors like DHT21,DHT22 */
@@ -1255,30 +1254,22 @@ typedef enum {
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
 #define AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT "0"
 #define AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT "999999"
-#define AFE_CONFIG_API_HTTP_TIMEOUT                                            \
-  200 // Time for HTTP response. If 5000 than device goes to config mode if
+#define AFE_CONFIG_API_HTTP_TIMEOUT  200 // Time for HTTP response. If 5000 than device goes to config mode if
       // Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN                                       \
-  "domoticz/in" // MQTT Topic for outgoing from AFE messages
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT                                      \
-  "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE                                        \
-  380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in" // MQTT Topic for outgoing from AFE messages
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE  380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
       // messages that contains description
-#define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH                              \
-  57 // Outgoing MQTT message size for switch
-#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH                              \
-  70 // Outgoing MQTT message size for custom sensor
+#define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 57 // Outgoing MQTT message size for switch
+#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70 // Outgoing MQTT message size for custom sensor
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH                                \
-  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH                          \
-  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#define AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
@@ -1294,13 +1285,11 @@ typedef enum {
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#define AFE_CONFIG_API_JSON_REGULATOR_COMMAND_LENGTH                           \
-  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH // it's a switch
+#define AFE_CONFIG_API_JSON_REGULATOR_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH // it's a switch
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH                   \
-  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH // it's a switch
+#define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH // it's a switch
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -1311,8 +1300,12 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_DHT_COMMAND_LENGTH 200
 #endif
 
-#define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH                                     \
-  190 // Outgoing url size for statuses updates to Domoticz
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#define AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
+#endif 
+
+
+#define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH  190 // Outgoing url size for statuses updates to Domoticz
 
 #ifdef AFE_CONFIG_HUMIDITY
 /* Humidity Domoticz state*/

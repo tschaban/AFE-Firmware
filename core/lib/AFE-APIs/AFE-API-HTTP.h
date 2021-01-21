@@ -156,9 +156,8 @@ private:
   AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
-      /* Classifies and invokes code for HTTP request processing */
-      void
-      processRequest(HTTPCOMMAND *);
+  /* Classifies and invokes code for HTTP request processing */
+  void processRequest(HTTPCOMMAND *);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void processRelay(HTTPCOMMAND *);

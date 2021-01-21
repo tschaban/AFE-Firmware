@@ -24,16 +24,22 @@ private:
   I2CPORT _I2C;
   AFEI2CScanner _I2CScanner;
 
+  /* Adds to item to the cache */
+  void add(uint8_t address);
+
 public:
   Adafruit_MCP23017 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
 
   /* Constructors */
   AFEMCP23017Broker();
 
+  /* Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
+   * connected
+   * to MCP */
   void begin(AFEDataAccess *, AFEDevice *);
-  uint8_t getId(uint8_t address);
-  void add(uint8_t address);
-};
 
+  /* Gets ID of the MCP based on it's address. Used for caching */
+  uint8_t getId(uint8_t address);
+};
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 #endif // _AFE_MCP23107_Broker_h

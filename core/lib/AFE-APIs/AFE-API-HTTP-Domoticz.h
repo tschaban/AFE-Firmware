@@ -139,7 +139,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   virtual void addClass(AFESensorBinary *);
   boolean publishBinarySensorState(uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_SWITCH
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 
 };

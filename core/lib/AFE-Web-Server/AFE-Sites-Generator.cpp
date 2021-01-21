@@ -2718,7 +2718,7 @@ void AFESitesGenerator::siteExit(String &page, uint8_t command) {
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   DEVICE configuration;
   configuration = Device->configuration;
-  openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL), F(""));
+  openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL), F(L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT));
   if (!authorized) {
     page.concat(F("<h3>"));
     page.concat(F(L_INDEX_WRONG_PASSWORD));
