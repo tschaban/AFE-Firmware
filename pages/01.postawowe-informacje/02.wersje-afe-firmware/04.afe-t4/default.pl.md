@@ -17,7 +17,7 @@ recaptchacontact:
 * do 32 przycisków: mono/bi-stabilnych
 * do 32 diod LED
 * do 32 czujników dwustanowych (PIR, Magnetyczny, kontaktron itp)
-* do 1 czujnika DS18B20   [w wersji PRO](/postawowe-informacje/wersja-pro)
+* do 1 czujnika DS18B20 [w wersji PRO](/postawowe-informacje/wersja-pro)
 * 1 wejście do przetwarzania sygnałów analogowo-cyfrowych - [w wersji PRO](/postawowe-informacje/wersja-pro)
 
 **API**
@@ -26,14 +26,15 @@ recaptchacontact:
 * Domoticz HTTP API
 * Domoticz MQTT API
 
-** Funkcje **
-* Możliwość dokonania korekty wartości czujnika DS18B20
+** Wybrane Funkcje **
 * Sterowanie przekaźnikiem bezprzewodowo przez sieć WiFi 
 * Ustawiania stanu początkowego przekaźnika po uruchomieniu
+* Przekaźnik wyzwalany niskim lub wysokim stanem
 * Ustawienie stany przekaźnika po podłączeniu się do brokera MQTT
 * Automatyczne wyłączanie przekaźnika po zadanym czasie
 * Sterowanie przekaźnikiem zewnętrznym włącznikiem/przyciskiem mono (dzwonkowym) lub bistabilnymi
 * LED może informwać o stanie przekaźnika
+* Możliwość dokonania korekty wartości czujnika DS18B20
 * Odczyty z przetwornika analogowo-cyfrowego [[w wersji PRO](/postawowe-informacje/wersja-pro)]
 * Obsługa wiadomości LWT (dla MQTT)
 * Konfiguracji przechowywania wiadomości MQTT przez broker (MQTT Retain)
