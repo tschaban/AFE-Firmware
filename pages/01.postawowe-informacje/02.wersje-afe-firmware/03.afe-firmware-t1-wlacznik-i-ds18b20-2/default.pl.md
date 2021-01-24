@@ -1,5 +1,5 @@
 ---
-title: 'T4 - Rozszerzona o ekspander MCP23017'
+title: 'T4 - ekspander MCP23017'
 published: true
 recaptchacontact:
     enabled: false
