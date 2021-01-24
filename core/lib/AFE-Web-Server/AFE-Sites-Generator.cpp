@@ -968,7 +968,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   char value[4];
   Data->getConfiguration(id, &configuration);
 
-  openSection(page, L_REGULATOR, "");
+  openSection(page, F(L_REGULATOR), F(""));
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -1078,7 +1078,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, "Domoticz", L_DOMOTICZ_NO_IF_IDX_0);
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
@@ -1089,7 +1089,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, L_REGULATOR_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+      openSection(page, F(L_REGULATOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
       closeSection(page);
@@ -1106,8 +1106,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   char value[4];
   Data->getConfiguration(id, &configuration);
 
-  openSection(page, L_THERMAL_PROTECTORS,
-              L_THERMAL_PROTECTOR_AUTOMATIC_SWITCHING_OFF);
+  openSection(page, F(L_THERMAL_PROTECTORS),
+              F(L_THERMAL_PROTECTOR_AUTOMATIC_SWITCHING_OFF));
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
@@ -1168,7 +1168,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, "Domoticz", L_DOMOTICZ_NO_IF_IDX_0);
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
@@ -1179,7 +1179,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, L_THERMAL_PROTECTOR_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+      openSection(page, F(L_THERMAL_PROTECTOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
       closeSection(page);
@@ -1420,7 +1420,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   char _text[13];
 
   sprintf(_text, "DHT: #%d", id + 1);
-  openSection(page, _text, "");
+  openSection(page, _text, F(""));
 
   /* Item: GPIO */
   addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
@@ -1464,7 +1464,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   closeSection(page);
 
   /* Item: Unit */
-  openSection(page, L_UNITS, "");
+  openSection(page, F(L_UNITS), F(""));
   addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
   addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
                                               AFE_TEMPERATURE_UNIT_CELSIUS);
@@ -1474,7 +1474,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   closeSection(page);
 
   /* Item: Corrections of sensor values */
-  openSection(page, L_CORRECTIONS, "");
+  openSection(page, F(L_CORRECTIONS), F(""));
   sprintf(_number, "%-.3f", configuration.temperature.correction);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "tc", L_TEMPERATURE,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999",
@@ -1489,7 +1489,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, "Domoticz", L_DOMOTICZ_NO_IF_IDX_0);
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
 
     sprintf(_number, "%d", configuration.domoticz.temperature.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i1", L_TEMPERATURE_IDX,
@@ -1543,7 +1543,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, L_DHT_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+      openSection(page, F(L_DHT_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "m", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
 
@@ -2948,7 +2948,7 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
 
   char _value[20];
 
-  openSection(page, L_REGULATOR_REGULATION, "");
+  openSection(page, F(L_REGULATOR_REGULATION), F(""));
   page.concat(FPSTR(HTTP_ITEM_REGULATOR));
   page.replace("{{L_REGULATOR_TURN_IF}}", F(L_REGULATOR_TURN_ON_IF));
   page.replace("{{item.selected-0}}",

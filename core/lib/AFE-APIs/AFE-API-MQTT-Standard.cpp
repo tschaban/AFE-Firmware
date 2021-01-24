@@ -321,10 +321,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    Mqtt.subscribe(_DHTSensor[i]->mqttCommandTopic);
-    if (strlen(_DHTSensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_DHTSensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _DHTSensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _DHTSensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DHT;
       currentCacheSize++;
@@ -927,11 +929,8 @@ boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
     if (strlen(_BinarySensor[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state",
-              _BinarySensor[id]->configuration.mqtt.topic);
       publishStatus = Mqtt.publish(
-          mqttStateTopic,
+          _BinarySensor[id]->configuration.mqtt.topic,
           _BinarySensor[id]->get() == 1
               ? _BinarySensor[id]->configuration.sendAsSwitch ? "off" : "open"
               : _BinarySensor[id]->configuration.sendAsSwitch ? "on"

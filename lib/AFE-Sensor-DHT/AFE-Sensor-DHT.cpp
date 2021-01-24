@@ -34,28 +34,6 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Serial << "DONE";
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Defining get and state MQTT Topics */
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = AFE_EMPTY_STRING;
-  }
-
-#ifdef DEBUG
-  Serial << endl
-         << "INFO: DHT: MQTT Topic [state]: " << mqttStateTopic
-         << ", [cmd]:" << mqttCommandTopic;
-#endif
-
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
   _initialized = true;
 }
 
