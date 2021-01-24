@@ -8,7 +8,7 @@ recaptchacontact:
 **Firmware umożliwia**
 
 * sterowanie bezprzewodowo do trzydziestu dwóch urządzeń / układów elektrycznych z wykorzystaniem ekspandera portów MCP23017 pracującego na sznine IIC
-* obsługę jeden czujnik DS18B20 [w wersji PRO][postawowe-informacje/wersja-pro]
+* obsługę jeden czujnik DS18B20 [w wersji PRO][/postawowe-informacje/wersja-pro]
 
 **Sprzęt:**
 * ESP8286/8285 1Mb do 4Mb
@@ -17,7 +17,7 @@ recaptchacontact:
 * do 32 przycisków: mono/bi-stabilnych
 * do 32 diod LED
 * do 32 czujników dwustanowych (PIR, Magnetyczny, kontaktron itp)
-* do 1 czujnika DS18B20  [w wersji PRO][postawowe-informacje/wersja-pro]
+* do 1 czujnika DS18B20  [w wersji PRO][/postawowe-informacje/wersja-pro]
 * 1 wejście do przetwarzania sygnałów analogowo-cyfrowych - [w wersji PRO](/postawowe-informacje/wersja-pro)
 
 **API**
