@@ -2747,6 +2747,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
       configuration->interval = root["interval"];
       configuration->unit = root["unit"];
       configuration->sendOnlyChanges = root["sendOnlyChanges"];
+      configuration->resolution = root["resolution"] | AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -2813,6 +2814,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
     root["interval"] = configuration->interval;
     root["unit"] = configuration->unit;
     root["sendOnlyChanges"] = configuration->sendOnlyChanges;
+    root["resolution"] = configuration->resolution;
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration->mqtt.topic;
 #else
@@ -2853,7 +2856,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
   configuration.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
   configuration.sendOnlyChanges =
       AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_SENDING_ONLY_CHANGES;
-
+  configuration.resolution = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif

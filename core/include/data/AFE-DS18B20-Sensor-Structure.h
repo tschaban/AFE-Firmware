@@ -23,6 +23,7 @@ struct DS18B20 {
   uint32_t interval;
   uint8_t unit;
   boolean sendOnlyChanges;
+  uint8_t resolution;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
