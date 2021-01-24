@@ -995,7 +995,7 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
 boolean AFEAPIMQTTDomoticz::publishBinarySensorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
-    char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];
+    char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH];
 
     generateSwitchMessage(json, _BinarySensor[id]->configuration.domoticz.idx,
                           _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF

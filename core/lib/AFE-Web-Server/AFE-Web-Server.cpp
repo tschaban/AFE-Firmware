@@ -232,7 +232,7 @@ void AFEWebServer::generate(boolean upload) {
           10; // adds additional 10sec for a reboot to be finished
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Setting auto-logout to ") << siteConfig.rebootTime
+             << F("INFO: SITE: Setting auto-logout to ") << siteConfig.rebootTime
              << F("seconds");
 #endif
     }
@@ -498,7 +498,7 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Firmware upgrade. Update: ")
+             << F("INFO: UPGRADE: Firmware file name: ")
              << upload.filename.c_str();
 #endif
 
@@ -506,10 +506,19 @@ void AFEWebServer::generate(boolean upload) {
           (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
 
 #ifdef DEBUG
-      Serial << endl << F("INFO: Sketch size: ") << ESP.getSketchSize();
       Serial << endl
-             << F("INFO: Free sketch size: ") << ESP.getFreeSketchSpace();
-      Serial << endl << F("INFO: Max sketch space: ") << maxSketchSpace;
+             << F("INFO: UPGRADE: Firmware size: ")
+             << (ESP.getSketchSize() / 1024) << "kb";
+      Serial << endl
+             << F("INFO: UPGRADE: Free space size: ")
+             << (ESP.getFreeSketchSpace() / 1024) << "kb";
+      Serial << endl
+             << F("INFO: UPGRADE: Max free space size for this hardware: ")
+             << (maxSketchSpace / 1024) << "kb";
+
+      Serial << endl
+             << F("INFO: UPGRADE: Flash size: ") << (ESP.getSketchSize() / 1024)
+             << "kb";
 #endif
 
       if (!Update.begin(maxSketchSpace)) { // start with max available size
@@ -528,6 +537,7 @@ void AFEWebServer::generate(boolean upload) {
 
       if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 #ifdef DEBUG
+        Serial << endl;
         Update.printError(Serial);
 #endif
         upgradeFailed = true;
@@ -537,9 +547,9 @@ void AFEWebServer::generate(boolean upload) {
                               // progress
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: Update Success. Firmware size: ") << upload.totalSize
+               << F("INFO: UPGRADE: Success. Firmware size: ") << upload.totalSize
                << endl
-               << F("INFO: Rebooting...");
+               << F("INFO: UPGRADE:  Rebooting...");
 #endif
       } else {
 #ifdef DEBUG
@@ -550,13 +560,14 @@ void AFEWebServer::generate(boolean upload) {
     } else if (upload.status == UPLOAD_FILE_ABORTED) {
       Update.end();
 #ifdef DEBUG
-      Serial << endl << F("ERROR: Update was aborted");
+      Serial << endl << F("ERROR: UPGRADE: Update was aborted");
 #endif
     }
     delay(0);
   } else {
 
 #ifdef DEBUG
+/*
     Serial << endl
            << F("INFO: Generating ")
            << (siteConfig.twoColumns ? F("Two Columns") : F("One Column"))
@@ -566,12 +577,13 @@ void AFEWebServer::generate(boolean upload) {
     Serial << F(", Reboot: ") << (siteConfig.reboot ? F("Yes") : F("No"));
     Serial << F(", Mode: ") << siteConfig.rebootMode;
     Serial << F(", Time: ") << siteConfig.rebootTime;
+*/    
 #endif
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Starting generating HTTP-Response. ") << endl
-           << F("INFO: HEAP: Available: ") << system_get_free_heap_size() / 1024
+           << F("INFO: SITE: Starting generating HTTP-Response. ") << endl
+           << F("INFO: MEMORY: Available: ") << system_get_free_heap_size() / 1024
            << F("kB");
 #endif
 
@@ -580,14 +592,14 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: HEAP: After mem allocation for HTTP response : ")
+           << F("INFO: MEMORY: After mem allocation for HTTP response : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
     generateSite(&siteConfig, page);
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: HEAP: Post HTTP response generation : ")
+           << F("INFO: MEMORY: Post HTTP response generation : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
 
@@ -595,7 +607,7 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: HEAP: After HTTP response published : ")
+           << F("INFO: MEMORY: After HTTP response published : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
   }
@@ -690,7 +702,7 @@ void AFEWebServer::listener() {
 #ifdef DEBUG
       Serial << endl
              << endl
-             << F("INFO: Automatic logout from the config panel after : ")
+             << F("INFO: SITE: Automatic logout from the config panel after : ")
              << Device->configuration.timeToAutoLogOff
              << F("min. of idle time");
 #endif
@@ -707,12 +719,12 @@ void AFEWebServer::publishHTML(const String &page) {
 
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Site streaming started. To transfer: ")
+         << F("INFO: SITE: Streaming started. To transfer: ")
          << (pageSize / 1024) << F("kB");
 
   if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
     Serial << endl
-           << F("ERROR: Page size buffor ") << AFE_MAX_PAGE_SIZE
+           << F("ERROR: SITE: Buffor ") << AFE_MAX_PAGE_SIZE
            << F("B too small : ") << pageSize << F(" ... ");
   }
 #endif
@@ -723,7 +735,7 @@ void AFEWebServer::publishHTML(const String &page) {
   Serial << endl
          << F("INFO: MEMORY: Free :  size after sending Header: ")
          << system_get_free_heap_size() / 1024 << F("kB") << endl
-         << F("INFO: Transfering site over TCP.");
+         << F("INFO: SITE: Transfering site over TCP");
 #endif
 
   server.send(200, "text/html", page);
@@ -754,7 +766,7 @@ void AFEWebServer::publishHTML(const String &page) {
 */
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Site published");
+  Serial << endl << F("INFO: SITE: Published");
 #endif
 
   if ((Device->getMode() == AFE_MODE_CONFIGURATION ||

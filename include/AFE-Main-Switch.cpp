@@ -25,7 +25,7 @@ void initializeSwitch(void) {
 #endif
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: Switch(es) initialized");
+  Serial << endl << F("INFO: BOOT: Switch(es) initialized");
 #endif
 }
 

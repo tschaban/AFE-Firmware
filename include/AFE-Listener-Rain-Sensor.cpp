@@ -18,14 +18,14 @@ void initializeRainSensor(void) {
                       newRainImpulse, RISING);
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Interrupt attached to GPIO: ")
+             << F("INFO: RAINMETER: Interrupt attached to GPIO: ")
              << RainSensor.configuration.gpio;
 #endif
     }
 #ifdef DEBUG
     else {
       Serial << endl
-             << F("ERROR: Interrupt NOT attached to GPIO: ")
+             << F("ERROR: RAINMETER: Interrupt NOT attached to GPIO: ")
              << RainSensor.configuration.gpio;
     }
 #endif

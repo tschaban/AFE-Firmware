@@ -16,12 +16,32 @@ void setup() {
          << endl
          << F("INFO: All classes and global variables initialized") << endl
          << F("INFO: Initializing device") << endl;
+
+  Serial << endl << "INFO: ESP: ID " << ESP.getFlashChipId();
+  Serial << endl << "INFO: ESP: Real flash size: ";
+  if (ESP.getFlashChipRealSize() >= 1048576) {
+    Serial << (ESP.getFlashChipRealSize() / 1048576) << " Mbits";
+  } else {
+    Serial << (ESP.getFlashChipRealSize() / 1024) << " Kbits";
+  }
+
+  Serial << endl << "INFO: ESP: Flesh size: ";
+  if (ESP.getFlashChipSize() >= 1048576) {
+    Serial << (ESP.getFlashChipSize() / 1048576) << " Mbits";
+  } else {
+    Serial << (ESP.getFlashChipSize() / 1024) << " Kbits";
+  }
+
+  Serial << endl
+         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000) << " MHz";
+  Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
+
 #endif
 
   // Erase all config
   ESP.eraseConfig();
 #ifdef DEBUG
-  Serial << F("INFO: ESP Config erased");
+  Serial << F("INFO: ESP: Erasing internally stored configuration") << endl;
 #endif
 
 /* Initializing SPIFFS file system */
@@ -34,10 +54,10 @@ void setup() {
 
   if (_fileSystemReady) {
 #ifdef DEBUG
-    Serial << F("INFO: File system: mounted. Performs a quick garbage "
+    Serial << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
                 "collection operation on SPIFFS");
   } else {
-    Serial << F("ERROR: File system not mounted");
+    Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
     yield();
     SPIFFS.gc();
@@ -48,7 +68,7 @@ void setup() {
 /* Checking if the device is launched for a first time. If so it loades
  * default configuration */
 #ifdef DEBUG
-  Serial << endl << F("INFO: Checking if first time launch ... ");
+  Serial << endl << F("INFO: FIRMWARE: Checking if first time launch ... ");
 #endif
 
   if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
@@ -75,7 +95,7 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Checking, if WiFi was configured: ");
+  Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -85,22 +105,22 @@ void setup() {
 /* Checking if the firmware has been upgraded */
 #ifdef DEBUG
     Serial << F("NO") << endl
-           << F("INFO: Checking if firmware should be upgraded?");
+           << F("INFO: FIRMWARE: Checking if firmware should be upgraded?");
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
-      Serial << endl << F("WARN: Firmware is not up2date. Upgrading...");
+      Serial << endl << F("WARN: FIRMWARE: Up2date. Upgrading...");
 #endif
       Upgrader->upgrade();
 #ifdef DEBUG
-      Serial << endl << F("INFO: Firmware upgraded");
+      Serial << endl << F("INFO: FIRMWARE: Upgraded");
 #endif
     }
 #ifdef DEBUG
     else {
-      Serial << endl << F("INFO: Firmware is up2date");
+      Serial << endl << F("INFO: FIRMWARE: up2date");
     }
 #endif
     delete Upgrader;
@@ -111,7 +131,7 @@ void setup() {
       /* Initializing relay */
       initializeRelay();
 #ifdef DEBUG
-      Serial << endl << F("INFO: Relay(s) initialized");
+      Serial << endl << F("INFO: BOOT: Relay initialized");
 #endif
     }
 #endif
@@ -125,11 +145,11 @@ void setup() {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Network initialized");
+  Serial << endl << F("INFO: BOOT: Network initialized");
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Starting network");
+  Serial << endl << F("INFO: BOOT: Starting network");
 #endif
   Network.listener();
 
@@ -193,17 +213,16 @@ void setup() {
     initializeBinarySensor();
 #endif
 
-#if defined(T3_CONFIG)
-    /* Initializing PIRs */
-    initPIR();
-#ifdef DEBUG
-    Serial << endl << F("PIR initialized");
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+    initializeAnemometerSensor();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+    initializeRainSensor();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    if (Device.getMode() == AFE_MODE_NORMAL &&
-        Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
+    if (Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
       AnalogInput.begin();
     }
 #endif
@@ -237,44 +256,35 @@ void setup() {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    initializeAnemometerSensor();
-  }
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    initializeRainSensor();
-  }
-#endif
-
 #ifdef DEBUG
   Serial << endl
-         << F("################################################################"
+         << F("############################################################"
+              "####"
               "########")
          << endl
-         << F("#                           BOOTING COMPLETED                   "
+         << F("#                           BOOTING COMPLETED               "
+              "    "
               "       #")
          << endl
-         << F("#                            STARTING DEVICE                    "
+         << F("#                            STARTING DEVICE                "
+              "    "
               "       #");
   if (Device.getMode() != AFE_MODE_NORMAL) {
     Serial << endl
-           << F("#                           CONFIGURATION MODE                "
+           << F("#                           CONFIGURATION MODE            "
+                "    "
                 "         #");
   }
 
   Serial << endl
-         << F("################################################################"
+         << F("############################################################"
+              "####"
               "########");
 
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
-         << String(system_get_free_heap_size() / 1024) << "kB";              
+         << String(system_get_free_heap_size() / 1024) << "kB";
 #endif
-
-
 }
 
 void loop() {
@@ -363,7 +373,8 @@ void loop() {
     yield();
     Network.listener();
 
-    /** Here: Code that will be run no matter if connected or disconnected from
+    /** Here: Code that will be run no matter if connected or disconnected
+     * from
      * Network / MQTT Broker
      * Works for device in Normal or Configuration mode: (excluding: HotSpot
      * mode) */

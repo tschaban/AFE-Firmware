@@ -19,7 +19,7 @@ void initializeGate(void) {
       Relay[Gate[i].configuration.relayId].gateId = i;
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: For a RelayID: ") << Gate[i].configuration.relayId
+             << F("INFO: GATE: For a RelayID: ") << Gate[i].configuration.relayId
              << F(" setting GateID: ") << i;
 #endif
     }
@@ -29,13 +29,13 @@ void initializeGate(void) {
       Contactron[Gate[i].getContactronId(j)].gateId = i;
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: For a ContactronID: ") << Gate[i].getContactronId(j)
+             << F("INFO: GATE: For a ContactronID: ") << Gate[i].getContactronId(j)
              << F(" setting GateID: ") << i;
 #endif
     }
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: Gate: ") << i << F(" initialized");
+    Serial << endl << F("INFO: GATE: ") << i << F(" initialized");
 #endif
   }
 }

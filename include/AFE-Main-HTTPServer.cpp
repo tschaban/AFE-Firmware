@@ -42,6 +42,6 @@ void initializeHTTPServer(void) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: HTTP Server initialized");
+  Serial << endl << F("INFO: BOOT: HTTP Server initialized");
 #endif
 }

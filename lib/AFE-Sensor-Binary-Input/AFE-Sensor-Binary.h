@@ -22,7 +22,7 @@ private:
   boolean _initialized = false;
   boolean _detected = false;
   unsigned long startTime = 0;
-  byte state;
+  byte state; // stores actual sensor state
 
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -35,7 +35,6 @@ private:
 public:
   BINARY_SENSOR configuration;
 
-
   /* Constructors */
   AFESensorBinary();
 
@@ -46,8 +45,12 @@ public:
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 
+  /* Get state of the sensor */
   byte get(void);
+
+  /* Listens for state changes, taking into account bouncing */
   boolean listener(void);
+
     /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 };

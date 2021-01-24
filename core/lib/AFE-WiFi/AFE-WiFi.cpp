@@ -39,7 +39,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 // WiFi.setPhyMode(WIFI_PHY_MODE_11B);
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: WiFi: Phisical mode mode (1:B 2:G 3:N): ")
+         << F("INFO: WIFI: Phisical mode mode (1:B 2:G 3:N): ")
          << WiFi.getPhyMode();
 #endif
 
@@ -91,7 +91,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
     }
 
-    //WiFi.persistent(false);
+    // WiFi.persistent(false);
     // WiFi.disconnect(true);
     // WiFi.mode(WIFI_OFF);
     WiFi.mode(WIFI_STA);
@@ -127,11 +127,10 @@ void AFEWiFi::listener() {
             WiFi.begin(networkConfiguration.ssid,
                        networkConfiguration.password);
 #ifdef DEBUG
-            Serial << endl
-                   << F("INFO: WIFI: Starting establishing WiFi connection ");
-            Serial << endl
-                   << networkConfiguration.ssid << F(" - ")
-                   << networkConfiguration.password;
+            Serial
+                << endl
+                << F("INFO: WIFI: Starting establishing WiFi connection to: ")
+                << networkConfiguration.ssid;
 #endif
           }
         }
@@ -153,7 +152,7 @@ void AFEWiFi::listener() {
           delay(10);
 #ifdef DEBUG
           Serial << endl
-                 << F("INFO: WiFi connection attempt: ") << connections
+                 << F("INFO: WIFI connection attempt: ") << connections
                  << F(" from ") << networkConfiguration.noConnectionAttempts
                  << F(", IP(") << WiFi.localIP() << F(")") << F(" WL-Status=")
                  << WiFi.status();
@@ -193,7 +192,7 @@ void AFEWiFi::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: WiFi: Connection established") << F(", MAC: ")
+               << F("INFO: WIFI: Connection established") << F(", MAC: ")
                << WiFi.macAddress() << F(", IP: ") << WiFi.localIP();
 #endif
       }
