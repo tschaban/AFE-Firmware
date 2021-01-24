@@ -13,12 +13,12 @@ void contractonEventsListener(void);
 /* Method initialize contactrons */
 void initializeContracton() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Initializing contractons");
+  Serial << endl << F("INFO: BOOT: Initializing contractons");
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
     Contactron[i].begin(i, &Device, &Data);
 #ifdef DEBUG
-    Serial << endl << F("INFO: Contactron: ") << i << F(" initialized");
+    Serial << endl << F("INFO: BOOT: Contactron: ") << i << F(" initialized");
 #endif
   }
 }

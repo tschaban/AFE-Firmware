@@ -35,7 +35,7 @@
 #define L_UPGRADED_TO_NEW_VERSION  "Firmware has been upgraded to a newer version"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE "Firmware has been upgraded to a new type. Device reconfiguration is required."
 
-#define L_DONATE "&#128077; Like it? Consider supporting thousands of hours I've spent on developing it so far. thx"
+#define L_DONATE "&#128077; Like it? Consider supporting hundreds of hours I've spent on developing it so far. thx"
 
 /* Menu */
 #define L_HARDWARE "Hardware"

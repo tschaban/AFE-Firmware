@@ -34,7 +34,7 @@ void initializeMQTTAPI(void) {
       Device.configuration.api.mqtt) {
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API: Initializing MQTT");
+    Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -128,7 +128,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API: MQTT init completed");
+    Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif
   }
 }
@@ -138,7 +138,7 @@ void initializeHTTPAPI(void) {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT) {
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API: Initializing MQTT");
+    Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -226,7 +226,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API: HTTP init completed");
+    Serial << endl << F("INFO: BOOT: API: HTTP init completed");
 #endif
   }
 }
@@ -330,7 +330,7 @@ void initializeHTTPDomoticzAPI(void) {
 
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API: MQTT init completed");
+    Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif
   }
 }

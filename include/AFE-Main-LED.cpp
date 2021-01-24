@@ -25,9 +25,9 @@ void initializeLED(void) {
     }
 #ifdef DEBUG
     if (initialized) {
-      Serial << endl << F("INFO: System LED initialized");
+      Serial << endl << F("INFO: BOOT: System LED initialized");
     } else {
-      Serial << endl << F("WARN: System LED NOT initialized");
+      Serial << endl << F("WARN: BOOT: System LED NOT initialized");
     }
 #endif // DEBUG
   }

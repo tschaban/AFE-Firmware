@@ -4,8 +4,8 @@
 /* Set this before run */
 
 $type = "4";
-$version = "2.4.0.B4";
-$language = "PL";
+$version = "2.5.0";
+$language = "EN";
 
 /******************/
 
@@ -73,7 +73,7 @@ $index++;
 
 // Domoticz API
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_1m-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266";
 $sourceFolder[$index]["size"] = "1Mb";
 $sourceFolder[$index]["hardware"] = 0;
@@ -88,21 +88,21 @@ $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266";
 $sourceFolder[$index]["size"] = "4Mb";
 $sourceFolder[$index]["hardware"] = 0;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-generic-domoticz-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8266_4m-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
 $sourceFolder[$index]["size"] = "4Mb";
 $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 $index++;
 
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8285_1m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_8285_1m-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = "ESP8285";
 $sourceFolder[$index]["size"] = "1Mb";
 $sourceFolder[$index]["hardware"] = 0;

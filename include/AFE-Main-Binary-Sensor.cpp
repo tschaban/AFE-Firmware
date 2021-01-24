@@ -19,7 +19,7 @@ void initializeBinarySensor(void) {
     BinarySensor[i].begin(i, &Data);
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: Binary sensors initialized");
+  Serial << endl << F("INFO: BOOT: Binary sensors initialized");
 #endif
 }
 

@@ -35,7 +35,7 @@
 #define L_UPGRADED_TO_NEW_VERSION  "Została zainstalowana nowa wersja AFE Firmware"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna konfiguracja urządzenia."
 
-#define L_DONATE "&#128077; Używasz AFE?<br>Rozważ wsparcie kilku tysięcy godzin, które poświęciłem, żeby zrobić to oprogramowanie dla Ciebie. Dzięki."
+#define L_DONATE "&#128077; Używasz AFE?<br>Rozważ wsparcie setek godzin pracy, które włożyłem, żeby zrobić to oprogramowanie. Dzięki."
 
 /* Menu */
 #define L_HARDWARE "Sprzęt"

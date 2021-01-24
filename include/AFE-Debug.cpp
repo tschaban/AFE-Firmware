@@ -21,14 +21,14 @@ void debugListener() {
 
 void getAvailableMem() {
   Serial << endl
-         << F("INFO: Free Memory = ") << system_get_free_heap_size() / 1024 << F("kB");
+         << F("INFO: MEMORY = ") << system_get_free_heap_size() / 1024 << F("kB");
 }
 
 void getFileSystemInfo() {
   FSInfo fileSystem;
   SPIFFS.info(fileSystem);
   Serial << endl
-         << F("INFO: File system. Used: ") << fileSystem.usedBytes / 1024 << F("kB from ")
+         << F("INFO: FILES SYSTEM. Used: ") << fileSystem.usedBytes / 1024 << F("kB from ")
          << fileSystem.totalBytes / 1024 << F("kB")
          << F(" Max.open files ") << fileSystem.maxOpenFiles;
 }

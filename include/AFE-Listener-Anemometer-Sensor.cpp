@@ -19,14 +19,14 @@ void initializeAnemometerSensor(void) {
           newWindImpulse, RISING);
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: Interrupt attached to GPIO: ")
+             << F("INFO: ANEMOMETER: Interrupt attached to GPIO: ")
              << AnemometerSensor.configuration.gpio;
 #endif
     }
 #ifdef DEBUG
     else {
       Serial << endl
-             << F("ERROR: Interrupt NOT attached to GPIO: ")
+             << F("ERROR: ANEMOMETER: Interrupt NOT attached to GPIO: ")
              << AnemometerSensor.configuration.gpio;
     }
 #endif
