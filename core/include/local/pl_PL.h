@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #ifndef _LANG_PL_h
-#define Connecting via MCP23017 (GPIO above must be set to NONE)
+#define _LANG_PL_h
 
 #define L_LANGUAGE "pl-PL"
 #define L_LANGUAGE_SHORT "pl"
