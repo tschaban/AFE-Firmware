@@ -366,6 +366,11 @@
 #define L_DS18B20_MQTT_TOPIC "MQTT Temat informacji z czujnika DS18B20"
 #define L_DS18B20_SEARCH "Skanuj GPIO"
 #define L_DS18B20_NO_SENSOR "Żaden czujnik nie został jeszcze znaleziony. Sprawdź, czy jest poprawnie podłączony, a następnie przeskanuj GPIO"
+#define L_DS18B20_RESOLUTION "Rozdzielczość"
+#define L_DS18B20_RESOLUTION_9B "Niska (9bit)"
+#define L_DS18B20_RESOLUTION_10B "Dostateczna (10bit)"
+#define L_DS18B20_RESOLUTION_11B "Dobra (11bit)"
+#define L_DS18B20_RESOLUTION_12B "Wysoka (12bit)"
 
 /* DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT

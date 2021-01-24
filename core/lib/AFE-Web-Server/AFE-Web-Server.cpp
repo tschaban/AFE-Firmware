@@ -232,8 +232,8 @@ void AFEWebServer::generate(boolean upload) {
           10; // adds additional 10sec for a reboot to be finished
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: SITE: Setting auto-logout to ") << siteConfig.rebootTime
-             << F("seconds");
+             << F("INFO: SITE: Setting auto-logout to ")
+             << siteConfig.rebootTime << F("seconds");
 #endif
     }
 
@@ -547,8 +547,8 @@ void AFEWebServer::generate(boolean upload) {
                               // progress
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: UPGRADE: Success. Firmware size: ") << upload.totalSize
-               << endl
+               << F("INFO: UPGRADE: Success. Firmware size: ")
+               << upload.totalSize << endl
                << F("INFO: UPGRADE:  Rebooting...");
 #endif
       } else {
@@ -577,14 +577,14 @@ void AFEWebServer::generate(boolean upload) {
     Serial << F(", Reboot: ") << (siteConfig.reboot ? F("Yes") : F("No"));
     Serial << F(", Mode: ") << siteConfig.rebootMode;
     Serial << F(", Time: ") << siteConfig.rebootTime;
-*/    
+*/
 #endif
 
 #ifdef DEBUG
     Serial << endl
            << F("INFO: SITE: Starting generating HTTP-Response. ") << endl
-           << F("INFO: MEMORY: Available: ") << system_get_free_heap_size() / 1024
-           << F("kB");
+           << F("INFO: MEMORY: Available: ")
+           << system_get_free_heap_size() / 1024 << F("kB");
 #endif
 
     String page;
@@ -1419,6 +1419,10 @@ void AFEWebServer::get(DS18B20 &data) {
                                            : AFE_TEMPERATURE_UNIT_CELSIUS;
 
   data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
+
+  data.resolution = server.arg("r").length() > 0
+                        ? server.arg("r").toInt()
+                        : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx = server.arg("x").length() > 0 ? server.arg("x").toInt()

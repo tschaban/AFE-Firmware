@@ -12,28 +12,15 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   Sensor.setOneWire(&WireBUS);
   Sensor.begin();
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  /* Defining get and state MQTT Topics */
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttStateTopic[0] = AFE_EMPTY_STRING;
-  }
-
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
   if (Sensor.isConnected(configuration.address)) {
     _initialized = true;
+     Sensor.setResolution(configuration.resolution);
 #ifdef DEBUG
     char addressTxt[17];
     addressToChar(configuration.address, addressTxt);
-    Serial << endl << "INFO: Sensor DS18B20[" << addressTxt << "] initialized";
+    Serial << endl << "INFO: Sensor DS18B20[" << addressTxt << "] initialized";    
+    Serial << endl << "INFO: Sensor DS18B20[" << addressTxt << "] resolution: " << Sensor.getResolution() << " bits";
+
 #endif
   } else {
     _initialized = false;

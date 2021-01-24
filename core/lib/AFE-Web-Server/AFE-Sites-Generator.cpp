@@ -1179,7 +1179,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   }
 #else
     if (Device->configuration.api.mqtt) {
-      openSection(page, F(L_THERMAL_PROTECTOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+      openSection(page, F(L_THERMAL_PROTECTOR_MQTT_TOPIC),
+                  F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
       closeSection(page);
@@ -1383,6 +1384,19 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
                           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS);
   addSelectOptionFormItem(page, "F", "2", configuration.unit ==
                                               AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+  addSelectFormItemClose(page);
+
+  /* Item: Resolution */
+  addSelectFormItemOpen(page, "r", L_DS18B20_RESOLUTION);
+  addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_9B, "9",
+                          configuration.resolution == 9);
+  addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_10B, "10",
+                          configuration.resolution == 10);
+  addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_11B, "11",
+                          configuration.resolution == 11);
+  addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_12B, "12",
+                          configuration.resolution == 12);
+
   addSelectFormItemClose(page);
 
   closeSection(page);
@@ -2718,7 +2732,8 @@ void AFESitesGenerator::siteExit(String &page, uint8_t command) {
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   DEVICE configuration;
   configuration = Device->configuration;
-  openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL), F(L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT));
+  openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL),
+              F(L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT));
   if (!authorized) {
     page.concat(F("<h3>"));
     page.concat(F(L_INDEX_WRONG_PASSWORD));

@@ -280,10 +280,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    Mqtt.subscribe(_DS18B20Sensor[i]->mqttCommandTopic);
-    if (strlen(_DS18B20Sensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_DS18B20Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _DS18B20Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _DS18B20Sensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DS18B20;
       currentCacheSize++;
@@ -293,10 +295,12 @@ void AFEAPIMQTTStandard::subscribe() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    Mqtt.subscribe(_Regulator[i]->mqttCommandTopic);
-    if (strlen(_Regulator[i]->mqttCommandTopic) > 0) {
+    if (strlen(_Regulator[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _Regulator[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _Regulator[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_REGULATOR;
       currentCacheSize++;
@@ -306,10 +310,12 @@ void AFEAPIMQTTStandard::subscribe() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    Mqtt.subscribe(_ThermalProtector[i]->mqttCommandTopic);
-    if (strlen(_ThermalProtector[i]->mqttCommandTopic) > 0) {
+    if (strlen(_ThermalProtector[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _ThermalProtector[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _ThermalProtector[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type =
           AFE_MQTT_DEVICE_THERMAL_PROTECTOR;
@@ -815,9 +821,13 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
 boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    publishStatus =
-        Mqtt.publish(_Regulator[id]->mqttStateTopic,
-                     _Regulator[id]->configuration.enabled ? "on" : "off");
+    if (strlen(_Regulator[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _Regulator[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic, _Regulator[id]->configuration.enabled ? "on" : "off");
+    }
   }
   return publishStatus;
 }
@@ -851,9 +861,15 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    publishStatus = Mqtt.publish(
-        _ThermalProtector[id]->mqttStateTopic,
-        _ThermalProtector[id]->configuration.enabled ? "on" : "off");
+
+    if (strlen(_ThermalProtector[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _ThermalProtector[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic,
+          _ThermalProtector[id]->configuration.enabled ? "on" : "off");
+    }
   }
   return publishStatus;
 }
