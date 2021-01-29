@@ -98,7 +98,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.4.1"
+#define AFE_FIRMWARE_VERSION "2.5.1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -1311,7 +1311,7 @@ typedef enum {
 } afe_humidity_domoticz_state_t;
 #endif
 
-#else // Defauals for None-Domotucz MQTT
+#else // Defauals for None-Domoticz MQTT
 
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
 #define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH 69 // Size of a Command topic: MQTT_BASIC_CONFIG + 4
@@ -1321,13 +1321,15 @@ typedef enum {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Defaults for each MQTT Version (standard and domoticz) */
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
-       // down
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
 #define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT false
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL false
+#define AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION false
+#define AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER 1
+#define AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT 1000 // ms
 
 /* ***************** Files: Config and defaults *********************/
 

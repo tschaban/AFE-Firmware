@@ -12,7 +12,7 @@
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "dla Sonoff Basic"
 #elif defined(T0_CONFIG)
-#define L_FIRMWARE_NAME "WŁĄCZNIK WIFI"
+#define L_FIRMWARE_NAME "Wersja podstawowa"
 #elif defined(T1_CONFIG)
 #define L_FIRMWARE_NAME "Włącznik z czujnikiem temperatury"
 #elif defined(T2_CONFIG)
@@ -154,11 +154,15 @@
 #define L_MQTT_IDX_LWT "IDX dla wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
-#define L_MQTT_TIMEOUT "Limit czasu odpowiedzi"
+#define L_MQTT_TIMEOUT "Jak długo czekać na odpowiedź z serwera"
 #define L_MQTT_RETAIN_SECTION "Zapamiętywanie wiadomości w MQTT Broker"
 #define L_MQTT_RETAIN_SECTION_INFO "Wysłane wiadomości zostaną zapamiętana przez serwer i będą automatycznie wysłana do każdego kto zasubskrybuje dany temat."
 #define L_MQTT_RETAIN_LWT "Pamiętaj LWT"
 #define L_MQTT_RETAIN_ALL "Pamiętaj wszystkie wiadomości"
+#define L_MQTT_CONNECTION "Konfiguracja łączenia"
+#define L_MQTT_CONNECTION_HINT "Włącz sprawdzanie dostępności serwera w sieci LAN, jeśli urządzenie musi działać, gdy serwer jest niedostępny. Możesz dodatkowo zmnieszyć lub zwiększyć czas oczekiwania na odpowiedź z serwera"
+#define L_MQTT_USE_PING "Sprawdzić dostępność serwera przed połączeniem?"
+#define L_MQTT_USE_PING_HINT "Serwer nie może blokować poleceń PING"
 
 /* Form: Domoticz server configuration */
 #define L_DOMOTICZ_PROTOCOL "Protokół"
