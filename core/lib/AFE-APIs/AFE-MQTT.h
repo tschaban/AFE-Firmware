@@ -6,6 +6,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
+#include <AsyncPing.h>
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 
@@ -33,12 +34,15 @@ private:
   char *_DeviceName;
   NETWORK _NetworkConfiguration;
 
+  AsyncPing Pings;
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
   unsigned long _ledStartTime = 0;
 #endif
 
   unsigned long _sleepStartTime = 0;
+  unsigned long _pingStartTime = 0;
   boolean _sleepMode = false;
   boolean _isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
@@ -60,6 +64,9 @@ private:
   /* Method turns off MQTT API */
   void disconnect();
 
+  /* Check if host is available */
+  void pingHost(void);
+
 public:
   MQTT_MESSAGE message;
   WiFiClient esp;
@@ -74,7 +81,6 @@ public:
 #endif
   void begin(AFEDataAccess *, char *);
 
-
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
  * default values */
   boolean listener();
@@ -87,7 +93,6 @@ public:
 
   /* Methods subsribes to topic in the MQTT Broker */
   void subscribe(const char *);
-
 };
 
 #endif

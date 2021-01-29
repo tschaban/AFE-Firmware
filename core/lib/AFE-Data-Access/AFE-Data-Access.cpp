@@ -1191,6 +1191,9 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
           root["retainLWT"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
       configuration->retainAll =
           root["retainAll"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
+      configuration->pingHostBeforeConnection =
+          root["pingHostBeforeConnection"] |
+          AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION;
 
 #ifdef DEBUG
       Serial << endl
@@ -1255,6 +1258,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     root["timeout"] = configuration->timeout;
     root["retainAll"] = configuration->retainAll;
     root["retainLWT"] = configuration->retainLWT;
+    root["pingHostBeforeConnection"] = configuration->pingHostBeforeConnection;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1284,22 +1288,24 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   Serial << endl
          << F("INFO: Creating file: ") << AFE_FILE_MQTT_BROKER_CONFIGURATION;
 #endif
-  MQTT MQTTConfiguration;
+  MQTT configuration;
   /* MQTT Default config */
-  MQTTConfiguration.host[0] = AFE_EMPTY_STRING;
-  MQTTConfiguration.ip[0] = AFE_EMPTY_STRING;
-  MQTTConfiguration.user[0] = AFE_EMPTY_STRING;
-  MQTTConfiguration.password[0] = AFE_EMPTY_STRING;
-  MQTTConfiguration.port = AFE_CONFIG_MQTT_DEFAULT_PORT;
+  configuration.host[0] = AFE_EMPTY_STRING;
+  configuration.ip[0] = AFE_EMPTY_STRING;
+  configuration.user[0] = AFE_EMPTY_STRING;
+  configuration.password[0] = AFE_EMPTY_STRING;
+  configuration.port = AFE_CONFIG_MQTT_DEFAULT_PORT;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTTConfiguration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  MQTTConfiguration.lwt.topic[0] = AFE_EMPTY_STRING;
+  configuration.lwt.topic[0] = AFE_EMPTY_STRING;
 #endif
-  MQTTConfiguration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
-  MQTTConfiguration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
-  MQTTConfiguration.retainLWT = AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
-  saveConfiguration(&MQTTConfiguration);
+  configuration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
+  configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
+  configuration.retainLWT = AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
+  configuration.pingHostBeforeConnection =
+      AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION;
+  saveConfiguration(&configuration);
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2747,7 +2753,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
       configuration->interval = root["interval"];
       configuration->unit = root["unit"];
       configuration->sendOnlyChanges = root["sendOnlyChanges"];
-      configuration->resolution = root["resolution"] | AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
+      configuration->resolution =
+          root["resolution"] | AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else

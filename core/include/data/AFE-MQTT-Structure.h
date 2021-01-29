@@ -96,6 +96,7 @@ struct MQTT {
   uint16_t timeout;
   boolean retainLWT;
   boolean retainAll;
+  boolean pingHostBeforeConnection;
 };
 
 #endif

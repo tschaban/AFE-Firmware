@@ -12,7 +12,7 @@
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "for Sonoff Basic"
 #elif defined(T0_CONFIG)
-#define L_FIRMWARE_NAME "WIFI SWITCH"
+#define L_FIRMWARE_NAME "Basic version"
 #elif defined(T1_CONFIG)
 #define L_FIRMWARE_NAME "Switch with temperature sensor"
 #elif defined(T2_CONFIG)

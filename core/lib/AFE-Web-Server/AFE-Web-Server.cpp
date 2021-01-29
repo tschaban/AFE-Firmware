@@ -1014,6 +1014,7 @@ void AFEWebServer::get(MQTT &data) {
 
   data.retainLWT = server.arg("rl").length() > 0 ? true : false;
   data.retainAll = server.arg("ra").length() > 0 ? true : false;
+  data.pingHostBeforeConnection = server.arg("ph").length() > 0 ? true : false;
 }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED

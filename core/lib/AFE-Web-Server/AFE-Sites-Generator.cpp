@@ -655,12 +655,20 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
                    configuration.user, "32");
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "s", L_PASSWORD,
                    configuration.password, "32");
+
+  closeSection(page);
+
+  openSection(page, F(L_MQTT_CONNECTION), F(L_MQTT_CONNECTION_HINT));
+
+  addCheckboxFormItem(page, "ph", L_MQTT_USE_PING, "1",
+                      configuration.pingHostBeforeConnection,L_MQTT_USE_PING_HINT);
+
   sprintf(_number, "%d", configuration.timeout);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_MQTT_TIMEOUT,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "30000", "1",
                    L_MILISECONDS);
-  closeSection(page);
 
+  closeSection(page);
 /* Section: LWT */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   char _idx[7];
