@@ -35,7 +35,7 @@
 #define L_UPGRADED_TO_NEW_VERSION  "Firmware has been upgraded to a newer version"
 #define L_UPGRADED_TO_NEW_VERSION_TYPE "Firmware has been upgraded to a new type. Device reconfiguration is required."
 
-#define L_DONATE "&#128077; Like it? Consider supporting hundreds of hours I've spent on developing it so far. thx"
+#define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx.</small>"
 
 /* Menu */
 #define L_HARDWARE "Hardware"
@@ -160,6 +160,11 @@
 #define L_MQTT_RETAIN_SECTION_INFO "Sent messages will be retian by the MQTT Broker and automatically published to every client subscribing to them"
 #define L_MQTT_RETAIN_LWT "Retain LWT messsage"
 #define L_MQTT_RETAIN_ALL "Retain all messages"
+#define L_MQTT_CONNECTION "Connection configuration"
+#define L_MQTT_CONNECTION_HINT "In case the device must work without MQTT server host availability in the LAN, enable host PING check before establishing a connection to MQTT Broker.  You can aslo set the duration of a timeout per connection attempt. "
+#define L_MQTT_USE_PING "Check if MQTT Server host is reachable in the LAN?"
+#define L_MQTT_USE_PING_HINT "The host cannot block PING command"
+
 
 
 /* Form: Domoticz server configuration */
