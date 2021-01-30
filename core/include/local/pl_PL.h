@@ -384,7 +384,10 @@
 #define L_DHT_MQTT_TOPIC "MQTT Temat informacji z czujnika DHT"
 #define L_DHT_SENSOR_TYPE "Typ czujnika"
 #define L_DHT_AUTO_DETECT "Wykryj automatycznie"
+#endif // AFE_CONFIG_HARDWARE_DHT
 
+
+#if defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY) 
 const char dewPointPerception_Dry[] PROGMEM = "Dla niektórych trochę sucho";
 const char dewPointPerception_VeryComfy[] PROGMEM = "Bardzo komfortowo";
 const char dewPointPerception_Comfy[] PROGMEM = "Komfortowo";
@@ -406,7 +409,7 @@ const char comfort_TooHumid[] PROGMEM     = "Za wilgotno";
 const char comfort_HotAndHumid[] PROGMEM  = "Gorąco i wilgotno";
 const char comfort_ColdAndHumid[] PROGMEM = "Zimno i wilgotno";
 const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
-#endif // AFE_CONFIG_HARDWARE_DHT
+#endif
 
 
 /* Anemometer Sensor */

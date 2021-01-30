@@ -217,7 +217,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: HTTP requst processed");
+  Serial << endl << F("INFO: HTTP request processed");
 #endif
 }
 

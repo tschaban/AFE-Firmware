@@ -7,7 +7,6 @@
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 #include <arduino.h>
-
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
@@ -15,7 +14,14 @@
 #include <AFE-Sensors-Common.h>
 #include <ArduinoJson.h>
 
-class AFESensorBMEX80 {
+#if AFE_LANGUAGE == 0
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+
+
+class AFESensorBMEX80 : public AFESensorsCommon {
 
 private:
   boolean ready = false;
@@ -32,13 +38,9 @@ public:
   BMEX80 configuration;
   BMEX80_DATA data;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMEX80();
-  
+
   /* Initialization of the sensor */
   void begin(uint8_t id);
 
@@ -52,9 +54,6 @@ public:
    * changes */
   void listener();
 
-#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED) && defined(AFE_CONFIG_HUMIDITY)
-  afe_humidity_domoticz_state_t getDomoticzHumidityState(float value);
-#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80

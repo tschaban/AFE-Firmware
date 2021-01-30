@@ -212,7 +212,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%-.2f;%-.2f;%-d",
                 _BMx80Sensor[id]->data.temperature.value,
                 _BMx80Sensor[id]->data.humidity.value,
-                _BMx80Sensor[id]->getDomoticzHumidityState(
+                _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                     _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx,
@@ -224,7 +224,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%-.2f;%-.2f;%-d;%-.2f;0",
                 _BMx80Sensor[id]->data.temperature.value,
                 _BMx80Sensor[id]->data.humidity.value,
-                _BMx80Sensor[id]->getDomoticzHumidityState(
+                _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                     _BMx80Sensor[id]->data.humidity.value),
                 _BMx80Sensor[id]->data.pressure.value);
         sendCustomSensorCommand(
@@ -234,7 +234,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
       }
 
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(
+        sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                                  _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,

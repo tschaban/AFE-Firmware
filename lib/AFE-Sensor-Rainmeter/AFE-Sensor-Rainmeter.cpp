@@ -12,14 +12,6 @@ boolean AFESensorRainmeter::begin(AFEDataAccess *Data,
   _Sensor = Sensor;
   Data->getConfiguration(&configuration);
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
-
   _initialized = true;
 
   _Sensor->begin(configuration.sensitiveness);

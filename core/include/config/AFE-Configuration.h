@@ -454,7 +454,7 @@
 
 /* ---- Wheater Station ---- */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.3.1"
+#define AFE_FIRMWARE_VERSION "2.5.1.B1"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -463,14 +463,16 @@
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 #define AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
+#define AFE_FILE_SYSTEM AFE_FS_SPIFFS
+
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_HARDWARE_BH1750
 //#define AFE_CONFIG_HARDWARE_AS3935
-#define AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#define AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+//#define AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+//#define AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 /* Max number of hardware items, per AFE version */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 1
@@ -1043,7 +1045,7 @@ typedef enum {
 /* BMx80 Defaults */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL 60
-#define AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH 730
+#define AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH 1195 // {"temperature":{"value":25.0273,"unit":"C","correction":25.0273},"pressure":{"value":993.6063,"unit":"hPa","correction":993.6063},"relativePressure":{"value":1003.809,"unit":"hPa"},"dewPoint":{"value":5.321408,"unit":"C"},"humidity":{"value":281.10078,"unit":"%H","correction":281.10078,"rating":3},"absoluteHumidity":{"value":6.480335,"unit":"%H"},"heatIndex":{"value":24.31934,"unit":"C"},"perception":{"value":0,"description":"W porządku dla większości, ale wszyscy odczuwają wilgoć przy górnej krawędzi"},"comfort":{"value":4,"ratio":84.7268,"unit":"%","description":"Gorąco i wilgotno"},"iaq":{"value":1110,"rating":1,"accuracy":0},"staticIaq":{"value":1110,"rating":1,"accuracy":0},"co2Equivalent":{"value":1400,"unit":"ppm","rating":1,"accuracy":0},"breathVocEquivalent":{"value":0.342646,"unit":"?","accuracy":0},"gasResistance":{"value":2324.371,"unit":"kOm"}}
 #define AFE_BMX_UNKNOWN_SENSOR 255
 #define AFE_BMP180_SENSOR 1
 #define AFE_BME280_SENSOR 2
@@ -1160,30 +1162,16 @@ typedef enum {
 #define AFE_CONFIG_SITE_NETWORK 2
 #define AFE_CONFIG_SITE_MQTT 3
 #define AFE_CONFIG_SITE_MQTT_TOPICS 4
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #define AFE_CONFIG_SITE_DOMOTICZ 5
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-#ifdef AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_SITE_LED 6
 #define AFE_CONFIG_SITE_SYSTEM_LED 7
-#endif // AFE_CONFIG_HARDWARE_LED
-#ifdef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_SITE_RELAY 8
-#endif // AFE_CONFIG_HARDWARE_RELAY
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_SITE_SWITCH 9
-#endif // AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_SITE_PASSWORD 10
 #define AFE_CONFIG_SITE_PRO_VERSION 11
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #define AFE_CONFIG_SITE_ANALOG_INPUT 12
-#endif // FE_CONFIG_HARDWARE_ADC_VCC
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #define AFE_CONFIG_SITE_CONTACTRON 13
-#endif // AFE_CONFIG_HARDWARE_CONTACTRON
-#ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_SITE_GATE 14
-#endif // AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_SITE_EXIT 15
 #define AFE_CONFIG_SITE_RESET 16
 #define AFE_CONFIG_SITE_POST_RESET 17
@@ -1191,45 +1179,20 @@ typedef enum {
 #define AFE_CONFIG_SITE_FIRST_TIME_CONNECTING 19
 #define AFE_CONFIG_SITE_UPGRADE 20
 #define AFE_CONFIG_SITE_POST_UPGRADE 21
-#ifdef AFE_CONFIG_HARDWARE_UART
 #define AFE_CONFIG_SITE_UART 22
-#endif // AFE_CONFIG_HARDWARE_UART
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #define AFE_CONFIG_SITE_HPMA115S0 23
-#endif // AFE_CONFIG_HARDWARE_HPMA115S0
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
 #define AFE_CONFIG_SITE_BMEX80 24
-#endif // AFE_CONFIG_HARDWARE_BMEX80
-#ifdef AFE_CONFIG_HARDWARE_BH1750
 #define AFE_CONFIG_SITE_BH1750 25
-#endif // AFE_CONFIG_HARDWARE_BH1750
-#ifdef AFE_CONFIG_HARDWARE_AS3935
 #define AFE_CONFIG_SITE_AS3935 26
-#endif // AFE_CONFIG_HARDWARE_AS3935
-#ifdef AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_SITE_I2C 27
-#endif // AFE_CONFIG_HARDWARE_I2C
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
 #define AFE_CONFIG_SITE_DS18B20 28
-#endif // AFE_CONFIG_HARDWARE_DS18B20
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 #define AFE_CONFIG_SITE_ANEMOMETER_SENSOR 29
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #define AFE_CONFIG_SITE_RAINMETER_SENSOR 30
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #define AFE_CONFIG_SITE_REGULATOR 31
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #define AFE_CONFIG_SITE_THERMAL_PROTECTOR 32
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#ifdef AFE_CONFIG_HARDWARE_DHT
 #define AFE_CONFIG_SITE_DHT 33
-#endif // AFE_CONFIG_HARDWARE_DHT
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #define AFE_CONFIG_SITE_BINARY_SENSOR 34
-#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 
 
 /* ***************** APIs: Config and defaults *********************/
@@ -1323,7 +1286,7 @@ typedef enum {
 /* Defaults for each MQTT Version (standard and domoticz) */
 #define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
-#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 768 // Default MQTT Buffer size - must handle entire message
+#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 1195 //768 // Default MQTT Buffer size - must handle entire message, max JSON is BME680, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT false
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL false
@@ -1355,8 +1318,7 @@ typedef enum {
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_DATA "/cfg-rainmeter-data-0.json"
 #define AFE_FILE_REGULATOR_CONFIGURATION "/cfg-regulator-%d.json"
-#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION                               \
-  "/cfg-theremal-protector-%d.json"
+#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION "/cfg-theremal-protector-%d.json"
 #define AFE_FILE_DS18B20_SENSOR_CONFIGURATION "/cfg-ds18b20-%d.json"
 #define AFE_FILE_CONTACTRON_CONFIGURATION "cfg-contactron-%d.json"
 #define AFE_FILE_GATE_CONFIGURATION "cfg-gate-%d.json"

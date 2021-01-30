@@ -122,8 +122,8 @@ void AFESensorDHT::getJSON(char *json) {
   strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
 
   sprintf(json, "{\"temperature\":{\"value\":%.1f,\"unit\":\"%s\"},"
-                "\"humidity\":{\"value\":%.1f,\"unit\":\"%%\"},"
-                "\"absoluteHumidity\":{\"value\":%.2f,\"unit\":\"%%\"},"
+                "\"humidity\":{\"value\":%.1f,\"unit\":\"%%H\"},"
+                "\"absoluteHumidity\":{\"value\":%.2f,\"unit\":\"%%H\"},"
                 "\"heatIndex\":{\"value\":%.2f,\"unit\":\"%s\"},\"dewPoint\":{"
                 "\"value\":%.2f,\"unit\":\"%s\"},\"perception\":{\"value\":%d,"
                 "\"description\":\"%s\"},\"comfort\":{\"value\":%d,\"ratio\":%."

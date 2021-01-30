@@ -30,10 +30,6 @@ public:
   BH1750 configuration;
   float data = -1; // stories lux value
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructor */
   AFESensorBH1750();
 

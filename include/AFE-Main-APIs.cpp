@@ -67,7 +67,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    MqttAPI.addClass(&ParticleSensor[0]);
+    MqttAPI.addClass(&HPMA115S0Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -165,7 +165,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpAPI.addClass(&ParticleSensor[0]);
+    HttpAPI.addClass(&HPMA115S0Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -268,7 +268,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpDomoticzAPI.addClass(&ParticleSensor[0]);
+    HttpDomoticzAPI.addClass(&HPMA115S0Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750

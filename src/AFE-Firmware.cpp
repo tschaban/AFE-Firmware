@@ -4,7 +4,6 @@ void setup() {
 
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
-  // Serial.setDebugOutput(true);
   delay(10);
 #endif
 

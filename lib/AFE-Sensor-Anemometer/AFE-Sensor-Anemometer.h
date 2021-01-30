@@ -23,10 +23,6 @@ public:
   float lastSpeedKMH =
       0; // used by HTTPs API - stores and gets the lastest value by HTTP API
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructors */
   AFESensorAnemometer();
 

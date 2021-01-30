@@ -170,10 +170,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: BMx80 */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    Mqtt.subscribe(_BMx80Sensor[i]->mqttCommandTopic);
-    if (strlen(_BMx80Sensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_BMx80Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _BMx80Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _BMx80Sensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BMX80;
       currentCacheSize++;
@@ -184,10 +186,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: BH1750 */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    Mqtt.subscribe(_BH1750Sensor[i]->mqttCommandTopic);
-    if (strlen(_BH1750Sensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_BH1750Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _BH1750Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _BH1750Sensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BH1750;
       currentCacheSize++;
@@ -198,10 +202,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    Mqtt.subscribe(_AS3935Sensor[i]->mqttCommandTopic);
-    if (strlen(_AS3935Sensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_AS3935Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _AS3935Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _AS3935Sensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_AS3935;
       currentCacheSize++;
@@ -212,10 +218,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: HPMA115S0 */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    Mqtt.subscribe(_HPMA115S0Sensor[i]->mqttCommandTopic);
-    if (strlen(_HPMA115S0Sensor[i]->mqttCommandTopic) > 0) {
+    if (strlen(_HPMA115S0Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _HPMA115S0Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _HPMA115S0Sensor[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_HPMA115S0;
       currentCacheSize++;
@@ -226,10 +234,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: ANEMOMETER */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   if (_Device->configuration.noOfAnemometerSensors > 0) {
-    Mqtt.subscribe(_AnemometerSensor->mqttCommandTopic);
-    if (strlen(_AnemometerSensor->mqttCommandTopic) > 0) {
+    if (strlen(_AnemometerSensor->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _AnemometerSensor->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _AnemometerSensor->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ANEMOMETER;
       currentCacheSize++;
     }
@@ -239,10 +249,13 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: RAIN */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   if (_Device->configuration.noOfRainmeterSensors > 0) {
-    Mqtt.subscribe(_RainmeterSensor->mqttCommandTopic);
-    if (strlen(_RainmeterSensor->mqttCommandTopic) > 0) {
+
+    if (strlen(_RainmeterSensor->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _RainmeterSensor->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _RainmeterSensor->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RAINMETER;
       currentCacheSize++;
     }

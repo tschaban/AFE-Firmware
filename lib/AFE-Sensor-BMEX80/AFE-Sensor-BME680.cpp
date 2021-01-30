@@ -93,24 +93,6 @@ boolean AFESensorBME680::read() {
     data.co2Equivalent.accuracy = Bme.co2Accuracy;
     data.breathVocEquivalent.value = Bme.breathVocEquivalent;
     data.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
-    /*
-    #ifdef DEBUG
-        Serial << endl
-               << endl
-               << F("INFO: Unused BME sensor data:") << endl
-               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
-               << F(" - rawHumidity: ") << Bme.rawTemperature << endl
-               << F(" - stabStatus: ") << Bme.stabStatus << endl
-               << F(" - runInStatus: ") << Bme.runInStatus << endl
-               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
-               << F(" - gasPercentage: ") << Bme.gasPercentage << endl
-               << F(" - compGasValue: ") << Bme.compGasValue << endl
-               << F(" - compGasAccuracy: ") << Bme.compGasAccuracy << endl
-               << F(" - gasPercentageAcccuracy: ") << Bme.gasPercentageAcccuracy
-               << endl;
-
-    #endif
-    */
     updateState();
     dataInBuffer = true;
   }

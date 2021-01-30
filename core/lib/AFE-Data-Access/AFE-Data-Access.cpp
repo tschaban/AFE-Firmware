@@ -4141,6 +4141,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
           root["idx"]["co2Equivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.breathVocEquivalent.idx =
           root["idx"]["breathVocEquivalent"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.absoluteHumidity.idx =
+          root["idx"]["absoluteHumidity"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.comfort.idx =
+          root["idx"]["comfort"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.perception.idx =
+          root["idx"]["perception"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -4228,6 +4234,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
     idx["co2Equivalent"] = configuration->domoticz.co2Equivalent.idx;
     idx["breathVocEquivalent"] =
         configuration->domoticz.breathVocEquivalent.idx;
+    idx["perception"] = configuration->domoticz.perception.idx;
+    idx["comfort"] = configuration->domoticz.comfort.idx;
+    idx["absoluteHumidity"] = configuration->domoticz.absoluteHumidity.idx;
+
 #endif
     temperature["unit"] = configuration->temperature.unit;
     temperature["correction"] = configuration->temperature.correction;
@@ -4289,6 +4299,9 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.domoticz.staticIaq.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.co2Equivalent.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.breathVocEquivalent.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.perception.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.comfort.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.absoluteHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {

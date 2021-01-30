@@ -3,12 +3,6 @@
 #ifndef _AFE_Sensor_Rainmeter_h
 #define _AFE_Sensor_Rainmeter_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
@@ -31,10 +25,6 @@ public:
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   float rainLevelLast12Hours = 0;
   float rainLevelLast24Hours = 0;
-#endif
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
 
   /* Constructors */

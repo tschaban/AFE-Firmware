@@ -107,6 +107,25 @@ AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
 AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#include <AFE-Sensor-HPMA115S0.h>
+AFESensorHPMA115S0 HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#include <AFE-Sensor-Anemometer.h>
+AFESensorBinary WindImpulse;
+AFESensorAnemometer AnemometerSensor;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#include <AFE-Sensor-Rainmeter.h>
+AFESensorBinary RainImpulse;
+AFESensorRainmeter RainSensor;
+#endif
+
+
+
 #include <AFE-Main-APIs.cpp>
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -165,16 +184,16 @@ AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #include <AFE-Main-Binary-Sensor.cpp>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#include <AFE-Main-HPMA115S0.cpp>
+#endif
+
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-HPMA115S0.h>
-AFESensorHPMA115S0 ParticleSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-Sensor-AS3935.h>
@@ -185,17 +204,6 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #include <AFE-Sensor-Binary.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#include <AFE-Sensor-Anemometer.h>
-AFESensorBinary WindImpulse;
-AFESensorAnemometer AnemometerSensor;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-#include <AFE-Sensor-Rainmeter.h>
-AFESensorBinary RainImpulse;
-AFESensorRainmeter RainSensor;
-#endif
 
 #include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>

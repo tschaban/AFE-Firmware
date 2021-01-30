@@ -1662,6 +1662,18 @@ void AFEWebServer::get(BMEX80 &data) {
   data.domoticz.temperatureHumidity.idx = server.arg("i12").length() > 0
                                               ? server.arg("i12").toInt()
                                               : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.perception.idx = server.arg("i13").length() > 0
+                                     ? server.arg("i13").toInt()
+                                     : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.comfort.idx = server.arg("i14").length() > 0
+                                  ? server.arg("i14").toInt()
+                                  : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.absoluteHumidity.idx = server.arg("i15").length() > 0
+                                           ? server.arg("i15").toInt()
+                                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
