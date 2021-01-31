@@ -431,7 +431,7 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 }
 
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
-                                             char *svalue, uint8_t nvalue) {
+                                             char *svalue, uint16_t nvalue) {
 
   sprintf(
       json,
@@ -589,21 +589,22 @@ boolean AFEAPIMQTTDomoticz::publishHPMA115S0SensorData(uint8_t id) {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
     char value[5];
-    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
-
-      sprintf(value, "%-d", _HPMA115S0Sensor[id]->data.pm25);
-      generateDeviceValue(
-          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value);
-      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    }
 
     if (_HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx > 0) {
 
       sprintf(value, "%-d", _HPMA115S0Sensor[id]->data.pm10);
       generateDeviceValue(
-          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value);
+          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value,_HPMA115S0Sensor[id]->data.pm10);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
+
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
+      sprintf(value, "%-d", _HPMA115S0Sensor[id]->data.pm25);
+      generateDeviceValue(
+          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value, _HPMA115S0Sensor[id]->data.pm25);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+
   }
   return true;
 }
@@ -647,8 +648,8 @@ boolean AFEAPIMQTTDomoticz::publishAS3935SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-void AFEAPIMQTTDomoticz::addClass(AFESensorAnemometer *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+void AFEAPIMQTTDomoticz::addClass(AFEAnemometer *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -668,10 +669,10 @@ void AFEAPIMQTTDomoticz::publishAnemometerSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-void AFEAPIMQTTDomoticz::addClass(AFESensorRainmeter *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+void AFEAPIMQTTDomoticz::addClass(AFERainmeter *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -692,7 +693,7 @@ void AFEAPIMQTTDomoticz::publishRainSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
@@ -988,7 +989,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
+void AFEAPIMQTTDomoticz::addClass(AFEImpulseCatcher *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 

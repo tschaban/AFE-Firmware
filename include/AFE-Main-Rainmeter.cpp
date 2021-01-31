@@ -1,6 +1,16 @@
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 
-void ICACHE_RAM_ATTR newRainImpulse() {
+
+/* ---------Headers ---------*/
+
+void ICACHE_RAM_ATTR newRainImpulse(void);
+void initializeRainmeter(void);
+void rainmeterEventsListener(void);
+
+/* --------- Body -----------*/
+
+
+void ICACHE_RAM_ATTR newRainImpulse(void) {
   static uint32_t lastInterruptionTimeRainSensor = 0;
   uint32_t interruptionTime = millis();
   if (interruptionTime - lastInterruptionTimeRainSensor >
@@ -10,7 +20,7 @@ void ICACHE_RAM_ATTR newRainImpulse() {
   lastInterruptionTimeRainSensor = interruptionTime;
 }
 
-void initializeRainSensor(void) {
+void initializeRainmeter(void) {
   if (Device.configuration.noOfRainmeterSensors > 0) {
     if (RainSensor.begin(&Data, &RainImpulse)) {
       pinMode(RainSensor.configuration.gpio, INPUT_PULLUP);
@@ -32,7 +42,7 @@ void initializeRainSensor(void) {
   }
 }
 
-void rainSensorListener(void) {
+void rainmeterEventsListener(void) {
   if (Device.configuration.noOfRainmeterSensors > 0) {
     if (RainSensor.listener()) {
       MqttAPI.publishRainSensorData();

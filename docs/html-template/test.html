@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
-  <title>AFE Firmware 2.4.0.B3 [T4]</title>
+  <title>AFE Firmware 2.5.1.B1 [T6]</title>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
   <style>
     #l,
@@ -57,8 +57,8 @@
     }
 
     h4 {
-      font-size: 80%;      
-      margin-bottom: 1px;
+      font-size: 80%;
+      margin-bottom: 1px
     }
 
     .lst {
@@ -67,20 +67,21 @@
       padding: 0
     }
 
-    .itm a, .itm i {
+    .itm a,
+    .itm i {
       display: block;
       white-space: nowrap;
-      padding: .0em 1em;
+      padding: 0 1em;
       color: #777;
       font-size: 80%
     }
 
     .itm i {
-      font-weight: bold;
-      padding-top: 0.5em;
+      font-weight: 700;
+      padding-top: .5em
     }
 
-   .cf label,
+    .cf label,
     .hint,
     input,
     select {
@@ -92,7 +93,7 @@
     .itm a:hover {
       background-color: #aaa;
       text-decoration: none;
-      padding: .0em 1.5em;
+      padding: 0 1.5em;
       color: #000
     }
 
@@ -105,14 +106,15 @@
       border-bottom: 1px solid #ddd;
       font-size: 110%;
       font-weight: 500;
+      margin-bottom: 0;   
     }
 
     .ci .cd {
       color: #aaa;
-      line-height: 0em;
       font-size: 80%;
       font-style: italic;
       margin-bottom: 2em;
+      margin-top: 0;
     }
 
     .cm {
@@ -154,7 +156,7 @@
     }
 
     .cc {
-      margin: 0em 0 .1em 9.4em
+      margin: 0 0 .1em 9.4em
     }
 
     .cf label {
@@ -205,201 +207,104 @@
   </style>
 </head>
 
-<body><img src="http://api.smartnydom.pl/logo/T4/2.4.0.B3/5CebCF98-7Fd3D37f/0" style="width: 100%;display: block"
+<body><img src="http://api.smartnydom.pl/logo/T6/2.5.1.B1/84e5F3eb-EB6464eb/0" style="width: 100%;display: block"
     alt="AFE Firmware">
   <div id="c">
     <div id="l">
-      <h4>z expanderem MCP23017</h4>
+      <h4>Weather Station</h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=1">Urządzenie</a></li>
-        <li class="itm"><a href="/?o=2">Sieć WiFi</a></li>
+        <li class="itm"><a href="/?o=1">Device</a></li>
+        <li class="itm"><a href="/?o=2">Network</a></li>
         <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
       </ul>
-      <h4>&#10150; Sprzęt</h4>
+      <h4>&#10150; Hardware</h4>
       <ul class="lst">
-        <li class="itm"><i>LEDy</i></li>
+        <li class="itm"><i>LEDs</i></li>
         <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
-        <li class="itm"><i>Konfiguracja przekaźników</i></li>
-        <li class="itm"><a href="/?o=8&i=0">&#8227; Przekaźnik: 1</a></li>
-        <li class="itm"><a href="/?o=8&i=1">&#8227; Przekaźnik: 2</a></li>
-        <li class="itm"><a href="/?o=8&i=2">&#8227; Przekaźnik: 3</a></li>
-        <li class="itm"><a href="/?o=8&i=3">&#8227; Przekaźnik: 4</a></li>
-        <li class="itm"><a href="/?o=8&i=4">&#8227; Przekaźnik: 5</a></li>
-        <li class="itm"><i>Przyciski</i></li>
-        <li class="itm"><a href="/?o=9&i=0">&#8227; Przycisk: 1</a></li>
-        <li class="itm"><a href="/?o=9&i=1">&#8227; Przycisk: 2</a></li>
-        <li class="itm"><a href="/?o=9&i=2">&#8227; Przycisk: 3</a></li>
-        <li class="itm"><a href="/?o=27">I2C</a></li>
+        <li class="itm"><a href="/?o=23">PM2.5/PM10 Particle Sensor</a></li>
       </ul>
-      <h4>&#10150; Funkcje</h4>
+      <h4>&#10150; Interfaces</h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=7">LED systemowy</a></li>
+        <li class="itm"><a href="/?o=27">I2C</a></li>
+        <li class="itm"><a href="/?o=22">UART</a></li>
+      </ul>
+      <h4>&#10150; Functionalities</h4>
+      <ul class="lst">
+        <li class="itm"><a href="/?o=7">System LED</a></li>
       </ul>
       <h4>&#10150; Firmware</h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=10">Ustaw hasło</a></li>
-        <li class="itm"><a href="/?o=20">Aktualizacja oprogramowania</a></li>
-        <li class="itm"><a href="/?o=16">Ustawienia początkowe</a></li>
-        <li class="itm"><a href="/?o=11">Wersja PRO</a></li>
+        <li class="itm"><a href="/?o=10">Set password</a></li>
+        <li class="itm"><a href="/?o=20">Firmware upgrade</a></li>
+        <li class="itm"><a href="/?o=16">Reset to orginal state</a></li>
+        <li class="itm"><a href="/?o=11">PRO Version</a></li>
       </ul>
       <h4></h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=15">&#10004; Zakończ konfigurację</a></li>
+        <li class="itm"><a href="/?o=15">&#10004; Finish configuration</a></li>
       </ul>
     </div>
     <div id="r">
-      <form method="post" action="/?c=1&o=1">
+      <form method="post" action="/?c=1&o=3">
         <div class="ci">
-          <h1>Urządzenie</h1>
-          <p class="cd">Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako nazwa
-            hotspot'a urządzenia</p>
+          <h1>MQTT Broker</h1>
+          <p class="cd">Enter MQTT Broker hostname or its IP address</p>
           <fieldset>
-            <div class="cf"><label>Nazwa urządzenia</label><input name="n" type="text" maxlength="16" value="T4"><span
-                class="hint">Max 16 znaków</span></div>
+            <div class="cf"><label>Hostname</label><input name="h" type="text" maxlength="32" value=""><span
+                class="hint">Max 32 chars</span></div>
+            <div class="cf"><label>Address IP</label><input name="a" type="text" value="192.168.2.146"></div>
+            <div class="cf"><label>Port</label><input name="p" type="number" min="0" max="65535" step="1"
+                value="1883"><span class="hint">Range 0 - 65535</span></div>
+            <div class="cf"><label>User name</label><input name="u" type="text" maxlength="32" value="device"><span
+                class="hint">Max 32 chars</span></div>
+            <div class="cf"><label>Password</label><input name="s" type="password" maxlength="32"
+                value="Device#221!2021"><span class="hint">Max 32 chars</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Konfiguracja urządzenia</h1>
-          <p class="cd">Wybierz podłączone elementy do urządzenia</p>
+          <h1>Connection configuration</h1>
+          <p class="cd">In case the device must work without MQTT server host availability in the LAN, enable host PING
+            check before establishing a connection to MQTT Broker. You can aslo set the duration of a timeout per
+            connection attempt. </p>
           <fieldset>
-            <div class="cf"><label>Ilość Led'ów</label><select name="l">
-                <option value="0">Brak</option>
-                <option value="1" selected="selected">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                <option value="21">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-                <option value="24">24</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="28">28</option>
-                <option value="29">29</option>
-                <option value="30">30</option>
-                <option value="31">31</option>
-                <option value="32">32</option>
-              </select></div>
-            <div class="cf"><label>Ilość przekaźników</label><select name="r">
-                <option value="0">Brak</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5" selected="selected">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                <option value="21">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-                <option value="24">24</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="28">28</option>
-                <option value="29">29</option>
-                <option value="30">30</option>
-                <option value="31">31</option>
-                <option value="32">32</option>
-              </select></div>
-            <div class="cf"><label>Ilość przycisków</label><select name="s">
-                <option value="0">Brak</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3" selected="selected">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-                <option value="11">11</option>
-                <option value="12">12</option>
-                <option value="13">13</option>
-                <option value="14">14</option>
-                <option value="15">15</option>
-                <option value="16">16</option>
-                <option value="17">17</option>
-                <option value="18">18</option>
-                <option value="19">19</option>
-                <option value="20">20</option>
-                <option value="21">21</option>
-                <option value="22">22</option>
-                <option value="23">23</option>
-                <option value="24">24</option>
-                <option value="25">25</option>
-                <option value="26">26</option>
-                <option value="27">27</option>
-                <option value="28">28</option>
-                <option value="29">29</option>
-                <option value="30">30</option>
-                <option value="31">31</option>
-                <option value="32">32</option>
-              </select></div>
-            <div class="cc"><label><input name="ad" type="checkbox" value="1" disabled="disabled">Pomiary z wejścia
-                analogowego</label><span class="hint">(Wersja PRO)</span></div>
+            <div class="cc"><label><input name="ph" type="checkbox" value="1" checked="checked">Check if MQTT Server
+                host is reachable in the LAN?</label><span class="hint">(The host cannot block PING command)</span>
+            </div>
+            <div class="cf"><label>Timeout</label><input name="t" type="number" min="0" max="30000" step="1"
+                value="5000"><span class="hint">Range 0 - 30000 milisekonds</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Sterowanie urządzeniem</h1>
-          <p class="cd">Włączanie / Wyłączanie mechanizmów sterowania urządzeniem</p>
+          <h1>LWT's Topic</h1>
+          <p class="cd">If left empty, message won't be sent to MQTT Broker</p>
           <fieldset>
-            <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP API</label></div>
-            <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT API</label></div>
+            <div class="cf"><label>Topic</label><input name="t0" type="text" maxlength="64" value="t6/lwt"><span
+                class="hint">Max 64 chars</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Automatyczne zakończenie konfiguracji</h1>
-          <p class="cd">Konfiguracja urządzenia zostanie automatycznie wyłączona po 10min. braku akcji w panelu
-            konfiguracyjnym</p>
+          <h1>MQTT Topics retain settings</h1>
+          <p class="cd">Sent messages will be retian by the MQTT Broker and automatically published to every client
+            subscribing to them</p>
           <fieldset>
-            <div class="cc"><label><input name="al" type="checkbox" value="1">włączone</label></div>
+            <div class="cc"><label><input name="rl" type="checkbox" value="1" checked="checked">Retain LWT
+                messsage</label></div>
+            <div class="cc"><label><input name="ra" type="checkbox" value="1">Retain all messages</label></div>
           </fieldset>
-        </div><input type="submit" class="b bs" value="Zapisz">
+        </div><input type="submit" class="b bs" value="Save">
       </form>
     </div>
   </div>
   <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
-        src="https://img.shields.io/badge/Pomoc-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/pl"
-      target="_blank"><img src="https://img.shields.io/badge/Pomoc-Dokumentacja-green.svg" alt="Dokumentacja" /></a> <a
-      href="https://afe.smartnydom.pl/pl/pliki-to-pobrania/historia-zmian" target="_blank"><img
-        src="https://img.shields.io/badge/Wersja%20-%202.4.0.B3[T4]-blue.svg" alt="T4-2.4.0.B3" /></a> <img
+        src="https://img.shields.io/badge/Help-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/en"
+      target="_blank"><img src="https://img.shields.io/badge/Help-Documentation-green.svg" alt="Documentation" /></a> <a
+      href="https://afe.smartnydom.pl/en/pliki-to-pobrania/historia-zmian" target="_blank"><img
+        src="https://img.shields.io/badge/Version%20-%202.5.1.B1[T6]-blue.svg" alt="T6-2.5.1.B1" /></a> <img
       src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 0" /> <img
       src="https://img.shields.io/badge/API-Standard-yellow.svg" /> <img
-      src="https://img.shields.io/badge/PRO-Nie-orange.svg" alt="PRO" /> <img
-      src="https://img.shields.io/badge/Heap-17KB-9cf.svg" alt="PRO" /> <img
-      src="https://img.shields.io/badge/Size-1Mb-yellowgreen.svg" /></div>
+      src="https://img.shields.io/badge/PRO-No-orange.svg" alt="PRO" /> <img
+      src="https://img.shields.io/badge/Mem-21KB-9cf.svg" alt="PRO" /> <img
+      src="https://img.shields.io/badge/Size-4Mb-yellowgreen.svg" /></div>
 </body>
 
 </html>

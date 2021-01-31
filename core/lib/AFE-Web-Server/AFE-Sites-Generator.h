@@ -240,7 +240,7 @@ public:
   void siteAS3935Sensor(String &page, uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void siteAnemometerSensor(String &page);
 #endif
 
@@ -256,7 +256,7 @@ public:
   void siteI2CBUS(String &page);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void siteRainmeterSensor(String &page);
 #endif
 

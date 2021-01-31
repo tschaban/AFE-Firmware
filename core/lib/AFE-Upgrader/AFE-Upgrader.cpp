@@ -245,10 +245,10 @@ void AFEUpgrader::upgradeToT5V220() {
 
 #ifdef T6_CONFIG
 void AFEUpgrader::upgradeToT6V230() {
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   Data->createAnemometerSensorConfigurationFile();
 #endif
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   Data->createRainmeterSensorConfigurationFile();
   Data->createRainmeterSensorDataConfigurationFile();
 #endif

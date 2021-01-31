@@ -112,16 +112,20 @@ AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 AFESensorHPMA115S0 HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#include <AFE-Sensor-Anemometer.h>
-AFESensorBinary WindImpulse;
-AFESensorAnemometer AnemometerSensor;
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER) 
+#include <AFE-Impulse-Catcher.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#include <AFE-Sensor-Anemometer.h>
+AFEImpulseCatcher WindImpulse;
+AFEAnemometer AnemometerSensor;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <AFE-Sensor-Rainmeter.h>
-AFESensorBinary RainImpulse;
-AFESensorRainmeter RainSensor;
+AFEImpulseCatcher RainImpulse;
+AFERainmeter RainSensor;
 #endif
 
 
@@ -186,6 +190,14 @@ AFESensorRainmeter RainSensor;
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <AFE-Main-HPMA115S0.cpp>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#include <AFE-Main-Rainmeter.cpp>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#include <AFE-Main-Anemometer.cpp>
 #endif
 
 

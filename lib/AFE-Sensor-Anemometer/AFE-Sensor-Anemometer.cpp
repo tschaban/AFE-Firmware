@@ -2,12 +2,12 @@
 
 #include "AFE-Sensor-Anemometer.h"
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 
-AFESensorAnemometer::AFESensorAnemometer(){};
+AFEAnemometer::AFEAnemometer(){};
 
-boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
-                                   AFESensorBinary *Sensor) {
+boolean AFEAnemometer::begin(AFEDataAccess *Data,
+                                   AFEImpulseCatcher *Sensor) {
   _Data = Data;
   _Sensor = Sensor;
   startTime = millis();
@@ -54,7 +54,7 @@ boolean AFESensorAnemometer::begin(AFEDataAccess *Data,
   return _initialized;
 }
 
-boolean AFESensorAnemometer::listener(void) {
+boolean AFEAnemometer::listener(void) {
   boolean _ret = false;
   if (_initialized) {
     if ((millis() - startTime >= configuration.interval * 1000)) {
@@ -82,7 +82,7 @@ boolean AFESensorAnemometer::listener(void) {
   return _ret;
 }
 
-void AFESensorAnemometer::newImpulse(void) {
+void AFEAnemometer::newImpulse(void) {
     impulseCounter++;
 #ifdef DEBUG
     Serial << endl
@@ -91,7 +91,7 @@ void AFESensorAnemometer::newImpulse(void) {
 #endif
 }
 
-void AFESensorAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
+void AFEAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
   duration = millis() - counterStarted;
   if (duration < 0) { // used previous duration if timer rollouts
     duration = _previousDuration;
@@ -106,11 +106,11 @@ void AFESensorAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
          << F(", during: ") << (duration / 1000) << F("sec.");
 #endif
 }
-void AFESensorAnemometer::getJSON(char *json) {
+void AFEAnemometer::getJSON(char *json) {
   sprintf(json,
           "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
           "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
           lastSpeedMS, lastSpeedKMH);
 }
 
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER

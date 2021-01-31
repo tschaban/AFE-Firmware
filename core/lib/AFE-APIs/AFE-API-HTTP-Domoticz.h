@@ -40,7 +40,7 @@ private:
 
   /* sends to Domoticz custome sensor call */
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
-                                  uint8_t nvalue = 0);
+                                  uint16_t nvalue = 0);
 
   /* Replace space with %20 */
 //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
@@ -92,15 +92,15 @@ public:
   boolean publishAS3935SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  virtual void addClass(AFESensorAnemometer *);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  virtual void addClass(AFEAnemometer *);
   void publishAnemometerSensorData();
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  virtual void addClass(AFESensorRainmeter *);
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  virtual void addClass(AFERainmeter *);
   void publishRainSensorData();
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   virtual void addClass(AFEGate *);
@@ -137,7 +137,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  virtual void addClass(AFESensorBinary *);
+  virtual void addClass(AFEImpulseCatcher *);
   boolean publishBinarySensorState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 

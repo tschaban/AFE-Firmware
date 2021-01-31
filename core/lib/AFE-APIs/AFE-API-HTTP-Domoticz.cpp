@@ -87,7 +87,7 @@ boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
 
 boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
                                                     const char *value,
-                                                    uint8_t nvalue) {
+                                                    uint16_t nvalue) {
   boolean _return = false;
   if (enabled) {
     String call = getApiCall("udevice", idx);
@@ -300,16 +300,16 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorHPMA115S0 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishHPMA115S0SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled) {
-    char value[20]; // @TODO CHeck the max size
-    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
-      sprintf(value, "%-.d", _HPMA115S0Sensor[id]->data.pm25);
-      sendCustomSensorCommand(
-          _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value);
-    }
+    char value[5]; 
     if (_HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx > 0) {
       sprintf(value, "%-.d", _HPMA115S0Sensor[id]->data.pm10);
       sendCustomSensorCommand(
-          _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value);
+          _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value, _HPMA115S0Sensor[id]->data.pm10);
+    }
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
+      sprintf(value, "%-.d", _HPMA115S0Sensor[id]->data.pm25);
+      sendCustomSensorCommand(
+          _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value, _HPMA115S0Sensor[id]->data.pm25);
     }
     _ret = true;
   }
@@ -351,8 +351,8 @@ boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorAnemometer *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+void AFEAPIHTTPDomoticz::addClass(AFEAnemometer *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -366,10 +366,10 @@ void AFEAPIHTTPDomoticz::publishAnemometerSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorRainmeter *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+void AFEAPIHTTPDomoticz::addClass(AFERainmeter *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -384,7 +384,7 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
@@ -593,7 +593,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorBinary *Sensor) {
+void AFEAPIHTTPDomoticz::addClass(AFEImpulseCatcher *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
@@ -601,7 +601,7 @@ boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
   if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
     publishStatus =
         sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
-                          _BinarySensor[id]->get()==1 ? "Off" : "On");
+                          _BinarySensor[id]->get() == 1 ? "Off" : "On");
   }
   return publishStatus;
 }

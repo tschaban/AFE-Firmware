@@ -7,15 +7,7 @@ AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
 void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  Data.getConfiguration(id,&configuration);
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
+  Data.getConfiguration(id, &configuration);
 
   // SerialBus.init(13, 14, false, 64);
   // SerialBus.begin(9600);
@@ -262,16 +254,8 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   return _ret;
 }
 
-boolean AFESensorHPMA115S0::isReady() {
-  if (ready) {
-    ready = false;
-    return true;
-  } else {
-    return false;
-  }
-}
-
-void AFESensorHPMA115S0::listener() {
+boolean AFESensorHPMA115S0::listener() {
+  boolean ready = false;
   if (_initialized) {
     if ((millis() - startTime >= configuration.interval * 1000) &&
         _measuremntsON) {
@@ -285,7 +269,8 @@ void AFESensorHPMA115S0::listener() {
 //      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
 #endif
 
       UART.send(commandRead);
@@ -303,7 +288,8 @@ void AFESensorHPMA115S0::listener() {
         read(true) ? _measuremntsON = false : _measuremntsON = true;
       }
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
       Serial << endl << F("------------------------------");
 #endif
     }
@@ -321,11 +307,13 @@ void AFESensorHPMA115S0::listener() {
         read(true) ? _measuremntsON = true : _measuremntsON = false;
       }
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
       Serial << endl << F("---------------------------------");
 #endif
     }
   }
+  return ready;
 }
 
 void AFESensorHPMA115S0::getJSON(char *json) {

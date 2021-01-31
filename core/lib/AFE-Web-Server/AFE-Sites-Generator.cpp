@@ -170,17 +170,20 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
-    addMenuItem(page, L_HPMA115S0_SENSOR, AFE_CONFIG_SITE_HPMA115S0);
+    addMenuHeaderItem(page, L_PARTICLE_SENSORS);
+    addMenuSubItem(page, L_HPMA115S0_SENSOR,
+                   Device->configuration.noOfHPMA115S0s,
+                   AFE_CONFIG_SITE_HPMA115S0);
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (Device->configuration.noOfAnemometerSensors > 0) {
     addMenuItem(page, L_ANEMOMETER_SENSOR, AFE_CONFIG_SITE_ANEMOMETER_SENSOR);
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   if (Device->configuration.noOfRainmeterSensors > 0) {
     addMenuItem(page, L_RAINMETER, AFE_CONFIG_SITE_RAINMETER_SENSOR);
   }
@@ -393,13 +396,13 @@ void AFESitesGenerator::siteDevice(String &page) {
                         !FirmwarePro->Pro.valid);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS,
                         Device->configuration.noOfAnemometerSensors, "w",
                         L_ANEMOMETER_SENSOR);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
                         Device->configuration.noOfRainmeterSensors, "d",
                         L_RAINMETER);
@@ -2268,9 +2271,7 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
-  page += "<div class=\"cf\">";
   addListOfGPIOs(page, "g", configuration.irqGPIO);
-  page += "</div>";
 
   page += "<div class=\"cf\"><label>";
   page += F(L_DISTANCE_UNIT);
@@ -2370,68 +2371,51 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
   openSection(page, F(L_ANEMOMETER_SENSOR), F(""));
   ANEMOMETER configuration;
   Data->getConfiguration(&configuration);
 
+  /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  page += "<div class=\"cf\">";
+  /* Item: GPIO */
   addListOfGPIOs(page, "g", configuration.gpio);
-  page += "</div>";
 
+  /* Item: interval */
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
-
   closeSection(page);
 
   openSection(page, F(L_ANEMOMETER_CALIBRATION),
               F(L_ANEMOMETER_IMPULSE_DISTANCE_HINT));
 
+  /* Item: Distance */
   sprintf(_number, "%-.2f", configuration.impulseDistance);
-
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
                    L_ANEMOMETER_IMPULSE_DISTANCE, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999.99", "0.01");
 
-  page += "<div class=\"cf\"><label>";
-  page += F(L_DISTANCE_UNIT);
-  page += "</label><select name=\"u\"><option value=\"";
-  page += AFE_DISTANCE_CENTIMETER;
-  page += "\"";
-  page += (configuration.impulseDistanceUnit == AFE_DISTANCE_CENTIMETER
-               ? " selected=\"selected\""
-               : "");
-  page += ">";
-  page += F(L_CM);
-  page += "</option><option value=\"";
-  page += AFE_DISTANCE_METER;
-  page += "\"";
-  page += (configuration.impulseDistanceUnit == AFE_DISTANCE_METER
-               ? " selected=\"selected\""
-               : "");
-  page += ">";
-  page += F(L_M);
-  page += "</option><option value=\"";
-  page += AFE_DISTANCE_KILOMETER;
-  page += "\"";
-  page += (configuration.impulseDistanceUnit == AFE_DISTANCE_KILOMETER
-               ? " selected=\"selected\""
-               : "");
-  page += ">";
-  page += F(L_KM);
-  page += "</option></select></div>";
+  /* Item: Distance unit */
 
-  page += "<br><p class=\"cm\">";
-  page += F(L_ANEMOMETER_SENSITIVENESS_HINT);
-  page += "</p>";
+  addSelectFormItemOpen(page, "u", L_DISTANCE_UNIT);
+  addSelectOptionFormItem(page, L_CM, "0", configuration.impulseDistanceUnit ==
+                                               AFE_DISTANCE_CENTIMETER);
+  addSelectOptionFormItem(page, L_M, "1", configuration.impulseDistanceUnit ==
+                                               AFE_DISTANCE_METER);
+  addSelectOptionFormItem(page, L_KM, "2", configuration.impulseDistanceUnit ==
+                                               AFE_DISTANCE_KILOMETER);                                               
+  addSelectFormItemClose(page);
+
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", F(L_ANEMOMETER_SENSITIVENESS_HINT));
+
   sprintf(_number, "%d", configuration.sensitiveness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "s", L_SENSITIVENESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1",
@@ -2459,9 +2443,9 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFESitesGenerator::siteRainmeterSensor(String &page) {
 
   openSection(page, F(L_RAINMETER), F(""));
@@ -2471,27 +2455,21 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  page += "<div class=\"cf\">";
   addListOfGPIOs(page, "g", configuration.gpio);
-  page += "</div>";
 
   char _number[8];
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
-
-  page += "</fieldset></div>";
-
+  closeSection(page);
   openSection(page, F(L_RAINMETER_CALIBRATION), F(""));
 
   sprintf(_number, "%-.2f", configuration.resolution);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "r", L_RAINMETER_RESOLUTION,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "9999.99", "0.01",
                    "ml/m2");
-
-  page += "</fieldset></div>";
-
+  closeSection(page);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
@@ -2501,19 +2479,17 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
                      AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    page += "</fieldset></div>";
   }
 #else
   if (Device->configuration.api.mqtt) {
     openSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    page.concat("<fieldset>");
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
-    page += "</fieldset></div>";
   }
 #endif
+  closeSection(page);
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFESitesGenerator::siteADCInput(String &page) {

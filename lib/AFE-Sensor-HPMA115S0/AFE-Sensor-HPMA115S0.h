@@ -30,8 +30,6 @@ private:
   */
 
   HPMA115S0_DATA buffer;
-
-  boolean ready = false;
   boolean _initialized = false;
 
   AFEUART UART;
@@ -49,22 +47,15 @@ public:
   HPMA115S0 configuration;
   HPMA115S0_DATA data;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructor */
   AFESensorHPMA115S0();
 
   /* Turns On sensor */
   void begin(uint8_t id);
 
-  /* Is true when data has been read from the sensor */
-  boolean isReady();
-
   /* Method has to be added to the loop in order to listen for sensor value
    * changes */
-  void listener();
+  boolean listener(void);
  
   /* Method sends command to the sensor */
   boolean sendCommand(const uint8_t *command,

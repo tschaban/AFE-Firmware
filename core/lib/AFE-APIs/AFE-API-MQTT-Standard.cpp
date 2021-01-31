@@ -232,7 +232,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif
 
 /* Subscribe: ANEMOMETER */
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (_Device->configuration.noOfAnemometerSensors > 0) {
     if (strlen(_AnemometerSensor->configuration.mqtt.topic) > 0) {
       sprintf(mqttCommandTopic, "%s/cmd",
@@ -247,7 +247,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif
 
 /* Subscribe: RAIN */
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   if (_Device->configuration.noOfRainmeterSensors > 0) {
 
     if (strlen(_RainmeterSensor->configuration.mqtt.topic) > 0) {
@@ -352,6 +352,14 @@ void AFEAPIMQTTStandard::subscribe() {
     }
   }
 #endif
+
+#ifdef DEBUG
+  if (sizeof(mqttTopicsCache) < currentCacheSize - 1) {
+    Serial << endl
+           << F("ERROR: MQTT Topics cache[") << sizeof(mqttTopicsCache)
+           << F("is too small : ") << currentCacheSize - 1;
+  }
+#endif
 }
 
 void AFEAPIMQTTStandard::processRequest() {
@@ -405,16 +413,16 @@ void AFEAPIMQTTStandard::processRequest() {
         processAS3935(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_HARDWARE_AS3935
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
       case AFE_MQTT_DEVICE_ANEMOMETER:
         processAnemometerSensor();
         break;
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
       case AFE_MQTT_DEVICE_RAINMETER:
         processRainSensor();
         break;
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
       case AFE_MQTT_DEVICE_HPMA115S0:
         processHPMA115S0(&mqttTopicsCache[i].id);
@@ -543,9 +551,6 @@ void AFEAPIMQTTStandard::publishADCValues() {
     Mqtt.publish(_AnalogInput->configuration.mqtt.topic, message);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
-
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPIMQTTStandard::processADC() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing ADC: ");
@@ -562,7 +567,6 @@ void AFEAPIMQTTStandard::processADC() {
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-
 void AFEAPIMQTTStandard::processBatteryMeter() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BatteryMeter: ");
@@ -694,7 +698,7 @@ boolean AFEAPIMQTTStandard::publishAS3935SensorData(uint8_t id) {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 void AFEAPIMQTTStandard::publishAnemometerSensorData() {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
@@ -716,9 +720,9 @@ void AFEAPIMQTTStandard::processAnemometerSensor() {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFEAPIMQTTStandard::publishRainSensorData() {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_RAINMETER_DATA_LENGTH];
@@ -740,7 +744,7 @@ void AFEAPIMQTTStandard::processRainSensor() {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIMQTTStandard::processGate(uint8_t *id) {
@@ -970,4 +974,4 @@ boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

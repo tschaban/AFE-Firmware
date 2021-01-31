@@ -212,12 +212,12 @@ void setup() {
     initializeBinarySensor();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-    initializeAnemometerSensor();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+    initializeAnemometer();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-    initializeRainSensor();
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+    initializeRainmeter();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -337,12 +337,12 @@ void loop() {
         analogInputEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-        windSensorListener();
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+        anemometerEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-        rainSensorListener();
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+        rainmeterEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR

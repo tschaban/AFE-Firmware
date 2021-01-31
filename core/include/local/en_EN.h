@@ -318,7 +318,8 @@
 
 
 /* HPMA11BS0 */
-#define L_HPMA115S0_SENSOR "PM2.5/PM10 Particle Sensor"
+#define L_PARTICLE_SENSORS "Particle Sensors"
+#define L_HPMA115S0_SENSOR "HPMA115S0"
 #define L_HPMA115S0_POST_SLEEP_INTERVAL                                           \
   "If the parameter below is different than 0, the sensor will go to sleep "   \
   "mode between measurements. The setting below defined how many seconds "     \
@@ -414,7 +415,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 
 /* Anemometer Sensor */
-#define L_ANEMOMETER_SENSOR "Anemometer speed sensor"
+#define L_ANEMOMETER_SENSOR "Anemometer"
 #define L_ANEMOMETER_SENSITIVENESS_HINT "Sensitiveness should be adjusted experimentally until sensor behaves as expected. Lower value more sensitive sensor"
 #define L_ANEMOMETER_CALIBRATION "Anemometer calibration"
 #define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Wind distans per one anemometer impulse"

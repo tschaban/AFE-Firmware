@@ -148,12 +148,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteDHTSensor(page, siteConfig->deviceID);
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
     Site.siteAnemometerSensor(page);
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   case AFE_CONFIG_SITE_RAINMETER_SENSOR:
     Site.siteRainmeterSensor(page);
     break;
@@ -372,7 +372,7 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
       else if (siteConfig.ID == AFE_CONFIG_SITE_ANEMOMETER_SENSOR) {
         ANEMOMETER configuration;
         getAnemometerSensorData(&configuration);
@@ -380,7 +380,7 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
       else if (siteConfig.ID == AFE_CONFIG_SITE_RAINMETER_SENSOR) {
         RAINMETER configuration;
         getRainmeterSensorData(&configuration);
@@ -582,8 +582,8 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: SITE: Starting generating HTTP-Response. ") << endl
-           << F("INFO: MEMORY: Available: ")
+           << F("INFO: SITE: Starting generating. ") << endl
+           << F("INFO: MEMORY: Free: ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
 
@@ -592,24 +592,18 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: MEMORY: After mem allocation for HTTP response : ")
+           << F("INFO: MEMORY: Free after allocation for HTTP response : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
     generateSite(&siteConfig, page);
 
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: MEMORY: Post HTTP response generation : ")
+           << F("INFO: MEMORY: Free after site generated : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
 
     publishHTML(page);
-
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: MEMORY: After HTTP response published : ")
-           << system_get_free_heap_size() / 1024 << F("kB");
-#endif
   }
 
   /* Rebooting device */
@@ -650,6 +644,7 @@ boolean AFEWebServer::getOptionName() {
     }
     receivedHTTPCommand = true;
   }
+
   return receivedHTTPCommand;
 }
 
@@ -711,7 +706,14 @@ void AFEWebServer::listener() {
   }
 }
 
-boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
+boolean AFEWebServer::httpAPIlistener() {
+
+ //if (receivedHTTPCommand==true) {
+ //  Serial << endl << "##### receivedHTTPCommand = " << receivedHTTPCommand;
+// }
+
+  return receivedHTTPCommand;
+}
 
 void AFEWebServer::publishHTML(const String &page) {
   uint16_t pageSize = page.length();
@@ -730,14 +732,6 @@ void AFEWebServer::publishHTML(const String &page) {
 #endif
   server.sendHeader("Content-Length", String(page.length()));
   server.setContentLength(pageSize);
-
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: MEMORY: Free :  size after sending Header: ")
-         << system_get_free_heap_size() / 1024 << F("kB") << endl
-         << F("INFO: SITE: Transfering site over TCP");
-#endif
-
   server.send(200, "text/html", page);
 
 /*
@@ -889,12 +883,12 @@ void AFEWebServer::get(DEVICE &data) {
       server.arg("a3").length() > 0 ? server.arg("a3").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   data.noOfAnemometerSensors =
       server.arg("w").length() > 0 ? server.arg("w").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   data.noOfRainmeterSensors =
       server.arg("d").length() > 0 ? server.arg("d").toInt() : 0;
 #endif
@@ -1776,7 +1770,7 @@ void AFEWebServer::getAS3935SensorData(AS3935 *data) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 void AFEWebServer::getAnemometerSensorData(ANEMOMETER *data) {
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data->name, sizeof(data->name));
@@ -1786,25 +1780,25 @@ void AFEWebServer::getAnemometerSensorData(ANEMOMETER *data) {
 
   data->gpio = server.arg("g").length() > 0
                    ? server.arg("g").toInt()
-                   : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_GPIO;
+                   : AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
 
   data->interval = server.arg("f").length() > 0
                        ? server.arg("f").toInt()
-                       : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_INTERVAL;
+                       : AFE_HARDWARE_ANEMOMETER_DEFAULT_INTERVAL;
 
   data->sensitiveness = server.arg("s").length() > 0
                             ? server.arg("s").toInt()
-                            : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_BOUNCING;
+                            : AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
 
   data->impulseDistance =
       server.arg("l").length() > 0
           ? server.arg("l").toFloat()
-          : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE;
+          : AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE;
 
   data->impulseDistanceUnit =
       server.arg("u").length() > 0
           ? server.arg("u").toInt()
-          : AFE_HARDWARE_ANEMOMETER_SENSOR_DEFAULT_IMPULSE_DISTANCE_UNIT;
+          : AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE_UNIT;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data->domoticz.idx =
@@ -1817,7 +1811,7 @@ void AFEWebServer::getAnemometerSensorData(ANEMOMETER *data) {
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEWebServer::get(ADCINPUT &data) {
@@ -1892,7 +1886,7 @@ void AFEWebServer::get(ADCINPUT &data) {
 }
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFEWebServer::getRainmeterSensorData(RAINMETER *data) {
 
   if (server.arg("n").length() > 0) {
@@ -1903,20 +1897,19 @@ void AFEWebServer::getRainmeterSensorData(RAINMETER *data) {
 
   data->gpio = server.arg("g").length() > 0
                    ? server.arg("g").toInt()
-                   : AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_GPIO;
+                   : AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
 
   data->interval = server.arg("f").length() > 0
                        ? server.arg("f").toInt()
-                       : AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_INTERVAL;
+                       : AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
 
   data->sensitiveness = server.arg("s").length() > 0
                             ? server.arg("s").toInt()
-                            : AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_BOUNCING;
+                            : AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
 
-  data->resolution =
-      server.arg("r").length() > 0
-          ? server.arg("r").toFloat()
-          : (float)AFE_HARDWARE_RAINMETER_SENSOR_DEFAULT_RESOLUTION;
+  data->resolution = server.arg("r").length() > 0
+                         ? server.arg("r").toFloat()
+                         : (float)AFE_HARDWARE_RAINMETER_DEFAULT_RESOLUTION;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data->domoticz.idx =
@@ -1929,7 +1922,7 @@ void AFEWebServer::getRainmeterSensorData(RAINMETER *data) {
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 void AFEWebServer::get(BINARY_SENSOR &data) {

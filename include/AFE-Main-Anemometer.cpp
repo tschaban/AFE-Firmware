@@ -1,4 +1,13 @@
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+
+/* ---------Headers ---------*/
+
+void ICACHE_RAM_ATTR newWindImpulse(void);
+void initializeAnemometer(void);
+void anemometerEventsListener(void);
+
+/* --------- Body -----------*/
+
 
 void ICACHE_RAM_ATTR newWindImpulse() {
   static uint32_t lastInterruptionTimeAnemometerSensor = 0;
@@ -10,7 +19,7 @@ void ICACHE_RAM_ATTR newWindImpulse() {
   lastInterruptionTimeAnemometerSensor = interruptionTime;
 }
 
-void initializeAnemometerSensor(void) {
+void initializeAnemometer(void) {
   if (Device.configuration.noOfAnemometerSensors > 0) {
     if (AnemometerSensor.begin(&Data, &WindImpulse)) {
       pinMode(AnemometerSensor.configuration.gpio, INPUT_PULLUP);
@@ -33,7 +42,7 @@ void initializeAnemometerSensor(void) {
   }
 }
 
-void windSensorListener(void) {
+void anemometerEventsListener(void) {
   if (Device.configuration.noOfAnemometerSensors > 0) {
     if (AnemometerSensor.listener()) {
       MqttAPI.publishAnemometerSensorData();

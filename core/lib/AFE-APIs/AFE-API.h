@@ -45,11 +45,11 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <AFE-Sensor-Anemometer.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <AFE-Sensor-Rainmeter.h>
 #endif
 
@@ -131,12 +131,12 @@ public:
   virtual void addClass(AFESensorAS3935 *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  virtual void addClass(AFESensorAnemometer *);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  virtual void addClass(AFEAnemometer *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  virtual void addClass(AFESensorRainmeter *);
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  virtual void addClass(AFERainmeter *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -164,7 +164,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  virtual void addClass(AFESensorBinary *);
+  virtual void addClass(AFEImpulseCatcher *);
 #endif
 
 
@@ -203,12 +203,12 @@ protected:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  AFESensorAnemometer *_AnemometerSensor;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  AFEAnemometer *_AnemometerSensor;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  AFESensorRainmeter *_RainmeterSensor;
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  AFERainmeter *_RainmeterSensor;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -237,7 +237,7 @@ protected:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+  AFEImpulseCatcher *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
 

@@ -317,7 +317,8 @@
 #define L_GATE_IDX_STATE "IDX Stan bramy/drzwi"
 
 /* HPMA11BS0 */
-#define L_HPMA115S0_SENSOR "Czujnik cząstek PM2.5/PM10"
+#define L_PARTICLE_SENSORS "Czujniki pyłów"
+#define L_HPMA115S0_SENSOR "HPMA115S0"
 #define L_HPMA115S0_POST_SLEEP_INTERVAL                                              \
   "Jeśli poniższa wartość jest większa od 0 to czujnik będzie usypiany "    \
   "między odczytami. Wartość poniżej definiuje na ile sekund przed odczytem " \
