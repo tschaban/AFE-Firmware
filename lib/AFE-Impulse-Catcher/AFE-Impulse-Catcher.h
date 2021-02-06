@@ -11,10 +11,6 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-#endif
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -39,11 +35,6 @@ private:
   uint32_t counterStarted = 0;
 
   uint32_t _previousDuration = 0; // Used in case of time rollout
-  
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
-#endif
 };
 
 #endif // #if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER)

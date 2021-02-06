@@ -583,8 +583,8 @@ void AFEWebServer::generate(boolean upload) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: SITE: Starting generating. ") << endl
-           << F("INFO: MEMORY: Free: ")
-           << system_get_free_heap_size() / 1024 << F("kB");
+           << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
+           << F("kB");
 #endif
 
     String page;
@@ -708,9 +708,9 @@ void AFEWebServer::listener() {
 
 boolean AFEWebServer::httpAPIlistener() {
 
- //if (receivedHTTPCommand==true) {
- //  Serial << endl << "##### receivedHTTPCommand = " << receivedHTTPCommand;
-// }
+  // if (receivedHTTPCommand==true) {
+  //  Serial << endl << "##### receivedHTTPCommand = " << receivedHTTPCommand;
+  // }
 
   return receivedHTTPCommand;
 }
@@ -1546,6 +1546,17 @@ void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
       server.arg("m").length() > 0
           ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
+
+  data->whoPM10Norm =
+      server.arg("n1").length() > 0
+          ? server.arg("n1").toFloat()
+          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+
+  data->whoPM25Norm =
+      server.arg("n2").length() > 0
+          ? server.arg("n2").toFloat()
+          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data->domoticz.pm25.idx = server.arg("x2").length() > 0
                                 ? server.arg("x2").toInt()
@@ -1553,6 +1564,12 @@ void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
   data->domoticz.pm10.idx = server.arg("x1").length() > 0
                                 ? server.arg("x1").toInt()
                                 : AFE_DOMOTICZ_DEFAULT_IDX;
+  data->domoticz.whoPM10Norm.idx = server.arg("x3").length() > 0
+                                ? server.arg("x3").toInt()
+                                : AFE_DOMOTICZ_DEFAULT_IDX;
+  data->domoticz.whoPM25Norm.idx = server.arg("x4").length() > 0
+                                ? server.arg("x4").toInt()
+                                : AFE_DOMOTICZ_DEFAULT_IDX;                                
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));

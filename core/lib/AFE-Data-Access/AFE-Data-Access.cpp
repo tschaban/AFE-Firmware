@@ -3731,14 +3731,19 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
       configuration->interval = root["interval"];
       configuration->timeToMeasure = root["timeToMeasure"];
+      configuration->whoPM10Norm = root["whoPM10Norm"] | AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+      configuration->whoPM25Norm = root["whoPM25Norm"] | AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.pm25.idx =
           root["idx"]["pm25"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.pm10.idx =
           root["idx"]["pm10"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.whoPM25Norm.idx =
+          root["idx"]["whoPM25Norm"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.whoPM10Norm.idx =
+          root["idx"]["whoPM10Norm"] | AFE_DOMOTICZ_DEFAULT_IDX;          
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -3798,10 +3803,14 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
     root["interval"] = configuration->interval;
     root["timeToMeasure"] = configuration->timeToMeasure;
     root["name"] = configuration->name;
+    root["whoPM10Norm"] = configuration->whoPM10Norm;
+    root["whoPM25Norm"] = configuration->whoPM25Norm;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     idx["pm25"] = configuration->domoticz.pm25.idx;
     idx["pm10"] = configuration->domoticz.pm10.idx;
+    idx["whoPM10Norm"] = configuration->domoticz.whoPM10Norm.idx;
+    idx["whoPM25Norm"] = configuration->domoticz.whoPM25Norm.idx;    
 #else
     root["mqttTopic"] = configuration->mqtt.topic;
 #endif
@@ -3835,9 +3844,15 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   configuration.interval = AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
   configuration.timeToMeasure =
       AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
+  configuration.whoPM10Norm =
+      AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+  configuration.whoPM25Norm =
+      AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.pm25.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.pm10.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.whoPM10Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.whoPM25Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;  
 #endif
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
 #ifdef DEBUG
@@ -4970,11 +4985,9 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
       root.printTo(Serial);
 #endif
       sprintf(configuration->name, root["name"] | "");
-      configuration->gpio =
-          root["gpio"] | AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
+      configuration->gpio = root["gpio"] | AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
       configuration->sensitiveness =
-          root["sensitiveness"] |
-          AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
+          root["sensitiveness"] | AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
       configuration->interval =
           root["interval"] | AFE_HARDWARE_ANEMOMETER_DEFAULT_INTERVAL;
       configuration->impulseDistance = root["impulseDistance"].as<float>();
@@ -4991,8 +5004,8 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_ANEMOMETER
-             << F(", actual JSON size: ") << jsonBuffer.size();
+             << AFE_CONFIG_FILE_BUFFER_ANEMOMETER << F(", actual JSON size: ")
+             << jsonBuffer.size();
       if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: Too small buffer size");
       }
@@ -5058,8 +5071,8 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
     Serial << endl
            << F("INFO: Data saved") << endl
            << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_ANEMOMETER
-           << F(", actual JSON size: ") << jsonBuffer.size();
+           << AFE_CONFIG_FILE_BUFFER_ANEMOMETER << F(", actual JSON size: ")
+           << jsonBuffer.size();
     if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER < jsonBuffer.size() + 10) {
       Serial << endl << F("WARN: Too small buffer size");
     }
@@ -5128,11 +5141,9 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
       root.printTo(Serial);
 #endif
       sprintf(configuration->name, root["name"] | "");
-      configuration->gpio =
-          root["gpio"] | AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
+      configuration->gpio = root["gpio"] | AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
       configuration->sensitiveness =
-          root["sensitiveness"] |
-          AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
+          root["sensitiveness"] | AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
       configuration->interval =
           root["interval"] | AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
       configuration->resolution = root["resolution"].as<float>();
@@ -5146,8 +5157,8 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_RAINMETER
-             << F(", actual JSON size: ") << jsonBuffer.size();
+             << AFE_CONFIG_FILE_BUFFER_RAINMETER << F(", actual JSON size: ")
+             << jsonBuffer.size();
       if (AFE_CONFIG_FILE_BUFFER_RAINMETER < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: Too small buffer size");
       }
@@ -5210,8 +5221,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_RAINMETER
+           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RAINMETER
            << F(", actual JSON size: ") << jsonBuffer.size();
     if (AFE_CONFIG_FILE_BUFFER_RAINMETER < jsonBuffer.size() + 10) {
       Serial << endl << F("WARN: Too small buffer size");
@@ -5300,8 +5310,7 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
              << F("INFO: JSON: Buffer size: ")
              << AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA <
-          jsonBuffer.size() + 10) {
+      if (AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: Too small buffer size");
       }
 #endif
@@ -5374,8 +5383,8 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
     Serial << endl
            << F("INFO: Data saved") << endl
            << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA
-           << F(", actual JSON size: ") << jsonBuffer.size();
+           << AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA << F(", actual JSON size: ")
+           << jsonBuffer.size();
     if (AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA < jsonBuffer.size() + 10) {
       Serial << endl << F("WARN: Too small buffer size");
     }

@@ -12,7 +12,7 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
   _Sensor = Sensor;
   startTime = millis();
   Data->getConfiguration(&configuration);
-
+  _Sensor->begin(configuration.sensitiveness);
   _initialized = true;
 
   switch (configuration.impulseDistanceUnit) {
@@ -61,7 +61,7 @@ boolean AFEAnemometer::listener(void) {
 
       uint32_t noOfImpulses;
       uint32_t duration;
-      get(noOfImpulses, duration);
+      _Sensor->get(noOfImpulses, duration);
 
       lastSpeedMS =
           ((noOfImpulses * (oneImpulseDistanceCM / 100) * 1000) / duration);

@@ -629,7 +629,6 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   closeSection(page);
 
   openSection(page, F(L_MQTT_CONNECTION), F(L_MQTT_CONNECTION_HINT));
-
   addCheckboxFormItem(page, "ph", L_MQTT_USE_PING, "1",
                       configuration.pingHostBeforeConnection,
                       L_MQTT_USE_PING_HINT);
@@ -1961,13 +1960,11 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
   char _number[7];
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "f",
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  page += "<br><br>";
-  page += "<p class=\"cm\">";
-  page += F(L_HPMA115S0_POST_SLEEP_INTERVAL);
-  page += "</p>";
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{item.value}}", F(L_HPMA115S0_POST_SLEEP_INTERVAL));
 
   sprintf(_number, "%d", configuration.timeToMeasure);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m",
@@ -1975,17 +1972,41 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999", "1", L_SECONDS);
   closeSection(page);
 
+  openSection(page, F(L_HPMA115S0_WHO_NORMS), F(L_HPMA115S0_WHO_NORMS_HINT));
+
+  sprintf(_number, "%-.2f", configuration.whoPM10Norm);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "n1", "PM10", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999.99", "0.01",
+                   L_HPMA115S0_WHO_NORM_UNIT);
+
+  sprintf(_number, "%-.2f", configuration.whoPM25Norm);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "n2", "PM25", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999.99", "0.01",
+                   L_HPMA115S0_WHO_NORM_UNIT);
+
+  closeSection(page);
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.domoticz.pm10.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x1", "IDX PM10", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
     sprintf(_number, "%d", configuration.domoticz.pm25.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x2", "IDX PM2.5",
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    sprintf(_number, "%d", configuration.domoticz.pm10.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x1", "IDX PM10", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
+    sprintf(_number, "%d", configuration.domoticz.whoPM25Norm.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x3", "IDX WHO PM10",
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.whoPM25Norm.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x4", "IDX WHO PM2.5",
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
     closeSection(page);
@@ -2230,13 +2251,13 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  /* Item: sensitivness, not possiblity to change */
+  /* Item: sensitivness, not possiblity to change 
   sprintf(_number, "%d", configuration.mode);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", L_SENSITIVENESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, L_ADC_CANT_CHANGE, true);
-
+*/
   closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2408,9 +2429,9 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
   addSelectOptionFormItem(page, L_CM, "0", configuration.impulseDistanceUnit ==
                                                AFE_DISTANCE_CENTIMETER);
   addSelectOptionFormItem(page, L_M, "1", configuration.impulseDistanceUnit ==
-                                               AFE_DISTANCE_METER);
+                                              AFE_DISTANCE_METER);
   addSelectOptionFormItem(page, L_KM, "2", configuration.impulseDistanceUnit ==
-                                               AFE_DISTANCE_KILOMETER);                                               
+                                               AFE_DISTANCE_KILOMETER);
   addSelectFormItemClose(page);
 
   page.concat(FPSTR(HTTP_INFO_TEXT));

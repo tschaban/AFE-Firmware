@@ -461,6 +461,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
     char value[50];
+    /* Temperatura */
     if (_BMx80Sensor[id]->configuration.domoticz.temperature.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.temperature.value);
       generateDeviceValue(
@@ -468,12 +469,14 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
           value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
+    /* Pressure */
     if (_BMx80Sensor[id]->configuration.domoticz.pressure.idx > 0) {
       sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.pressure.value);
       generateDeviceValue(
           json, _BMx80Sensor[id]->configuration.domoticz.pressure.idx, value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
+    /* Relative pressure */
     if (_BMx80Sensor[id]->configuration.domoticz.relativePressure.idx > 0) {
       sprintf(value, "%-.2f;0", _BMx80Sensor[id]->data.relativePressure.value);
       generateDeviceValue(
@@ -483,7 +486,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
     }
 
     if (_BMx80Sensor[id]->configuration.type != AFE_BMP180_SENSOR) {
-
+      /* Temp and Hum */
       if (_BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx >
           0) {
         sprintf(value, "%-.2f;%-.2f;%-d",
@@ -497,7 +500,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
-
+      /* Temp + Hum + Press */
       if (_BMx80Sensor[id]
               ->configuration.domoticz.temperatureHumidityPressure.idx > 0) {
         sprintf(value, "%-.2f;%-.2f;%-d;%-.2f;0",
@@ -512,7 +515,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
-
+      /* Humididty */
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
         sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                                  _BMx80Sensor[id]->data.humidity.value));
@@ -522,12 +525,29 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
 
+      /* Absolute Humidity */
+      if (_BMx80Sensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
+        sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
+                                 _BMx80Sensor[id]->data.humidity.value));
+        generateDeviceValue(
+            json, _BMx80Sensor[id]->configuration.domoticz.absoluteHumidity.idx,
+            value, (uint8_t)_BMx80Sensor[id]->absoluteHumidity(
+                       _BMx80Sensor[id]->data.temperature.value,
+                       _BMx80Sensor[id]->data.humidity.value,
+                       _BMx80Sensor[id]->configuration.temperature.unit ==
+                           AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+        Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      }
+
+      /* DewPoint */
       if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);
         generateDeviceValue(
             json, _BMx80Sensor[id]->configuration.domoticz.dewPoint.idx, value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+
+      /* Heat Index */
       if (_BMx80Sensor[id]->configuration.domoticz.heatIndex.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.heatIndex.value);
         generateDeviceValue(
@@ -535,8 +555,43 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+
+      /* Perception */
+      if (_BMx80Sensor[id]->configuration.domoticz.perception.idx > 0) {
+        char _perception[22]; // Max size of Perception from lang.pack
+        byte _perceptionId = _BMx80Sensor[id]->perception(
+            _BMx80Sensor[id]->data.temperature.value,
+            _BMx80Sensor[id]->data.humidity.value,
+            _BMx80Sensor[id]->configuration.temperature.unit ==
+                AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        strcpy_P(_perception,
+                 (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
+        generateDeviceValue(
+            json, _BMx80Sensor[id]->configuration.domoticz.perception.idx,
+            _perception,
+            _BMx80Sensor[id]->convertPerceptionDomoticz(_perceptionId));
+        Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      }
+
+      /* Comfort */
+      if (_BMx80Sensor[id]->configuration.domoticz.comfort.idx > 0) {
+        char _comfort[80]; // Max size of Comfort from lang.pack
+        ComfortState comfortStatus;
+        _BMx80Sensor[id]->comfort(
+            comfortStatus, _BMx80Sensor[id]->data.temperature.value,
+            _BMx80Sensor[id]->data.humidity.value,
+            _BMx80Sensor[id]->configuration.temperature.unit ==
+                AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+        generateDeviceValue(
+            json, _BMx80Sensor[id]->configuration.domoticz.comfort.idx,
+            _comfort, _BMx80Sensor[id]->convertComfortDomoticz(comfortStatus));
+        Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      }
     }
     if (_BMx80Sensor[id]->configuration.type == AFE_BME680_SENSOR) {
+
+      /* Gas Sensor */
       if (_BMx80Sensor[id]->configuration.domoticz.gasResistance.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.gasResistance.value);
         generateDeviceValue(
@@ -544,12 +599,14 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+      /* IAQ */
       if (_BMx80Sensor[id]->configuration.domoticz.iaq.idx > 0) {
         sprintf(value, "%-.0f", _BMx80Sensor[id]->data.iaq.value);
         generateDeviceValue(
             json, _BMx80Sensor[id]->configuration.domoticz.iaq.idx, value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+      /* Static IAQ */
       if (_BMx80Sensor[id]->configuration.domoticz.staticIaq.idx > 0) {
         sprintf(value, "%-.0f", _BMx80Sensor[id]->data.staticIaq.value);
         generateDeviceValue(
@@ -557,6 +614,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+      /* CO2 */
       if (_BMx80Sensor[id]->configuration.domoticz.co2Equivalent.idx > 0) {
         sprintf(value, "%-.0f", _BMx80Sensor[id]->data.co2Equivalent.value);
         generateDeviceValue(
@@ -564,6 +622,7 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
             value);
         Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
+      /* BVOC */
       if (_BMx80Sensor[id]->configuration.domoticz.breathVocEquivalent.idx >
           0) {
         sprintf(value, "%-.1f",
@@ -592,19 +651,36 @@ boolean AFEAPIMQTTDomoticz::publishHPMA115S0SensorData(uint8_t id) {
 
     if (_HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx > 0) {
 
-      sprintf(value, "%-d", _HPMA115S0Sensor[id]->data.pm10);
-      generateDeviceValue(
-          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value,_HPMA115S0Sensor[id]->data.pm10);
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.pm10);
+      generateDeviceValue(json,
+                          _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx,
+                          value, _HPMA115S0Sensor[id]->data.pm10);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
 
     if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
-      sprintf(value, "%-d", _HPMA115S0Sensor[id]->data.pm25);
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.pm25);
+      generateDeviceValue(json,
+                          _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx,
+                          value, _HPMA115S0Sensor[id]->data.pm25);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.whoPM10Norm.idx > 0) {
+
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.whoPM10Norm);
       generateDeviceValue(
-          json, _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value, _HPMA115S0Sensor[id]->data.pm25);
+          json, _HPMA115S0Sensor[id]->configuration.domoticz.whoPM10Norm.idx,
+          value, _HPMA115S0Sensor[id]->data.whoPM10Norm);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
 
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.whoPM25Norm.idx > 0) {
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.whoPM25Norm);
+      generateDeviceValue(
+          json, _HPMA115S0Sensor[id]->configuration.domoticz.whoPM25Norm.idx,
+          value, _HPMA115S0Sensor[id]->data.whoPM25Norm);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
   }
   return true;
 }
@@ -656,13 +732,9 @@ void AFEAPIMQTTDomoticz::addClass(AFEAnemometer *Sensor) {
 void AFEAPIMQTTDomoticz::publishAnemometerSensorData() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH];
-
     char value[20];
-
     if (_AnemometerSensor->configuration.domoticz.idx > 0) {
-
       sprintf(value, "0;N;%-.2f;0;?;?", 10 * _AnemometerSensor->lastSpeedMS);
-
       generateDeviceValue(json, _AnemometerSensor->configuration.domoticz.idx,
                           value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
@@ -679,14 +751,10 @@ void AFEAPIMQTTDomoticz::addClass(AFERainmeter *Sensor) {
 void AFEAPIMQTTDomoticz::publishRainSensorData() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_RAINMETER_COMMAND_LENGTH];
-
     char value[20];
-
     if (_RainmeterSensor->configuration.domoticz.idx > 0) {
-
       sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour * 100,
               _RainmeterSensor->current.counter);
-
       generateDeviceValue(json, _RainmeterSensor->configuration.domoticz.idx,
                           value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);

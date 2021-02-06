@@ -3,6 +3,8 @@
 #ifndef _AFE_AIR_ITEM_Structure_h
 #define _AFE_AIR_ITEM_Structure_h
 
+#include <Arduino.h>
+
 struct AIR_ITEM_SETTING {
   float correction;
   uint8_t unit;

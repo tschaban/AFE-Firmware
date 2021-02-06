@@ -14,7 +14,7 @@ void ICACHE_RAM_ATTR newWindImpulse() {
   uint32_t interruptionTime = millis();
   if (interruptionTime - lastInterruptionTimeAnemometerSensor >
       WindImpulse.bouncing) {
-    WindImpulse.newImpulse();
+    WindImpulse.newImpulse();   
   }
   lastInterruptionTimeAnemometerSensor = interruptionTime;
 }

@@ -68,8 +68,17 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 
     Bme.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
 #ifdef DEBUG
+    Serial << endl << "INFO: Bosch: Sensor configuration";
+
+    bsec_bme_settings_t _config = Bme.g
+#endif
+
+    Bme.setG
+#ifdef DEBUG
     checkBmeStatus();
 #endif
+
+
   }
 
   return true;
@@ -85,7 +94,7 @@ boolean AFESensorBME680::read() {
     data.pressure.value = Bme.pressure / 100;
     data.humidity.value = Bme.humidity;
     data.gasResistance.value = Bme.gasResistance / 1000;
-    data.iaq.value = Bme.iaqEstimate;
+    data.iaq.value = Bme.iaq;
     data.iaq.accuracy = Bme.iaqAccuracy;
     data.staticIaq.value = Bme.staticIaq;
     data.staticIaq.accuracy = Bme.staticIaqAccuracy;
@@ -137,6 +146,7 @@ void AFESensorBME680::checkBmeStatus() {
 #endif
 
 void AFESensorBME680::loadState(void) {
+
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Bosch: Reading state from EEPROM: ");

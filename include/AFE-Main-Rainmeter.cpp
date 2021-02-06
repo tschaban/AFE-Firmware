@@ -8,7 +8,7 @@ void initializeRainmeter(void);
 void rainmeterEventsListener(void);
 
 /* --------- Body -----------*/
-
+ 
 
 void ICACHE_RAM_ATTR newRainImpulse(void) {
   static uint32_t lastInterruptionTimeRainSensor = 0;

@@ -326,6 +326,11 @@
   "pomiarów"
 #define L_HPMA115S0_MEASURE_AFTER "Pomiar po czasie"
 #define L_HPMA115S0_MQTT_TOPIC "Temat MQTT czujnika HPMA115S0"
+#define L_HPMA115S0_WHO_NORMS "Normy WHO średniego dobowego stężenia pyłów"
+#define L_HPMA115S0_WHO_NORMS_HINT "Normy WHO możesz nadpisać własnymi lub obowiązującymi w danym kraju"
+#define L_HPMA115S0_WHO_NORM_UNIT "średnie dobowe w µg/m3"
+
+
 
 
 /* BMEX80 */

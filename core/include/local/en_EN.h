@@ -327,6 +327,9 @@
   "measurement's interval"
 #define L_HPMA115S0_MEASURE_AFTER "Measure after"
 #define L_HPMA115S0_MQTT_TOPIC "HPMA115S0 Sensor's MQTT Topic"
+#define L_HPMA115S0_WHO_NORMS "WHO Norms for the average daily particles concentration"
+#define L_HPMA115S0_WHO_NORMS_HINT "You can overwrite WHO Norms with your own or applicable in your area"
+#define L_HPMA115S0_WHO_NORM_UNIT "average daily concentration in µg/m3 "
 
 
 /* BMX080 */

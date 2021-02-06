@@ -155,6 +155,13 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(FirmwareConfiguration.version, "2.2.2") == 0) {
     upgradeToT6V230();
   }
+
+  if (strcmp(FirmwareConfiguration.version, "2.3.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.3.1") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.3.1.E1") == 0) {
+    upgradeToT6V250();
+  }
+
 #endif
 
   Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
@@ -256,4 +263,14 @@ void AFEUpgrader::upgradeToT6V230() {
   Data->createADCInputConfigurationFile();
 #endif
 }
+
+void AFEUpgrader::upgradeToT6V250() {
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  Data->createDS18B20SensorConfigurationFile();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  Data->createDHTSensorConfigurationFile();
+#endif
+}
+
 #endif // T6_CONFIG
