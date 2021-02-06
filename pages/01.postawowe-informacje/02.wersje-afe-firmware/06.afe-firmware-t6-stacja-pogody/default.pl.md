@@ -17,10 +17,12 @@ recaptchacontact:
 * do 2 diod LED
 * 1 czujnik Bosch BME680, BME280, BMP180 lub BMP085
 	* BMP085, BMP180 - temperatura, ciśnienie, ciśnienie względne (zrobione)
-	* BME280 - temperatura, wilgotność, ciśnienie względne, punkt rosy, temperatura odczuwalna  (zrobione)
-	* BME680 - temperatura, wilgotność, ciśnienie, ciśnienie względne, Punkt Rosy, Temperatura Odczuwalna, IAQ, Statyczne IAQ, Ekwiwalent CO2, Breath VOC Ekwiwalent 
+	* BME280 - temperatura, wilgotność, wilgotność absolutna, ciśnienie względne oraz bezwzgędne, punkt rosy, temperatura odczuwalna, poziom percepcji oraz komfortu odbioru warunków atmosferycznych
+	* BME680 - wszystko co BME280 oraz IAQ, Statyczne IAQ, Ekwiwalent CO2, Breath VOC Ekwiwalent, poziom percepcji oraz komfortu odbioru warunków atmosferycznych 
 * 1 czujnik BH1750 (natężenia światła)
-* 1 czujnik Honeywell HPMA115S0 (pyłów zawieszonych 2.5 oraz 10)
+* 1 czujnik Honeywell HPMA115S0 (pyłów zawieszonych 2.5 oraz 10) oraz poziom przekroczeń stężenia pyłów wg zakresów WHO
+* 1 czujnik DS18B20
+* 1 czujnik DHT11,21 lub 22
 * 1 czujnik AS3935 (odległości od burzy) - [w wersji PRO: dodane do testów](/postawowe-informacje/wersja-pro)
 * 1 czujnik deszczu
 * 1 czujnik wiatru
