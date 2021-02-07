@@ -110,7 +110,6 @@ recaptchacontact:
 
 ##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-4-0/?target=_blank)
 
-!! Przeczytaj koniecznie: [Aktualizacjia do wersji 4Mb](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi/aktualizacja-afe-t5-z-wersji-2-0-x-do-2-2-x) 
 
 **Poprzednie wersje**
 * Wersja [2.2.2](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-2/?target=_blank)
@@ -132,7 +131,7 @@ recaptchacontact:
 
 ##### [Pobierz najnowszą wersję 2.5.1](https://www.smartnydom.pl/download/afe-firmware-t6-2-5-1/)
 
-! Werja 1Mb po wgraniu nie ma możliwości aktualizacji przez przeglądarkę
+!!! Werja 1Mb po wgraniu nie ma możliwości aktualizacji przez przeglądarkę
 
 **Poprzednie wersje**
 * Wersja [2.3.1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1/?target=_blank)
@@ -145,6 +144,8 @@ recaptchacontact:
 * Wersja [1.0.1](https://www.smartnydom.pl/download/afe-firmware-t6-1-0-1/?target=_blank)
 
 ---
+
+!! Przeczytaj koniecznie: [Aktualizacjia do wersji 4Mb](/postawowe-informacje/wersje-afe-firmware/t5-brama-drzwi/aktualizacja-afe-t5-z-wersji-2-0-x-do-2-2-x) 
 
 !!!! Uwaga dotycząca wersji MEGA: Nie wszystkie GPIO można swobodnie wykorzystywać w ESP. Niektóre GPIO mają swoje specyficzne funkcje i zadania. Podłączanie do nich przekaźników, przycisków itp. mogą powodować niestabilność urządzenia
 
