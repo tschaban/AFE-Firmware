@@ -58,7 +58,7 @@ recaptchacontact:
 * [Wersja 1.0.0](https://github.com/tschaban/AFE-Firmware/milestone/20?closed=1)
 
 ##### AFE Firmware T6
-* [Wersja 2.3.1](https://github.com/tschaban/AFE-Firmware/milestone/85?closed=1)
+* [Wersja 2.5.1](https://github.com/tschaban/AFE-Firmware/milestone/85?closed=1)
 * [Wersja 2.3.1](https://github.com/tschaban/AFE-Firmware/milestone/69?closed=1)
 * [Wersja 2.3.0](https://github.com/tschaban/AFE-Firmware/milestone/68?closed=1)
 * [Wersja 2.2.2](https://github.com/tschaban/AFE-Firmware/milestone/66?closed=1)
