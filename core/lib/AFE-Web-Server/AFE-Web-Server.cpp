@@ -77,12 +77,14 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_POST_RESET:
     Site.sitePostReset(page);
     break;
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE    
   case AFE_CONFIG_SITE_UPGRADE:
     Site.siteUpgrade(page);
     break;
   case AFE_CONFIG_SITE_POST_UPGRADE:
     Site.sitePostUpgrade(page, upgradeFailed);
     break;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   case AFE_CONFIG_SITE_RELAY:
     Site.siteRelay(page, siteConfig->deviceID);
@@ -490,6 +492,7 @@ void AFEWebServer::generate(boolean upload) {
     }
   }
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   if (upload) {
     HTTPUpload &upload = server.upload();
     String _updaterError;
@@ -566,19 +569,8 @@ void AFEWebServer::generate(boolean upload) {
     delay(0);
   } else {
 
-#ifdef DEBUG
-/*
-    Serial << endl
-           << F("INFO: Generating ")
-           << (siteConfig.twoColumns ? F("Two Columns") : F("One Column"))
-           << F(" site: ") << siteConfig.ID;
-    Serial << F(", device ID: ") << siteConfig.deviceID;
-    Serial << F(", Command: ") << command;
-    Serial << F(", Reboot: ") << (siteConfig.reboot ? F("Yes") : F("No"));
-    Serial << F(", Mode: ") << siteConfig.rebootMode;
-    Serial << F(", Time: ") << siteConfig.rebootTime;
-*/
-#endif
+#endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+
 
 #ifdef DEBUG
     Serial << endl
@@ -604,7 +596,10 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 
     publishHTML(page);
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   }
+#endif  
 
   /* Rebooting device */
   if (siteConfig.reboot) {

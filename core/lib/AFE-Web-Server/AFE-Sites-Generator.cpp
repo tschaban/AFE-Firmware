@@ -26,18 +26,9 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
   if (Device->getMode() == AFE_MODE_CONFIGURATION ||
       Device->getMode() == AFE_MODE_NORMAL) {
-    page.concat(F("<img src=\"http://api.smartnydom.pl/logo/T"));
-    page.concat(Firmware.type);
-    page.concat(F("/"));
-    page.concat(Firmware.version);
-    page.concat(F("/"));
-    page.concat(deviceID);
-    page.concat(F("/"));
-    page.concat(AFE_DEVICE_TYPE_ID);
-    page.concat(
-        F("\" style=\"width: 100%;display: block\" alt=\"AFE Firmware\">"));
+    page += FPSTR(HTTP_FIRMWARE_BANNER_IMAGE);
   } else {
-    page.concat("<h3 class=\"la\">AFE Firmware: " AFE_DEVICE_TYPE_NAME "</h3>");
+    page += FPSTR(HTTP_FIRMWARE_BANNER_TEXT);
   }
 
   page.concat(F("<div id=\"c\">"));
@@ -257,7 +248,9 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   page.concat(F("</h4><ul class=\"lst\">"));
 
   addMenuItem(page, L_PASSWORD_SET_PASSWORD, AFE_CONFIG_SITE_PASSWORD);
+  #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   addMenuItem(page, L_FIRMWARE_UPGRADE, AFE_CONFIG_SITE_UPGRADE);
+  #endif
   addMenuItem(page, L_RESET_DEVICE, AFE_CONFIG_SITE_RESET);
   addMenuItem(page, L_PRO_VERSION, AFE_CONFIG_SITE_PRO_VERSION);
 
@@ -2251,7 +2244,7 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  /* Item: sensitivness, not possiblity to change 
+  /* Item: sensitivness, not possiblity to change
   sprintf(_number, "%d", configuration.mode);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", L_SENSITIVENESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -2648,6 +2641,7 @@ void AFESitesGenerator::siteI2CBUS(String &page) {
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 void AFESitesGenerator::siteUpgrade(String &page) {
   openSection(page, F(L_FIRMWARE_UPGRADE), F(L_UPGRADE_DONT_PLUG_OFF));
   page.concat(FPSTR(HTTP_SITE_UPGRADE));
@@ -2672,6 +2666,7 @@ void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
   page.concat(F("...</li>"));
   closeSection(page);
 }
+#endif
 
 void AFESitesGenerator::siteReset(String &page) {
   openSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
@@ -2851,8 +2846,6 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
     page.replace("{{L_HELP}}", F(L_HELP));
     page.replace("{{L_DOCUMENTATION}}", F(L_DOCUMENTATION));
     page.replace("{{L_VERSION}}", F(L_VERSION));
-    page.replace("{{f.deviceName}}", F(AFE_DEVICE_TYPE_NAME));
-    page.replace("{{f.deviceID}}", String(AFE_DEVICE_TYPE_ID));
     page.replace("{{freeHeap}}", String(system_get_free_heap_size() / 1024));
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2878,8 +2871,14 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 #else
   page.replace("{{f.version}}", Firmware.version);
 #endif
+  
   page.replace("{{f.type}}", String(Firmware.type));
+  page.replace("{{f.deviceName}}", F(AFE_DEVICE_TYPE_NAME));
+  page.replace("{{f.deviceID}}", deviceID);
+  page.replace("{{L_LANGUAGE_SHORT}}", L_LANGUAGE_SHORT);
+  page.replace("{{f.deviceType}}", String(AFE_DEVICE_TYPE_ID));
 
+ 
   page.concat(F("</body></html>"));
 }
 

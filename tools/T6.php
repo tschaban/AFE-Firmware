@@ -4,8 +4,8 @@
 /* Set this before run */
 
 $type = "6";
-$version = "2.5.1.B2";
-$language = "PL";
+$version = "2.5.1";
+$language = "EN";
 
 /******************/
 
@@ -20,67 +20,92 @@ $targetFolder = "C:/Users/Adrian/Cloud/Pulpit/AFE.Firmware.T".$type.".".$version
 $targetAPI[0] = "Domoticz API";
 $targetAPI[1] = "Standard API";
 
-$targetHardware[0] = "ESP Generic";
-$targetHardware[1] = "ESP Generic with debugger";
-$targetHardware[2] = "Weather Station v2 (iECS)";
-$targetHardware[3] = "Weather Station v2.1 (iECS)";
+$index = 0;
+
+$targetHardware[$index++] = "ESP Generic";
+$targetHardware[$index++] = "ESP Generic with debugger";
+$targetHardware[$index++] = "Weather Station v2 (iECS)";
+$targetHardware[$index++] = "Weather Station v2.1 (iECS)";
 
 $folderStructure[0] = $targetFolder;
 $folderStructure[1] = $targetFolder."/".$targetLanguage;
 $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 
+
+$index = 0;
+
 // Standard API
 
-$sourceFolder[0]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-generic/firmware.bin";
-$sourceFolder[0]["chip"] = "ESP8266";
-$sourceFolder[0]["size"] = "4Mb";
-$sourceFolder[0]["hardware"] = 0;
-$sourceFolder[0]["api"] = $targetAPI[1];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
 
-$sourceFolder[1]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-development/firmware.bin";
-$sourceFolder[1]["chip"] = "ESP8266.DEBUG";
-$sourceFolder[1]["size"] = "4Mb";
-$sourceFolder[1]["hardware"] = 1;
-$sourceFolder[1]["api"] = $targetAPI[1];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-development/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
 
-$sourceFolder[2]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20/firmware.bin";
-$sourceFolder[2]["chip"] = "ESP8266.WeatherStationV2iECS";
-$sourceFolder[2]["size"] = "4Mb";
-$sourceFolder[2]["hardware"] = 2;
-$sourceFolder[2]["api"] = $targetAPI[1];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.WeatherStationV2iECS";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 2;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
 
-$sourceFolder[3]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21/firmware.bin";
-$sourceFolder[3]["chip"] = "ESP8266.WeatherStationV2.1iECS";
-$sourceFolder[3]["size"] = "4Mb";
-$sourceFolder[3]["hardware"] = 3;
-$sourceFolder[3]["api"] = $targetAPI[1];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.WeatherStationV2.1iECS";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 3;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
+
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_1m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "1Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+$index++;
 
 // Domoticz API
 
-$sourceFolder[4]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-generic-domoticz/firmware.bin";
-$sourceFolder[4]["chip"] = "ESP8266";
-$sourceFolder[4]["size"] = "4Mb";
-$sourceFolder[4]["hardware"] = 0;
-$sourceFolder[4]["api"] = $targetAPI[0];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
 
-$sourceFolder[5]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-development-domoticz/firmware.bin";
-$sourceFolder[5]["chip"] = "ESP8266.DEBUG";
-$sourceFolder[5]["size"] = "4Mb";
-$sourceFolder[5]["hardware"] = 1;
-$sourceFolder[5]["api"] = $targetAPI[0];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-development-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.DEBUG";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
 
-$sourceFolder[6]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20-domoticz/firmware.bin";
-$sourceFolder[6]["chip"] = "ESP8266.WeatherStationV2iECS";
-$sourceFolder[6]["size"] = "4Mb";
-$sourceFolder[6]["hardware"] = 2;
-$sourceFolder[6]["api"] = $targetAPI[0];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.WeatherStationV2iECS";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 2;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
 
-$sourceFolder[7]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21-domoticz/firmware.bin";
-$sourceFolder[7]["chip"] = "ESP8266.WeatherStationV2.1iECS";
-$sourceFolder[7]["size"] = "4Mb";
-$sourceFolder[7]["hardware"] = 3;
-$sourceFolder[7]["api"] = $targetAPI[0];
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266.WeatherStationV2.1iECS";
+$sourceFolder[$index]["size"] = "4Mb";
+$sourceFolder[$index]["hardware"] = 3;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+$index++;
 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_1m-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = "ESP8266";
+$sourceFolder[$index]["size"] = "1Mb";
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
 echo "\nCreating folders structure";
 if (!file_exists($targetFolder)) {

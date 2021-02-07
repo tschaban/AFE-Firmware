@@ -68,13 +68,6 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 
     Bme.updateSubscription(sensorList, 10, BSEC_SAMPLE_RATE_LP);
 #ifdef DEBUG
-    Serial << endl << "INFO: Bosch: Sensor configuration";
-
-    bsec_bme_settings_t _config = Bme.g
-#endif
-
-    Bme.setG
-#ifdef DEBUG
     checkBmeStatus();
 #endif
 

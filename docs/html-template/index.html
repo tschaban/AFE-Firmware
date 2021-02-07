@@ -1,309 +1,269 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
     <meta charset="utf-8">
-    <title>AFE Firmware 1.0.0 [T0]</title>
-    <style>body {
-        margin: 0; background: #ddd;
-        padding:15px;
-    }
+    <title>AFE Firmware 2.5.1.B3 [T6]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
+    <style>
+        html {
+            background: url(images/background.jpg) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-color: #ddd;
+        }
 
-    #c {
-        display: table;
-        width: 100%;
-            }
 
-    #l, #r {
-        display: table-cell
-    }
 
-    #l {
-        width: 300px;
-        background: #282828;
-        padding: 20px;
-        color: #eee
-    }
 
-    #r {
-        padding: 20px;
-        background: #eee;
-    }
 
-    p, a, input, h1, h3, h4, span, label, button, li {
-        font-family: sans-serif
-    }
 
-    a {
-        text-decoration: none
-    }
 
-    .ltit, .ltag {
-        margin: 0
-    }
 
-    .ltag {
-        font-weight: 300;
-        color: #b0cadb;
-        margin-bottom: 20px
-    }
 
-    .lst {
-        list-style: none;
-        margin: 0;
-        padding: 0
-    }
 
-    .itm a {
-        display: block;
-        text-decoration: none;
-        white-space: nowrap;
-        padding: .2em 1em;
-        color: #777;
-        font-size: 95%
-    }
 
-    .itm a:hover, .itm a:focus {
-        background-color: #eee;
-        text-decoration: none;
-        padding: .2em 1.5em;
-        color: #000
-    }
 
-    .ci {
-        margin-bottom: 2em
-    }
 
-    .ci h1 {
-        color: #aaa;
-        border-bottom: 1px solid #ddd;
-        font-size: 110%;
-        font-weight: 500;
-        letter-spacing: .1em
-    }
 
-    .ci .cd {
-        color: #444;
-        line-height: 1.8em;
-        font-size: 80%;
-        font-style: italic
-    }
 
-    .cm {
-        color: #999;
-        font-size: 90%;
-        margin: 0 0 20px 0
-    }
 
-    .la {
-        margin: 0 .1em;
-        padding: .3em 1em;
-        color: #fff;
-        background: #999;
-        font-size: 80%
-    }
+        #l,
+        #r {
+            padding: 20px;
+            display: table-cell
+        }
 
-    .lr {
-        background: #ca3c3c
-    }
+        .ltit,
+        body {
+            margin: 20px;
+        }
 
-    .lg {
-        background: #2fb548
-    }
+        .b,
+        .itm a,
+        a {
+            text-decoration: none
+        }
 
-    fieldset {
-        margin: 0;
-        padding: .35em 0 .75em;
-        border: 0
-    }
+        body {
+            opacity: 0.95;
+            padding: 30px;
+            margin:auto;
+            max-width: 1024px;
+        }
 
-    .cf {
-        margin-bottom: .5em
-    }
+        #c {
+            display: table;
+            width: 100%
+        }
 
-    .cc {
-        margin: 1em 0 .5em 9.4em
-    }
+        #l {
+            width: 200px;
+            background: #33363b;
+            color: #eee
+        }
 
-    .cf label {
-        text-align: right;
-        display: inline-block;
-        vertical-align: middle;
-        width: 10em;
-        margin: 0 1em 0 0;
-        font-size: .875em
-    }
+        #r {
+            background: #eee
+        }
 
-    .cc label {
-        font-size: .875em
-    }
+        a,
+        button,
+        h1,
+        h3,
+        h4,
+        input,
+        label,
+        li,
+        p,
+        span {
+            font-family: 'Titillium Web', sans-serif
+        }
 
-    input, select {
-        padding: .5em .6em;
-        display: inline-block;
-        border: 1px solid #ccc;
-        vertical-align: middle;
-        box-sizing: border-box
-    }
+        h4 {
+            font-size: 80%;
+            margin-bottom: 1px
+        }
 
-    .hint {
-        display: inline-block;
-        padding-left: .3em;
-        color: #aaa;
-        vertical-align: middle;
-        font-size: 80%
-    }
+        .lst {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
 
-    .b {
-        font-size: 100%;
-        padding: .5em 1em;
-        border: 1px solid #999;
-        border: none rgba(0, 0, 0, 0);
-        text-decoration: none;
-        color: white
-    }
+        .itm a,
+        .itm i {
+            display: block;
+            white-space: nowrap;
+            padding: 0 1em;
+            color: #777;
+            font-size: 80%
+        }
 
-    .bs {
-        background: #2fb548
-    }
+        .itm i {
+            font-weight: 700;
+            padding-top: .5em
+        }
 
-    .be {
-        background: #ca3c3c
-    }
+        .cf label,
+        .hint,
+        input,
+        select {
+            display: inline-block;
+            vertical-align: middle
+        }
 
-    .bw {
-        background: #df7514
-    }
+        .itm a:focus,
+        .itm a:hover {
+            background-color: #aaa;
+            text-decoration: none;
+            padding: 0 1.5em;
+            color: #000
+        }
 
-    .bc {
-        background: #42b8dd
-    }
+        .ci {
+            margin-bottom: 1em
+        }
 
-    .b:hover, .b:focus {
-        filter: alpha(opacity=90);
-        background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.10));
-        background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.10))
-    }</style>
-    <script type="text/javascript">hide = function (e) {
-        document.getElementById(e).style.display = 'none';
-    };
-    show = function (e) {
-        document.getElementById(e).style.display = 'inline';
-    };</script>
+        .ci h1 {
+            color: #999;
+            border-bottom: 1px solid #ddd;
+            font-size: 110%;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .ci .cd {
+            color: #aaa;
+            font-size: 80%;
+            font-style: italic;
+            margin-bottom: 2em;
+            margin-top: 0;
+        }
+
+        .cm {
+            color: #999;
+            font-size: 90%;
+            margin: 0 0 20px
+        }
+
+        .la {
+            margin: 0 .1em;
+            padding: .3em 1em;
+            color: #fff;
+            background: #999;
+            font-size: 80%
+        }
+
+        .cc label,
+        .cf label {
+            font-size: .875em
+        }
+
+        .lr {
+            background: #ca3c3c
+        }
+
+        .bs,
+        .lg {
+            background: #2fb548
+        }
+
+        fieldset {
+            margin: 0;
+            padding: .35em 0 .75em;
+            border: 0
+        }
+
+        .cf {
+            margin-bottom: .3em
+        }
+
+        .cc {
+            margin: 0 0 .1em 9.4em
+        }
+
+        .cf label {
+            text-align: right;
+            width: 10em;
+            margin: 0 1em 0 0
+        }
+
+        input,
+        select {
+            padding: .4em .6em;
+            border: 1px solid #ccc;
+            box-sizing: border-box
+        }
+
+        .hint {
+            padding-left: .5em;
+            color: #aaa;
+            font-size: 80%
+        }
+
+        .b {
+            font-size: 100%;
+            padding: .2em 1em;
+            border: 1px solid #999;
+            border: transparent;
+            color: #fff
+        }
+
+        .be {
+            background: #ca3c3c
+        }
+
+        .bw {
+            background: #df7514
+        }
+
+        .bc {
+            background: #42b8dd
+        }
+
+        .b:focus,
+        .b:hover {
+            filter: alpha(opacity=90);
+            background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
+            background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1))
+        }
+    </style>
 </head>
-<body>
-<div id="c">
-    <div id="l"><h3 class="ltit">AFE FIRMWARE</h3><h4 class="ltag">dla urządzeń zbudowanych o ESP8266</h4><h4>MENU</h4>
-        <ul class="lst">
-            <li class="itm"><a href="\?option=language">[PL] Język / [EN] Language</a></li>
-            <li class="itm"><a href="\?option=basic">Konfiguracja podstawowa</a></li>
-            <li class="itm"><a href="\?option=mqtt">MQTT Broker</a></li>
-            <li class="itm"><a href="\?option=relay">Przekaźnik</a></li>
-            <li class="itm"><a href="\?option=switch">Przycisk / Włącznik</a><br><br></li>
-            <li class="itm"><a href="\update">Aktulizacja firmware</a></li>
-            <li class="itm"><a href="\?option=reset">Przywracanie ustawień początkowych</a></li>
-            <br><br>
-            <li class="itm"><a href="\?option=exit">Zakończ konfigurację</a></li>
-        </ul>
-        <br><br><h4>INFORMACJE</h4>
-        <ul class="lst">
-            <li class="itm"><a href="http://smart-house.adrian.czabanowski.com/afe-firmware-pl/" target="_blank">Dokumentacja</a>
-            </li>
-            <li class="itm"><a href="http://smart-house.adrian.czabanowski.com/forum/firmware-do-przelacznika-sonoff/"
-                               target="_blank">Pomoc</a></li>
-            <li class="itm"><a href="https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE" target="_blank">Licencja</a>
-            </li>
-            <li class="itm"><a href="http://smart-house.adrian.czabanowski.com/afe-firmware-pl/t0/historia-zmian"
-                               target="_blank">Wersja 1.0.0 [T0]</a></li>
-        </ul>
-        <br><br><h4>WSPARCIE</h4>
 
-        <p class="cm">Oprogramowanie dostępne jest za darmo w ramach licencji <a
-                href="https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE" target="_blank" style="color:#fff">MIT</a>
-        </p>
-
-        <p class="cm">Jeśli spełnia Twoje oczekiwania to rozważ wsparcie <a href="https://adrian.czabanowski.com"
-                                                                            target="_blank"
-                                                                            style="color:#fff">autora</a>. Z góry dzięki
-        </p>
-        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VBPLM42PYCTM8&lc=PL&item_name=Wsparcie%20projektu%20AFE%20Firmware&item_number=Firmware%20%5bvT0%5d&currency_code=PLN&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"
-           target="_blank"><img src="https://adrian.czabanowski.com/images/paypal.png" border="0" alt="PayPal"
-                                style="width:290px"></a></div>
-    <div id="r">
-        <form action="/?option=basic&command=1" method="post">
-            <div class="ci"><h1>Nawa urządzenie</h1>
-
-                <p class="cd">Nazwa jest wykorzystywana jako nazwa hosta w Twojej lokalnej sieci WiFi oraz jako nazwa
-                    punktu dostępowego WiFi dla konfiguracji urządzenia</p>
+<body><img src="http://api.smartnydom.pl/logo/T6/2.5.1.B3/5CebCF98-7Fd3D37f/0/pl" style="width: 100%;display: block"
+        alt="AFE Firmware">
+    <div id="c">
+        <div id="r">
+            <div class="ci">
+                <h1>Urządzenie jest w trybie operacyjnym</h1>
+                <p class="cd">Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków</p>
                 <fieldset>
-                    <div class="cf"><label>Nazwa urządzenia*</label><input name="hostname" type="text" maxlength="16"
-                                                                           value="AFE-Device"><span class="hint">Max 16 znaków</span>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="ci"><h1>Konfiguracja dostępu do sieci WiFi</h1>
-
-                <p class="cd">Urządzenie bez dostępu do sieci WiFi będzie działać tylko w trybie sterowania ręcznego</p>
-                <fieldset>
-                    <div class="cf"><label>Nazwa sieci WiFI*</label><input name="wifi_ssid" type="text" maxlength="32"
-                                                                           value="POLICJA: Posterunek"><span
-                            class="hint">Max 32 znaków</span></div>
-                    <div class="cf"><label>Hasło*</label><input type="password" name="wifi_password" maxlength="32"
-                                                                value="1231231234"><span
-                            class="hint">Max 32 znaków</span></div>
-                </fieldset>
-            </div>
-            <div class="ci"><h1>Ustawienia sieci</h1>
-
-                <p class="cd">Możesz skonfigurowac siec ręcznie lub automatycznie za pośrednictwem DHCP</p>
-                <fieldset>
-                    <div class="cc"><label><input name="dhcp_config" type="checkbox" value="1" checked="checked" onclick="hide('manual')">
-                        Automatyczna konfiguracja przez DHCP?</label></div>
-                    <div id="manual">
-                    <div class="cf"><label>Adres IP</label><input name="device_ip1" type="number" maxlength="3"
-                                                                  style="width:70px" value="0">.<input name="device_ip2"
-                                                                                                       type="number"
-                                                                                                       maxlength="3"
-                                                                                                       style="width:70px"
-                                                                                                       value="0">.<input
-                            name="device_ip3" type="number" maxlength="3" style="width:70px" value="0">.<input
-                            name="device_ip4" type="number" maxlength="3" style="width:70px" value="0"></div>
-                    <div class="cf"><label>Bramka</label><input name="gateway_ip1" type="number" maxlength="3"
-                                                                style="width:70px" value="0">.<input name="gateway_ip2"
-                                                                                                     type="number"
-                                                                                                     maxlength="3"
-                                                                                                     style="width:70px"
-                                                                                                     value="0">.<input
-                            name="gateway_ip3" type="number" maxlength="3" style="width:70px" value="0">.<input
-                            name="gateway_ip4" type="number" maxlength="3" style="width:70px" value="0"></div>
-                    <div class="cf"><label>Maska sieci</label><input name="subnet_ip1" type="number" maxlength="3"
-                                                                     style="width:70px" value="255">.<input
-                            name="subnet_ip2" type="number" maxlength="3" style="width:70px" value="255">.<input
-                            name="subnet_ip3" type="number" maxlength="3" style="width:70px" value="255">.<input
-                            name="subnet_ip4" type="number" maxlength="3" style="width:70px" value="0"></div>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="ci"><h1>Konfiguracja nawiązywania połączeń z siecią WiFi</h1>
-
-                <p class="cd">Zaawansowane ustawienia dotyczące łączeniem się do sieci WiFi oraz MQTT Brokera</p>
-                <fieldset>
-                    <div class="cf"><label>Ilośc prób łączania się*</label><input name="no_connection_attempts"
-                                                                                  type="number" maxlength="3"
-                                                                                  value="10"><span
-                            class="hint">1-255</span></div>
-                    <div class="cf"><label>Czas między próbami łączenia się*</label><input type="number"
-                                                                                           name="wait_time_connections"
-                                                                                           maxlength="3" value="1"><span
-                            class="hint">1-255 (sekundy)</span></div>
-                    <div class="cf"><label>Czas po jakim powtórzyc próby łaczenia się*</label><input type="number"
-                                                                                                     name="wait_time_series"
-                                                                                                     maxlength="3"
-                                                                                                     value="60"><span
-                            class="hint">1-255 (sekundy)</span></div>
-                </fieldset>
-            </div>
-            <input type="submit" class="b bs" value="Zapisz"></form>
+                    <fieldset>
+                        <form method="post">
+                            <div class="cf"><input name="p" type="password" placeholder="Hasło"></div>
+                            <div class="cf"><input type="submit" class="b bs" value="Tryb normalny"
+                                    formaction="/?o=0&i=1" /> <input type="submit" class="b be" value="Tryb HotSpot"
+                                    formaction="/?o=0&i=2" /></div>
+                        </form>
+                    </fieldset>
+            </div><a style="color:#0475b6;" href="https://pl.donate.afe-firmware.smartnydom.pl"><small>&#128077; Używasz
+                    AFE? To może rozważ wsparcie N-setek godzin pracy włożonych przeze mnie. Dzięki.</small></a>
+        </div>
     </div>
-</div>
+    <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
+                src="https://img.shields.io/badge/Pomoc-Forum-red.svg" alt="Forum" /></a> <a
+            href="https://afe.smartnydom.pl/pl" target="_blank"><img
+                src="https://img.shields.io/badge/Pomoc-Dokumentacja-green.svg" alt="Dokumentacja" /></a> <a
+            href="https://afe.smartnydom.pl/pl/pliki-to-pobrania/historia-zmian" target="_blank"><img
+                src="https://img.shields.io/badge/Wersja%20-%202.5.1.B3[T6]-blue.svg" alt="T6-2.5.1.B3" /></a> <img
+            src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 5CebCF98-7Fd3D37f" /> <img
+            src="https://img.shields.io/badge/API-Standard-yellow.svg" /> <img
+            src="https://img.shields.io/badge/PRO-Nie-orange.svg" alt="PRO" /> <img
+            src="https://img.shields.io/badge/Mem-21KB-9cf.svg" alt="PRO" /> <img
+            src="https://img.shields.io/badge/Size-4Mb-yellowgreen.svg" /></div>
 </body>
+
 </html>
