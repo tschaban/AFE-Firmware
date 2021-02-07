@@ -62,39 +62,51 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-    // @TODO Missing noOf check
-    MqttAPI.addClass(&BMEX80Sensor[0]);
+    if (Device.configuration.noOfBMEX80s > 0) {
+      MqttAPI.addClass(&BMEX80Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    MqttAPI.addClass(&ParticleSensor[0]);
+    if (Device.configuration.noOfHPMA115S0s > 0) {
+      MqttAPI.addClass(&HPMA115S0Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    // @TODO Missing noOf check
-    MqttAPI.addClass(&BH1750Sensor[0]);
+    if (Device.configuration.noOfBH1750s > 0) {
+      MqttAPI.addClass(&BH1750Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-    MqttAPI.addClass(&AS3935Sensor[0]);
+    if (Device.configuration.noOfAS3935s > 0) {
+      MqttAPI.addClass(&AS3935Sensor[0]);
+    }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-    MqttAPI.addClass(&AnemometerSensor);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+    if (Device.configuration.noOfAnemometerSensors > 0) {
+      MqttAPI.addClass(&AnemometerSensor);
+    }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-    MqttAPI.addClass(&RainSensor);
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+    if (Device.configuration.noOfRainmeterSensors > 0) {
+      MqttAPI.addClass(&RainSensor);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    // @TODO Missing noOf check
-    MqttAPI.addClass(&Gate[0]);
+    if (Device.configuration.noOfGates > 0) {
+      MqttAPI.addClass(&Gate[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-
-    MqttAPI.addClass(&Contactron[0]);
+    if (Device.configuration.noOfContactrons > 0) {
+      MqttAPI.addClass(&Contactron[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -165,7 +177,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpAPI.addClass(&ParticleSensor[0]);
+    HttpAPI.addClass(&HPMA115S0Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -177,11 +189,11 @@ void initializeHTTPAPI(void) {
     HttpAPI.addClass(&AS3935Sensor[0]);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     HttpAPI.addClass(&AnemometerSensor);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
     HttpAPI.addClass(&RainSensor);
 #endif
 
@@ -268,7 +280,7 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpDomoticzAPI.addClass(&ParticleSensor[0]);
+    HttpDomoticzAPI.addClass(&HPMA115S0Sensor[0]);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
@@ -280,11 +292,11 @@ void initializeHTTPDomoticzAPI(void) {
     HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     HttpDomoticzAPI.addClass(&AnemometerSensor);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
     HttpDomoticzAPI.addClass(&RainSensor);
 #endif
 
@@ -327,7 +339,6 @@ void initializeHTTPDomoticzAPI(void) {
       HttpDomoticzAPI.addClass(&BinarySensor[0]);
     }
 #endif
-
 
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");

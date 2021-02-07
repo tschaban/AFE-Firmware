@@ -40,6 +40,7 @@ private:
 
 #ifdef T6_CONFIG
   void upgradeToT6V230();
+  void upgradeToT6V250();
 #endif
 
 public:

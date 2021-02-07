@@ -3,24 +3,17 @@
 #ifndef _AFE_Sensor_Rainmeter_h
 #define _AFE_Sensor_Rainmeter_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 
 #include <AFE-Data-Access.h>
-#include <AFE-Sensor-Binary.h>
+#include <AFE-Impulse-Catcher.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFESensorRainmeter {
+class AFERainmeter {
 
 public:
   RAINMETER configuration;
@@ -33,15 +26,11 @@ public:
   float rainLevelLast24Hours = 0;
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructors */
-  AFESensorRainmeter();
+  AFERainmeter();
 
   /* Init switch */
-  boolean begin(AFEDataAccess *, AFESensorBinary *);
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
@@ -49,12 +38,12 @@ public:
   boolean listener(void);
 
 private:
-  AFESensorBinary *_Sensor;
+  AFEImpulseCatcher *_Sensor;
   AFEDataAccess *_Data;
   boolean _initialized = false;
   uint32_t startTime = 0;
   uint32_t start60Sec = 0;
 };
 
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 #endif

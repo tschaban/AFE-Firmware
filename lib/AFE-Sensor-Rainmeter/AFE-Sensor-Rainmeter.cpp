@@ -2,23 +2,15 @@
 
 #include "AFE-Sensor-Rainmeter.h"
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 
-AFESensorRainmeter::AFESensorRainmeter(){};
+AFERainmeter::AFERainmeter(){};
 
-boolean AFESensorRainmeter::begin(AFEDataAccess *Data,
-                                  AFESensorBinary *Sensor) {
+boolean AFERainmeter::begin(AFEDataAccess *Data,
+                                  AFEImpulseCatcher *Sensor) {
   _Data = Data;
   _Sensor = Sensor;
   Data->getConfiguration(&configuration);
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
 
   _initialized = true;
 
@@ -55,7 +47,7 @@ boolean AFESensorRainmeter::begin(AFEDataAccess *Data,
   return _initialized;
 }
 
-boolean AFESensorRainmeter::listener(void) {
+boolean AFERainmeter::listener(void) {
   boolean _ret = false;
   if (_initialized) {
 
@@ -145,7 +137,7 @@ boolean AFESensorRainmeter::listener(void) {
   return _ret;
 }
 
-void AFESensorRainmeter::getJSON(char *json) {
+void AFERainmeter::getJSON(char *json) {
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
                 "min\"},{\"value\":%.3f,\"unit\":\"mm/"
@@ -161,4 +153,4 @@ void AFESensorRainmeter::getJSON(char *json) {
 #endif
 }
 
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER

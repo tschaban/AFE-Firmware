@@ -70,6 +70,8 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 #ifdef DEBUG
     checkBmeStatus();
 #endif
+
+
   }
 
   return true;
@@ -85,7 +87,7 @@ boolean AFESensorBME680::read() {
     data.pressure.value = Bme.pressure / 100;
     data.humidity.value = Bme.humidity;
     data.gasResistance.value = Bme.gasResistance / 1000;
-    data.iaq.value = Bme.iaqEstimate;
+    data.iaq.value = Bme.iaq;
     data.iaq.accuracy = Bme.iaqAccuracy;
     data.staticIaq.value = Bme.staticIaq;
     data.staticIaq.accuracy = Bme.staticIaqAccuracy;
@@ -93,24 +95,6 @@ boolean AFESensorBME680::read() {
     data.co2Equivalent.accuracy = Bme.co2Accuracy;
     data.breathVocEquivalent.value = Bme.breathVocEquivalent;
     data.breathVocEquivalent.accuracy = Bme.breathVocAccuracy;
-    /*
-    #ifdef DEBUG
-        Serial << endl
-               << endl
-               << F("INFO: Unused BME sensor data:") << endl
-               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
-               << F(" - rawHumidity: ") << Bme.rawTemperature << endl
-               << F(" - stabStatus: ") << Bme.stabStatus << endl
-               << F(" - runInStatus: ") << Bme.runInStatus << endl
-               << F(" - rawTemperature: ") << Bme.rawTemperature << endl
-               << F(" - gasPercentage: ") << Bme.gasPercentage << endl
-               << F(" - compGasValue: ") << Bme.compGasValue << endl
-               << F(" - compGasAccuracy: ") << Bme.compGasAccuracy << endl
-               << F(" - gasPercentageAcccuracy: ") << Bme.gasPercentageAcccuracy
-               << endl;
-
-    #endif
-    */
     updateState();
     dataInBuffer = true;
   }
@@ -155,6 +139,7 @@ void AFESensorBME680::checkBmeStatus() {
 #endif
 
 void AFESensorBME680::loadState(void) {
+
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Bosch: Reading state from EEPROM: ");

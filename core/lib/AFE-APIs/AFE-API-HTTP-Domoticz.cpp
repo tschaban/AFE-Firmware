@@ -87,7 +87,7 @@ boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
 
 boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
                                                     const char *value,
-                                                    uint8_t nvalue) {
+                                                    uint16_t nvalue) {
   boolean _return = false;
   if (enabled) {
     String call = getApiCall("udevice", idx);
@@ -212,7 +212,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%-.2f;%-.2f;%-d",
                 _BMx80Sensor[id]->data.temperature.value,
                 _BMx80Sensor[id]->data.humidity.value,
-                _BMx80Sensor[id]->getDomoticzHumidityState(
+                _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                     _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.temperatureHumidity.idx,
@@ -224,7 +224,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%-.2f;%-.2f;%-d;%-.2f;0",
                 _BMx80Sensor[id]->data.temperature.value,
                 _BMx80Sensor[id]->data.humidity.value,
-                _BMx80Sensor[id]->getDomoticzHumidityState(
+                _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                     _BMx80Sensor[id]->data.humidity.value),
                 _BMx80Sensor[id]->data.pressure.value);
         sendCustomSensorCommand(
@@ -234,12 +234,25 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
       }
 
       if (_BMx80Sensor[id]->configuration.domoticz.humidity.idx > 0) {
-        sprintf(value, "%d", _BMx80Sensor[id]->getDomoticzHumidityState(
+        sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                                  _BMx80Sensor[id]->data.humidity.value));
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.humidity.idx, value,
             (uint8_t)_BMx80Sensor[id]->data.humidity.value);
       }
+
+      if (_BMx80Sensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
+        sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
+                                 _BMx80Sensor[id]->data.humidity.value));
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.absoluteHumidity.idx,
+            value, (uint8_t)_BMx80Sensor[id]->absoluteHumidity(
+                       _BMx80Sensor[id]->data.temperature.value,
+                       _BMx80Sensor[id]->data.humidity.value,
+                       _BMx80Sensor[id]->configuration.temperature.unit ==
+                           AFE_TEMPERATURE_UNIT_FAHRENHEIT));
+      }
+
       if (_BMx80Sensor[id]->configuration.domoticz.dewPoint.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.dewPoint.value);
         sendCustomSensorCommand(
@@ -249,6 +262,37 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data.heatIndex.value);
         sendCustomSensorCommand(
             _BMx80Sensor[id]->configuration.domoticz.heatIndex.idx, value);
+      }
+
+      /* Perception */
+      if (_BMx80Sensor[id]->configuration.domoticz.perception.idx > 0) {
+        char _perception[22]; // Max size of Perception from lang.pack
+        byte _perceptionId = _BMx80Sensor[id]->perception(
+            _BMx80Sensor[id]->data.temperature.value,
+            _BMx80Sensor[id]->data.humidity.value,
+            _BMx80Sensor[id]->configuration.temperature.unit ==
+                AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        strcpy_P(_perception,
+                 (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
+
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.heatIndex.idx, _perception,
+            _BMx80Sensor[id]->convertPerceptionDomoticz(_perceptionId));
+      }
+
+      /* Comfort */
+      if (_BMx80Sensor[id]->configuration.domoticz.comfort.idx > 0) {
+        char _comfort[80]; // Max size of Comfort from lang.pack
+        ComfortState comfortStatus;
+        _BMx80Sensor[id]->comfort(
+            comfortStatus, _BMx80Sensor[id]->data.temperature.value,
+            _BMx80Sensor[id]->data.humidity.value,
+            _BMx80Sensor[id]->configuration.temperature.unit ==
+                AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+        strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
+        sendCustomSensorCommand(
+            _BMx80Sensor[id]->configuration.domoticz.heatIndex.idx, _comfort,
+            _BMx80Sensor[id]->convertComfortDomoticz(comfortStatus));
       }
     }
 
@@ -300,16 +344,30 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorHPMA115S0 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishHPMA115S0SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled) {
-    char value[20]; // @TODO CHeck the max size
-    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
-      sprintf(value, "%-.d", _HPMA115S0Sensor[id]->data.pm25);
-      sendCustomSensorCommand(
-          _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value);
-    }
+    char value[5];
     if (_HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx > 0) {
-      sprintf(value, "%-.d", _HPMA115S0Sensor[id]->data.pm10);
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.pm10);
       sendCustomSensorCommand(
-          _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value);
+          _HPMA115S0Sensor[id]->configuration.domoticz.pm10.idx, value,
+          _HPMA115S0Sensor[id]->data.pm10);
+    }
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx > 0) {
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.pm25);
+      sendCustomSensorCommand(
+          _HPMA115S0Sensor[id]->configuration.domoticz.pm25.idx, value,
+          _HPMA115S0Sensor[id]->data.pm25);
+    }
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.whoPM10Norm.idx > 0) {
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.whoPM10Norm);
+      sendCustomSensorCommand(
+          _HPMA115S0Sensor[id]->configuration.domoticz.whoPM10Norm.idx, value,
+          _HPMA115S0Sensor[id]->data.whoPM10Norm);
+    }
+    if (_HPMA115S0Sensor[id]->configuration.domoticz.whoPM25Norm.idx > 0) {
+      sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data.whoPM25Norm);
+      sendCustomSensorCommand(
+          _HPMA115S0Sensor[id]->configuration.domoticz.whoPM25Norm.idx, value,
+          _HPMA115S0Sensor[id]->data.whoPM25Norm);
     }
     _ret = true;
   }
@@ -351,8 +409,8 @@ boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorAnemometer *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+void AFEAPIHTTPDomoticz::addClass(AFEAnemometer *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -366,10 +424,10 @@ void AFEAPIHTTPDomoticz::publishAnemometerSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorRainmeter *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+void AFEAPIHTTPDomoticz::addClass(AFERainmeter *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
@@ -384,7 +442,7 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
@@ -593,7 +651,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPIHTTPDomoticz::addClass(AFESensorBinary *Sensor) {
+void AFEAPIHTTPDomoticz::addClass(AFEImpulseCatcher *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
@@ -601,7 +659,7 @@ boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
   if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
     publishStatus =
         sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
-                          _BinarySensor[id]->get()==1 ? "Off" : "On");
+                          _BinarySensor[id]->get() == 1 ? "Off" : "On");
   }
   return publishStatus;
 }

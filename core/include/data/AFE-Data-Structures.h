@@ -92,11 +92,11 @@
 #include <AFE-I2C-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <AFE-ANEMOMETER-Sensor-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <AFE-RAINMETER-Sensor-Structure.h>
 #endif
 

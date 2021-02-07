@@ -318,7 +318,8 @@
 
 
 /* HPMA11BS0 */
-#define L_HPMA115S0_SENSOR "PM2.5/PM10 Particle Sensor"
+#define L_PARTICLE_SENSORS "Particle Sensors"
+#define L_HPMA115S0_SENSOR "HPMA115S0"
 #define L_HPMA115S0_POST_SLEEP_INTERVAL                                           \
   "If the parameter below is different than 0, the sensor will go to sleep "   \
   "mode between measurements. The setting below defined how many seconds "     \
@@ -326,6 +327,9 @@
   "measurement's interval"
 #define L_HPMA115S0_MEASURE_AFTER "Measure after"
 #define L_HPMA115S0_MQTT_TOPIC "HPMA115S0 Sensor's MQTT Topic"
+#define L_HPMA115S0_WHO_NORMS "WHO Norms for the average daily particles concentration"
+#define L_HPMA115S0_WHO_NORMS_HINT "You can overwrite WHO Norms with your own or applicable in your area"
+#define L_HPMA115S0_WHO_NORM_UNIT "average daily concentration in µg/m3 "
 
 
 /* BMX080 */
@@ -386,7 +390,9 @@
 #define L_DHT_MQTT_TOPIC "DHT Sensor's MQTT Topic"
 #define L_DHT_SENSOR_TYPE "Type"
 #define L_DHT_AUTO_DETECT "Detect automatically"
+#endif // AFE_CONFIG_HARDWARE_DHT
 
+#if defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY) 
 const char dewPointPerception_Dry[] PROGMEM = "A bit dry for some";
 const char dewPointPerception_VeryComfy[] PROGMEM = "Very comfortable";
 const char dewPointPerception_Comfy[] PROGMEM = "Comfortable";
@@ -408,10 +414,11 @@ const char comfort_TooHumid[] PROGMEM     = "Too humid";
 const char comfort_HotAndHumid[] PROGMEM  = "Hot and humid";
 const char comfort_ColdAndHumid[] PROGMEM = "Cold and humid";
 const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
-#endif // AFE_CONFIG_HARDWARE_DHT
+#endif
+
 
 /* Anemometer Sensor */
-#define L_ANEMOMETER_SENSOR "Anemometer speed sensor"
+#define L_ANEMOMETER_SENSOR "Anemometer"
 #define L_ANEMOMETER_SENSITIVENESS_HINT "Sensitiveness should be adjusted experimentally until sensor behaves as expected. Lower value more sensitive sensor"
 #define L_ANEMOMETER_CALIBRATION "Anemometer calibration"
 #define L_ANEMOMETER_IMPULSE_DISTANCE_HINT "Wind distans per one anemometer impulse"

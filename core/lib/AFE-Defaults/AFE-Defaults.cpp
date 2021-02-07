@@ -85,11 +85,11 @@ void AFEDefaults::set() {
     Data->createAS3935SensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     Data->createAnemometerSensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
     Data->createRainmeterSensorConfigurationFile();
     Data->createRainmeterSensorDataConfigurationFile();
 #endif

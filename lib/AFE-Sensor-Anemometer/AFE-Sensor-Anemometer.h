@@ -5,16 +5,17 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#include <AFE-Data-Access.h>
 #include <arduino.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Impulse-Catcher.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFESensorAnemometer {
+class AFEAnemometer {
 
 public:
   ANEMOMETER configuration;
@@ -23,15 +24,11 @@ public:
   float lastSpeedKMH =
       0; // used by HTTPs API - stores and gets the lastest value by HTTP API
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
-#endif
-
   /* Constructors */
-  AFESensorAnemometer();
+  AFEAnemometer();
 
   /* Init switch */
-  boolean begin(AFEDataAccess *, AFESensorBinary *);
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
@@ -39,7 +36,7 @@ public:
   boolean listener(void);
 
 private:
-  AFESensorBinary *_Sensor;
+  AFEImpulseCatcher *_Sensor;
   AFEDataAccess *_Data;
   boolean _initialized = false;
   uint32_t startTime = 0;
@@ -57,5 +54,5 @@ private:
 
 };
 
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 #endif // _AFE_Sensor_Wind_h

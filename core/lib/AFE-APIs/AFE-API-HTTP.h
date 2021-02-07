@@ -46,11 +46,11 @@
 #include <AFE-Sensor-AS3935.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <AFE-Sensor-Anemometer.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <AFE-Sensor-Rainmeter.h>
 #endif
 
@@ -119,12 +119,12 @@ private:
   AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  AFESensorAnemometer *_AnemometerSensor;
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  AFEAnemometer *_AnemometerSensor;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  AFESensorRainmeter *_RainmeterSensor;
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  AFERainmeter *_RainmeterSensor;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -153,7 +153,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+  AFEImpulseCatcher *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
   /* Classifies and invokes code for HTTP request processing */
@@ -187,11 +187,11 @@ private:
   void processAS3935(HTTPCOMMAND *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void processAnemometerSensor(HTTPCOMMAND *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void processRainSensor(HTTPCOMMAND *);
 #endif
 
@@ -275,12 +275,12 @@ public:
   void addClass(AFESensorAS3935 *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
-  void addClass(AFESensorAnemometer *);
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  void addClass(AFEAnemometer *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
-  void addClass(AFESensorRainmeter *);
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  void addClass(AFERainmeter *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -308,7 +308,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  void addClass(AFESensorBinary *);
+  void addClass(AFEImpulseCatcher *);
 #endif
 };
 

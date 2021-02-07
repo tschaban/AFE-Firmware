@@ -141,11 +141,11 @@ private:
   void getAS3935SensorData(AS3935 *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void getAnemometerSensorData(ANEMOMETER *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void getRainmeterSensorData(RAINMETER *);
 #endif
 

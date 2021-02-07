@@ -4,6 +4,7 @@
 #define _AFE_DOMOTICZ_Structure_h
 
 #include <AFE-Configuration.h>
+#include <Arduino.h>
 
 struct DOMOTICZ_BASIC_CONFIG {
   uint32_t idx = AFE_DOMOTICZ_DEFAULT_IDX;

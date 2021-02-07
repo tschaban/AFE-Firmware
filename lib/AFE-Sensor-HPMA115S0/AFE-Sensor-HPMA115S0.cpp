@@ -7,15 +7,7 @@ AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
 void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  Data.getConfiguration(id,&configuration);
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
+  Data.getConfiguration(id, &configuration);
 
   // SerialBus.init(13, 14, false, 64);
   // SerialBus.begin(9600);
@@ -262,16 +254,8 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   return _ret;
 }
 
-boolean AFESensorHPMA115S0::isReady() {
-  if (ready) {
-    ready = false;
-    return true;
-  } else {
-    return false;
-  }
-}
-
-void AFESensorHPMA115S0::listener() {
+boolean AFESensorHPMA115S0::listener() {
+  boolean ready = false;
   if (_initialized) {
     if ((millis() - startTime >= configuration.interval * 1000) &&
         _measuremntsON) {
@@ -285,7 +269,8 @@ void AFESensorHPMA115S0::listener() {
 //      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
 #endif
 
       UART.send(commandRead);
@@ -293,6 +278,13 @@ void AFESensorHPMA115S0::listener() {
         data.pm25 = buffer.pm25;
         data.pm10 = buffer.pm10;
         if (data.pm25 != 0 || data.pm10 != 0) {
+          data.whoPM25Norm = configuration.whoPM25Norm > 0
+                                 ? 100 / configuration.whoPM25Norm * data.pm25
+                                 : 0;
+          data.whoPM10Norm = configuration.whoPM10Norm > 0
+                                 ? 100 / configuration.whoPM10Norm * data.pm10
+                                 : 0;
+
           ready = true;
         }
       }
@@ -303,7 +295,8 @@ void AFESensorHPMA115S0::listener() {
         read(true) ? _measuremntsON = false : _measuremntsON = true;
       }
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
       Serial << endl << F("------------------------------");
 #endif
     }
@@ -321,19 +314,22 @@ void AFESensorHPMA115S0::listener() {
         read(true) ? _measuremntsON = true : _measuremntsON = false;
       }
 #if defined(DEBUG)
-      Serial << endl << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
+      Serial << endl
+             << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
       Serial << endl << F("---------------------------------");
 #endif
     }
   }
+  return ready;
 }
 
 void AFESensorHPMA115S0::getJSON(char *json) {
-
   sprintf(json,
-          "{\"PM25\":{\"value\":%d,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
-          "%d,\"unit\":\"µg/m3\"}}",
-          data.pm25, data.pm10);
+          "{\"PM25\":{\"value\":%.2f,\"unit\":\"µg/m3\"},\"PM10\":{\"value\":"
+          "%.2f,\"unit\":\"µg/"
+          "m3\"},\"WHO\":{\"PM25\":{\"value\":%.2f,\"unit\":\"%%\"},\"PM10\":{"
+          "\"value\":%.2f,\"unit\":\"%%\"}}}",
+          data.pm25, data.pm10, data.whoPM25Norm, data.whoPM10Norm);
 }
 
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0

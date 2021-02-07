@@ -196,20 +196,20 @@ public:
   void createAS3935SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void getConfiguration(ANEMOMETER *);
   void saveConfiguration(ANEMOMETER *);
   void createAnemometerSensorConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void getConfiguration(RAINMETER *);
   void saveConfiguration(RAINMETER *);
   void createRainmeterSensorConfigurationFile();
   void get(RAINMETER_DATA *);
   void save(RAINMETER_DATA *);
   void createRainmeterSensorDataConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 /* Methods turns on / off APIs */
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL

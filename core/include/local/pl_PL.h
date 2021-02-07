@@ -317,7 +317,8 @@
 #define L_GATE_IDX_STATE "IDX Stan bramy/drzwi"
 
 /* HPMA11BS0 */
-#define L_HPMA115S0_SENSOR "Czujnik cząstek PM2.5/PM10"
+#define L_PARTICLE_SENSORS "Czujniki pyłów"
+#define L_HPMA115S0_SENSOR "HPMA115S0"
 #define L_HPMA115S0_POST_SLEEP_INTERVAL                                              \
   "Jeśli poniższa wartość jest większa od 0 to czujnik będzie usypiany "    \
   "między odczytami. Wartość poniżej definiuje na ile sekund przed odczytem " \
@@ -325,6 +326,11 @@
   "pomiarów"
 #define L_HPMA115S0_MEASURE_AFTER "Pomiar po czasie"
 #define L_HPMA115S0_MQTT_TOPIC "Temat MQTT czujnika HPMA115S0"
+#define L_HPMA115S0_WHO_NORMS "Normy WHO średniego dobowego stężenia pyłów"
+#define L_HPMA115S0_WHO_NORMS_HINT "Normy WHO możesz nadpisać własnymi lub obowiązującymi w danym kraju"
+#define L_HPMA115S0_WHO_NORM_UNIT "średnie dobowe w µg/m3"
+
+
 
 
 /* BMEX80 */
@@ -384,7 +390,10 @@
 #define L_DHT_MQTT_TOPIC "MQTT Temat informacji z czujnika DHT"
 #define L_DHT_SENSOR_TYPE "Typ czujnika"
 #define L_DHT_AUTO_DETECT "Wykryj automatycznie"
+#endif // AFE_CONFIG_HARDWARE_DHT
 
+
+#if defined(AFE_CONFIG_TEMPERATURE) && defined(AFE_CONFIG_HUMIDITY) 
 const char dewPointPerception_Dry[] PROGMEM = "Dla niektórych trochę sucho";
 const char dewPointPerception_VeryComfy[] PROGMEM = "Bardzo komfortowo";
 const char dewPointPerception_Comfy[] PROGMEM = "Komfortowo";
@@ -406,7 +415,7 @@ const char comfort_TooHumid[] PROGMEM     = "Za wilgotno";
 const char comfort_HotAndHumid[] PROGMEM  = "Gorąco i wilgotno";
 const char comfort_ColdAndHumid[] PROGMEM = "Zimno i wilgotno";
 const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
-#endif // AFE_CONFIG_HARDWARE_DHT
+#endif
 
 
 /* Anemometer Sensor */

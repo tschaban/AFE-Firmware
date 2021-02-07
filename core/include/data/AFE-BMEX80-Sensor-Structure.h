@@ -3,7 +3,6 @@
 #ifndef _AFE_BMEX80_Structure_h
 #define _AFE_BMEX80_Structure_h
 
-
 #include <AFE-Air-Item-Structure.h>
 #include <AFE-Configuration.h>
 
@@ -27,6 +26,9 @@ struct BMEX80_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG staticIaq;
   DOMOTICZ_BASIC_CONFIG co2Equivalent;
   DOMOTICZ_BASIC_CONFIG breathVocEquivalent;
+  DOMOTICZ_BASIC_CONFIG perception;
+  DOMOTICZ_BASIC_CONFIG comfort;
+  DOMOTICZ_BASIC_CONFIG absoluteHumidity;
 };
 #endif
 

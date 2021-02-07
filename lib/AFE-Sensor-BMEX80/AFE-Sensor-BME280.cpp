@@ -25,7 +25,7 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
       return false;
     } else {
       bme.setSampling(
-          Adafruit_BME280::BME280_MODE_FORCED, Adafruit_BME280::SAMPLING_X1,
+          Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1,
           Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1,
           Adafruit_BME280::FILTER_OFF);
 

@@ -155,6 +155,13 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(FirmwareConfiguration.version, "2.2.2") == 0) {
     upgradeToT6V230();
   }
+
+  if (strcmp(FirmwareConfiguration.version, "2.3.0") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.3.1") == 0 ||
+      strcmp(FirmwareConfiguration.version, "2.3.1.E1") == 0) {
+    upgradeToT6V250();
+  }
+
 #endif
 
   Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
@@ -245,10 +252,10 @@ void AFEUpgrader::upgradeToT5V220() {
 
 #ifdef T6_CONFIG
 void AFEUpgrader::upgradeToT6V230() {
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   Data->createAnemometerSensorConfigurationFile();
 #endif
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
   Data->createRainmeterSensorConfigurationFile();
   Data->createRainmeterSensorDataConfigurationFile();
 #endif
@@ -256,4 +263,14 @@ void AFEUpgrader::upgradeToT6V230() {
   Data->createADCInputConfigurationFile();
 #endif
 }
+
+void AFEUpgrader::upgradeToT6V250() {
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+  Data->createDS18B20SensorConfigurationFile();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  Data->createDHTSensorConfigurationFile();
+#endif
+}
+
 #endif // T6_CONFIG
