@@ -1992,7 +1992,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    sprintf(_number, "%d", configuration.domoticz.whoPM25Norm.idx);
+    sprintf(_number, "%d", configuration.domoticz.whoPM10Norm.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x3", "IDX WHO PM10",
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
