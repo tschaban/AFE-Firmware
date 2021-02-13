@@ -126,7 +126,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  void getHPMA115S0SensorData(HPMA115S0 *);
+  void get(HPMA115S0 &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -138,15 +138,15 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  void getAS3935SensorData(AS3935 *);
+  void get(AS3935 &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  void getAnemometerSensorData(ANEMOMETER *);
+  void get(ANEMOMETER &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  void getRainmeterSensorData(RAINMETER *);
+  void get(RAINMETER &data);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC

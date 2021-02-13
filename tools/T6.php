@@ -4,8 +4,8 @@
 /* Set this before run */
 
 $type = "6";
-$version = "2.5.1";
-$language = "EN";
+$version = "2.5.2";
+$language = "PL";
 
 /******************/
 
