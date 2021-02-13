@@ -129,11 +129,14 @@ recaptchacontact:
 	* zawiera wersje generyczne oraz skonfigurowane pod konkretne urządzenia
 	* pakiet do pobrania zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
-##### [Pobierz najnowszą wersję 2.5.1](https://www.smartnydom.pl/download/afe-firmware-t6-2-5-1/)
+
+
+##### [Pobierz najnowszą wersję 2.5.2](https://www.smartnydom.pl/download/afe-firmware-t6-2-5-2/?target=_blank)
 
 !!! Werja 1Mb po wgraniu nie ma możliwości aktualizacji przez przeglądarkę
 
 **Poprzednie wersje**
+* Wersja [2.5.1](https://www.smartnydom.pl/download/afe-firmware-t6-2-5-1/?target=_blank)
 * Wersja [2.3.1](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-1/?target=_blank)
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t6-stacja-pogody-2-3-0/?target=_blank)
 * Wersja [2.2.2](https://www.smartnydom.pl/download/afe-firmware-t6-2-2-2/?target=_blank)
