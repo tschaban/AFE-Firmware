@@ -3,42 +3,28 @@
 
 <head>
     <meta charset="utf-8">
-    <title>AFE Firmware 2.5.1.B3 [T6]</title>
+    <title>AFE Firmware 2.5.1 [T6]</title>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
     <style>
         html {
-            background: url(images/background.jpg) no-repeat center center fixed;
+            background: url(images/background-6.jpg) no-repeat center center fixed;
             -webkit-background-size: cover;
             -moz-background-size: cover;
             -o-background-size: cover;
             background-size: cover;
-            background-color: #ddd;
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        #l,
-        #r {
-            padding: 20px;
+        .l,
+        .r {
+            margin: 0;
+            padding: 0 1.2em 1.2em 1.2em;
             display: table-cell
         }
 
         .ltit,
         body {
-            margin: 20px;
+            margin: auto
         }
 
         .b,
@@ -48,25 +34,30 @@
         }
 
         body {
-            opacity: 0.95;
-            padding: 30px;
-            margin:auto;
-            max-width: 1024px;
+            padding: 2em;
+            max-width: 980px;
         }
 
-        #c {
+        .c {
             display: table;
-            width: 100%
+            width: 100%;
+            margin-bottom: 3em;
         }
 
-        #l {
+        .l {
             width: 200px;
-            background: #33363b;
-            color: #eee
+            background: #000;
+            color: #fff;
+            border-top-left-radius: .8em;
+            border-bottom-left-radius: .8em;
+            opacity: 0.6;
         }
 
-        #r {
-            background: #eee
+        .r {
+            background: #eee;
+            border-top-right-radius: .8em;
+            border-bottom-right-radius: .8em;
+            opacity: 0.93;
         }
 
         a,
@@ -83,7 +74,7 @@
         }
 
         h4 {
-            font-size: 80%;
+            font-size: 0.8em;
             margin-bottom: 1px
         }
 
@@ -99,7 +90,7 @@
             white-space: nowrap;
             padding: 0 1em;
             color: #777;
-            font-size: 80%
+            font-size: 0.8em
         }
 
         .itm i {
@@ -130,9 +121,10 @@
         .ci h1 {
             color: #999;
             border-bottom: 1px solid #ddd;
-            font-size: 110%;
+            font-size: 1.2em;
             font-weight: 500;
-            margin-bottom: 0;
+            margin: 0;
+
         }
 
         .ci .cd {
@@ -233,37 +225,32 @@
     </style>
 </head>
 
-<body><img src="http://api.smartnydom.pl/logo/T6/2.5.1.B3/5CebCF98-7Fd3D37f/0/pl" style="width: 100%;display: block"
-        alt="AFE Firmware">
-    <div id="c">
-        <div id="r">
+<body>
+    <div class="c">
+        <div class="l">
+            <h1>AFE Firmware</h1>
+            <h4>Wersja T0.3.0.0</h4>
+
+
+
+        </div>
+        <div class="r">
             <div class="ci">
                 <h1>Urządzenie jest w trybie operacyjnym</h1>
                 <p class="cd">Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków</p>
                 <fieldset>
-                    <fieldset>
-                        <form method="post">
-                            <div class="cf"><input name="p" type="password" placeholder="Hasło"></div>
-                            <div class="cf"><input type="submit" class="b bs" value="Tryb normalny"
-                                    formaction="/?o=0&i=1" /> <input type="submit" class="b be" value="Tryb HotSpot"
-                                    formaction="/?o=0&i=2" /></div>
-                        </form>
-                    </fieldset>
+
+                    <form method="post">
+                        <div class="cf"><input name="p" type="password" placeholder="Hasło"></div>
+                        <div class="cf"><input type="submit" class="b bs" value="Tryb normalny"
+                                formaction="/?o=0&i=1" /> <input type="submit" class="b be" value="Tryb HotSpot"
+                                formaction="/?o=0&i=2" /></div>
+                    </form>
+                </fieldset>
             </div><a style="color:#0475b6;" href="https://pl.donate.afe-firmware.smartnydom.pl"><small>&#128077; Używasz
                     AFE? To może rozważ wsparcie N-setek godzin pracy włożonych przeze mnie. Dzięki.</small></a>
         </div>
     </div>
-    <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
-                src="https://img.shields.io/badge/Pomoc-Forum-red.svg" alt="Forum" /></a> <a
-            href="https://afe.smartnydom.pl/pl" target="_blank"><img
-                src="https://img.shields.io/badge/Pomoc-Dokumentacja-green.svg" alt="Dokumentacja" /></a> <a
-            href="https://afe.smartnydom.pl/pl/pliki-to-pobrania/historia-zmian" target="_blank"><img
-                src="https://img.shields.io/badge/Wersja%20-%202.5.1.B3[T6]-blue.svg" alt="T6-2.5.1.B3" /></a> <img
-            src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 5CebCF98-7Fd3D37f" /> <img
-            src="https://img.shields.io/badge/API-Standard-yellow.svg" /> <img
-            src="https://img.shields.io/badge/PRO-Nie-orange.svg" alt="PRO" /> <img
-            src="https://img.shields.io/badge/Mem-21KB-9cf.svg" alt="PRO" /> <img
-            src="https://img.shields.io/badge/Size-4Mb-yellowgreen.svg" /></div>
 </body>
 
 </html>

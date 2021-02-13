@@ -21,9 +21,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
   if (siteConfig->twoColumns) {
-    Site.generateTwoColumnsLayout(page, siteConfig->rebootTime);
+    Site.generateMenu(page, siteConfig->rebootTime);
   } else {
-    Site.generateOneColumnLayout(page, siteConfig->rebootTime);
+    Site.generateEmptyMenu(page, siteConfig->rebootTime);
   }
 
   if (siteConfig->form) {

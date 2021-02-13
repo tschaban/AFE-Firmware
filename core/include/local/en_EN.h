@@ -93,9 +93,9 @@
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
-#define L_INDEX_NORMAL_MODE "Normal mode"
-#define L_INDEX_HOTSPOT_MODE "HotSpot Mode"
-#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Device is in operations mode"
+#define L_INDEX_NORMAL_MODE "Over WiFi"
+#define L_INDEX_HOTSPOT_MODE "Direct via HotSpot"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Configuration panel"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
 

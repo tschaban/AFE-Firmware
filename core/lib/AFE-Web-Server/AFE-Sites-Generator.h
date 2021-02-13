@@ -150,8 +150,8 @@ public:
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  void generateOneColumnLayout(String &page, uint16_t redirect = 0);
-  void generateTwoColumnsLayout(String &page, uint16_t redirect = 0);
+  void generateEmptyMenu(String &page, uint16_t redirect = 0);
+  void generateMenu(String &page, uint16_t redirect = 0);
 
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);

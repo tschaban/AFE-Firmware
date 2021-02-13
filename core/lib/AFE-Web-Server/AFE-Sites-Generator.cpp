@@ -23,35 +23,29 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
   } else {
     page.replace("{{s.redirect}}", "");
   }
-
-  if (Device->getMode() == AFE_MODE_CONFIGURATION ||
-      Device->getMode() == AFE_MODE_NORMAL) {
-    page += FPSTR(HTTP_FIRMWARE_BANNER_IMAGE);
-  } else {
-    page += FPSTR(HTTP_FIRMWARE_BANNER_TEXT);
-  }
-
-  page.concat(F("<div id=\"c\">"));
+  /*
+    if (Device->getMode() == AFE_MODE_CONFIGURATION ||
+        Device->getMode() == AFE_MODE_NORMAL) {
+      page += FPSTR(HTTP_FIRMWARE_BANNER_IMAGE);
+    } else {
+      page += FPSTR(HTTP_FIRMWARE_BANNER_TEXT);
+    }
+  */
+  page.concat(F("<div class=\"c\">"));
 }
 
-void AFESitesGenerator::generateOneColumnLayout(String &page,
-                                                uint16_t redirect) {
+void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
-  page.concat(F("<div id=\"r\">"));
+  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1>"));
+  page.concat(F("<h4>Wersja T0.3.0.0</h4>"));
+  page.concat(F("</div><div class=\"r\">"));
 }
 
-void AFESitesGenerator::generateTwoColumnsLayout(String &page,
-                                                 uint16_t redirect) {
+void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
 
   generateHeader(page, redirect);
-  page.concat(F("<div id=\"l\">"));
-  if (Device->getMode() == AFE_MODE_ACCESS_POINT) {
-    page.concat(F("<h3 class=\"ltit\">AFE FIRMWARE</h3>"));
-  }
-  page.concat(F("<h4>"));
-  page.concat(F(L_FIRMWARE_NAME));
-  page.concat(F("</h4><ul class=\"lst\">"));
+  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1><ul class=\"lst\">"));
 
   /* Gnerating Menu */
   addMenuItem(page, L_DEVICE, AFE_CONFIG_SITE_DEVICE);
@@ -248,9 +242,9 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   page.concat(F("</h4><ul class=\"lst\">"));
 
   addMenuItem(page, L_PASSWORD_SET_PASSWORD, AFE_CONFIG_SITE_PASSWORD);
-  #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   addMenuItem(page, L_FIRMWARE_UPGRADE, AFE_CONFIG_SITE_UPGRADE);
-  #endif
+#endif
   addMenuItem(page, L_RESET_DEVICE, AFE_CONFIG_SITE_RESET);
   addMenuItem(page, L_PRO_VERSION, AFE_CONFIG_SITE_PRO_VERSION);
 
@@ -259,7 +253,7 @@ void AFESitesGenerator::generateTwoColumnsLayout(String &page,
   addMenuItem(page, L_FINISH_CONFIGURATION, AFE_CONFIG_SITE_EXIT);
 
   /* Information section */
-  page.concat(F("</ul></div><div id=\"r\">"));
+  page.concat(F("</ul></div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::siteDevice(String &page) {
@@ -2706,6 +2700,14 @@ void AFESitesGenerator::siteExit(String &page, uint8_t command) {
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   DEVICE configuration;
   configuration = Device->configuration;
+
+  char _text[42];
+  sprintf(_text, "Device: %s", configuration.name);
+
+  openSection(page, _text, F(""));
+
+  closeSection(page);
+
   openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL),
               F(L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT));
   if (!authorized) {
@@ -2713,14 +2715,12 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
     page.concat(F(L_INDEX_WRONG_PASSWORD));
     page.concat(F("</h3>"));
   }
-  page.concat(
-      F("<fieldset><form method=\"post\"><div class=\"cf\"><input name=\"p\" "
-        "type=\"password\" "
-        "placeholder=\""));
+  page.concat(F("<form method=\"post\"><div class=\"cf\"><input name=\"p\" "
+                "type=\"password\" "
+                "placeholder=\""));
   page.concat(F(L_PASSWORD));
-  page.concat(
-      F("\"></div><div class=\"cf\"><input type=\"submit\" class=\"b bs\" "
-        "value=\""));
+  page.concat(F("\"> <input type=\"submit\" class=\"b bs\" "
+                "value=\""));
   page.concat(F(L_INDEX_NORMAL_MODE));
   page.concat(F("\" formaction=\"/?o=0&i="));
   page += AFE_MODE_CONFIGURATION;
@@ -2728,7 +2728,20 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page.concat(F(L_INDEX_HOTSPOT_MODE));
   page.concat(F("\" formaction=\"/?o=0&i="));
   page += AFE_MODE_ACCESS_POINT;
-  page.concat(F("\" /></div></form></fieldset></div>"));
+  page.concat(F("\" /></div></form>"));
+  closeSection(page);
+
+  openSection(page, F("Hardware"), F(""));
+
+  page.concat(ESP.getCoreVersion());
+  page.concat("<br>");
+  page.concat(ESP.getFullVersion());
+  page.concat("<br>");
+  page.concat(ESP.getFreeHeap());
+  page.concat("<br>");
+  page.concat(ESP.getHeapFragmentation());
+
+  closeSection(page);
 }
 
 void AFESitesGenerator::siteProKey(String &page) {
@@ -2871,14 +2884,13 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 #else
   page.replace("{{f.version}}", Firmware.version);
 #endif
-  
+
   page.replace("{{f.type}}", String(Firmware.type));
   page.replace("{{f.deviceName}}", F(AFE_DEVICE_TYPE_NAME));
   page.replace("{{f.deviceID}}", deviceID);
   page.replace("{{L_LANGUAGE_SHORT}}", L_LANGUAGE_SHORT);
   page.replace("{{f.deviceType}}", String(AFE_DEVICE_TYPE_ID));
 
- 
   page.concat(F("</body></html>"));
 }
 
