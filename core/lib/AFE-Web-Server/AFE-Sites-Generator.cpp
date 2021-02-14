@@ -5,10 +5,12 @@
 AFESitesGenerator::AFESitesGenerator() {}
 
 void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmwarePro *_FirmwarePro) {
+                              AFEFirmwarePro *_FirmwarePro,
+                              AFEJSONRPC *_RestAPI) {
   Device = _Device;
   FirmwarePro = _FirmwarePro;
   Data = _Data;
+  RestAPI = _RestAPI;
   Data->getConfiguration(&Firmware);
   Data->getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
 }
@@ -259,6 +261,34 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 void AFESitesGenerator::siteDevice(String &page) {
   DEVICE configuration = Device->configuration;
   boolean _itemDisabled = false;
+
+  openSection(page, F("Firmware"), F(""));
+
+  String JsonRespose;
+  String HtmlResponse;
+
+  page.concat(F("<ul class=\"lst\">"));
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  if (HtmlResponse.length() > 0) {
+    page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+    page.replace("{{f.info}}", HtmlResponse);
+  }
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  if (HtmlResponse.length() > 0) {
+    page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+    page.replace("{{f.info}}", HtmlResponse);
+  }
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  if (HtmlResponse.length() > 0) {
+    page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+    page.replace("{{f.info}}", HtmlResponse);
+  }
+
+  page.concat(F("</ul>"));
+  closeSection(page);
 
   if (Device->upgraded != AFE_UPGRADE_NONE) {
     page.concat(F("<h4 class=\"bc\" style=\"padding:5px;\">"));
@@ -2705,6 +2735,19 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   sprintf(_text, "Device: %s", configuration.name);
 
   openSection(page, _text, F(""));
+
+  String JsonRespose;
+  String HtmlResponse;
+
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  page.concat(HtmlResponse);
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  page.concat(HtmlResponse);
+  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
+  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  page.concat(HtmlResponse);
 
   closeSection(page);
 

@@ -1454,4 +1454,13 @@ typedef enum {
 #define AFE_FORM_ITEM_TYPE_PASSWORD "password"
 #define AFE_FORM_ITEM_SKIP_PROPERTY "?"
 
+
+/* JSONRPC API */
+#define AFE_CONFIG_JSONRPC_REST_API_URL "http://test.api.smartnydom.pl/rest/"
+
+#define AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME "get-welcome-message"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION "check-version"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO "check-pro"
+
+
 #endif // _AFE_Configuration_h

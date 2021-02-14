@@ -4,18 +4,25 @@
 
 AFEWebServer::AFEWebServer() {}
 
+#ifdef AFE_CONFIG_HARDWARE_LED
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro) {
+                         AFEFirmwarePro *_FirmwarePro, AFELED *_Led,
+                         AFEJSONRPC *_RestAPI) {
+  SystemLED = _Led;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_CONFIG_HARDWARE_LED
+
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI) {
   server.begin();
-  Site.begin(_Data, _Device, _FirmwarePro);
+  Site.begin(_Data, _Device, _FirmwarePro, _RestAPI);
   Data = _Data;
   Device = _Device;
+  RestAPI = _RestAPI;
   FirmwarePro = _FirmwarePro;
 }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWebServer::initSystemLED(AFELED *_SystemLED) { SystemLED = _SystemLED; }
-#endif
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
@@ -77,7 +84,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_POST_RESET:
     Site.sitePostReset(page);
     break;
-#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE    
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   case AFE_CONFIG_SITE_UPGRADE:
     Site.siteUpgrade(page);
     break;
@@ -571,7 +578,6 @@ void AFEWebServer::generate(boolean upload) {
 
 #endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-
 #ifdef DEBUG
     Serial << endl
            << F("INFO: SITE: Starting generating. ") << endl
@@ -599,7 +605,7 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   }
-#endif  
+#endif
 
   /* Rebooting device */
   if (siteConfig.reboot) {
@@ -1542,15 +1548,13 @@ void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
           ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
 
-  data->whoPM10Norm =
-      server.arg("n1").length() > 0
-          ? server.arg("n1").toFloat()
-          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+  data->whoPM10Norm = server.arg("n1").length() > 0
+                          ? server.arg("n1").toFloat()
+                          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
 
-  data->whoPM25Norm =
-      server.arg("n2").length() > 0
-          ? server.arg("n2").toFloat()
-          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
+  data->whoPM25Norm = server.arg("n2").length() > 0
+                          ? server.arg("n2").toFloat()
+                          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data->domoticz.pm25.idx = server.arg("x2").length() > 0
@@ -1560,11 +1564,11 @@ void AFEWebServer::getHPMA115S0SensorData(HPMA115S0 *data) {
                                 ? server.arg("x1").toInt()
                                 : AFE_DOMOTICZ_DEFAULT_IDX;
   data->domoticz.whoPM10Norm.idx = server.arg("x3").length() > 0
-                                ? server.arg("x3").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;
+                                       ? server.arg("x3").toInt()
+                                       : AFE_DOMOTICZ_DEFAULT_IDX;
   data->domoticz.whoPM25Norm.idx = server.arg("x4").length() > 0
-                                ? server.arg("x4").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;                                
+                                       ? server.arg("x4").toInt()
+                                       : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data->mqtt.topic, sizeof(data->mqtt.topic));

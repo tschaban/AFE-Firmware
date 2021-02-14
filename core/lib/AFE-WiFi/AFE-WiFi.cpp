@@ -195,6 +195,7 @@ void AFEWiFi::listener() {
                << F("INFO: WIFI: Connection established") << F(", MAC: ")
                << WiFi.macAddress() << F(", IP: ") << WiFi.localIP();
 #endif
+
       }
     }
   }

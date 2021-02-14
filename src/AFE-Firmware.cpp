@@ -32,7 +32,8 @@ void setup() {
   }
 
   Serial << endl
-         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000) << " MHz";
+         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000)
+         << " MHz";
   Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
 
 #endif
@@ -236,7 +237,14 @@ void setup() {
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
-  }
+  } // end of initialization for operating mode
+
+/* Initializating REST API */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  RestAPI.begin(&Data, &Device, &Led);
+#else
+  RestAPI.begin(&Data, &Device);
+#endif
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */

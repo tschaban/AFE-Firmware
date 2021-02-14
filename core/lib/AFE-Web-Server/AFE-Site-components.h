@@ -9,6 +9,8 @@ const char JSON_RESPONSE[] PROGMEM =
     "{\"device\":{\"type\":\"{{device.type}}\",\"name\":\"{{device.name}}\"},\"command\":\"{{"
     "request.command}}\",\"data\":{{response.data}},\"status\":\"{{response.status}}\"}";
 
+const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{json.method}}\",\"params\":{{json.params}},\"id\":1}";
+
 const char HTTP_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta "
     "charset=\"utf-8\">{{s.redirect}}<title>AFE "
@@ -20,6 +22,7 @@ const char HTTP_FIRMWARE_BANNER_IMAGE[] PROGMEM = "<img src=\"http://api.smartny
 const char HTTP_FIRMWARE_BANNER_TEXT[] PROGMEM = "<h3 class=\"la\">AFE Firmware T{{firmware.type}}v{{f.version}} {{f.deviceName}}</h3>"; 
 
 
+const char HTTP_FIRMWARE_INFO_ITEM[] PROGMEM = "<li style=\"text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em\">{{f.info}}</li>";
 
 
 const char HTTP_FOOTER_CONNECTED[] PROGMEM = "<a style=\"color:#0475b6;\" "

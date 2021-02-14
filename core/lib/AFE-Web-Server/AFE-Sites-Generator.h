@@ -10,6 +10,7 @@
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Site-components.h>
 #include <ESP8266WiFi.h>
+#include <AFE-API-JSONRPC.h>
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
@@ -48,6 +49,8 @@ private:
   AFEDevice *Device;
   FIRMWARE Firmware;
   AFEFirmwarePro *FirmwarePro;
+  AFEJSONRPC *RestAPI;
+
   char deviceID[17];
 
   void generateHeader(String &page, uint16_t redirect);
@@ -145,7 +148,7 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)

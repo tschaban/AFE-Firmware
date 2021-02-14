@@ -1,19 +1,18 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>AFE Firmware 2.5.1 [T6]</title>
+    <title>AFE Firmware 2.5.1 [T0]</title>
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
     <style>
         html {
-            background: url(images/background-6.jpg) no-repeat center center fixed;
+            background: url(http://api.smartnydom.pl/images/background.jpg) no-repeat center center fixed;
             -webkit-background-size: cover;
             -moz-background-size: cover;
             -o-background-size: cover;
-            background-size: cover;
+            background-size: cover
         }
-
 
         .l,
         .r {
@@ -35,29 +34,29 @@
 
         body {
             padding: 2em;
-            max-width: 980px;
+            max-width: 980px
         }
 
         .c {
             display: table;
             width: 100%;
-            margin-bottom: 3em;
+            margin-bottom: 3em
         }
 
         .l {
-            width: 200px;
+            width: 280px;
             background: #000;
             color: #fff;
             border-top-left-radius: .8em;
             border-bottom-left-radius: .8em;
-            opacity: 0.6;
+            opacity: .8
         }
 
         .r {
             background: #eee;
             border-top-right-radius: .8em;
             border-bottom-right-radius: .8em;
-            opacity: 0.93;
+            opacity: .93
         }
 
         a,
@@ -74,7 +73,7 @@
         }
 
         h4 {
-            font-size: 0.8em;
+            font-size: .8em;
             margin-bottom: 1px
         }
 
@@ -90,7 +89,7 @@
             white-space: nowrap;
             padding: 0 1em;
             color: #777;
-            font-size: 0.8em
+            font-size: .8em
         }
 
         .itm i {
@@ -123,8 +122,7 @@
             border-bottom: 1px solid #ddd;
             font-size: 1.2em;
             font-weight: 500;
-            margin: 0;
-
+            margin: 0
         }
 
         .ci .cd {
@@ -132,7 +130,7 @@
             font-size: 80%;
             font-style: italic;
             margin-bottom: 2em;
-            margin-top: 0;
+            margin-top: 0
         }
 
         .cm {
@@ -218,7 +216,6 @@
 
         .b:focus,
         .b:hover {
-            filter: alpha(opacity=90);
             background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
             background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1))
         }
@@ -229,28 +226,129 @@
     <div class="c">
         <div class="l">
             <h1>AFE Firmware</h1>
-            <h4>Wersja T0.3.0.0</h4>
-
-
-
+            <ul class="lst">
+                <li class="itm"><a href="/?o=1">Device</a></li>
+                <li class="itm"><a href="/?o=2">Network</a></li>
+                <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
+            </ul>
+            <h4>&#10150; Hardware</h4>
+            <ul class="lst">
+                <li class="itm"><i>LEDs</i></li>
+                <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
+                <li class="itm"><i>Relays configuration</i></li>
+                <li class="itm"><a href="/?o=8&i=0">&#8227; Relay: 1</a></li>
+                <li class="itm"><a href="/?o=8&i=1">&#8227; Relay: 2</a></li>
+                <li class="itm"><a href="/?o=8&i=2">&#8227; Relay: 3</a></li>
+                <li class="itm"><a href="/?o=8&i=3">&#8227; Relay: 4</a></li>
+                <li class="itm"><i>Button / Switches</i></li>
+                <li class="itm"><a href="/?o=9&i=0">&#8227; Switch: 1</a></li>
+            </ul>
+            <h4>&#10150; Interfaces</h4>
+            <ul class="lst"></ul>
+            <h4>&#10150; Functionalities</h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=7">System LED</a></li>
+            </ul>
+            <h4>&#10150; Firmware</h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=10">Set password</a></li>
+                <li class="itm"><a href="/?o=20">Firmware upgrade</a></li>
+                <li class="itm"><a href="/?o=16">Reset to orginal state</a></li>
+                <li class="itm"><a href="/?o=11">PRO Version</a></li>
+            </ul>
+            <h4></h4>
+            <ul class="lst">
+                <li class="itm"><a href="/?o=15">&#10004; Finish configuration</a></li>
+            </ul>
         </div>
         <div class="r">
-            <div class="ci">
-                <h1>Urządzenie jest w trybie operacyjnym</h1>
-                <p class="cd">Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków</p>
-                <fieldset>
+            <form method="post" action="/?c=1&o=1">
 
-                    <form method="post">
-                        <div class="cf"><input name="p" type="password" placeholder="Hasło"></div>
-                        <div class="cf"><input type="submit" class="b bs" value="Tryb normalny"
-                                formaction="/?o=0&i=1" /> <input type="submit" class="b be" value="Tryb HotSpot"
-                                formaction="/?o=0&i=2" /></div>
-                    </form>
-                </fieldset>
-            </div><a style="color:#0475b6;" href="https://pl.donate.afe-firmware.smartnydom.pl"><small>&#128077; Używasz
-                    AFE? To może rozważ wsparcie N-setek godzin pracy włożonych przeze mnie. Dzięki.</small></a>
+                <div class="ci">
+                    <h1>Firmware</h1>
+                    <p class="cd"></p>
+
+                <ul class="lst">
+                    <li style="text-decoration: none; padding-left: 2em;color:#777">AFE jest w naszej bazie</li>
+                    <li style="text-decoration: none; padding-left: 2em;color:#777">Posiadasz najnowsz&#261; wersj&#281; oprogramowania</li>
+                    <li style="text-decoration: none; padding-left: 2em;color:#777">AFE Pro: Klucz: <strong>1a923-trial</strong> <span style="color:red;">nie jest aktywny</span></li>
+                </ul>
+            </div>
+
+
+                <div class="ci">
+                    <h1>Device</h1>
+                    <p class="cd">Name is used for device identification within your LAN and a device's hotspot name
+                        used for configuration mode</p>
+                    <fieldset>
+                        <div class="cf"><label>Device name</label><input name="n" type="text" maxlength="16"
+                                value="AFE-Device"><span class="hint">Max 16 chars</span></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Hardware configuration</h1>
+                    <p class="cd">Select connected items to your device</p>
+                    <fieldset>
+                        <div class="cf"><label>Number of LEDs</label><select name="l">
+                                <option value="0">None</option>
+                                <option value="1" selected="selected">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></div>
+                        <div class="cf"><label>Number of relays</label><select name="r">
+                                <option value="0">None</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4" selected="selected">4</option>
+                            </select></div>
+                        <div class="cf"><label>Number of switches</label><select name="s">
+                                <option value="0">None</option>
+                                <option value="1" selected="selected">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></div>
+                        <div class="cc"><label><input name="ad" type="checkbox" value="1"
+                                    disabled="disabled">Measurements from Analog Input</label><span class="hint">(PRO
+                                Version)</span></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Device controlling mechanism</h1>
+                    <p class="cd">Enable / Disable APIs</p>
+                    <fieldset>
+                        <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP
+                                API</label></div>
+                        <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT
+                                API</label></div>
+                    </fieldset>
+                </div>
+                <div class="ci">
+                    <h1>Automatic logout form the configuration panel</h1>
+                    <p class="cd">Device configuration will be automatically closed after 10min. of idle time in the
+                        configuration panel</p>
+                    <fieldset>
+                        <div class="cc"><label><input name="al" type="checkbox" value="1">enabled</label></div>
+                    </fieldset>
+                </div><input type="submit" class="b bs" value="Save">
+            </form>
         </div>
     </div>
+    <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
+                src="https://img.shields.io/badge/Help-Forum-red.svg" alt="Forum" /></a> <a
+            href="https://afe.smartnydom.pl/en" target="_blank"><img
+                src="https://img.shields.io/badge/Help-Documentation-green.svg" alt="Documentation" /></a> <a
+            href="https://afe.smartnydom.pl/en/pliki-to-pobrania/historia-zmian" target="_blank"><img
+                src="https://img.shields.io/badge/Version%20-%202.5.1[T0]-blue.svg" alt="T0-2.5.1" /></a> <img
+            src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 5CebCF98-7Fd3D37f" /> <img
+            src="https://img.shields.io/badge/API-Standard-yellow.svg" /> <img
+            src="https://img.shields.io/badge/PRO-No-orange.svg" alt="PRO" /> <img
+            src="https://img.shields.io/badge/Mem-30KB-9cf.svg" alt="PRO" /> <img
+            src="https://img.shields.io/badge/Size-1Mb-yellowgreen.svg" /></div>
 </body>
 
 </html>
