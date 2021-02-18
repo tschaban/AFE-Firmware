@@ -9,7 +9,6 @@ const char JSON_RESPONSE[] PROGMEM =
     "{\"device\":{\"type\":\"{{device.type}}\",\"name\":\"{{device.name}}\"},\"command\":\"{{"
     "request.command}}\",\"data\":{{response.data}},\"status\":\"{{response.status}}\"}";
 
-const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{json.method}}\",\"params\":{{json.params}},\"id\":1}";
 
 const char HTTP_HEADER[] PROGMEM =
     "<!doctype html><html lang=\"{{s.lang}}\"><head><meta "

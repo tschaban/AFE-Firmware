@@ -264,24 +264,23 @@ void AFESitesGenerator::siteDevice(String &page) {
 
   openSection(page, F("Firmware"), F(""));
 
-  String JsonRespose;
   String HtmlResponse;
 
   page.concat(F("<ul class=\"lst\">"));
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
   if (HtmlResponse.length() > 0) {
     page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
     page.replace("{{f.info}}", HtmlResponse);
   }
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
   if (HtmlResponse.length() > 0) {
     page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
     page.replace("{{f.info}}", HtmlResponse);
   }
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
   if (HtmlResponse.length() > 0) {
     page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
     page.replace("{{f.info}}", HtmlResponse);
@@ -2739,14 +2738,14 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   String JsonRespose;
   String HtmlResponse;
 
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+
   page.concat(HtmlResponse);
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+
   page.concat(HtmlResponse);
-  RestAPI->sent(JsonRespose, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
-  RestAPI->getHTMLResponse(&JsonRespose, HtmlResponse);
+  RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
+
   page.concat(HtmlResponse);
 
   closeSection(page);

@@ -284,7 +284,6 @@ void AFEWebServer::generate(boolean upload) {
         get(configuration);
         Data->saveConfiguration(&configuration);
         configuration = {0};
-        FirmwarePro->callService(AFE_WEBSERVICE_ADD_KEY);
       } else if (siteConfig.ID == AFE_CONFIG_SITE_MQTT) {
         MQTT configuration;
         get(configuration);

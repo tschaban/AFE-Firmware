@@ -23,7 +23,6 @@ private:
   NETWORK networkConfiguration;
   unsigned long delayStartTime = 0;
   uint8_t WiFiMode;
-  HTTPClient http;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
@@ -45,12 +44,14 @@ public:
   /* Constructor: no actions */
   AFEWiFi();
 
+  HTTPClient http;
+
 /* Sets connection parameters and host name. Must be invoked before connect
  * method */
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *, AFELED *);
 #else
-  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);  
+  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
 #endif
 
   /* Return TRUE if device is connected to WiFi Acces Point */

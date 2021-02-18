@@ -153,7 +153,15 @@ void setup() {
 #endif
   Network.listener();
 
-  FirmwarePro.begin(&Network);
+/* Initializating REST API */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  RestAPI.begin(&Data, &Device, &Network, &Led);
+#else
+  RestAPI.begin(&Data, &Device, &Network);
+#endif
+
+  /* Initializing FirmwarePro */
+  FirmwarePro.begin(&Data, &RestAPI);
 
   /* Initializing HTTP WebServer */
   initializeHTTPServer();
@@ -241,9 +249,9 @@ void setup() {
 
 /* Initializating REST API */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  RestAPI.begin(&Data, &Device, &Led);
+  RestAPI.begin(&Data, &Device, &Network, &Led);
 #else
-  RestAPI.begin(&Data, &Device);
+  RestAPI.begin(&Data, &Device, &Network);
 #endif
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
