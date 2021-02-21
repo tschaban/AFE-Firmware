@@ -467,7 +467,7 @@
 
 /* ---- Wheater Station ---- */
 #elif defined(T6_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.5.2"
+#define AFE_FIRMWARE_VERSION "2.5.3"
 #define AFE_FIRMWARE_TYPE 6
 
 /* Functionalities */
@@ -1015,8 +1015,7 @@
 #define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
 #define AFE_MQTT_GATE_UNKNOWN "unknown"
 
-#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH                                   \
-  200 // Not checked, used by HTTP API
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH  200 // Not checked, used by HTTP API
 
 #endif // AFE_CONFIG_HARDWARE_GATE
 
@@ -1143,7 +1142,7 @@ typedef enum {
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL 1
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE 255
 #define AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH 200 // @TODO check it
-#endif                                             // AFE_CONFIG_HARDWARE_AS3935
+#endif       // AFE_CONFIG_HARDWARE_AS3935
 
 /* Anemometer Sensor Defaults */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
@@ -1261,15 +1260,15 @@ typedef enum {
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
 #define AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT "0"
 #define AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT "999999"
-#define AFE_CONFIG_API_HTTP_TIMEOUT                                            \
+#define AFE_CONFIG_API_HTTP_TIMEOUT      \
   200 // Time for HTTP response. If 5000 than device goes to config mode if
       // Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN                                       \
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN \
   "domoticz/in" // MQTT Topic for outgoing from AFE messages
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT                                      \
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT\
   "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE                                        \
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE  \
   380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
       // messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH                              \
@@ -1338,7 +1337,7 @@ typedef enum {
 #else // Defauals for None-Domoticz MQTT
 
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH                                       \
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH \
   69 // Size of a Command topic: MQTT_BASIC_CONFIG + 4
 #define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH                                     \
   71 // Size of a State topic: MQTT_BASIC_CONFIG + 6
@@ -1346,7 +1345,7 @@ typedef enum {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Defaults for each MQTT Version (standard and domoticz) */
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT                                        \
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  \
   5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
        // down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
@@ -1398,55 +1397,45 @@ typedef enum {
 #define AFE_FILE_BINARY_SENSOR_CONFIGURATION "/cfg-binary-sensor-%d.json"
 
 /* Configuration files, JSON Buffers.  */
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER                                     \
-  352                                     // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_BH1750 221 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_I2C 54     // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE                                     \
-  31 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION                                     \
-  78                                        // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72  // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 405   // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_NETWORK 375  // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER    352                                     // AJ check
+#define AFE_CONFIG_FILE_BUFFER_BH1750 221 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_I2C 54     // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 405   // AJ check
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 375  // AJ check
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_LED 124 //  Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_LED 124 //  AJ check
 #else
-#define AFE_CONFIG_FILE_BUFFER_LED 76        // Verfied by ArduinoJson Assistant
-#endif                                       // AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_RELAY                                           \
-  287 // Verfied by ArduinoJson Assistant for T6 only
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE                                     \
-  36 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_SWITCH                                          \
-  238 // Verfied by ArduinoJson Assistant for T6 only
-#define AFE_CONFIG_FILE_BUFFER_ADC 489       // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_UART 54       // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_LED 76        // AJ check
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RELAY  287 // AJ check for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE  36 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_SWITCH   238 // AJ check for T6 only
+#define AFE_CONFIG_FILE_BUFFER_ADC 489       // AJ check
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_UART 54       // AJ check
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 984 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 984 // AJ check
 #else
-#define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // AJ check
 #endif
-#define AFE_CONFIG_FILE_BUFFER_AS3935 439 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON                                      \
-  241                                   // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_AS3935 439 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON  241  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_GATE 319 // AJ check
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
-#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER                                      \
-  303                                        // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_RAINMETER 259 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER  303  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER 259 // AJ check
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA 1100 // Not verfied
-#define AFE_CONFIG_FILE_BUFFER_DS18B20 407   // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR                               \
-  261                                  // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_DHT 643 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR                                   \
-  238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_DS18B20 407   // AJ check
+#define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR  261                                  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DHT 643 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR  238 // AJ check for T6 only
 
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"
