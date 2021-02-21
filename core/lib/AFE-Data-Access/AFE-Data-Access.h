@@ -65,6 +65,9 @@ public:
   void saveConfiguration(MQTT *);
   void createMQTTConfigurationFile();
 
+  void getWelcomeMessage(String &message);
+  void saveWelecomeMessage(const __FlashStringHelper *message);
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void getConfiguration(DOMOTICZ *);
   void saveConfiguration(DOMOTICZ *);

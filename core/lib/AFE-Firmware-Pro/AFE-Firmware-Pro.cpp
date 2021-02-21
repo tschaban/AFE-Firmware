@@ -28,7 +28,7 @@ void AFEFirmwarePro::validate() {
   } else if (strlen(Pro.serial) > 0) {
     boolean isValid;
     if (RestAPI->sent(isValid, "is-pro") ==
-        AFE_CONFIG_JSONRPC_REST_OK_RESPONSE) {
+        HTTP_CODE_OK) {
 
       if (Pro.valid!=isValid) {
         Data->saveConfiguration(&Pro);
@@ -54,7 +54,7 @@ void AFEFirmwarePro::validate() {
 }
 
 void AFEFirmwarePro::listener() {
-  if (millis() - miliseconds > 10000) {
+  if (millis() - miliseconds > 3000) {
     
     Serial << endl << F("INFO: #### Time:" ) << millis();
     validate();

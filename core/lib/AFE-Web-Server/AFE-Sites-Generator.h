@@ -5,12 +5,13 @@
 
 #include <arduino.h>
 
+#include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Site-components.h>
 #include <ESP8266WiFi.h>
-#include <AFE-API-JSONRPC.h>
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
@@ -159,9 +160,12 @@ public:
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   /* These methods generates firmware upgrade sections */
   void siteUpgrade(String &page);
   void sitePostUpgrade(String &page, boolean status);
+  void siteWANUpgrade(String &page, const __FlashStringHelper *title);
+#endif
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */

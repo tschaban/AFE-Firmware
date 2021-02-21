@@ -7,11 +7,17 @@ void eventsListener(void);
 /* --------- Body -----------*/
 
 void eventsListener(void) {
-  /* Event handler: connection to wireless network has been established */
+  /* Event: connected to WiFi*/
   if (Network.eventConnected()) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENTS: Connected to WiFi");
 #endif
+
+    /* Checking Access to WAN */
+    RestAPI.checkAccessToWAN();
+
+/* Actions to run only on Normal mode */
+if (Device.getMode() == AFE_MODE_NORMAL) {
 
 /* ################## HTTP DOMOTICZ ################### */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -20,7 +26,8 @@ void eventsListener(void) {
     if (Device.configuration.api.domoticz) {
 
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Domoticz HTTP API boot actions triggering");
+      Serial << endl
+             << F("INFO: EVENTS: Domoticz HTTP API boot actions triggering");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -29,7 +36,8 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current gate state to Domoticz");
+      Serial << endl
+             << F("INFO: EVENTS: Sending current gate state to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
         HttpDomoticzAPI.publishGateState(i);
@@ -39,7 +47,8 @@ void eventsListener(void) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: EVENTS: Sending current state of contactrons to Domoticz");
+             << F("INFO: EVENTS: Sending current state of contactrons to "
+                  "Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
         HttpDomoticzAPI.publishContactronState(i);
@@ -49,7 +58,9 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current state of switches to Domoticz");
+      Serial
+          << endl
+          << F("INFO: EVENTS: Sending current state of switches to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
         HttpDomoticzAPI.publishSwitchState(i);
@@ -58,7 +69,9 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current state of binary sensors to Domoticz");
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of binary sensors to "
+                  "Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
         HttpDomoticzAPI.publishBinarySensorState(i);
@@ -67,7 +80,9 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current state of regulator to Domoticz");
+      Serial
+          << endl
+          << F("INFO: EVENTS: Sending current state of regulator to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfRegulators; i++) {
         HttpDomoticzAPI.publishRegulatorState(i);
@@ -76,7 +91,9 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current state of regulator to Domoticz");
+      Serial
+          << endl
+          << F("INFO: EVENTS: Sending current state of regulator to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfThermalProtectors; i++) {
         HttpDomoticzAPI.publishThermalProtectorState(i);
@@ -85,7 +102,8 @@ void eventsListener(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #ifdef DEBUG
-      Serial << endl << F("INFO: EVENTS: Sending current state of relays to Domoticz");
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of relays to Domoticz");
 #endif
       for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -109,7 +127,6 @@ void eventsListener(void) {
       }
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_LED
       Led.off();
 #endif
@@ -120,11 +137,20 @@ void eventsListener(void) {
     Serial << endl << F("INFO: EVENTS: Post WiFi Connection actions completed");
 #endif
 
+  } // if (Device.getMode() == AFE_MODE_NORMAL) {
+
   } /* End of Network.eventConnected() */
 
-  /* Checking if device has connected to MQTT Broker. If yes it subsribes to
-   * MQTT Topics and sends device's items current states */
-  if (Device.configuration.api.mqtt) {
+  /* Event: disconnected form WiFi */
+  if (Network.eventDisconnected()) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: EVENTS: Diconnected from WiFi");
+#endif
+    RestAPI.setNoWANAccess();
+  }
+
+  /* Event: connected to MQTT API */
+  if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
       MqttAPI.subscribe();
       MqttAPI.synchronize();

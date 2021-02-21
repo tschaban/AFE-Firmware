@@ -15,6 +15,9 @@ struct NETWORK {
   uint8_t noConnectionAttempts;
   uint8_t waitTimeConnections;
   uint8_t waitTimeSeries;
+  char ssidBackup[33];
+  char passwordBackup[33];
+  uint8_t noFailuresToSwitchNetwork;
 };
 
 #endif

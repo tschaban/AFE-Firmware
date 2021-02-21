@@ -9,7 +9,18 @@
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 #include <WiFiUdp.h>
+#include <esp8266httpupdate.h>
+#include <WiFiClient.h>
+
+#if AFE_LANGUAGE == 0
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -56,7 +67,7 @@ private:
 
   AFESitesGenerator Site;
 
-  boolean upgradeFailed = false;
+  boolean upgradeSuccess = false;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
@@ -164,6 +175,10 @@ private:
   void get(BINARY_SENSOR &data);
 #endif
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+  boolean upgradeOTAWAN(void);
+  boolean upgradOTAFile(void);
+#endif
 
 public:
   AFEWebServer();

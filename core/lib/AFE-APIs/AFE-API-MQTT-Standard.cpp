@@ -354,10 +354,10 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif
 
 #ifdef DEBUG
-  if (sizeof(mqttTopicsCache) < currentCacheSize - 1) {
+  if (currentCacheSize > 0 && sizeof(mqttTopicsCache) < currentCacheSize - 1) {
     Serial << endl
            << F("ERROR: MQTT Topics cache[") << sizeof(mqttTopicsCache)
-           << F("is too small : ") << currentCacheSize - 1;
+           << F("] is too small : ") << currentCacheSize - 1;
   }
 #endif
 }

@@ -22,13 +22,17 @@
 #define AFE_MODE_NETWORK_NOT_SET 4
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
+/* Host to check WAN Access */
+#define AFE_WAN_ACCSSS_HOST "google-public-dns-a.google.com"
+#define AFE_WAN_ACCSSS_PINGS 1
+#define AFE_WAN_ACCSSS_PING_TIMEOUT 1000
+#define AFE_WAN_ACCSSS_TIMEOUT 3000 // performs check if access to the network longer than this time in ms
+
 /* APIs */
 #define AFE_API_STANDARD 0
 #define AFE_API_DOMOTICZ 1
 
 /* URLs to AFE WebService */
-#define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
-#define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
 #define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
 
 /* Types of URL requests */
@@ -98,7 +102,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.5.1"
+#define AFE_FIRMWARE_VERSION "3.0.0.B0"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -578,6 +582,16 @@
 #define AFE_FILE_SYSTEM_USED AFE_FS_SPIFFS
 #endif
 
+/* ***************** NETWORK *********************/
+
+#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 30
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME 1
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
+#define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
+#define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
+
+
+
 /* ***************** HARDWARE: Config and defaults *********************/
 
 /* Configs related to a relay functionality */
@@ -677,8 +691,7 @@
 #define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay control
 
 /* Switche bouncing */
-#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING                                   \
-  50 // Bouncing for switch in miliseconds
+#define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING  50 // Bouncing for switch in miliseconds
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO 0
@@ -895,8 +908,7 @@
 #define AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH 8
 #define AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT 10000
 
-#define AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH                                \
-  46 // {"temperature":{"value":-999.999,"unit":"C"}}
+#define AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH  46 // {"temperature":{"value":-999.999,"unit":"C"}}
 #endif
 
 /* DHxx sesnors like DHT21,DHT22 */
@@ -920,8 +932,7 @@
 #define AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION 0
 #define AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION 0
 //#define AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT 10000
-#define AFE_CONFIG_API_JSON_DHT_DATA_LENGTH                                    \
-  420 // {"temperature":{"value":218.4,"unit":"C"},"humidity":{"value":317.0,"unit":"%"},"absoluteHumidity":{"value":110.29,"unit":"%"},"heatIndex":{"value":217.81,"unit":"C"},"dewPoint":{"value":112.33,"unit":"C"},"perception":{"value":1,"description":"W
+#define AFE_CONFIG_API_JSON_DHT_DATA_LENGTH  420 // {"temperature":{"value":218.4,"unit":"C"},"humidity":{"value":317.0,"unit":"%"},"absoluteHumidity":{"value":110.29,"unit":"%"},"heatIndex":{"value":217.81,"unit":"C"},"dewPoint":{"value":112.33,"unit":"C"},"perception":{"value":1,"description":"W
       // porządku dla większości, ale wszyscy odczuwają wilgoć przy górnej
       // krawędzi"},"comfort":{"value":0,"ratio":100.00,"unit":"%","description":"Gorąco
       // i wilgotno"}}
@@ -1244,6 +1255,7 @@ typedef enum {
 #define AFE_CONFIG_SITE_THERMAL_PROTECTOR 32
 #define AFE_CONFIG_SITE_DHT 33
 #define AFE_CONFIG_SITE_BINARY_SENSOR 34
+#define AFE_CONFIG_SITE_WAN_UPGRADE 35
 
 /* ***************** APIs: Config and defaults *********************/
 
@@ -1384,8 +1396,7 @@ typedef enum {
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_DATA "/cfg-rainmeter-data-0.json"
 #define AFE_FILE_REGULATOR_CONFIGURATION "/cfg-regulator-%d.json"
-#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION                               \
-  "/cfg-theremal-protector-%d.json"
+#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION  "/cfg-theremal-protector-%d.json"
 #define AFE_FILE_DS18B20_SENSOR_CONFIGURATION "/cfg-ds18b20-%d.json"
 #define AFE_FILE_CONTACTRON_CONFIGURATION "cfg-contactron-%d.json"
 #define AFE_FILE_GATE_CONFIGURATION "cfg-gate-%d.json"
@@ -1396,17 +1407,15 @@ typedef enum {
 #define AFE_FILE_AS3935_CONFIGURATION "cfg-as3935-%d.json"
 #define AFE_FILE_DHT_SENSOR_CONFIGURATION "/cfg-dht-%d.json"
 #define AFE_FILE_BINARY_SENSOR_CONFIGURATION "/cfg-binary-sensor-%d.json"
+#define AFE_FILE_WELCOME_MESSAGE "/welcome-message.txt"
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER                                     \
-  352                                     // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER  352  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_BH1750 221 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_I2C 54     // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE                                     \
-  31 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION                                     \
-  78                                        // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_PRO_VERSION  78  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 405   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // Verfied by ArduinoJson Assistant
@@ -1417,12 +1426,9 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_LED 76        // Verfied by ArduinoJson Assistant
 #endif                                       // AFE_CONFIG_HARDWARE_MCP23017
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_RELAY                                           \
-  287 // Verfied by ArduinoJson Assistant for T6 only
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE                                     \
-  36 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_SWITCH                                          \
-  238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY  287 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_SWITCH  238 // Verfied by ArduinoJson Assistant for T6 only
 #define AFE_CONFIG_FILE_BUFFER_ADC 489       // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_UART 54       // Verfied by ArduinoJson Assistant
@@ -1432,21 +1438,17 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // Verfied by ArduinoJson Assistant
 #endif
 #define AFE_CONFIG_FILE_BUFFER_AS3935 439 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON                                      \
-  241                                   // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON  241 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_GATE 319 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
-#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER                                      \
-  303                                        // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER  303   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER 259 // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA 1100 // Not verfied
 #define AFE_CONFIG_FILE_BUFFER_DS18B20 407   // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR                               \
-  261                                  // Verfied by ArduinoJson Assistant
+#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR  261                                  // Verfied by ArduinoJson Assistant
 #define AFE_CONFIG_FILE_BUFFER_DHT 643 // Verfied by ArduinoJson Assistant
-#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR                                   \
-  238 // Verfied by ArduinoJson Assistant for T6 only
+#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR  238 // Verfied by ArduinoJson Assistant for T6 only
 
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"
@@ -1461,9 +1463,7 @@ typedef enum {
 #define AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME "get-welcome-message"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION "check-version"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO "check-pro"
-#define AFE_CONFIG_JSONRPC_REST_OK_RESPONSE 200
-#define AFE_CONFIG_JSONRPC_REST_FAILURE_RESPONSE 500
 #define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 200
-#define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIE 255
+#define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIE 300
 
 #endif // _AFE_Configuration_h

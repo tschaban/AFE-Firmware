@@ -5,10 +5,12 @@
 
 #include <arduino.h>
 #include <AFE-Configuration.h>
-#include <AFE-WiFi.h>
 #include <AFE-Device.h>
 #include <AFE-LED.h>
 #include <ArduinoJson.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <AsyncPing.h>
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -26,38 +28,42 @@ const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{"
 
 class AFEJSONRPC {
 private:
-  AFEWiFi *Network;
-  PRO_VERSION Pro;
+  WiFiClient WirelessClient;
+  HTTPClient http;
   char deviceID[17];
-  void generateMessage(String &message, const char *method, const char *params);
-
+  AFEDevice *Device;
+  AFEDataAccess *Data;  
   String message;
-  StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIE> jsonBuffer;
+  AsyncPing Pings;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
 #endif
 
+  void generateMessage(String &message, const char *method, const char *params);
+
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *);
+  void begin(AFEDataAccess *, AFEDevice *);
 #endif
 
 public:
-  AFEDevice *Device;
-  AFEDataAccess *Data;
+  PRO_VERSION Pro;  
 
   AFEJSONRPC();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFELED *);
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *);
+  void begin(AFEDataAccess *, AFEDevice *);
 #endif
 
   int sent(boolean &response, const char *method);
   int sent(String &response, const char *method);
   int sent(String &response, const char *method, const char *params);
 
+  void checkAccessToWAN(void);
+  boolean accessToWAN();
+  void setNoWANAccess(void);
 };
 
 #endif // _AFE_API_JSONRPC_h

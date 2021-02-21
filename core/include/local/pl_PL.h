@@ -266,7 +266,7 @@
 #define L_UPGRADE_RESTORE_DEFAULT_SETTINGS "Przywróć ustawienia początkowe"
 #define L_UPGRADE_WARNING "Uwaga"
 #define L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED "przywrócenie ustawień początkowych usuwa wszystkie ustawienia urządzenia, włącznie z konfiguracją sieci WiFi"
-#define L_UPGRADE_IN_PROGRESS "Trwa przywracanie ustawień początkowych"
+#define L_RESTORE_IN_PROGRESS "Trwa przywracanie ustawień początkowych"
 #define L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
   "Po 20 sekundach połącz się z siecią WiFi o nazwie: "                    \
   "<strong>AFE-Device</strong>, a następnie połącz się z panelem "         \

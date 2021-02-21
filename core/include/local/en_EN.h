@@ -148,6 +148,10 @@
 #define L_NETWORK_CONNECT "Connect"
 #define L_NETWORK_SEARCH_FOR_IP_ADDRESS "In your WiFi router look for an IP address of a device with follwing MAC address"
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration by entering device IP address in the browser"
+#define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
+#define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
+#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Works only with routers with DHCP enabled"
+#define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
@@ -249,15 +253,23 @@
 
 /* Form: upgrade and post upgrade */
 #define L_UPGRADE_SELECT_FIRMWARE "Select Firmware"
-#define L_UPGRADE_INFO                                                         \
-  "Device will be automatically rebooted after "                               \
-  "upgrade<br><br><strong>Warning</strong>: after upgrade do not plug off "    \
-  "the device from power source for around a minute.<br>Device configuration requires an update<br><strong>This "       \
-  "process cannot be interrupted</strong>"
-#define L_UPGRADE "Upgrade"
-#define L_UPGRADE_DONT_PLUG_OFF                                                        \
-  "<strong>Warning</strong>: don't plug off the device from a power source "   \
-  "while upgrading"
+
+#define L_UPGRADE_READ_BEFORE "Read before upgrading the firmware"
+
+#define L_UPGRADE_INTERUPTED "Don't refresh the browser while upgrading the device"
+#define L_UPGRADE_DONT_PLUG_OFF "Don't plug off the device from the power source "
+#define L_UPGRADE_TIME "The upgrade process will take up to a minute"
+#define L_UPGRADE_AUTO_REBOOT "Device will be automatically rebooted after upgrade process is finished"
+
+#define L_UPGRADE_VIA_WAN "Download and Upgrade"
+#define L_UPGRADE_VIA_WAN_HINT "Firmware will be automatically downloaded and uploaded to the device"
+
+#define L_UPGRADE_FROM_FILE "Upgrade with binary file"
+#define L_UPGRADE "Upgrade with binary file"
+
+
+#define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
+
 #define L_UPGRADE_FAILED "Upgrade failed"
 #define L_UPGRADE_SUCCESSFUL "Upgrade finished succesfully"
 #define L_UPGRADE_DEVICE_WILL_BE_REBOOTED                                              \
@@ -267,7 +279,7 @@
 #define L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED                                        \
   "restoring to default settings will remove all configuration's "             \
   "information, incl. WiFi configuration"
-#define L_UPGRADE_IN_PROGRESS "Restoring configuration is in progress"
+#define L_RESTORE_IN_PROGRESS "Restoring configuration is in progress"
 #define L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
   "After 20 seconds connect to WiFi network called "                           \
   "<strong>AFE-Device</strong> and open configuration panel"
@@ -275,6 +287,8 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
+
+
 
 /* Form: password */
 #define L_PASSWORD_SET_PASSWORD "Set password"
