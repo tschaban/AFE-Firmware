@@ -25,14 +25,7 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
   } else {
     page.replace("{{s.redirect}}", "");
   }
-  /*
-    if (Device->getMode() == AFE_MODE_CONFIGURATION ||
-        Device->getMode() == AFE_MODE_NORMAL) {
-      page += FPSTR(HTTP_FIRMWARE_BANNER_IMAGE);
-    } else {
-      page += FPSTR(HTTP_FIRMWARE_BANNER_TEXT);
-    }
-  */
+
   page.concat(F("<div class=\"c\">"));
 }
 
@@ -522,28 +515,6 @@ void AFESitesGenerator::siteDevice(String &page) {
   addCheckboxFormItem(page, "al", L_ENABLED, "1",
                       configuration.timeToAutoLogOff > 0);
   closeSection(page);
-}
-
-void AFESitesGenerator::siteConnecting(String &page) {
-  NETWORK configuration;
-  Data->getConfiguration(&configuration);
-  page.concat(F("<p>"));
-  page.concat(F(L_NETWORK_DEVICE_CONNECTS));
-  page.concat(F(": <strong>"));
-  page += configuration.ssid;
-  page.concat(F("</strong> ["));
-  page += configuration.password;
-  page.concat(F("]</p><ul><li>"));
-  page.concat(F(L_NETWORK_CONNECT_TO));
-  page.concat(F(": "));
-  page += configuration.ssid;
-  page.concat(F("</li><li>"));
-  page.concat(F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
-  page.concat(F(": "));
-  page += WiFi.macAddress();
-  page.concat(F("</li><li>"));
-  page.concat(F(L_NETWORK_FINISH_NETWORK_CONFIGURATION));
-  page.concat(F("</li></ul>"));
 }
 
 void AFESitesGenerator::siteNetwork(String &page) {
@@ -2704,42 +2675,48 @@ void AFESitesGenerator::siteUpgrade(String &page) {
 
   siteWANUpgrade(page, F(L_UPGRADE_READ_BEFORE));
 
+  openSection(page, F(L_UPGRADE_FROM_FILE), F(""));
+
+  page.concat(
+      F("<form method=\"post\" action=\"upgrade?o=21\" "
+        "enctype=\"multipart/form-data\"><div "
+        "class=\"cf\"><label>{{L1}}</label><input "
+        "class=\"bs\" "
+        "name=\"update\" type=\"file\" accept=\".bin\"></div><input "
+        "style=\"margin-top:1.5em\" type=\"submit\" value=\"{{L2}}\" class=\"b "
+        "be\"></form>"));
+
+  page.replace("{{L1}}", F(L_UPGRADE_SELECT_FIRMWARE));
+  page.replace("{{L2}}", F(L_UPGRADE));
+  closeSection(page);
+
   if (RestAPI->accessToWAN()) {
     openSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
     page.concat(
-        "<form method=\"post\" action=\"/?o=35\"><input type=\"submit\" "
-        "class=\"b be\" value=\"Aktualizuj przez WAN\"></form>");
-    // L_UPGRADE_VIA_WAN
+        F("<form method=\"post\" action=\"/?o=35\"><input type=\"submit\" "
+          "class=\"b be\" value=\"{{L}}\"></form>"));
+    page.replace("{{L}}", F(L_UPGRADE_VIA_WAN));
+
     closeSection(page);
   }
-  openSection(page, F(L_UPGRADE_FROM_FILE), F(""));
-
-  page.concat(FPSTR(HTTP_SITE_UPGRADE));
-  page.replace("{{L_UPGRADE_SELECT_FIRMWARE}}", F(L_UPGRADE_SELECT_FIRMWARE));
-  page.replace("{{L_UPGRADE}}", F(L_UPGRADE));
-  closeSection(page);
 }
 
 void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
-  openSection(page, F(L_FIRMWARE_UPGRADE), F(""));
-  page.concat(F("<ul>"));
+  openMessageSection(page, F(L_FIRMWARE_UPGRADE), F(""));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   if (!status) {
-    page.concat(F("<li style=\"color:red\">"));
-    page.concat(F(L_UPGRADE_FAILED));
+    page.replace("{{f.info}}", F(L_UPGRADE_FAILED));
   } else {
-    page.concat(F("<li>"));
-    page.concat(F(L_UPGRADE_SUCCESSFUL));
+    page.replace("{{f.info}}", F(L_UPGRADE_SUCCESSFUL));
   }
-  page.concat(F("</li><li>"));
-  page.concat(F(L_UPGRADE_DEVICE_WILL_BE_REBOOTED));
-  page.concat(F("...</li>"));
-  closeSection(page);
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_DEVICE_WILL_BE_REBOOTED));
+  closeMessageSection(page);
 }
 
 void AFESitesGenerator::siteWANUpgrade(String &page,
                                        const __FlashStringHelper *title) {
-  openSection(page, title, F(""));
-  page.concat(F("<ul class=\"lst\">"));
+  openMessageSection(page, title, F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   page.replace("{{f.info}}", F(L_UPGRADE_INTERUPTED));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
@@ -2748,45 +2725,67 @@ void AFESitesGenerator::siteWANUpgrade(String &page,
   page.replace("{{f.info}}", F(L_UPGRADE_TIME));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   page.replace("{{f.info}}", F(L_UPGRADE_AUTO_REBOOT));
-  page.concat(F("</ul>"));
-  closeSection(page);
+  closeMessageSection(page);
 }
 
 #endif
 
 void AFESitesGenerator::siteReset(String &page) {
-  openSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
-  page.concat(FPSTR(HTTP_SITE_RESET_TO_DEFAULTS));
-  page.replace("{{L_UPGRADE_WARNING}}", F(L_UPGRADE_WARNING));
-  page.replace("{{L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED}}",
-               F(L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED));
-  page.replace("{{L_UPGRADE_RESTORE_DEFAULT_SETTINGS}}",
-               F(L_UPGRADE_RESTORE_DEFAULT_SETTINGS));
+  openMessageSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_RESTORE_CONFIGURATION_WILL_BE_REMOVED));
+  page.concat(F("</ul>"));
+  page.concat(
+      F("<input style=\"margin-top:1.5em\" type=\"submit\" class=\"b be\" "
+        "value=\"{{L}}\">"));
+  page.replace("{{L}}", F(L_UPGRADE_RESTORE_DEFAULT_SETTINGS));
   closeSection(page);
 }
 
 void AFESitesGenerator::sitePostReset(String &page) {
-  openSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
-  page.concat(FPSTR(HTTP_SITE_POST_RESET));
-  page.replace("{{L_RESTORE_IN_PROGRESS}}", F(L_RESTORE_IN_PROGRESS));
-  page.replace("{{L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}",
-               F(L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE));
-  closeSection(page);
+  openMessageSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_RESTORE_IN_PROGRESS));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}",
+               F(L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
+  closeMessageSection(page);
 }
 
 void AFESitesGenerator::siteExit(String &page, uint8_t command) {
-  openSection(page, F(L_UPGRADE_REBOOT), F(""));
-  page.concat(F("<fieldset><div class=\"cf\"><ul><li>"));
-  page.concat(F(L_UPGRADE_REBOOT_IN_PROGRESS));
-  page.concat(F("</li><li>"));
+  openMessageSection(page, F(L_UPGRADE_REBOOT), F(""));
+
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_REBOOT_IN_PROGRESS));
+
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   if (command != AFE_MODE_ACCESS_POINT) {
-    page.concat(F(L_UPGRADE_SITE_WILL_BE_RELOADED));
+    page.replace("{{f.info}}", F(L_UPGRADE_SITE_WILL_BE_RELOADED));
   } else {
-    page.concat(F(L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE));
-    page.concat(
-        F(": <a href=\"http://192.168.5.1\">http://192.168.5.1</a></p>"));
+    page.replace("{{f.info}}",
+                 F(L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE));
+    page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+    page.replace("{{f.info}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
   }
-  page.concat(F("</li></ul></div></fieldset></div>"));
+
+  closeMessageSection(page);
+}
+
+void AFESitesGenerator::siteConnecting(String &page) {
+  NETWORK configuration;
+  Data->getConfiguration(&configuration);
+  openMessageSection(page, F(L_NETWORK_ALMOST), F(""));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_NETWORK_DEVICE_CONNECTS));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_NETWORK_CONNECT_TO));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
+  page.replace("{{MAC}}", WiFi.macAddress());
+  page.replace("{{SSID}}", configuration.ssid);
+  closeMessageSection(page);
 }
 
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
@@ -2795,12 +2794,11 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
 
   char _text[42];
   sprintf(_text, "Device: %s", configuration.name);
-  openSection(page, _text, F(""));
+  openMessageSection(page, _text, F(""));
 
   if (RestAPI->accessToWAN()) {
     String HtmlResponse;
     // @TODO reserve max size
-    page.concat(F("<ul class=\"lst\">"));
 
     RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
     if (HtmlResponse.length() > 0) {
@@ -2823,7 +2821,7 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
     page.concat(F("</ul>"));
   }
 
-  closeSection(page);
+  closeMessageSection(page);
 
   openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL),
               F(L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT));
@@ -3025,6 +3023,28 @@ void AFESitesGenerator::openSection(String &page,
   page.replace("{{description}}", description);
 }
 
+void AFESitesGenerator::openMessageSection(
+    String &page, const char *title, const __FlashStringHelper *description) {
+  openSection(page, title, description);
+  page.concat(F("<ul class=\"lst\">"));
+}
+
+void AFESitesGenerator::openMessageSection(
+    String &page, const __FlashStringHelper *title,
+    const __FlashStringHelper *description) {
+  openSection(page, title, description);
+  page.concat(F("<ul class=\"lst\">"));
+}
+
+void AFESitesGenerator::closeSection(String &page) {
+  page.concat(FPSTR(HTTP_FORM_BLOCK_CLOSURE));
+}
+
+void AFESitesGenerator::closeMessageSection(String &page) {
+  page.concat(F("</ul>"));
+  page.concat(FPSTR(HTTP_FORM_BLOCK_CLOSURE));
+}
+
 void AFESitesGenerator::addListOfHardwareItem(String &page, uint8_t noOfItems,
                                               uint8_t noOffConnected,
                                               const char *field,
@@ -3100,10 +3120,6 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
   closeSection(page);
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-
-void AFESitesGenerator::closeSection(String &page) {
-  page.concat(FPSTR(HTTP_FORM_BLOCK_CLOSURE));
-}
 
 void AFESitesGenerator::addListOfGPIOs(String &item, const char *field,
                                        uint8_t selected, const char *title) {

@@ -12,7 +12,6 @@
 #include <AFE-Site-components.h>
 #include <ESP8266WiFi.h>
 
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #endif
@@ -63,6 +62,14 @@ private:
                    const __FlashStringHelper *description);
 
   void closeSection(String &page);
+
+  void openMessageSection(String &page, const char *title,
+                          const __FlashStringHelper *description);
+
+  void openMessageSection(String &page, const __FlashStringHelper *title,
+                          const __FlashStringHelper *description);
+
+  void closeMessageSection(String &page);
 
   /* Item: HTML <input type=""> */
   void addInputFormItem(String &item, const char *type, const char *name,

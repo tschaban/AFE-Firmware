@@ -143,11 +143,12 @@
 #define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Time between connections' attempts"
 #define L_NETWORK_SLEEP_TIME "Sleep time before next connection attempts"
 #define L_NETWORK_ADVANCED "Advanced"
-#define L_NETWORK_DEVICE_CONNECTS "Device is connecting to"
-#define L_NETWORK_CONNECT_TO "Connect to"
-#define L_NETWORK_CONNECT "Connect"
-#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "In your WiFi router look for an IP address of a device with follwing MAC address"
-#define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration by entering device IP address in the browser"
+#define L_NETWORK_ALMOST "We're almost there!"
+#define L_NETWORK_DEVICE_CONNECTS "Device is connecting to your wireless network: {{SSID}}"
+#define L_NETWORK_CONNECT_TO "Connect now to your wireless network and open you WiFi Router configuration panel"
+//#define L_NETWORK_CONNECT "Connect"
+#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Look for a device's IP address where its MAC address is: {{MAC}} or hostname: AFE-Device"
+#define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration in your browser using device's IP address"
 #define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
 #define L_NETWORK_BACKUP_CONFIGURATION_HINT "Works only with routers with DHCP enabled"
@@ -270,19 +271,18 @@
 
 #define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
 
-#define L_UPGRADE_FAILED "Upgrade failed"
+#define L_UPGRADE_FAILED "<span class=\"color:red\">Upgrade failed</span>"
 #define L_UPGRADE_SUCCESSFUL "Upgrade finished succesfully"
 #define L_UPGRADE_DEVICE_WILL_BE_REBOOTED                                              \
-  "After 15s the device will be rebooted. Please wait"
+  "After 15s the device will be rebooted. Please wait ..."
 #define L_UPGRADE_RESTORE_DEFAULT_SETTINGS "Restore default settings"
-#define L_UPGRADE_WARNING "Warning"
-#define L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED                                        \
-  "restoring to default settings will remove all configuration's "             \
+#define L_RESTORE_CONFIGURATION_WILL_BE_REMOVED                                        \
+  "<strong>Warning:</strong> restoring to default settings will remove all configuration's "             \
   "information, incl. WiFi configuration"
 #define L_RESTORE_IN_PROGRESS "Restoring configuration is in progress"
-#define L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
-  "After 20 seconds connect to WiFi network called "                           \
-  "<strong>AFE-Device</strong> and open configuration panel"
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE "After 20 seconds connect to WiFi network called as your device name" 
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE "After 20 seconds connect to WiFi network called <strong>AFE Device</strong>" 
+#define L_RESTORE_NETWORK_OPEN_PANEL  "Afterwards open configuration panel : <a href=\"http://192.168.5.1\">http://192.168.5.1</a>"
 #define L_UPGRADE_RESTORING_DEFAULT_SETTING "Restoring to default settings"
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"

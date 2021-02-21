@@ -109,26 +109,6 @@ const char HTTP_ITEM_SELECT_CLOSE[] PROGMEM = "</select></div>";
 
 const char HTTP_ITEM_HINT[] PROGMEM = "<br><p class=\"cm\">{{item.hint}}</p>";
 
-const char HTTP_SITE_RESET_TO_DEFAULTS[] PROGMEM =
-    "<fieldset><p class=\"cm\"><strong>{{L_UPGRADE_WARNING}}</strong>: </p><p "
-    "class=\"cm\">{{L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED}}: </p><input "
-    "type=\"submit\" class=\"b be\" "
-    "value=\"{{L_UPGRADE_RESTORE_DEFAULT_SETTINGS}}\"></fieldset>";
-
-const char HTTP_SITE_POST_RESET[] PROGMEM =
-    "<fieldset><p class=\"cm\">{{L_RESTORE_IN_PROGRESS}}</p><p "
-    "class=\"cm\">{{L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE}}: "
-    "</p><a "
-    "href=\"http://192.168.5.1\">http://192.168.5.1</a></fieldset>";
-
-const char HTTP_SITE_UPGRADE[] PROGMEM =
-    "<form method=\"post\" action=\"upgrade?o=21\" "
-    "enctype=\"multipart/form-data\"><div "
-    "class=\"cf\"><label>{{L_UPGRADE_SELECT_FIRMWARE}}</label><input "
-    "class=\"bs\" "
-    "name=\"update\" type=\"file\" accept=\".bin\"></div><button style=\"margin-top: 1.5em\" type=\"submit\" class=\"b "
-    "be\">{{L_UPGRADE}}</button></form>";
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "<div class=\"cf\"><label>{{L_REGULATOR_TURN_IF}}</label><select "

@@ -39,6 +39,8 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
   if (configFile) {
     message = configFile.readString();
     configFile.close();
+    /* After message is read, it's removed from the file */
+    saveWelecomeMessage(F(""));
   }
 
 #ifdef DEBUG

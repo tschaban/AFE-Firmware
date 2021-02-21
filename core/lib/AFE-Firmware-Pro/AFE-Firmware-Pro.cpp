@@ -27,10 +27,9 @@ void AFEFirmwarePro::validate() {
     Data->saveConfiguration(&Pro);
   } else if (strlen(Pro.serial) > 0) {
     boolean isValid;
-    if (RestAPI->sent(isValid, "is-pro") ==
-        HTTP_CODE_OK) {
+    if (RestAPI->sent(isValid, "is-pro") == HTTP_CODE_OK) {
 
-      if (Pro.valid!=isValid) {
+      if (Pro.valid != isValid) {
         Data->saveConfiguration(&Pro);
         Pro.valid = isValid;
 #ifdef DEBUG
@@ -40,9 +39,8 @@ void AFEFirmwarePro::validate() {
 
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: AFE PRO: Key checked: ") << (isValid
-          ? F("valid")
-          : F("invalid"));
+             << F("INFO: AFE PRO: Key checked: ")
+             << (isValid ? F("valid") : F("invalid"));
 #endif
     }
 #ifdef DEBUG
@@ -54,20 +52,12 @@ void AFEFirmwarePro::validate() {
 }
 
 void AFEFirmwarePro::listener() {
-  if (millis() - miliseconds > 3000) {
-    
-    Serial << endl << F("INFO: #### Time:" ) << millis();
-    validate();
-
-      Serial << endl
-         << "INFO: MEMORY: After key check: : "
-         << String(system_get_free_heap_size() / 1024) << "kB";
-
-    // minutes++;
+  if (millis() - miliseconds > 59999) {
+    minutes++;
     miliseconds = millis();
-    // if (minutes == AFE_KEY_FREQUENCY_VALIDATION) {
-    //  validate();
-    //  minutes = 0;
-    // }
+    if (minutes == AFE_KEY_FREQUENCY_VALIDATION) {
+      validate();
+      minutes = 0;
+    }
   }
 }
