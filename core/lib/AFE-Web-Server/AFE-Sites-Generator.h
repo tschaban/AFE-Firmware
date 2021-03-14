@@ -108,6 +108,7 @@ private:
 
   /* Item: Menu */
   void addMenuItem(String &item, const char *title, uint8_t siteId);
+  void addMenuItemExternal(String &item, const __FlashStringHelper *title, const __FlashStringHelper *url);
   void addMenuHeaderItem(String &item, const char *title);
   void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);

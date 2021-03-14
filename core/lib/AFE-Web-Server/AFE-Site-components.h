@@ -35,34 +35,13 @@ const char HTTP_FORM_BLOCK_HEADER[] PROGMEM =
 
 const char HTTP_FORM_BLOCK_CLOSURE[] PROGMEM = "</fieldset></div>";
 
-const char HTTP_FOOTER_EXTENDED[] PROGMEM =
-    "<div style=\"padding: 5px 0\"><a "
-    "href=\"https://www.smartnydom.pl/forum/afe-firmware/\" "
-    "target=\"_blank\"><img "
-    "src=\"https://img.shields.io/badge/{{L_HELP}}-Forum-red.svg\" "
-    "alt=\"Forum\" /></a> <a href=\"https://afe.smartnydom.pl/{{s.lang}}\" "
-    "target=\"_blank\"><img "
-    "src=\"https://img.shields.io/badge/"
-    "{{L_HELP}}-{{L_DOCUMENTATION}}-green.svg\" alt=\"{{L_DOCUMENTATION}}\" "
-    "/></a> <a "
-    "href=\"https://afe.smartnydom.pl/{{s.lang}}/pliki-to-pobrania/"
-    "historia-zmian\" target=\"_blank\"><img "
-    "src=\"https://img.shields.io/badge/"
-    "{{L_VERSION}}%20-%20{{f.version}}[T{{f.type}}]-blue.svg\" "
-    "alt=\"T{{f.type}}-{{f.version}}\" /></a> <img "
-    "src=\"https://img.shields.io/badge/"
-    "Device-{{f.deviceName}}-lightgrey.svg\" alt=\"DeviceID {{f.deviceID}}\" "
-    "/> <img src=\"https://img.shields.io/badge/API-{{f.API}}-yellow.svg\" "
-    "/> <img src=\"https://img.shields.io/badge/PRO-{{f.Pro}}-orange.svg\" "
-    "alt=\"PRO\" /> <img "
-    "src=\"https://img.shields.io/badge/Mem-{{freeHeap}}KB-9cf.svg\" "
-    "alt=\"PRO\" /> <img "
-    "src=\"https://img.shields.io/badge/Size-{{f.size}}-yellowgreen.svg\" "
-    "/></div>";
-
 /* Fixed menu items */
 const char HTTP_MENU_ITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{site.id}}\">{{item.title}}</a></li>";
+
+const char HTTP_MENU_ITEM_EXTERNAL[] PROGMEM =
+    "<li class=\"itm\"><a href=\"{{site.url}}\">{{item.title}}</a></li>";
+
 
 const char HTTP_MENU_SUBITEMS_HEADER[] PROGMEM =
     "<li class=\"itm\"><i>{{item.title}}</i></li>";

@@ -10,6 +10,10 @@
 /* Max size of the configuration HTML page */
 #define AFE_MAX_PAGE_SIZE 12000
 
+/* Urls */
+#define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
+#define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
+
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
 #define AFE_UPGRADE_VERSION 1

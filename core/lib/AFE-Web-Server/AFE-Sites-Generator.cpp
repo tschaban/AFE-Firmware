@@ -31,16 +31,17 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1>"));
-  page.concat(F("<h4>Wersja T0.3.0.0</h4>"));
-  page.concat(F("</div><div class=\"r\">"));
+  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1><h4>"));
+  page.concat(F(L_VERSION));
+  page.concat(F(" T{{f.type}}.{{f.version}}</h4></div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
 
   generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1><ul class=\"lst\">"));
+  page.concat(
+      F("<div class=\"l\"><h1>AFE Firmware</h1><ul class=\"lst\">"));
 
   /* Gnerating Menu */
   addMenuItem(page, L_DEVICE, AFE_CONFIG_SITE_DEVICE);
@@ -242,6 +243,10 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #endif
   addMenuItem(page, L_RESET_DEVICE, AFE_CONFIG_SITE_RESET);
   addMenuItem(page, L_PRO_VERSION, AFE_CONFIG_SITE_PRO_VERSION);
+  
+  addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
+  addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
+
 
   page.concat(F("</ul><h4></h4><ul class=\"lst\">"));
 
@@ -2692,13 +2697,29 @@ void AFESitesGenerator::siteUpgrade(String &page) {
 
   if (RestAPI->accessToWAN()) {
     openSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
+
     page.concat(
         F("<form method=\"post\" action=\"/?o=35\"><input type=\"submit\" "
-          "class=\"b be\" value=\"{{L}}\"></form>"));
+          "class=\"b bw\" value=\"{{L}}\"></form>"));
     page.replace("{{L}}", F(L_UPGRADE_VIA_WAN));
 
     closeSection(page);
   }
+
+  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_VERSION));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_ESP));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_API));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_LANG));
+  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
+  closeMessageSection(page);
 }
 
 void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
@@ -2967,29 +2988,32 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   }
 
   page.concat(F("</div></div>"));
-
-  if (extended) {
-    page.concat(FPSTR(HTTP_FOOTER_EXTENDED));
-    page.replace("{{L_HELP}}", F(L_HELP));
-    page.replace("{{L_DOCUMENTATION}}", F(L_DOCUMENTATION));
-    page.replace("{{L_VERSION}}", F(L_VERSION));
-    page.replace("{{freeHeap}}", String(system_get_free_heap_size() / 1024));
+  page.replace("{{freeHeap}}", String(system_get_free_heap_size() / 1024));
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    page.replace("{{f.API}}", F("Domoticz"));
+  page.replace("{{f.API}}", F("Domoticz"));
 #else
-    page.replace("{{f.API}}", F("Standard"));
+  page.replace("{{f.API}}", F("Standard"));
 #endif
 
-#ifdef ESP_4MB
-    page.replace("{{f.size}}", F("4Mb"));
+#if defined(ESP_4MB)
+  page.replace("{{f.size}}", F("4Mb"));
+#elif defined(ESP_2MB)
+  page.replace("{{f.size}}", F("2Mb"));
 #else
-    page.replace("{{f.size}}", F("1Mb"));
+  page.replace("{{f.size}}", F("1Mb"));
 #endif
 
-    FirmwarePro->Pro.valid ? page.replace("{{f.Pro}}", F(L_YES))
-                           : page.replace("{{f.Pro}}", F(L_NO));
-  }
+#if defined(ESP8285)
+  page.replace("{{f.esp}}", F("8285"));
+#elif defined(ESP32)
+  page.replace("{{f.esp}}", F("32"));
+#else
+  page.replace("{{f.esp}}", F("8266"));
+#endif
+
+  FirmwarePro->Pro.valid ? page.replace("{{f.Pro}}", F(L_YES))
+                         : page.replace("{{f.Pro}}", F(L_NO));
 
 #ifdef AFE_CONFIG_USE_MAX_HARDWARE
   char _version[sizeof(Firmware.version) + 6];
@@ -3286,6 +3310,14 @@ void AFESitesGenerator::addMenuItem(String &item, const char *title,
   item.concat(FPSTR(HTTP_MENU_ITEM));
   item.replace("{{item.title}}", title);
   item.replace("{{site.id}}", String(siteId));
+}
+
+void AFESitesGenerator::addMenuItemExternal(String &item,
+                                            const __FlashStringHelper *title,
+                                            const __FlashStringHelper *url) {
+  item.concat(FPSTR(HTTP_MENU_ITEM_EXTERNAL));
+  item.replace("{{item.title}}", title);
+  item.replace("{{site.url}}", url);
 }
 
 void AFESitesGenerator::addMenuHeaderItem(String &item, const char *title) {

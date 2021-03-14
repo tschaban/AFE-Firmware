@@ -71,7 +71,7 @@
 #define L_USERNAME "User name"
 #define L_PASSWORD "Password"
 #define L_SECONDS "seconds"
-#define L_MILISECONDS "milisekonds"
+#define L_MILISECONDS "msec"
 #define L_IP_ADDRESS "Address IP"
 #define L_NONE "None"
 #define L_NAME "Name"
@@ -267,6 +267,14 @@
 
 #define L_UPGRADE_FROM_FILE "Upgrade with binary file"
 #define L_UPGRADE "Upgrade with binary file"
+
+#define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
+#define L_UPGRADE_FIRMWARE_VERSION "Version: AFE T{{f.type}}.{{f.version}}"
+#define L_UPGRADE_FIRMWARE_ESP "ESP: ESP{{f.esp}}.{{f.size}}"
+#define L_UPGRADE_FIRMWARE_API "API: {{f.API}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device name: {{f.deviceName}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_ID "Device ID: {{f.deviceID}}"
+#define L_UPGRADE_FIRMWARE_LANG "Language: {{L_LANGUAGE_SHORT}}"
 
 
 #define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
