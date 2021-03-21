@@ -46,8 +46,9 @@ void AFEFirmwarePro::validate() {
 #ifdef DEBUG
     else {
       Serial << endl << F("ERROR: AFE PRO: while checing the key");
+    }      
 #endif
-    }
+
   }
 }
 

@@ -6,7 +6,9 @@
 #include <arduino.h>
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
+#endif
 #include <ArduinoJson.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>

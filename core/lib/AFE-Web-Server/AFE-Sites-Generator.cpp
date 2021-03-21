@@ -20,10 +20,10 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
   page += FPSTR(HTTP_HEADER);
 
   if (redirect > 0) {
-    page.replace("{{s.redirect}}", "<meta http-equiv=\"refresh\" content=\"" +
-                                       String(redirect) + "; url=/\">");
+    page.replace("{{s.r}}", "<meta http-equiv=\"refresh\" content=\"" +
+                                String(redirect) + "; url=/\">");
   } else {
-    page.replace("{{s.redirect}}", "");
+    page.replace("{{s.r}}", "");
   }
 
   page.concat(F("<div class=\"c\">"));
@@ -31,31 +31,52 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\"><h1>AFE Firmware</h1><h4>"));
+  page.concat(F("<div class=\"l\">{{A}}<h4 style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.type}}.{{f.version}}</h4></div><div class=\"r\">"));
+  page.concat(F(" T{{f.t}}.{{f.v}}</h4></div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
 
   generateHeader(page, redirect);
-  page.concat(
-      F("<div class=\"l\"><h1>AFE Firmware</h1><ul class=\"lst\">"));
+  page.concat(F("<div class=\"l\">{{A}}<ul class=\"lst\">"));
 
   /* Gnerating Menu */
-  addMenuItem(page, L_DEVICE, AFE_CONFIG_SITE_DEVICE);
-  addMenuItem(page, L_NETWORK, AFE_CONFIG_SITE_NETWORK);
+  addMenuItem(page, F(L_DEVICE), AFE_CONFIG_SITE_DEVICE);
+
+  page.concat(F("</ul><h4>&#10150; "));
+  page.concat(F(L_CONNECTIONS));
+  page.concat(F("</h4><ul class=\"lst\">"));
+
+  addMenuItem(page, F(L_NETWORK), AFE_CONFIG_SITE_NETWORK);
 
   if (Device->configuration.api.mqtt) {
-    addMenuItem(page, L_MQTT_BROKER, AFE_CONFIG_SITE_MQTT);
+    addMenuItem(page, F(L_MQTT_BROKER), AFE_CONFIG_SITE_MQTT);
   }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz) {
-    addMenuItem(page, L_DOMOTICZ_SERVER, AFE_CONFIG_SITE_DOMOTICZ);
+    addMenuItem(page, F(L_DOMOTICZ_SERVER), AFE_CONFIG_SITE_DOMOTICZ);
   }
 #endif
+
+/* I2C */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  addMenuItem(page, F("I2C"), AFE_CONFIG_SITE_I2C);
+#endif // AFE_CONFIG_HARDWARE_I2C
+
+/* UART */
+#ifdef AFE_CONFIG_HARDWARE_UART
+/* Don't show it if HPMA115SO sensor is not added to the device */
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+#endif
+    addMenuItem(page, F("UART"), AFE_CONFIG_SITE_UART);
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  }
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+#endif // AFE_CONFIG_HARDWARE_UART
 
   page.concat(F("</ul><h4>&#10150; "));
   page.concat(F(L_HARDWARE));
@@ -63,7 +84,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
-    addMenuHeaderItem(page, L_LEDS);
+    addMenuHeaderItem(page, F(L_LEDS));
     addMenuSubItem(page, "LED", Device->configuration.noOfLEDs,
                    AFE_CONFIG_SITE_LED);
   }
@@ -71,7 +92,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
-    addMenuHeaderItem(page, L_GATE_CONFIGURATION);
+    addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
     addMenuSubItem(page, L_GATE, Device->configuration.noOfGates,
                    AFE_CONFIG_SITE_GATE);
   }
@@ -81,7 +102,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   if (Device->configuration.noOfRelays > 0) {
 
-    addMenuHeaderItem(page, L_RELAYS_CONFIGURATION);
+    addMenuHeaderItem(page, F(L_RELAYS_CONFIGURATION));
     addMenuSubItem(page, L_RELAY, Device->configuration.noOfRelays,
                    AFE_CONFIG_SITE_RELAY);
   }
@@ -89,7 +110,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   if (Device->configuration.noOfSwitches > 0) {
-    addMenuHeaderItem(page, L_BUTTONS_SWITCHES);
+    addMenuHeaderItem(page, F(L_BUTTONS_SWITCHES));
     addMenuSubItem(page, L_SWITCH, Device->configuration.noOfSwitches,
                    AFE_CONFIG_SITE_SWITCH);
   }
@@ -97,7 +118,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   if (Device->configuration.noOfBinarySensors > 0) {
-    addMenuHeaderItem(page, L_BINARY_SENSORS);
+    addMenuHeaderItem(page, F(L_BINARY_SENSORS));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBinarySensors,
                    AFE_CONFIG_SITE_BINARY_SENSOR);
   }
@@ -106,7 +127,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 /* Contactrons and Gate */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   if (Device->configuration.noOfContactrons > 0) {
-    addMenuHeaderItem(page, L_CONTACTRONS);
+    addMenuHeaderItem(page, F(L_CONTACTRONS));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfContactrons,
                    AFE_CONFIG_SITE_CONTACTRON);
   }
@@ -116,7 +137,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   if (Device->configuration.noOfDS18B20s > 0) {
 
-    addMenuHeaderItem(page, L_DS18B20_SENSORS);
+    addMenuHeaderItem(page, F(L_DS18B20_SENSORS));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfDS18B20s,
                    AFE_CONFIG_SITE_DS18B20);
   }
@@ -125,7 +146,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 /* Sensor DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   if (Device->configuration.noOfDHTs > 0) {
-    addMenuHeaderItem(page, "DHT");
+    addMenuHeaderItem(page, F("DHT"));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfDHTs,
                    AFE_CONFIG_SITE_DHT);
   }
@@ -133,7 +154,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   if (Device->configuration.noOfBMEX80s > 0) {
-    addMenuHeaderItem(page, L_BMEX80_SENSORS);
+    addMenuHeaderItem(page, F(L_BMEX80_SENSORS));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBMEX80s,
                    AFE_CONFIG_SITE_BMEX80);
   }
@@ -142,7 +163,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   if (Device->configuration.noOfBH1750s > 0) {
 
-    addMenuHeaderItem(page, L_BH1750_SENSORS);
+    addMenuHeaderItem(page, F(L_BH1750_SENSORS));
     addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBH1750s,
                    AFE_CONFIG_SITE_BH1750);
   }
@@ -151,7 +172,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
-    addMenuHeaderItem(page, L_PARTICLE_SENSORS);
+    addMenuHeaderItem(page, F(L_PARTICLE_SENSORS));
     addMenuSubItem(page, L_HPMA115S0_SENSOR,
                    Device->configuration.noOfHPMA115S0s,
                    AFE_CONFIG_SITE_HPMA115S0);
@@ -160,48 +181,27 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (Device->configuration.noOfAnemometerSensors > 0) {
-    addMenuItem(page, L_ANEMOMETER_SENSOR, AFE_CONFIG_SITE_ANEMOMETER_SENSOR);
+    addMenuItem(page, F(L_ANEMOMETER_SENSOR), AFE_CONFIG_SITE_ANEMOMETER_SENSOR);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   if (Device->configuration.noOfRainmeterSensors > 0) {
-    addMenuItem(page, L_RAINMETER, AFE_CONFIG_SITE_RAINMETER_SENSOR);
+    addMenuItem(page, F(L_RAINMETER), AFE_CONFIG_SITE_RAINMETER_SENSOR);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Device->configuration.noOfAS3935s > 0) {
-    addMenuItem(page, L_AS3935_SENSOR, AFE_CONFIG_SITE_AS3935);
+    addMenuItem(page, F(L_AS3935_SENSOR), AFE_CONFIG_SITE_AS3935);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput) {
-    addMenuItem(page, L_ANALOG_INPUT, AFE_CONFIG_SITE_ANALOG_INPUT);
+    addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
   }
 #endif
-
-  page.concat(F("</ul><h4>&#10150; "));
-  page.concat(F(L_INTERFACE));
-  page.concat(F("</h4><ul class=\"lst\">"));
-
-/* I2C */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  addMenuItem(page, "I2C", AFE_CONFIG_SITE_I2C);
-#endif // AFE_CONFIG_HARDWARE_I2C
-
-/* UART */
-#ifdef AFE_CONFIG_HARDWARE_UART
-/* Don't show it if HPMA115SO sensor is not added to the device */
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  if (Device->configuration.noOfHPMA115S0s > 0) {
-#endif
-    addMenuItem(page, "UART", AFE_CONFIG_SITE_UART);
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  }
-#endif // AFE_CONFIG_HARDWARE_HPMA115S0
-#endif // AFE_CONFIG_HARDWARE_UART
 
   page.concat(F("</ul><h4>&#10150; "));
   page.concat(F(L_FUNCTIONS));
@@ -210,14 +210,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 /* System LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
-    addMenuItem(page, L_LED_SYSTEM, AFE_CONFIG_SITE_SYSTEM_LED);
+    addMenuItem(page, F(L_LED_SYSTEM), AFE_CONFIG_SITE_SYSTEM_LED);
   }
 #endif
 
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   if (Device->configuration.noOfRegulators > 0) {
-    addMenuHeaderItem(page, L_REGULATORS);
+    addMenuHeaderItem(page, F(L_REGULATORS));
     addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
                    AFE_CONFIG_SITE_REGULATOR);
   }
@@ -226,7 +226,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   if (Device->configuration.noOfThermalProtectors > 0) {
-    addMenuHeaderItem(page, L_THERMAL_PROTECTORS);
+    addMenuHeaderItem(page, F(L_THERMAL_PROTECTORS));
     addMenuSubItem(page, L_THERMAL_PROTECTOR,
                    Device->configuration.noOfThermalProtectors,
                    AFE_CONFIG_SITE_THERMAL_PROTECTOR);
@@ -237,20 +237,19 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   page.concat(F(L_FIRMWARE));
   page.concat(F("</h4><ul class=\"lst\">"));
 
-  addMenuItem(page, L_PASSWORD_SET_PASSWORD, AFE_CONFIG_SITE_PASSWORD);
+  addMenuItem(page, F(L_PASSWORD_SET_PASSWORD), AFE_CONFIG_SITE_PASSWORD);
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-  addMenuItem(page, L_FIRMWARE_UPGRADE, AFE_CONFIG_SITE_UPGRADE);
+  addMenuItem(page, F(L_FIRMWARE_UPGRADE), AFE_CONFIG_SITE_UPGRADE);
 #endif
-  addMenuItem(page, L_RESET_DEVICE, AFE_CONFIG_SITE_RESET);
-  addMenuItem(page, L_PRO_VERSION, AFE_CONFIG_SITE_PRO_VERSION);
-  
+  addMenuItem(page, F(L_RESET_DEVICE), AFE_CONFIG_SITE_RESET);
+  addMenuItem(page, F(L_PRO_VERSION), AFE_CONFIG_SITE_PRO_VERSION);
+
   addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
   addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
 
-
   page.concat(F("</ul><h4></h4><ul class=\"lst\">"));
 
-  addMenuItem(page, L_FINISH_CONFIGURATION, AFE_CONFIG_SITE_EXIT);
+  addMenuItem(page, F(L_FINISH_CONFIGURATION), AFE_CONFIG_SITE_EXIT);
 
   /* Information section */
   page.concat(F("</ul></div><div class=\"r\">"));
@@ -261,50 +260,36 @@ void AFESitesGenerator::siteDevice(String &page) {
   boolean _itemDisabled = false;
 
   String message;
+  message.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
   Data->getWelcomeMessage(message);
 
   if (message.length() > 0 || RestAPI->accessToWAN()) {
-    openSection(page, F("Firmware"), F(""));
-    page.concat(F("<ul class=\"lst\">"));
-    page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-    page.replace("{{f.info}}", message);
+    openMessageSection(page, F("Firmware"), F(""));
 
-    if (RestAPI->accessToWAN()) {
+    if (message.length() > 0) {
+      page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
+      page.replace("{{I}}", message);
+    } else if (RestAPI->accessToWAN()) {
 
       RestAPI->sent(message, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (message.length() > 0) {
         page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-        page.replace("{{f.info}}", message);
+        page.replace("{{I}}", message);
       }
 
       RestAPI->sent(message, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
       if (message.length() > 0) {
         page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-        page.replace("{{f.info}}", message);
+        page.replace("{{I}}", message);
       }
 
       RestAPI->sent(message, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
       if (message.length() > 0) {
         page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-        page.replace("{{f.info}}", message);
+        page.replace("{{I}}", message);
       }
     }
-    page.concat(F("</ul>"));
     closeSection(page);
-  }
-
-  if (Device->upgraded != AFE_UPGRADE_NONE) {
-    page.concat(F("<h4 class=\"bc\" style=\"padding:5px;\">"));
-    switch (Device->upgraded) {
-    case AFE_UPGRADE_VERSION:
-      page.concat(F(L_UPGRADED_TO_NEW_VERSION));
-      break;
-    case AFE_UPGRADE_VERSION_TYPE:
-      page.concat(F(L_UPGRADED_TO_NEW_VERSION_TYPE));
-      break;
-    }
-    page.concat(F("</h4>"));
-    Device->upgraded = AFE_UPGRADE_NONE;
   }
 
   /* Section: Device name */
@@ -750,7 +735,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
   closeSection(page);
@@ -816,7 +801,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
@@ -1281,7 +1266,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_SWITCH_SENSITIVENESS_HINT));
+  page.replace("{{i.v}}", F(L_SWITCH_SENSITIVENESS_HINT));
 
   char _number[4];
   sprintf(_number, "%d", configuration.sensitiveness);
@@ -1295,7 +1280,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
   addListOfGPIOs(page, "g", configuration.gpio);
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
@@ -1739,7 +1724,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   page.concat(FPSTR(HTTP_ITEM_HINT));
-  page.replace("{{item.hint}}", F(L_CONTACTRON_SET_SENSITIVENESS));
+  page.replace("{{i.h}}", F(L_CONTACTRON_SET_SENSITIVENESS));
 
   /* Item: bouncing */
   char _number[5];
@@ -1991,7 +1976,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
                    L_SECONDS);
 
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_HPMA115S0_POST_SLEEP_INTERVAL));
+  page.replace("{{i.v}}", F(L_HPMA115S0_POST_SLEEP_INTERVAL));
 
   sprintf(_number, "%d", configuration.timeToMeasure);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m",
@@ -2462,7 +2447,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
   addSelectFormItemClose(page);
 
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_ANEMOMETER_SENSITIVENESS_HINT));
+  page.replace("{{i.v}}", F(L_ANEMOMETER_SENSITIVENESS_HINT));
 
   sprintf(_number, "%d", configuration.sensitiveness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "s", L_SENSITIVENESS,
@@ -2657,7 +2642,6 @@ void AFESitesGenerator::siteUARTBUS(String &page) {
   SERIALPORT configuration;
   Data->getConfiguration(&configuration);
   openSection(page, F("UART"), F(""));
-  page.concat("<fieldset>");
   addListOfGPIOs(page, "r", configuration.RXD, "GPIO RXD");
   addListOfGPIOs(page, "t", configuration.TXD, "GPIO TXD");
   closeSection(page);
@@ -2696,29 +2680,34 @@ void AFESitesGenerator::siteUpgrade(String &page) {
   closeSection(page);
 
   if (RestAPI->accessToWAN()) {
-    openSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
 
-    page.concat(
-        F("<form method=\"post\" action=\"/?o=35\"><input type=\"submit\" "
-          "class=\"b bw\" value=\"{{L}}\"></form>"));
-    page.replace("{{L}}", F(L_UPGRADE_VIA_WAN));
+    String _firmwareId;
+    _firmwareId.reserve(6);
+    RestAPI->sent(_firmwareId,
+                  AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID);
 
-    closeSection(page);
+    if (_firmwareId.length() > 0) {
+      openSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
+
+      page.concat(
+          F("<form method=\"post\" action=\"/?o=35\"><input type=\"hidden\" "
+            "name=\"f\" value=\"{{V}}\"><input type=\"submit\" "
+            "class=\"b bw\" value=\"{{L}}\"></form>"));
+      page.replace("{{L}}", F(L_UPGRADE_VIA_WAN));
+      page.replace("{{V}}", _firmwareId);
+      closeSection(page);
+    }
   }
 
   openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_VERSION));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_ESP));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_API));
-  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_LANG));
-  page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
   closeMessageSection(page);
 }
 
@@ -2726,12 +2715,12 @@ void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
   openMessageSection(page, F(L_FIRMWARE_UPGRADE), F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   if (!status) {
-    page.replace("{{f.info}}", F(L_UPGRADE_FAILED));
+    page.replace("{{I}}", F(L_UPGRADE_FAILED));
   } else {
-    page.replace("{{f.info}}", F(L_UPGRADE_SUCCESSFUL));
+    page.replace("{{I}}", F(L_UPGRADE_SUCCESSFUL));
   }
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_DEVICE_WILL_BE_REBOOTED));
+  page.replace("{{I}}", F(L_UPGRADE_DEVICE_WILL_BE_REBOOTED));
   closeMessageSection(page);
 }
 
@@ -2739,13 +2728,13 @@ void AFESitesGenerator::siteWANUpgrade(String &page,
                                        const __FlashStringHelper *title) {
   openMessageSection(page, title, F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_INTERUPTED));
+  page.replace("{{I}}", F(L_UPGRADE_INTERUPTED));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_DONT_PLUG_OFF));
+  page.replace("{{I}}", F(L_UPGRADE_DONT_PLUG_OFF));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_TIME));
+  page.replace("{{I}}", F(L_UPGRADE_TIME));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_AUTO_REBOOT));
+  page.replace("{{I}}", F(L_UPGRADE_AUTO_REBOOT));
   closeMessageSection(page);
 }
 
@@ -2754,7 +2743,7 @@ void AFESitesGenerator::siteWANUpgrade(String &page,
 void AFESitesGenerator::siteReset(String &page) {
   openMessageSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_RESTORE_CONFIGURATION_WILL_BE_REMOVED));
+  page.replace("{{I}}", F(L_RESTORE_CONFIGURATION_WILL_BE_REMOVED));
   page.concat(F("</ul>"));
   page.concat(
       F("<input style=\"margin-top:1.5em\" type=\"submit\" class=\"b be\" "
@@ -2766,12 +2755,12 @@ void AFESitesGenerator::siteReset(String &page) {
 void AFESitesGenerator::sitePostReset(String &page) {
   openMessageSection(page, F(L_UPGRADE_RESTORING_DEFAULT_SETTING), F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_RESTORE_IN_PROGRESS));
+  page.replace("{{I}}", F(L_RESTORE_IN_PROGRESS));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}",
+  page.replace("{{I}}",
                F(L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
+  page.replace("{{I}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
   closeMessageSection(page);
 }
 
@@ -2779,16 +2768,16 @@ void AFESitesGenerator::siteExit(String &page, uint8_t command) {
   openMessageSection(page, F(L_UPGRADE_REBOOT), F(""));
 
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_UPGRADE_REBOOT_IN_PROGRESS));
+  page.replace("{{I}}", F(L_UPGRADE_REBOOT_IN_PROGRESS));
 
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
   if (command != AFE_MODE_ACCESS_POINT) {
-    page.replace("{{f.info}}", F(L_UPGRADE_SITE_WILL_BE_RELOADED));
+    page.replace("{{I}}", F(L_UPGRADE_SITE_WILL_BE_RELOADED));
   } else {
-    page.replace("{{f.info}}",
+    page.replace("{{I}}",
                  F(L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE));
     page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-    page.replace("{{f.info}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
+    page.replace("{{I}}", F(L_RESTORE_NETWORK_OPEN_PANEL));
   }
 
   closeMessageSection(page);
@@ -2799,13 +2788,13 @@ void AFESitesGenerator::siteConnecting(String &page) {
   Data->getConfiguration(&configuration);
   openMessageSection(page, F(L_NETWORK_ALMOST), F(""));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_NETWORK_DEVICE_CONNECTS));
+  page.replace("{{I}}", F(L_NETWORK_DEVICE_CONNECTS));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_NETWORK_CONNECT_TO));
+  page.replace("{{I}}", F(L_NETWORK_CONNECT_TO));
   page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-  page.replace("{{f.info}}", F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
-  page.replace("{{MAC}}", WiFi.macAddress());
-  page.replace("{{SSID}}", configuration.ssid);
+  page.replace("{{I}}", F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
+  page.replace("{{M}}", WiFi.macAddress());
+  page.replace("{{S}}", configuration.ssid);
   closeMessageSection(page);
 }
 
@@ -2814,7 +2803,7 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   configuration = Device->configuration;
 
   char _text[42];
-  sprintf(_text, "Device: %s", configuration.name);
+  sprintf(_text, "%s: %s", L_DEVICE, configuration.name);
   openMessageSection(page, _text, F(""));
 
   if (RestAPI->accessToWAN()) {
@@ -2824,19 +2813,19 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
     RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
     if (HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-      page.replace("{{f.info}}", HtmlResponse);
+      page.replace("{{I}}", HtmlResponse);
     }
 
     RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
     if (HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-      page.replace("{{f.info}}", HtmlResponse);
+      page.replace("{{I}}", HtmlResponse);
     }
 
     RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
     if (HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-      page.replace("{{f.info}}", HtmlResponse);
+      page.replace("{{I}}", HtmlResponse);
     }
 
     page.concat(F("</ul>"));
@@ -2868,9 +2857,6 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page.concat(F("\" /></div></form>"));
   closeSection(page);
 
-  openSection(page, F("Hardware"), F(""));
-
-  closeSection(page);
 }
 
 void AFESitesGenerator::siteProKey(String &page) {
@@ -2888,7 +2874,7 @@ void AFESitesGenerator::siteProKey(String &page) {
     RestAPI->sent(HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO);
     if (HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_FIRMWARE_INFO_ITEM));
-      page.replace("{{f.info}}", HtmlResponse);
+      page.replace("{{I}}", HtmlResponse);
     }
 
     page.concat(F("</ul>"));
@@ -2930,7 +2916,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   /* Item: GPIO from expander */
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 #endif // AFE_CONFIG_HARDWARE_MCP23017
@@ -2949,7 +2935,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 
   /* Item: Bouncing */
   page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{item.value}}", F(L_SWITCH_SENSITIVENESS_HINT));
+  page.replace("{{i.v}}", F(L_SWITCH_SENSITIVENESS_HINT));
 
   char _number[4];
   sprintf(_number, "%d", configuration.bouncing);
@@ -2983,51 +2969,63 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
-  if (Device->getMode() == AFE_MODE_NORMAL) {
-    page.concat(FPSTR(HTTP_FOOTER_CONNECTED));
+  if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {
+    String _text;
+    _text.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
+    RestAPI->sent(_text, AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
+    if (_text.length() > 0) {
+      page.concat(_text);
+    }
   }
 
   page.concat(F("</div></div>"));
-  page.replace("{{freeHeap}}", String(system_get_free_heap_size() / 1024));
+  page.replace("{{e.f}}", String(system_get_free_heap_size() / 1024));
+
+  page.replace("{{A}}",
+               RestAPI->accessToWAN()
+                   ? F("<img style=\"opacity:.2;padding:1.8em 0 1em 0\" "
+                       "src=\"http://test.api.smartnydom.pl/images/"
+                       "afe-logo.png\">")
+                   : F("<h1>AFE Firmware</h1>"));
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  page.replace("{{f.API}}", F("Domoticz"));
+  page.replace("{{f.a}}", F("Domoticz"));
 #else
-  page.replace("{{f.API}}", F("Standard"));
+  page.replace("{{f.a}}", F("Standard"));
 #endif
 
 #if defined(ESP_4MB)
-  page.replace("{{f.size}}", F("4Mb"));
+  page.replace("{{f.s}}", F("4Mb"));
 #elif defined(ESP_2MB)
-  page.replace("{{f.size}}", F("2Mb"));
+  page.replace("{{f.s}}", F("2Mb"));
 #else
-  page.replace("{{f.size}}", F("1Mb"));
+  page.replace("{{f.s}}", F("1Mb"));
 #endif
 
 #if defined(ESP8285)
-  page.replace("{{f.esp}}", F("8285"));
+  page.replace("{{f.e}}", F("8285"));
 #elif defined(ESP32)
-  page.replace("{{f.esp}}", F("32"));
+  page.replace("{{f.e}}", F("32"));
 #else
-  page.replace("{{f.esp}}", F("8266"));
+  page.replace("{{f.e}}", F("8266"));
 #endif
 
-  FirmwarePro->Pro.valid ? page.replace("{{f.Pro}}", F(L_YES))
-                         : page.replace("{{f.Pro}}", F(L_NO));
+  FirmwarePro->Pro.valid ? page.replace("{{f.p}}", F(L_YES))
+                         : page.replace("{{f.p}}", F(L_NO));
 
 #ifdef AFE_CONFIG_USE_MAX_HARDWARE
   char _version[sizeof(Firmware.version) + 6];
   sprintf(_version, "%s %s", Firmware.version, "MEGA");
-  page.replace("{{f.version}}", _version);
+  page.replace("{{f.v}}", _version);
 #else
-  page.replace("{{f.version}}", Firmware.version);
+  page.replace("{{f.v}}", Firmware.version);
 #endif
 
-  page.replace("{{f.type}}", String(Firmware.type));
-  page.replace("{{f.deviceName}}", F(AFE_DEVICE_TYPE_NAME));
-  page.replace("{{f.deviceID}}", deviceID);
-  page.replace("{{L_LANGUAGE_SHORT}}", L_LANGUAGE_SHORT);
-  page.replace("{{f.deviceType}}", String(AFE_DEVICE_TYPE_ID));
+  page.replace("{{f.t}}", String(Firmware.type));
+  page.replace("{{f.d}}", F(AFE_DEVICE_TYPE_NAME));
+  page.replace("{{f.n}}", deviceID);
+  page.replace("{{f.l}}", L_LANGUAGE_SHORT);
+  page.replace("{{f.h}}", String(AFE_DEVICE_TYPE_ID));
 
   page.concat(F("</body></html>"));
 }
@@ -3035,16 +3033,16 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 void AFESitesGenerator::openSection(String &page, const char *title,
                                     const __FlashStringHelper *description) {
   page.concat(FPSTR(HTTP_FORM_BLOCK_HEADER));
-  page.replace("{{title}}", title);
-  page.replace("{{description}}", description);
+  page.replace("{{T}}", title);
+  page.replace("{{D}}", description);
 }
 
 void AFESitesGenerator::openSection(String &page,
                                     const __FlashStringHelper *title,
                                     const __FlashStringHelper *description) {
   page.concat(FPSTR(HTTP_FORM_BLOCK_HEADER));
-  page.replace("{{title}}", title);
-  page.replace("{{description}}", description);
+  page.replace("{{T}}", title);
+  page.replace("{{D}}", description);
 }
 
 void AFESitesGenerator::openMessageSection(
@@ -3115,31 +3113,31 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
 
   openSection(page, F(L_REGULATOR_REGULATION), F(""));
   page.concat(FPSTR(HTTP_ITEM_REGULATOR));
-  page.replace("{{L_REGULATOR_TURN_IF}}", F(L_REGULATOR_TURN_ON_IF));
-  page.replace("{{item.selected-0}}",
+  page.replace("{{L.R}}", F(L_REGULATOR_TURN_ON_IF));
+  page.replace("{{i.s0}}",
                configuration->turnOnAbove == 0 ? " selected=\"selected\"" : "");
-  page.replace("{{item.selected-1}}",
+  page.replace("{{i.s1}}",
                configuration->turnOnAbove == 1 ? " selected=\"selected\"" : "");
   sprintf(_value, "%-.4f", configuration->turnOn);
-  page.replace("{{item.value}}", _value);
-  page.replace("{{item.name}}", "ta");
-  page.replace("{{item.input.name}}", "on");
+  page.replace("{{i.v}}", _value);
+  page.replace("{{i.n}}", "ta");
+  page.replace("{{i.in}}", "on");
 
   page.concat(FPSTR(HTTP_ITEM_REGULATOR));
-  page.replace("{{L_REGULATOR_TURN_IF}}", F(L_REGULATOR_TURN_OFF_IF));
-  page.replace("{{item.selected-0}}", configuration->turnOffAbove == 0
-                                          ? " selected=\"selected\""
-                                          : "");
-  page.replace("{{item.selected-1}}", configuration->turnOffAbove == 1
-                                          ? " selected=\"selected\""
-                                          : "");
+  page.replace("{{L.R}}", F(L_REGULATOR_TURN_OFF_IF));
+  page.replace("{{i.s0}}", configuration->turnOffAbove == 0
+                               ? " selected=\"selected\""
+                               : "");
+  page.replace("{{i.s1}}", configuration->turnOffAbove == 1
+                               ? " selected=\"selected\""
+                               : "");
   sprintf(_value, "%-.4f", configuration->turnOff);
-  page.replace("{{item.value}}", _value);
-  page.replace("{{item.name}}", "tb");
-  page.replace("{{item.input.name}}", "off");
+  page.replace("{{i.v}}", _value);
+  page.replace("{{i.n}}", "tb");
+  page.replace("{{i.in}}", "off");
 
-  page.replace("{{L_REGULATOR_LOWER}}", F(L_REGULATOR_LOWER));
-  page.replace("{{L_REGULATOR_HIGHER}}", F(L_REGULATOR_HIGHER));
+  page.replace("{{LRL}}", F(L_REGULATOR_LOWER));
+  page.replace("{{LRH}}", F(L_REGULATOR_HIGHER));
 
   closeSection(page);
 }
@@ -3149,23 +3147,23 @@ void AFESitesGenerator::addListOfGPIOs(String &item, const char *field,
                                        uint8_t selected, const char *title) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
-  item.replace("{{item.name}}", field);
-  item.replace("{{item.label}}", title);
+  item.replace("{{i.n}}", field);
+  item.replace("{{i.l}}", title);
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-  item.replace("{{item.value}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
-  item.replace("{{item.label}}", F(L_NONE));
-  item.replace("{{item.selected}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                                        ? F(" selected=\"selected\"")
-                                        : F(""));
+  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{i.l}}", F(L_NONE));
+  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? F(" selected=\"selected\"")
+                              : F(""));
 
   for (uint8_t i = 0; i < AFE_NUMBER_OF_GPIOS; i++) {
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
-    item.replace("{{item.value}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{item.label}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{item.selected}}", selected == pgm_read_byte(GPIOS + i)
-                                          ? F(" selected=\"selected\"")
-                                          : F(""));
+    item.replace("{{i.v}}", String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.l}}", String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.s}}", selected == pgm_read_byte(GPIOS + i)
+                                ? F(" selected=\"selected\"")
+                                : F(""));
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
@@ -3176,14 +3174,14 @@ void AFESitesGenerator::addListOfMCP23017GPIOs(String &item, const char *field,
                                                const char *title) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
-  item.replace("{{item.name}}", field);
-  item.replace("{{item.label}}", title);
+  item.replace("{{i.n}}", field);
+  item.replace("{{i.l}}", title);
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-  item.replace("{{item.value}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
-  item.replace("{{item.label}}", F(L_NONE));
-  item.replace("{{item.selected}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                                        ? F(" selected=\"selected\"")
-                                        : F(""));
+  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{i.l}}", F(L_NONE));
+  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? F(" selected=\"selected\"")
+                              : F(""));
   char gpioName[3];
 
   for (uint8_t i = 0; i < AFE_NUMBER_OF_MCP23017_GPIOS; i++) {
@@ -3191,13 +3189,11 @@ void AFESitesGenerator::addListOfMCP23017GPIOs(String &item, const char *field,
     sprintf(gpioName, "%s%d", i < 8 ? "A" : "B",
             pgm_read_byte(MCP23017_GPIOS_ID + i) - (i < 8 ? 0 : 8));
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-    item.replace("{{item.value}}",
-                 String(pgm_read_byte(MCP23017_GPIOS_ID + i)));
-    item.replace("{{item.label}}", gpioName);
-    item.replace("{{item.selected}}",
-                 selected == pgm_read_byte(MCP23017_GPIOS_ID + i)
-                     ? F(" selected=\"selected\"")
-                     : F(""));
+    item.replace("{{i.v}}", String(pgm_read_byte(MCP23017_GPIOS_ID + i)));
+    item.replace("{{i.l}}", gpioName);
+    item.replace("{{i.s}}", selected == pgm_read_byte(MCP23017_GPIOS_ID + i)
+                                ? F(" selected=\"selected\"")
+                                : F(""));
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
@@ -3277,13 +3273,13 @@ void AFESitesGenerator::_addSelectionFormItem(
     String &item, boolean type, const char *name, const char *label,
     const char *value, boolean checked, const char *hint, boolean disabled) {
   item.concat(FPSTR(HTTP_ITEM_CHECKBOX));
-  item.replace("{{item.type}}", type ? "checkbox" : "radio");
-  item.replace("{{item.name}}", name);
-  item.replace("{{item.label}}", label);
-  item.replace("{{item.value}}", value);
-  item.replace("{{item.checked}}", checked ? " checked=\"checked\"" : "");
-  item.replace("{{item.disabled}}", disabled ? " disabled=\"disabled\"" : "");
-  item.replace("{{item.hint}}",
+  item.replace("{{i.t}}", type ? "checkbox" : "radio");
+  item.replace("{{i.n}}", name);
+  item.replace("{{i.l}}", label);
+  item.replace("{{i.v}}", value);
+  item.replace("{{i.c}}", checked ? " checked=\"checked\"" : "");
+  item.replace("{{i.d}}", disabled ? " disabled=\"disabled\"" : "");
+  item.replace("{{i.h}}",
                strcmp(hint, AFE_FORM_ITEM_SKIP_PROPERTY) != 0
                    ? "<span class=\"hint\">(" + String(hint) + ")</span>"
                    : "");
@@ -3305,51 +3301,53 @@ void AFESitesGenerator::addRadioButtonFormItem(
                         disabled);
 }
 
-void AFESitesGenerator::addMenuItem(String &item, const char *title,
+void AFESitesGenerator::addMenuItem(String &item, const __FlashStringHelper *title,
                                     uint8_t siteId) {
   item.concat(FPSTR(HTTP_MENU_ITEM));
-  item.replace("{{item.title}}", title);
-  item.replace("{{site.id}}", String(siteId));
+  item.replace("{{i.i}}", FPSTR(title));
+  char _number[3];
+  sprintf(_number,"%d",siteId);
+  item.replace("{{s.i}}", _number);
 }
 
 void AFESitesGenerator::addMenuItemExternal(String &item,
                                             const __FlashStringHelper *title,
                                             const __FlashStringHelper *url) {
   item.concat(FPSTR(HTTP_MENU_ITEM_EXTERNAL));
-  item.replace("{{item.title}}", title);
-  item.replace("{{site.url}}", url);
+  item.replace("{{i.i}}", title);
+  item.replace("{{s.u}}", url);
 }
 
-void AFESitesGenerator::addMenuHeaderItem(String &item, const char *title) {
+void AFESitesGenerator::addMenuHeaderItem(String &item, const __FlashStringHelper *title) {
   item.concat(FPSTR(HTTP_MENU_SUBITEMS_HEADER));
-  item.replace("{{item.title}}", title);
+  item.replace("{{i.i}}", FPSTR(title));
 }
 
 void AFESitesGenerator::addMenuSubItem(String &item, const char *title,
                                        uint8_t numberOfItems, uint8_t siteId) {
   for (uint8_t i = 0; i < numberOfItems; i++) {
     item.concat(FPSTR(HTTP_MENU_SUBITEM));
-    item.replace("{{item.title}}", title);
-    item.replace("{{item.id}}", String(i));
-    item.replace("{{item.id.display}}", String(i + 1));
-    item.replace("{{site.id}}", String(siteId));
+    item.replace("{{i.i}}", title);
+    item.replace("{{i.D}}", String(i));
+    item.replace("{{i.y}}", String(i + 1));
+    item.replace("{{s.i}}", String(siteId));
   }
 }
 
 void AFESitesGenerator::addSelectFormItemOpen(String &item, const char *name,
                                               const char *label) {
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
-  item.replace("{{item.label}}", label);
-  item.replace("{{item.name}}", name);
+  item.replace("{{i.l}}", label);
+  item.replace("{{i.n}}", name);
 }
 
 void AFESitesGenerator::addSelectOptionFormItem(String &item, const char *label,
                                                 const char *value,
                                                 boolean selected) {
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-  item.replace("{{item.value}}", value);
-  item.replace("{{item.label}}", label);
-  item.replace("{{item.selected}}", selected ? " selected=\"selected\"" : "");
+  item.replace("{{i.v}}", value);
+  item.replace("{{i.l}}", label);
+  item.replace("{{i.s}}", selected ? " selected=\"selected\"" : "");
 }
 
 void AFESitesGenerator::addSelectFormItemClose(String &item) {

@@ -119,6 +119,35 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     sprintf(_text, "%d", AFE_DEVICE_TYPE_ID);
     http.addHeader("afe-hid", _text);
     http.addHeader("afe-lang", L_LANGUAGE_SHORT);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    http.addHeader("afe-api", "D");
+#else
+    http.addHeader("afe-api", "S");
+#endif
+
+#if defined(ESP8285)
+    http.addHeader("afe-chip", "8285");
+#elif defined(ESP8266)
+    http.addHeader("afe-chip", "8266");
+#else
+    http.addHeader("afe-chip", "32");
+#endif
+
+#if defined(ESP_4MB)
+    http.addHeader("afe-size", "4");
+#elif defined(ESP_2MB)
+    http.addHeader("afe-size", "2");
+#else
+    http.addHeader("afe-size", "1");
+#endif
+
+#ifdef DEBUG
+    http.addHeader("afe-debug", "1");
+#else
+    http.addHeader("afe-debug", "0");
+#endif
+
     _httpCode = http.POST(message);
 #ifdef DEBUG
     Serial << endl
@@ -140,7 +169,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
       Serial << endl
              << F("INFO: API REST: JSON Buffer size: ") << capacity
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIE < jsonBuffer.size() + 10) {
+      if (AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: API REST: Too small buffer size");
       }
 #endif
@@ -197,5 +226,5 @@ void AFEJSONRPC::setNoWANAccess(void) {
   _PingResponded = false;
 #ifdef DEBUG
   Serial << endl << F("INFO: WAN ACCESS: No access to WAN");
-#endif 
+#endif
 }

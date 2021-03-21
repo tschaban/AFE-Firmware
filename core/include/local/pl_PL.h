@@ -31,12 +31,6 @@
 #define L_DEVICE_NOT_EXIST "\"Urządzenie o takiej nazwie nie istnieje\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Komenda nie jest zaimplementowana\""
 
-/* Upgrades */
-#define L_UPGRADED_TO_NEW_VERSION  "Została zainstalowana nowa wersja AFE Firmware"
-#define L_UPGRADED_TO_NEW_VERSION_TYPE "Został zainstalowany nowy typ AFE Firmware. Wymagana jest ponowna konfiguracja urządzenia."
-
-#define L_DONATE "<small>&#128077; Używasz AFE? To może rozważ wsparcie N-setek godzin pracy włożonych przeze mnie. Dzięki.</small>"
-
 /* Menu */
 #define L_HARDWARE "Sprzęt"
 #define L_FUNCTIONS "Funkcje"
@@ -60,7 +54,7 @@
 #define L_PRO_VERSION "Wersja PRO"
 #define L_NETWORK_CONNECTED "Podłączony"
 #define L_DISCONNECTED "Odłączony"
-#define L_INTERFACE "Interface'y"
+#define L_CONNECTIONS "Połączenia"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -142,11 +136,18 @@
 #define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Czas między próbami łączenia się"
 #define L_NETWORK_SLEEP_TIME "Czas po jakim powtórzyć próby łączenia się"
 #define L_NETWORK_ADVANCED "Zaawansowane"
+#define L_NETWORK_ALMOST "Prawie jesteśmy na miejscu!"
 #define L_NETWORK_DEVICE_CONNECTS "Urządzenie łaczy się z siecią"
 #define L_NETWORK_CONNECT_TO "Połącz się z siecią WiFi"
-#define L_NETWORK_CONNECT "Połącz"
+//#define L_NETWORK_CONNECT "Połącz"
 #define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Następnie w konfigurację routera WiFi, wyszukaj adres IP urządzenia o adresie MAC"
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION  "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
+#define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
+#define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
+#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Działa tylko z routerami z włączonym DHCPd"
+#define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
+
+
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
@@ -251,30 +252,43 @@
 
 /* Form: upgrade and post upgrade */
 #define L_UPGRADE_SELECT_FIRMWARE "Wybierz Firmware"
-#define L_UPGRADE_INFO                                                         \
-  "Po zakończeniu aktualizacji urządzenie zostanie automatycznie "           \
-  "zresetowane<br><br><strong>Uwaga:</strong> po aktualizacji nie odłączaj " \
-  "urządzenia przez co najmniej 1min.<br>Ustawienia urządzenia będą aktualizowane<br><strong>Ten proces nie może zostać "             \
-  "przerwany</strong>"
+#define L_UPGRADE_READ_BEFORE "Przeczytaj przed aktualizacją oprogramowania"
+
+#define L_UPGRADE_INTERUPTED "Nie odświeżaj przeglądarki podczas aktualizacji"
+#define L_UPGRADE_DONT_PLUG_OFF "Nie odłączaj urządzenia od źródła zasilania"
+#define L_UPGRADE_TIME "Proces aktualizacji potrwa do minuty"
+#define L_UPGRADE_AUTO_REBOOT "Urządzenie zostanie automatycznie uruchomione po ukończeniu aktualizacji"
+
+#define L_UPGRADE_VIA_WAN "Pobierz i uaktualnij"
+#define L_UPGRADE_VIA_WAN_HINT "Firmware zostanie automatycznie pobrane i wgrane do urządzenia"
+
+#define L_UPGRADE_FROM_FILE "Załaduj plik *.bin"
 #define L_UPGRADE "Aktualizuj"
-#define L_UPGRADE_DONT_PLUG_OFF                                                        \
-  "<strong>UWAGA</strong>: nie odłączaj urządzenia od źródła zasilania " \
-  "podczas aktualizacji"
-#define L_UPGRADE_FAILED "Aktualizacja nie powiodła się"
+
+#define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
+#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
+#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
+
+#define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
+
+#define L_UPGRADE_FAILED "<span style=\"color:red\">Aktualizacja nie powiodła się</span>"
 #define L_UPGRADE_SUCCESSFUL "Aktualizacja zakończona pomyślnie"
-#define L_UPGRADE_DEVICE_WILL_BE_REBOOTED  "Po 15 sekundach oprogramowanie zostanie przeładowane. Proszę czekać"
+#define L_UPGRADE_DEVICE_WILL_BE_REBOOTED                                              \
+  "Po 15 sekundach urządzenie zostanie zrestartowane. Proszę czekać ..."
 #define L_UPGRADE_RESTORE_DEFAULT_SETTINGS "Przywróć ustawienia początkowe"
-#define L_UPGRADE_WARNING "Uwaga"
-#define L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED "przywrócenie ustawień początkowych usuwa wszystkie ustawienia urządzenia, włącznie z konfiguracją sieci WiFi"
-#define L_RESTORE_IN_PROGRESS "Trwa przywracanie ustawień początkowych"
-#define L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
-  "Po 20 sekundach połącz się z siecią WiFi o nazwie: "                    \
-  "<strong>AFE-Device</strong>, a następnie połącz się z panelem "         \
-  "konfiguracyjnym pod adresem"
-#define L_UPGRADE_RESTORING_DEFAULT_SETTING "Przywracanie ustawień początkowych"
-#define L_UPGRADE_REBOOT_IN_PROGRESS "Trwa restart urządzenia"
-#define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie przeładowana automatycznie... czekaj"
-#define L_UPGRADE_REBOOT "Restart urządzenia"
+#define L_RESTORE_CONFIGURATION_WILL_BE_REMOVED                                        \
+  "<strong> Ostrzeżenie:</strong> przywrócenie ustawień domyślnych spowoduje usunięcie aktualnej konfiguracji, w tym konfiguracja WiFi"
+#define L_RESTORE_IN_PROGRESS "Trwa przywracanie konfiguracji początkowej"
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE "Po 20 sekundach połącz się z siecią Wi-Fi o nazwie twojego urządzenia" 
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE "Po 20 sekundach połącz się z siecią WiFi o nazwie <strong>AFE Device</strong>" 
+#define L_RESTORE_NETWORK_OPEN_PANEL  "Następnie otwórz panel konfiguracyjny : <a href=\"http://192.168.5.1\">http://192.168.5.1</a>"
+#define L_UPGRADE_RESTORING_DEFAULT_SETTING "Przywracanie ustawień domyślnych"
+#define L_UPGRADE_REBOOT_IN_PROGRESS "Trwa ponowne uruchamianie"
+#define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie automatycznie przeładowana ... czekaj"
+#define L_UPGRADE_REBOOT "Ponowne uruchamianie"
+
 
 /* Form: password */
 #define L_PASSWORD_SET_PASSWORD "Ustaw hasło"

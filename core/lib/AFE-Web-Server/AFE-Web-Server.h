@@ -176,7 +176,8 @@ private:
 #endif
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-  boolean upgradeOTAWAN(void);
+  uint16_t getOTAFirmwareId();
+  boolean upgradeOTAWAN(uint16_t firmwareId);
   boolean upgradOTAFile(void);
 #endif
 

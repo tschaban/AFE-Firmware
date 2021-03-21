@@ -209,7 +209,6 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                 : false);
 
   page.replace("{{s.lang}}", L_LANGUAGE_SHORT);
-  page.replace("{{L_DONATE}}", L_DONATE);
 
   return page;
 }
@@ -523,7 +522,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
 
     String page;
-    // page.reserve(AFE_MAX_PAGE_SIZE);
+// page.reserve(AFE_MAX_PAGE_SIZE);
 
 #ifdef DEBUG
     Serial << endl
@@ -542,7 +541,7 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
     if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
-      upgradeSuccess = upgradeOTAWAN();
+      upgradeSuccess = upgradeOTAWAN(getOTAFirmwareId());
     }
   }
 #endif
@@ -651,7 +650,7 @@ boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(const String &page) {
   uint16_t pageSize = page.length();
-  // uint16_t size = 1024;
+// uint16_t size = 1024;
 
 #ifdef DEBUG
   Serial << endl
@@ -668,30 +667,30 @@ void AFEWebServer::publishHTML(const String &page) {
   server.setContentLength(pageSize);
   server.send(200, "text/html", page);
 
-  /*
-    if (pageSize > size) {
-  #ifdef DEBUG
-      Serial << endl
-             << F("INFO: MEMORY: Free :  size after sending Header: ")
-             << system_get_free_heap_size() / 1024 << F("kB") << endl
-             << F("INFO: Transfering site over TCP: ");
-  #endif
-      server.send(200, "text/html", page.substring(0, size));
-      uint16_t transfered = size;
-      uint16_t nextChunk;
-      while (transfered < pageSize) {
-        nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-  #ifdef DEBUG
-        Serial << F(".");
-  #endif
+/*
+  if (pageSize > size) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: MEMORY: Free :  size after sending Header: ")
+           << system_get_free_heap_size() / 1024 << F("kB") << endl
+           << F("INFO: Transfering site over TCP: ");
+#endif
+    server.send(200, "text/html", page.substring(0, size));
+    uint16_t transfered = size;
+    uint16_t nextChunk;
+    while (transfered < pageSize) {
+      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+#ifdef DEBUG
+      Serial << F(".");
+#endif
 
-        server.sendContent(page.substring(transfered, nextChunk));
-        transfered = nextChunk;
-      }
-    } else {
-      server.send(200, "text/html", page);
+      server.sendContent(page.substring(transfered, nextChunk));
+      transfered = nextChunk;
     }
-  */
+  } else {
+    server.send(200, "text/html", page);
+  }
+*/
 
 #ifdef DEBUG
   Serial << endl << F("INFO: SITE: Published");
@@ -726,7 +725,7 @@ void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
 /* Upgrade methods */
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-boolean AFEWebServer::upgradeOTAWAN(void) {
+boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   t_httpUpdate_return ret;
   ESP8266HTTPUpdate OTAServerUpdate;
   WiFiClient WirelessClient;
@@ -735,36 +734,39 @@ boolean AFEWebServer::upgradeOTAWAN(void) {
 #ifdef AFE_CONFIG_HARDWARE_LED
   SystemLED->on();
 #endif
-
-  OTAServerUpdate.rebootOnUpdate(false);
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: WAN UPDATE: Starting upgrade");
-#endif
-
-  ret = OTAServerUpdate.update(WirelessClient,
-                               "http://test.api.smartnydom.pl/update/");
+  
+  if (firmwareId > 0) {
+    OTAServerUpdate.rebootOnUpdate(false);
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: WAN UPDATE: Update completed with status: ") << ret;
+    Serial << endl << F("INFO: WAN UPDATE: Starting upgrade");
+#endif
+    ret = OTAServerUpdate.update(WirelessClient, AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL + String(firmwareId));
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WAN UPDATE: Update completed with status: ") << ret;
 #endif
 
-  if (ret != HTTP_UPDATE_NO_UPDATES) {
-    if (ret == HTTP_UPDATE_OK) {
-      Serial << endl << F("INFO: WAN UPDATE: success");
-      Data->saveWelecomeMessage(F(L_UPGRADE_SUCCESSFUL));
-      delay(1000);
-      Device->reboot(Device->getMode());
-    } else {
-      if (ret == HTTP_UPDATE_FAILED) {
-        Serial << endl << F("INFO: WAN UPDATE: failure");
-        _success = false;
-        Data->saveWelecomeMessage(F("Upgrade nie udał się"));
+    if (ret != HTTP_UPDATE_NO_UPDATES) {
+      if (ret == HTTP_UPDATE_OK) {
+#ifdef DEBUG
+        Serial << endl << F("INFO: WAN UPDATE: success");
+#endif
+        Data->saveWelecomeMessage(F(L_UPGRADE_SUCCESSFUL));
+        delay(1000);
+        Device->reboot(Device->getMode());
+      } else {
+        if (ret == HTTP_UPDATE_FAILED) {
+#ifdef DEBUG
+          Serial << endl << F("INFO: WAN UPDATE: failure");
+#endif
+          _success = false;
+          Data->saveWelecomeMessage(F(L_UPGRADE_FAILED));
+        }
       }
     }
   }
-
 #ifdef AFE_CONFIG_HARDWARE_LED
   SystemLED->off();
 #endif
@@ -2052,3 +2054,9 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+uint16_t AFEWebServer::getOTAFirmwareId() {
+  return server.arg("f").length() > 0 ? server.arg("f").toInt() : 0;
+}
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
