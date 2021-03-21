@@ -5,7 +5,7 @@
 
 $type = "0";
 $version = "3.0.0.b0";
-$language = "en";
+$language = "pl";
 
 /******************/
 
@@ -51,6 +51,22 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 // Standard API
 
 $index;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-generic-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+$index++;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
@@ -131,6 +147,22 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 // Domoticz API
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-domoticz-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic-domoticz/firmware.bin";
