@@ -1,13 +1,10 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Firmware_h
-#define _AFE_Firmware_h
+#ifndef _AFE_Firmware_Pro_h
+#define _AFE_Firmware_Pro_h
 
 #include <AFE-Data-Access.h>
-#include <AFE-WiFi.h>
-
-#define AFE_WEBSERVICE_VALIDATE_KEY 0
-#define AFE_WEBSERVICE_ADD_KEY 1
+#include <AFE-API-JSONRPC.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -16,10 +13,10 @@
 class AFEFirmwarePro {
 
 private:
-  AFEDataAccess Data;
+  AFEDataAccess *Data;
+  AFEJSONRPC *RestAPI;
   unsigned long miliseconds = 0;
   unsigned long minutes = 0;
-  AFEWiFi *Network;
 
 public:
   PRO_VERSION Pro;
@@ -27,14 +24,10 @@ public:
   /* Constructor */
   AFEFirmwarePro();
 
-  void begin(AFEWiFi *);
-
-  /* Validating if the key is valid */
-  void callService(uint8_t method);
+  void begin(AFEDataAccess *, AFEJSONRPC *);
 
   /* Checking if the key is still valid */
-  void reValidateKey();
-
+  void validate();
   void listener();
 };
 

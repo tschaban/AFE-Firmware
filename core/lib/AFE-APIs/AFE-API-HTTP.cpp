@@ -776,9 +776,9 @@ void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   respond.concat(FPSTR(JSON_RESPONSE));
   respond.replace("{{device.type}}", request->device);
   respond.replace("{{device.name}}",
-                  strlen(request->name) > 0 ? request->name : "\"\"");
+                  strlen(request->name) > 0 ? request->name : "");
   respond.replace("{{request.command}}",
-                  strlen(request->command) > 0 ? request->command : "\"\"");
+                  strlen(request->command) > 0 ? request->command : "");
   respond.replace("{{response.data}}", strlen(value) > 0 ? value : "\"\"");
   respond.replace("{{response.status}}", status ? "success" : "error");
   _HTTP->sendJSON(respond);

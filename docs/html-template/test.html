@@ -3,18 +3,27 @@
 
 <head>
   <meta charset="utf-8">
-  <title>AFE Firmware 2.5.1.B1 [T6]</title>
+  <title>AFE Firmware 3.0.0.B1 [T0]</title>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
   <style>
-    #l,
-    #r {
-      padding: 20px;
+    html {
+      background: url(http://api.smartnydom.pl/images/background.jpg) no-repeat center center fixed;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover
+    }
+
+    .l,
+    .r {
+      margin: 0;
+      padding: 1.2em 1.2em 2.2em 1.2em;
       display: table-cell
     }
 
     .ltit,
     body {
-      margin: 0
+      margin: auto
     }
 
     .b,
@@ -24,23 +33,30 @@
     }
 
     body {
-      background: #ddd;
-      padding: 15px
+      padding: 2em;
+      max-width: 980px
     }
 
-    #c {
+    .c {
       display: table;
-      width: 100%
+      width: 100%;
+      margin-bottom: 3em
     }
 
-    #l {
-      width: 200px;
-      background: #33363b;
-      color: #eee
+    .l {
+      width: 280px;
+      background: #000;
+      color: #fff;
+      border-top-left-radius: .8em;
+      border-bottom-left-radius: .8em;
+      opacity: .92;
     }
 
-    #r {
-      background: #eee
+    .r {
+      background: #eee;
+      border-top-right-radius: .8em;
+      border-bottom-right-radius: .8em;
+      opacity: .93;
     }
 
     a,
@@ -57,7 +73,7 @@
     }
 
     h4 {
-      font-size: 80%;
+      font-size: .8em;
       margin-bottom: 1px
     }
 
@@ -72,8 +88,8 @@
       display: block;
       white-space: nowrap;
       padding: 0 1em;
-      color: #777;
-      font-size: 80%
+      color: #aaa;
+      font-size: .8em
     }
 
     .itm i {
@@ -104,9 +120,9 @@
     .ci h1 {
       color: #999;
       border-bottom: 1px solid #ddd;
-      font-size: 110%;
+      font-size: 1.2em;
       font-weight: 500;
-      margin-bottom: 0;   
+      margin: 0
     }
 
     .ci .cd {
@@ -114,7 +130,7 @@
       font-size: 80%;
       font-style: italic;
       margin-bottom: 2em;
-      margin-top: 0;
+      margin-top: 0
     }
 
     .cm {
@@ -200,18 +216,15 @@
 
     .b:focus,
     .b:hover {
-      filter: alpha(opacity=90);
       background-image: -webkit-linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1));
       background-image: linear-gradient(transparent, rgba(0, 0, 0, .05) 40%, rgba(0, 0, 0, .1))
     }
   </style>
 </head>
 
-<body><img src="http://api.smartnydom.pl/logo/T6/2.5.1.B1/84e5F3eb-EB6464eb/0" style="width: 100%;display: block"
-    alt="AFE Firmware">
-  <div id="c">
-    <div id="l">
-      <h4>Weather Station</h4>
+<body>
+  <div class="c">
+    <div class="l"><img style="opacity:.4" src="http://test.api.smartnydom.pl/images/afe-logo.png">
       <ul class="lst">
         <li class="itm"><a href="/?o=1">Device</a></li>
         <li class="itm"><a href="/?o=2">Network</a></li>
@@ -221,13 +234,11 @@
       <ul class="lst">
         <li class="itm"><i>LEDs</i></li>
         <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
-        <li class="itm"><a href="/?o=23">PM2.5/PM10 Particle Sensor</a></li>
+        <li class="itm"><i>Button / Switches</i></li>
+        <li class="itm"><a href="/?o=9&i=0">&#8227; Switch: 1</a></li>
       </ul>
       <h4>&#10150; Interfaces</h4>
-      <ul class="lst">
-        <li class="itm"><a href="/?o=27">I2C</a></li>
-        <li class="itm"><a href="/?o=22">UART</a></li>
-      </ul>
+      <ul class="lst"></ul>
       <h4>&#10150; Functionalities</h4>
       <ul class="lst">
         <li class="itm"><a href="/?o=7">System LED</a></li>
@@ -238,73 +249,90 @@
         <li class="itm"><a href="/?o=20">Firmware upgrade</a></li>
         <li class="itm"><a href="/?o=16">Reset to orginal state</a></li>
         <li class="itm"><a href="/?o=11">PRO Version</a></li>
+        <li class="itm"><a href="https://afe.smartnydom.pl">Documentation</a></li>
+        <li class="itm"><a href="https://www.smartnydom.pl/forum/afe-firmware/">Help</a></li>
       </ul>
       <h4></h4>
       <ul class="lst">
         <li class="itm"><a href="/?o=15">&#10004; Finish configuration</a></li>
       </ul>
     </div>
-    <div id="r">
-      <form method="post" action="/?c=1&o=3">
+    <div class="r">
+      <form method="post" action="/?c=1&o=1">
         <div class="ci">
-          <h1>MQTT Broker</h1>
-          <p class="cd">Enter MQTT Broker hostname or its IP address</p>
+          <h1>Firmware</h1>
+          <p class="cd"></p>
           <fieldset>
-            <div class="cf"><label>Hostname</label><input name="h" type="text" maxlength="32" value=""><span
-                class="hint">Max 32 chars</span></div>
-            <div class="cf"><label>Address IP</label><input name="a" type="text" value="192.168.2.146"></div>
-            <div class="cf"><label>Port</label><input name="p" type="number" min="0" max="65535" step="1"
-                value="1883"><span class="hint">Range 0 - 65535</span></div>
-            <div class="cf"><label>User name</label><input name="u" type="text" maxlength="32" value="device"><span
-                class="hint">Max 32 chars</span></div>
-            <div class="cf"><label>Password</label><input name="s" type="password" maxlength="32"
-                value="Device#221!2021"><span class="hint">Max 32 chars</span></div>
+            <ul class="lst">
+              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em"><strong>Hi</strong>, I hope
+                firmware meets your expectations. If you experienced problems, report them <a
+                  href="https://www.smartnydom.pl/forum/english-support/">here</a> please.</li>
+              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em">Firmware has been upgraded
+                to: <strong>AFE T0.3.0.0.B1.EN.ESP8266.1Mb.H0</strong> version</li>
+              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em">AFE Pro: is not active. <a
+                  href="https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro">More</a> information about AFE
+                Pro.</li>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Connection configuration</h1>
-          <p class="cd">In case the device must work without MQTT server host availability in the LAN, enable host PING
-            check before establishing a connection to MQTT Broker. You can aslo set the duration of a timeout per
-            connection attempt. </p>
+          <h1>Device</h1>
+          <p class="cd">Name is used for device identification within your LAN and a device's hotspot name used for
+            configuration mode</p>
           <fieldset>
-            <div class="cc"><label><input name="ph" type="checkbox" value="1" checked="checked">Check if MQTT Server
-                host is reachable in the LAN?</label><span class="hint">(The host cannot block PING command)</span>
-            </div>
-            <div class="cf"><label>Timeout</label><input name="t" type="number" min="0" max="30000" step="1"
-                value="5000"><span class="hint">Range 0 - 30000 milisekonds</span></div>
+            <div class="cf"><label>Device name</label><input name="n" type="text" maxlength="16" value="T0"><span
+                class="hint">Max 16 chars</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>LWT's Topic</h1>
-          <p class="cd">If left empty, message won't be sent to MQTT Broker</p>
+          <h1>Hardware configuration</h1>
+          <p class="cd">Select connected items to your device</p>
           <fieldset>
-            <div class="cf"><label>Topic</label><input name="t0" type="text" maxlength="64" value="t6/lwt"><span
-                class="hint">Max 64 chars</span></div>
+            <div class="cf"><label>Number of LEDs</label><select name="l">
+                <option value="0">None</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select></div>
+            <div class="cf"><label>Number of relays</label><select name="r">
+                <option value="0" selected="selected">None</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select></div>
+            <div class="cf"><label>Number of switches</label><select name="s">
+                <option value="0">None</option>
+                <option value="1" selected="selected">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select></div>
+            <div class="cc"><label><input name="ad" type="checkbox" value="1" disabled="disabled">Measurements from
+                Analog Input</label><span class="hint">(PRO Version)</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>MQTT Topics retain settings</h1>
-          <p class="cd">Sent messages will be retian by the MQTT Broker and automatically published to every client
-            subscribing to them</p>
+          <h1>Device controlling mechanism</h1>
+          <p class="cd">Enable / Disable APIs</p>
           <fieldset>
-            <div class="cc"><label><input name="rl" type="checkbox" value="1" checked="checked">Retain LWT
-                messsage</label></div>
-            <div class="cc"><label><input name="ra" type="checkbox" value="1">Retain all messages</label></div>
+            <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP API</label></div>
+            <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT API</label></div>
+          </fieldset>
+        </div>
+        <div class="ci">
+          <h1>Automatic logout form the configuration panel</h1>
+          <p class="cd">Device configuration will be automatically closed after 10min. of idle time in the configuration
+            panel</p>
+          <fieldset>
+            <div class="cc"><label><input name="al" type="checkbox" value="1">enabled</label></div>
           </fieldset>
         </div><input type="submit" class="b bs" value="Save">
       </form>
     </div>
   </div>
-  <div style="padding: 5px 0"><a href="https://www.smartnydom.pl/forum/afe-firmware/" target="_blank"><img
-        src="https://img.shields.io/badge/Help-Forum-red.svg" alt="Forum" /></a> <a href="https://afe.smartnydom.pl/en"
-      target="_blank"><img src="https://img.shields.io/badge/Help-Documentation-green.svg" alt="Documentation" /></a> <a
-      href="https://afe.smartnydom.pl/en/pliki-to-pobrania/historia-zmian" target="_blank"><img
-        src="https://img.shields.io/badge/Version%20-%202.5.1.B1[T6]-blue.svg" alt="T6-2.5.1.B1" /></a> <img
-      src="https://img.shields.io/badge/Device-ESP Generic-lightgrey.svg" alt="DeviceID 0" /> <img
-      src="https://img.shields.io/badge/API-Standard-yellow.svg" /> <img
-      src="https://img.shields.io/badge/PRO-No-orange.svg" alt="PRO" /> <img
-      src="https://img.shields.io/badge/Mem-21KB-9cf.svg" alt="PRO" /> <img
-      src="https://img.shields.io/badge/Size-4Mb-yellowgreen.svg" /></div>
 </body>
 
 </html>

@@ -1,7 +1,5 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-
-
 /* ---------Headers ---------*/
 
 void handleFavicon(void);
@@ -35,10 +33,10 @@ void initializeHTTPServer(void) {
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     WebServer.onNotFound(handleOnNotFound);
   }
-
-  WebServer.begin(&Data, &Device, &FirmwarePro);
 #ifdef AFE_CONFIG_HARDWARE_LED
-  WebServer.initSystemLED(&Led);
+  WebServer.begin(&Data, &Device, &FirmwarePro, &Led, &RestAPI);
+#else
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI);
 #endif
 
 #ifdef DEBUG

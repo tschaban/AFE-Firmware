@@ -4,61 +4,55 @@
 
 AFEFirmwarePro::AFEFirmwarePro(){};
 
-void AFEFirmwarePro::begin(AFEWiFi *_Network) {
-  Data.getConfiguration(&Pro);
-  Network = _Network;
+void AFEFirmwarePro::begin(AFEDataAccess *_Data, AFEJSONRPC *_RestAPI) {
+  Data = _Data;
+  RestAPI = _RestAPI;
+  Data->getConfiguration(&Pro);
   miliseconds = millis();
 }
 
-void AFEFirmwarePro::callService(uint8_t method) {
-
-  Data.getConfiguration(&Pro);
-
-  String _response;
-  String url = (method == AFE_WEBSERVICE_VALIDATE_KEY ? AFE_URL_VALIDATE_KEY
-                                                      : AFE_URL_ADD_KEY);
-  url.concat(Data.getDeviceUID());
-  url.concat("/");
-  url.concat(Pro.serial);
+void AFEFirmwarePro::validate() {
 
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: ")
-         << (method == AFE_WEBSERVICE_VALIDATE_KEY ? F("Validating")
-                                                   : F("Adding"))
-         << F(" serial number") << endl
-         << F("INFO: URL: ") << url;
-#endif
-
-  uint16_t httpCode = Network->getJSON(url, _response);
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: HTTP Response: ") << _response;
-#endif
-  if (_response.substring(10, 11) == "t" ||
-      _response.substring(10, 11) == "f") {
-    Pro.valid = _response.substring(10, 11) == "t" ? true : false;
-  }
-  if (httpCode == 200) {
-    Data.saveConfiguration(&Pro);
-  }
-}
-
-void AFEFirmwarePro::reValidateKey() {
-
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Checking AFE PRO Key after: ") << minutes << F(" minutes");
+         << F("INFO: AFE PRO: Checking key after: ") << minutes
+         << F(" minutes");
 #endif
 
   if (strlen(Pro.serial) == 0 && Pro.valid) {
     Pro.valid = false;
 #ifdef DEBUG
-    Serial << endl << F("INFO: Valid with no Key");
+    Serial << endl << F("INFO: AFE PRO: Valid with no key");
 #endif
-    Data.saveConfiguration(&Pro);
+    Data->saveConfiguration(&Pro);
   } else if (strlen(Pro.serial) > 0) {
-    callService(AFE_WEBSERVICE_VALIDATE_KEY);
+    String _HtmlResponse;
+    boolean isValid;
+    _HtmlResponse.reserve(6);
+    if (RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO)) {
+      isValid = _HtmlResponse.length() > 0 && _HtmlResponse.equals("true")
+                    ? true
+                    : false;
+
+      if (Pro.valid != isValid) {
+        Pro.valid = isValid;
+        Data->saveConfiguration(&Pro);
+#ifdef DEBUG
+        Serial << endl << F("INFO: AFE PRO: Key state has been changed");
+#endif
+      }
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: AFE PRO: Key checked: ")
+             << (isValid ? F("valid") : F("invalid"));
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << endl << F("ERROR: AFE PRO: while checing the key");
+    }
+#endif
   }
 }
 
@@ -67,7 +61,7 @@ void AFEFirmwarePro::listener() {
     minutes++;
     miliseconds = millis();
     if (minutes == AFE_KEY_FREQUENCY_VALIDATION) {
-      reValidateKey();
+      validate();
       minutes = 0;
     }
   }

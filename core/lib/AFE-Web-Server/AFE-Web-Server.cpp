@@ -4,26 +4,32 @@
 
 AFEWebServer::AFEWebServer() {}
 
+#ifdef AFE_CONFIG_HARDWARE_LED
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro) {
+                         AFEFirmwarePro *_FirmwarePro, AFELED *_Led,
+                         AFEJSONRPC *_RestAPI) {
+  SystemLED = _Led;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_CONFIG_HARDWARE_LED
+
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI) {
   server.begin();
-  Site.begin(_Data, _Device, _FirmwarePro);
+  Site.begin(_Data, _Device, _FirmwarePro, _RestAPI);
   Data = _Data;
   Device = _Device;
+  RestAPI = _RestAPI;
   FirmwarePro = _FirmwarePro;
 }
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWebServer::initSystemLED(AFELED *_SystemLED) { SystemLED = _SystemLED; }
-#endif
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
   if (siteConfig->twoColumns) {
-    Site.generateTwoColumnsLayout(page, siteConfig->rebootTime);
+    Site.generateMenu(page, siteConfig->rebootTime);
   } else {
-    Site.generateOneColumnLayout(page, siteConfig->rebootTime);
+    Site.generateEmptyMenu(page, siteConfig->rebootTime);
   }
 
   if (siteConfig->form) {
@@ -77,12 +83,15 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_POST_RESET:
     Site.sitePostReset(page);
     break;
-#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE    
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   case AFE_CONFIG_SITE_UPGRADE:
     Site.siteUpgrade(page);
     break;
   case AFE_CONFIG_SITE_POST_UPGRADE:
-    Site.sitePostUpgrade(page, upgradeFailed);
+    Site.sitePostUpgrade(page, upgradeSuccess);
+    break;
+  case AFE_CONFIG_SITE_WAN_UPGRADE:
+    Site.siteWANUpgrade(page, F(L_UPGRADE_IN_PROGRESS));
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -200,7 +209,6 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                 : false);
 
   page.replace("{{s.lang}}", L_LANGUAGE_SHORT);
-  page.replace("{{L_DONATE}}", L_DONATE);
 
   return page;
 }
@@ -276,8 +284,10 @@ void AFEWebServer::generate(boolean upload) {
         PRO_VERSION configuration;
         get(configuration);
         Data->saveConfiguration(&configuration);
+        sprintf(RestAPI->Pro.serial, "%s", configuration.serial);
+        sprintf(FirmwarePro->Pro.serial, "%s", configuration.serial);
+        FirmwarePro->validate();
         configuration = {0};
-        FirmwarePro->callService(AFE_WEBSERVICE_ADD_KEY);
       } else if (siteConfig.ID == AFE_CONFIG_SITE_MQTT) {
         MQTT configuration;
         get(configuration);
@@ -478,8 +488,13 @@ void AFEWebServer::generate(boolean upload) {
         siteConfig.twoColumns = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_RESET) {
         siteConfig.formButton = false;
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
       } else if (siteConfig.ID == AFE_CONFIG_SITE_UPGRADE) {
         siteConfig.form = false;
+      } else if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
+        siteConfig.form = false;
+        siteConfig.rebootTime = 30;
+        siteConfig.twoColumns = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_POST_UPGRADE) {
         if (!upload) {
           siteConfig.form = false;
@@ -488,89 +503,16 @@ void AFEWebServer::generate(boolean upload) {
           siteConfig.reboot = true;
           siteConfig.rebootMode = Device->getMode();
         }
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
       }
     }
   }
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   if (upload) {
-    HTTPUpload &upload = server.upload();
-    String _updaterError;
-    if (upload.status == UPLOAD_FILE_START) {
-      WiFiUDP::stopAll();
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: UPGRADE: Firmware file name: ")
-             << upload.filename.c_str();
-#endif
-
-      uint32_t maxSketchSpace =
-          (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: UPGRADE: Firmware size: ")
-             << (ESP.getSketchSize() / 1024) << "kb";
-      Serial << endl
-             << F("INFO: UPGRADE: Free space size: ")
-             << (ESP.getFreeSketchSpace() / 1024) << "kb";
-      Serial << endl
-             << F("INFO: UPGRADE: Max free space size for this hardware: ")
-             << (maxSketchSpace / 1024) << "kb";
-
-      Serial << endl
-             << F("INFO: UPGRADE: Flash size: ") << (ESP.getSketchSize() / 1024)
-             << "kb";
-#endif
-
-      if (!Update.begin(maxSketchSpace)) { // start with max available size
-#ifdef DEBUG
-        Update.printError(Serial);
-#endif
-        upgradeFailed = true;
-      }
-    } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-      SystemLED->toggle();
-#endif
-#ifdef DEBUG
-      Serial << F(".");
-#endif
-
-      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-#ifdef DEBUG
-        Serial << endl;
-        Update.printError(Serial);
-#endif
-        upgradeFailed = true;
-      }
-    } else if (upload.status == UPLOAD_FILE_END && !_updaterError.length()) {
-      if (Update.end(true)) { // true to set the size to the current
-                              // progress
-#ifdef DEBUG
-        Serial << endl
-               << F("INFO: UPGRADE: Success. Firmware size: ")
-               << upload.totalSize << endl
-               << F("INFO: UPGRADE:  Rebooting...");
-#endif
-      } else {
-#ifdef DEBUG
-        Update.printError(Serial);
-#endif
-        upgradeFailed = true;
-      }
-    } else if (upload.status == UPLOAD_FILE_ABORTED) {
-      Update.end();
-#ifdef DEBUG
-      Serial << endl << F("ERROR: UPGRADE: Update was aborted");
-#endif
-    }
-    delay(0);
+    upgradeSuccess = upgradOTAFile();
   } else {
-
 #endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-
 
 #ifdef DEBUG
     Serial << endl
@@ -598,8 +540,11 @@ void AFEWebServer::generate(boolean upload) {
     publishHTML(page);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+    if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
+      upgradeSuccess = upgradeOTAWAN(getOTAFirmwareId());
+    }
   }
-#endif  
+#endif
 
   /* Rebooting device */
   if (siteConfig.reboot) {
@@ -701,14 +646,7 @@ void AFEWebServer::listener() {
   }
 }
 
-boolean AFEWebServer::httpAPIlistener() {
-
-  // if (receivedHTTPCommand==true) {
-  //  Serial << endl << "##### receivedHTTPCommand = " << receivedHTTPCommand;
-  // }
-
-  return receivedHTTPCommand;
-}
+boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(const String &page) {
   uint16_t pageSize = page.length();
@@ -783,6 +721,132 @@ void AFEWebServer::handleFirmwareUpgrade(
 void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
   server.onNotFound(fn);
 }
+
+/* Upgrade methods */
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
+  t_httpUpdate_return ret;
+  ESP8266HTTPUpdate OTAServerUpdate;
+  WiFiClient WirelessClient;
+  boolean _success = false;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  SystemLED->on();
+#endif
+
+  if (firmwareId > 0) {
+    OTAServerUpdate.rebootOnUpdate(false);
+
+#ifdef DEBUG
+    Serial << endl << F("INFO: WAN UPDATE: Starting upgrade");
+#endif
+    ret = OTAServerUpdate.update(WirelessClient,
+                                 AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL +
+                                     String(firmwareId));
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WAN UPDATE: Update completed with status: ") << ret;
+#endif
+
+    if (ret != HTTP_UPDATE_NO_UPDATES) {
+      if (ret == HTTP_UPDATE_OK) {
+#ifdef DEBUG
+        Serial << endl << F("INFO: WAN UPDATE: success");
+#endif
+        Data->saveWelecomeMessage(F(L_UPGRADE_SUCCESSFUL));
+        delay(1000);
+        Device->reboot(Device->getMode());
+      } else {
+        if (ret == HTTP_UPDATE_FAILED) {
+#ifdef DEBUG
+          Serial << endl << F("INFO: WAN UPDATE: failure");
+#endif
+          _success = false;
+          Data->saveWelecomeMessage(F(L_UPGRADE_FAILED));
+        }
+      }
+    }
+  }
+#ifdef AFE_CONFIG_HARDWARE_LED
+  SystemLED->off();
+#endif
+
+  return _success;
+}
+
+boolean AFEWebServer::upgradOTAFile(void) {
+  HTTPUpload &upload = server.upload();
+  String _updaterError;
+  boolean _success = false;
+  if (upload.status == UPLOAD_FILE_START) {
+    WiFiUDP::stopAll();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: UPGRADE: Firmware file name: ")
+           << upload.filename.c_str();
+#endif
+
+    uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: UPGRADE: Firmware size: ")
+           << (ESP.getSketchSize() / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: Free space size: ")
+           << (ESP.getFreeSketchSpace() / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: Max free space size for this hardware:")
+           << (maxSketchSpace / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: ");
+#endif
+
+    if (!Update.begin(maxSketchSpace)) { // start with max available
+#ifdef DEBUG
+      Update.printError(Serial);
+#endif
+    }
+  } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+    SystemLED->toggle();
+#endif
+#ifdef DEBUG
+    Serial << F(".");
+#endif
+
+    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+#ifdef DEBUG
+      Serial << endl;
+      Update.printError(Serial);
+#endif
+    }
+  } else if (upload.status == UPLOAD_FILE_END && !_updaterError.length()) {
+    if (Update.end(true)) { // true to set the size to the current
+      // progress
+      _success = true;
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: UPGRADE: Success. Firmware size: ") << upload.totalSize
+             << endl
+             << F("INFO: UPGRADE:  Rebooting...");
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Update.printError(Serial);
+    }
+#endif
+  } else if (upload.status == UPLOAD_FILE_ABORTED) {
+    Update.end();
+#ifdef DEBUG
+    Serial << endl << F("ERROR: UPGRADE: Update was aborted");
+#endif
+  }
+  yield();
+  return _success;
+}
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 /* Reading Server data */
 
@@ -919,10 +983,23 @@ void AFEWebServer::get(NETWORK &data) {
     data.ssid[0] = AFE_EMPTY_STRING;
   }
 
+  if (server.arg("sb").length() > 0) {
+    server.arg("sb").toCharArray(data.ssidBackup, sizeof(data.ssidBackup));
+  } else {
+    data.ssidBackup[0] = AFE_EMPTY_STRING;
+  }
+
   if (server.arg("p").length() > 0) {
     server.arg("p").toCharArray(data.password, sizeof(data.password));
   } else {
     data.password[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg("pb").length() > 0) {
+    server.arg("pb").toCharArray(data.passwordBackup,
+                                 sizeof(data.passwordBackup));
+  } else {
+    data.passwordBackup[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg("i1").length() > 0) {
@@ -943,17 +1020,23 @@ void AFEWebServer::get(NETWORK &data) {
     data.subnet[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg("na").length() > 0) {
-    data.noConnectionAttempts = server.arg("na").toInt();
-  }
+  data.noConnectionAttempts =
+      server.arg("na").length() > 0
+          ? server.arg("na").toInt()
+          : AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
 
-  if (server.arg("wc").length() > 0) {
-    data.waitTimeConnections = server.arg("wc").toInt();
-  }
+  data.waitTimeConnections = server.arg("wc").length() > 0
+                                 ? server.arg("wc").toInt()
+                                 : AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
 
-  if (server.arg("ws").length() > 0) {
-    data.waitTimeSeries = server.arg("ws").toInt();
-  }
+  data.waitTimeSeries = server.arg("ws").length() > 0
+                            ? server.arg("ws").toInt()
+                            : AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
+
+  data.noFailuresToSwitchNetwork =
+      server.arg("fs").length() > 0
+          ? server.arg("fs").toInt()
+          : AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
   data.isDHCP = server.arg("d").length() > 0 ? true : false;
 }
@@ -1150,9 +1233,7 @@ void AFEWebServer::get(PRO_VERSION &data) {
     data.serial[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg("v").length() > 0) {
-    data.valid = server.arg("v").toInt() == 0 ? false : true;
-  }
+  data.valid = false;
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -1534,37 +1615,35 @@ void AFEWebServer::get(I2CPORT &data) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEWebServer::get(HPMA115S0 &data) {
   data.interval = server.arg("f").length() > 0
-                       ? server.arg("f").toInt()
-                       : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
 
   data.timeToMeasure =
       server.arg("m").length() > 0
           ? server.arg("m").toInt()
           : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_TIME_TO_MEASURE;
 
-  data.whoPM10Norm =
-      server.arg("n1").length() > 0
-          ? server.arg("n1").toFloat()
-          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+  data.whoPM10Norm = server.arg("n1").length() > 0
+                         ? server.arg("n1").toFloat()
+                         : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
 
-  data.whoPM25Norm =
-      server.arg("n2").length() > 0
-          ? server.arg("n2").toFloat()
-          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
+  data.whoPM25Norm = server.arg("n2").length() > 0
+                         ? server.arg("n2").toFloat()
+                         : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.pm25.idx = server.arg("x2").length() > 0
-                                ? server.arg("x2").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;
+                               ? server.arg("x2").toInt()
+                               : AFE_DOMOTICZ_DEFAULT_IDX;
   data.domoticz.pm10.idx = server.arg("x1").length() > 0
-                                ? server.arg("x1").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;
+                               ? server.arg("x1").toInt()
+                               : AFE_DOMOTICZ_DEFAULT_IDX;
   data.domoticz.whoPM10Norm.idx = server.arg("x3").length() > 0
-                                ? server.arg("x3").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;
+                                      ? server.arg("x3").toInt()
+                                      : AFE_DOMOTICZ_DEFAULT_IDX;
   data.domoticz.whoPM25Norm.idx = server.arg("x4").length() > 0
-                                ? server.arg("x4").toInt()
-                                : AFE_DOMOTICZ_DEFAULT_IDX;                                
+                                      ? server.arg("x4").toInt()
+                                      : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -1736,17 +1815,16 @@ void AFEWebServer::get(AS3935 &data) {
   }
 
   data.i2cAddress = server.arg("a").length() > 0
-                         ? server.arg("a").toInt()
-                         : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+                        ? server.arg("a").toInt()
+                        : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 
   data.irqGPIO = server.arg("g").length() > 0 ? server.arg("g").toInt() : 0;
 
-  data.setNoiseFloorAutomatically =
-      server.arg("f").length() > 0 ? true : false;
+  data.setNoiseFloorAutomatically = server.arg("f").length() > 0 ? true : false;
 
   data.noiseFloor = server.arg("nf").length() > 0
-                         ? server.arg("nf").toInt()
-                         : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
+                        ? server.arg("nf").toInt()
+                        : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_NOISE_FLOOR;
 
   data.minimumNumberOfLightningSpikes =
       server.arg("m").length() > 0
@@ -1764,8 +1842,8 @@ void AFEWebServer::get(AS3935 &data) {
           : AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL;
 
   data.indoor = server.arg("w").length() > 0 && server.arg("w").toInt() == 1
-                     ? true
-                     : false;
+                    ? true
+                    : false;
 
   data.unit =
       server.arg("u").length() > 0 ? server.arg("u").toInt() : AFE_DISTANCE_KM;
@@ -1791,21 +1869,20 @@ void AFEWebServer::get(ANEMOMETER &data) {
   }
 
   data.gpio = server.arg("g").length() > 0
-                   ? server.arg("g").toInt()
-                   : AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
+                  ? server.arg("g").toInt()
+                  : AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
 
   data.interval = server.arg("f").length() > 0
-                       ? server.arg("f").toInt()
-                       : AFE_HARDWARE_ANEMOMETER_DEFAULT_INTERVAL;
+                      ? server.arg("f").toInt()
+                      : AFE_HARDWARE_ANEMOMETER_DEFAULT_INTERVAL;
 
   data.sensitiveness = server.arg("s").length() > 0
-                            ? server.arg("s").toInt()
-                            : AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
+                           ? server.arg("s").toInt()
+                           : AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
 
-  data.impulseDistance =
-      server.arg("l").length() > 0
-          ? server.arg("l").toFloat()
-          : AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE;
+  data.impulseDistance = server.arg("l").length() > 0
+                             ? server.arg("l").toFloat()
+                             : AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE;
 
   data.impulseDistanceUnit =
       server.arg("u").length() > 0
@@ -1908,20 +1985,20 @@ void AFEWebServer::get(RAINMETER &data) {
   }
 
   data.gpio = server.arg("g").length() > 0
-                   ? server.arg("g").toInt()
-                   : AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
+                  ? server.arg("g").toInt()
+                  : AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
 
   data.interval = server.arg("f").length() > 0
-                       ? server.arg("f").toInt()
-                       : AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
+                      ? server.arg("f").toInt()
+                      : AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
 
   data.sensitiveness = server.arg("s").length() > 0
-                            ? server.arg("s").toInt()
-                            : AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
+                           ? server.arg("s").toInt()
+                           : AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
 
   data.resolution = server.arg("r").length() > 0
-                         ? server.arg("r").toFloat()
-                         : (float)AFE_HARDWARE_RAINMETER_DEFAULT_RESOLUTION;
+                        ? server.arg("r").toFloat()
+                        : (float)AFE_HARDWARE_RAINMETER_DEFAULT_RESOLUTION;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
@@ -1977,3 +2054,9 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+uint16_t AFEWebServer::getOTAFirmwareId() {
+  return server.arg("f").length() > 0 ? server.arg("f").toInt() : 0;
+}
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE

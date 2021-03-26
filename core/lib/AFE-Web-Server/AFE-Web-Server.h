@@ -3,12 +3,24 @@
 #ifndef _AFE_Web_Server_h
 #define _AFE_Web_Server_h
 
+#include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Sites-Generator.h>
 #include <ESP8266WebServer.h>
+
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 #include <WiFiUdp.h>
+#include <esp8266httpupdate.h>
+#include <WiFiClient.h>
+
+#if AFE_LANGUAGE == 0
+#include <pl_PL.h>
+#else
+#include <en_EN.h>
+#endif
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -36,6 +48,7 @@ private:
   AFEDevice *Device;
   AFEFirmwarePro *FirmwarePro;
   AFEDataAccess *Data;
+  AFEJSONRPC *RestAPI;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
@@ -54,7 +67,12 @@ private:
 
   AFESitesGenerator Site;
 
-  boolean upgradeFailed = false;
+  boolean upgradeSuccess = false;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+#endif
+
 
   /* Method gets url Option parameter value */
   boolean getOptionName();
@@ -157,14 +175,25 @@ private:
   void get(BINARY_SENSOR &data);
 #endif
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+  uint16_t getOTAFirmwareId();
+  boolean upgradeOTAWAN(uint16_t firmwareId);
+  boolean upgradOTAFile(void);
+#endif
+
 public:
   AFEWebServer();
 
   /* Method pushes HTML site from WebServer */
   void publishHTML(const String &page);
 
-  /* Method initialize WebServer and Updater server */
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
+/* Method initialize WebServer and Updater server */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFELED *,
+             AFEJSONRPC *);
+#else
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */

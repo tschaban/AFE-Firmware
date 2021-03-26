@@ -4,28 +4,45 @@
 /* Set this before run */
 
 $type = "0";
-$version = "2.5.1";
-$language = "EN";
+$version = "3.0.0";
+$language = "pl";
 
 /******************/
 
-$targetLanguage[0] = "PL";
-$targetLanguage[1] = "EN";
+$targetLanguage[0] = "pl";
+$targetLanguage[1] = "en";
 
-$targetAPI[0] = "Domoticz API";
-$targetAPI[1] = "Standard API";
+$targetAPI[0] = "domoticz.api";
+$targetAPI[1] = "standard.api";
 
-$targetFolder = "C:/Users/Adrian/Cloud/Pulpit/AFE.Firmware.T".$type.".".$version;
+$rootPath = "C:/Users/Adrian/Cloud/Pulpit/";
+$targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 
-$targetAPI[0] = "Domoticz API";
-$targetAPI[1] = "Standard API";
+$targetHardware[0][0] = "esp-generic";
+$targetHardware[0][1] = 0;
 
-$targetHardware[0] = "ESP Generic";
-$targetHardware[1] = "ESP Generic with debugger";
-$targetHardware[2] = "Shelly-1";
-$targetHardware[3] = "Sonoff 4CH and 4CH Pro";
-$targetHardware[4] = "Sonoff Basic";
-$targetHardware[5] = "Sonoff Touch";
+$targetHardware[1][0] = "esp-generic-debugger";
+$targetHardware[1][1] = 0;
+
+$targetHardware[2][0] = "shelly-1";
+$targetHardware[2][1] = 20;
+
+$targetHardware[3][0] = "sonoff-4ch";
+$targetHardware[3][1] = 2;
+
+$targetHardware[4][0] = "sonoff-basic";
+$targetHardware[4][1] = 1;
+
+$targetHardware[5][0] = "sonoff-touch-g1";
+$targetHardware[5][1] = 6;
+
+$targetHardware[6][0] = "sonoff-touch-g2";
+$targetHardware[6][1] = 7;
+
+$targetHardware[7][0] = "sonoff-touch-g3";
+$targetHardware[7][1] = 8;
+
+
 
 $folderStructure[0] = $targetFolder;
 $folderStructure[1] = $targetFolder."/".$targetLanguage;
@@ -33,170 +50,253 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 
 // Standard API
 
-$sourceFolder[0]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic/firmware.bin";
-$sourceFolder[0]["chip"] = "ESP8266";
-$sourceFolder[0]["size"] = "1Mb";
-$sourceFolder[0]["hardware"] = 0;
-$sourceFolder[0]["api"] = $targetAPI[1];
+$index;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[1]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-development/firmware.bin";
-$sourceFolder[1]["chip"] = "ESP8266.DEBUG";
-$sourceFolder[1]["size"] = "1Mb";
-$sourceFolder[1]["hardware"] = 1;
-$sourceFolder[1]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-generic-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[2]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m-generic/firmware.bin";
-$sourceFolder[2]["chip"] = "ESP8285";
-$sourceFolder[2]["size"] = "1Mb";
-$sourceFolder[2]["hardware"] = 0;
-$sourceFolder[2]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[3]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m_Sonoff-Basic-V1/firmware.bin";
-$sourceFolder[3]["chip"] = "ESP8266.SonoffBasic";
-$sourceFolder[3]["size"] = "1Mb";
-$sourceFolder[3]["hardware"] = 4;
-$sourceFolder[3]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[4]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Basic-V1/firmware.bin";
-$sourceFolder[4]["chip"] = "ESP8285.SonoffBasic";
-$sourceFolder[4]["size"] = "1Mb";
-$sourceFolder[4]["hardware"] = 4;
-$sourceFolder[4]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m_Sonoff-Basic-V1/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 4;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[5]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-4CH/firmware.bin";
-$sourceFolder[5]["chip"] = "ESP8285.Sonoff4CH";
-$sourceFolder[5]["size"] = "1Mb";
-$sourceFolder[5]["hardware"] = 3;
-$sourceFolder[5]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Basic-V1/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 4;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[6]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-1G/firmware.bin";
-$sourceFolder[6]["chip"] = "ESP8285.SonoffTouchG1";
-$sourceFolder[6]["size"] = "1Mb";
-$sourceFolder[6]["hardware"] = 5;
-$sourceFolder[6]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-4CH/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 3;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[7]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-2G/firmware.bin";
-$sourceFolder[7]["chip"] = "ESP8285.SonoffTouchG2";
-$sourceFolder[7]["size"] = "1Mb";
-$sourceFolder[7]["hardware"] = 5;
-$sourceFolder[7]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-1G/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 5;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[8]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-3G/firmware.bin";
-$sourceFolder[8]["chip"] = "ESP8285.SonoffTouchG3";
-$sourceFolder[8]["size"] = "1Mb";
-$sourceFolder[8]["hardware"] = 5;
-$sourceFolder[8]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-2G/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 6;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
-$sourceFolder[9]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_Shelly-1/firmware.bin";
-$sourceFolder[9]["chip"] = "ESP8266.Shelly1";
-$sourceFolder[9]["size"] = "2Mb";
-$sourceFolder[9]["hardware"] = 2;
-$sourceFolder[9]["api"] = $targetAPI[1];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-3G/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 7;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_Shelly-1/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 2;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
 // Domoticz API
 
-$sourceFolder[10]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic-domoticz/firmware.bin";
-$sourceFolder[10]["chip"] = "ESP8266";
-$sourceFolder[10]["size"] = "1Mb";
-$sourceFolder[10]["hardware"] = 0;
-$sourceFolder[10]["api"] = $targetAPI[0];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
-$sourceFolder[11]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-development-domoticz/firmware.bin";
-$sourceFolder[11]["chip"] = "ESP8266.DEBUG";
-$sourceFolder[11]["size"] = "1Mb";
-$sourceFolder[11]["hardware"] = 1;
-$sourceFolder[11]["api"] = $targetAPI[0];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_4m-domoticz-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
-$sourceFolder[12]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m-generic-domoticz/firmware.bin";
-$sourceFolder[12]["chip"] = "ESP8285";
-$sourceFolder[12]["size"] = "1Mb";
-$sourceFolder[12]["hardware"] = 0;
-$sourceFolder[12]["api"] = $targetAPI[0];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
-$sourceFolder[13]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m_Sonoff-Basic-V1-domoticz/firmware.bin";
-$sourceFolder[13]["chip"] = "ESP8266.SonoffBasic";
-$sourceFolder[13]["size"] = "1Mb";
-$sourceFolder[13]["hardware"] = 4;
-$sourceFolder[13]["api"] = $targetAPI[0];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m-development-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 1;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
-$sourceFolder[14]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Basic-V1-domoticz/firmware.bin";
-$sourceFolder[14]["chip"] = "ESP8285.SonoffBasic";
-$sourceFolder[14]["size"] = "1Mb";
-$sourceFolder[14]["hardware"] = 4;
-$sourceFolder[14]["api"] = $targetAPI[0];
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m-generic-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 0;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_1m_Sonoff-Basic-V1-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 4;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Basic-V1-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 4;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-4CH-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 3;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-1G-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 5;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-2G-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 6;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-3G-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8285;
+$sourceFolder[$index]["size"] = 1;
+$sourceFolder[$index]["hardware"] = 7;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_Shelly-1-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 2;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
 
-$sourceFolder[15]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-4CH-domoticz/firmware.bin";
-$sourceFolder[15]["chip"] = "ESP8285.Sonoff4CH";
-$sourceFolder[15]["size"] = "1Mb";
-$sourceFolder[15]["hardware"] = 3;
-$sourceFolder[15]["api"] = $targetAPI[0];
-
-$sourceFolder[16]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-1G-domoticz/firmware.bin";
-$sourceFolder[16]["chip"] = "ESP8285.SonoffTouchG1";
-$sourceFolder[16]["size"] = "1Mb";
-$sourceFolder[16]["hardware"] = 5;
-$sourceFolder[16]["api"] = $targetAPI[0];
-
-$sourceFolder[17]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-2G-domoticz/firmware.bin";
-$sourceFolder[17]["chip"] = "ESP8285.SonoffTouchG2";
-$sourceFolder[17]["size"] = "1Mb";
-$sourceFolder[17]["hardware"] = 5;
-$sourceFolder[17]["api"] = $targetAPI[0];
-
-$sourceFolder[18]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_1m_Sonoff-Touch-3G-domoticz/firmware.bin";
-$sourceFolder[18]["chip"] = "ESP8285.SonoffTouchG3";
-$sourceFolder[18]["size"] = "1Mb";
-$sourceFolder[18]["hardware"] = 5;
-$sourceFolder[18]["api"] = $targetAPI[0];
-
-$sourceFolder[19]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_Shelly-1-domoticz/firmware.bin";
-$sourceFolder[19]["chip"] = "ESP8266.Shelly1";
-$sourceFolder[19]["size"] = "2Mb";
-$sourceFolder[19]["hardware"] = 2;
-$sourceFolder[19]["api"] = $targetAPI[0];
+function createdIndexFile($path) {
+    $handle = fopen($path."/index.html", "w");
+    fclose($handle);
+}
 
 
 echo "\nCreating folders structure";
 if (!file_exists($targetFolder)) {
     mkdir($targetFolder);
+    createdIndexFile($targetFolder);
 }
 
 foreach ($targetLanguage as &$targetLanguageFolder) {
     if (!file_exists($targetFolder."/".$targetLanguageFolder)) {
         mkdir($targetFolder."/".$targetLanguageFolder);
+        createdIndexFile($targetFolder."/".$targetLanguageFolder);
     }
     foreach ($targetAPI as &$targetAPIFolder) {
         if (!file_exists($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder)) {
             mkdir($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder);
+            createdIndexFile($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder);
         }
         foreach ($targetHardware as &$targetHardwareFolder) {
-            if (!file_exists($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder)) {
-                mkdir($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder);                              
+            if (!file_exists($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0])) {
+                mkdir($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0]);
+                createdIndexFile($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0]);                              
             }        
-            $finalFolder[$targetLanguageFolder][$targetAPIFolder][$targetHardwareFolder] = $targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder;
+            $finalFolder[$targetLanguageFolder][$targetAPIFolder][$targetHardwareFolder[0]] = $targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0];
         }    
     }
 }
 
 
+$handle = fopen($targetFolder."/script-".$language.".sql", "a");
+fwrite($handle, "UPDATE afe_firmwares set current_version = 0 WHERE type = ".$type." AND language = '".$language."';\n");
+
 echo "\nCoping firmwares";
 
 foreach ($sourceFolder as &$source) {
     $sourceToCopy = $source["file"];
-    $fileName = "AFE.Firmware.T".$type.".".$version.".".$language.".".$source["chip"].".".$source["size"].".bin";
-    $copyTo = $finalFolder[$language][$source["api"]][$targetHardware[$source["hardware"]]]."/".$fileName ;
+    $fileName = "afe.firmware.t".$type.".".$version.".".$language.".esp".$source["chip"].".". $targetHardware[$source["hardware"]][0] . "." . $source["size"]."mb.bin";
+    $copyTo = $finalFolder[$language][$source["api"]][$targetHardware[$source["hardware"]][0]]."/".$fileName ;
      
     if (file_exists($sourceToCopy)) {
-        rename($sourceToCopy, $copyTo);
+        copy($sourceToCopy, $copyTo);
         echo "\nSUCCESS: " . $fileName;
+        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":"S")."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", 1, 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
+        
     } else {
         echo "\nERROR: File doesn't exist:  " . $sourceToCopy;
     }
-  
-    
-
 }
 
+fclose($handle); 
 ?>

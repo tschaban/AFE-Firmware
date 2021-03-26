@@ -5,6 +5,7 @@
 
 #include <arduino.h>
 
+#include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
@@ -48,6 +49,10 @@ private:
   AFEDevice *Device;
   FIRMWARE Firmware;
   AFEFirmwarePro *FirmwarePro;
+  AFEJSONRPC *RestAPI;
+
+  String _HtmlResponse;
+
   char deviceID[17];
 
   void generateHeader(String &page, uint16_t redirect);
@@ -59,6 +64,14 @@ private:
                    const __FlashStringHelper *description);
 
   void closeSection(String &page);
+
+  void openMessageSection(String &page, const char *title,
+                          const __FlashStringHelper *description);
+
+  void openMessageSection(String &page, const __FlashStringHelper *title,
+                          const __FlashStringHelper *description);
+
+  void closeMessageSection(String &page);
 
   /* Item: HTML <input type=""> */
   void addInputFormItem(String &item, const char *type, const char *name,
@@ -90,26 +103,28 @@ private:
                               boolean disabled = false);
 
   /* Item: HTML <select><option></option></select> */
-  void addSelectFormItemOpen(String &item, const char *name, const char *label);
+  void addSelectFormItemOpen(String &item, const __FlashStringHelper *name, const __FlashStringHelper *label);
   void addSelectOptionFormItem(String &item, const char *label,
                                const char *value, boolean selected);
   void addSelectFormItemClose(String &item);
 
   /* Item: Menu */
-  void addMenuItem(String &item, const char *title, uint8_t siteId);
-  void addMenuHeaderItem(String &item, const char *title);
+  void addMenuItem(String &item, const __FlashStringHelper *title, uint8_t siteId);
+
+  void addMenuItemExternal(String &item, const __FlashStringHelper *title, const __FlashStringHelper *url);
+  void addMenuHeaderItem(String &item, const __FlashStringHelper *title);
   void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);
 
   /* Item: HTML <select> populated with GPIOs */
-  void addListOfGPIOs(String &item, const char *field, uint8_t selected,
+  void addListOfGPIOs(String &item, const __FlashStringHelper *field, uint8_t selected,
                       const char *title = "GPIO");
 
   /* Item: HTML <select> populated with <option> for number of items selection
    */
   void addListOfHardwareItem(String &item, uint8_t noOfItems,
-                             uint8_t noOffConnected, const char *field,
-                             const char *label, boolean disabled = false);
+                             uint8_t noOffConnected, const __FlashStringHelper *field,
+                             const __FlashStringHelper *label, boolean disabled = false);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
@@ -145,20 +160,23 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  void generateOneColumnLayout(String &page, uint16_t redirect = 0);
-  void generateTwoColumnsLayout(String &page, uint16_t redirect = 0);
+  void generateEmptyMenu(String &page, uint16_t redirect = 0);
+  void generateMenu(String &page, uint16_t redirect = 0);
 
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
 
+#ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   /* These methods generates firmware upgrade sections */
   void siteUpgrade(String &page);
   void sitePostUpgrade(String &page, boolean status);
+  void siteWANUpgrade(String &page, const __FlashStringHelper *title);
+#endif
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */

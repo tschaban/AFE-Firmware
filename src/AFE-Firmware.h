@@ -27,12 +27,14 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
+#include <AFE-API-JSONRPC.h>
 
 AFEDataAccess Data;
 AFEFirmwarePro FirmwarePro;
 AFEDevice Device;
 AFEWiFi Network;
 AFEWebServer WebServer;
+AFEJSONRPC RestAPI;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #include <AFE-MCP23017-Broker.h>

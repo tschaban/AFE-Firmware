@@ -6,6 +6,7 @@
 .idea
 .vscode
 webservice/_config.php
+webservice/api
 lib-external
 sandpit
 webservice/docs

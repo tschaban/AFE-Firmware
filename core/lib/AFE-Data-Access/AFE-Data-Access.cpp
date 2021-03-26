@@ -23,6 +23,67 @@ boolean AFEDataAccess::fileExist(const char *path) {
 #endif
 }
 
+void AFEDataAccess::getWelcomeMessage(String &message) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
+#endif
+
+  if (configFile) {
+    message = configFile.readString();
+    configFile.close();
+    /* After message is read, it's removed from the file */
+    saveWelecomeMessage(F(""));
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: File: ") << AFE_FILE_WELCOME_MESSAGE
+           << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl
+           << F("INFO: Writing to file: ") << FPSTR(message);
+#endif
+
+    configFile.print(FPSTR(message));
+    configFile.close();
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: File ") << AFE_FILE_WELCOME_MESSAGE
+           << F(" not opened for writing");
+  }
+#endif
+}
+
 const String AFEDataAccess::getDeviceUID() {
   String uid;
 #ifdef DEBUG
@@ -987,6 +1048,8 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     root["mode"] = mode;
     root.printTo(configFile);
 
+    configFile.close();
+
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Data saved") << endl
@@ -1036,6 +1099,9 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       sprintf(configuration->ssid, root["ssid"]);
       sprintf(configuration->password, root["password"]);
 
+      sprintf(configuration->ssidBackup, root["ssidBackup"] | "");
+      sprintf(configuration->passwordBackup, root["passwordBackup"] | "");
+
       configuration->isDHCP = root["isDHCP"];
 
       sprintf(configuration->ip, root["ip"]);
@@ -1045,6 +1111,9 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       configuration->noConnectionAttempts = root["noConnectionAttempts"];
       configuration->waitTimeConnections = root["waitTimeConnections"];
       configuration->waitTimeSeries = root["waitTimeSeries"];
+      configuration->noFailuresToSwitchNetwork =
+          root["noFailuresToSwitchNetwork"] |
+          AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
 #ifdef DEBUG
       Serial << endl
@@ -1095,6 +1164,8 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     root["ssid"] = configuration->ssid;
     root["password"] = configuration->password;
+    root["ssidBackup"] = configuration->ssidBackup;
+    root["passwordBackup"] = configuration->passwordBackup;
     root["isDHCP"] = configuration->isDHCP;
     root["ip"] = configuration->ip;
     root["gateway"] = configuration->gateway;
@@ -1103,6 +1174,8 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["noConnectionAttempts"] = configuration->noConnectionAttempts;
     root["waitTimeConnections"] = configuration->waitTimeConnections;
     root["waitTimeSeries"] = configuration->waitTimeSeries;
+    root["noFailuresToSwitchNetwork"] =
+        configuration->noFailuresToSwitchNetwork;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1132,18 +1205,23 @@ void AFEDataAccess::createNetworkConfigurationFile() {
          << F("INFO: Creating file: ") << AFE_FILE_NETWORK_CONFIGURATION;
 #endif
 
-  NETWORK networkConfiguration;
+  NETWORK configuration;
   /* Network default config */
-  networkConfiguration.ssid[0] = AFE_EMPTY_STRING;
-  networkConfiguration.password[0] = AFE_EMPTY_STRING;
-  networkConfiguration.isDHCP = true;
-  networkConfiguration.ip[0] = AFE_EMPTY_STRING;
-  networkConfiguration.gateway[0] = AFE_EMPTY_STRING;
-  networkConfiguration.subnet[0] = AFE_EMPTY_STRING;
-  networkConfiguration.noConnectionAttempts = 30;
-  networkConfiguration.waitTimeConnections = 1;
-  networkConfiguration.waitTimeSeries = 20;
-  saveConfiguration(&networkConfiguration);
+  configuration.ssid[0] = AFE_EMPTY_STRING;
+  configuration.password[0] = AFE_EMPTY_STRING;
+  configuration.ssidBackup[0] = AFE_EMPTY_STRING;
+  configuration.passwordBackup[0] = AFE_EMPTY_STRING;
+  configuration.isDHCP = true;
+  configuration.ip[0] = AFE_EMPTY_STRING;
+  configuration.gateway[0] = AFE_EMPTY_STRING;
+  configuration.subnet[0] = AFE_EMPTY_STRING;
+  configuration.noConnectionAttempts =
+      AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
+  configuration.waitTimeConnections = AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
+  configuration.waitTimeSeries = AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
+  configuration.noFailuresToSwitchNetwork =
+      AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
+  saveConfiguration(&configuration);
 }
 
 void AFEDataAccess::getConfiguration(MQTT *configuration) {
@@ -3733,8 +3811,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
       configuration->interval = root["interval"];
       configuration->timeToMeasure = root["timeToMeasure"];
-      configuration->whoPM10Norm = root["whoPM10Norm"] | AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
-      configuration->whoPM25Norm = root["whoPM25Norm"] | AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
+      configuration->whoPM10Norm =
+          root["whoPM10Norm"] |
+          AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM10;
+      configuration->whoPM25Norm =
+          root["whoPM25Norm"] |
+          AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.pm25.idx =
           root["idx"]["pm25"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -3743,7 +3825,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
       configuration->domoticz.whoPM25Norm.idx =
           root["idx"]["whoPM25Norm"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.whoPM10Norm.idx =
-          root["idx"]["whoPM10Norm"] | AFE_DOMOTICZ_DEFAULT_IDX;          
+          root["idx"]["whoPM10Norm"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -3810,7 +3892,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
     idx["pm25"] = configuration->domoticz.pm25.idx;
     idx["pm10"] = configuration->domoticz.pm10.idx;
     idx["whoPM10Norm"] = configuration->domoticz.whoPM10Norm.idx;
-    idx["whoPM25Norm"] = configuration->domoticz.whoPM25Norm.idx;    
+    idx["whoPM25Norm"] = configuration->domoticz.whoPM25Norm.idx;
 #else
     root["mqttTopic"] = configuration->mqtt.topic;
 #endif
@@ -3852,7 +3934,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   configuration.domoticz.pm25.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.pm10.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.whoPM10Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-  configuration.domoticz.whoPM25Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;  
+  configuration.domoticz.whoPM25Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
 #ifdef DEBUG

@@ -31,11 +31,7 @@
 #define L_DEVICE_NOT_EXIST "\"Device does not exist\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
 
-/* Upgrades */
-#define L_UPGRADED_TO_NEW_VERSION  "Firmware has been upgraded to a newer version"
-#define L_UPGRADED_TO_NEW_VERSION_TYPE "Firmware has been upgraded to a new type. Device reconfiguration is required."
-
-#define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx.</small>"
+#define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
 
 /* Menu */
 #define L_HARDWARE "Hardware"
@@ -62,7 +58,7 @@
 #define L_NETWORK_CONNECTED "Connected"
 #define L_DISCONNECTED "Disconnected"
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
-#define L_INTERFACE "Interfaces"
+#define L_CONNECTIONS "Connections"
 
 
 /* Forms commons */
@@ -71,7 +67,7 @@
 #define L_USERNAME "User name"
 #define L_PASSWORD "Password"
 #define L_SECONDS "seconds"
-#define L_MILISECONDS "milisekonds"
+#define L_MILISECONDS "msec"
 #define L_IP_ADDRESS "Address IP"
 #define L_NONE "None"
 #define L_NAME "Name"
@@ -90,12 +86,14 @@
 #define L_RANGE "Range"
 #define L_SENSITIVENESS "Sensitiveness"
 #define L_ADDRESS "Address"
+#define L_CORRECTIONS "Corrections"
+#define L_UNITS "Units"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
-#define L_INDEX_NORMAL_MODE "Normal mode"
-#define L_INDEX_HOTSPOT_MODE "HotSpot Mode"
-#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Device is in operations mode"
+#define L_INDEX_NORMAL_MODE "Over WiFi"
+#define L_INDEX_HOTSPOT_MODE "Direct via HotSpot"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Configuration panel"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
 
@@ -118,15 +116,15 @@
 #define L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS "Number of thermal protectors"
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Number of binary's sensors"
 
+#define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
 #define L_DEVICE_CONTROLLING "Device controlling mechanism"
 #define L_DEVICE_CONTROLLING_INFO "Enable / Disable APIs"
 #define L_DEVICE_CONTROLLED_GATES "Gates/Doors controlled"
-#define L_DEVICE_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
-#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
 #define L_DEVICE_DOMOTICZ_VERSION_410 "4.10x or older"
 #define L_DEVICE_DOMOTICZ_VERSION_2020 "2020.x or newer"
-#define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
+#define L_DEVICE_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
+#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
 
 
 /* Form: network configuration */
@@ -143,11 +141,16 @@
 #define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Time between connections' attempts"
 #define L_NETWORK_SLEEP_TIME "Sleep time before next connection attempts"
 #define L_NETWORK_ADVANCED "Advanced"
-#define L_NETWORK_DEVICE_CONNECTS "Device is connecting to"
-#define L_NETWORK_CONNECT_TO "Connect to"
-#define L_NETWORK_CONNECT "Connect"
-#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "In your WiFi router look for an IP address of a device with follwing MAC address"
-#define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration by entering device IP address in the browser"
+#define L_NETWORK_ALMOST "We're almost there!"
+#define L_NETWORK_DEVICE_CONNECTS "Device is connecting to your wireless network: {{S}}"
+#define L_NETWORK_CONNECT_TO "Connect now to your wireless network and open you WiFi Router configuration panel"
+//#define L_NETWORK_CONNECT "Connect"
+#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Look for a device's IP address where its MAC address is: {{M}} or hostname: AFE-Device"
+#define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration in your browser using device's IP address"
+#define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
+#define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
+#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Works only with routers with DHCP enabled"
+#define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
@@ -249,32 +252,45 @@
 
 /* Form: upgrade and post upgrade */
 #define L_UPGRADE_SELECT_FIRMWARE "Select Firmware"
-#define L_UPGRADE_INFO                                                         \
-  "Device will be automatically rebooted after "                               \
-  "upgrade<br><br><strong>Warning</strong>: after upgrade do not plug off "    \
-  "the device from power source for around a minute.<br>Device configuration requires an update<br><strong>This "       \
-  "process cannot be interrupted</strong>"
-#define L_UPGRADE "Upgrade"
-#define L_UPGRADE_DONT_PLUG_OFF                                                        \
-  "<strong>Warning</strong>: don't plug off the device from a power source "   \
-  "while upgrading"
-#define L_UPGRADE_FAILED "Upgrade failed"
-#define L_UPGRADE_SUCCESSFUL "Upgrade finished succesfully"
+#define L_UPGRADE_READ_BEFORE "Read before upgrading the firmware"
+
+#define L_UPGRADE_INTERUPTED "Don't refresh the browser while upgrading the device"
+#define L_UPGRADE_DONT_PLUG_OFF "Don't plug off the device from the power source"
+#define L_UPGRADE_TIME "The upgrade process will take up to a minute"
+#define L_UPGRADE_AUTO_REBOOT "Device will be automatically rebooted after upgrade process is finished"
+
+#define L_UPGRADE_VIA_WAN "Download and Upgrade"
+#define L_UPGRADE_VIA_WAN_HINT "Firmware will be automatically downloaded and uploaded to the device"
+
+#define L_UPGRADE_FROM_FILE "Upload *.bin file"
+#define L_UPGRADE "Upgrade with binary file"
+
+#define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
+#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
+#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device name: {{f.d}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_ID "Device ID: {{f.n}}"
+
+#define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
+
+#define L_UPGRADE_FAILED "<span style=\"color:red\">Upgrade failed</span>"
+#define L_UPGRADE_SUCCESSFUL "Upgrade finished successfully"
 #define L_UPGRADE_DEVICE_WILL_BE_REBOOTED                                              \
-  "After 15s the device will be rebooted. Please wait"
+  "After 15s the device will be rebooted. Please wait ..."
 #define L_UPGRADE_RESTORE_DEFAULT_SETTINGS "Restore default settings"
-#define L_UPGRADE_WARNING "Warning"
-#define L_UPGRADE_CONFIGURATION_WILL_BE_REMOVED                                        \
-  "restoring to default settings will remove all configuration's "             \
+#define L_RESTORE_CONFIGURATION_WILL_BE_REMOVED                                        \
+  "<strong>Warning:</strong> restoring to default settings will remove all configuration's "             \
   "information, incl. WiFi configuration"
-#define L_UPGRADE_IN_PROGRESS "Restoring configuration is in progress"
-#define L_UPGRADE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE                                     \
-  "After 20 seconds connect to WiFi network called "                           \
-  "<strong>AFE-Device</strong> and open configuration panel"
+#define L_RESTORE_IN_PROGRESS "Restoring configuration is in progress"
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE "After 20 seconds connect to WiFi network called as your device name" 
+#define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE "After 20 seconds connect to WiFi network called <strong>AFE Device</strong>" 
+#define L_RESTORE_NETWORK_OPEN_PANEL  "Afterwards open configuration panel : <a href=\"http://192.168.5.1\">http://192.168.5.1</a>"
 #define L_UPGRADE_RESTORING_DEFAULT_SETTING "Restoring to default settings"
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
+
+
 
 /* Form: password */
 #define L_PASSWORD_SET_PASSWORD "Set password"
@@ -449,8 +465,6 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* Generic Sensors: temperature */
 #define L_TEMPERATURE "Temperature"
 #define L_TEMPERATURE_IDX "IDX Temperature"
-#define L_CORRECTIONS "Corrections"
-#define L_UNITS "Units"
 
 /* Generic Sensors: humidity */
 #define L_HUMIDITY "Humidity"

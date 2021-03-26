@@ -10,6 +10,10 @@
 /* Max size of the configuration HTML page */
 #define AFE_MAX_PAGE_SIZE 12000
 
+/* Urls */
+#define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
+#define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
+
 /* Upgrade types */
 #define AFE_UPGRADE_NONE 0
 #define AFE_UPGRADE_VERSION 1
@@ -22,13 +26,18 @@
 #define AFE_MODE_NETWORK_NOT_SET 4
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
+/* Host to check WAN Access */
+#define AFE_WAN_ACCSSS_HOST "google-public-dns-a.google.com"
+#define AFE_WAN_ACCSSS_PINGS 1
+#define AFE_WAN_ACCSSS_PING_TIMEOUT 1000
+#define AFE_WAN_ACCSSS_TIMEOUT                                                 \
+  3000 // performs check if access to the network longer than this time in ms
+
 /* APIs */
 #define AFE_API_STANDARD 0
 #define AFE_API_DOMOTICZ 1
 
 /* URLs to AFE WebService */
-#define AFE_URL_VALIDATE_KEY "http://api.smartnydom.pl/key/validate/"
-#define AFE_URL_ADD_KEY "http://api.smartnydom.pl/key/add/"
 #define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
 
 /* Types of URL requests */
@@ -98,7 +107,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.5.1"
+#define AFE_FIRMWARE_VERSION "3.0.0"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -578,6 +587,14 @@
 #define AFE_FILE_SYSTEM_USED AFE_FS_SPIFFS
 #endif
 
+/* ***************** NETWORK *********************/
+
+#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 30
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME 1
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
+#define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
+#define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
+
 /* ***************** HARDWARE: Config and defaults *********************/
 
 /* Configs related to a relay functionality */
@@ -923,8 +940,8 @@
 #define AFE_CONFIG_API_JSON_DHT_DATA_LENGTH                                    \
   420 // {"temperature":{"value":218.4,"unit":"C"},"humidity":{"value":317.0,"unit":"%"},"absoluteHumidity":{"value":110.29,"unit":"%"},"heatIndex":{"value":217.81,"unit":"C"},"dewPoint":{"value":112.33,"unit":"C"},"perception":{"value":1,"description":"W
       // porządku dla większości, ale wszyscy odczuwają wilgoć przy górnej
-      // krawędzi"},"comfort":{"value":0,"ratio":100.00,"unit":"%","description":"Gorąco
-      // i wilgotno"}}
+// krawędzi"},"comfort":{"value":0,"ratio":100.00,"unit":"%","description":"Gorąco
+// i wilgotno"}}
 
 #endif // AFE_CONFIG_HARDWARE_DHT
 
@@ -1015,7 +1032,8 @@
 #define AFE_MQTT_GATE_PARTIALLY_OPEN "partiallyOpen"
 #define AFE_MQTT_GATE_UNKNOWN "unknown"
 
-#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH  200 // Not checked, used by HTTP API
+#define AFE_CONFIG_API_JSON_GATE_DATA_LENGTH                                   \
+  200 // Not checked, used by HTTP API
 
 #endif // AFE_CONFIG_HARDWARE_GATE
 
@@ -1142,7 +1160,7 @@ typedef enum {
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_SPIKES_REJECTION_LEVEL 1
 #define AFE_CONFIG_HARDWARE_AS3935_DEFAULT_UNKNOWN_DISTANCE 255
 #define AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH 200 // @TODO check it
-#endif       // AFE_CONFIG_HARDWARE_AS3935
+#endif                                             // AFE_CONFIG_HARDWARE_AS3935
 
 /* Anemometer Sensor Defaults */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
@@ -1243,6 +1261,7 @@ typedef enum {
 #define AFE_CONFIG_SITE_THERMAL_PROTECTOR 32
 #define AFE_CONFIG_SITE_DHT 33
 #define AFE_CONFIG_SITE_BINARY_SENSOR 34
+#define AFE_CONFIG_SITE_WAN_UPGRADE 35
 
 /* ***************** APIs: Config and defaults *********************/
 
@@ -1260,15 +1279,15 @@ typedef enum {
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
 #define AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT "0"
 #define AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT "999999"
-#define AFE_CONFIG_API_HTTP_TIMEOUT      \
+#define AFE_CONFIG_API_HTTP_TIMEOUT                                            \
   200 // Time for HTTP response. If 5000 than device goes to config mode if
       // Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN \
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN                                       \
   "domoticz/in" // MQTT Topic for outgoing from AFE messages
-#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT\
+#define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT                                      \
   "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE  \
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE                                        \
   380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
       // messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH                              \
@@ -1337,7 +1356,7 @@ typedef enum {
 #else // Defauals for None-Domoticz MQTT
 
 #define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH \
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH                                       \
   69 // Size of a Command topic: MQTT_BASIC_CONFIG + 4
 #define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH                                     \
   71 // Size of a State topic: MQTT_BASIC_CONFIG + 6
@@ -1345,7 +1364,7 @@ typedef enum {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Defaults for each MQTT Version (standard and domoticz) */
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT  \
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT                                        \
   5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
        // down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
@@ -1395,52 +1414,65 @@ typedef enum {
 #define AFE_FILE_AS3935_CONFIGURATION "cfg-as3935-%d.json"
 #define AFE_FILE_DHT_SENSOR_CONFIGURATION "/cfg-dht-%d.json"
 #define AFE_FILE_BINARY_SENSOR_CONFIGURATION "/cfg-binary-sensor-%d.json"
+#define AFE_FILE_WELCOME_MESSAGE "/welcome-message.txt"
 
 /* Configuration files, JSON Buffers.  */
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER    352                                     // AJ check
-#define AFE_CONFIG_FILE_BUFFER_BH1750 221 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_I2C 54     // AJ check
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ check
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_BH1750 221      // AJ check
+#define AFE_CONFIG_FILE_BUFFER_I2C 54          // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ check
-#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72  // AJ check
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 405   // AJ check
-#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_NETWORK 375  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 405      // AJ check
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145    // AJ check
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 375     // AJ check
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #define AFE_CONFIG_FILE_BUFFER_LED 124 //  AJ check
 #else
-#define AFE_CONFIG_FILE_BUFFER_LED 76        // AJ check
-#endif // AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_RELAY  287 // AJ check for T6 only
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE  36 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_SWITCH   238 // AJ check for T6 only
-#define AFE_CONFIG_FILE_BUFFER_ADC 489       // AJ check
-#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_UART 54       // AJ check
+#define AFE_CONFIG_FILE_BUFFER_LED 76         // AJ check
+#endif                                        // AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RELAY 287      // AJ check for T6 only
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_SWITCH 238     // AJ check for T6 only
+#define AFE_CONFIG_FILE_BUFFER_ADC 489        // AJ check
+#define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_UART 54        // AJ check
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 984 // AJ check
 #else
 #define AFE_CONFIG_FILE_BUFFER_BMEX80 572 // AJ check
 #endif
-#define AFE_CONFIG_FILE_BUFFER_AS3935 439 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_CONTACTRON  241  // AJ check
-#define AFE_CONFIG_FILE_BUFFER_GATE 319 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_AS3935 439     // AJ check
+#define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_GATE 319       // AJ check
 #define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
-#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER  303  // AJ check
-#define AFE_CONFIG_FILE_BUFFER_RAINMETER 259 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA 1100 // Not verfied
-#define AFE_CONFIG_FILE_BUFFER_DS18B20 407   // AJ check
-#define AFE_CONFIG_FILE_BUFFER_REGULATOR 337 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR  261                                  // AJ check
-#define AFE_CONFIG_FILE_BUFFER_DHT 643 // AJ check
-#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR  238 // AJ check for T6 only
+#define AFE_CONFIG_FILE_BUFFER_ANEMOMETER 303        // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER 259         // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA 1100   // Not verfied
+#define AFE_CONFIG_FILE_BUFFER_DS18B20 407           // AJ check
+#define AFE_CONFIG_FILE_BUFFER_REGULATOR 337         // AJ check
+#define AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR 261 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DHT 643               // AJ check
+#define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR 238     // AJ check for T6 only
 
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"
 #define AFE_FORM_ITEM_TYPE_TEXT "text"
 #define AFE_FORM_ITEM_TYPE_PASSWORD "password"
 #define AFE_FORM_ITEM_SKIP_PROPERTY "?"
+
+/* JSONRPC API */
+#define AFE_CONFIG_JSONRPC_REST_API_URL "http://api.smartnydom.pl/rest/"
+#define AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL "http://api.smartnydom.pl/download/"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME "get-welcome-message"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION "check-version"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO "check-pro"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO "is-pro"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID "get-latest-firmware-id"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT "get-footer-message"
+#define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 200
+#define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE 380
 
 #endif // _AFE_Configuration_h

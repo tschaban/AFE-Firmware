@@ -10,47 +10,63 @@
 #include <AFE-LED.h>
 #endif
 
-#include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
+
+/* WiFi Class */
+
 class AFEWiFi {
 
 private:
   AFEDevice *Device;
-  NETWORK networkConfiguration;
+  NETWORK configuration;
   unsigned long delayStartTime = 0;
   uint8_t WiFiMode;
-  HTTPClient http;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
 #endif
 
+  /* Used to count connection attemps before going to sleep mode */
   uint8_t connections = 0;
+  /* Used to switch between Primary and Backup configuration */
+  uint8_t noOfFailures = 0;
   unsigned long sleepStartTime = 0;
-  boolean sleepMode = false; // It's set to true after defined in configuration
-                             // X number of connection failures
+  /* It's set to true after defined in configuration X number of connection
+   * failures */
+  boolean sleepMode = false;
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
 #endif
 
   boolean eventConnectionEstablished = false;
-  boolean disconnected = false;
+  boolean eventConnectionLost = false;
+  boolean disconnected = true;
+
+  /* Is set to true is backup configuratio exists */
+  boolean isBackupConfigurationSet = false;
+
+  void switchConfiguration();
 
 public:
   /* Constructor: no actions */
   AFEWiFi();
+  ESP8266WiFiClass WirelessNetwork;
+
+  /* Indicates on to which router the device is connected */
+  boolean isPrimaryConfiguration = false;
 
 /* Sets connection parameters and host name. Must be invoked before connect
  * method */
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *, AFELED *);
 #else
-  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);  
+  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
 #endif
 
   /* Return TRUE if device is connected to WiFi Acces Point */
@@ -59,12 +75,11 @@ public:
   /* Returns true if device just connected to the network. It's set to true each
    * time it connected. */
   boolean eventConnected();
+  boolean eventDisconnected();
 
   /* Method checks if device is connected to WiFi - if it's not then it connects
    * to it */
   void listener();
-
-  uint16_t getJSON(const String &url, String &response);
 };
 
 #endif // _AFE_WiFi_h

@@ -32,7 +32,8 @@ void setup() {
   }
 
   Serial << endl
-         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000) << " MHz";
+         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000)
+         << " MHz";
   Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
 
 #endif
@@ -152,7 +153,15 @@ void setup() {
 #endif
   Network.listener();
 
-  FirmwarePro.begin(&Network);
+/* Initializating REST API */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  RestAPI.begin(&Data, &Device, &Led);
+#else
+  RestAPI.begin(&Data, &Device);
+#endif
+
+  /* Initializing FirmwarePro */
+  FirmwarePro.begin(&Data, &RestAPI);
 
   /* Initializing HTTP WebServer */
   initializeHTTPServer();
@@ -236,7 +245,7 @@ void setup() {
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
-  }
+  } // end of initialization for operating mode
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
@@ -292,9 +301,6 @@ void loop() {
       Device.getMode() == AFE_MODE_CONFIGURATION) {
     if (Network.connected()) {
       if (Device.getMode() == AFE_MODE_NORMAL) {
-
-        /* Triggerd when connectes/reconnects to WiFi */
-        eventsListener();
 
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
@@ -391,6 +397,10 @@ void loop() {
       relayEventsListener();
 #endif
     }
+
+    /* Trigger actions triggered by WiFi: connected/disconnected or MQTT
+     * Connected */
+    eventsListener();
 
   } else { /* Deviced runs in Access Point mode */
     WebServer.listener();
