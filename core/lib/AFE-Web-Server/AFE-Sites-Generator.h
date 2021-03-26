@@ -51,6 +51,8 @@ private:
   AFEFirmwarePro *FirmwarePro;
   AFEJSONRPC *RestAPI;
 
+  String _HtmlResponse;
+
   char deviceID[17];
 
   void generateHeader(String &page, uint16_t redirect);
@@ -101,7 +103,7 @@ private:
                               boolean disabled = false);
 
   /* Item: HTML <select><option></option></select> */
-  void addSelectFormItemOpen(String &item, const char *name, const char *label);
+  void addSelectFormItemOpen(String &item, const __FlashStringHelper *name, const __FlashStringHelper *label);
   void addSelectOptionFormItem(String &item, const char *label,
                                const char *value, boolean selected);
   void addSelectFormItemClose(String &item);
@@ -115,14 +117,14 @@ private:
                       uint8_t siteId);
 
   /* Item: HTML <select> populated with GPIOs */
-  void addListOfGPIOs(String &item, const char *field, uint8_t selected,
+  void addListOfGPIOs(String &item, const __FlashStringHelper *field, uint8_t selected,
                       const char *title = "GPIO");
 
   /* Item: HTML <select> populated with <option> for number of items selection
    */
   void addListOfHardwareItem(String &item, uint8_t noOfItems,
-                             uint8_t noOffConnected, const char *field,
-                             const char *label, boolean disabled = false);
+                             uint8_t noOffConnected, const __FlashStringHelper *field,
+                             const __FlashStringHelper *label, boolean disabled = false);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,

@@ -11,6 +11,7 @@ void AFEDevice::begin() {
 
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);
+  yield();
   delay(1000);
   ESP.restart();
 }

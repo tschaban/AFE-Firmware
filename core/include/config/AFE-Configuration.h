@@ -107,7 +107,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.0.B0"
+#define AFE_FIRMWARE_VERSION "3.0.0"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -1468,7 +1468,8 @@ typedef enum {
 #define AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL "http://api.smartnydom.pl/download/"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME "get-welcome-message"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION "check-version"
-#define AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO "check-pro"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO "check-pro"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO "is-pro"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID "get-latest-firmware-id"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT "get-footer-message"
 #define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 200

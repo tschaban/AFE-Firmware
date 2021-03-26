@@ -67,7 +67,8 @@ void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: Writing to file: ") << FPSTR(message);
+    Serial << F("success") << endl
+           << F("INFO: Writing to file: ") << FPSTR(message);
 #endif
 
     configFile.print(FPSTR(message));
@@ -1046,6 +1047,8 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     JsonObject &root = jsonBuffer.createObject();
     root["mode"] = mode;
     root.printTo(configFile);
+
+    configFile.close();
 
 #ifdef DEBUG
     Serial << endl

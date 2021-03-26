@@ -26,12 +26,17 @@ void AFEFirmwarePro::validate() {
 #endif
     Data->saveConfiguration(&Pro);
   } else if (strlen(Pro.serial) > 0) {
+    String _HtmlResponse;
     boolean isValid;
-    if (RestAPI->sent(isValid, "is-pro") == HTTP_CODE_OK) {
+    _HtmlResponse.reserve(6);
+    if (RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO)) {
+      isValid = _HtmlResponse.length() > 0 && _HtmlResponse.equals("true")
+                    ? true
+                    : false;
 
       if (Pro.valid != isValid) {
-        Data->saveConfiguration(&Pro);
         Pro.valid = isValid;
+        Data->saveConfiguration(&Pro);
 #ifdef DEBUG
         Serial << endl << F("INFO: AFE PRO: Key state has been changed");
 #endif
@@ -46,9 +51,8 @@ void AFEFirmwarePro::validate() {
 #ifdef DEBUG
     else {
       Serial << endl << F("ERROR: AFE PRO: while checing the key");
-    }      
+    }
 #endif
-
   }
 }
 

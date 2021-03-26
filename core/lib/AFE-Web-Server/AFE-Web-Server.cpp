@@ -734,14 +734,16 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #ifdef AFE_CONFIG_HARDWARE_LED
   SystemLED->on();
 #endif
-  
+
   if (firmwareId > 0) {
     OTAServerUpdate.rebootOnUpdate(false);
 
 #ifdef DEBUG
     Serial << endl << F("INFO: WAN UPDATE: Starting upgrade");
 #endif
-    ret = OTAServerUpdate.update(WirelessClient, AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL + String(firmwareId));
+    ret = OTAServerUpdate.update(WirelessClient,
+                                 AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL +
+                                     String(firmwareId));
 
 #ifdef DEBUG
     Serial << endl
@@ -1231,9 +1233,7 @@ void AFEWebServer::get(PRO_VERSION &data) {
     data.serial[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg("v").length() > 0) {
-    data.valid = server.arg("v").toInt() == 0 ? false : true;
-  }
+  data.valid = false;
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
