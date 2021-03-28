@@ -34,7 +34,7 @@ void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}.{{f.v}}</small></div><div class=\"r\">"));
+  page.concat(F(" T{{f.t}}-{{f.v}}</small></div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
@@ -43,7 +43,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}.{{f.v}}</small><ul class=\"lst\">"));
+  page.concat(F(" T{{f.t}}-{{f.v}}</small><ul class=\"lst\">"));
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F("Menu"));
@@ -1016,7 +1016,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   /* Item: controlling parameter */
-  addSelectFormItemOpen(page, "cp", L_DHT_CONTROLLING_PARAMETER);
+  addSelectFormItemOpen(page, F("cp"), F(L_DHT_CONTROLLING_PARAMETER));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(page, L_NONE, value,
                           configuration.controllingParameter ==
@@ -1432,14 +1432,14 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   openSection(page, _text, F(""));
 
   /* Item: GPIO */
-  addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
+  addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO");
 
   /* Item: Name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
   /* Item: type of the sensor */
-  addSelectFormItemOpen(page, "t", L_DHT_SENSOR_TYPE);
+  addSelectFormItemOpen(page, F("t"), F(L_DHT_SENSOR_TYPE));
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(page, L_DHT_AUTO_DETECT, "0",
@@ -1474,7 +1474,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
   /* Item: Unit */
   openSection(page, F(L_UNITS), F(""));
-  addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
+  addSelectFormItemOpen(page, F("tu"), F(L_TEMPERATURE));
   addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
                                               AFE_TEMPERATURE_UNIT_CELSIUS);
   addSelectOptionFormItem(page, "F", "2", configuration.temperature.unit ==
