@@ -30,9 +30,10 @@ recaptchacontact:
 
 
 
-##### [Pobierz najnowszą wersję 3.0.0](https://www.smartnydom.pl/download/afe-firmware-t0-3-0-0/?target=_blank)
+##### [Pobierz najnowszą wersję 3.0.1](https://www.smartnydom.pl/download/afe-firmware-t0-3-0-1/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja [3.0.0](https://www.smartnydom.pl/download/afe-firmware-t0-3-0-0/?target=_blankk)
 * Wersja [2.5.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-5-1/?target=_blankk)
 * Wersja [2.4.1](https://www.smartnydom.pl/download/afe-firmware-t0-2-4-1/?target=_blank)
 * Wersja [2.4.0](https://www.smartnydom.pl/download/afe-firmware-t0-2-4-0/?target=_blank)
@@ -56,7 +57,7 @@ recaptchacontact:
 	* wersja:Mega-Pack: z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
 	* Wersja: Custom E1: obsługa do 30 czujników DS18B20, 1 dioda LED, 1 przycisk, 0 przekaźników
 
-##### [Pobierz najnowszą wersję 3.0.0](https://www.smartnydom.pl/download/afe-firmware-t1-3-0-0/?target=_blank)
+##### [Pobierz najnowszą wersję 3.0.1](https://www.smartnydom.pl/download/afe-firmware-t1-3-0-1/?target=_blank)
 
 
 **Poprzednie wersje**
