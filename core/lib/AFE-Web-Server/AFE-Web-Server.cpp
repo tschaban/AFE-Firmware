@@ -1518,33 +1518,33 @@ void AFEWebServer::get(DHT &data) {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg("g").length() > 0) {
-    data.gpio = server.arg("g").toInt();
-  }
+  data.gpio = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_CONFIG_HARDWARE_DHT_DEFAULT_GPIO;
 
-  if (server.arg("t").length() > 0) {
-    data.type = server.arg("t").toInt();
-  }
+  data.type = server.arg("t").length() > 0 ? server.arg("t").toInt()
+                                           : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  if (server.arg("f").length() > 0) {
-    data.interval = server.arg("f").toInt();
-  }
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;
 
-  if (server.arg("tc").length() > 0) {
-    data.temperature.correction = server.arg("tc").toFloat();
-  }
+  data.temperature.correction =
+      server.arg("tc").length() > 0
+          ? server.arg("tc").toFloat()
+          : AFE_CONFIG_HARDWARE_DHT_DEFAULT_TEMPERATURE_CORRECTION;
 
-  if (server.arg("tu").length() > 0) {
-    data.temperature.unit = server.arg("tu").toInt();
-  }
+  data.temperature.unit = server.arg("tu").length() > 0
+                              ? server.arg("tu").toInt()
+                              : AFE_TEMPERATURE_UNIT_CELSIUS;
 
-  if (server.arg("hc").length() > 0) {
-    data.humidity.correction = server.arg("hc").toFloat();
-  }
+  data.humidity.correction =
+      server.arg("hc").length() > 0
+          ? server.arg("hc").toFloat()
+          : AFE_CONFIG_HARDWARE_DHT_DEFAULT_HUMIDITY_CORRECTION;
 
-  if (server.arg("hu").length() > 0) {
-    data.humidity.unit = server.arg("hu").toInt();
-  }
+  data.humidity.unit = server.arg("hu").length() > 0 ? server.arg("hu").toInt()
+                                                     : AFE_HUMIDITY_UNIT;
 
   data.sendOnlyChanges = server.arg("s").length() > 0 ? true : false;
 
