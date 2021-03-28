@@ -98,6 +98,12 @@
 #elif defined(AFE_DEVICE_iECS_WHEATER_STATION_21)
 #define AFE_DEVICE_TYPE_NAME "iECS Weather Station v2.1"
 #define AFE_DEVICE_TYPE_ID 23
+#elif defined(AFE_CONFIG_T1_USE_MAX_HARDWARE)
+#define AFE_DEVICE_TYPE_NAME "T1 Mega pack"
+#define AFE_DEVICE_TYPE_ID 10
+#elif defined(AFE_T1_CUSTOM_E1)
+#define AFE_DEVICE_TYPE_NAME "T1 E1 Custom"
+#define AFE_DEVICE_TYPE_ID 11
 #else
 #define AFE_DEVICE_TYPE_NAME "ESP Generic"
 #define AFE_DEVICE_TYPE_ID 0
@@ -202,7 +208,7 @@
 
 /* ---- Basic Switch + DS18B20 ---- */
 #elif defined(T1_CONFIG)
-#define AFE_FIRMWARE_VERSION "2.5.0"
+#define AFE_FIRMWARE_VERSION "3.0.0"
 #define AFE_FIRMWARE_TYPE 1
 
 /* File system used */
@@ -223,7 +229,7 @@
 #define AFE_CONFIG_HARDWARE_LED
 
 /* Max number of hardware items, per AFE version */
-#if defined(AFE_CONFIG_USE_MAX_HARDWARE)
+#if defined(AFE_CONFIG_T1_USE_MAX_HARDWARE)
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 8
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 8
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 8
@@ -291,7 +297,7 @@
 #define AFE_CONFIG_HARDWARE_LED
 
 /* Max number of hardware items, per AFE version */
-#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+#ifdef AFE_CONFIG_T1_USE_MAX_HARDWARE
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 8
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 8
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 8

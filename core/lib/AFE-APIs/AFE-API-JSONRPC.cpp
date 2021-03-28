@@ -95,6 +95,7 @@ int AFEJSONRPC::sent(boolean &response, const char *method) {
 int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
   int _httpCode = HTTP_CODE_INTERNAL_SERVER_ERROR;
+  response = "";
 
   if (accessToWAN()) {
 
