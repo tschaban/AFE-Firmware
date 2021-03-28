@@ -53,15 +53,14 @@ recaptchacontact:
 * Paczka do ściągnięcia 
 	* zawiera wersje 1Mb oraz 4Mb
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
-	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
+	* wersja:Mega-Pack: z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
+	* Wersja: Custom E1: obsługa do 30 czujników DS18B20, 1 dioda LED, 1 przycisk, 0 przekaźników
 
-##### [Pobierz najnowszą wersję 2.5.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-5-0/?target=_blank)
+##### [Pobierz najnowszą wersję 3.0.0](https://www.smartnydom.pl/download/afe-firmware-t1-3-0-0/?target=_blank)
 
-**Wersje specjalne**
-* Wersja [2.4.1.E1](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-1-e1/?target=_blank)
-	* obsługa do 30 czujników DS18B20, 1 dioda LED, 1 przycisk, 0 przekaźników 
 
 **Poprzednie wersje**
+* Wersja [2.5.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-5-0/?target=_blank)
 * Wersja [2.4.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-4-0/?target=_blank)
 * Wersja [2.3.1](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-1/?target=_blank)
 * Wersja [2.3.0](https://www.smartnydom.pl/download/afe-firmware-t1-2-3-0/?target=_blank)
