@@ -27,7 +27,7 @@
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
 /* Host to check WAN Access */
-#define AFE_WAN_ACCSSS_HOST "google-public-dns-a.google.com"
+#define AFE_WAN_ACCSSS_HOST "8.8.8.8"
 #define AFE_WAN_ACCSSS_PINGS 1
 #define AFE_WAN_ACCSSS_PING_TIMEOUT 1000
 #define AFE_WAN_ACCSSS_TIMEOUT                                                 \
@@ -113,7 +113,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.0"
+#define AFE_FIRMWARE_VERSION "3.0.1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */

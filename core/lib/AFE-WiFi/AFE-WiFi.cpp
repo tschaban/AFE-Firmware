@@ -168,15 +168,15 @@ void AFEWiFi::listener() {
                 << (isPrimaryConfiguration ? configuration.ssid
                                            : configuration.ssidBackup);
 
-            Serial << endl << "INFO: WIFI: Parameters: "
+            Serial << endl
+                   << "INFO: WIFI: Parameters: " << endl
                    << " - getAutoConnect=" << WirelessNetwork.getAutoConnect()
                    << endl
-                   << " - getAutoReconnect=" << WirelessNetwork.getAutoReconnect()
-                   << endl
+                   << " - getAutoReconnect="
+                   << WirelessNetwork.getAutoReconnect() << endl
                    << " - getListenInterval="
                    << WirelessNetwork.getListenInterval() << endl
-                   << " - getMode=" << WirelessNetwork.getMode() 
-                   << endl
+                   << " - getMode=" << WirelessNetwork.getMode() << endl
                    << " - getPersistent=" << WirelessNetwork.getPersistent()
                    << endl
                    << " - getPhyMode=" << WirelessNetwork.getPhyMode() << endl
@@ -201,6 +201,7 @@ void AFEWiFi::listener() {
           connections++;
 
           yield();
+          delay(10);
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: WIFI: Connection to ")
@@ -273,6 +274,9 @@ boolean AFEWiFi::connected() {
       (!configuration.isDHCP && WirelessNetwork.status() == WL_CONNECTED)) {
 
     // if (WirelessNetwork.waitForConnectResult() == WL_NETWORK_CONNECTED) {
+
+    yield();
+    delay(10);
 
     if (disconnected) {
       eventConnectionEstablished = true;

@@ -213,8 +213,11 @@ void AFEJSONRPC::checkAccessToWAN(void) {
   Pings.on(true, _handlePingAnswer);
   Pings.on(false, _handlePingEnd);
   setNoWANAccess();
-  Pings.begin(AFE_WAN_ACCSSS_HOST, AFE_WAN_ACCSSS_PINGS,
-              AFE_WAN_ACCSSS_PING_TIMEOUT);
+
+  IPAddress ip;
+  ip.fromString(AFE_WAN_ACCSSS_HOST);
+
+  Pings.begin(ip, AFE_WAN_ACCSSS_PINGS, AFE_WAN_ACCSSS_PING_TIMEOUT);
 #ifdef DEBUG
   Serial << endl
          << F("INFO: WAN ACCESS: Sent to ping to: ") << AFE_WAN_ACCSSS_HOST;
