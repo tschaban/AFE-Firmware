@@ -21,10 +21,10 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   }
 
   /* Checking if backup configuration exists and setting a flag */
-  if (strlen(configuration.ssid) > 0 &&
+  if (strlen(configuration.ssidBackup) > 0 &&
       strcmp(configuration.ssidBackup, AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID) !=
           0 &&
-      strlen(configuration.password) > 0) {
+      strlen(configuration.passwordBackup) > 0) {
     isBackupConfigurationSet = true;
 #ifdef DEBUG
     Serial << endl
@@ -167,6 +167,20 @@ void AFEWiFi::listener() {
                 << F("INFO: WIFI: Starting establishing WiFi connection to: ")
                 << (isPrimaryConfiguration ? configuration.ssid
                                            : configuration.ssidBackup);
+
+            Serial << endl << "INFO: WIFI: Parameters: "
+                   << " - getAutoConnect=" << WirelessNetwork.getAutoConnect()
+                   << endl
+                   << " - getAutoReconnect=" << WirelessNetwork.getAutoReconnect()
+                   << endl
+                   << " - getListenInterval="
+                   << WirelessNetwork.getListenInterval() << endl
+                   << " - getMode=" << WirelessNetwork.getMode() 
+                   << endl
+                   << " - getPersistent=" << WirelessNetwork.getPersistent()
+                   << endl
+                   << " - getPhyMode=" << WirelessNetwork.getPhyMode() << endl
+                   << " - getSleepMode=" << WirelessNetwork.getSleepMode();
 #endif
           }
         }
@@ -186,7 +200,7 @@ void AFEWiFi::listener() {
             delayStartTime + (configuration.waitTimeConnections * 1000)) {
           connections++;
 
-          delay(10);
+          yield();
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: WIFI: Connection to ")
@@ -196,7 +210,7 @@ void AFEWiFi::listener() {
                  << WirelessNetwork.localIP() << F(")") << F(" WL-Status=")
                  << WirelessNetwork.status();
           if (isBackupConfigurationSet) {
-            Serial << F(", Failures counter: ") << noOfFailures+1 << F("/")
+            Serial << F(", Failures counter: ") << noOfFailures + 1 << F("/")
                    << configuration.noFailuresToSwitchNetwork;
           }
 #endif
@@ -260,7 +274,6 @@ boolean AFEWiFi::connected() {
 
     // if (WirelessNetwork.waitForConnectResult() == WL_NETWORK_CONNECTED) {
 
-    delay(10);
     if (disconnected) {
       eventConnectionEstablished = true;
       eventConnectionLost = false;

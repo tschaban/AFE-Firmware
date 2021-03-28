@@ -32,16 +32,18 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\">{{A}}<h4 style=\"opacity:.3\">"));
+  page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}.{{f.v}}</h4></div><div class=\"r\">"));
+  page.concat(F(" T{{f.t}}.{{f.v}}</small></div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
 
   generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\">{{A}}<ul class=\"lst\">"));
+  page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
+  page.concat(F(L_VERSION));
+  page.concat(F(" T{{f.t}}.{{f.v}}</small><ul class=\"lst\">"));
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F("Menu"));
@@ -969,7 +971,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
                    configuration.name, "16");
 
   /* Item: relay */
-  addSelectFormItemOpen(page, "r", L_RELAY);
+  addSelectFormItemOpen(page, F("r"), F(L_RELAY));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
       page, L_NONE, value,
@@ -985,7 +987,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   /* Item: sensor */
-  addSelectFormItemOpen(page, "s", L_SENSOR);
+  addSelectFormItemOpen(page, F("s"), F(L_SENSOR));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
       page, L_NONE, value,
@@ -1106,7 +1108,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  addSelectFormItemOpen(page, "r", L_RELAY);
+  addSelectFormItemOpen(page, F("r"), F(L_RELAY));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
       page, L_NONE, value,
@@ -1121,7 +1123,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   }
   addSelectFormItemClose(page);
 
-  addSelectFormItemOpen(page, "s", L_SENSOR);
+  addSelectFormItemOpen(page, F("s"), F(L_SENSOR));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(
       page, L_NONE, value,
@@ -1326,14 +1328,14 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   openSection(page, F(L_DS18B20_SENSOR), F(""));
 
   /* Item: GPIO */
-  addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
+  addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO");
 
   /* Item: Sensor address */
 
   numberOfFoundSensors = _Sensor.scan(configuration.gpio, _addresses);
 
   if (numberOfFoundSensors > 0) {
-    addSelectFormItemOpen(page, "a", L_ADDRESS);
+    addSelectFormItemOpen(page, F("a"), F(L_ADDRESS));
     char _scannedAddressText[17];
     char _configAddressText[17];
     for (uint8_t i = 0; i < numberOfFoundSensors; i++) {
@@ -1372,7 +1374,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999", "0.001");
 
   /* Item: Unit */
-  addSelectFormItemOpen(page, "u", L_UNITS);
+  addSelectFormItemOpen(page, F("u"), F(L_UNITS));
   addSelectOptionFormItem(page, "C", "1",
                           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS);
   addSelectOptionFormItem(page, "F", "2", configuration.unit ==
@@ -1380,7 +1382,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   /* Item: Resolution */
-  addSelectFormItemOpen(page, "r", L_DS18B20_RESOLUTION);
+  addSelectFormItemOpen(page, F("r"), F(L_DS18B20_RESOLUTION));
   addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_9B, "9",
                           configuration.resolution == 9);
   addSelectOptionFormItem(page, L_DS18B20_RESOLUTION_10B, "10",
@@ -2979,8 +2981,8 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.replace("{{A}}", RestAPI->accessToWAN()
                             ? F("<img style=\"opacity:.4\" "
                                 "src=\"http://api.smartnydom.pl/images/"
-                                "afe-logo.png\">")
-                            : F("<h1>AFE Firmware</h1>"));
+                                "afe-logo.png\"><br>")
+                            : F("<h1 style=\"margin-bottom:0\">AFE Firmware</h1>"));
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   page.replace("{{f.a}}", F("Domoticz"));
@@ -3007,7 +3009,7 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   FirmwarePro->Pro.valid ? page.replace("{{f.p}}", F(L_YES))
                          : page.replace("{{f.p}}", F(L_NO));
 
-#ifdef AFE_CONFIG_USE_MAX_HARDWARE
+#ifdef AFE_CONFIG_T1_USE_MAX_HARDWARE
   char _version[sizeof(Firmware.version) + 6];
   sprintf(_version, "%s %s", Firmware.version, "MEGA");
   page.replace("{{f.v}}", _version);
