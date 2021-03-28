@@ -79,9 +79,10 @@ recaptchacontact:
 	* wersja MEGA z powiększona ilościa dostępnych GPIO oraz możliwościa podłaczenia elementów.
 
 
-##### [Pobierz najnowszą wersję 2.5.0](https://www.smartnydom.pl/download/afe-firmware-t2-2-5-0/?target=_blank)
+##### [Pobierz najnowszą wersję 3.0.1](https://www.smartnydom.pl/download/afe-firmware-t2-3-0-1/?target=_blank)
 
 **Poprzednie wersje**
+* Wersja [2.5.0](https://www.smartnydom.pl/download/afe-firmware-t2-2-5-0/?target=_blank)
 * Wersja [2.4.1](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-1/?target=_blank)
 * Wersja [2.4.0](https://www.smartnydom.pl/download/afe-firmware-t2-2-4-0/?target=_blank)
 * Wersje 1.0.0 - 1.4.0: [Archiwum](https://drive.google.com/drive/u/0/folders/1fAypOyCr1LRCL7Kr7N5C_hqR-yO_stb4/?target=_blank)
