@@ -1057,7 +1057,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPIMQTTDomoticz::addClass(AFEImpulseCatcher *Sensor) {
+void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 

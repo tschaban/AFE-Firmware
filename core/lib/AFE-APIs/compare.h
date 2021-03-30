@@ -53,16 +53,12 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   Serial << endl << F("----------------------------------") << endl;
 #endif
 
-  if (strlen(request->command) == 0) {
-#ifdef DEBUG
-    Serial << endl << F("WARN: Got empty request");
-#endif
-    return;
+  if (false) {
+    yield();
   }
-
 /* Checking if Relay request */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  if (strcmp(request->device, "relay") == 0) {
+  else if (strcmp(request->device, "relay") == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Relay HTTP requests");
 #endif
@@ -123,23 +119,23 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 /* Checking if Anemometer request */
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
   else if (strcmp(request->device, "anemometer") == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Anemometer requests");
 #endif
     processAnemometerSensor(request);
   }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 /* Checking if Rain request */
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
   else if (strcmp(request->device, "rainmeter") == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Rainmeter requests");
 #endif
     processRainSensor(request);
   }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_GATE
   else if (strcmp(request->device, "gate") == 0) {
 #ifdef DEBUG
@@ -221,7 +217,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: HTTP request processed");
+  Serial << endl << F("INFO: HTTP requst processed");
 #endif
 }
 
@@ -495,10 +491,10 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 /* Processing Anemometer Input request */
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 /* Adding pointer to Anemometer class */
-void AFEAPIHTTP::addClass(AFEAnemometer *AnemometerSensor) {
+void AFEAPIHTTP::addClass(AFESensorAnemometer *AnemometerSensor) {
   _AnemometerSensor = AnemometerSensor;
 }
 
@@ -511,12 +507,12 @@ void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER_SENSOR
 
 /* Processing Rain Input request */
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 /* Adding pointer to Rainclass */
-void AFEAPIHTTP::addClass(AFERainmeter *RainmeterSensor) {
+void AFEAPIHTTP::addClass(AFESensorRainmeter *RainmeterSensor) {
   _RainmeterSensor = RainmeterSensor;
 }
 
@@ -529,7 +525,7 @@ void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_RAINMETER
+#endif // AFE_CONFIG_HARDWARE_RAINMETER_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFEAPIHTTP::addClass(AFEGate *Item) {
@@ -776,9 +772,9 @@ void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   respond.concat(FPSTR(JSON_RESPONSE));
   respond.replace("{{device.type}}", request->device);
   respond.replace("{{device.name}}",
-                  strlen(request->name) > 0 ? request->name : "");
+                  strlen(request->name) > 0 ? request->name : "\"\"");
   respond.replace("{{request.command}}",
-                  strlen(request->command) > 0 ? request->command : "");
+                  strlen(request->command) > 0 ? request->command : "\"\"");
   respond.replace("{{response.data}}", strlen(value) > 0 ? value : "\"\"");
   respond.replace("{{response.status}}", status ? "success" : "error");
   _HTTP->sendJSON(respond);
