@@ -96,10 +96,12 @@ recaptchacontact:
 	* zawiera wersje 1Mb oraz 4Mb
 	* zawiera dedykowane API dla użytkowników Domoticz (v4 oraz v2020). Jeśli posiadasz inny system do automatyki zainstaluj wersję Standard.
 
-##### [Pobierz najnowszą wersję 2.5.0](https://www.smartnydom.pl/download/afe-firmware-t4-2-4-0/?target=_blan)
+##### [Pobierz najnowszą wersję 3.0.1](https://www.smartnydom.pl/download/afe-firmware-t4-3-0-1/)
+
+
 
 **Poprzednie wersje**
-* 
+* Wersja [2.5.0](https://www.smartnydom.pl/download/afe-firmware-t4-2-4-0/?target=_blank)
 ---
 ### AFE Firmware T5: Sterowanie kontrolerem bramy/drzwi/furtki
 * Sterowanie max dwoma bramami, furtkami oraz monitorowanie stanu otwarcia bramy z wykorzystaniem czujników magnetycznych
