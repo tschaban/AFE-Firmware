@@ -164,9 +164,8 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  virtual void addClass(AFEImpulseCatcher *);
+  virtual void addClass(AFESensorBinary *);
 #endif
-
 
 protected:
   /* Is API enabled, set in begin() */
@@ -237,7 +236,7 @@ protected:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  AFEImpulseCatcher *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
 

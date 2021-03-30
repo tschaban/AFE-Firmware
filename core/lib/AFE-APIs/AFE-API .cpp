@@ -207,14 +207,12 @@ void AFEAPI::addClass(AFESensorDHT *Sensor) {
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPI::addClass(AFEImpulseCatcher *Sensor) {
+void AFEAPI::addClass(AFESensorBinary *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
     _BinarySensor[i] = Sensor + i;
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the Binary sensor: ") << i + 1
-           << F(" added");
-#endif
   }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the Binary sensor added");
+#endif
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

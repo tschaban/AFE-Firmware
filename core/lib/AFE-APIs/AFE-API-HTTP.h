@@ -153,7 +153,7 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  AFEImpulseCatcher *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
   /* Classifies and invokes code for HTTP request processing */
@@ -308,7 +308,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  void addClass(AFEImpulseCatcher *);
+  void addClass(AFESensorBinary *);
 #endif
 };
 

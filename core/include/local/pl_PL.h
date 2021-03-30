@@ -110,7 +110,7 @@
 #define L_DEVICE_NUMBER_OF_AS3935_SENSORS "Liczba czujników AS3935"
 #define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
 #define L_DEVICE_NUMBER_OF_REGULATORS "Ilość regulatorów"
-#define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarny"
+#define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarnych"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"

@@ -1284,7 +1284,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
-  addListOfGPIOs(page, "g", configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration.gpio);
   page.concat(FPSTR(HTTP_INFO_TEXT));
   page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
@@ -2659,8 +2659,8 @@ void AFESitesGenerator::siteI2CBUS(String &page) {
   I2CPORT configuration;
   Data->getConfiguration(&configuration);
   openSection(page, F("I2C"), F(""));
-  addListOfGPIOs(page, "a", configuration.SDA, "GPIO SDA");
-  addListOfGPIOs(page, "l", configuration.SCL, "GPIO SCL");
+  addListOfGPIOs(page, F("a"), configuration.SDA, "GPIO SDA");
+  addListOfGPIOs(page, F("l"), configuration.SCL, "GPIO SCL");
   closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -2910,7 +2910,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
               F(L_BINARY_SENSOR_MCP23017_CONNECTION));
 
   /* Item: GPIO */
-  addListOfGPIOs(page, "g", configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   /* Item: GPIO from expander */
@@ -3360,7 +3360,7 @@ void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
   AFEI2CScanner I2CScanner;
   I2CScanner.begin();
 
-  addSelectFormItemOpen(item, "a", "I2C " L_ADDRESS);
+  addSelectFormItemOpen(item, F("a"), F("I2C " L_ADDRESS));
   addSelectOptionFormItem(item, L_NONE, "0", address == 0);
 
   char _i2cItemName[90];
