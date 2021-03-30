@@ -102,6 +102,8 @@ recaptchacontact:
 
 **Poprzednie wersje**
 * Wersja [2.5.0](https://www.smartnydom.pl/download/afe-firmware-t4-2-4-0/?target=_blank)
+
+
 ---
 ### AFE Firmware T5: Sterowanie kontrolerem bramy/drzwi/furtki
 * Sterowanie max dwoma bramami, furtkami oraz monitorowanie stanu otwarcia bramy z wykorzystaniem czujników magnetycznych
