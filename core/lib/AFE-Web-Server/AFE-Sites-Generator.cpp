@@ -2052,7 +2052,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
 
   /* Item: type of the sensor */
-  addSelectFormItemOpen(page, "b", L_BMEX80_SENSOR_TYPE);
+  addSelectFormItemOpen(page, F("b"), F(L_BMEX80_SENSOR_TYPE));
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_BMX_UNKNOWN_SENSOR);
   addSelectOptionFormItem(page, "BMx085/BMx180", "1",
@@ -2083,7 +2083,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 
     /* Item: Unit */
     openSection(page, F(L_UNITS), F(""));
-    addSelectFormItemOpen(page, "tu", L_TEMPERATURE);
+    addSelectFormItemOpen(page, F("tu"), F(L_TEMPERATURE));
     addSelectOptionFormItem(page, "C", "1", configuration.temperature.unit ==
                                                 AFE_TEMPERATURE_UNIT_CELSIUS);
     addSelectOptionFormItem(page, "F", "2",
@@ -2422,7 +2422,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
                    configuration.name, "16");
 
   /* Item: GPIO */
-  addListOfGPIOs(page, "g", configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration.gpio);
 
   /* Item: interval */
   char _number[7];
@@ -2443,7 +2443,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
   /* Item: Distance unit */
 
-  addSelectFormItemOpen(page, "u", L_DISTANCE_UNIT);
+  addSelectFormItemOpen(page, F("u"), F(L_DISTANCE_UNIT));
   addSelectOptionFormItem(page, L_CM, "0", configuration.impulseDistanceUnit ==
                                                AFE_DISTANCE_CENTIMETER);
   addSelectOptionFormItem(page, L_M, "1", configuration.impulseDistanceUnit ==
@@ -2494,7 +2494,7 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  addListOfGPIOs(page, "g", configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration.gpio);
 
   char _number[8];
   sprintf(_number, "%d", configuration.interval);
@@ -2648,8 +2648,8 @@ void AFESitesGenerator::siteUARTBUS(String &page) {
   SERIALPORT configuration;
   Data->getConfiguration(&configuration);
   openSection(page, F("UART"), F(""));
-  addListOfGPIOs(page, "r", configuration.RXD, "GPIO RXD");
-  addListOfGPIOs(page, "t", configuration.TXD, "GPIO TXD");
+  addListOfGPIOs(page, F("r"), configuration.RXD, "GPIO RXD");
+  addListOfGPIOs(page, F("t"), configuration.TXD, "GPIO TXD");
   closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_UART
