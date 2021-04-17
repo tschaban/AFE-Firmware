@@ -350,7 +350,7 @@
 
 /* ---- 4xRelay MCP23017 ---- */
 #elif defined(T4_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.1"
+#define AFE_FIRMWARE_VERSION "3.0.2"
 #define AFE_FIRMWARE_TYPE 4
 
 #define AFE_FILE_SYSTEM AFE_FS_SPIFFS
