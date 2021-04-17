@@ -116,10 +116,11 @@ recaptchacontact:
 
 ! AFE Firmware T5 dostępne jest w wersji 1Mb oraz 4Mb. Czujniki Bosch oraz BH1750 dostępne są tylko w wersji AFE 4Mb. AFE 4Mb wymaga ESP8266 z 4Mb rozmiarem pamięci flash 
 
-##### [Pobierz najnowszą wersję 2.4.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-4-0/?target=_blank)
+##### [Pobierz najnowszą wersję 3.0.2](https://www.smartnydom.pl/download/afe-firmware-t5-3-0-2/?target=_blank)
 
 
 **Poprzednie wersje**
+* Wersja [2.4.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-4-0/?target=_blank)
 * Wersja [2.2.2](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-2/?target=_blank)
 * Wersja [2.2.1](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-1/?target=_blank)
 * Wersja [2.2.0](https://www.smartnydom.pl/download/afe-firmware-t5-2-2-0/?target=_blank)
