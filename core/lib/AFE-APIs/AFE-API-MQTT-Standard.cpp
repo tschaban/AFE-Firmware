@@ -265,10 +265,12 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    Mqtt.subscribe(_Contactron[i]->mqttCommandTopic);
-    if (strlen(_Contactron[i]->mqttCommandTopic) > 0) {
+    if (strlen(_Contactron[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _Contactron[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _Contactron[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_CONTACTRON;
       currentCacheSize++;
@@ -279,10 +281,11 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    Mqtt.subscribe(_Gate[i]->mqttCommandTopic);
-    if (strlen(_Gate[i]->mqttCommandTopic) > 0) {
+    if (strlen(_Gate[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd", _Gate[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              _Gate[i]->mqttCommandTopic);
+              mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_GATE;
       currentCacheSize++;
@@ -766,15 +769,19 @@ void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishGateState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    uint8_t _state = _Gate[id]->get();
-    publishStatus = Mqtt.publish(_Gate[id]->mqttStateTopic,
-                                 _state == AFE_GATE_OPEN
-                                     ? AFE_MQTT_GATE_OPEN
-                                     : _state == AFE_GATE_CLOSED
-                                           ? AFE_MQTT_GATE_CLOSED
-                                           : _state == AFE_GATE_PARTIALLY_OPEN
-                                                 ? AFE_MQTT_GATE_PARTIALLY_OPEN
-                                                 : AFE_MQTT_GATE_UNKNOWN);
+    if (strlen(_Gate[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state", _Gate[id]->configuration.mqtt.topic);
+      uint8_t _state = _Gate[id]->get();
+      publishStatus = Mqtt.publish(
+          mqttStateTopic, _state == AFE_GATE_OPEN
+                              ? AFE_MQTT_GATE_OPEN
+                              : _state == AFE_GATE_CLOSED
+                                    ? AFE_MQTT_GATE_CLOSED
+                                    : _state == AFE_GATE_PARTIALLY_OPEN
+                                          ? AFE_MQTT_GATE_PARTIALLY_OPEN
+                                          : AFE_MQTT_GATE_UNKNOWN);
+    }
   }
   return publishStatus;
 }
@@ -798,10 +805,15 @@ void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    publishStatus = Mqtt.publish(_Contactron[id]->mqttStateTopic,
-                                 _Contactron[id]->get() == AFE_CONTACTRON_OPEN
-                                     ? AFE_MQTT_CONTACTRON_OPEN
-                                     : AFE_MQTT_CONTACTRON_CLOSED);
+    if (strlen(_Contactron[id]->configuration.mqtt.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _Contactron[id]->configuration.mqtt.topic);
+      publishStatus = Mqtt.publish(mqttStateTopic,
+                                   _Contactron[id]->get() == AFE_CONTACTRON_OPEN
+                                       ? AFE_MQTT_CONTACTRON_OPEN
+                                       : AFE_MQTT_CONTACTRON_CLOSED);
+    }
   }
   return publishStatus;
 }

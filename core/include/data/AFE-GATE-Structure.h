@@ -3,11 +3,9 @@
 #ifndef _AFE_GATE_Structure_h
 #define _AFE_GATE_Structure_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <AFE-Configuration.h>
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <arduino.h>
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
 #include <AFE-DOMOTICZ-Structure.h>
@@ -40,4 +38,6 @@ struct GATE {
 #endif
 };
 
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#endif // _AFE_GATE_Structure_h

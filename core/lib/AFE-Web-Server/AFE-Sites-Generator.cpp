@@ -777,7 +777,6 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   boolean isGateRelay = false;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
     Data->getConfiguration(i, &gateConfiguration);
-
     if (gateConfiguration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
         gateConfiguration.relayId == id) {
       isGateRelay = true;
@@ -1345,12 +1344,12 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
                               memcmp(_addresses[i], configuration.address,
                                      sizeof(_addresses[i])) == 0);
     }
-    page += "</select><input type=\"submit\" class =\"b bc\" "
-            "value=\"" L_DS18B20_SEARCH "\"></div>";
+    page.concat(F("</select><input type=\"submit\" class =\"b bc\" "
+            "value=\"" L_DS18B20_SEARCH "\"></div>"));
   } else {
-    page += "<p class=\"cm\">" L_DS18B20_NO_SENSOR "</p>";
-    page += "<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
-            "\"><br /><br />";
+    page.concat(F("<p class=\"cm\">" L_DS18B20_NO_SENSOR "</p>"));
+    page.concat(F("<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
+            "\"><br /><br />"));
   }
 
   /* Item: Name */
@@ -1711,17 +1710,17 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   Data->getConfiguration(id, &configuration);
   char title[23];
   sprintf(title, "%s #%d", L_CONTACTRON, id + 1);
-  openSection(page, title, "");
+  openSection(page, title, F(""));
 
   /* Item: GPIO */
-  addListOfGPIOs(page, "g", configuration.gpio, "GPIO");
+  addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO");
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
   /* Item: type */
-  addSelectFormItemOpen(page, "y", L_SWITCH_TYPE);
+  addSelectFormItemOpen(page, F("y"), F(L_SWITCH_TYPE));
   addSelectOptionFormItem(page, "NO", "0",
                           configuration.type == AFE_CONTACTRON_NO);
   addSelectOptionFormItem(page, "NC", "1",
@@ -1741,7 +1740,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   closeSection(page);
 
   /* Item: LED */
-  openSection(page, L_CONTACTRON_LED_ASSIGNED_TO_SENSOR, "");
+  openSection(page, F(L_CONTACTRON_LED_ASSIGNED_TO_SENSOR), F(""));
   addLEDSelectionItem(page, configuration.ledID);
   closeSection(page);
 
@@ -1760,7 +1759,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, L_CONTACTRON_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    openSection(page, F(L_CONTACTRON_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);
@@ -1775,7 +1774,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   Data->getConfiguration(id, &gateConfiguration);
   CONTACTRON contactronConfiguration[2];
 
-  openSection(page, L_GATE_CONFIGURATION, "");
+  openSection(page, F(L_GATE_CONFIGURATION), F(""));
 
   /* Item: Gate name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -1785,7 +1784,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   char _relayName[20];
   char _relayId[4];
   RELAY relayConfiguration;
-  addSelectFormItemOpen(page, "r", L_GATE_RELAY_ID_CONTROLLING_GATE);
+  addSelectFormItemOpen(page, F("r"), F(L_GATE_RELAY_ID_CONTROLLING_GATE));
   sprintf(_relayId, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
 
   addSelectOptionFormItem(page, L_NONE, _relayId,
@@ -1809,7 +1808,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
   /* Item: contactron 1 */
   if (Device->configuration.noOfContactrons > 0) {
-    addGateContactronsListItem(page, "c1", gateConfiguration.contactron.id[0]);
+    addGateContactronsListItem(page, F("c1"),
+                               gateConfiguration.contactron.id[0]);
   }
 
   /* If there is more than a one contactron connected, add option to assigne
@@ -1817,7 +1817,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
   if (Device->configuration.noOfContactrons > 1) {
     /* Item: contactron 2 */
-    addGateContactronsListItem(page, "c2", gateConfiguration.contactron.id[1]);
+    addGateContactronsListItem(page, F("c2"),
+                               gateConfiguration.contactron.id[1]);
   }
 
   closeSection(page);
@@ -1842,7 +1843,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
     if (numberOfContractons > 0) {
 
-      openSection(page, L_GATE_STATES_CONFIGURATION, "");
+      openSection(page, F(L_GATE_STATES_CONFIGURATION), F(""));
 
       for (uint8_t i = 0; i < numberOfContractons; i++) {
 
@@ -1850,87 +1851,87 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
                                &contactronConfiguration[i]);
       }
 
-      page.concat("<fieldset>");
+      page.concat(F("<fieldset>"));
 
-      page += "<p class=\"cm\">";
-      page += F(L_GATE_IF_MAGNETIC_SENSOR);
-      page += ": <strong>";
+      page.concat(F("<p class=\"cm\">"));
+      page.concat(F(L_GATE_IF_MAGNETIC_SENSOR));
+      page.concat(F(": <strong>"));
       page += contactronConfiguration[0].name;
 
       if (numberOfContractons == 2) {
-        page += "</strong> ";
-        page += F(L_GATE_AND_SENSOR);
-        page += ": <strong>";
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_AND_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[1].name;
-        page += "</strong> ";
-        page += F(L_GATE_ARE_OPEN);
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_ARE_OPEN));
       } else {
-        page += "</strong> ";
-        page += F(L_GATE_IS_OPEN);
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_OPEN));
       }
-      page += " ";
-      page += F(L_GATE_THEN);
-      page += ":</p>";
-      addGateStatesListItem(page, 0, gateConfiguration.states.state[0]);
+      page.concat(F(" "));
+      page.concat(F(L_GATE_THEN));
+      page.concat(F(":</p>"));
+      addGateStatesListItem(page, F("s0"), gateConfiguration.states.state[0]);
       if (numberOfContractons == 2) {
-        page += "<br><br><p class=\"cm\">";
-        page += F(L_GATE_IF_MAGNETIC_SENSOR);
-        page += ": <strong>";
+        page.concat(F("<br><br><p class=\"cm\">"));
+        page.concat(F(L_GATE_IF_MAGNETIC_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[0].name;
-        page += "</strong> ";
-        page += F(L_GATE_IS_OPEN);
-        page += " ";
-        page += F(L_GATE_AND_SENSOR);
-        page += ": <strong>";
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_OPEN));
+        page.concat(F(" "));
+        page.concat(F(L_GATE_AND_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[1].name;
-        page += "</strong> ";
-        page += F(L_GATE_IS_CLOSED);
-        page += " ";
-        page += F(L_GATE_THEN);
-        page += ":";
-        page += "</p>";
-        addGateStatesListItem(page, 1, gateConfiguration.states.state[1]);
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_CLOSED));
+        page.concat(F(" "));
+        page.concat(F(L_GATE_THEN));
+        page.concat(F(":"));
+        page.concat(F("</p>"));
+        addGateStatesListItem(page, F("s1"), gateConfiguration.states.state[1]);
 
-        page += "<br><br><p class=\"cm\">";
-        page += F(L_GATE_IF_MAGNETIC_SENSOR);
-        page += ": <strong>";
+        page.concat(F("<br><br><p class=\"cm\">"));
+        page.concat(F(L_GATE_IF_MAGNETIC_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[0].name;
-        page += "</strong> ";
-        page += F(L_GATE_IS_CLOSED);
-        page += " ";
-        page += F(L_GATE_AND_SENSOR);
-        page += ": <strong>";
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_CLOSED));
+        page.concat(F(" "));
+        page.concat(F(L_GATE_AND_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[1].name;
-        page += "</strong> ";
-        page += F(L_GATE_IS_OPEN);
-        page += " ";
-        page += F(L_GATE_THEN);
-        page += ":";
-        page += "</p>";
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_OPEN));
+        page.concat(F(" "));
+        page.concat(F(L_GATE_THEN));
+        page.concat(F(":"));
+        page.concat(F("</p>"));
 
-        addGateStatesListItem(page, 2, gateConfiguration.states.state[2]);
+        addGateStatesListItem(page, F("s2"), gateConfiguration.states.state[2]);
       }
 
-      page += "<br><br><p class=\"cm\">";
+      page.concat(F("<br><br><p class=\"cm\">"));
 
-      page += F(L_GATE_IF_MAGNETIC_SENSOR);
-      page += ": <strong>";
+      page.concat(F(L_GATE_IF_MAGNETIC_SENSOR));
+      page.concat(F(": <strong>"));
       page += contactronConfiguration[0].name;
       if (numberOfContractons == 2) {
-        page += "</strong> ";
-        page += F(L_GATE_AND_SENSOR);
-        page += ": <strong>";
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_AND_SENSOR));
+        page.concat(F(": <strong>"));
         page += contactronConfiguration[1].name;
-        page += "</strong> ";
-        page += F(L_GATE_ARE_CLOSED);
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_ARE_CLOSED));
       } else {
-        page += "</strong> ";
-        page += F(L_GATE_IS_CLOSED);
+        page.concat(F("</strong> "));
+        page.concat(F(L_GATE_IS_CLOSED));
       }
-      page += " ";
-      page += F(L_GATE_THEN);
-      page += ":</p>";
-      addGateStatesListItem(page, 3, gateConfiguration.states.state[3]);
+      page.concat(F(" "));
+      page.concat(F(L_GATE_THEN));
+      page.concat(F(":</p>"));
+      addGateStatesListItem(page, F("s3"), gateConfiguration.states.state[3]);
       closeSection(page);
     }
   }
@@ -1958,7 +1959,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, L_GATE_MQTT_TOPIC, L_MQTT_TOPIC_EMPTY);
+    openSection(page, F(L_GATE_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      gateConfiguration.mqtt.topic, "64");
     closeSection(page);
@@ -2978,11 +2979,12 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.concat(F("</div></div>"));
   page.replace("{{e.f}}", String(system_get_free_heap_size() / 1024));
 
-  page.replace("{{A}}", RestAPI->accessToWAN()
-                            ? F("<img style=\"opacity:.4\" "
-                                "src=\"http://api.smartnydom.pl/images/"
-                                "afe-logo.png\"><br>")
-                            : F("<h1 style=\"margin-bottom:0\">AFE Firmware</h1>"));
+  page.replace("{{A}}",
+               RestAPI->accessToWAN()
+                   ? F("<img style=\"opacity:.4\" "
+                       "src=\"http://api.smartnydom.pl/images/"
+                       "afe-logo.png\"><br>")
+                   : F("<h1 style=\"margin-bottom:0\">AFE Firmware</h1>"));
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   page.replace("{{f.a}}", F("Domoticz"));
@@ -3379,11 +3381,11 @@ void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFESitesGenerator::addGateStatesListItem(String &item, uint8_t id,
+void AFESitesGenerator::addGateStatesListItem(String &item,
+                                              const __FlashStringHelper *name,
                                               byte state) {
-  char _gateStateId[3];
-  sprintf(_gateStateId, "s%d", id);
-  addSelectFormItemOpen(item, _gateStateId, L_GATE_SET_STATE);
+
+  addSelectFormItemOpen(item, name, F(L_GATE_SET_STATE));
   addSelectOptionFormItem(item, L_GATE_OPENED, "0", state == AFE_GATE_OPEN);
   addSelectOptionFormItem(item, L_GATE_PARTIALLY_OPENED, "2",
                           state == AFE_GATE_PARTIALLY_OPEN);
@@ -3395,14 +3397,13 @@ void AFESitesGenerator::addGateStatesListItem(String &item, uint8_t id,
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFESitesGenerator::addGateContactronsListItem(String &item,
-                                                   const char *name,
-                                                   uint8_t contactronId) {
+void AFESitesGenerator::addGateContactronsListItem(
+    String &item, const __FlashStringHelper *name, uint8_t contactronId) {
   char _name[23];
   char _id[4];
   CONTACTRON configuration;
 
-  addSelectFormItemOpen(item, name, L_CONTACTRON);
+  addSelectFormItemOpen(item, name, F(L_CONTACTRON));
   sprintf(_id, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(item, L_NONE, _id,
                           contactronId == AFE_HARDWARE_ITEM_NOT_EXIST);

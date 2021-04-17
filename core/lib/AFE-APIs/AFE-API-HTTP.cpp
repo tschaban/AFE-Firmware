@@ -589,7 +589,7 @@ void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_GATE
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEAPIHTTP::addClass(AFESensorDS18B20 *Sensor) {

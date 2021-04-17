@@ -48,15 +48,6 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
     Contactron[i].begin(configuration.contactron.id[i], _Device, _Data);
   }
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-    mqttStateTopic[0] = AFE_EMPTY_STRING;
-  }
-#endif
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Gate Initialization completed");

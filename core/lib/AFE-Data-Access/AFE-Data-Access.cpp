@@ -1669,7 +1669,7 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, &LEDConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS;
-#elif defined(AFE_DEVICE_iECSv20)
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2)
   LEDConfiguration.changeToOppositeValue = true;
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
   saveConfiguration(0, &LEDConfiguration);
@@ -2004,7 +2004,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 
-#ifndef AFE_DEVICE_iECSv20
+#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
@@ -2110,7 +2110,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(AFE_DEVICE_iECSv20)
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
   saveRelayState(1, false);
@@ -2147,48 +2147,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
     saveConfiguration(i, &RelayConfiguration);
   }
 }
-/*
-void AFEDataAccess::createRelayConfigurationFile(uint8_t id) {
-  RELAY RelayConfiguration;
-// Relay config
-#ifdef AFE_CONFIG_HARDWARE_LED
-  RelayConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  RelayConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  RelayConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
-  RelayConfiguration.state.MQTTConnected =
-      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
-
-  RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
-  RelayConfiguration.state.powerOn =
-      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
-
-  RelayConfiguration.triggerSignal =
-      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  RelayConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
-  RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
-
-  // Adding config files for remaining relays
-  RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
-#ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: cfg-relay-") << id << F(".json");
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
-  saveRelayState(id, false);
-#endif
-  sprintf(RelayConfiguration.name, "R%d", id + 1);
-  saveConfiguration(id, &RelayConfiguration);
-}
-*/
 /* Relay state methods*/
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
@@ -2514,7 +2473,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   // Just one switch is possible for Shelly-1, and one config file is created
   // for Switch
   index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
-#elif defined(AFE_DEVICE_iECSv20)
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2)
   SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
   SwitchConfiguration.functionality =
       AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY;
@@ -3097,19 +3056,26 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
 
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#if defined(AFE_DEVICE_iECSv20)
-  ContactronConfiguration.gpio = 14;
+#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C1");
   saveConfiguration(0, &ContactronConfiguration);
-  ContactronConfiguration.gpio = 13;
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_2_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C2");
   saveConfiguration(1, &ContactronConfiguration);
-  ContactronConfiguration.gpio = 3;
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_3_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C3");
   saveConfiguration(2, &ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
+
+#ifdef AFE_DEVICE_iECS_GATE_DRIVERv3
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_4_DEFAULT_GPIO;
+  sprintf(ContactronConfiguration.name, "C4");
+  saveConfiguration(2, &ContactronConfiguration);
+  index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
 #endif
-  ContactronConfiguration.gpio = 0;
+#endif
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_X_DEFAULT_GPIO;
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
        i++) {
 #ifdef DEBUG
@@ -3281,7 +3247,7 @@ void AFEDataAccess::createGateConfigurationFile() {
 
   GateConfiguration.contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
 
-#if defined(AFE_DEVICE_iECSv20)
+#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2)
   GateConfiguration.contactron.id[0] = 0;
   GateConfiguration.relayId = 0;
   GateConfiguration.states.state[0] = AFE_GATE_OPEN;

@@ -8,7 +8,9 @@
 
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-Data-Access.h>
+#ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
+#endif
 #include <arduino.h>
 
 #ifdef DEBUG
@@ -22,11 +24,6 @@ public:
 
   // ID of the GATE the contactron is assigned to. 255 None.
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 4];
-  char mqttStateTopic[sizeof(configuration.mqtt.topic) + 6];
-#endif
 
   /* Constructors */
   AFEContactron();
@@ -55,8 +52,9 @@ private:
   boolean _changed = false; // True if contractor changed state
 
   unsigned long startTime = 0;
-
+#ifdef AFE_CONFIG_HARDWARE_LED
   AFELED ContactronLed;
+#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON

@@ -68,7 +68,6 @@ void AFEWiFi::switchConfiguration() {
   noOfFailures = 0;
   WirelessNetwork.persistent(false);
   WirelessNetwork.disconnect(true);
-
   if (WirelessNetwork.hostname(Device->configuration.name)) {
 #ifdef DEBUG
     Serial << endl
@@ -79,7 +78,6 @@ void AFEWiFi::switchConfiguration() {
            << Device->configuration.name;
 #endif
   }
-
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
 
   /* Setting Fixed IP for Primary Configuration if set */
@@ -256,6 +254,22 @@ void AFEWiFi::listener() {
         ledStartTime = 0;
         Led->off();
 #endif
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting hostname to: ") << Device->configuration.name;
+#endif
+
+   yield();
+
+  if (WirelessNetwork.hostname(Device->configuration.name)) {
+    yield();
+#ifdef DEBUG
+    Serial << F(" ... Success");
+  } else {
+    Serial << F(" ... Error");
+#endif
+  }
 
 #ifdef DEBUG
         Serial << endl
