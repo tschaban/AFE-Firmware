@@ -103,28 +103,33 @@ private:
                               boolean disabled = false);
 
   /* Item: HTML <select><option></option></select> */
-  void addSelectFormItemOpen(String &item, const __FlashStringHelper *name, const __FlashStringHelper *label);
+  void addSelectFormItemOpen(String &item, const __FlashStringHelper *name,
+                             const __FlashStringHelper *label);
   void addSelectOptionFormItem(String &item, const char *label,
                                const char *value, boolean selected);
   void addSelectFormItemClose(String &item);
 
   /* Item: Menu */
-  void addMenuItem(String &item, const __FlashStringHelper *title, uint8_t siteId);
+  void addMenuItem(String &item, const __FlashStringHelper *title,
+                   uint8_t siteId);
 
-  void addMenuItemExternal(String &item, const __FlashStringHelper *title, const __FlashStringHelper *url);
+  void addMenuItemExternal(String &item, const __FlashStringHelper *title,
+                           const __FlashStringHelper *url);
   void addMenuHeaderItem(String &item, const __FlashStringHelper *title);
   void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);
 
   /* Item: HTML <select> populated with GPIOs */
-  void addListOfGPIOs(String &item, const __FlashStringHelper *field, uint8_t selected,
-                      const char *title = "GPIO");
+  void addListOfGPIOs(String &item, const __FlashStringHelper *field,
+                      uint8_t selected, const char *title = "GPIO");
 
   /* Item: HTML <select> populated with <option> for number of items selection
    */
   void addListOfHardwareItem(String &item, uint8_t noOfItems,
-                             uint8_t noOffConnected, const __FlashStringHelper *field,
-                             const __FlashStringHelper *label, boolean disabled = false);
+                             uint8_t noOffConnected,
+                             const __FlashStringHelper *field,
+                             const __FlashStringHelper *label,
+                             boolean disabled = false);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
@@ -137,12 +142,12 @@ private:
 
 /* Item: list of gate states */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  void addGateStatesListItem(String &item, uint8_t id, byte state);
+  void addGateStatesListItem(String &item, const __FlashStringHelper *name, byte state);
 #endif
 
 /* Item: list of contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  void addGateContactronsListItem(String &item, const char *name,
+  void addGateContactronsListItem(String &item, const __FlashStringHelper *name,
                                   uint8_t contactronId);
 #endif
 

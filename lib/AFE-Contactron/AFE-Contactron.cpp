@@ -10,22 +10,13 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
                           AFEDataAccess *_Data) {
   Data = _Data;
   Device = _Device;
-  Data->getConfiguration(id,&configuration);
+  Data->getConfiguration(id, &configuration);
   pinMode(configuration.gpio, INPUT_PULLUP);
+#ifdef AFE_CONFIG_HARDWARE_LED
   if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed.begin(Data,configuration.ledID);
-  }
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (strlen(configuration.mqtt.topic) > 0) {
-    sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
-    sprintf(mqttStateTopic, "%s/state", configuration.mqtt.topic);
-  } else {
-    mqttCommandTopic[0] = AFE_EMPTY_STRING;
-    mqttStateTopic[0] = AFE_EMPTY_STRING;
+    ContactronLed.begin(Data, configuration.ledID);
   }
 #endif
-
   _initialized = true;
 }
 
@@ -34,18 +25,26 @@ boolean AFEContactron::get() {
   boolean _return;
   if (configuration.type == AFE_CONTACTRON_NO) {
     if (currentState) {
+#ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.on();
+#endif
       _return = AFE_CONTACTRON_OPEN;
     } else {
+#ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.off();
+#endif
       _return = AFE_CONTACTRON_CLOSED;
     }
   } else {
     if (currentState) {
+#ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.off();
+#endif
       _return = AFE_CONTACTRON_CLOSED;
     } else {
+#ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.on();
+#endif
       _return = AFE_CONTACTRON_OPEN;
     }
   }
