@@ -10,8 +10,6 @@
 
 #include <ArduinoJson.h>
 
-
-
 #include <FS.h>
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
 #include <LittleFS.h>
@@ -89,7 +87,7 @@ public:
   void getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
-//  void createRelayConfigurationFile(uint8_t id);
+  //  void createRelayConfigurationFile(uint8_t id);
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -106,7 +104,7 @@ public:
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
-//  void createLEDConfigurationFile(uint8_t id);
+  //  void createLEDConfigurationFile(uint8_t id);
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();
@@ -117,7 +115,6 @@ public:
   void saveConfiguration(ADCINPUT *);
   void createADCInputConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
-
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void getConfiguration(uint8_t id, DS18B20 *);
@@ -142,7 +139,6 @@ public:
   void saveConfiguration(uint8_t id, THERMAL_PROTECTOR *);
   void createThermalProtectorConfigurationFile(void);
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-
 
 #if defined(T3_CONFIG)
   PIR getPIRConfiguration(uint8_t id);
@@ -225,6 +221,10 @@ public:
   void createBinarySensorConfigurationFile();
 #endif
 
-
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  void getConfiguration(uint8_t id, PN532_SENSOR *);
+  void saveConfiguration(uint8_t id, PN532_SENSOR *);
+  void createPN532ConfigurationFile();
+#endif
 };
 #endif

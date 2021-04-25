@@ -202,6 +202,12 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addMenuItem(page, F("PN532 Sensor"), AFE_CONFIG_SITE_PN532_SENSOR);
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput) {
     addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
@@ -1345,11 +1351,12 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
                                      sizeof(_addresses[i])) == 0);
     }
     page.concat(F("</select><input type=\"submit\" class =\"b bc\" "
-            "value=\"" L_DS18B20_SEARCH "\"></div>"));
+                  "value=\"" L_DS18B20_SEARCH "\"></div>"));
   } else {
     page.concat(F("<p class=\"cm\">" L_DS18B20_NO_SENSOR "</p>"));
-    page.concat(F("<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
-            "\"><br /><br />"));
+    page.concat(
+        F("<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
+          "\"><br /><br />"));
   }
 
   /* Item: Name */
@@ -2967,6 +2974,32 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_PN532
+void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
+  // PN532_SENSOR configuration;
+  // Data->getConfiguration(id, &configuration);
+
+
+  Serial << endl << "INFO: PN532: Method id: " << id;
+
+  AFESensorPN532 PN532Sensor;
+  PN532Sensor.begin(0,Data);
+
+  if (id == 1) {
+    PN532Sensor.formattingClassic();
+  } else if (id == 2) {
+    PN532Sensor.formattingNFC();
+  } else if (id == 3) {
+    PN532Sensor.readNFC();
+  }
+
+  page.concat("<a href=\"/?o=36&i=1\">Format Classic</a><br>");
+  page.concat("<a href=\"/?o=36&i=2\">Format NFC</a><br>");
+  page.concat("<a href=\"/?o=36&i=3\">Read NFC</a><br>");
+}
+
+#endif // AFE_CONFIG_HARDWARE_PN532
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

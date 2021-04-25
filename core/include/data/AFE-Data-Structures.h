@@ -104,5 +104,8 @@
 #include <AFE-BINARY-Sensor-Structure.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532
+#include <AFE-PN532-Sensor-Structure.h>
+#endif
 
 #endif

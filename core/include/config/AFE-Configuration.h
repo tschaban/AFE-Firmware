@@ -398,17 +398,18 @@
 
 /* ---- Gate ----*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.2"
+#define AFE_FIRMWARE_VERSION "3.1.0.B0"
 #define AFE_FIRMWARE_TYPE 5
 
 /* Define Hardware */
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
-#define AFE_CONFIG_FUNCTIONALITY_ADC
+//#define AFE_CONFIG_FUNCTIONALITY_ADC
 
 #ifdef ESP_4MB
-#define AFE_CONFIG_HARDWARE_BMEX80
-#define AFE_CONFIG_HARDWARE_BH1750
+//#define AFE_CONFIG_HARDWARE_BMEX80
+//#define AFE_CONFIG_HARDWARE_BH1750
+#define AFE_CONFIG_HARDWARE_PN532
 #endif // ESP_4MB
 
 /* Max number of hardware items per AFE version */
@@ -421,6 +422,7 @@
 #ifdef ESP_4MB
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750 1
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532 1
 #endif
 
 /* Max number of hardware items per specyfic hardware device */
@@ -449,6 +451,7 @@
 #ifdef ESP_4MB
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_PN532 1
 #endif
 
 /* Default values for hardware items per specyfic hardware device */
@@ -471,6 +474,7 @@
 #ifdef ESP_4MB
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532 0
 #endif
 
 /* Functionalities */
@@ -873,6 +877,21 @@
 #define AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH 19 // {"state":"closed"}
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
+
+/* PN532 Sensor */
+#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifndef AFE_CONFIG_HARDWARE_UART
+#define AFE_CONFIG_HARDWARE_UART
+#endif
+
+#define AFE_HARDWARE_PN532_SENSOR_KEY_A 0
+#define AFE_HARDWARE_PN532_SENSOR_KEY_B 1
+
+#define AFE_HARDWARE_PN532_SENSOR_DEFAULT_KEY AFE_HARDWARE_PN532_SENSOR_KEY_B
+
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+
+
 /* DS18B20 Sensor */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #ifndef AFE_CONFIG_TEMPERATURE
@@ -1245,6 +1264,7 @@ typedef enum {
 #define AFE_CONFIG_SITE_DHT 33
 #define AFE_CONFIG_SITE_BINARY_SENSOR 34
 #define AFE_CONFIG_SITE_WAN_UPGRADE 35
+#define AFE_CONFIG_SITE_PN532_SENSOR 36
 
 /* ***************** APIs: Config and defaults *********************/
 

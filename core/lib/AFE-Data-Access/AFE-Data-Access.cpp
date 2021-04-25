@@ -561,6 +561,10 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  configuration->noOfPN532Sensors = 1; // root["noOfPN532Sensors"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -684,6 +688,11 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
+#endif
+
+
+#ifdef AFE_CONFIG_HARDWARE_PN532
+    root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
 #endif
 
     root.printTo(configFile);
@@ -830,7 +839,13 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   deviceConfiguration.noOfBinarySensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
-  saveConfiguration(&deviceConfiguration);
+
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  deviceConfiguration.noOfPN532Sensors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
+#endif
+
+          saveConfiguration(&deviceConfiguration);
 }
 
 void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
@@ -2004,7 +2019,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 
-#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
+#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+      defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
@@ -2110,7 +2126,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+    defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
   saveRelayState(1, false);
@@ -3056,7 +3073,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
 
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
+#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                  \
+    defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C1");
   saveConfiguration(0, &ContactronConfiguration);
@@ -5656,4 +5674,10 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532
+void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR  *configuration) {}
+void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR  *configuration) {}
+void AFEDataAccess::createPN532ConfigurationFile() {}
 #endif

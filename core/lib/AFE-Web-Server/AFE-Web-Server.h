@@ -175,6 +175,11 @@ private:
   void get(BINARY_SENSOR &data);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  void get(PN532_SENSOR &data);
+#endif
+
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
   boolean upgradeOTAWAN(uint16_t firmwareId);

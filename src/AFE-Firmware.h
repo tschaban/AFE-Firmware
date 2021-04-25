@@ -21,13 +21,14 @@ LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 #include <Streaming.h>
 #endif
 
+#include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
-#include <AFE-API-JSONRPC.h>
+
 
 AFEDataAccess Data;
 AFEFirmwarePro FirmwarePro;
@@ -114,7 +115,8 @@ AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 AFESensorHPMA115S0 HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER) 
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) ||                                 \
+    defined(AFE_CONFIG_HARDWARE_RAINMETER)
 #include <AFE-Impulse-Catcher.h>
 #endif
 
@@ -130,7 +132,10 @@ AFEImpulseCatcher RainImpulse;
 AFERainmeter RainSensor;
 #endif
 
-
+#ifdef AFE_CONFIG_HARDWARE_PN532
+#include <AFE-Sensor-PN532.h>
+AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532];
+#endif
 
 #include <AFE-Main-APIs.cpp>
 
@@ -202,12 +207,14 @@ AFERainmeter RainSensor;
 #include <AFE-Main-Anemometer.cpp>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532
+#include <AFE-Main-PN532.cpp>
+#endif
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
 AFEI2CScanner I2CScanner;
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-Sensor-AS3935.h>
@@ -217,7 +224,6 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #include <AFE-Sensor-Binary.h>
 #endif
-
 
 #include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>

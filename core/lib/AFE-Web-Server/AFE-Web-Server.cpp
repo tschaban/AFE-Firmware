@@ -192,6 +192,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteBinarySensor(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  case AFE_CONFIG_SITE_PN532_SENSOR:
+    Site.sitePN532Sensor(page, siteConfig->deviceID);
+    break;
+
+#endif
   }
 
   if (siteConfig->form) {
@@ -456,6 +462,15 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
+#ifdef AFE_CONFIG_HARDWARE_PN532
+      else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR) {
+        PN532_SENSOR configuration;
+        get(configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+        configuration = {0};
+      }
+#endif
+
     } else if (command == AFE_SERVER_CMD_NONE) {
       if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
         siteConfig.form = false;
@@ -2060,3 +2075,8 @@ uint16_t AFEWebServer::getOTAFirmwareId() {
   return server.arg("f").length() > 0 ? server.arg("f").toInt() : 0;
 }
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
+
+
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  void AFEWebServer::get(PN532_SENSOR &data) {}
+#endif
