@@ -64,7 +64,16 @@
 
 /* Number of GPIOs available in ESP8266, used in the conjunction with
  * AFE-Site-components.h table */
+#ifndef AFE_ESP32 /* ESP82xx */
 #define AFE_NUMBER_OF_GPIOS 13
+#else /* ESP32 */
+#ifdef ESP32_30_PINS
+#define AFE_NUMBER_OF_GPIOS 25
+#else // ESP32_38_PINS
+#define AFE_NUMBER_OF_GPIOS 34
+#endif // ESP32_30_PINS
+#endif
+
 
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)

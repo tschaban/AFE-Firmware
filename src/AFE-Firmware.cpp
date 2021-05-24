@@ -311,7 +311,7 @@ void setup() {
          << F("############################################################"
               "####"
               "########");
-#ifndef ESP32
+#ifndef AFE_ESP32
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
