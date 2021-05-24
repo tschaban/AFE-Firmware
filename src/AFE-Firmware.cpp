@@ -16,6 +16,9 @@ void setup() {
          << F("INFO: All classes and global variables initialized") << endl
          << F("INFO: Initializing device") << endl;
 
+
+#ifndef AFE_ESP32 /* ESP82xx */
+
   Serial << endl << "INFO: ESP: ID " << ESP.getFlashChipId();
   Serial << endl << "INFO: ESP: Real flash size: ";
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -36,18 +39,34 @@ void setup() {
          << " MHz";
   Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
 
+#else /* ESP32 */
+
+// @TODO ESP32
 #endif
 
+
+
+
+#endif
+
+
+#ifndef AFE_ESP32 /* ESP82xx */
   // Erase all config
   ESP.eraseConfig();
 #ifdef DEBUG
   Serial << F("INFO: ESP: Erasing internally stored configuration") << endl;
 #endif
+#else /* ESP32 */
+//@TODO ESP32
+#endif
+
+
+
 
 /* Initializing SPIFFS file system */
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  bool _fileSystemReady = LittleFS.begin();
+  bool _fileSystemReady = LITTLEFS.begin();
 #else
   bool _fileSystemReady = SPIFFS.begin();
 #endif
@@ -59,8 +78,12 @@ void setup() {
   } else {
     Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_SPIFFS
     yield();
     SPIFFS.gc();
+#endif
+
   }
 
   Device.begin();
@@ -288,10 +311,11 @@ void setup() {
          << F("############################################################"
               "####"
               "########");
-
+#ifndef ESP32
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
+#endif         
 #endif
 }
 

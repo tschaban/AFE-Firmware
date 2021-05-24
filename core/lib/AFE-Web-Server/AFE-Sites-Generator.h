@@ -10,7 +10,14 @@
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Site-components.h>
+
+#ifndef AFE_ESP32 /* ESP82xx */
 #include <ESP8266WiFi.h>
+#else /* ESP32 */
+#include <WiFi.h>
+#endif
+
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>

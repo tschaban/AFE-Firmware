@@ -6,9 +6,16 @@
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
-#include <AsyncPing.h>
+//#include <AsyncPing.h>
 #include <PubSubClient.h>
 #include <WiFiClient.h>
+
+#ifndef AFE_ESP32 /* ESP82xx */
+// @TODO ESP32
+#else /* ESP32 */
+#include <ESP32Ping.h>
+#endif
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #if AFE_LANGUAGE == 0
@@ -33,8 +40,8 @@ private:
   AFEDataAccess *_Data;
   char *_DeviceName;
   NETWORK _NetworkConfiguration;
-
-  AsyncPing Pings;
+  //AsyncPing Pings;
+  boolean hostReachable;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;

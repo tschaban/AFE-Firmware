@@ -5,16 +5,19 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
-#include <ESP8266WiFi.h>
-#include <IPAddress.h>
-
 #include <ArduinoJson.h>
+#include <IPAddress.h>
+#include <arduino.h>
 
-
-
+#ifndef AFE_ESP32 /* ESP82xx */
+#include <ESP8266WiFi.h>
 #include <FS.h>
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
 #include <LittleFS.h>
+#endif
+#else /* ESP32 */
+#include <LITTLEFS.h>
+#include <WiFi.h>
 #endif
 
 // Disabled with T0 as it was added to the parsher, is it required for T6?
@@ -89,7 +92,7 @@ public:
   void getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
-//  void createRelayConfigurationFile(uint8_t id);
+  //  void createRelayConfigurationFile(uint8_t id);
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -106,7 +109,7 @@ public:
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
-//  void createLEDConfigurationFile(uint8_t id);
+  //  void createLEDConfigurationFile(uint8_t id);
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();
@@ -117,7 +120,6 @@ public:
   void saveConfiguration(ADCINPUT *);
   void createADCInputConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
-
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void getConfiguration(uint8_t id, DS18B20 *);
@@ -142,7 +144,6 @@ public:
   void saveConfiguration(uint8_t id, THERMAL_PROTECTOR *);
   void createThermalProtectorConfigurationFile(void);
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-
 
 #if defined(T3_CONFIG)
   PIR getPIRConfiguration(uint8_t id);
@@ -224,7 +225,5 @@ public:
   void saveConfiguration(uint8_t id, BINARY_SENSOR *);
   void createBinarySensorConfigurationFile();
 #endif
-
-
 };
 #endif

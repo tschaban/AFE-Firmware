@@ -1345,11 +1345,12 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
                                      sizeof(_addresses[i])) == 0);
     }
     page.concat(F("</select><input type=\"submit\" class =\"b bc\" "
-            "value=\"" L_DS18B20_SEARCH "\"></div>"));
+                  "value=\"" L_DS18B20_SEARCH "\"></div>"));
   } else {
     page.concat(F("<p class=\"cm\">" L_DS18B20_NO_SENSOR "</p>"));
-    page.concat(F("<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
-            "\"><br /><br />"));
+    page.concat(
+        F("<input type=\"submit\" class =\"b bc\" value=\"" L_DS18B20_SEARCH
+          "\"><br /><br />"));
   }
 
   /* Item: Name */
@@ -2977,7 +2978,6 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   }
 
   page.concat(F("</div></div>"));
-  page.replace("{{e.f}}", String(system_get_free_heap_size() / 1024));
 
   page.replace("{{A}}",
                RestAPI->accessToWAN()

@@ -1,7 +1,7 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
 #include "AFE-MQTT.h"
-
+/*
 // Interuption counter
 volatile static boolean hostReachable = false;
 
@@ -35,7 +35,7 @@ boolean handlePingEnd(const AsyncPingResponse &response) {
   hostReachable = response.total_recv > 0 ? true : false;
   return true;
 };
-
+*/
 AFEMQTT::AFEMQTT(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -235,7 +235,7 @@ void AFEMQTT::connect() {
         yield();
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: MQTT Connection attempt: ") << _connections 
+               << F("INFO: MQTT Connection attempt: ") << _connections
                << F(" from ") << _NetworkConfiguration.noConnectionAttempts
                << F(", connection status: ") << _Broker.state()
                << F(", connection time: ") << millis() - _delayStartTime
@@ -280,65 +280,84 @@ void AFEMQTT::setReconnectionParams(
 
 void AFEMQTT::pingHost(void) {
   hostReachable = false;
-  Pings.on(true, handlePingAnswer);
-  Pings.on(false, handlePingEnd);
-
   if (strlen(configuration.ip) > 0) {
     IPAddress addr;
     addr.fromString(configuration.ip);
-    Pings.begin(addr, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
-                AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
+    hostReachable = Ping.ping(addr, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER);
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.ip;
 #endif
   } else if (strlen(configuration.host) > 0) {
-    Pings.begin(configuration.host, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
-                AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
+    hostReachable = Ping.ping(configuration.host,
+                              AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER);
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.host;
 #endif
   }
-}
+    /*
+      hostReachable = false;
+      Pings.on(true, handlePingAnswer);
+      Pings.on(false, handlePingEnd);
 
-boolean AFEMQTT::eventConnected() {
-  boolean returnValue = _eventConnectionEstablished;
-  _eventConnectionEstablished = false;
-  return returnValue;
-}
-
-boolean AFEMQTT::publish(const char *topic, const char *message) {
-
-  boolean pubslishingStatus = false;
-
-  if (_Broker.state() == MQTT_CONNECTED) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-    _Led->on();
-#endif
-#ifdef DEBUG
-    Serial << endl << F("----------- Publish MQTT -----------");
-    Serial << endl << F("Topic: ") << topic;
-    Serial << endl << F("Message: ") << message;
-    Serial << endl << F("Retain: ") << (configuration.retainAll ? "YES" : "NO");
-#endif
-    if (strlen(topic) > 0) {
-      pubslishingStatus =
-          _Broker.publish(topic, message, configuration.retainAll);
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << F("WARN: No MQTT topic.");
-    }
-#endif
-#ifdef AFE_CONFIG_HARDWARE_LED
-    _Led->off();
-#endif
-#ifdef DEBUG
-    Serial << endl
-           << F("Status: ")
-           << (pubslishingStatus ? F("published") : F("NOT pubslished"));
-    Serial << endl << F("------------------------------------");
-#endif
+      if (strlen(configuration.ip) > 0) {
+        IPAddress addr;
+        addr.fromString(configuration.ip);
+        Pings.begin(addr, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
+                    AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
+    #ifdef DEBUG
+        Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.ip;
+    #endif
+      } else if (strlen(configuration.host) > 0) {
+        Pings.begin(configuration.host,
+    AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
+                    AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
+    #ifdef DEBUG
+        Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.host;
+    #endif
+      }
+      */
   }
 
-  return pubslishingStatus;
-}
+  boolean AFEMQTT::eventConnected() {
+    boolean returnValue = _eventConnectionEstablished;
+    _eventConnectionEstablished = false;
+    return returnValue;
+  }
+
+  boolean AFEMQTT::publish(const char *topic, const char *message) {
+
+    boolean pubslishingStatus = false;
+
+    if (_Broker.state() == MQTT_CONNECTED) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+      _Led->on();
+#endif
+#ifdef DEBUG
+      Serial << endl << F("----------- Publish MQTT -----------");
+      Serial << endl << F("Topic: ") << topic;
+      Serial << endl << F("Message: ") << message;
+      Serial << endl
+             << F("Retain: ") << (configuration.retainAll ? "YES" : "NO");
+#endif
+      if (strlen(topic) > 0) {
+        pubslishingStatus =
+            _Broker.publish(topic, message, configuration.retainAll);
+      }
+#ifdef DEBUG
+      else {
+        Serial << endl << F("WARN: No MQTT topic.");
+      }
+#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+      _Led->off();
+#endif
+#ifdef DEBUG
+      Serial << endl
+             << F("Status: ")
+             << (pubslishingStatus ? F("published") : F("NOT pubslished"));
+      Serial << endl << F("------------------------------------");
+#endif
+    }
+
+    return pubslishingStatus;
+  }

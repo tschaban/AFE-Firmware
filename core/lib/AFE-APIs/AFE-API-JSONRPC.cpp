@@ -2,7 +2,7 @@
 
 #include "AFE-API-JSONRPC.h"
 
-/* Required to check access to WAN. Async ping */
+/* Required to check access to WAN. Async ping
 volatile static boolean _PingResponded = false;
 
 boolean _handlePingAnswer(const AsyncPingResponse &response) {
@@ -35,6 +35,8 @@ boolean _handlePingEnd(const AsyncPingResponse &response) {
   _PingResponded = response.total_recv > 0 ? true : false;
   return true;
 };
+
+*/
 
 AFEJSONRPC::AFEJSONRPC(){};
 
@@ -210,6 +212,10 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 }
 
 void AFEJSONRPC::checkAccessToWAN(void) {
+
+  _PingResponded = Ping.ping("www.google.com");
+
+  /*
   Pings.on(true, _handlePingAnswer);
   Pings.on(false, _handlePingEnd);
   setNoWANAccess();
@@ -222,6 +228,7 @@ void AFEJSONRPC::checkAccessToWAN(void) {
   Serial << endl
          << F("INFO: WAN ACCESS: Sent to ping to: ") << AFE_WAN_ACCSSS_HOST;
 #endif
+*/
 }
 
 boolean AFEJSONRPC::accessToWAN() { return _PingResponded; }

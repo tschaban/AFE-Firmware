@@ -39,7 +39,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(ESP32)
   Serial << endl
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
          << WirelessNetwork.getPhyMode();
@@ -78,7 +78,10 @@ void AFEWiFi::switchConfiguration() {
            << Device->configuration.name;
 #endif
   }
+
+#ifndef ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
+#endif
 
   /* Setting Fixed IP for Primary Configuration if set */
   if (isPrimaryConfiguration && !configuration.isDHCP) {
@@ -172,13 +175,18 @@ void AFEWiFi::listener() {
                    << endl
                    << " - getAutoReconnect="
                    << WirelessNetwork.getAutoReconnect() << endl
+                   << " - getMode=" << WirelessNetwork.getMode();
+
+#ifndef ESP32
+            Serial << endl
                    << " - getListenInterval="
                    << WirelessNetwork.getListenInterval() << endl
-                   << " - getMode=" << WirelessNetwork.getMode() << endl
+
                    << " - getPersistent=" << WirelessNetwork.getPersistent()
                    << endl
                    << " - getPhyMode=" << WirelessNetwork.getPhyMode() << endl
                    << " - getSleepMode=" << WirelessNetwork.getSleepMode();
+#endif // !ESP32
 #endif
           }
         }
@@ -256,20 +264,21 @@ void AFEWiFi::listener() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Setting hostname to: ") << Device->configuration.name;
+        Serial << endl
+               << F("INFO: WIFI: Setting hostname to: ")
+               << Device->configuration.name;
 #endif
 
-   yield();
+        yield();
 
-  if (WirelessNetwork.hostname(Device->configuration.name)) {
-    yield();
+        if (WirelessNetwork.hostname(Device->configuration.name)) {
+          yield();
 #ifdef DEBUG
-    Serial << F(" ... Success");
-  } else {
-    Serial << F(" ... Error");
+          Serial << F(" ... Success");
+        } else {
+          Serial << F(" ... Error");
 #endif
-  }
+        }
 
 #ifdef DEBUG
         Serial << endl

@@ -8,19 +8,29 @@
 #include <AFE-Device.h>
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Sites-Generator.h>
+
+#ifndef AFE_ESP32 /* ESP82xx */
 #include <ESP8266WebServer.h>
+#else /* ESP32 */
+#include <WebServer.h>
+#endif
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+#include <WiFiClient.h>
+#ifndef AFE_ESP32 /* ESP82xx */
 #include <WiFiUdp.h>
 #include <esp8266httpupdate.h>
-#include <WiFiClient.h>
+#else /* ESP32 */
+#include <Update.h>
+#endif
+
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
 #include <en_EN.h>
 #endif
-#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -44,7 +54,12 @@ struct AFE_SITE_PARAMETERS {
 class AFEWebServer {
 
 private:
+#ifndef AFE_ESP32 /* ESP82xx */
   ESP8266WebServer server;
+#else /* ESP32 */
+  WebServer server;
+#endif
+
   AFEDevice *Device;
   AFEFirmwarePro *FirmwarePro;
   AFEDataAccess *Data;
@@ -72,7 +87,6 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
-
 
   /* Method gets url Option parameter value */
   boolean getOptionName();
@@ -177,7 +191,9 @@ private:
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
+#ifndef AFE_ESP32 /* ESP82xx */  
   boolean upgradeOTAWAN(uint16_t firmwareId);
+#endif  
   boolean upgradOTAFile(void);
 #endif
 
@@ -203,6 +219,8 @@ public:
   /* Method listens for HTTP requests */
   void listener();
 
+
+#ifndef AFE_ESP32 /* ESP82xx */
   /* Method listens for onNotFound */
   void onNotFound(ESP8266WebServer::THandlerFunction fn);
 
@@ -211,6 +229,18 @@ public:
   void handleFirmwareUpgrade(const char *uri,
                              ESP8266WebServer::THandlerFunction handlerUpgrade,
                              ESP8266WebServer::THandlerFunction handlerUpload);
+#else /* ESP32 */
+  /* Method listens for onNotFound */
+  void onNotFound(WebServer::THandlerFunction fn);
+
+  /* Method adds URL for listen */
+  void handle(const char *uri, WebServer::THandlerFunction handler);
+  void handleFirmwareUpgrade(const char *uri,
+                             WebServer::THandlerFunction handlerUpgrade,
+                             WebServer::THandlerFunction handlerUpload);
+#endif
+
+
 
   /* Method generate HTML side. It reads also data from HTTP requests
    * arguments

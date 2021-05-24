@@ -515,23 +515,26 @@ void AFEWebServer::generate(boolean upload) {
 #endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef DEBUG
+    Serial << endl << F("INFO: SITE: Starting generating. ");
+#ifndef ESP32
     Serial << endl
-           << F("INFO: SITE: Starting generating. ") << endl
            << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
            << F("kB");
+#endif // !ESP32
 #endif
 
     String page;
 // page.reserve(AFE_MAX_PAGE_SIZE);
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(ESP32)
     Serial << endl
            << F("INFO: MEMORY: Free after allocation for HTTP response : ")
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
     generateSite(&siteConfig, page);
 
-#ifdef DEBUG
+
+#if defined(DEBUG) && !defined(ESP32)
     Serial << endl
            << F("INFO: MEMORY: Free after site generated : ")
            << system_get_free_heap_size() / 1024 << F("kB");
@@ -540,9 +543,11 @@ void AFEWebServer::generate(boolean upload) {
     publishHTML(page);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+#ifndef AFE_ESP32 /* ESP82xx */
     if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
       upgradeSuccess = upgradeOTAWAN(getOTAFirmwareId());
     }
+#endif
   }
 #endif
 
@@ -707,6 +712,7 @@ void AFEWebServer::sendJSON(const String &json) {
   server.send(200, "application/json", json);
 }
 
+#ifndef AFE_ESP32 /* ESP82xx */
 void AFEWebServer::handle(const char *uri,
                           ESP8266WebServer::THandlerFunction handler) {
   server.on(uri, handler);
@@ -721,10 +727,29 @@ void AFEWebServer::handleFirmwareUpgrade(
 void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
   server.onNotFound(fn);
 }
+#else /* ESP32 */
+void AFEWebServer::handle(const char *uri,
+                          WebServer::THandlerFunction handler) {
+  server.on(uri, handler);
+}
+
+void AFEWebServer::handleFirmwareUpgrade(
+    const char *uri, WebServer::THandlerFunction handlerUpgrade,
+    WebServer::THandlerFunction handlerUpload) {
+  server.on(uri, HTTP_POST, handlerUpgrade, handlerUpload);
+}
+
+void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
+  server.onNotFound(fn);
+}
+#endif
 
 /* Upgrade methods */
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
+
+#ifndef AFE_ESP32 /* ESP82xx */
+
 boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   t_httpUpdate_return ret;
   ESP8266HTTPUpdate OTAServerUpdate;
@@ -846,6 +871,81 @@ boolean AFEWebServer::upgradOTAFile(void) {
   yield();
   return _success;
 }
+
+#else /* ESP32 */
+boolean AFEWebServer::upgradOTAFile(void) {
+  HTTPUpload &upload = server.upload();
+  String _updaterError;
+  boolean _success = false;
+  if (upload.status == UPLOAD_FILE_START) {
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: UPGRADE: Firmware file name: ")
+           << upload.filename.c_str();
+#endif
+
+    uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: UPGRADE: Firmware size: ")
+           << (ESP.getSketchSize() / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: Free space size: ")
+           << (ESP.getFreeSketchSpace() / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: Max free space size for this hardware: ")
+           << (maxSketchSpace / 1024) << "Kb" << endl
+           << F("INFO: UPGRADE: Max size: ")
+           << (UPDATE_SIZE_UNKNOWN / 1024 / 1024) << "KB" << endl
+           << F("INFO: UPGRADE: ");
+#endif
+
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { // start with max available
+#ifdef DEBUG
+      Update.printError(Serial);
+#endif
+    }
+  } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+#ifdef ESP_CONFIG_HARDWARE_LED
+    SystemLED->toggle();
+#endif
+#ifdef DEBUG
+    Serial << F(".");
+#endif
+
+    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+#ifdef DEBUG
+      Serial << endl;
+      Update.printError(Serial);
+#endif
+    }
+  } else if (upload.status == UPLOAD_FILE_END) {
+    if (Update.end(true)) { // true to set the size to the current
+      // progress
+      _success = true;
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: UPGRADE: Success. Firmware size: ") << upload.totalSize
+             << endl
+             << F("INFO: UPGRADE:  Rebooting...");
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Update.printError(Serial);
+    }
+#endif
+  } else if (upload.status == UPLOAD_FILE_ABORTED) {
+    Update.end();
+#ifdef DEBUG
+    Serial << endl << F("ERROR: UPGRADE: Update was aborted");
+#endif
+  }
+  return _success;
+}
+
+#endif // not AFE_ESP32
+
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 /* Reading Server data */

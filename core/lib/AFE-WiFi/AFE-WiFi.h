@@ -10,7 +10,15 @@
 #include <AFE-LED.h>
 #endif
 
+
+#ifndef AFE_ESP32 /* ESP82xx */
 #include <ESP8266WiFi.h>
+#else /* ESP32 */
+#include <WiFi.h>
+#endif
+
+
+
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -56,7 +64,14 @@ private:
 public:
   /* Constructor: no actions */
   AFEWiFi();
+
+#ifndef AFE_ESP32 /* ESP82xx */
   ESP8266WiFiClass WirelessNetwork;
+#else /* ESP32 */
+  WiFiClass WirelessNetwork;
+#endif
+
+
 
   /* Indicates on to which router the device is connected */
   boolean isPrimaryConfiguration = false;
