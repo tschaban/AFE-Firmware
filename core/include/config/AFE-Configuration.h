@@ -10,6 +10,11 @@
 /* Max size of the configuration HTML page */
 #define AFE_MAX_PAGE_SIZE 12000
 
+/* Turn On/Off debbuging of Ping class */
+#ifdef DEBUG
+#define ENABLE_DEBUG_PING
+#endif
+
 /* Urls */
 #define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
 #define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
@@ -29,7 +34,7 @@
 /* Host to check WAN Access */
 #define AFE_WAN_ACCSSS_HOST "8.8.8.8"
 #define AFE_WAN_ACCSSS_PINGS 1
-#define AFE_WAN_ACCSSS_PING_TIMEOUT 1000
+//#define AFE_WAN_ACCSSS_PING_TIMEOUT 1000
 #define AFE_WAN_ACCSSS_TIMEOUT 3000 // performs check if access to the network longer than this time in ms
 
 /* APIs */
@@ -1250,6 +1255,17 @@ typedef enum {
 #define AFE_CONFIG_SITE_BINARY_SENSOR 34
 #define AFE_CONFIG_SITE_WAN_UPGRADE 35
 
+
+#ifndef AFE_ESP32 /* ESP82xx */
+#define AFE_SITE_REBOOT 10
+#define AFE_SITE_REBOOT_POST_UPGRADE 15
+#define AFE_SITE_REBOOT_POST_WAN_UPGRADE 30
+#else /* ESP32 */
+#define AFE_SITE_REBOOT 5
+#define AFE_SITE_REBOOT_POST_UPGRADE 5
+#define AFE_SITE_REBOOT_POST_WAN_UPGRADE 5
+#endif
+
 /* ***************** APIs: Config and defaults *********************/
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -1355,6 +1371,7 @@ typedef enum {
 /* ***************** Files: Config and defaults *********************/
 
 /* Configuration files names */
+#ifndef AFE_ESP32 /* ESP82xx */
 #define AFE_FILE_DOMOTICZ_CONFIGURATION "cfg-domoticz-server.json"
 #define AFE_FILE_DEVICE_UID "cfg-device-uid.json"
 #define AFE_FILE_MQTT_BROKER_CONFIGURATION "cfg-mqtt-broker.json"
@@ -1374,10 +1391,6 @@ typedef enum {
 #define AFE_FILE_UART_CONFIGURATION "cfg-uart.json"
 #define AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION "cfg-anemometer-sensor-0.json"
 #define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "cfg-rainmeter-sensor-0.json"
-#define AFE_FILE_RAINMETER_SENSOR_DATA "/cfg-rainmeter-data-0.json"
-#define AFE_FILE_REGULATOR_CONFIGURATION "/cfg-regulator-%d.json"
-#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION "/cfg-theremal-protector-%d.json"
-#define AFE_FILE_DS18B20_SENSOR_CONFIGURATION "/cfg-ds18b20-%d.json"
 #define AFE_FILE_CONTACTRON_CONFIGURATION "cfg-contactron-%d.json"
 #define AFE_FILE_GATE_CONFIGURATION "cfg-gate-%d.json"
 #define AFE_FILE_GATE_STATE_CONFIGURATION "cfg-gate-state-%d.json"
@@ -1385,6 +1398,41 @@ typedef enum {
 #define AFE_FILE_BMX680_CONFIGURATION "cfg-BMEX80-%d.json"
 #define AFE_FILE_BH1750_CONFIGURATION "cfg-bh1750-%d.json"
 #define AFE_FILE_AS3935_CONFIGURATION "cfg-as3935-%d.json"
+#else /* ESP32 */
+#define AFE_FILE_DOMOTICZ_CONFIGURATION "/cfg-domoticz-server.json"
+#define AFE_FILE_DEVICE_UID "/cfg-device-uid.json"
+#define AFE_FILE_MQTT_BROKER_CONFIGURATION "/cfg-mqtt-broker.json"
+#define AFE_FILE_DEVICE_MODE "/cfg-device-mode.json"
+#define AFE_FILE_PRO_VERSION_CONFIGURATION "/cfg-pro-version.json"
+#define AFE_FILE_PASSWORD_CONFIGURATION "/cfg-password.json"
+#define AFE_FILE_DEVICE_CONFIGURATION "/cfg-device.json"
+#define AFE_FILE_FIRMWARE_CONFIGURATION "/cfg-firmware.json"
+#define AFE_FILE_NETWORK_CONFIGURATION "/cfg-network.json"
+#define AFE_FILE_I2C_CONFIGURATION "/cfg-i2c.json"
+#define AFE_FILE_LED_CONFIGURATION "/cfg-led-%d.json"
+#define AFE_FILE_SYSTEM_LED_CONFIGURATION "/cfg-system-led.json"
+#define AFE_FILE_RELAY_CONFIGURATION "/cfg-relay-%d.json"
+#define AFE_FILE_RELAY_STATE_CONFIGURATION "/cfg-relay-state-%d.json"
+#define AFE_FILE_SWITCH_CONFIGURATION "/cfg-switch-%d.json"
+#define AFE_FILE_ADC_CONFIGURATION "/cfg-analog-input.json"
+#define AFE_FILE_UART_CONFIGURATION "/cfg-uart.json"
+#define AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION "/cfg-anemometer-sensor-0.json"
+#define AFE_FILE_RAINMETER_SENSOR_CONFIGURATION "/cfg-rainmeter-sensor-0.json"
+#define AFE_FILE_CONTACTRON_CONFIGURATION "/cfg-contactron-%d.json"
+#define AFE_FILE_GATE_CONFIGURATION "/cfg-gate-%d.json"
+#define AFE_FILE_GATE_STATE_CONFIGURATION "/cfg-gate-state-%d.json"
+#define AFE_FILE_HPMA114S0_CONFIGURATION "/cfg-hpma115s0-%d.json"
+#define AFE_FILE_BMX680_CONFIGURATION "/cfg-BMEX80-%d.json"
+#define AFE_FILE_BH1750_CONFIGURATION "/cfg-bh1750-%d.json"
+#define AFE_FILE_AS3935_CONFIGURATION "/cfg-as3935-%d.json"
+#endif /* ESP8266/ESP32 */
+
+
+
+#define AFE_FILE_RAINMETER_SENSOR_DATA "/cfg-rainmeter-data-0.json"
+#define AFE_FILE_REGULATOR_CONFIGURATION "/cfg-regulator-%d.json"
+#define AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION "/cfg-theremal-protector-%d.json"
+#define AFE_FILE_DS18B20_SENSOR_CONFIGURATION "/cfg-ds18b20-%d.json"
 #define AFE_FILE_DHT_SENSOR_CONFIGURATION "/cfg-dht-%d.json"
 #define AFE_FILE_BINARY_SENSOR_CONFIGURATION "/cfg-binary-sensor-%d.json"
 #define AFE_FILE_WELCOME_MESSAGE "/welcome-message.txt"

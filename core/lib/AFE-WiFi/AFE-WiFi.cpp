@@ -52,8 +52,8 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
     IPAddress apIP(192, 168, 5, 1);
     WirelessNetwork.mode(WIFI_AP);
-    WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     WirelessNetwork.softAP(Device->configuration.name);
+    WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
 #ifdef DEBUG
     Serial << F("completed");
 #endif
@@ -81,6 +81,8 @@ void AFEWiFi::switchConfiguration() {
 
 #ifndef ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
+#else
+  WiFi.setSleep(false);
 #endif
 
   /* Setting Fixed IP for Primary Configuration if set */
@@ -292,14 +294,16 @@ void AFEWiFi::listener() {
 }
 
 boolean AFEWiFi::connected() {
+
+#ifndef AFE_ESP32 /* ESP82xx */
   if ((configuration.isDHCP &&
        WirelessNetwork.localIP().toString() != "(IP unset)") ||
       (!configuration.isDHCP && WirelessNetwork.status() == WL_CONNECTED)) {
-
-    // if (WirelessNetwork.waitForConnectResult() == WL_NETWORK_CONNECTED) {
-
     yield();
     delay(10);
+#else /* ESP32 */
+  if (WiFi.status() == WL_CONNECTED) {
+#endif
 
     if (disconnected) {
       eventConnectionEstablished = true;

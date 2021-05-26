@@ -213,7 +213,24 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
 void AFEJSONRPC::checkAccessToWAN(void) {
 
-  _PingResponded = Ping.ping("www.google.com");
+
+  #ifdef DEBUG
+  Serial << endl
+         << F("INFO: WAN ACCESS: checking access to : ") << AFE_WAN_ACCSSS_HOST;
+#endif
+
+  IPAddress ip;
+  ip.fromString(AFE_WAN_ACCSSS_HOST);
+  _PingResponded = Ping.ping(ip,AFE_WAN_ACCSSS_PINGS);
+
+#ifdef DEBUG
+
+  Serial << endl << F(" - ") << (_PingResponded?F("connected to WAN"):F("NOT connected to WAN")); 
+  Serial << endl
+         << F(" - average time: ") << Ping.averageTime();
+#endif
+
+
 
   /*
   Pings.on(true, _handlePingAnswer);

@@ -1514,7 +1514,7 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1582,7 +1582,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1831,7 +1831,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
 void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1923,7 +1923,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2151,7 +2151,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 /* Relay state methods*/
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
-  char fileName[23];
+  char fileName[25];
   sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2207,7 +2207,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
   return state;
 }
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-  char fileName[23];
+  char fileName[25];
   sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2257,7 +2257,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[19];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2329,7 +2329,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[19];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2756,7 +2756,7 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 
-  char fileName[20];
+  char fileName[21];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2829,7 +2829,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
-  char fileName[20];
+  char fileName[21];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2921,7 +2921,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
-  char fileName[22];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2987,7 +2987,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
-  char fileName[22];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3091,7 +3091,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
 void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3163,7 +3163,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3280,7 +3280,7 @@ void AFEDataAccess::createGateConfigurationFile() {
 uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = AFE_GATE_CLOSED;
 
-  char fileName[22];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3339,7 +3339,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 }
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 
-  char fileName[22];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3576,7 +3576,7 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 void AFEDataAccess::getConfiguration(uint8_t id,
                                      THERMAL_PROTECTOR *configuration) {
 
-  char fileName[31];
+  char fileName[32];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3648,7 +3648,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       THERMAL_PROTECTOR *configuration) {
-  char fileName[31];
+  char fileName[32];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3748,7 +3748,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
-  char fileName[21];
+  char fileName[22];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3824,7 +3824,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
-  char fileName[21];
+  char fileName[22];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4144,7 +4144,7 @@ void AFEDataAccess::createI2CConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
-  char fileName[17];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4246,7 +4246,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
-  char fileName[17];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4382,7 +4382,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4447,7 +4447,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4524,7 +4524,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4598,7 +4598,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 
-  char fileName[18];
+  char fileName[19];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG

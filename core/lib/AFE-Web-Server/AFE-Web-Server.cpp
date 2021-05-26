@@ -277,7 +277,7 @@ void AFEWebServer::generate(boolean upload) {
         siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
         siteConfig.reboot = true;
         siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
-        siteConfig.rebootTime = 15;
+        siteConfig.rebootTime = AFE_SITE_REBOOT_POST_UPGRADE;
         siteConfig.form = false;
         siteConfig.twoColumns = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_PRO_VERSION) {
@@ -475,13 +475,13 @@ void AFEWebServer::generate(boolean upload) {
             siteConfig.rebootMode = siteConfig.deviceID;
             siteConfig.ID = AFE_CONFIG_SITE_EXIT;
             siteConfig.reboot = true;
-            siteConfig.rebootTime = 10;
+            siteConfig.rebootTime = AFE_SITE_REBOOT;
           }
         }
       } else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT) {
         siteConfig.reboot = true;
         siteConfig.rebootMode = AFE_MODE_NORMAL;
-        siteConfig.rebootTime = 10;
+        siteConfig.rebootTime = AFE_SITE_REBOOT;
         siteConfig.form = false;
         siteConfig.twoColumns = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME) {
@@ -493,13 +493,13 @@ void AFEWebServer::generate(boolean upload) {
         siteConfig.form = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
         siteConfig.form = false;
-        siteConfig.rebootTime = 30;
+        siteConfig.rebootTime = AFE_SITE_REBOOT_POST_WAN_UPGRADE;
         siteConfig.twoColumns = false;
       } else if (siteConfig.ID == AFE_CONFIG_SITE_POST_UPGRADE) {
         if (!upload) {
           siteConfig.form = false;
           siteConfig.twoColumns = false;
-          siteConfig.rebootTime = 15;
+          siteConfig.rebootTime = AFE_SITE_REBOOT_POST_UPGRADE;
           siteConfig.reboot = true;
           siteConfig.rebootMode = Device->getMode();
         }
