@@ -9,7 +9,6 @@ void PN532EventsListener(void);
 
 /* --------- Body -----------*/
 
-
 /* Method initialize contactrons */
 void initializePN532Sensor() {
 #ifdef DEBUG
@@ -26,7 +25,11 @@ void initializePN532Sensor() {
 /* Method processes Contactron's related events */
 void PN532EventsListener() {
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
-    PN532Sensor[i].listener();    
+    if (PN532Sensor[i].listener()) {
+      char json[100];
+      PN532Sensor[i].getJSON(json);
+      Serial << endl << json;
+    }
   }
 }
 

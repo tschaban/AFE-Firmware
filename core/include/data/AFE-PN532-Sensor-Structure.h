@@ -15,5 +15,12 @@ struct PN532_SENSOR {
   char name[17];  
 };
 
+struct PN532_TAG {
+  char value[AFE_HARDWARE_PN532_BLOCK_SIZE];
+};
+
+struct PN532_SECTOR {
+  PN532_TAG block[AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR];
+};
 
 #endif

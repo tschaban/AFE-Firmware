@@ -2980,11 +2980,11 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   // PN532_SENSOR configuration;
   // Data->getConfiguration(id, &configuration);
 
-
   Serial << endl << "INFO: PN532: Method id: " << id;
 
   AFESensorPN532 PN532Sensor;
-  PN532Sensor.begin(0,Data);
+  PN532Sensor.begin(0, Data);
+  String data;
 
   if (id == 1) {
     PN532Sensor.formattingClassic();
@@ -2992,11 +2992,24 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
     PN532Sensor.formattingNFC();
   } else if (id == 3) {
     PN532Sensor.readNFC();
+  } else if (id == 4) {
+
+    PN532Sensor.readBlock(8, data);
+    PN532Sensor.readBlock(9, data);
+    PN532Sensor.readBlock(10, data);
+  } else if (id == 5) {
+    PN532Sensor.writeBlock(8, "ADRIAN");
+    PN532Sensor.writeBlock(9, "CZABANOWSKI");
+    PN532Sensor.writeBlock(10, "ADRIAN CZABANOWSKI");
   }
 
   page.concat("<a href=\"/?o=36&i=1\">Format Classic</a><br>");
   page.concat("<a href=\"/?o=36&i=2\">Format NFC</a><br>");
   page.concat("<a href=\"/?o=36&i=3\">Read NFC</a><br>");
+  page.concat("<a href=\"/?o=36&i=4\">Read a block</a><br>");
+  page.concat("<a href=\"/?o=36&i=5&text=");
+  page.concat(data);
+  page.concat("\">Write a block</a><br>");
 }
 
 #endif // AFE_CONFIG_HARDWARE_PN532

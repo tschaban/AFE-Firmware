@@ -11,7 +11,6 @@
 #include <PN532.h>
 #include <PN532_SWHSU.h>
 
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -44,11 +43,15 @@ class AFESensorPN532 {
 
 private:
   boolean _initialized = false;
+  boolean _tagInCache = false;
+  PN532_SECTOR tag;
 
   PN532_SWHSU PN532UARTInterface;
   PN532 NFCReader;
 
-  uint8_t cardUID[] = {0, 0, 0, 0, 0, 0, 0}; // Buffer to store the returned UID
+  uint8_t cardUID[7] = {0, 0, 0, 0,
+                        0, 0, 0}; // Buffer to store the returned UID
+
   uint8_t cardUIDLength; // Length of the UID (4 or 7 bytes depending on
                          // ISO14443A card type)
 
@@ -56,6 +59,8 @@ private:
   boolean authenticatedBlock(uint32_t blockId);
 
 public:
+
+
   /* Constructor */
   AFESensorPN532();
 
@@ -71,6 +76,12 @@ public:
   void formattingNFC();
   void formattingClassic();
   void readNFC();
+  
+  void readBlock(uint8_t blockId, String &data);
+  void writeBlock(uint8_t blockId, const char *data);
+  boolean readSector(uint8_t sectorId, PN532_SECTOR &data);
+  void get(PN532_SECTOR &data);
+
 };
 
 #endif // AFE_CONFIG_HARDWARE_PN532
