@@ -495,5 +495,21 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
 #define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
 
+
+/* PN532 */
+#define L_PN532_SENSOR "Czujnik PN532"
+#define L_PN532_MIFARE_ADMIN "Karta MiFare Classic 1k"
+#define L_PN532_CARD_FORMAT "Formatowanie karty"
+#define L_PN532_CARD_FORMAT_HINT "Formatowanie karty usuwa wszystkie zapisane na niej informacje. Kartę należy umieścić przy czujniku i nie ruszać podczas jej formatowania"
+#define L_PN532_FORMAT_NFC "<a href=\"/?o=37&i=2\">Formatuj NFC</a>"
+#define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=37&i=1\">Formatuj Classic MiFare</a>"
+#define L_PN532_READ_TAG "<a href=\"/?o=37&i=3\">Odczytaj aktualny TAG</a>"
+#define L_PN532_SAVE_TAG "Zapis TAG na karcie"
+#define L_PN532_SAVE_TAG_HINT "Kartę musi być sformwatowana to NFC. Należy ją umieścić przy czujniku i nie ruszać podczas jej zapisywania"
+
+#define L_PN532_CURRENT_TAG "Aktualny TAG w karcie"
+#define L_PN532_CURRENT_PRIMARY_TAG "TAG"
+#define L_PN532_CURRENT_BACKUP_TAG "TAG: zapasowa kopia"
+
 #endif // _LANG_PL_h
 

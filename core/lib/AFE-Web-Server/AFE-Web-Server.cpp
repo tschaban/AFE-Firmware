@@ -196,7 +196,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_PN532_SENSOR:
     Site.sitePN532Sensor(page, siteConfig->deviceID);
     break;
-
+  case AFE_CONFIG_SITE_PN532_SENSOR_ADMIN:
+    Site.sitePN532SensorAdmin(page, siteConfig->deviceID);
+    break;
 #endif
   }
 
@@ -466,8 +468,10 @@ void AFEWebServer::generate(boolean upload) {
       else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR) {
         PN532_SENSOR configuration;
         get(configuration);
-        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+        Data->saveConfiguration(0, &configuration);
         configuration = {0};
+      } else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN) {
+        processMiFareCard();
       }
 #endif
 
@@ -2076,7 +2080,76 @@ uint16_t AFEWebServer::getOTAFirmwareId() {
 }
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-
 #ifdef AFE_CONFIG_HARDWARE_PN532
-  void AFEWebServer::get(PN532_SENSOR &data) {}
+void AFEWebServer::get(PN532_SENSOR &data) {
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+  data.tx = server.arg("tx").length() > 0 ? server.arg("tx").toInt()
+                                          : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.rx = server.arg("rx").length() > 0 ? server.arg("rx").toInt()
+                                          : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  data.requestProcessingTime = server.arg("f").length() > 0
+                                   ? server.arg("f").toInt()
+                                   : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx =
+      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+}
+
+void AFEWebServer::processMiFareCard() {
+  AFESensorPN532 PN532Sensor;
+  PN532Sensor.begin(0, Data);
+
+  char tag[AFE_HARDWARE_PN532_BLOCK_SIZE];
+  char label[3];
+
+  for (uint8_t i = 0;
+       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+    sprintf(label, "t%d", i);
+    if (server.arg(label).length() > 0) {
+      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE);
+    } else {
+      tag[0] = AFE_EMPTY_STRING;
+    }
+
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: PN532: Writing to block: "
+           << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i << " : " << tag;
+#endif
+    PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, tag);
+    
+  }
+
+  for (uint8_t i = 0;
+       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+    sprintf(label, "t%d", i + 4);
+    if (server.arg(label).length() > 0) {
+      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE);
+    } else {
+      tag[0] = AFE_EMPTY_STRING;
+    }
+
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: PN532: Writing to block: "
+           << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i << " : " << tag;
+#endif
+    PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i, tag);
+  }
+}
 #endif

@@ -224,6 +224,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+/* PN532 */
+#ifdef AFE_CONFIG_HARDWARE_PN532
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addMenuItem(page, F(L_PN532_MIFARE_ADMIN),
+                AFE_CONFIG_SITE_PN532_SENSOR_ADMIN);
+  }
+#endif
+
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   if (Device->configuration.noOfRegulators > 0) {
@@ -2977,41 +2985,150 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
 void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
-  // PN532_SENSOR configuration;
-  // Data->getConfiguration(id, &configuration);
+  PN532_SENSOR configuration;
+  char _number[6];
+  Data->getConfiguration(0, &configuration);
 
-  Serial << endl << "INFO: PN532: Method id: " << id;
+  openSection(page, F(L_PN532_SENSOR), F(""));
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
 
-  AFESensorPN532 PN532Sensor;
-  PN532Sensor.begin(0, Data);
-  String data;
+  /* Item: UART GPIOs */
+  addListOfGPIOs(page, F("rx"), configuration.rx, "GPIO RXD");
+  addListOfGPIOs(page, F("tx"), configuration.tx, "GPIO TXD");
 
-  if (id == 1) {
-    PN532Sensor.formattingClassic();
-  } else if (id == 2) {
-    PN532Sensor.formattingNFC();
-  } else if (id == 3) {
-    PN532Sensor.readNFC();
-  } else if (id == 4) {
+  /* Item: Time for processing requests */
+  sprintf(_number, "%d", configuration.requestProcessingTime);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1",
+                   L_MILISECONDS);
 
-    PN532Sensor.readBlock(8, data);
-    PN532Sensor.readBlock(9, data);
-    PN532Sensor.readBlock(10, data);
-  } else if (id == 5) {
-    PN532Sensor.writeBlock(8, "ADRIAN");
-    PN532Sensor.writeBlock(9, "CZABANOWSKI");
-    PN532Sensor.writeBlock(10, "ADRIAN CZABANOWSKI");
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
   }
-
-  page.concat("<a href=\"/?o=36&i=1\">Format Classic</a><br>");
-  page.concat("<a href=\"/?o=36&i=2\">Format NFC</a><br>");
-  page.concat("<a href=\"/?o=36&i=3\">Read NFC</a><br>");
-  page.concat("<a href=\"/?o=36&i=4\">Read a block</a><br>");
-  page.concat("<a href=\"/?o=36&i=5&text=");
-  page.concat(data);
-  page.concat("\">Write a block</a><br>");
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif
 }
 
+void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
+  AFESensorPN532 PN532Sensor;
+  PN532Sensor.begin(0, Data);
+
+  switch (id) {
+  case 1: /* Formatting Card to MiFare Classik 1k */
+    PN532Sensor.formattingClassic();
+    break;
+  case 2: /* Formattin to NFC card */
+    PN532Sensor.formattingNFC();
+    break;
+  case 3: /* Reading current TAG */ {
+
+    String data;
+    data.reserve(17);
+    openSection(page, F(L_PN532_CURRENT_TAG), F(""));
+
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+    page.replace("{{i.v}}", F(L_PN532_CURRENT_PRIMARY_TAG));
+
+    for (uint8_t i = 0;
+         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+      data = "";
+      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, data);
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", data);
+    }
+
+    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+      data = "";
+      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
+                            data);
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", data);
+    }
+
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+    page.replace("{{i.v}}", F(L_PN532_CURRENT_BACKUP_TAG));
+
+    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR;
+         i++) {
+      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                                AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                                i,
+                            data);
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", data);
+    }
+
+    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR;
+         i++) {
+      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                                AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                                i,
+                            data);
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", data);
+    }
+
+    closeSection(page);
+
+    break;
+  }
+#ifdef DEBUG
+  case 4: /* Read what's saved in card (only in DEBUG mode) */
+    PN532Sensor.readNFC();
+    break;
+#endif
+  }
+
+  /* Generating site */
+
+  Data->getWelcomeMessage(_HtmlResponse);
+
+  if (_HtmlResponse.length() > 0) {
+    openMessageSection(page, F("Firmware"), F(""));
+
+    if (_HtmlResponse.length() > 0) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", _HtmlResponse);
+    }
+    closeSection(page);
+  }
+
+  openSection(page, F(L_PN532_CARD_FORMAT), F(L_PN532_CARD_FORMAT_HINT));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_FORMAT_NFC));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_FORMAT_MINIFARE));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_READ_TAG));
+  closeSection(page);
+
+  openSection(page, F(L_PN532_SAVE_TAG), F(L_PN532_SAVE_TAG_HINT));
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", "TAG 1", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", "TAG 2", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 3", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 4", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 5", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 6", "", "16");
+  closeSection(page);
+}
 #endif // AFE_CONFIG_HARDWARE_PN532
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {

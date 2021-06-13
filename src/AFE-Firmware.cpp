@@ -236,9 +236,8 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
-  initializePN532Sensor();
+    initializePN532Sensor();
 #endif
-
 
     /* Initializing APIs */
     initializeMQTTAPI();
@@ -250,13 +249,10 @@ void setup() {
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
-  } 
-  
-  
-/* End of initialization for operating mode. Initialization for all devices modes */
+  }
 
-
-
+/* End of initialization for operating mode. Initialization for all devices
+ * modes */
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
@@ -274,8 +270,6 @@ void setup() {
     Led.blinkingOn(100);
   }
 #endif
-
-
 
 #ifdef DEBUG
   Serial << endl
@@ -368,6 +362,11 @@ void loop() {
         binarySensorEventsListener();
 #endif
 
+/* Listenings and processing PN532 events */
+#ifdef AFE_CONFIG_HARDWARE_PN532
+        PN532EventsListener();
+#endif
+
         /* Checking if Key is still valid */
         FirmwarePro.listener();
 
@@ -409,12 +408,6 @@ void loop() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
       relayEventsListener();
 #endif
-
-/* Listenings and processing PN532 events */
-#ifdef AFE_CONFIG_HARDWARE_PN532
-  PN532EventsListener();
-#endif
-
     }
 
     /* Trigger actions triggered by WiFi: connected/disconnected or MQTT
@@ -430,8 +423,6 @@ void loop() {
   switchEventsListener();
   processSwitchEvents();
 #endif
-
-
 
 /* Led listener */
 #ifdef AFE_CONFIG_HARDWARE_LED

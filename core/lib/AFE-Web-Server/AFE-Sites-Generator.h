@@ -294,6 +294,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
   void sitePN532Sensor(String &page, uint8_t id);
+  void sitePN532SensorAdmin(String &page, uint8_t id);
 #endif
 };
 

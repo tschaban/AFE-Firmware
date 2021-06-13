@@ -43,9 +43,9 @@ class AFESensorPN532 {
 
 private:
   boolean _initialized = false;
-  boolean _tagInCache = false;
-  PN532_SECTOR tag;
-
+  boolean _request = false;
+  unsigned long _requestTime = 0;
+  
   PN532_SWHSU PN532UARTInterface;
   PN532 NFCReader;
 
@@ -60,6 +60,7 @@ private:
 
 public:
 
+  PN532_SENSOR configuraton;
 
   /* Constructor */
   AFESensorPN532();
@@ -71,17 +72,16 @@ public:
   boolean listener(void);
 
   /* Returns the sensor data in JSON format */
-  void getJSON(char *json);
+  void getJSON(char *json, PN532_SECTOR *data);
 
   void formattingNFC();
   void formattingClassic();
   void readNFC();
-  
+
   void readBlock(uint8_t blockId, String &data);
   void writeBlock(uint8_t blockId, const char *data);
-  boolean readSector(uint8_t sectorId, PN532_SECTOR &data);
-  void get(PN532_SECTOR &data);
 
+  boolean readTag(PN532_SECTOR &data);
 };
 
 #endif // AFE_CONFIG_HARDWARE_PN532

@@ -1,5 +1,8 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
+do zrobienia noofPN sensor in devce
+
+
 #ifdef AFE_CONFIG_HARDWARE_PN532
 
 /* ---------Headers ---------*/
@@ -26,9 +29,16 @@ void initializePN532Sensor() {
 void PN532EventsListener() {
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
     if (PN532Sensor[i].listener()) {
-      char json[100];
-      PN532Sensor[i].getJSON(json);
-      Serial << endl << json;
+      PN532_SECTOR tag;
+    /*
+      if (PN532Sensor[i].readTag(tag)) {
+        Serial << endl << endl << "PROCESING REQUEST";
+        char json[AFE_CONFIG_API_JSON_PN582_DATA_LENGTH];
+        PN532Sensor[i].getJSON(json,&tag);
+          Serial << endl << json;
+      }
+    */
+    
     }
   }
 }

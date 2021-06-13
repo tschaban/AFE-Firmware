@@ -12,7 +12,15 @@
 
 
 struct PN532_SENSOR {
-  char name[17];  
+  char name[17];
+  uint8_t tx;
+  uint8_t rx;
+  uint16_t requestProcessingTime;
+  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 struct PN532_TAG {
@@ -20,7 +28,7 @@ struct PN532_TAG {
 };
 
 struct PN532_SECTOR {
-  PN532_TAG block[AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR];
+  PN532_TAG block[AFE_HARDWARE_PN532_TAG_SIZE];
 };
 
 #endif

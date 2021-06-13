@@ -41,15 +41,14 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
     configFile.close();
     /* After message is read, it's removed from the file */
     saveWelecomeMessage(F(""));
-  }
-
+  } else {
+    message = "";
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: File: ") << AFE_FILE_WELCOME_MESSAGE
            << F(" not opened");
-  }
 #endif
+  }
 }
 
 void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
@@ -562,7 +561,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
-  configuration->noOfPN532Sensors = 1; // root["noOfPN532Sensors"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
+      configuration->noOfPN532Sensors = 1; // root["noOfPN532Sensors"] |
+// AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
 #endif
 
 #ifdef DEBUG
@@ -689,7 +689,6 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
     root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
@@ -845,7 +844,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
 #endif
 
-          saveConfiguration(&deviceConfiguration);
+  saveConfiguration(&deviceConfiguration);
 }
 
 void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
@@ -5677,7 +5676,153 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532
-void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR  *configuration) {}
-void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR  *configuration) {}
-void AFEDataAccess::createPN532ConfigurationFile() {}
+void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PN532_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      sprintf(configuration->name, root["name"]);
+      configuration->tx = root["tx"].as<int>();
+      configuration->rx = root["rx"].as<int>();
+      configuration->requestProcessingTime = root["requestProcessingTime"];
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#else
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PN532_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration->name;
+    root["tx"] = configuration->tx;
+    root["rx"] = configuration->rx;
+    root["requestProcessingTime"] = configuration->requestProcessingTime;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration->domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createPN532ConfigurationFile() {
+  PN532_SENSOR configuration;
+  sprintf(configuration.name, "pn532");
+  configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#else
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-pn532-sensor-") << i << F(".json");
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    sprintf(configuration.mqtt.topic, "pn532");
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+    saveConfiguration(i, &configuration);
+  }
+}
+
 #endif
