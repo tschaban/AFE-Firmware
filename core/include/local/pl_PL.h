@@ -111,6 +111,7 @@
 #define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
 #define L_DEVICE_NUMBER_OF_REGULATORS "Ilość regulatorów"
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarnych"
+#define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -497,6 +498,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 
 /* PN532 */
+
 #define L_PN532_SENSOR "Czujnik PN532"
 #define L_PN532_MIFARE_ADMIN "Karta MiFare Classic 1k"
 #define L_PN532_CARD_FORMAT "Formatowanie karty"
@@ -505,11 +507,20 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=37&i=1\">Formatuj Classic MiFare</a>"
 #define L_PN532_READ_TAG "<a href=\"/?o=37&i=3\">Odczytaj aktualny TAG</a>"
 #define L_PN532_SAVE_TAG "Zapis TAG na karcie"
-#define L_PN532_SAVE_TAG_HINT "Kartę musi być sformwatowana to NFC. Należy ją umieścić przy czujniku i nie ruszać podczas jej zapisywania"
-
+#define L_PN532_SAVE_TAG_HINT "Kartę musi być sformwatowana to NFC. Należy ją umieścić przy czujniku i nie ruszać podczas jej zapisywania. w Tag'ach używać tylko cyfry, znaki (bez PL liter) oraz podstawowe znaki specjalne"
 #define L_PN532_CURRENT_TAG "Aktualny TAG w karcie"
 #define L_PN532_CURRENT_PRIMARY_TAG "TAG"
 #define L_PN532_CURRENT_BACKUP_TAG "TAG: zapasowa kopia"
+#define L_PN532_TAG_ID "Identyfikator"
+#define L_PN532_TAG_WHO "Użytkownik"
+#define L_PN532_LED "LED sygnalizujące stany czujnika PN582"
+#define L_PN532_REQUEST_PROCESSING "Czas przetwarzania żądania po odczytaniu karty"
+#define L_PN532_TIMEOUT "Czas oczekiwania na kartę"
+#define L_PN532_INTERFACE "Interface"
+#define L_PN532_LISTENER_TIMEOUT "Co ile próbować czytać kartę"
+#define L_PN532_SHOW_INTERFACE_CONFIGURATION "Pokaż parametery konfiguracyjne interface'u"
+#define L_PN532_TIMEOUTS "Czasy"
+
 
 #endif // _LANG_PL_h
 

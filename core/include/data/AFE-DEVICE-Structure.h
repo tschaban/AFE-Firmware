@@ -70,7 +70,7 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   uint8_t noOfBinarySensors;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   uint8_t noOfPN532Sensors;
 #endif
 };

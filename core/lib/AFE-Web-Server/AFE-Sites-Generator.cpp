@@ -202,7 +202,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   if (Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F("PN532 Sensor"), AFE_CONFIG_SITE_PN532_SENSOR);
   }
@@ -225,7 +225,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #endif
 
 /* PN532 */
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   if (Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(L_PN532_MIFARE_ADMIN),
                 AFE_CONFIG_SITE_PN532_SENSOR_ADMIN);
@@ -427,6 +427,12 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
                         Device->configuration.noOfRainmeterSensors, F("d"),
                         F(L_RAINMETER));
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS,
+                        Device->configuration.noOfPN532Sensors, F("ck"),
+                        F(L_DEVICE_NUMBER_OF_PN532_SENSORS));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -2983,28 +2989,74 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   PN532_SENSOR configuration;
   char _number[6];
   Data->getConfiguration(0, &configuration);
 
   openSection(page, F(L_PN532_SENSOR), F(""));
+
   /* Item: name of the sensor */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  /* Item: UART GPIOs */
-  addListOfGPIOs(page, F("rx"), configuration.rx, "GPIO RXD");
-  addListOfGPIOs(page, F("tx"), configuration.tx, "GPIO TXD");
+  closeSection(page);
 
-  /* Item: Time for processing requests */
-  sprintf(_number, "%d", configuration.requestProcessingTime);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1",
-                   L_MILISECONDS);
+  openSection(page, F(L_PN532_INTERFACE), F(""));
+  /* Item: interface */
+  addSelectFormItemOpen(page, F("d"), F(L_PN532_INTERFACE));
+  addSelectOptionFormItem(page, L_NONE, "255", configuration.interface ==
+                                                   AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, "UART", "1",
+                          configuration.interface ==
+                              AFE_HARDWARE_PN532_INTERFACE_UART);
+  addSelectOptionFormItem(page, "I2C", "0",
+                          configuration.interface ==
+                              AFE_HARDWARE_PN532_INTERFACE_IIC);
+  addSelectFormItemClose(page);
+
+  page.concat("<input type=\"submit\" class=\"b bw\" "
+              "value=\"" L_PN532_SHOW_INTERFACE_CONFIGURATION "\"><br><br>");
+
+  if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_UART) {
+    /* Item: UART GPIOs */
+    addListOfGPIOs(page, F("rx"), configuration.rx, "GPIO RXD");
+    addListOfGPIOs(page, F("tx"), configuration.tx, "GPIO TXD");
+  } else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
+    /* Item: IIC address */
+    addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+  }
 
   closeSection(page);
+
+  openSection(page, F(L_PN532_TIMEOUTS), F(""));
+
+  /* Item: Interval card reads PN532 */
+  sprintf(_number, "%d", configuration.listenerTimeout);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "b", L_PN532_LISTENER_TIMEOUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "0", "5000", "1", L_MILISECONDS);
+
+  /* Item: Timeout PN532 */
+  sprintf(_number, "%d", configuration.timeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "w", L_PN532_TIMEOUT,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "10", "5000", "1",
+                   L_MILISECONDS);
+  /* Item: Time for processing requests */
+  sprintf(_number, "%d", configuration.requestProcessingTime);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_PN532_REQUEST_PROCESSING, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+
+  closeSection(page);
+
+/* Item: LED */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  openSection(page, F(L_PN532_LED), F(""));
+  addLEDSelectionItem(page, configuration.ledID);
+  closeSection(page);
+#endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
@@ -3055,7 +3107,8 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
       page.replace("{{I}}", data);
     }
 
-    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+    for (uint8_t i = 0;
+         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
       data = "";
       PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
                             data);
@@ -3066,8 +3119,8 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
     page.concat(FPSTR(HTTP_INFO_TEXT));
     page.replace("{{i.v}}", F(L_PN532_CURRENT_BACKUP_TAG));
 
-    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR;
-         i++) {
+    for (uint8_t i = 0;
+         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
       PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
                                 AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
                                 i,
@@ -3076,8 +3129,8 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
       page.replace("{{I}}", data);
     }
 
-    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR;
-         i++) {
+    for (uint8_t i = 0;
+         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
       PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
                                 AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
                                 i,
@@ -3121,15 +3174,17 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   closeSection(page);
 
   openSection(page, F(L_PN532_SAVE_TAG), F(L_PN532_SAVE_TAG_HINT));
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", "TAG 1", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", "TAG 2", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 3", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 4", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 5", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 6", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, "",
+                   "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, "",
+                   "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", "", "16");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", "", "16");
   closeSection(page);
 }
-#endif // AFE_CONFIG_HARDWARE_PN532
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

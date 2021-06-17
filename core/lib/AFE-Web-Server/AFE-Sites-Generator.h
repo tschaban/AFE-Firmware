@@ -32,7 +32,7 @@
 #include <AFE-Sensor-DHT.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
 #endif
 
@@ -292,7 +292,7 @@ public:
   void siteBinarySensor(String &page, uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   void sitePN532Sensor(String &page, uint8_t id);
   void sitePN532SensorAdmin(String &page, uint8_t id);
 #endif

@@ -192,7 +192,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteBinarySensor(page, siteConfig->deviceID);
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   case AFE_CONFIG_SITE_PN532_SENSOR:
     Site.sitePN532Sensor(page, siteConfig->deviceID);
     break;
@@ -464,7 +464,7 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       }
 #endif
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
       else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR) {
         PN532_SENSOR configuration;
         get(configuration);
@@ -988,6 +988,11 @@ void AFEWebServer::get(DEVICE &data) {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   data.noOfBinarySensors =
       server.arg("b").length() > 0 ? server.arg("b").toInt() : 0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  data.noOfPN532Sensors =
+      server.arg("ck").length() > 0 ? server.arg("ck").toInt() : 0;
 #endif
 
   data.timeToAutoLogOff =
@@ -2080,7 +2085,7 @@ uint16_t AFEWebServer::getOTAFirmwareId() {
 }
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 void AFEWebServer::get(PN532_SENSOR &data) {
   if (server.arg("n").length() > 0) {
     server.arg("n").toCharArray(data.name, sizeof(data.name));
@@ -2096,7 +2101,33 @@ void AFEWebServer::get(PN532_SENSOR &data) {
 
   data.requestProcessingTime = server.arg("f").length() > 0
                                    ? server.arg("f").toInt()
+                                   : AFE_HARDWARE_PN532_DEFUALT_REQUEST_PROCESSING_TIME;
+
+  data.timeout = server.arg("w").length() > 0
+                                   ? server.arg("w").toInt()
+                                   : AFE_HARDWARE_PN532_DEFUALT_TIMEOUT;
+
+  data.listenerTimeout = server.arg("b").length() > 0
+                                   ? server.arg("b").toInt()
+                                   : AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
+
+  data.i2cAddress = server.arg("a").length() > 0
+                                   ? server.arg("a").toInt()
+                                   : 0;
+
+
+  data.interface = server.arg("d").length() > 0
+                                   ? server.arg("d").toInt()
+                                   : AFE_HARDWARE_PN532_DEFAULT_INTERFACE;
+
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  data.ledID = server.arg("l").length() > 0
+                                   ? server.arg("l").toInt()
                                    : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx =
@@ -2132,7 +2163,6 @@ void AFEWebServer::processMiFareCard() {
            << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i << " : " << tag;
 #endif
     PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, tag);
-    
   }
 
   for (uint8_t i = 0;
@@ -2152,4 +2182,4 @@ void AFEWebServer::processMiFareCard() {
     PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i, tag);
   }
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR

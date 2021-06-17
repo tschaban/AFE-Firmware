@@ -4,12 +4,17 @@
 #define _AFE_Sensor_PN532_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #include <AFE-Data-Access.h>
 
 #include <PN532.h>
 #include <PN532_SWHSU.h>
+#include <PN532_I2C.h>
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -45,9 +50,13 @@ private:
   boolean _initialized = false;
   boolean _request = false;
   unsigned long _requestTime = 0;
-  
+  unsigned long _listenerTime = 0;
+
   PN532_SWHSU PN532UARTInterface;
+  PN532_I2C PN532I2CInterface;
+  
   PN532 NFCReader;
+  PN532_TAGS tag;
 
   uint8_t cardUID[7] = {0, 0, 0, 0,
                         0, 0, 0}; // Buffer to store the returned UID
@@ -55,12 +64,15 @@ private:
   uint8_t cardUIDLength; // Length of the UID (4 or 7 bytes depending on
                          // ISO14443A card type)
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED Led;
+#endif
+
   boolean foundCard();
   boolean authenticatedBlock(uint32_t blockId);
 
 public:
-
-  PN532_SENSOR configuraton;
+  PN532_SENSOR configuration;
 
   /* Constructor */
   AFESensorPN532();
@@ -72,7 +84,7 @@ public:
   boolean listener(void);
 
   /* Returns the sensor data in JSON format */
-  void getJSON(char *json, PN532_SECTOR *data);
+  void getJSON(char *json);
 
   void formattingNFC();
   void formattingClassic();
@@ -81,8 +93,8 @@ public:
   void readBlock(uint8_t blockId, String &data);
   void writeBlock(uint8_t blockId, const char *data);
 
-  boolean readTag(PN532_SECTOR &data);
+  boolean readTag();
 };
 
-#endif // AFE_CONFIG_HARDWARE_PN532
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 #endif // _AFE_Sensor_PN532_h

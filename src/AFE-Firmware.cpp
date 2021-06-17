@@ -235,7 +235,7 @@ void setup() {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();
 #endif
 
@@ -363,7 +363,7 @@ void loop() {
 #endif
 
 /* Listenings and processing PN532 events */
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
         PN532EventsListener();
 #endif
 

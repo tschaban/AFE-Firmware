@@ -139,6 +139,12 @@ void initializeMQTTAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    if (Device.configuration.noOfPN532Sensors > 0) {
+      MqttAPI.addClass(&PN532Sensor[0]);
+    }
+#endif
+
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif

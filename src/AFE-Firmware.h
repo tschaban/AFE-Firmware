@@ -132,9 +132,9 @@ AFEImpulseCatcher RainImpulse;
 AFERainmeter RainSensor;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
-AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532];
+AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 #endif
 
 #include <AFE-Main-APIs.cpp>
@@ -207,7 +207,7 @@ AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532];
 #include <AFE-Main-Anemometer.cpp>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Main-PN532.cpp>
 #endif
 

@@ -221,7 +221,7 @@ public:
   void createBinarySensorConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   void getConfiguration(uint8_t id, PN532_SENSOR *);
   void saveConfiguration(uint8_t id, PN532_SENSOR *);
   void createPN532ConfigurationFile();

@@ -560,9 +560,10 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
-      configuration->noOfPN532Sensors = 1; // root["noOfPN532Sensors"] |
-// AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+      configuration->noOfPN532Sensors =
+          root["noOfPN532Sensors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
 #endif
 
 #ifdef DEBUG
@@ -690,7 +691,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
 #endif
 
@@ -839,9 +840,9 @@ void AFEDataAccess::createDeviceConfigurationFile() {
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   deviceConfiguration.noOfPN532Sensors =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532;
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -5675,7 +5676,7 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_PN532
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
   char fileName[26];
   sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
@@ -5707,7 +5708,16 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
       sprintf(configuration->name, root["name"]);
       configuration->tx = root["tx"].as<int>();
       configuration->rx = root["rx"].as<int>();
-      configuration->requestProcessingTime = root["requestProcessingTime"];
+      configuration->requestProcessingTime =
+          root["requestProcessingTime"].as<int>();
+      configuration->interface = root["interface"].as<int>();
+      configuration->listenerTimeout = root["listenerTimeout"].as<int>();
+      configuration->i2cAddress = root["i2cAddress"].as<int>();
+
+      configuration->timeout = root["timeout"].as<int>();
+#ifdef AFE_CONFIG_HARDWARE_LED
+      configuration->ledID = root["ledID"].as<int>();
+#endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
@@ -5766,6 +5776,14 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
     root["tx"] = configuration->tx;
     root["rx"] = configuration->rx;
     root["requestProcessingTime"] = configuration->requestProcessingTime;
+    root["timeout"] = configuration->timeout;
+    root["interface"] = configuration->interface;
+    root["listenerTimeout"] = configuration->listenerTimeout;
+    root["i2cAddress"] = configuration->i2cAddress;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    root["ledID"] = configuration->ledID;
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -5801,6 +5819,17 @@ void AFEDataAccess::createPN532ConfigurationFile() {
   sprintf(configuration.name, "pn532");
   configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.timeout = AFE_HARDWARE_PN532_DEFUALT_TIMEOUT;
+  configuration.requestProcessingTime =
+      AFE_HARDWARE_PN532_DEFUALT_REQUEST_PROCESSING_TIME;
+  configuration.i2cAddress = AFE_HARDWARE_PN532_DEFAULT_INTERFACE;
+  configuration.listenerTimeout = AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
+  configuration.i2cAddress = 0;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  configuration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else

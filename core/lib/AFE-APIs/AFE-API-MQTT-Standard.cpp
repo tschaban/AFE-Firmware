@@ -986,4 +986,17 @@ boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+boolean AFEAPIMQTTStandard::publishPN532SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_PN582_DATA_LENGTH];
+    _PN532Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_PN532Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
 #endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
