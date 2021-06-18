@@ -10,7 +10,6 @@
 #endif
 #include <AFE-MQTT-Structure.h>
 
-
 struct PN532_SENSOR {
   char name[17];
   uint8_t interface;
@@ -20,12 +19,10 @@ struct PN532_SENSOR {
   uint16_t requestProcessingTime;
   uint16_t listenerTimeout;
   uint16_t timeout;
- #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t ledID;
 #endif
-  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  DOMOTICZ_BASIC_CONFIG domoticz;
-#else
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   MQTT_BASIC_CONFIG mqtt;
 #endif
 };
@@ -36,6 +33,18 @@ struct PN532_TAG {
 
 struct PN532_TAGS {
   PN532_TAG block[AFE_HARDWARE_PN532_TAG_SIZE];
+};
+
+struct MIFARE_CARD {
+  char cardId[16];
+  uint8_t relayId;
+  uint8_t action;
+  boolean sendAsSwitch;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 #endif

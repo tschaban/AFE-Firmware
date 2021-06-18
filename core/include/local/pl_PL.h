@@ -521,6 +521,18 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_SHOW_INTERFACE_CONFIGURATION "Pokaż parametery konfiguracyjne interface'u"
 #define L_PN532_TIMEOUTS "Czasy"
 
+#define L_MIFARE_CARD "Karta MiFare"
+#define L_MIFARE_CARD_ID "ID Karty"
+#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnkem / bramą"
+#define L_MIFARE_CARD_CONTROLS "Steruje"
+#define L_MIFARE_CARD_ACTION "Akcja"
+#define L_MIFARE_CARD_ACTION_ON "ON"
+#define L_MIFARE_CARD_ACTION_OFF "OFF"
+#define L_MIFARE_CARD_ACTION_TOGGLE "Przełącz"
+#define L_MIFARE_CARD_SEND_DETECTIONS "Wysyłaj detekcję kart"
+#define L_MIFARE_CARD_SEND_AS_SWITCH "Wysyłaj detekcję kart wartościami: ON/OFF"
+#define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Domyślnie: OPEN/CLOSED"
+
 
 #endif // _LANG_PL_h
 

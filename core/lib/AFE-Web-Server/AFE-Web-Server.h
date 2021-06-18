@@ -178,6 +178,7 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   void get(PN532_SENSOR &data);
   void processMiFareCard();
+  void get(MIFARE_CARD &data);
 #endif
 
 

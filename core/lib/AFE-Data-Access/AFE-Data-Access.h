@@ -225,6 +225,10 @@ public:
   void getConfiguration(uint8_t id, PN532_SENSOR *);
   void saveConfiguration(uint8_t id, PN532_SENSOR *);
   void createPN532ConfigurationFile();
+
+  void getConfiguration(uint8_t id, MIFARE_CARD *);
+  void saveConfiguration(uint8_t id, MIFARE_CARD *);
+  void createMiFareCardConfigurationFile();
 #endif
 };
 #endif

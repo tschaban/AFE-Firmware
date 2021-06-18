@@ -5721,8 +5721,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
-#else
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
 #ifdef DEBUG
@@ -5784,9 +5782,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     root["ledID"] = configuration->ledID;
 #endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["idx"] = configuration->domoticz.idx;
-#else
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
@@ -5832,13 +5828,7 @@ void AFEDataAccess::createPN532ConfigurationFile() {
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++) {
 #ifdef DEBUG
@@ -5846,9 +5836,149 @@ void AFEDataAccess::createPN532ConfigurationFile() {
            << F("INFO: Creating file: cfg-pn532-sensor-") << i << F(".json");
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "pn532");
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+    saveConfiguration(i, &configuration);
+  }
+}
+
+void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+  char fileName[24];
+  sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration->action = root["action"].as<int>();
+      configuration->sendAsSwitch = root["sendAsSwitch"];
+      configuration->relayId = root["relayId"].as<int>();
+      sprintf(configuration->cardId, root["cardId"] | "");
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration.domoticz.idx = = root["idx"].as<int>();
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+  char fileName[24];
+  sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["action"] = configuration->action;
+    root["cardId"] = configuration->cardId;
+    root["relayId"] = configuration->relayId;
+    root["sendAsSwitch"] = configuration->sendAsSwitch;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["idx"] = configuration->domoticz.idx;
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createMiFareCardConfigurationFile() {
+  MIFARE_CARD configuration;
+  configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.action = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sendAsSwitch = AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
+  configuration.cardId[0] = AFE_EMPTY_STRING;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS;
+           i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+#endif
 
     saveConfiguration(i, &configuration);
   }

@@ -3079,6 +3079,116 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 #endif
 }
 
+void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
+  MIFARE_CARD configuration;
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  GATE gateConfiguration;
+#endif
+
+  char text[20];
+  Data->getConfiguration(id, &configuration);
+
+  openSection(page, F(L_MIFARE_CARD), F(""));
+
+  /* Item: card Id */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "m", L_MIFARE_CARD_ID,
+                   configuration.cardId, "16");
+  closeSection(page);
+
+  openSection(page, F(L_MIFARE_CARD_CONTROLS_RELAY_GATE), F(""));
+
+/* Item: relay / gate */
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
+
+  addSelectFormItemOpen(page, F("r"), F(L_MIFARE_CARD_CONTROLS));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST);
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  uint8_t relayIsForGate;
+#endif
+  RELAY relayConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+    page += "<option value=\"";
+    page += i;
+    page += "\"";
+    page += configuration.relayId == i ? " selected=\"selected\"" : "";
+    page += ">";
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    relayIsForGate = false;
+    for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
+      Data->getConfiguration(j, &gateConfiguration);
+      if (i == gateConfiguration.relayId) {
+        page += F(L_GATE);
+        page += ": ";
+        page += gateConfiguration.name;
+        relayIsForGate = true;
+        break;
+      }
+    }
+    if (!relayIsForGate) {
+      Data->getConfiguration(i, &relayConfiguration);
+      sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+      page.concat(text);
+    }
+#else
+    Data->getConfiguration(i, &relayConfiguration);
+    sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+    page.concat(text);
+#endif
+    page += "</option>";
+  }
+  addSelectFormItemClose(page);
+
+#endif // // defined(AFE_CONFIG_HARDWARE_RELAY) ||
+       // defined(AFE_CONFIG_HARDWARE_GATE)
+
+  /* Item: Action */
+  addSelectFormItemOpen(page, F("a"), F(L_MIFARE_CARD_ACTION));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.action == AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_ON, "1",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_ON);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_OFF, "0",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_OFF);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_TOGGLE, "2",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_TOGGLE);
+  addSelectFormItemClose(page);
+
+  closeSection(page);
+
+  openSection(page, F(L_MIFARE_CARD_SEND_DETECTIONS), F(""));
+
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch,
+                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+
+    char _idx[7];
+    sprintf(_idx, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+  }
+#endif
+
+  closeSection(page);
+}
+
 void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   AFESensorPN532 PN532Sensor;
   PN532Sensor.begin(0, Data);
