@@ -135,6 +135,8 @@ AFERainmeter RainSensor;
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
 AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+#include <AFE-MiFare-Card.h>
+AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
 #include <AFE-Main-APIs.cpp>

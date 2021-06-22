@@ -72,6 +72,7 @@ struct DEVICE {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   uint8_t noOfPN532Sensors;
+  uint8_t noOfMiFareCards;
 #endif
 };
 

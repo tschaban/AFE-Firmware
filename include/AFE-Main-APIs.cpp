@@ -143,6 +143,9 @@ void initializeMQTTAPI(void) {
     if (Device.configuration.noOfPN532Sensors > 0) {
       MqttAPI.addClass(&PN532Sensor[0]);
     }
+        if (Device.configuration.noOfMiFareCards > 0) {
+      MqttAPI.addClass(&MiFareCard[0]);
+    }
 #endif
 
 #ifdef DEBUG

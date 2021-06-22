@@ -83,6 +83,7 @@
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
+#include <AFE-MiFare-Card.h>
 #endif
 
 
@@ -175,6 +176,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 virtual void addClass(AFESensorPN532 *);
+virtual void addClass(AFEMiFareCard *);
 #endif
 
 
@@ -252,6 +254,7 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
 

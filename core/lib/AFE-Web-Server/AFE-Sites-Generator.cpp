@@ -206,6 +206,13 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   if (Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F("PN532 Sensor"), AFE_CONFIG_SITE_PN532_SENSOR);
   }
+
+  if (Device->configuration.noOfMiFareCards > 0) {
+    addMenuHeaderItem(page, F(L_MIFARE_CARDS));
+    addMenuSubItem(page, L_MIFARE, Device->configuration.noOfMiFareCards,
+                   AFE_CONFIG_SITE_MIFARE_CARDS);
+  }
+
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -374,10 +381,6 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DHT_SENSORS));
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHT
-// TODO
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
                         Device->configuration.noOfHPMA115S0s, F("hp"),
@@ -433,6 +436,9 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS,
                         Device->configuration.noOfPN532Sensors, F("ck"),
                         F(L_DEVICE_NUMBER_OF_PN532_SENSORS));
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS,
+                        Device->configuration.noOfMiFareCards, F("f"),
+                        F(L_DEVICE_NUMBER_OF_MIFARE_CARDS));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -3071,7 +3077,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    openSection(page, F(L_PN532_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);
@@ -3081,6 +3087,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 
 void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   MIFARE_CARD configuration;
+   char _number[6];
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
@@ -3161,16 +3168,9 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
   closeSection(page);
 
-  openSection(page, F(L_MIFARE_CARD_SEND_DETECTIONS), F(""));
-
-  /* Item: send as switch*/
-  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
-                      configuration.sendAsSwitch,
-                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
-
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
@@ -3180,11 +3180,25 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    openSection(page, F(L_MIFARE_CARD_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
   }
 #endif
+  closeSection(page);
+
+  openSection(page, F(L_MIFARE_CARD_SEND_DETECTIONS), F(""));
+
+  /* Item: How long keep the card state */
+  sprintf(_number, "%d", configuration.howLongKeepState);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_HOW_LONG_KEEP_STATE,
+      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch,
+                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
 
   closeSection(page);
 }

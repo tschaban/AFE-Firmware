@@ -226,4 +226,13 @@ void AFEAPI::addClass(AFESensorPN532 *Sensor) {
   Serial << endl << F("INFO: The reference to the PN532 sensor added");
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+void AFEAPI::addClass(AFEMiFareCard *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfMiFareCards; i++) {
+    _MiFareCard[i] = Sensor + i;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the MiFare Card added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR

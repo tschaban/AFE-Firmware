@@ -9,8 +9,9 @@
 #include <AFE-Data-Access.h>
 
 #include <PN532.h>
-#include <PN532_SWHSU.h>
 #include <PN532_I2C.h>
+#include <PN532_SWHSU.h>
+
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -54,9 +55,8 @@ private:
 
   PN532_SWHSU PN532UARTInterface;
   PN532_I2C PN532I2CInterface;
-  
+
   PN532 NFCReader;
-  PN532_TAGS tag;
 
   uint8_t cardUID[7] = {0, 0, 0, 0,
                         0, 0, 0}; // Buffer to store the returned UID
@@ -73,6 +73,7 @@ private:
 
 public:
   PN532_SENSOR configuration;
+  PN532_TAGS tag;
 
   /* Constructor */
   AFESensorPN532();

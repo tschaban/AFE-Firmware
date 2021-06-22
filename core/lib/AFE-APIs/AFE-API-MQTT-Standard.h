@@ -67,6 +67,7 @@ private:
 #endif
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
                       + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS
+                      + AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
 #endif
   ];
 
@@ -177,6 +178,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   boolean publishPN532SensorData(uint8_t id);
+  boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 };
 

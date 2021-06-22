@@ -476,7 +476,7 @@ void AFEWebServer::generate(boolean upload) {
       } else if (siteConfig.ID == AFE_CONFIG_SITE_MIFARE_CARDS) {
         MIFARE_CARD configuration;
         get(configuration);
-        Data->saveConfiguration(0, &configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       } else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN) {
         processMiFareCard();
@@ -1000,7 +1000,14 @@ void AFEWebServer::get(DEVICE &data) {
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   data.noOfPN532Sensors =
-      server.arg("ck").length() > 0 ? server.arg("ck").toInt() : 0;
+      server.arg("ck").length() > 0
+          ? server.arg("ck").toInt()
+          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
+  data.noOfMiFareCards =
+      server.arg("f").length() > 0
+          ? server.arg("f").toInt()
+          : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
+
 #endif
 
   data.timeToAutoLogOff =
@@ -2195,6 +2202,11 @@ void AFEWebServer::get(MIFARE_CARD &data) {
   data.sendAsSwitch = server.arg("s").length() > 0
                           ? server.arg("s").toInt()
                           : AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
+
+  data.howLongKeepState = server.arg("h").length() > 0
+                          ? server.arg("h").toInt()
+                          : AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
+
 
   data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;

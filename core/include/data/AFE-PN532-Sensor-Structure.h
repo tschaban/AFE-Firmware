@@ -40,6 +40,7 @@ struct MIFARE_CARD {
   uint8_t relayId;
   uint8_t action;
   boolean sendAsSwitch;
+  uint16_t howLongKeepState;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

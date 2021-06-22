@@ -990,10 +990,26 @@ boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
 boolean AFEAPIMQTTStandard::publishPN532SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_PN582_DATA_LENGTH];
-    _PN532Sensor[id]->getJSON(message);
-    publishStatus =
-        Mqtt.publish(_PN532Sensor[id]->configuration.mqtt.topic, message);
+    if (strlen(_PN532Sensor[id]->configuration.mqtt.topic) > 0) {
+      char message[AFE_CONFIG_API_JSON_PN582_DATA_LENGTH];
+      _PN532Sensor[id]->getJSON(message);
+      publishStatus =
+          Mqtt.publish(_PN532Sensor[id]->configuration.mqtt.topic, message);
+    }
+  }
+  return publishStatus;
+}
+boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
+  boolean publishStatus = false;
+  if (enabled) {
+    if (strlen(_MiFareCard[id]->configuration.mqtt.topic) > 0) {
+      publishStatus = Mqtt.publish(
+          _MiFareCard[id]->configuration.mqtt.topic,
+          state == AFE_HARDWARE_MIFARE_CARD_ACTION_OFF
+              ? _MiFareCard[id]->configuration.sendAsSwitch ? "off" : "open"
+              : _MiFareCard[id]->configuration.sendAsSwitch ? "on" : "closed");
+      _MiFareCard[id]->state = state;
+    }
   }
   return publishStatus;
 }

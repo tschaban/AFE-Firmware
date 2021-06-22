@@ -564,6 +564,9 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->noOfPN532Sensors =
           root["noOfPN532Sensors"] |
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
+      configuration->noOfMiFareCards =
+          root["noOfMiFareCards"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
 #ifdef DEBUG
@@ -693,6 +696,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
+    root["noOfMiFareCards"] = configuration->noOfMiFareCards;
 #endif
 
     root.printTo(configFile);
@@ -843,6 +847,8 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   deviceConfiguration.noOfPN532Sensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
+  deviceConfiguration.noOfMiFareCards =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -5871,6 +5877,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
       configuration->action = root["action"].as<int>();
       configuration->sendAsSwitch = root["sendAsSwitch"];
       configuration->relayId = root["relayId"].as<int>();
+      configuration->howLongKeepState = root["howLongKeepState"].as<int>();
       sprintf(configuration->cardId, root["cardId"] | "");
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -5930,6 +5937,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
     root["cardId"] = configuration->cardId;
     root["relayId"] = configuration->relayId;
     root["sendAsSwitch"] = configuration->sendAsSwitch;
+    root["howLongKeepState"] = configuration->howLongKeepState;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -5966,6 +5974,7 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
   configuration.action = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.sendAsSwitch = AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
   configuration.cardId[0] = AFE_EMPTY_STRING;
+  configuration.howLongKeepState = AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX
