@@ -5881,7 +5881,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
       sprintf(configuration->cardId, root["cardId"] | "");
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration.domoticz.idx = = root["idx"].as<int>();
+      configuration->domoticz.idx = root["idx"].as<int>();
 #else
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
@@ -5974,16 +5974,16 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
   configuration.action = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.sendAsSwitch = AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
   configuration.cardId[0] = AFE_EMPTY_STRING;
-  configuration.howLongKeepState = AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
+  configuration.howLongKeepState =
+      AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS;
-           i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");

@@ -218,6 +218,7 @@ void AFEAPI::addClass(AFESensorBinary *Sensor) {
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 void AFEAPI::addClass(AFESensorPN532 *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfPN532Sensors; i++) {
     _PN532Sensor[i] = Sensor + i;
@@ -226,7 +227,7 @@ void AFEAPI::addClass(AFESensorPN532 *Sensor) {
   Serial << endl << F("INFO: The reference to the PN532 sensor added");
 #endif
 }
-
+#endif
 void AFEAPI::addClass(AFEMiFareCard *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfMiFareCards; i++) {
     _MiFareCard[i] = Sensor + i;

@@ -324,9 +324,11 @@ void AFESensorPN532::formattingClassic() {
         memset(blockBuffer, 0, sizeof(blockBuffer));
         if (!(NFCReader.mifareclassic_WriteDataBlock(
                 (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1, blockBuffer))) {
+#ifdef DEBUG                  
           Serial << endl
                  << "ERROR: PN532: Unable to write to sector: " << idx
                  << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1;
+#endif                 
           return;
         }
 
@@ -380,7 +382,9 @@ void AFESensorPN532::readNFC() {
                << "-------------------------";
 #endif
         authenticated = authenticatedBlock(currentblock);
+#ifdef DEBUG        
         Serial << endl;
+#endif        
       }
 
       if (authenticated) {

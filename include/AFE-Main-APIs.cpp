@@ -140,10 +140,12 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     if (Device.configuration.noOfPN532Sensors > 0) {
       MqttAPI.addClass(&PN532Sensor[0]);
     }
-        if (Device.configuration.noOfMiFareCards > 0) {
+#endif
+    if (Device.configuration.noOfMiFareCards > 0) {
       MqttAPI.addClass(&MiFareCard[0]);
     }
 #endif
@@ -246,6 +248,13 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    if (Device.configuration.noOfBinarySensors > 0) {
+      HttpAPI.addClass(&BinarySensor[0]);
+    }
+#endif
+
+
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: HTTP init completed");
 #endif
@@ -346,6 +355,12 @@ void initializeHTTPDomoticzAPI(void) {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     if (Device.configuration.noOfBinarySensors > 0) {
       HttpDomoticzAPI.addClass(&BinarySensor[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    if (Device.configuration.noOfMiFareCards > 0) {
+      HttpDomoticzAPI.addClass(&MiFareCard[0]);
     }
 #endif
 

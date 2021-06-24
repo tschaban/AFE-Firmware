@@ -38,9 +38,9 @@ void PN532EventsListener() {
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
     if (PN532Sensor[i].listener()) {
       if (PN532Sensor[i].readTag()) {
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
         MqttAPI.publishPN532SensorData(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        HttpDomoticzAPI.publishPN532SensorData();
 #endif
 
         for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
@@ -75,6 +75,11 @@ void PN532EventsListener() {
                 Relay[MiFareCard[j].configuration.relayId].toggle();
                 break;
               }
+              MqttAPI.publishRelayState(MiFareCard[j].configuration.relayId);
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+              HttpDomoticzAPI.publishRelayState(
+                  MiFareCard[j].configuration.relayId);
+#endif
               actionTaken = true;
             }
 #endif
@@ -91,6 +96,9 @@ void PN532EventsListener() {
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {
         MqttAPI.publishMiFareCardState(j, MiFareCard[j].state);
+        #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        HttpDomoticzAPI.publishMiFareCardState(j, MiFareCard[j].state);
+        #endif
       }
     }
   }

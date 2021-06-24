@@ -166,7 +166,14 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   virtual void addClass(AFESensorBinary *);
   boolean publishBinarySensorState(uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  virtual void addClass(AFEMiFareCard *);
+  boolean publishMiFareCardState(uint8_t id, uint8_t state);
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+
 
 };
 

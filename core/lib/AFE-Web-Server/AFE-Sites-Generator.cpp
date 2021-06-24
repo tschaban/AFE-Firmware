@@ -204,7 +204,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   if (Device->configuration.noOfPN532Sensors > 0) {
-    addMenuItem(page, F("PN532 Sensor"), AFE_CONFIG_SITE_PN532_SENSOR);
+    addMenuItem(page, F(L_PN532_SENSOR), AFE_CONFIG_SITE_PN532_SENSOR);
   }
 
   if (Device->configuration.noOfMiFareCards > 0) {
@@ -3007,9 +3007,6 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  closeSection(page);
-
-  openSection(page, F(L_PN532_INTERFACE), F(""));
   /* Item: interface */
   addSelectFormItemOpen(page, F("d"), F(L_PN532_INTERFACE));
   addSelectOptionFormItem(page, L_NONE, "255", configuration.interface ==
@@ -3064,18 +3061,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   closeSection(page);
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    char _idx[7];
-    sprintf(_idx, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
-#else
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.mqtt) {
     openSection(page, F(L_PN532_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
@@ -3168,6 +3154,25 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
   closeSection(page);
 
+  openSection(page, F(L_MIFARE_CARD_INTEGRATION), F(L_MIFARE_CARD_INTEGRATION_HINT));
+
+
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{i.v}}", F(L_MIFARE_CARD_HOW_LONG_KEEP_STATE));
+
+  /* Item: How long keep the card state */
+  sprintf(_number, "%d", configuration.howLongKeepState);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_TIME,
+      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch,
+                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
+#endif
+  closeSection(page);  
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
@@ -3187,20 +3192,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 #endif
   closeSection(page);
 
-  openSection(page, F(L_MIFARE_CARD_SEND_DETECTIONS), F(""));
 
-  /* Item: How long keep the card state */
-  sprintf(_number, "%d", configuration.howLongKeepState);
-  addInputFormItem(
-      page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_HOW_LONG_KEEP_STATE,
-      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
-
-  /* Item: send as switch*/
-  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
-                      configuration.sendAsSwitch,
-                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
-
-  closeSection(page);
 }
 
 void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {

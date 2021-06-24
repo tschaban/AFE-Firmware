@@ -175,7 +175,9 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 virtual void addClass(AFESensorPN532 *);
+#endif
 virtual void addClass(AFEMiFareCard *);
 #endif
 
@@ -253,7 +255,9 @@ protected:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
 AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+#endif
 AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
