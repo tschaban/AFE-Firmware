@@ -27,7 +27,7 @@ private:
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
 
   /* Generates custome sensor JSON */
-  void generateDeviceValue(char *json, uint32_t idx, char *svalue,
+  void generateDeviceValue(char *json, uint32_t idx, const char *svalue,
                            uint16_t nvalue = 0);
 
   /* Cache that stories IDXs */
@@ -170,7 +170,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   virtual void addClass(AFEMiFareCard *);
-  boolean publishMiFareCardState(uint8_t id, uint8_t state);
+  boolean publishMiFareCardState(uint8_t id, uint8_t state, const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 

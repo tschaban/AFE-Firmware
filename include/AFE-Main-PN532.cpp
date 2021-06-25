@@ -95,9 +95,9 @@ void PN532EventsListener() {
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {
-        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state);
+        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state, PN532Sensor[i].tag.block[1].value);
         #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        HttpDomoticzAPI.publishMiFareCardState(j, MiFareCard[j].state);
+        HttpDomoticzAPI.publishMiFareCardState(j,MiFareCard[j].state, PN532Sensor[i].tag.block[1].value);
         #endif
       }
     }

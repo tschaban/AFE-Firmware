@@ -95,6 +95,7 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
     call += nvalue;
     call += "&svalue=";
     call += value;
+    call.replace(" ","%20");
     _return = callURL(call);
   }
   return _return;
@@ -671,12 +672,12 @@ void AFEAPIHTTPDomoticz::addClass(AFEMiFareCard *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t state) {
+boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t state,
+                                                   const char *user) {
   boolean publishStatus = false;
   if (enabled && _MiFareCard[id]->configuration.domoticz.idx) {
-    publishStatus =
-        sendSwitchCommand(_MiFareCard[id]->configuration.domoticz.idx,
-                          state == AFE_HARDWARE_MIFARE_CARD_ACTION_OFF ? "Off" : "On");
+    publishStatus = sendCustomSensorCommand(
+        _MiFareCard[id]->configuration.domoticz.idx, user, state);
   }
   return publishStatus;
 }

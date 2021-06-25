@@ -15,7 +15,6 @@
 class AFEMiFareCard {
 
 private:
-  boolean _initialized = false;
   boolean _statusChanged = false;
   unsigned long _timer = 0;
 

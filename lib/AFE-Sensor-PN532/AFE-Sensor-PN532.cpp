@@ -324,11 +324,11 @@ void AFESensorPN532::formattingClassic() {
         memset(blockBuffer, 0, sizeof(blockBuffer));
         if (!(NFCReader.mifareclassic_WriteDataBlock(
                 (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1, blockBuffer))) {
-#ifdef DEBUG                  
+#ifdef DEBUG
           Serial << endl
                  << "ERROR: PN532: Unable to write to sector: " << idx
                  << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1;
-#endif                 
+#endif
           return;
         }
 
@@ -359,6 +359,7 @@ void AFESensorPN532::formattingClassic() {
 #endif
 }
 
+#ifdef DEBUG
 void AFESensorPN532::readNFC() {
   uint8_t currentblock;       // Counter to keep track of which block we're on
   bool authenticated = false; // Flag to indicate if the sector is authenticated
@@ -382,9 +383,9 @@ void AFESensorPN532::readNFC() {
                << "-------------------------";
 #endif
         authenticated = authenticatedBlock(currentblock);
-#ifdef DEBUG        
+#ifdef DEBUG
         Serial << endl;
-#endif        
+#endif
       }
 
       if (authenticated) {
@@ -409,48 +410,67 @@ void AFESensorPN532::readNFC() {
   Led.off();
 #endif
 }
+#endif
 
-void AFESensorPN532::readBlock(uint8_t blockId, String &data) {
+boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
+                                  boolean lookForCard) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.on();
+#endif
+  boolean _ret = false;
   uint8_t _data[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
-  char _text[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
 
-  if (foundCard()) {
-    if (authenticatedBlock(blockId)) {
-
-#ifdef DEBUG
-      Serial << endl << "INFO: PN532: Reading block: " << blockId << endl;
+  if (lookForCard) {
+    if (!foundCard()) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+      Led.off();
 #endif
-      if (NFCReader.mifareclassic_ReadDataBlock(blockId, _data)) {
-
-        for (uint8_t i = 0; i < AFE_HARDWARE_PN532_BLOCK_SIZE; i++) {
-          _text[i] = _data[i];
-        }
-
-        data = _text;
-
-#ifdef DEBUG
-        NFCReader.PrintHexChar(_data, AFE_HARDWARE_PN532_BLOCK_SIZE);
-      } else {
-        Serial << endl << "WARN: PN532: Something went wrong with card reading";
-#endif
-      }
+      return _ret;
     }
   }
+
+  if (authenticatedBlock(blockId)) {
+
+#ifdef DEBUG
+    Serial << endl << "INFO: PN532: Reading block: " << blockId << endl;
+#endif
+    if (NFCReader.mifareclassic_ReadDataBlock(blockId, _data)) {
+
+      for (uint8_t i = 0; i < AFE_HARDWARE_PN532_BLOCK_SIZE; i++) {
+        data[i] = _data[i];
+      }
+      _ret = true;
+#ifdef DEBUG
+      NFCReader.PrintHexChar(_data, AFE_HARDWARE_PN532_BLOCK_SIZE);
+    } else {
+      Serial << endl << "WARN: PN532: Something went wrong with card reading";
+#endif
+    }
+  }
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.off();
+#endif
+  return _ret;
 }
 
 void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
 
-  uint8_t _data[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-  for (uint8_t i = 0; i < strlen(data); i++) {
-    _data[i] = data[i];
-  }
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Led.on();
+#endif
 
   if (strlen(data) > AFE_HARDWARE_PN532_BLOCK_SIZE) {
 #ifdef DEBUG
     Serial << endl << "ERROR: PN532: Too long string to save in the block";
 #endif
     return;
+  }
+
+  uint8_t _data[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  for (uint8_t i = 0; i <= strlen(data); i++) {
+    _data[i] = data[i];
   }
 
   if (foundCard()) {
@@ -469,6 +489,10 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
       }
       delay(10);
     }
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Led.off();
+#endif
 
     if (authenticatedBlock(blockId +
                            AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR)) {
@@ -495,9 +519,9 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
 boolean AFESensorPN532::readTag() {
   boolean _ret = false;
   boolean _success = false;
+  char _text[AFE_HARDWARE_PN532_BLOCK_SIZE];
 
   if (foundCard()) {
-    uint8_t _data[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
 
 #ifdef DEBUG
     Serial << "INFO: PN532: Reading Tag" << endl;
@@ -505,37 +529,25 @@ boolean AFESensorPN532::readTag() {
 
     for (uint8_t i = 0;
          i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-
+      _text[0] = AFE_EMPTY_STRING;
       _success =
-          authenticatedBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i);
-
-      if (_success) {
-        _success = NFCReader.mifareclassic_ReadDataBlock(
-            AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, _data);
-      }
-
-      /* Reading backup block if there was a problem with reading the primary */
+          readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, _text, false);
+      /* Reading backup block if there was a problem with reading the
+         primary */
       if (!_success) {
-        _success =
-            authenticatedBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i +
-                               AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR);
-
-        if (_success) {
-          _success = NFCReader.mifareclassic_ReadDataBlock(
-              AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i +
-                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
-              _data);
-        }
+        _success = readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i +
+                                 AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                             _text, false);
       }
 
       if (_success) {
-        for (uint8_t idx = 0; idx < AFE_HARDWARE_PN532_BLOCK_SIZE; idx++) {
-          tag.block[i].value[idx] = _data[idx];
-        }
+        sprintf(tag.block[i].value, "%s", _text);
 #ifdef DEBUG
         Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i
                << "] : " << tag.block[i].value;
 #endif
+      } else {
+        tag.block[i].value[0] = AFE_EMPTY_STRING;
       }
     }
 
@@ -543,34 +555,20 @@ boolean AFESensorPN532::readTag() {
 
       for (uint8_t i = 0;
            i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-
-        _success =
-            authenticatedBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i);
-
-        if (_success) {
-          _success = NFCReader.mifareclassic_ReadDataBlock(
-              AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i, _data);
-        }
-
+        _text[0] = AFE_EMPTY_STRING;
+        _success = readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
+                             _text, false);
         /* Reading backup block if there was a problem with reading the primary
          */
         if (!_success) {
-          _success = authenticatedBlock(
-              AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i +
-              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR);
-
-          if (_success) {
-            _success = NFCReader.mifareclassic_ReadDataBlock(
-                AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i +
-                    AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
-                _data);
-          }
+          _success =
+              readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i +
+                            AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                        _text, false);
         }
 
         if (_success) {
-          for (uint8_t idx = 0; idx < AFE_HARDWARE_PN532_BLOCK_SIZE; idx++) {
-            tag.block[i + 3].value[idx] = _data[idx];
-          }
+          sprintf(tag.block[i + 3].value, "%s", _text);
 #ifdef DEBUG
           Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i
                  << "] : " << tag.block[i + 3].value;
@@ -579,11 +577,12 @@ boolean AFESensorPN532::readTag() {
               AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR - 1) {
             _ret = true;
           }
+        } else {
+          tag.block[i + 3].value[0] = AFE_EMPTY_STRING;
         }
       }
     }
   }
-
   return _ret;
 }
 

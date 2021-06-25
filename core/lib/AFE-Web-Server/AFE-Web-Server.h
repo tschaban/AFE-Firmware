@@ -39,6 +39,7 @@ struct AFE_SITE_PARAMETERS {
   uint16_t rebootTime = 0;
   boolean form = true;
   boolean formButton = true;
+  uint8_t option = AFE_HARDWARE_ITEM_NOT_EXIST;
 };
 
 class AFEWebServer {
@@ -76,6 +77,8 @@ private:
 
   /* Method gets url Option parameter value */
   boolean getOptionName();
+  
+  uint8_t getOption();
   uint8_t getCommand();
   uint8_t getSiteID();
   uint8_t getID();

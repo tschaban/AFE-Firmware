@@ -3072,8 +3072,17 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 }
 
 void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
+
+  if (!FirmwarePro->Pro.valid) {
+    if (id > AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION - 1) {
+      page.concat(FPSTR(HTTP_INFO_TEXT));
+      page.replace("{{i.v}}", F(L_MIFARE_CARD_NONE_PRO));
+      return;
+    }
+  }
+
   MIFARE_CARD configuration;
-   char _number[6];
+  char _number[6];
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
@@ -3122,7 +3131,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
     }
     if (!relayIsForGate) {
       Data->getConfiguration(i, &relayConfiguration);
-      sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+      sprintf(text, "%s: %s", L_RELAY, relayConfiguration.name);
       page.concat(text);
     }
 #else
@@ -3154,24 +3163,24 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
   closeSection(page);
 
-  openSection(page, F(L_MIFARE_CARD_INTEGRATION), F(L_MIFARE_CARD_INTEGRATION_HINT));
+  openSection(page, F(L_MIFARE_CARD_INTEGRATION),
+              F(L_MIFARE_CARD_INTEGRATION_HINT));
 
-
-    page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.concat(FPSTR(HTTP_INFO_TEXT));
   page.replace("{{i.v}}", F(L_MIFARE_CARD_HOW_LONG_KEEP_STATE));
 
   /* Item: How long keep the card state */
   sprintf(_number, "%d", configuration.howLongKeepState);
-  addInputFormItem(
-      page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_TIME,
-      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_TIME,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1",
+                   L_MILISECONDS);
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   /* Item: send as switch*/
   addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
                       configuration.sendAsSwitch,
                       L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
 #endif
-  closeSection(page);  
+  closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
@@ -3191,114 +3200,168 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   }
 #endif
   closeSection(page);
-
-
 }
 
 void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   AFESensorPN532 PN532Sensor;
   PN532Sensor.begin(0, Data);
+  char _number[6];
 
   switch (id) {
-  case 1: /* Formatting Card to MiFare Classik 1k */
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_CLASSIC: /* Formatting Card to
+                                                          MiFare Classik 1k */
     PN532Sensor.formattingClassic();
     break;
-  case 2: /* Formattin to NFC card */
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_NFC: /* Formattin to NFC card */
     PN532Sensor.formattingNFC();
     break;
-  case 3: /* Reading current TAG */ {
-
-    String data;
-    data.reserve(17);
-    openSection(page, F(L_PN532_CURRENT_TAG), F(""));
-
-    page.concat(FPSTR(HTTP_INFO_TEXT));
-    page.replace("{{i.v}}", F(L_PN532_CURRENT_PRIMARY_TAG));
-
-    for (uint8_t i = 0;
-         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-      data = "";
-      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, data);
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", data);
-    }
-
-    for (uint8_t i = 0;
-         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-      data = "";
-      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
-                            data);
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", data);
-    }
-
-    page.concat(FPSTR(HTTP_INFO_TEXT));
-    page.replace("{{i.v}}", F(L_PN532_CURRENT_BACKUP_TAG));
-
-    for (uint8_t i = 0;
-         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
-                                AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
-                                i,
-                            data);
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", data);
-    }
-
-    for (uint8_t i = 0;
-         i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-      PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
-                                AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
-                                i,
-                            data);
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", data);
-    }
-
-    closeSection(page);
-
-    break;
-  }
 #ifdef DEBUG
-  case 4: /* Read what's saved in card (only in DEBUG mode) */
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_READ_CARD: /* Read what's saved in card
+                                                     (only in DEBUG mode) */
     PN532Sensor.readNFC();
     break;
 #endif
   }
 
-  /* Generating site */
-
-  Data->getWelcomeMessage(_HtmlResponse);
-
-  if (_HtmlResponse.length() > 0) {
-    openMessageSection(page, F("Firmware"), F(""));
-
-    if (_HtmlResponse.length() > 0) {
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", _HtmlResponse);
-    }
-    closeSection(page);
-  }
+  openSection(page, F(L_MIFARE_ADMIN_INFO), F(""));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_1));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_2));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_3));
+  closeSection(page);
 
   openSection(page, F(L_PN532_CARD_FORMAT), F(L_PN532_CARD_FORMAT_HINT));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_PN532_FORMAT_NFC));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_NFC);
+  page.replace("{{o}}", _number);
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_PN532_FORMAT_MINIFARE));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_PN532_READ_TAG));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_CLASSIC);
+  page.replace("{{o}}", _number);
   closeSection(page);
 
-  openSection(page, F(L_PN532_SAVE_TAG), F(L_PN532_SAVE_TAG_HINT));
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, "",
+  openSection(page, F(L_PN532_SAVE_TAG), F(""));
+
+  page.concat(F(L_PN532_READ_TAG));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG);
+  page.replace("{{o}}", _number);
+
+  char data[AFE_HARDWARE_PN532_BLOCK_SIZE];
+
+  /* TAG: ID */
+  data[0] = AFE_EMPTY_STRING;
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, data,
                    "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, "",
+  /* TAG: User */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    data[0] = AFE_EMPTY_STRING;
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 1, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, data,
                    "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", "", "16");
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", "", "16");
+  /* TAG: 1 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    data[0] = AFE_EMPTY_STRING;
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 2, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", data, "16");
+  /* TAG: 2 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    data[0] = AFE_EMPTY_STRING;
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", data, "16");
+  /* TAG: 3 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    data[0] = AFE_EMPTY_STRING;
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 1, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", data, "16");
+  /* TAG: 4 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    data[0] = AFE_EMPTY_STRING;
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 2, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", data, "16");
   closeSection(page);
+
+  /*
+
+
+    if (id == 3) {
+      char data[AFE_HARDWARE_PN532_BLOCK_SIZE];
+
+      openSection(page, F(L_PN532_CURRENT_TAG), F(""));
+
+      page.concat(FPSTR(HTTP_INFO_TEXT));
+      page.replace("{{i.v}}", F(L_PN532_CURRENT_PRIMARY_TAG));
+
+      for (uint8_t i = 0;
+           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+        data[0] = AFE_EMPTY_STRING;
+        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i,
+    data);
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", data);
+      }
+
+      for (uint8_t i = 0;
+           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+        data[0] = AFE_EMPTY_STRING;
+        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
+                              data);
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", data);
+      }
+
+      page.concat(FPSTR(HTTP_INFO_TEXT));
+      page.replace("{{i.v}}", F(L_PN532_CURRENT_BACKUP_TAG));
+
+      for (uint8_t i = 0;
+           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+        data[0] = AFE_EMPTY_STRING;
+        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR
+    +
+                                  i,
+                              data);
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", data);
+      }
+
+      for (uint8_t i = 0;
+           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+        data[0] = AFE_EMPTY_STRING;
+        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR
+    +
+                                  i,
+                              data);
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", data);
+      }
+
+      closeSection(page);
+    }
+
+    openSection(page, F(L_PN532_SAVE_TAG), F(L_PN532_SAVE_TAG_HINT));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, "",
+                     "16");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, "",
+                     "16");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", "", "16");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", "", "16");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", "", "16");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", "", "16");
+    closeSection(page);
+
+  */
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 

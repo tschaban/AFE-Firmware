@@ -12,7 +12,6 @@
 #include <PN532_I2C.h>
 #include <PN532_SWHSU.h>
 
-
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
@@ -89,9 +88,10 @@ public:
 
   void formattingNFC();
   void formattingClassic();
+#ifdef DEBUG
   void readNFC();
-
-  void readBlock(uint8_t blockId, String &data);
+#endif
+  boolean readBlock(uint8_t blockId, char *data, boolean lookForCard = true);
   void writeBlock(uint8_t blockId, const char *data);
 
   boolean readTag();

@@ -431,7 +431,7 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 }
 
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
-                                             char *svalue, uint16_t nvalue) {
+                                             const char *svalue, uint16_t nvalue) {
 
   sprintf(
       json,
@@ -1080,15 +1080,14 @@ void AFEAPIMQTTDomoticz::addClass(AFEMiFareCard *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t state) {
+boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t state,
+                                                   const char *user) {
   boolean publishStatus = false;
   if (enabled && _MiFareCard[id]->configuration.domoticz.idx) {
     char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
 
-    generateSwitchMessage(json, _MiFareCard[id]->configuration.domoticz.idx,
-                          state == AFE_HARDWARE_MIFARE_CARD_ACTION_OFF
-                              ? AFE_SWITCH_OFF
-                              : AFE_SWITCH_ON);
+    generateDeviceValue(json, _MiFareCard[id]->configuration.domoticz.idx, user,
+                        state);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
   }
   return publishStatus;

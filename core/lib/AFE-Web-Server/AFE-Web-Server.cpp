@@ -240,6 +240,7 @@ void AFEWebServer::generate(boolean upload) {
   siteConfig.ID = getSiteID();
   uint8_t command = getCommand();
   siteConfig.deviceID = getID();
+  siteConfig.option = getOption();
 
   if (!upload) {
 
@@ -643,6 +644,14 @@ uint8_t AFEWebServer::getID() {
     return server.arg("i").toInt();
   } else {
     return -1;
+  }
+}
+
+uint8_t AFEWebServer::getOption() {
+  if (server.hasArg("opt")) {
+    return server.arg("opt").toInt();
+  } else {
+    return AFE_HARDWARE_ITEM_NOT_EXIST;
   }
 }
 
@@ -2158,7 +2167,7 @@ void AFEWebServer::processMiFareCard() {
        i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
     sprintf(label, "t%d", i);
     if (server.arg(label).length() > 0) {
-      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE);
+      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE + 1);
     } else {
       tag[0] = AFE_EMPTY_STRING;
     }
@@ -2175,7 +2184,7 @@ void AFEWebServer::processMiFareCard() {
        i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
     sprintf(label, "t%d", i + 4);
     if (server.arg(label).length() > 0) {
-      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE);
+      server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE + 1);
     } else {
       tag[0] = AFE_EMPTY_STRING;
     }
@@ -2203,10 +2212,10 @@ void AFEWebServer::get(MIFARE_CARD &data) {
                           ? server.arg("s").toInt()
                           : AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
 
-  data.howLongKeepState = server.arg("h").length() > 0
-                          ? server.arg("h").toInt()
-                          : AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
-
+  data.howLongKeepState =
+      server.arg("h").length() > 0
+          ? server.arg("h").toInt()
+          : AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
 
   data.relayId = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;

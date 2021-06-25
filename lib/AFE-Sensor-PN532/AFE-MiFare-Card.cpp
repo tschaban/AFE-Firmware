@@ -11,7 +11,6 @@ void AFEMiFareCard::begin(uint8_t id, AFEDataAccess *_Data) {
   Serial << endl << "INFO: MiFare Card: " << id;
 #endif
   _Data->getConfiguration(id, &configuration);
-  _initialized = true;
 }
 
 boolean AFEMiFareCard::listener() {

@@ -503,13 +503,15 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_SENSOR "Czujnik PN532"
 #define L_PN532_MIFARE_ADMIN "Zarządzanie kartą MiFare Classic"
 #define L_PN532_CARD_FORMAT "Formatowanie karty"
-#define L_PN532_CARD_FORMAT_HINT "Formatowanie karty usuwa wszystkie zapisane na niej informacje. Kartę należy umieścić przy czujniku i nie ruszać podczas jej formatowania"
-#define L_PN532_FORMAT_NFC "<a href=\"/?o=37&i=2\">Formatuj NFC</a>"
-#define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=37&i=1\">Formatuj Classic MiFare</a>"
-#define L_PN532_READ_TAG "<a href=\"/?o=37&i=3\">Odczytaj aktualny TAG</a>"
-#define L_PN532_SAVE_TAG "Zapis TAG na karcie"
-#define L_PN532_SAVE_TAG_HINT "Kartę musi być sformwatowana to NFC. Należy ją umieścić przy czujniku i nie ruszać podczas jej zapisywania. w Tag'ach używać tylko cyfry, znaki (bez PL liter) oraz podstawowe znaki specjalne"
-#define L_PN532_CURRENT_TAG "Aktualny TAG w karcie"
+#define L_PN532_CARD_FORMAT_HINT "Formatowanie karty usuwa wszystkie zapisane na niej informacje."
+#define L_PN532_FORMAT_NFC "<a href=\"/?o=38&i={{o}}\">Formatuj NFC</a>"
+#define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=38&i={{o}}\">Formatuj Classic MiFare</a>"
+#define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Odczytaj aktualny TAG</a></div>"
+#define L_PN532_SAVE_TAG "Zapisywanie informacji na karcie"
+#define L_PN532_INFO_1 "Kartę powinna zostać sformwatowana do NFC"
+#define L_PN532_INFO_2 "Informacje zapisywane na karcie mogą zawierać cyfry, znaki alfabetu (bez PL liter) oraz podstawowe znaki specjalne"
+#define L_PN532_INFO_3 "Kartę należy umieścić przy czytniku i NIE ruszać podczas formwatowania, odczytywania oraz zapisywania informacji"
+#define L_PN532_CURRENT_TAG "Aktualny inforacje zapisane na karcie"
 #define L_PN532_CURRENT_PRIMARY_TAG "TAG"
 #define L_PN532_CURRENT_BACKUP_TAG "TAG: zapasowa kopia"
 #define L_PN532_TAG_ID "Identyfikator"
@@ -540,6 +542,10 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytania karty MiFare"
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) w systeme do automatyki po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic. W wersji AFE Pro dostępna jest obsługa do 10 kart. Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+
+
+#define L_MIFARE_ADMIN_INFO "Informacje"
 
 
 #endif // _LANG_PL_h
