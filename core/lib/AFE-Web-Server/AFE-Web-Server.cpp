@@ -203,6 +203,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteMiFareCard(page, siteConfig->deviceID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  case AFE_CONFIG_SITE_CLED:
+    Site.siteCLED(page, siteConfig->deviceID);
+    break;
+#endif
   }
 
   if (siteConfig->form) {
@@ -481,6 +486,17 @@ void AFEWebServer::generate(boolean upload) {
         configuration = {0};
       } else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN) {
         processMiFareCard();
+      }
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      else if (siteConfig.ID == AFE_CONFIG_SITE_CLED) {
+        CLED CLEDConfiguration;
+        CLED_EFFECTS CLEDEffectsConfiguration;
+        get(CLEDConfiguration, CLEDEffectsConfiguration);
+        Data->saveConfiguration(0, &CLEDConfiguration);
+        Data->saveConfiguration(0, &CLEDEffectsConfiguration);
+        CLEDConfiguration = {0};
+        CLEDEffectsConfiguration = {0};
       }
 #endif
 
@@ -1017,6 +1033,11 @@ void AFEWebServer::get(DEVICE &data) {
           ? server.arg("f").toInt()
           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  data.noOfCLEDs =
+      server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 #endif
 
   data.timeToAutoLogOff =
@@ -2158,7 +2179,7 @@ void AFEWebServer::get(PN532_SENSOR &data) {
 
 void AFEWebServer::processMiFareCard() {
   AFESensorPN532 PN532Sensor;
-  PN532Sensor.begin(0, Data);
+  PN532Sensor.begin(0, Data, Device);
 
   char tag[AFE_HARDWARE_PN532_BLOCK_SIZE];
   char label[3];
@@ -2200,7 +2221,7 @@ void AFEWebServer::processMiFareCard() {
 
 void AFEWebServer::get(MIFARE_CARD &data) {
   if (server.arg("m").length() > 0) {
-    server.arg("m").toCharArray(data.cardId, sizeof(data.cardId));
+    server.arg("m").toCharArray(data.cardId, sizeof(data.cardId) + 1);
   } else {
     data.cardId[0] = AFE_EMPTY_STRING;
   }
@@ -2221,8 +2242,14 @@ void AFEWebServer::get(MIFARE_CARD &data) {
                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.domoticz.idx =
-      server.arg("x").length() > 0 ? server.arg("x").toInt() : 0;
+  char label[3];
+
+  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+    sprintf(label, "x%d", i);
+    data.domoticz[i].idx =
+        server.arg(label).length() > 0 ? server.arg(label).toInt() : 0;
+  }
+
 #else
   if (server.arg("t").length() > 0) {
     server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
@@ -2233,3 +2260,38 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
+  CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
+                                               : AFE_CONFIG_HARDWARE_CLED_GPIO;
+
+  CLEDData.colorOrder = server.arg("o").length() > 0
+                            ? server.arg("o").toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_COLOLRS_ORDER;
+
+  CLEDData.chipset = server.arg("m").length() > 0
+                         ? server.arg("m").toInt()
+                         : 0;
+
+  CLEDData.ledNumber = server.arg("l").length() > 0
+                           ? server.arg("l").toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+
+  char _label[3];
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+    sprintf(_label, "b%d", i);
+    CLEDEffectsData.effect[i].brightness =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+        
+    sprintf(_label, "t%d", i);
+    CLEDEffectsData.effect[i].time =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+
+    sprintf(_label, "k%d", i);
+    CLEDEffectsData.effect[i].color =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+  }
+}
+#endif

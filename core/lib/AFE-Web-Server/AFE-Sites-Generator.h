@@ -297,6 +297,10 @@ public:
   void sitePN532SensorAdmin(String &page, uint8_t id);
   void siteMiFareCard(String &page, uint8_t id);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void siteCLED(String &page, uint8_t id);
+#endif
 };
 
 #endif

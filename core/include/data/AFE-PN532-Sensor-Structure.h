@@ -28,7 +28,7 @@ struct PN532_SENSOR {
 };
 
 struct PN532_TAG {
-  char value[AFE_HARDWARE_PN532_BLOCK_SIZE];
+  char value[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
 };
 
 struct PN532_TAGS {
@@ -42,7 +42,7 @@ struct MIFARE_CARD {
   boolean sendAsSwitch;
   uint16_t howLongKeepState;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  DOMOTICZ_BASIC_CONFIG domoticz;
+  DOMOTICZ_BASIC_CONFIG domoticz[AFE_HARDWARE_PN532_TAG_SIZE];
 #else
   MQTT_BASIC_CONFIG mqtt;
 #endif

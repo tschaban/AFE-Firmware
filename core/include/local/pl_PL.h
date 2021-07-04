@@ -99,6 +99,7 @@
 #define L_DEVICE_HARDWARE_CONFIGURATION "Konfiguracja urządzenia"
 #define L_DEVICE_HARDWARE_CONFIGURATION_INFO "Wybierz podłączone elementy do urządzenia"
 #define L_DEVICE_NUMBER_OF_LEDS "Ilość Led'ów"
+#define L_DEVICE_NUMBER_OF_CLEDS "Ilość Led'ów RGB"
 #define L_DEVICE_NUMBER_OF_RELAYS "Ilość przekaźników"
 #define L_DEVICE_NUMBER_OF_SWITCHES "Ilość przycisków"
 #define L_DEVICE_NUMBER_OF_CONTACTRONS "Ilość czujników magnetycznych"
@@ -543,9 +544,13 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) w systeme do automatyki po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
 #define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic. W wersji AFE Pro dostępna jest obsługa do 10 kart. Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
 
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
+
+
+#define L_CLEDS "Diody LED RGB"
 
 
 #endif // _LANG_PL_h

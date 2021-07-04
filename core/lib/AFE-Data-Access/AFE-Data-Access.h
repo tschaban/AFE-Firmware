@@ -20,6 +20,8 @@
 //#include <Adafruit_BMP085.h>
 //#endif
 
+
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -230,5 +232,18 @@ public:
   void saveConfiguration(uint8_t id, MIFARE_CARD *);
   void createMiFareCardConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void getConfiguration(uint8_t id, CLED *);
+  void saveConfiguration(uint8_t id, CLED *);
+  void createCLEDConfigurationFile();
+
+  void getConfiguration(uint8_t id, CLED_EFFECTS *);
+  void saveConfiguration(uint8_t id, CLED_EFFECTS *);
+  void createCLEDEffectsConfigurationFile();
+
+#endif
+
+
 };
 #endif

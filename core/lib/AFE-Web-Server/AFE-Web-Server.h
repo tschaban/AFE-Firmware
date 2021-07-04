@@ -184,6 +184,10 @@ private:
   void get(MIFARE_CARD &data);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void get(CLED &CLEDData,CLED_EFFECTS &CLEDEffectsData);
+#endif
+
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();

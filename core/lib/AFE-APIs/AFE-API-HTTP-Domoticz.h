@@ -143,7 +143,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   virtual void addClass(AFEMiFareCard *);
-  boolean publishMiFareCardState(uint8_t id, uint8_t state, const char *user);
+  boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 

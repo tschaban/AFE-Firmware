@@ -15,7 +15,7 @@ void initializePN532Sensor() {
   Serial << endl << F("INFO: BOOT: Initializing PN532");
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
-    PN532Sensor[i].begin(i, &Data);
+    PN532Sensor[i].begin(i, &Data, &Device);
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: PN532: ") << i << F(" initialized");
 #endif
@@ -95,10 +95,21 @@ void PN532EventsListener() {
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {
-        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state, PN532Sensor[i].tag.block[1].value);
-        #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        HttpDomoticzAPI.publishMiFareCardState(j,MiFareCard[j].state, PN532Sensor[i].tag.block[1].value);
-        #endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        for (uint8_t idxId = 0; idxId < AFE_HARDWARE_PN532_TAG_SIZE; idxId++) {
+
+          MqttAPI.publishMiFareCardState(j, idxId, MiFareCard[j].state,
+                                         PN532Sensor[i].tag.block[idxId].value);
+
+          HttpDomoticzAPI.publishMiFareCardState(
+              j, idxId, MiFareCard[j].state,
+              PN532Sensor[i].tag.block[idxId].value);
+        }
+#else
+        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state,
+                                       PN532Sensor[i].tag.block[1].value);
+#endif
       }
     }
   }

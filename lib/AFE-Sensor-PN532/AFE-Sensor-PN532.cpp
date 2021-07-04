@@ -6,13 +6,16 @@
 
 AFESensorPN532::AFESensorPN532(){};
 
-void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data) {
+void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data,
+                           AFEDevice *_Device) {
 
 #ifdef DEBUG
   Serial << endl << "INFO: PN532: Initializing PN532";
 #endif
 
-  _Data->getConfiguration(id, &configuration);
+  Data = _Data;
+
+  Data->getConfiguration(id, &configuration);
 
 #ifdef DEBUG
   Serial << endl << "INFO: PN532: Configuration";
@@ -42,7 +45,7 @@ void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data) {
     NFCReader.setInterface(PN532UARTInterface);
   } else {
     I2CPORT I2C;
-    _Data->getConfiguration(&I2C);
+    Data->getConfiguration(&I2C);
 
     if (configuration.i2cAddress != 0) {
 #ifdef DEBUG
@@ -82,14 +85,26 @@ void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data) {
   // configure board to read RFID tags
   NFCReader.SAMConfig();
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  DEVICE deviceConfiguration;
-  _Data->getConfiguration(&deviceConfiguration);
-  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-      deviceConfiguration.noOfLEDs >= configuration.ledID) {
-    Led.begin(_Data, configuration.ledID);
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  if (_Device->configuration.noOfCLEDs > 0) {
+    CLed.begin(Data, 0);
+    isCLedUsed = true;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    CLed.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+#endif
   }
-  deviceConfiguration = {};
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (!isCLedUsed) {
+    DEVICE deviceConfiguration;
+    Data->getConfiguration(&deviceConfiguration);
+    if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+        deviceConfiguration.noOfLEDs >= configuration.ledID) {
+      Led.begin(Data, configuration.ledID);
+    }
+    deviceConfiguration = {};
+  }
 #endif
 
   _initialized = true;
@@ -163,34 +178,71 @@ boolean AFESensorPN532::listener() {
         _listenerTime = millis();
       }
       if (millis() - _listenerTime > configuration.listenerTimeout) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-        Led.on();
-#endif
+        ledOn();
         _request = foundCard();
-#ifdef AFE_CONFIG_HARDWARE_LED
-        Led.off();
-#endif
+        ledOff();
         _listenerTime = 0;
       }
       if (_request) {
         _requestTime = millis();
-#ifdef AFE_CONFIG_HARDWARE_LED
-        Led.on();
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        CLed.effectOn(AFE_CONFIG_HARDWARE_EFFECT_WAVE);
+#endif
+        ledOn();
+      }
+    } else {
+      if (millis() - _requestTime > configuration.requestProcessingTime) {
+        _requestTime = 0;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        CLed.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+#endif
+      }
+      _request = false;
+    }
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    CLed.loop();
+#endif
+  }
+  return _request;
+}
+
+/*
+boolean AFESensorPN532::listener() {
+  if (_initialized) {
+    if (_requestTime == 0) {
+      if (_listenerTime == 0) {
+        _listenerTime = millis();
+      }
+      if (millis() - _listenerTime > configuration.listenerTimeout) {
+        ledOn();
+        _request = foundCard();
+        ledOff();
+        _listenerTime = 0;
+      }
+      if (_request) {
+        _requestTime = millis();
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        CLed.on(CRGB::Blue);
 #endif
       }
     } else {
       if (millis() - _requestTime > configuration.requestProcessingTime) {
         _requestTime = 0;
-#ifdef AFE_CONFIG_HARDWARE_LED
-        Led.off();
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        CLed.effectOn(AFE_CONFIG_HARDWARE_EFFECT_WAVE);
 #endif
+        ledOff();
       }
       _request = false;
     }
   }
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  CLed.loop();
+#endif
+
   return _request;
 }
-
+*/
 void AFESensorPN532::getJSON(char *json) {
   sprintf(json, "{\"tag1\":\"%s\",\"tag2\":\"%s\",\"tag3\":\"%s\",\"tag4\":\"%"
                 "s\",\"tag5\":\"%s\",\"tag6\":\"%s\"}",
@@ -202,9 +254,7 @@ void AFESensorPN532::formattingNFC() {
   const char *url = "smartnydom.pl";
   uint8_t ndefprefix = NDEF_URIPREFIX_HTTP_WWWDOT;
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.on();
-#endif
+  ledOn();
 
   if (foundCard()) {
     if (authenticatedBlock(0)) {
@@ -245,9 +295,7 @@ void AFESensorPN532::formattingNFC() {
 #endif
   }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.off();
-#endif
+  ledOff();
 }
 
 void AFESensorPN532::formattingClassic() {
@@ -255,9 +303,7 @@ void AFESensorPN532::formattingClassic() {
                                                       // contents
   uint8_t blankAccessBits[3] = {0xff, 0x07, 0x80};
   uint8_t idx = 0;
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.on();
-#endif
+  ledOn();
   if (foundCard()) {
 #ifdef DEBUG
     Serial << endl << "INFO: PN532: Reformatting card for Mifare Classic... ";
@@ -354,9 +400,7 @@ void AFESensorPN532::formattingClassic() {
       }
     }
   }
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.off();
-#endif
+  ledOff();
 }
 
 #ifdef DEBUG
@@ -365,9 +409,7 @@ void AFESensorPN532::readNFC() {
   bool authenticated = false; // Flag to indicate if the sector is authenticated
   uint8_t data[AFE_HARDWARE_PN532_BLOCK_SIZE]; // Array to store block data
                                                // during reads
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.on();
-#endif
+  ledOn();
 
   if (foundCard()) {
     for (currentblock = 0; currentblock < AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS;
@@ -406,24 +448,21 @@ void AFESensorPN532::readNFC() {
     }
   }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.off();
-#endif
+  ledOff();
 }
 #endif
 
 boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
                                   boolean lookForCard) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.on();
-#endif
+  ledOn();
   boolean _ret = false;
   uint8_t _data[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
+  data[0] = AFE_EMPTY_STRING;
 
   if (lookForCard) {
     if (!foundCard()) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Led.off();
+      ledOff();
 #endif
       return _ret;
     }
@@ -439,6 +478,7 @@ boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
       for (uint8_t i = 0; i < AFE_HARDWARE_PN532_BLOCK_SIZE; i++) {
         data[i] = _data[i];
       }
+      data[strlen(data) + 1] = AFE_EMPTY_STRING;
       _ret = true;
 #ifdef DEBUG
       NFCReader.PrintHexChar(_data, AFE_HARDWARE_PN532_BLOCK_SIZE);
@@ -448,17 +488,13 @@ boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
     }
   }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.off();
-#endif
+  ledOff();
   return _ret;
 }
 
 void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  Led.on();
-#endif
+  ledOn();
 
   if (strlen(data) > AFE_HARDWARE_PN532_BLOCK_SIZE) {
 #ifdef DEBUG
@@ -490,9 +526,7 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
       delay(10);
     }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Led.off();
-#endif
+    ledOff();
 
     if (authenticatedBlock(blockId +
                            AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR)) {
@@ -519,8 +553,6 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
 boolean AFESensorPN532::readTag() {
   boolean _ret = false;
   boolean _success = false;
-  char _text[AFE_HARDWARE_PN532_BLOCK_SIZE];
-
   if (foundCard()) {
 
 #ifdef DEBUG
@@ -529,46 +561,39 @@ boolean AFESensorPN532::readTag() {
 
     for (uint8_t i = 0;
          i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-      _text[0] = AFE_EMPTY_STRING;
-      _success =
-          readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, _text, false);
+      _success = readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i,
+                           tag.block[i].value, false);
       /* Reading backup block if there was a problem with reading the
          primary */
       if (!_success) {
         _success = readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i +
                                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
-                             _text, false);
+                             tag.block[i].value, false);
       }
-
-      if (_success) {
-        sprintf(tag.block[i].value, "%s", _text);
 #ifdef DEBUG
+      if (_success) {
         Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i
                << "] : " << tag.block[i].value;
-#endif
-      } else {
-        tag.block[i].value[0] = AFE_EMPTY_STRING;
       }
+#endif
     }
 
     if (_success) {
 
       for (uint8_t i = 0;
            i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-        _text[0] = AFE_EMPTY_STRING;
         _success = readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
-                             _text, false);
+                             tag.block[i + 3].value, false);
         /* Reading backup block if there was a problem with reading the primary
          */
         if (!_success) {
           _success =
               readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i +
                             AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
-                        _text, false);
+                        tag.block[i + 3].value, false);
         }
 
         if (_success) {
-          sprintf(tag.block[i + 3].value, "%s", _text);
 #ifdef DEBUG
           Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i
                  << "] : " << tag.block[i + 3].value;
@@ -577,13 +602,33 @@ boolean AFESensorPN532::readTag() {
               AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR - 1) {
             _ret = true;
           }
-        } else {
-          tag.block[i + 3].value[0] = AFE_EMPTY_STRING;
         }
       }
     }
   }
   return _ret;
+}
+
+void AFESensorPN532::ledOn() {
+//#ifdef AFE_CONFIG_HARDWARE_CLED
+//  CLed.on(CRGB::Green);
+//#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (!isCLedUsed) {
+    Led.on();
+  }
+#endif
+}
+
+void AFESensorPN532::ledOff() {
+//#ifdef AFE_CONFIG_HARDWARE_CLED
+//  CLed.off(CRGB::Black);
+//#endif
+#ifdef AFE_CONFIG_HARDWARE_LED
+  if (!isCLedUsed) {
+    Led.off();
+  }
+#endif
 }
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR

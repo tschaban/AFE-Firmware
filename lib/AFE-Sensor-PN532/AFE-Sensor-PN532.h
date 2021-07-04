@@ -12,6 +12,10 @@
 #include <PN532_I2C.h>
 #include <PN532_SWHSU.h>
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
@@ -49,12 +53,12 @@ class AFESensorPN532 {
 private:
   boolean _initialized = false;
   boolean _request = false;
-  unsigned long _requestTime = 0;
-  unsigned long _listenerTime = 0;
-
+  uint32_t _requestTime = 0;
+  uint32_t _listenerTime = 0;
+  
+  AFEDataAccess *Data;
   PN532_SWHSU PN532UARTInterface;
   PN532_I2C PN532I2CInterface;
-
   PN532 NFCReader;
 
   uint8_t cardUID[7] = {0, 0, 0, 0,
@@ -63,12 +67,25 @@ private:
   uint8_t cardUIDLength; // Length of the UID (4 or 7 bytes depending on
                          // ISO14443A card type)
 
+#if defined(AFE_CONFIG_HARDWARE_CLED) || defined(AFE_CONFIG_HARDWARE_LED)
+ boolean isCLedUsed = false;
+#endif
+
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED CLed;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 
   boolean foundCard();
   boolean authenticatedBlock(uint32_t blockId);
+
+
+  void ledOn();
+  void ledOff();
 
 public:
   PN532_SENSOR configuration;
@@ -78,7 +95,7 @@ public:
   AFESensorPN532();
 
   /* Init switch */
-  void begin(uint8_t id, AFEDataAccess *);
+  void begin(uint8_t id, AFEDataAccess *, AFEDevice *);
 
   /* Listens for state changes, taking into account bouncing */
   boolean listener(void);

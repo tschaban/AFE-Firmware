@@ -94,6 +94,12 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  if (Device->configuration.noOfCLEDs > 0) {
+    addMenuItem(page, F(L_CLEDS), AFE_CONFIG_SITE_CLED);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -329,6 +335,13 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                         Device->configuration.noOfLEDs, F("l"),
                         F(L_DEVICE_NUMBER_OF_LEDS));
+#endif
+
+/* CLED */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLEDS,
+                        Device->configuration.noOfCLEDs, F("a"),
+                        F(L_DEVICE_NUMBER_OF_CLEDS));
 #endif
 
 /* Contactrons */
@@ -3186,11 +3199,29 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
-    sprintf(_idx, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
+    char _name[3];
+    char _label[10];
+    sprintf(_idx, "%d", configuration.domoticz[0].idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x0",
+                     "IDX " L_PN532_TAG_ID, _idx, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_idx, "%d", configuration.domoticz[1].idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x1",
+                     "IDX " L_PN532_TAG_WHO, _idx, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    for (uint8_t tagId = 2; tagId < AFE_HARDWARE_PN532_TAG_SIZE; tagId++) {
+      sprintf(_idx, "%d", configuration.domoticz[tagId].idx);
+      sprintf(_label, "IDX TAG %d", tagId - 1);
+      sprintf(_name, "x%d", tagId);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _name, _label, _idx,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    }
   }
 #else
   if (Device->configuration.api.mqtt) {
@@ -3204,7 +3235,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
 void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   AFESensorPN532 PN532Sensor;
-  PN532Sensor.begin(0, Data);
+  PN532Sensor.begin(0, Data, Device);
   char _number[6];
 
   switch (id) {
@@ -3252,7 +3283,6 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   char data[AFE_HARDWARE_PN532_BLOCK_SIZE];
 
   /* TAG: ID */
-  data[0] = AFE_EMPTY_STRING;
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK, data);
   }
@@ -3260,110 +3290,181 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
                    "16");
   /* TAG: User */
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
-    data[0] = AFE_EMPTY_STRING;
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 1, data);
   }
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, data,
                    "16");
   /* TAG: 1 */
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
-    data[0] = AFE_EMPTY_STRING;
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 2, data);
   }
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", data, "16");
   /* TAG: 2 */
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
-    data[0] = AFE_EMPTY_STRING;
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK, data);
   }
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", data, "16");
   /* TAG: 3 */
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
-    data[0] = AFE_EMPTY_STRING;
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 1, data);
   }
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", data, "16");
   /* TAG: 4 */
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
-    data[0] = AFE_EMPTY_STRING;
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 2, data);
   }
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", data, "16");
+
+  /* Backup TAG: ID */
+
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+    page.replace("{{i.v}}", F(L_MIFARE_CARD_BACKUP_TAG));
+
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: User */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              1,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 1 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              2,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 2 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 3 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              1,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 4 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              2,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+  }
   closeSection(page);
-
-  /*
-
-
-    if (id == 3) {
-      char data[AFE_HARDWARE_PN532_BLOCK_SIZE];
-
-      openSection(page, F(L_PN532_CURRENT_TAG), F(""));
-
-      page.concat(FPSTR(HTTP_INFO_TEXT));
-      page.replace("{{i.v}}", F(L_PN532_CURRENT_PRIMARY_TAG));
-
-      for (uint8_t i = 0;
-           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-        data[0] = AFE_EMPTY_STRING;
-        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i,
-    data);
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", data);
-      }
-
-      for (uint8_t i = 0;
-           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-        data[0] = AFE_EMPTY_STRING;
-        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i,
-                              data);
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", data);
-      }
-
-      page.concat(FPSTR(HTTP_INFO_TEXT));
-      page.replace("{{i.v}}", F(L_PN532_CURRENT_BACKUP_TAG));
-
-      for (uint8_t i = 0;
-           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-        data[0] = AFE_EMPTY_STRING;
-        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
-                                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR
-    +
-                                  i,
-                              data);
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", data);
-      }
-
-      for (uint8_t i = 0;
-           i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
-        data[0] = AFE_EMPTY_STRING;
-        PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
-                                  AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR
-    +
-                                  i,
-                              data);
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", data);
-      }
-
-      closeSection(page);
-    }
-
-    openSection(page, F(L_PN532_SAVE_TAG), F(L_PN532_SAVE_TAG_HINT));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, "",
-                     "16");
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, "",
-                     "16");
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", "", "16");
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", "", "16");
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", "", "16");
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", "", "16");
-    closeSection(page);
-
-  */
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
+
+  CLED CLEDConfiguration;
+  CLED_EFFECTS CLEDEffectsConfiguration;
+  Data->getConfiguration(0, &CLEDConfiguration);
+  Data->getConfiguration(0, &CLEDEffectsConfiguration);
+  char _number[10];
+
+  openSection(page, F("Pasek LED RGB"), F(""));
+
+  /* Item: GPIO */
+  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_GPIO);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, true);
+
+  /* Item: Chipset */
+  sprintf(_number, "%d", 0);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "WS2811", true);
+
+  /* Item: number of leds */
+  sprintf(_number, "%d", CLEDConfiguration.ledNumber);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", "Ilość LED na listwie",
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   true);
+
+  /* Item: Colors order */
+  sprintf(_number, "%d", CLEDConfiguration.colorOrder);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", "Kolejność kolorów",
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "RGB", true);
+
+  closeSection(page);
+
+  openSection(page, F("Efekt fala"), F(""));
+  /*** Effect: one led wave */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", "Kolor", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", "Jasnosc", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", "Czas", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+  openSection(page, F("Efekt Fade In/Out"), F(""));
+  /*** Effect: FAde in / out */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", "Kolor", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", "Jasnosc", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", "Czas", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+                   L_MILISECONDS);
+  closeSection(page);
+}
+#endif
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

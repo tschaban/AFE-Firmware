@@ -1080,13 +1080,12 @@ void AFEAPIMQTTDomoticz::addClass(AFEMiFareCard *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t state,
-                                                   const char *user) {
+boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user) {
   boolean publishStatus = false;
-  if (enabled && _MiFareCard[id]->configuration.domoticz.idx) {
+  if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
     char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
 
-    generateDeviceValue(json, _MiFareCard[id]->configuration.domoticz.idx, user,
+    generateDeviceValue(json, _MiFareCard[id]->configuration.domoticz[tagId].idx, user,
                         state);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
   }

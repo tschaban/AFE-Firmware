@@ -672,12 +672,12 @@ void AFEAPIHTTPDomoticz::addClass(AFEMiFareCard *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t state,
+boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state,
                                                    const char *user) {
   boolean publishStatus = false;
-  if (enabled && _MiFareCard[id]->configuration.domoticz.idx) {
+  if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
     publishStatus = sendCustomSensorCommand(
-        _MiFareCard[id]->configuration.domoticz.idx, user, state);
+        _MiFareCard[id]->configuration.domoticz[tagId].idx, user, state);
   }
   return publishStatus;
 }

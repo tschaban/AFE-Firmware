@@ -74,6 +74,9 @@ struct DEVICE {
   uint8_t noOfPN532Sensors;
   uint8_t noOfMiFareCards;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  uint8_t noOfCLEDs;
+#endif
 };
 
 /* Custom DEVICE structure definition

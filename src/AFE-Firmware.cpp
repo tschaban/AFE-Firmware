@@ -300,9 +300,18 @@ void setup() {
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
 #endif
+/*
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalSMD5050 );
+  FastLED.setBrightness( BRIGHTNESS );
+
+  setAllLedsColor(CRGB::OrangeRed);
+*/
 }
 
 void loop() {
+
+  //OneLedWave();
+  //FadeInOut();
 
   if (Device.getMode() == AFE_MODE_NORMAL ||
       Device.getMode() == AFE_MODE_CONFIGURATION) {
