@@ -62,16 +62,6 @@ void AFECLED::blink(unsigned int duration, uint32_t onColor,
   }
 }
 
-void AFECLED::blinkingOn(unsigned long blinking_interval, uint32_t onColor,
-                         uint32_t offColor) {
-  _interval = blinking_interval;
-  _blinking = true;
-}
-
-void AFECLED::blinkingOff() { _blinking = false; }
-
-boolean AFECLED::isBlinking() { return _blinking; }
-
 void AFECLED::loop() {
   if (_initialized) {
     if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
@@ -112,7 +102,6 @@ void AFECLED::effectOff() {
 }
 
 void AFECLED::waveEffect(void) {
-
   if (millis() - _effectTimer > effects.effect[0].time) {
     if (_currentLedId == configuration.ledNumber - 1 || _currentLedId == 0) {
       _increment *= -1;
@@ -127,7 +116,6 @@ void AFECLED::waveEffect(void) {
 
 void AFECLED::fadeInOutEffect(void) {
   if (millis() - _effectTimer > 50) {
-
     if (_currentBrightness >=
             effects.effect[1].brightness - _fadeStep - 1 ||
         _currentBrightness < _fadeStep + 1) {

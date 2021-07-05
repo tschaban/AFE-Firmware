@@ -5956,8 +5956,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
     root["howLongKeepState"] = configuration->howLongKeepState;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
-      Serial << endl
-             << "### SACE=" << i << " id-" << configuration->domoticz[i].idx;
       jsonIdx.add(configuration->domoticz[i].idx);
     }
 #else

@@ -1,4 +1,6 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/
+The class is used to handle On/Off or Open/Closed states
+*/
 
 #ifndef _AFE_MiFare_Card_h
 #define _AFE_MiFare_Card_h
@@ -27,7 +29,11 @@ public:
   /* Init switch */
   void begin(uint8_t id, AFEDataAccess *);
 
+  /* Used to set On/Off or Open/Closed state. When card read and with access
+   * rights */
   void set();
+
+  /* Required to process MiFare Card states */ 
   boolean listener();
 };
 

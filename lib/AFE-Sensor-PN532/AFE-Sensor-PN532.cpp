@@ -206,43 +206,6 @@ boolean AFESensorPN532::listener() {
   return _request;
 }
 
-/*
-boolean AFESensorPN532::listener() {
-  if (_initialized) {
-    if (_requestTime == 0) {
-      if (_listenerTime == 0) {
-        _listenerTime = millis();
-      }
-      if (millis() - _listenerTime > configuration.listenerTimeout) {
-        ledOn();
-        _request = foundCard();
-        ledOff();
-        _listenerTime = 0;
-      }
-      if (_request) {
-        _requestTime = millis();
-#ifdef AFE_CONFIG_HARDWARE_CLED
-        CLed.on(CRGB::Blue);
-#endif
-      }
-    } else {
-      if (millis() - _requestTime > configuration.requestProcessingTime) {
-        _requestTime = 0;
-#ifdef AFE_CONFIG_HARDWARE_CLED
-        CLed.effectOn(AFE_CONFIG_HARDWARE_EFFECT_WAVE);
-#endif
-        ledOff();
-      }
-      _request = false;
-    }
-  }
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  CLed.loop();
-#endif
-
-  return _request;
-}
-*/
 void AFESensorPN532::getJSON(char *json) {
   sprintf(json, "{\"tag1\":\"%s\",\"tag2\":\"%s\",\"tag3\":\"%s\",\"tag4\":\"%"
                 "s\",\"tag5\":\"%s\",\"tag6\":\"%s\"}",
@@ -253,9 +216,7 @@ void AFESensorPN532::getJSON(char *json) {
 void AFESensorPN532::formattingNFC() {
   const char *url = "smartnydom.pl";
   uint8_t ndefprefix = NDEF_URIPREFIX_HTTP_WWWDOT;
-
   ledOn();
-
   if (foundCard()) {
     if (authenticatedBlock(0)) {
       if (NFCReader.mifareclassic_FormatNDEF()) {
@@ -294,7 +255,6 @@ void AFESensorPN532::formattingNFC() {
     }
 #endif
   }
-
   ledOff();
 }
 
@@ -454,16 +414,12 @@ void AFESensorPN532::readNFC() {
 
 boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
                                   boolean lookForCard) {
-  ledOn();
   boolean _ret = false;
   uint8_t _data[AFE_HARDWARE_PN532_BLOCK_SIZE + 1];
   data[0] = AFE_EMPTY_STRING;
 
   if (lookForCard) {
     if (!foundCard()) {
-#ifdef AFE_CONFIG_HARDWARE_LED
-      ledOff();
-#endif
       return _ret;
     }
   }
@@ -487,15 +443,11 @@ boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
 #endif
     }
   }
-
-  ledOff();
   return _ret;
 }
 
 void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
-
   ledOn();
-
   if (strlen(data) > AFE_HARDWARE_PN532_BLOCK_SIZE) {
 #ifdef DEBUG
     Serial << endl << "ERROR: PN532: Too long string to save in the block";
@@ -609,26 +561,19 @@ boolean AFESensorPN532::readTag() {
   return _ret;
 }
 
-void AFESensorPN532::ledOn() {
-//#ifdef AFE_CONFIG_HARDWARE_CLED
-//  CLed.on(CRGB::Green);
-//#endif
 #ifdef AFE_CONFIG_HARDWARE_LED
+void AFESensorPN532::ledOn() {
+
   if (!isCLedUsed) {
     Led.on();
   }
-#endif
 }
 
 void AFESensorPN532::ledOff() {
-//#ifdef AFE_CONFIG_HARDWARE_CLED
-//  CLed.off(CRGB::Black);
-//#endif
-#ifdef AFE_CONFIG_HARDWARE_LED
   if (!isCLedUsed) {
     Led.off();
   }
-#endif
 }
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR

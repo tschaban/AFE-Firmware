@@ -55,8 +55,9 @@ private:
   boolean _request = false;
   uint32_t _requestTime = 0;
   uint32_t _listenerTime = 0;
-  
+
   AFEDataAccess *Data;
+
   PN532_SWHSU PN532UARTInterface;
   PN532_I2C PN532I2CInterface;
   PN532 NFCReader;
@@ -68,9 +69,8 @@ private:
                          // ISO14443A card type)
 
 #if defined(AFE_CONFIG_HARDWARE_CLED) || defined(AFE_CONFIG_HARDWARE_LED)
- boolean isCLedUsed = false;
+  boolean isCLedUsed = false;
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   AFECLED CLed;
@@ -78,14 +78,12 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
+  void ledOn();
+  void ledOff();
 #endif
 
   boolean foundCard();
   boolean authenticatedBlock(uint32_t blockId);
-
-
-  void ledOn();
-  void ledOff();
 
 public:
   PN532_SENSOR configuration;
@@ -103,15 +101,24 @@ public:
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 
+  /* Methods format the card to NFC or Classic */
   void formattingNFC();
   void formattingClassic();
+
+  /* Read block from the card.
+  if lookForCard = false: assumes card is already near the reader */
+  boolean readBlock(uint8_t blockId, char *data, boolean lookForCard = true);
+
+  /* Write data to the block */
+  void writeBlock(uint8_t blockId, const char *data);
+  
+  /* Read AFE TAG, uses backup TAG in case of problems */
+  boolean readTag();
+
 #ifdef DEBUG
+  /* Reads all blocks. Only available in DEBUG mode. It's logged to the Serial port */
   void readNFC();
 #endif
-  boolean readBlock(uint8_t blockId, char *data, boolean lookForCard = true);
-  void writeBlock(uint8_t blockId, const char *data);
-
-  boolean readTag();
 };
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR

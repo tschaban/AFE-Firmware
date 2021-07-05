@@ -338,7 +338,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif
 
 /* CLED */
-#ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_CLED
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLEDS,
                         Device->configuration.noOfCLEDs, F("a"),
                         F(L_DEVICE_NUMBER_OF_CLEDS));
@@ -3390,7 +3390,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   Data->getConfiguration(0, &CLEDEffectsConfiguration);
   char _number[10];
 
-  openSection(page, F("Pasek LED RGB"), F(""));
+  openSection(page, F("Pasek LED RGB"), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_GPIO);
@@ -3408,7 +3408,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: number of leds */
   sprintf(_number, "%d", CLEDConfiguration.ledNumber);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", "Ilość LED na listwie",
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -3416,29 +3416,29 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: Colors order */
   sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", "Kolejność kolorów",
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "RGB", true);
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
 
   closeSection(page);
 
-  openSection(page, F("Efekt fala"), F(""));
+  openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
   /*** Effect: one led wave */
 
   /* Item: Led color */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", "Kolor", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", L_CLED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", "Jasnosc", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", "Czas", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
                    L_MILISECONDS);
 
@@ -3449,17 +3449,17 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: Led color */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", "Kolor", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", L_CLED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", "Jasnosc", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", "Czas", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
                    L_MILISECONDS);
   closeSection(page);

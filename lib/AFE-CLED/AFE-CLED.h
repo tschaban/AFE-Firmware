@@ -20,14 +20,14 @@ class AFECLED {
 
 private:
   boolean _initialized = false;
-  boolean _blinking = false;
-  uint32_t _interval;
-  uint32_t _previousMillis = 0;
   boolean state = false;
+
+  CRGB leds[8];
 
   CLED_EFFECTS effects;
   uint32_t _effectTimer = 0;
   uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
+
   /* Effect: wave */
   uint8_t _currentLedId = 1;
   int8_t _increment = 1;
@@ -35,22 +35,25 @@ private:
   /* Effect: Fade In/Out */
   uint8_t _currentBrightness = 0;
   uint8_t _fadeStep = 1;
-  
-  CRGB leds[8];
 
   uint32_t _offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR;
   uint32_t _onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR;
 
+  /* Set LED brightness */
   void setBrightness(uint8_t level);
-  void setColor(uint32_t color);
-  void setOnColor(uint32_t color);
-  void setOffColor(uint32_t color);
 
+  /* Set Color for all leds in the string */
+  void setColor(uint32_t color);
+
+  /* Handles Leds wave effect */
   void waveEffect(void);
+
+  /* Handles Fade In/Out effect */
   void fadeInOutEffect(void);
 
 public:
   CLED configuration;
+
   /* Constructor */
   AFECLED();
   boolean begin(AFEDataAccess *, uint8_t id);
@@ -72,25 +75,10 @@ public:
              uint32_t onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR,
              uint32_t offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR);
 
-  /* Turns on CLED blinking with interval as input paramters. It's in
-   * milliseconds */
-  void blinkingOn(unsigned long blinking_interval,
-                  uint32_t onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR,
-                  uint32_t offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR);
-
-  /* Turns off CLED blinking */
-  void blinkingOff();
-
-  /* Returns true if CLED is blinking, false if not */
-  boolean isBlinking();
-
-  /* Method must be added to main loop in order to enable continues CLED
-   * blinking
-   */
+  /* Method must be added to main loop in order to enable effects  */
   void loop();
-
   void effectOn(uint8_t effectId);
-  void effectOff();
+  void effectOff(void);
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

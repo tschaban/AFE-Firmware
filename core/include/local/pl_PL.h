@@ -509,9 +509,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=38&i={{o}}\">Formatuj Classic MiFare</a>"
 #define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Odczytaj aktualny TAG</a></div>"
 #define L_PN532_SAVE_TAG "Zapisywanie informacji na karcie"
-#define L_PN532_INFO_1 "Kartę powinna zostać sformwatowana do NFC"
-#define L_PN532_INFO_2 "Informacje zapisywane na karcie mogą zawierać cyfry, znaki alfabetu (bez PL liter) oraz podstawowe znaki specjalne"
-#define L_PN532_INFO_3 "Kartę należy umieścić przy czytniku i NIE ruszać podczas formwatowania, odczytywania oraz zapisywania informacji"
+#define L_PN532_INFO_1 "Kartę powinna zostać sformatowana do NFC"
+#define L_PN532_INFO_2 "Informacje zapisywane na karcie mogą zawierać cyfry, znaki alfabetu (ale bez PL liter) oraz podstawowe znaki specjalne"
+#define L_PN532_INFO_3 "Kartę należy umieścić przy czytniku i NIE ruszać podczas formatowania, odczytywania oraz zapisywania informacji"
 #define L_PN532_CURRENT_TAG "Aktualny inforacje zapisane na karcie"
 #define L_PN532_CURRENT_PRIMARY_TAG "TAG"
 #define L_PN532_CURRENT_BACKUP_TAG "TAG: zapasowa kopia"
@@ -551,7 +551,17 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 
 #define L_CLEDS "Diody LED RGB"
+#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę parametrów konfiguracyjnych paska LED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
+#define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
+#define L_CLED_COLORS_ORDER "Kolejność kolorów"
 
+#define L_CLED_EFFECT_WAVE "Efekt fala"
+#define L_CLED_EFFECT_FADE_IN_OUT "Efekt przygaszania"
+#define L_CLED_COLOR "Kolor"
+#define L_CLED_BRIGHTNESS "Jasność"
+#define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
+#define L_CLED_TIME_WAVE "Szybkość fali"
+#define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
 
 #endif // _LANG_PL_h
 

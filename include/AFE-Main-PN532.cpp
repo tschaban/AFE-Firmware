@@ -107,8 +107,7 @@ void PN532EventsListener() {
               PN532Sensor[i].tag.block[idxId].value);
         }
 #else
-        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state,
-                                       PN532Sensor[i].tag.block[1].value);
+        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state);
 #endif
       }
     }
