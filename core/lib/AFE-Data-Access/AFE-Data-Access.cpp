@@ -6125,10 +6125,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 
 void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_GPIO;
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
   configuration.chipset = 0;
-  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLOLRS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
+  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG

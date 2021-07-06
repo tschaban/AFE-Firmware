@@ -3393,7 +3393,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   openSection(page, F("Pasek LED RGB"), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
-  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_GPIO);
+  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,

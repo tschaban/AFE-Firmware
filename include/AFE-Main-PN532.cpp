@@ -36,16 +36,33 @@ void initializePN532Sensor() {
 void PN532EventsListener() {
   boolean actionTaken = false;
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
-    if (PN532Sensor[i].listener()) {
+
+    switch (PN532Sensor[i].listener()) {
+
+    /* Card detected */
+    case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND: 
+
       if (PN532Sensor[i].readTag()) {
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        MqttAPI.publishPN532SensorData(i);
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        /* Changing the CLED Effect card detected, but not authorized yet */
+        CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].setCustomEffectColor(
+            AFE_CONFIG_HARDWARE_EFFECT_WAVE,
+            AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
+        CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].effectOn(
+            AFE_CONFIG_HARDWARE_EFFECT_WAVE);
 #endif
-
         for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
           if (strcmp(MiFareCard[j].configuration.cardId,
                      PN532Sensor[i].tag.block[0].value) == 0) {
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+          /* Changing the CLED Effect color to authorized */
+            CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].setCustomEffectColor(
+                AFE_CONFIG_HARDWARE_EFFECT_WAVE,
+                CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR]
+                    .effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
+                    .color);
+#endif
 
             actionTaken = false;
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -90,8 +107,23 @@ void PN532EventsListener() {
             break;
           }
         }
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+        MqttAPI.publishPN532SensorData(i);
+#endif
       }
+      break;
+
+    /* End of processing time of a request. Used only by CLED */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    case AFE_HARDWARE_PN532_LISTENER_EVENT_PROCESSING_FINISHED:
+    /* Changing the CLED Effect to listening mode */
+      CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].effectOn(
+            AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+      break;
+#endif;      
     }
+
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {

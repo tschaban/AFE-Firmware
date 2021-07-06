@@ -94,6 +94,10 @@ void setup() {
   initializeLED();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  initializeCLed();
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
@@ -300,7 +304,6 @@ void setup() {
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
 #endif
-
 }
 
 void loop() {
@@ -408,6 +411,10 @@ void loop() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
       relayEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      CLedEventsListener();
 #endif
     }
 

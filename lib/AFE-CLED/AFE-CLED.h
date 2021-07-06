@@ -24,7 +24,6 @@ private:
 
   CRGB leds[8];
 
-  CLED_EFFECTS effects;
   uint32_t _effectTimer = 0;
   uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
 
@@ -35,6 +34,8 @@ private:
   /* Effect: Fade In/Out */
   uint8_t _currentBrightness = 0;
   uint8_t _fadeStep = 1;
+
+  uint32_t _effectColor[AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS];
 
   uint32_t _offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR;
   uint32_t _onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR;
@@ -51,8 +52,10 @@ private:
   /* Handles Fade In/Out effect */
   void fadeInOutEffect(void);
 
+
 public:
   CLED configuration;
+  CLED_EFFECTS effects;
 
   /* Constructor */
   AFECLED();
@@ -79,6 +82,10 @@ public:
   void loop();
   void effectOn(uint8_t effectId);
   void effectOff(void);
+
+/* It set's custom effect color */
+  void setCustomEffectColor(uint8_t effectId, uint32_t color);
+
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

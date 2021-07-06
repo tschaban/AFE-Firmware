@@ -12,9 +12,6 @@
 #include <PN532_I2C.h>
 #include <PN532_SWHSU.h>
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-#include <AFE-CLED.h>
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
@@ -68,18 +65,9 @@ private:
   uint8_t cardUIDLength; // Length of the UID (4 or 7 bytes depending on
                          // ISO14443A card type)
 
-#if defined(AFE_CONFIG_HARDWARE_CLED) || defined(AFE_CONFIG_HARDWARE_LED)
-  boolean isCLedUsed = false;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  AFECLED CLed;
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
-  void ledOn();
-  void ledOff();
 #endif
 
   boolean foundCard();
@@ -96,7 +84,7 @@ public:
   void begin(uint8_t id, AFEDataAccess *, AFEDevice *);
 
   /* Listens for state changes, taking into account bouncing */
-  boolean listener(void);
+  uint8_t listener(void);
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);

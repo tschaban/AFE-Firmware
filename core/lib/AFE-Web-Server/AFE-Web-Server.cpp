@@ -2264,11 +2264,11 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
   CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
-                                               : AFE_CONFIG_HARDWARE_CLED_GPIO;
+                                               : AFE_CONFIG_HARDWARE_CLED_0_GPIO;
 
   CLEDData.colorOrder = server.arg("o").length() > 0
                             ? server.arg("o").toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_COLOLRS_ORDER;
+                            : AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
 
   CLEDData.chipset = server.arg("m").length() > 0
                          ? server.arg("m").toInt()
@@ -2276,7 +2276,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
 
   CLEDData.ledNumber = server.arg("l").length() > 0
                            ? server.arg("l").toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+                           : AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
 
   char _label[3];
 

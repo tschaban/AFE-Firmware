@@ -12,16 +12,19 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
     Data->getConfiguration(id, &effects);
 
     FastLED
-        .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
-                 AFE_CONFIG_HARDWARE_CLED_GPIO,
-                 AFE_CONFIG_HARDWARE_CLED_COLOLRS_ORDER>(
-            leds, AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER)
+        .addLeds<AFE_CONFIG_HARDWARE_CLED_0_CHIPSET,
+                 AFE_CONFIG_HARDWARE_CLED_0_GPIO,
+                 AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER>(
+            leds, AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER)
         .setCorrection(TypicalSMD5050);
 
+    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS; i++) {
+      _effectColor[i] = effects.effect[i].color;
+    }
     /* Effect: fade in/out calcuating step */
-    _fadeStep = round(effects.effect[1].brightness / (
-                      effects.effect[1].time / 2 /
-                      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_INTERVAL));
+    _fadeStep = round(effects.effect[1].brightness /
+                      (effects.effect[1].time / 2 /
+                       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_INTERVAL));
     _initialized = true;
   }
   return _initialized;
@@ -86,12 +89,13 @@ void AFECLED::effectOn(uint8_t effectId) {
   _currentEffect = effectId;
   if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
     setColor(CRGB::Black);
-    FastLED.setBrightness(effects.effect[0].brightness);
+    FastLED.setBrightness(
+        effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE].brightness);
     _increment = 1;
   } else if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT) {
     _currentBrightness = _fadeStep + 1;
     FastLED.setBrightness(_currentBrightness);
-    setColor(effects.effect[1].color);
+    setColor(_effectColor[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT]);
     _increment = _fadeStep;
   }
   _effectTimer = millis();
@@ -102,13 +106,14 @@ void AFECLED::effectOff() {
 }
 
 void AFECLED::waveEffect(void) {
-  if (millis() - _effectTimer > effects.effect[0].time) {
+  if (millis() - _effectTimer >
+      effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE].time) {
     if (_currentLedId == configuration.ledNumber - 1 || _currentLedId == 0) {
       _increment *= -1;
     }
     leds[_currentLedId] = CRGB::Black;
     _currentLedId += _increment;
-    leds[_currentLedId] = effects.effect[0].color;
+    leds[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
     FastLED.show();
     _effectTimer = millis();
   }
@@ -117,16 +122,20 @@ void AFECLED::waveEffect(void) {
 void AFECLED::fadeInOutEffect(void) {
   if (millis() - _effectTimer > 50) {
     if (_currentBrightness >=
-            effects.effect[1].brightness - _fadeStep - 1 ||
+            effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT].brightness -
+                _fadeStep - 1 ||
         _currentBrightness < _fadeStep + 1) {
       _increment = _increment > 0 ? -1 * _fadeStep : _fadeStep;
     }
-
     _currentBrightness += _increment;
     FastLED.setBrightness(_currentBrightness);
     FastLED.show();
     _effectTimer = millis();
   }
+}
+
+void AFECLED::setCustomEffectColor(uint8_t effectId, uint32_t color) {
+  _effectColor[effectId] = color;
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED
