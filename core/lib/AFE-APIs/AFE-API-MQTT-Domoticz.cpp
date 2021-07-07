@@ -431,7 +431,7 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 }
 
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
-                                             char *svalue, uint16_t nvalue) {
+                                             const char *svalue, uint16_t nvalue) {
 
   sprintf(
       json,
@@ -1074,5 +1074,23 @@ boolean AFEAPIMQTTDomoticz::publishBinarySensorState(uint8_t id) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+void AFEAPIMQTTDomoticz::addClass(AFEMiFareCard *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user) {
+  boolean publishStatus = false;
+  if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
+    char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
+
+    generateDeviceValue(json, _MiFareCard[id]->configuration.domoticz[tagId].idx, user,
+                        state);
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -32,6 +32,10 @@
 #include <AFE-Sensor-DHT.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#include <AFE-Sensor-PN532.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -142,7 +146,8 @@ private:
 
 /* Item: list of gate states */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  void addGateStatesListItem(String &item, const __FlashStringHelper *name, byte state);
+  void addGateStatesListItem(String &item, const __FlashStringHelper *name,
+                             byte state);
 #endif
 
 /* Item: list of contactrons */
@@ -285,6 +290,16 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void siteBinarySensor(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  void sitePN532Sensor(String &page, uint8_t id);
+  void sitePN532SensorAdmin(String &page, uint8_t id);
+  void siteMiFareCard(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void siteCLED(String &page, uint8_t id);
 #endif
 };
 

@@ -39,6 +39,7 @@ struct AFE_SITE_PARAMETERS {
   uint16_t rebootTime = 0;
   boolean form = true;
   boolean formButton = true;
+  uint8_t option = AFE_HARDWARE_ITEM_NOT_EXIST;
 };
 
 class AFEWebServer {
@@ -76,6 +77,8 @@ private:
 
   /* Method gets url Option parameter value */
   boolean getOptionName();
+  
+  uint8_t getOption();
   uint8_t getCommand();
   uint8_t getSiteID();
   uint8_t getID();
@@ -174,6 +177,17 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void get(BINARY_SENSOR &data);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  void get(PN532_SENSOR &data);
+  void processMiFareCard();
+  void get(MIFARE_CARD &data);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void get(CLED &CLEDData,CLED_EFFECTS &CLEDEffectsData);
+#endif
+
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();

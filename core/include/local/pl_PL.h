@@ -99,6 +99,7 @@
 #define L_DEVICE_HARDWARE_CONFIGURATION "Konfiguracja urządzenia"
 #define L_DEVICE_HARDWARE_CONFIGURATION_INFO "Wybierz podłączone elementy do urządzenia"
 #define L_DEVICE_NUMBER_OF_LEDS "Ilość Led'ów"
+#define L_DEVICE_NUMBER_OF_CLEDS "Ilość Led'ów RGB"
 #define L_DEVICE_NUMBER_OF_RELAYS "Ilość przekaźników"
 #define L_DEVICE_NUMBER_OF_SWITCHES "Ilość przycisków"
 #define L_DEVICE_NUMBER_OF_CONTACTRONS "Ilość czujników magnetycznych"
@@ -111,6 +112,8 @@
 #define L_DEVICE_NUMBER_OF_DS18B20_SENSORS "Liczba czujników DS18B20"
 #define L_DEVICE_NUMBER_OF_REGULATORS "Ilość regulatorów"
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarnych"
+#define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
+#define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -494,6 +497,71 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
 #define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
 #define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
+
+
+/* PN532 */
+
+#define L_PN532_SENSOR "Czujnik PN532"
+#define L_PN532_MIFARE_ADMIN "Zarządzanie kartą MiFare Classic"
+#define L_PN532_CARD_FORMAT "Formatowanie karty"
+#define L_PN532_CARD_FORMAT_HINT "Formatowanie karty usuwa wszystkie zapisane na niej informacje."
+#define L_PN532_FORMAT_NFC "<a href=\"/?o=38&i={{o}}\">Formatuj NFC</a>"
+#define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=38&i={{o}}\">Formatuj Classic MiFare</a>"
+#define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Odczytaj aktualny TAG</a></div>"
+#define L_PN532_SAVE_TAG "Zapisywanie informacji na karcie"
+#define L_PN532_INFO_1 "Kartę powinna zostać sformatowana do NFC"
+#define L_PN532_INFO_2 "Informacje zapisywane na karcie mogą zawierać cyfry, znaki alfabetu (ale bez PL liter) oraz podstawowe znaki specjalne"
+#define L_PN532_INFO_3 "Kartę należy umieścić przy czytniku i NIE ruszać podczas formatowania, odczytywania oraz zapisywania informacji"
+#define L_PN532_CURRENT_TAG "Aktualny inforacje zapisane na karcie"
+#define L_PN532_CURRENT_PRIMARY_TAG "TAG"
+#define L_PN532_CURRENT_BACKUP_TAG "TAG: zapasowa kopia"
+#define L_PN532_TAG_ID "Identyfikator"
+#define L_PN532_TAG_WHO "Użytkownik"
+#define L_PN532_LED "LED sygnalizujące stany czujnika PN582"
+#define L_PN532_REQUEST_PROCESSING "Czas przetwarzania żądania po detekcji karty"
+#define L_PN532_TIMEOUT "Czas oczekiwania na kartę"
+#define L_PN532_INTERFACE "Interface"
+#define L_PN532_LISTENER_TIMEOUT "Interwał odczytów karty"
+#define L_PN532_SHOW_INTERFACE_CONFIGURATION "Pokaż parametery konfiguracyjne interface'u"
+#define L_PN532_TIMEOUTS "Konfiguracja odczytów"
+#define L_PN532_MQTT_TOPIC "Temat MQTT do wysyłania danych odczytanej kary MiFare"
+
+#define L_MIFARE_CARD "Karta MiFare Classic"
+#define L_MIFARE_CARDS "Karty MiFare Classic"
+#define L_MIFARE "MiFare"
+#define L_MIFARE_CARD_ID "Identyfikator Karty"
+#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnkem / bramą"
+#define L_MIFARE_CARD_CONTROLS "Steruje"
+#define L_MIFARE_CARD_ACTION "Akcja"
+#define L_MIFARE_CARD_ACTION_ON "ON"
+#define L_MIFARE_CARD_ACTION_OFF "OFF"
+#define L_MIFARE_CARD_ACTION_TOGGLE "Przełącz"
+#define L_MIFARE_CARD_INTEGRATION "Integracja"
+#define L_MIFARE_CARD_INTEGRATION_HINT "Konfiguracja integracji z systemem automatyki"
+#define L_MIFARE_CARD_SEND_AS_SWITCH "Wysyłaj detekcję kart wartościami: ON/OFF"
+#define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Domyślnie: OPEN/CLOSED"
+#define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytania karty MiFare"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) w systeme do automatyki po wykryciu karty"
+#define L_MIFARE_CARD_TIME "Czas"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic. W wersji AFE Pro dostępna jest obsługa do 10 kart. Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
+
+
+#define L_MIFARE_ADMIN_INFO "Informacje"
+
+
+#define L_CLEDS "Diody LED RGB"
+#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę parametrów konfiguracyjnych paska LED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
+#define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
+#define L_CLED_COLORS_ORDER "Kolejność kolorów"
+
+#define L_CLED_EFFECT_WAVE "Efekt fala"
+#define L_CLED_EFFECT_FADE_IN_OUT "Efekt przygaszania"
+#define L_CLED_COLOR "Kolor"
+#define L_CLED_BRIGHTNESS "Jasność"
+#define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
+#define L_CLED_TIME_WAVE "Szybkość fali"
+#define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
 
 #endif // _LANG_PL_h
 

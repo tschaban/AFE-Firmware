@@ -114,6 +114,11 @@ void AFEDefaults::set() {
     Data->createBinarySensorConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    Data->createPN532ConfigurationFile();
+    Data->createMiFareCardConfigurationFile();
+#endif
+
   }
 #ifdef DEBUG
   else {

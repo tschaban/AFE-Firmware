@@ -115,6 +115,9 @@
 #define L_DEVICE_NUMBER_OF_REGULATORS "Number of regulators"
 #define L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS "Number of thermal protectors"
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Number of binary's sensors"
+#define L_DEVICE_NUMBER_OF_PN532_SENSORS "Number of PN532's sensors"
+#define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
+#define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -493,6 +496,71 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_RELAY_TRIGGERED "Relay triggered by"
 #define L_MCP23017_SWITCH_CONNECTION "Switch can be connected directly to ESP's GPIO or through MCP23017 expander"
 #define L_MCP23017_CONNECTION_VIA_MCP "If connection is made via MCP23017 (GPIO above must be set to NONE)"
+
+
+/* PN532 */
+
+#define L_PN532_SENSOR "PN532 Sensor"
+#define L_PN532_MIFARE_ADMIN "MiFare Classic tools"
+#define L_PN532_CARD_FORMAT "Card formatting"
+#define L_PN532_CARD_FORMAT_HINT "All information will be permanently removed"
+#define L_PN532_FORMAT_NFC "<a href=\"/?o=38&i={{o}}\">Format to NFC</a>"
+#define L_PN532_FORMAT_MINIFARE "<a href=\"/?o=38&i={{o}}\">Format to Classic MiFare</a>"
+#define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Read TAG</a></div>"
+#define L_PN532_SAVE_TAG "Saving information on the card"
+#define L_PN532_INFO_1 "The card should be formatted to NFC"
+#define L_PN532_INFO_2 "Only alph-numeric characters and basic special characters can be saved on the card"
+#define L_PN532_INFO_3 "Place the card next to the reader and DO NOT move it while formatting, reading or writing information"
+#define L_PN532_CURRENT_TAG "Current information stored on the card"
+#define L_PN532_CURRENT_PRIMARY_TAG "TAG"
+#define L_PN532_CURRENT_BACKUP_TAG "TAG: backup copy"
+#define L_PN532_TAG_ID "ID"
+#define L_PN532_TAG_WHO "User"
+#define L_PN532_LED "LED informing about the status of the PN582 sensor"
+#define L_PN532_REQUEST_PROCESSING "Request processing timeout"
+#define L_PN532_TIMEOUT "Card waiting time"
+#define L_PN532_INTERFACE "Interface"
+#define L_PN532_LISTENER_TIMEOUT "Card reading interval"
+#define L_PN532_SHOW_INTERFACE_CONFIGURATION "Show interface configuration parameters"
+#define L_PN532_TIMEOUTS "Readings configuration"
+#define L_PN532_MQTT_TOPIC "MQTT topic to send MiFare card information"
+
+#define L_MIFARE_CARD "MiFare Classic Card"
+#define L_MIFARE_CARDS "MiFare Classic Cards"
+#define L_MIFARE "MiFare"
+#define L_MIFARE_CARD_ID "Card ID"
+#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Relay / gate control"
+#define L_MIFARE_CARD_CONTROLS "Controls"
+#define L_MIFARE_CARD_ACTION "Action"
+#define L_MIFARE_CARD_ACTION_ON "ON"
+#define L_MIFARE_CARD_ACTION_OFF "OFF"
+#define L_MIFARE_CARD_ACTION_TOGGLE "Toggle"
+#define L_MIFARE_CARD_INTEGRATION "Integration"
+#define L_MIFARE_CARD_INTEGRATION_HINT "Integration configuration with the automation system"
+#define L_MIFARE_CARD_SEND_AS_SWITCH "Send card detection using: ON/OFF values"
+#define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Default: OPEN/CLOSED"
+#define L_MIFARE_CARD_MQTT_TOPIC "MQTT Topic to monitor authorizations of MiFare card"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long to keep the CLOSED (ON) state in the automation system after detecting the card"
+#define L_MIFARE_CARD_TIME "Time"
+#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards. The AFE Pro version supports up to 10 cards. More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
+#define L_MIFARE_CARD_BACKUP_TAG "Backup copy of the TAG stored on the card"
+
+
+#define L_MIFARE_ADMIN_INFO "Information"
+
+
+#define L_CLEDS "RGB Leds"
+#define L_CLEDS_HINT "This firmware version doesn't enable to change the configuration parameters of the WS2812 RGB LED strip. It must be connected as described below"
+#define L_CLED_NUMBER_OF_LEDS "Number of leds strip"
+#define L_CLED_COLORS_ORDER "Colors order"
+
+#define L_CLED_EFFECT_WAVE "Wave effect"
+#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
+#define L_CLED_COLOR "Color"
+#define L_CLED_BRIGHTNESS "Brightness"
+#define L_CLED_MAX_BRIGHTNESS "Max brightness"
+#define L_CLED_TIME_WAVE "Wave speed"
+#define L_CLED_TIME_FADE_IN_OUT "Fade speed"
 
 #endif // _LANG_EN_h
 

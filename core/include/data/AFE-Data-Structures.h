@@ -104,5 +104,12 @@
 #include <AFE-BINARY-Sensor-Structure.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#include <AFE-PN532-Sensor-Structure.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED-Structure.h>
+#endif
 
 #endif
