@@ -95,6 +95,7 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
     call += nvalue;
     call += "&svalue=";
     call += value;
+    call.replace(" ","%20");
     _return = callURL(call);
   }
   return _return;
@@ -659,11 +660,27 @@ boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
   if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
     publishStatus =
         sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
-                          _BinarySensor[id]->get()==1 ? "Off" : "On");
+                          _BinarySensor[id]->get() == 1 ? "Off" : "On");
   }
   return publishStatus;
 }
 
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+void AFEAPIHTTPDomoticz::addClass(AFEMiFareCard *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+
+boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state,
+                                                   const char *user) {
+  boolean publishStatus = false;
+  if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
+    publishStatus = sendCustomSensorCommand(
+        _MiFareCard[id]->configuration.domoticz[tagId].idx, user, state);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

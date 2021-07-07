@@ -81,6 +81,13 @@
 #include <AFE-Sensor-Binary.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#include <AFE-Sensor-PN532.h>
+#include <AFE-MiFare-Card.h>
+#endif
+
+
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -167,6 +174,14 @@ public:
   virtual void addClass(AFESensorBinary *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+virtual void addClass(AFESensorPN532 *);
+#endif
+virtual void addClass(AFEMiFareCard *);
+#endif
+
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -237,6 +252,13 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+#endif
+AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
 

@@ -117,6 +117,10 @@ void setup() {
   initializeLED();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  initializeCLed();
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
@@ -258,6 +262,10 @@ void setup() {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    initializePN532Sensor();
+#endif
+
     /* Initializing APIs */
     initializeMQTTAPI();
 
@@ -268,7 +276,10 @@ void setup() {
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
-  } // end of initialization for operating mode
+  }
+
+/* End of initialization for operating mode. Initialization for all devices
+ * modes */
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
   /* Scanning I2C for devices */
@@ -379,6 +390,11 @@ void loop() {
         binarySensorEventsListener();
 #endif
 
+/* Listenings and processing PN532 events */
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+        PN532EventsListener();
+#endif
+
         /* Checking if Key is still valid */
         FirmwarePro.listener();
 
@@ -419,6 +435,10 @@ void loop() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
       relayEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      CLedEventsListener();
 #endif
     }
 

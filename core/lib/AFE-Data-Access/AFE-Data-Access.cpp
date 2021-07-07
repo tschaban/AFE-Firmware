@@ -41,15 +41,14 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
     configFile.close();
     /* After message is read, it's removed from the file */
     saveWelecomeMessage(F(""));
-  }
-
+  } else {
+    message = "";
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: File: ") << AFE_FILE_WELCOME_MESSAGE
            << F(" not opened");
-  }
 #endif
+  }
 }
 
 void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
@@ -561,6 +560,20 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+      configuration->noOfPN532Sensors =
+          root["noOfPN532Sensors"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
+      configuration->noOfMiFareCards =
+          root["noOfMiFareCards"] |
+          AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      configuration->noOfCLEDs =
+          root["noOfCLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -684,6 +697,15 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
+    root["noOfMiFareCards"] = configuration->noOfMiFareCards;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    root["noOfCLEDs"] = configuration->noOfCLEDs;
 #endif
 
     root.printTo(configFile);
@@ -830,6 +852,18 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   deviceConfiguration.noOfBinarySensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  deviceConfiguration.noOfPN532Sensors =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
+  deviceConfiguration.noOfMiFareCards =
+      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  deviceConfiguration.noOfCLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#endif
+
   saveConfiguration(&deviceConfiguration);
 }
 
@@ -2004,7 +2038,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.state.MQTTConnected =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 
-#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
+#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+      defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_POWER_ON;
@@ -2110,7 +2145,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+    defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
   saveRelayState(1, false);
@@ -3056,7 +3092,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif
 
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
+#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                  \
+    defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C1");
   saveConfiguration(0, &ContactronConfiguration);
@@ -5656,4 +5693,601 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PN532_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      sprintf(configuration->name, root["name"]);
+      configuration->tx = root["tx"].as<int>();
+      configuration->rx = root["rx"].as<int>();
+      configuration->requestProcessingTime =
+          root["requestProcessingTime"].as<int>();
+      configuration->interface = root["interface"].as<int>();
+      configuration->listenerTimeout = root["listenerTimeout"].as<int>();
+      configuration->i2cAddress = root["i2cAddress"].as<int>();
+
+      configuration->timeout = root["timeout"].as<int>();
+#ifdef AFE_CONFIG_HARDWARE_LED
+      configuration->ledID = root["ledID"].as<int>();
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PN532_SENSOR> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["name"] = configuration->name;
+    root["tx"] = configuration->tx;
+    root["rx"] = configuration->rx;
+    root["requestProcessingTime"] = configuration->requestProcessingTime;
+    root["timeout"] = configuration->timeout;
+    root["interface"] = configuration->interface;
+    root["listenerTimeout"] = configuration->listenerTimeout;
+    root["i2cAddress"] = configuration->i2cAddress;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    root["ledID"] = configuration->ledID;
+#endif
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createPN532ConfigurationFile() {
+  PN532_SENSOR configuration;
+  sprintf(configuration.name, "pn532");
+  configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.timeout = AFE_HARDWARE_PN532_DEFUALT_TIMEOUT;
+  configuration.requestProcessingTime =
+      AFE_HARDWARE_PN532_DEFUALT_REQUEST_PROCESSING_TIME;
+  configuration.i2cAddress = AFE_HARDWARE_PN532_DEFAULT_INTERFACE;
+  configuration.listenerTimeout = AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
+  configuration.i2cAddress = 0;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  configuration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-pn532-sensor-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &configuration);
+  }
+}
+
+void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+  char fileName[24];
+  sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration->action = root["action"].as<int>();
+      configuration->sendAsSwitch = root["sendAsSwitch"];
+      configuration->relayId = root["relayId"].as<int>();
+      configuration->howLongKeepState = root["howLongKeepState"].as<int>();
+      sprintf(configuration->cardId, root["cardId"] | "");
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+        configuration->domoticz[i].idx = root["idx"][i].as<int>();
+      }
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+  char fileName[24];
+  sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonArray &jsonIdx = root.createNestedArray("idx");
+    root["action"] = configuration->action;
+    root["cardId"] = configuration->cardId;
+    root["relayId"] = configuration->relayId;
+    root["sendAsSwitch"] = configuration->sendAsSwitch;
+    root["howLongKeepState"] = configuration->howLongKeepState;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+      jsonIdx.add(configuration->domoticz[i].idx);
+    }
+#else
+    root["MQTTTopic"] = configuration->mqtt.topic;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createMiFareCardConfigurationFile() {
+  MIFARE_CARD configuration;
+  configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.action = AFE_HARDWARE_ITEM_NOT_EXIST;
+  configuration.sendAsSwitch = AFE_HARDWARE_MIFARE_CARD_DEFAULT_SEND_AS;
+  configuration.cardId[0] = AFE_EMPTY_STRING;
+  configuration.howLongKeepState =
+      AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+    configuration.domoticz[i].idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  }
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &configuration);
+  }
+}
+
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
+  char fileName[17];
+  sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+      configuration->gpio = root["gpio"].as<int>();
+      configuration->chipset = root["chipset"].as<int>();
+      configuration->colorOrder = root["colorOrder"].as<int>();
+      configuration->ledNumber = root["ledNumber"].as<int>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
+  char fileName[17];
+  sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["gpio"] = configuration->gpio;
+    root["chipset"] = configuration->chipset;
+    root["colorOrder"] = configuration->colorOrder;
+    root["ledNumber"] = configuration->ledNumber;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDConfigurationFile() {
+  CLED configuration;
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
+  configuration.chipset = 0;
+  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
+  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Creating file: cfg-cled-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &configuration);
+  }
+}
+
+void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
+  char fileName[25];
+  sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS> jsonBuffer;
+
+    JsonArray &root = jsonBuffer.parseArray(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+        JsonObject &effect = root.get<JsonObject &>(i);
+        if (effect.success()) {
+          configuration->effect[i].brightness = effect["brightness"].as<int>();
+          configuration->effect[i].time = effect["time"].as<int>();
+          configuration->effect[i].color = effect["color"].as<int>();
+        }
+#ifdef DEBUG
+        else {
+          Serial << F("ERROR: JSON not pharsed");
+        }
+#endif
+      }
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON Array not pharsed");
+    }
+#endif
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
+  char fileName[25];
+  sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LittleFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS> jsonBuffer;
+    JsonArray &root = jsonBuffer.createArray();
+
+    JsonObject &e1 = root.createNestedObject();
+    e1["brightness"] = configuration->effect[0].brightness;
+    e1["color"] = configuration->effect[0].color;
+    e1["time"] = configuration->effect[0].time;
+
+    JsonObject &e2 = root.createNestedObject();
+    e2["brightness"] = configuration->effect[1].brightness;
+    e2["color"] = configuration->effect[1].color;
+    e2["time"] = configuration->effect[1].time;
+
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDEffectsConfigurationFile() {
+  CLED_EFFECTS configuration;
+
+  /* Wave */
+  configuration.effect[0].brightness = 50;
+  configuration.effect[0].color = 0x00008B; // DarkBlue
+  configuration.effect[0].time = 50;
+
+  /* Fade Out */
+  configuration.effect[1].brightness = 255;
+  configuration.effect[1].color = 0xCD5C5C; // IndigoRed
+  configuration.effect[1].time = 0;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &configuration);
+  }
+}
+
 #endif

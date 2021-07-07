@@ -108,7 +108,7 @@ const char *AFEI2CScanner::getName(byte deviceAddress) {
     //return "BH1750,MCP23017,MCP23008,PCF8574";
   else if (deviceAddress == 0x24)
     //return "MCP23017,MCP23008,PCF8574";
-    return "MCP23017";
+    return "MCP23017,PN532";
   else if (deviceAddress == 0x25)
     //return "MCP23017,MCP23008,PCF8574";
     return "MCP23017";

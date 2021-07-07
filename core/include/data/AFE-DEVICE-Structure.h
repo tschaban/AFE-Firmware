@@ -6,7 +6,6 @@
 #include <AFE-Configuration.h>
 #include <arduino.h>
 
-
 struct AFE_DEVICE_API {
   boolean http;
   boolean mqtt;
@@ -70,6 +69,13 @@ struct DEVICE {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   uint8_t noOfBinarySensors;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  uint8_t noOfPN532Sensors;
+  uint8_t noOfMiFareCards;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  uint8_t noOfCLEDs;
 #endif
 };
 

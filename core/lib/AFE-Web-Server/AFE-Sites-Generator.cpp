@@ -94,6 +94,12 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  if (Device->configuration.noOfCLEDs > 0) {
+    addMenuItem(page, F(L_CLEDS), AFE_CONFIG_SITE_CLED);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -202,6 +208,19 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addMenuItem(page, F(L_PN532_SENSOR), AFE_CONFIG_SITE_PN532_SENSOR);
+  }
+
+  if (Device->configuration.noOfMiFareCards > 0) {
+    addMenuHeaderItem(page, F(L_MIFARE_CARDS));
+    addMenuSubItem(page, L_MIFARE, Device->configuration.noOfMiFareCards,
+                   AFE_CONFIG_SITE_MIFARE_CARDS);
+  }
+
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   if (Device->configuration.isAnalogInput) {
     addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
@@ -215,6 +234,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
     addMenuItem(page, F(L_LED_SYSTEM), AFE_CONFIG_SITE_SYSTEM_LED);
+  }
+#endif
+
+/* PN532 */
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addMenuItem(page, F(L_PN532_MIFARE_ADMIN),
+                AFE_CONFIG_SITE_PN532_SENSOR_ADMIN);
   }
 #endif
 
@@ -310,6 +337,13 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DEVICE_NUMBER_OF_LEDS));
 #endif
 
+/* CLED */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLEDS,
+                        Device->configuration.noOfCLEDs, F("a"),
+                        F(L_DEVICE_NUMBER_OF_CLEDS));
+#endif
+
 /* Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
@@ -358,10 +392,6 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DHT,
                         Device->configuration.noOfDHTs, F("dh"),
                         F(L_DHT_SENSORS));
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-// TODO
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -413,6 +443,15 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
                         Device->configuration.noOfRainmeterSensors, F("d"),
                         F(L_RAINMETER));
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS,
+                        Device->configuration.noOfPN532Sensors, F("ck"),
+                        F(L_DEVICE_NUMBER_OF_PN532_SENSORS));
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS,
+                        Device->configuration.noOfMiFareCards, F("f"),
+                        F(L_DEVICE_NUMBER_OF_MIFARE_CARDS));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
@@ -2968,6 +3007,464 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
+  PN532_SENSOR configuration;
+  char _number[6];
+  Data->getConfiguration(0, &configuration);
+
+  openSection(page, F(L_PN532_SENSOR), F(""));
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: interface */
+  addSelectFormItemOpen(page, F("d"), F(L_PN532_INTERFACE));
+  addSelectOptionFormItem(page, L_NONE, "255", configuration.interface ==
+                                                   AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, "UART", "1",
+                          configuration.interface ==
+                              AFE_HARDWARE_PN532_INTERFACE_UART);
+  addSelectOptionFormItem(page, "I2C", "0",
+                          configuration.interface ==
+                              AFE_HARDWARE_PN532_INTERFACE_IIC);
+  addSelectFormItemClose(page);
+
+  page.concat("<input type=\"submit\" class=\"b bw\" "
+              "value=\"" L_PN532_SHOW_INTERFACE_CONFIGURATION "\"><br><br>");
+
+  if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_UART) {
+    /* Item: UART GPIOs */
+    addListOfGPIOs(page, F("rx"), configuration.rx, "GPIO RXD");
+    addListOfGPIOs(page, F("tx"), configuration.tx, "GPIO TXD");
+  } else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
+    /* Item: IIC address */
+    addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+  }
+
+  closeSection(page);
+
+  openSection(page, F(L_PN532_TIMEOUTS), F(""));
+
+  /* Item: Interval card reads PN532 */
+  sprintf(_number, "%d", configuration.listenerTimeout);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "b", L_PN532_LISTENER_TIMEOUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "0", "5000", "1", L_MILISECONDS);
+
+  /* Item: Timeout PN532 */
+  sprintf(_number, "%d", configuration.timeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "w", L_PN532_TIMEOUT,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "10", "5000", "1",
+                   L_MILISECONDS);
+  /* Item: Time for processing requests */
+  sprintf(_number, "%d", configuration.requestProcessingTime);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_PN532_REQUEST_PROCESSING, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+
+  closeSection(page);
+
+/* Item: LED */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  openSection(page, F(L_PN532_LED), F(""));
+  addLEDSelectionItem(page, configuration.ledID);
+  closeSection(page);
+#endif
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_PN532_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif
+}
+
+void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
+
+  if (!FirmwarePro->Pro.valid) {
+    if (id > AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION - 1) {
+      page.concat(FPSTR(HTTP_INFO_TEXT));
+      page.replace("{{i.v}}", F(L_MIFARE_CARD_NONE_PRO));
+      return;
+    }
+  }
+
+  MIFARE_CARD configuration;
+  char _number[6];
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  GATE gateConfiguration;
+#endif
+
+  char text[20];
+  Data->getConfiguration(id, &configuration);
+
+  openSection(page, F(L_MIFARE_CARD), F(""));
+
+  /* Item: card Id */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "m", L_MIFARE_CARD_ID,
+                   configuration.cardId, "16");
+  closeSection(page);
+
+  openSection(page, F(L_MIFARE_CARD_CONTROLS_RELAY_GATE), F(""));
+
+/* Item: relay / gate */
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
+
+  addSelectFormItemOpen(page, F("r"), F(L_MIFARE_CARD_CONTROLS));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST);
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  uint8_t relayIsForGate;
+#endif
+  RELAY relayConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+    page += "<option value=\"";
+    page += i;
+    page += "\"";
+    page += configuration.relayId == i ? " selected=\"selected\"" : "";
+    page += ">";
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    relayIsForGate = false;
+    for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
+      Data->getConfiguration(j, &gateConfiguration);
+      if (i == gateConfiguration.relayId) {
+        page += F(L_GATE);
+        page += ": ";
+        page += gateConfiguration.name;
+        relayIsForGate = true;
+        break;
+      }
+    }
+    if (!relayIsForGate) {
+      Data->getConfiguration(i, &relayConfiguration);
+      sprintf(text, "%s: %s", L_RELAY, relayConfiguration.name);
+      page.concat(text);
+    }
+#else
+    Data->getConfiguration(i, &relayConfiguration);
+    sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
+    page.concat(text);
+#endif
+    page += "</option>";
+  }
+  addSelectFormItemClose(page);
+
+#endif // // defined(AFE_CONFIG_HARDWARE_RELAY) ||
+       // defined(AFE_CONFIG_HARDWARE_GATE)
+
+  /* Item: Action */
+  addSelectFormItemOpen(page, F("a"), F(L_MIFARE_CARD_ACTION));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          configuration.action == AFE_HARDWARE_ITEM_NOT_EXIST);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_ON, "1",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_ON);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_OFF, "0",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_OFF);
+  addSelectOptionFormItem(page, L_MIFARE_CARD_ACTION_TOGGLE, "2",
+                          configuration.action ==
+                              AFE_HARDWARE_MIFARE_CARD_ACTION_TOGGLE);
+  addSelectFormItemClose(page);
+
+  closeSection(page);
+
+  openSection(page, F(L_MIFARE_CARD_INTEGRATION),
+              F(L_MIFARE_CARD_INTEGRATION_HINT));
+
+  page.concat(FPSTR(HTTP_INFO_TEXT));
+  page.replace("{{i.v}}", F(L_MIFARE_CARD_HOW_LONG_KEEP_STATE));
+
+  /* Item: How long keep the card state */
+  sprintf(_number, "%d", configuration.howLongKeepState);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_TIME,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1",
+                   L_MILISECONDS);
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch,
+                      L_MIFARE_CARD_SEND_AS_SWITCH_HINT);
+#endif
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    char _idx[7];
+    char _name[3];
+    char _label[10];
+    sprintf(_idx, "%d", configuration.domoticz[0].idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x0",
+                     "IDX " L_PN532_TAG_ID, _idx, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_idx, "%d", configuration.domoticz[1].idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x1",
+                     "IDX " L_PN532_TAG_WHO, _idx, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    for (uint8_t tagId = 2; tagId < AFE_HARDWARE_PN532_TAG_SIZE; tagId++) {
+      sprintf(_idx, "%d", configuration.domoticz[tagId].idx);
+      sprintf(_label, "IDX TAG %d", tagId - 1);
+      sprintf(_name, "x%d", tagId);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _name, _label, _idx,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    }
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_MIFARE_CARD_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+  }
+#endif
+  closeSection(page);
+}
+
+void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
+  AFESensorPN532 PN532Sensor;
+  PN532Sensor.begin(0, Data, Device);
+  char _number[6];
+
+  switch (id) {
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_CLASSIC: /* Formatting Card to
+                                                          MiFare Classik 1k */
+    PN532Sensor.formattingClassic();
+    break;
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_NFC: /* Formattin to NFC card */
+    PN532Sensor.formattingNFC();
+    break;
+#ifdef DEBUG
+  case AFE_HARDWARE_MIFARE_CARD_OPTION_READ_CARD: /* Read what's saved in card
+                                                     (only in DEBUG mode) */
+    PN532Sensor.readNFC();
+    break;
+#endif
+  }
+
+  openSection(page, F(L_MIFARE_ADMIN_INFO), F(""));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_1));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_2));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_INFO_3));
+  closeSection(page);
+
+  openSection(page, F(L_PN532_CARD_FORMAT), F(L_PN532_CARD_FORMAT_HINT));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_FORMAT_NFC));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_NFC);
+  page.replace("{{o}}", _number);
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_PN532_FORMAT_MINIFARE));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_FORMAT_CLASSIC);
+  page.replace("{{o}}", _number);
+  closeSection(page);
+
+  openSection(page, F(L_PN532_SAVE_TAG), F(""));
+
+  page.concat(F(L_PN532_READ_TAG));
+  sprintf(_number, "%d", AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG);
+  page.replace("{{o}}", _number);
+
+  char data[AFE_HARDWARE_PN532_BLOCK_SIZE];
+
+  /* TAG: ID */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, data,
+                   "16");
+  /* TAG: User */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 1, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, data,
+                   "16");
+  /* TAG: 1 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + 2, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", data, "16");
+  /* TAG: 2 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", data, "16");
+  /* TAG: 3 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 1, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", data, "16");
+  /* TAG: 4 */
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + 2, data);
+  }
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", data, "16");
+
+  /* Backup TAG: ID */
+
+  if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
+
+    page.concat(FPSTR(HTTP_INFO_TEXT));
+    page.replace("{{i.v}}", F(L_MIFARE_CARD_BACKUP_TAG));
+
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_PN532_TAG_ID, data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: User */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              1,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_PN532_TAG_WHO, data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 1 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              2,
+                          data);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t2", "TAG 1", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 2 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t4", "TAG 2", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 3 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              1,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t5", "TAG 3", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+    /* Backup TAG: 4 */
+    PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK +
+                              AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR +
+                              2,
+                          data);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t6", "TAG 4", data,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, true);
+  }
+  closeSection(page);
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
+
+  CLED CLEDConfiguration;
+  CLED_EFFECTS CLEDEffectsConfiguration;
+  Data->getConfiguration(0, &CLEDConfiguration);
+  Data->getConfiguration(0, &CLEDEffectsConfiguration);
+  char _number[10];
+
+  openSection(page, F("Pasek LED RGB"), F(L_CLEDS_HINT));
+
+  /* Item: GPIO */
+  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, true);
+
+  /* Item: Chipset */
+  sprintf(_number, "%d", 0);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "WS2811", true);
+
+  /* Item: number of leds */
+  sprintf(_number, "%d", CLEDConfiguration.ledNumber);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   true);
+
+  /* Item: Colors order */
+  sprintf(_number, "%d", CLEDConfiguration.colorOrder);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+
+  closeSection(page);
+
+  openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
+  /*** Effect: one led wave */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+  openSection(page, F("Efekt Fade In/Out"), F(""));
+  /*** Effect: FAde in / out */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+                   L_MILISECONDS);
+  closeSection(page);
+}
+#endif
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {
