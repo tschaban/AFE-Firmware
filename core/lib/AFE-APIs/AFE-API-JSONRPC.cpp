@@ -185,6 +185,16 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
         response = root["result"] | "";
       }
     }
+#ifdef DEBUG
+    else {
+      response = http.getString();
+
+      Serial << endl
+             << F("INFO: API REST: Response reply code: ") << _httpCode
+             << F(", content: ") << response << F(", Size: ")
+             << response.length();
+    }
+#endif
     http.end();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -213,24 +223,22 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
 void AFEJSONRPC::checkAccessToWAN(void) {
 
-
-  #ifdef DEBUG
+#ifdef DEBUG
   Serial << endl
          << F("INFO: WAN ACCESS: checking access to : ") << AFE_WAN_ACCSSS_HOST;
 #endif
 
   IPAddress ip;
   ip.fromString(AFE_WAN_ACCSSS_HOST);
-  _PingResponded = Ping.ping(ip,AFE_WAN_ACCSSS_PINGS);
+  _PingResponded = Ping.ping(ip, AFE_WAN_ACCSSS_PINGS);
 
 #ifdef DEBUG
 
-  Serial << endl << F(" - ") << (_PingResponded?F("connected to WAN"):F("NOT connected to WAN")); 
   Serial << endl
-         << F(" - average time: ") << Ping.averageTime();
+         << F(" - ") << (_PingResponded ? F("connected to WAN")
+                                        : F("NOT connected to WAN"));
+  Serial << endl << F(" - average time: ") << Ping.averageTime();
 #endif
-
-
 
   /*
   Pings.on(true, _handlePingAnswer);

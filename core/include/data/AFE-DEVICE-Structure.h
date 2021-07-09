@@ -77,6 +77,9 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_CLED
   uint8_t noOfCLEDs;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  uint8_t noOfI2Cs;
+#endif
 };
 
 /* Custom DEVICE structure definition

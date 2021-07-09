@@ -1,7 +1,6 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 
-
 /* ---------Headers ---------*/
 
 void initializeBH1750Sensor(void);
@@ -12,7 +11,11 @@ void BH1750SensorEventsListener(void);
 void initializeBH1750Sensor(void) {
   if (Device.configuration.noOfBH1750s > 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
-      BH1750Sensor[i].begin(i);
+#ifdef AFE_ESP32
+      BH1750Sensor[i].begin(i, &WirePort0, &WirePort1);
+#else
+      BH1750Sensor[i].begin(i, WirePort0);
+#endif
     }
   }
 }

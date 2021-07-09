@@ -88,6 +88,7 @@
 #define L_ADDRESS "Address"
 #define L_CORRECTIONS "Corrections"
 #define L_UNITS "Units"
+#define L_FREQUENCY "Frequency"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"

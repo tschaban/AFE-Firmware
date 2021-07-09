@@ -42,6 +42,9 @@ struct BMEX80 {
   char name[17];
   uint8_t type;
   uint32_t interval;
+#ifdef AFE_ESP32
+  uint8_t wirePortId;
+#endif  
   uint8_t i2cAddress;
   uint8_t resolution; // for BMP180 only
   AIR_ITEM_SETTING temperature;

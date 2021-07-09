@@ -145,6 +145,10 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 
 #include <AFE-Main-APIs.cpp>
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <AFE-Main-I2C.cpp>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #include <AFE-Main-MCP23017.cpp>
 #endif

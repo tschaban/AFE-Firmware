@@ -33,8 +33,22 @@ void initializeHTTPServer(void) {
   if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     WebServer.onNotFound(handleOnNotFound);
   }
-#ifdef AFE_CONFIG_HARDWARE_LED
-  WebServer.begin(&Data, &Device, &FirmwarePro, &Led, &RestAPI);
+#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led);
+#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0,
+                  &WirePort1);
+#else
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0);
+#endif // AFE_ESP32
+#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0,
+                  &WirePort1);
+#else
+  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0);
+#endif // AFE_ESP32
 #else
   WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI);
 #endif

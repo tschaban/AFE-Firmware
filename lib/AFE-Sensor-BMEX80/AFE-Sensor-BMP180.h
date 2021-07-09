@@ -11,6 +11,7 @@
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-I2C-Structure.h>
 #include <Adafruit_BMP085.h>
+#include <Wire.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -28,7 +29,7 @@ public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMP180();
 
-  boolean begin(BMEX80 *, I2CPORT *);
+  boolean begin(BMEX80 *, TwoWire *);
 
   boolean read();
 

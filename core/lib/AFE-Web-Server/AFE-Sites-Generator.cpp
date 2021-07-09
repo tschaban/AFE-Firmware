@@ -16,6 +16,26 @@ void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   _HtmlResponse.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
 }
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                              AFEFirmwarePro *_FirmwarePro,
+                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0,
+                              TwoWire *_WirePort1) {
+  WirePort0 = _WirePort0;
+  WirePort1 = _WirePort1;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#else
+void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                              AFEFirmwarePro *_FirmwarePro,
+                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0) {
+  WirePort0 = _WirePort0;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
+
 void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
   page += FPSTR(HTTP_HEADER);
@@ -2089,8 +2109,13 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 
   openSection(page, F(L_BMEX80_SENSOR), F(""));
 
-  /* Item: IIC address selection */
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
 
   /* Item: type of the sensor */
   addSelectFormItemOpen(page, F("b"), F(L_BMEX80_SENSOR_TYPE));
@@ -2296,8 +2321,13 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
   Data->getConfiguration(id, &configuration);
   openSection(page, F(L_BH1750_SENSOR), F(""));
 
-  /* Item: I2C Address selection */
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
 
   /* Item: name of the sensor */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -2696,12 +2726,27 @@ void AFESitesGenerator::siteUARTBUS(String &page) {
 #endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFESitesGenerator::siteI2CBUS(String &page) {
+#ifdef AFE_ESP32
+void AFESitesGenerator::siteI2CBUS(String &page, uint8_t id)
+#else
+void AFESitesGenerator::siteI2CBUS(String &page)
+#endif
+{
   I2CPORT configuration;
+#ifdef AFE_ESP32
+  Data->getConfiguration(id, &configuration);
+#else
   Data->getConfiguration(&configuration);
+#endif
   openSection(page, F("I2C"), F(""));
   addListOfGPIOs(page, F("a"), configuration.SDA, "GPIO SDA");
   addListOfGPIOs(page, F("l"), configuration.SCL, "GPIO SCL");
+#ifdef AFE_ESP32
+  char _int[7];
+  sprintf(_int, "%d", configuration.frequency);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_FREQUENCY, _int,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "100000", "400000", "1", "Hz");
+#endif
   closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -3433,13 +3478,13 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
                    L_MILISECONDS);
 
   closeSection(page);
@@ -3454,14 +3499,14 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
-                   L_MILISECONDS);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1", L_MILISECONDS);
   closeSection(page);
 }
 #endif
@@ -3854,10 +3899,22 @@ void AFESitesGenerator::addSelectFormItemClose(String &item) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
 void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
-                                                         uint8_t address) {
+                                                         uint8_t wirePortId,
+                                                         uint8_t address)
+#else
+void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
+                                                         uint8_t address)
+#endif // AFE_ESP32
+{
+
   AFEI2CScanner I2CScanner;
-  I2CScanner.begin();
+#ifdef AFE_ESP32
+  I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1);
+#else
+  I2CScanner.begin(WirePort0);
+#endif
 
   addSelectFormItemOpen(item, F("a"), F("I2C " L_ADDRESS));
   addSelectOptionFormItem(item, L_NONE, "0", address == 0);

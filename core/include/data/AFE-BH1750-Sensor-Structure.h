@@ -11,6 +11,9 @@
 struct BH1750 {
   char name[17];
   uint32_t interval;
+#ifdef AFE_ESP32
+  uint8_t wirePortId;
+#endif    
   uint8_t i2cAddress;
   uint8_t mode;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  

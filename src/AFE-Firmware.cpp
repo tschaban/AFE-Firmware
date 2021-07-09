@@ -180,6 +180,12 @@ void setup() {
 #endif
   Network.listener();
 
+/* Initializing I2C BUS */
+#ifdef ESP_CONFIG_HARDWARE_I2C
+  initializeI2CBUS();
+#endif // ESP_CONFIG_HARDWARE_I2C
+
+
 /* Initializating REST API */
 #ifdef AFE_CONFIG_HARDWARE_LED
   RestAPI.begin(&Data, &Device, &Led);
@@ -280,14 +286,6 @@ void setup() {
 
 /* End of initialization for operating mode. Initialization for all devices
  * modes */
-
-#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
-  /* Scanning I2C for devices */
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    I2CScanner.begin();
-    I2CScanner.scanAll();
-  }
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   Led.off();

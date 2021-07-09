@@ -25,8 +25,6 @@
 //#include <Adafruit_BMP085.h>
 //#endif
 
-
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -167,8 +165,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  void getConfiguration(uint8_t id, I2CPORT *);
+  void saveConfiguration(uint8_t id, I2CPORT *);
+#else
   void getConfiguration(I2CPORT *);
   void saveConfiguration(I2CPORT *);
+#endif
   void createI2CConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -248,7 +251,5 @@ public:
   void createCLEDEffectsConfigurationFile();
 
 #endif
-
-
 };
 #endif

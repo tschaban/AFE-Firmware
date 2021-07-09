@@ -4,19 +4,64 @@
 
 AFEWebServer::AFEWebServer() {}
 
-#ifdef AFE_CONFIG_HARDWARE_LED
+#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFELED *_Led,
-                         AFEJSONRPC *_RestAPI) {
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFELED *_Led) {
   SystemLED = _Led;
   begin(_Data, _Device, _FirmwarePro, _RestAPI);
 }
-#endif // AFE_CONFIG_HARDWARE_LED
+#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFELED *_Led, TwoWire *_WirePort0,
+                         TwoWire *_WirePort1) {
+  SystemLED = _Led;
+  WirePort0 = _WirePort0;
+  WirePort1 = _WirePort1;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#else
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFELED *_Led, TwoWire *_WirePort0) {
+  SystemLED = _Led;
+  WirePort0 = _WirePort0;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_ESP32
+#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         TwoWire *_WirePort0, TwoWire *_WirePort1) {
+  WirePort0 = _WirePort0;
+  WirePort1 = _WirePort1;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#else
+void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         TwoWire *_WirePort0) {
+  WirePort0 = _WirePort0;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_LED  AFE_CONFIG_HARDWARE_I2C
 
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
                          AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI) {
   server.begin();
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  Site.begin(_Data, _Device, _FirmwarePro, _RestAPI, WirePort0, WirePort1);
+#else
+  Site.begin(_Data, _Device, _FirmwarePro, _RestAPI, WirePort0);
+#endif //  AFE_ESP32
+#else
   Site.begin(_Data, _Device, _FirmwarePro, _RestAPI);
+#endif // AFE_CONFIG_HARDWARE_I2C
   Data = _Data;
   Device = _Device;
   RestAPI = _RestAPI;
@@ -126,7 +171,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_I2C
   case AFE_CONFIG_SITE_I2C:
+#ifdef AFE_ESP32
+    Site.siteI2CBUS(page, siteConfig->deviceID);
+#else
     Site.siteI2CBUS(page);
+#endif
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -445,7 +494,11 @@ void AFEWebServer::generate(boolean upload) {
       else if (siteConfig.ID == AFE_CONFIG_SITE_I2C) {
         I2CPORT configuration;
         get(configuration);
+#ifdef AFE_ESP32
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+#else
         Data->saveConfiguration(&configuration);
+#endif
         configuration = {0};
       }
 #endif
@@ -560,7 +613,7 @@ void AFEWebServer::generate(boolean upload) {
 
 #ifdef DEBUG
     Serial << endl << F("INFO: SITE: Starting generating. ");
-#ifndef ESP32
+#ifndef AFE_ESP32
     Serial << endl
            << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
            << F("kB");
@@ -576,7 +629,6 @@ void AFEWebServer::generate(boolean upload) {
            << system_get_free_heap_size() / 1024 << F("kB");
 #endif
     generateSite(&siteConfig, page);
-
 
 #if defined(DEBUG) && !defined(ESP32)
     Serial << endl
@@ -1136,8 +1188,7 @@ void AFEWebServer::get(DEVICE &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  data.noOfCLEDs =
-      server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+  data.noOfCLEDs = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 #endif
 
   data.timeToAutoLogOff =
@@ -1775,9 +1826,14 @@ void AFEWebServer::getSerialPortData(SERIALPORT *data) {
 #ifdef AFE_CONFIG_HARDWARE_I2C
 void AFEWebServer::get(I2CPORT &data) {
   data.SDA = server.arg("a").length() > 0 ? server.arg("a").toInt()
-                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
+                                          : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
   data.SCL = server.arg("l").length() > 0 ? server.arg("l").toInt()
-                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+                                          : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
+#ifdef AFE_ESP32
+  data.SDA = server.arg("f").length() > 0 ? server.arg("f").toInt()
+                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
+#endif
+
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -2363,16 +2419,15 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
-  CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
-                                               : AFE_CONFIG_HARDWARE_CLED_0_GPIO;
+  CLEDData.gpio = server.arg("g").length() > 0
+                      ? server.arg("g").toInt()
+                      : AFE_CONFIG_HARDWARE_CLED_0_GPIO;
 
   CLEDData.colorOrder = server.arg("o").length() > 0
                             ? server.arg("o").toInt()
                             : AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
 
-  CLEDData.chipset = server.arg("m").length() > 0
-                         ? server.arg("m").toInt()
-                         : 0;
+  CLEDData.chipset = server.arg("m").length() > 0 ? server.arg("m").toInt() : 0;
 
   CLEDData.ledNumber = server.arg("l").length() > 0
                            ? server.arg("l").toInt()
@@ -2384,7 +2439,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
     sprintf(_label, "b%d", i);
     CLEDEffectsData.effect[i].brightness =
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
-        
+
     sprintf(_label, "t%d", i);
     CLEDEffectsData.effect[i].time =
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;

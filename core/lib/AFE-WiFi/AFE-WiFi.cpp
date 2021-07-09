@@ -79,7 +79,7 @@ void AFEWiFi::switchConfiguration() {
 #endif
   }
 
-#ifndef ESP32
+#ifndef AFE_ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
 #else
   WiFi.setSleep(false);

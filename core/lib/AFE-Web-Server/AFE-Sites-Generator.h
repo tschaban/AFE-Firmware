@@ -17,10 +17,9 @@
 #include <WiFi.h>
 #endif
 
-
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
+#include <Wire.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -65,6 +64,16 @@ private:
   String _HtmlResponse;
 
   char deviceID[17];
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  TwoWire *WirePort0;
+  TwoWire *WirePort1;
+#else
+  TwoWire *WirePort0;
+#endif // AFE_ESP32
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+#endif // AFE_CONFIG_HARDWARE_I2C
 
   void generateHeader(String &page, uint16_t redirect);
 
@@ -165,8 +174,13 @@ private:
 
 /* Item: list discovered IIC devices */
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  void addDeviceI2CAddressSelectionItem(String &page, uint8_t address);
-#endif
+#ifdef AFE_ESP32
+  void addDeviceI2CAddressSelectionItem(String &item, uint8_t wirePortId,
+                                        uint8_t address);
+#else
+  void addDeviceI2CAddressSelectionItem(String &item, uint8_t address);
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 /* Item: list of LEDs */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -177,7 +191,17 @@ public:
   /* Constructor*/
   AFESitesGenerator();
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             TwoWire *, TwoWire *);
+#else
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             TwoWire *);
+#endif // AFE_ESP32
+#else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+#endif // AFE_CONFIG_HARDWARE_I2C
 
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
@@ -288,8 +312,12 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  void siteI2CBUS(String &page, uint8_t id);
+#else
   void siteI2CBUS(String &page);
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void siteRainmeterSensor(String &page);

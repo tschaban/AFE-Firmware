@@ -36,6 +36,10 @@
 #include <AFE-LED.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <Wire.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -69,6 +73,14 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *SystemLED;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  TwoWire *WirePort0;
+#ifdef AFE_ESP32
+  TwoWire *WirePort1;
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
+
   // It stores last HTTP API request
   HTTPCOMMAND httpCommand;
   // Once HTTP API requet is recieved it's set to true
@@ -85,13 +97,13 @@ private:
 
   boolean upgradeSuccess = false;
 
-#ifdef AFE_CONFIG_HARDWARE_LED
+#if defined(AFE_CONFIG_HARDWARE_LED) || defined(AFE_CONFIG_HARDWARE_I2C)
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED || AFE_CONFIG_HARDWARE_I2C
 
   /* Method gets url Option parameter value */
   boolean getOptionName();
-  
+
   uint8_t getOption();
   uint8_t getCommand();
   uint8_t getSiteID();
@@ -199,15 +211,14 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  void get(CLED &CLEDData,CLED_EFFECTS &CLEDEffectsData);
+  void get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData);
 #endif
-
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
-#ifndef AFE_ESP32 /* ESP82xx */  
+#ifndef AFE_ESP32 /* ESP82xx */
   boolean upgradeOTAWAN(uint16_t firmwareId);
-#endif  
+#endif
   boolean upgradOTAFile(void);
 #endif
 
@@ -218,9 +229,27 @@ public:
   void publishHTML(const String &page);
 
 /* Method initialize WebServer and Updater server */
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFELED *,
-             AFEJSONRPC *);
+#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             AFELED *);
+#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+  void begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFELED *_Led, TwoWire *_WirePort0,
+                         TwoWire *_WirePort1);
+#else
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             AFELED *, TwoWire *);
+#endif // AFE_ESP32
+#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#ifdef AFE_ESP32
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             TwoWire *, TwoWire *);
+#else
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+             TwoWire *);
+#endif // AFE_ESP32
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
@@ -232,7 +261,6 @@ public:
 
   /* Method listens for HTTP requests */
   void listener();
-
 
 #ifndef AFE_ESP32 /* ESP82xx */
   /* Method listens for onNotFound */
@@ -253,8 +281,6 @@ public:
                              WebServer::THandlerFunction handlerUpgrade,
                              WebServer::THandlerFunction handlerUpload);
 #endif
-
-
 
   /* Method generate HTML side. It reads also data from HTTP requests
    * arguments

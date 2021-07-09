@@ -5,11 +5,22 @@
 
 AFESensorBMEX80::AFESensorBMEX80(){};
 
-void AFESensorBMEX80::begin(uint8_t id) {
+#ifdef AFE_ESP32
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
+                            TwoWire *WirePort1) {
+  _WirePort1 = WirePort1;
+  begin(id, WirePort0);
+}
+
+#endif
+
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0) {
   AFEDataAccess Data;
   Data.getConfiguration(id, &configuration);
-  I2CPORT I2C;
-  Data.getConfiguration(&I2C);
+
+#ifdef AFE_ESP32
+  _WirePort0 = configuration.wirePortId == 0 ? _WirePort0 : _WirePort1;
+#endif
 
 #if defined(DEBUG)
   Serial << endl << endl << F("-------- BMEX80: Initializing --------");
@@ -17,13 +28,13 @@ void AFESensorBMEX80::begin(uint8_t id) {
 
   switch (configuration.type) {
   case AFE_BME680_SENSOR:
-    _initialized = s6.begin(&configuration, &I2C);
+    _initialized = s6.begin(&configuration, _WirePort0);
     break;
   case AFE_BME280_SENSOR:
-    _initialized = s2.begin(&configuration, &I2C);
+      _initialized = s2.begin(&configuration, _WirePort0);
     break;
   case AFE_BMP180_SENSOR:
-    _initialized = s1.begin(&configuration, &I2C);
+      _initialized = s1.begin(&configuration, _WirePort0);
     break;
   default:
     _initialized = false;
@@ -127,11 +138,11 @@ void AFESensorBMEX80::getJSON(char *json) {
   //@TODO Estimate max size of JSON
   StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH>
       jsonBuffer; // {"temperature":{"value":25.0273,"unit":"C","correction":25.0273},"pressure":{"value":993.6063,"unit":"hPa","correction":993.6063},"relativePressure":{"value":1003.809,"unit":"hPa"},"dewPoint":{"value":5.321408,"unit":"C"},"humidity":{"value":281.10078,"unit":"%H","correction":281.10078,"rating":3},"absoluteHumidity":{"value":6.480335,"unit":"%H"},"heatIndex":{"value":24.31934,"unit":"C"},"perception":{"value":0,"description":"W
-                  // porządku dla większości, ale wszyscy odczuwają wilgoć przy
-                  // górnej
-                  // krawędzi"},"comfort":{"value":4,"ratio":84.7268,"unit":"%","description":"Gorąco
-                  // i
-                  // wilgotno"},"iaq":{"value":1110,"rating":1,"accuracy":0},"staticIaq":{"value":1110,"rating":1,"accuracy":0},"co2Equivalent":{"value":1400,"unit":"ppm","rating":1,"accuracy":0},"breathVocEquivalent":{"value":0.342646,"unit":"?","accuracy":0},"gasResistance":{"value":2324.371,"unit":"kOm"}}
+  // porządku dla większości, ale wszyscy odczuwają wilgoć przy
+  // górnej
+  // krawędzi"},"comfort":{"value":4,"ratio":84.7268,"unit":"%","description":"Gorąco
+  // i
+  // wilgotno"},"iaq":{"value":1110,"rating":1,"accuracy":0},"staticIaq":{"value":1110,"rating":1,"accuracy":0},"co2Equivalent":{"value":1400,"unit":"ppm","rating":1,"accuracy":0},"breathVocEquivalent":{"value":0.342646,"unit":"?","accuracy":0},"gasResistance":{"value":2324.371,"unit":"kOm"}}
   JsonObject &root = jsonBuffer.createObject();
 
   JsonObject &temperature = root.createNestedObject("temperature");

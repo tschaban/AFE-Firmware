@@ -5,7 +5,7 @@
 
 AFESensorBME680::AFESensorBME680(){};
 
-boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
+boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort) {
 #ifdef DEBUG
   Serial << endl << F("INFO: Initializing: Sensor type: BME680");
 #endif
@@ -19,16 +19,12 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 
   configuration = _configuration;
   if (configuration->i2cAddress != 0) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: Setting I2C: SDA:") << I2C->SDA << F(", SCL:") << I2C->SCL;
-#endif
-    Wire.begin(I2C->SDA, I2C->SCL);
+
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Sensor address: 0x") << _HEX(configuration->i2cAddress);
 #endif
-    Bme.begin(configuration->i2cAddress, Wire);
+    Bme.begin(configuration->i2cAddress, WirePort);
 
 #ifdef DEBUG
     Serial << endl

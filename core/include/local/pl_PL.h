@@ -83,6 +83,7 @@
 #define L_ADDRESS "Adres"
 #define L_CORRECTIONS "Korekty"
 #define L_UNITS "Jednostki"
+#define L_FREQUENCY "Częstotliwość"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
