@@ -15,8 +15,6 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0,
 void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
   AFEDataAccess Data;
   Data.getConfiguration(_id, &configuration);
-// I2CPORT I2C;
-// Data.getConfiguration(&I2C);
 
 #ifdef AFE_ESP32
   /* Setting the WirePort used by the sensor to WirePort0 */
@@ -26,7 +24,11 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
 #ifdef DEBUG
   Serial << endl << endl << F("----- BH1750: Initializing -----");
 #endif
-  if (configuration.i2cAddress != 0) {
+  if (
+#ifdef AFE_ESP32
+      configuration.wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST &&
+#endif
+      configuration.i2cAddress != 0) {
 
 #ifdef DEBUG
     Serial << endl << F("Checking if the sensor is connected");
@@ -36,14 +38,6 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
 
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
-/*
-#ifdef DEBUG
-      Serial << endl
-             << F("Setting I2C: SDA:") << I2C.SDA << F(", SCL:") << I2C.SCL;
-#endif
-
-      bh1750.setI2C(I2C.SDA, I2C.SCL);
-*/
 #ifdef DEBUG
       Serial << endl
              << F("Sensor address: 0x") << _HEX(configuration.i2cAddress);

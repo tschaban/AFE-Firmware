@@ -15,6 +15,9 @@ struct PN532_SENSOR {
   uint8_t interface;
   uint8_t tx;
   uint8_t rx;
+#ifdef AFE_ESP32
+  uint8_t wirePortId;
+#endif
   uint8_t i2cAddress;
   uint16_t requestProcessingTime;
   uint16_t listenerTimeout;
@@ -36,7 +39,7 @@ struct PN532_TAGS {
 };
 
 struct MIFARE_CARD {
-  char cardId[16];
+  char cardId[17];
   uint8_t relayId;
   uint8_t action;
   boolean sendAsSwitch;

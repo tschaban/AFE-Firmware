@@ -15,7 +15,15 @@ void initializePN532Sensor() {
   Serial << endl << F("INFO: BOOT: Initializing PN532");
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+    PN532Sensor[i].begin(i, &Data, &Device, &WirePort0, &WirePort1);
+#else
+    PN532Sensor[i].begin(i, &Data, &Device, &WirePort0);
+#endif
+#else
     PN532Sensor[i].begin(i, &Data, &Device);
+#endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: PN532: ") << i << F(" initialized");
 #endif
@@ -40,7 +48,7 @@ void PN532EventsListener() {
     switch (PN532Sensor[i].listener()) {
 
     /* Card detected */
-    case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND: 
+    case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND:
 
       if (PN532Sensor[i].readTag()) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
@@ -56,7 +64,7 @@ void PN532EventsListener() {
                      PN532Sensor[i].tag.block[0].value) == 0) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-          /* Changing the CLED Effect color to authorized */
+            /* Changing the CLED Effect color to authorized */
             CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].setCustomEffectColor(
                 AFE_CONFIG_HARDWARE_EFFECT_WAVE,
                 CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR]
@@ -114,16 +122,15 @@ void PN532EventsListener() {
       }
       break;
 
-    /* End of processing time of a request. Used only by CLED */
+/* End of processing time of a request. Used only by CLED */
 #ifdef AFE_CONFIG_HARDWARE_CLED
     case AFE_HARDWARE_PN532_LISTENER_EVENT_PROCESSING_FINISHED:
-    /* Changing the CLED Effect to listening mode */
+      /* Changing the CLED Effect to listening mode */
       CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].effectOn(
-            AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+          AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
       break;
-#endif;      
+#endif
     }
-
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {

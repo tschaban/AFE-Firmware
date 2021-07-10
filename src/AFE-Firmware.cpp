@@ -181,7 +181,7 @@ void setup() {
   Network.listener();
 
 /* Initializing I2C BUS */
-#ifdef ESP_CONFIG_HARDWARE_I2C
+#ifdef AFE_CONFIG_HARDWARE_I2C
   initializeI2CBUS();
 #endif // ESP_CONFIG_HARDWARE_I2C
 

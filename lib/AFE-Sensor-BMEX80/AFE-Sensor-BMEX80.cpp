@@ -26,20 +26,28 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0) {
   Serial << endl << endl << F("-------- BMEX80: Initializing --------");
 #endif
 
-  switch (configuration.type) {
-  case AFE_BME680_SENSOR:
-    _initialized = s6.begin(&configuration, _WirePort0);
-    break;
-  case AFE_BME280_SENSOR:
+#ifdef AFE_ESP32
+  if (configuration.wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
+
+    switch (configuration.type) {
+    case AFE_BME680_SENSOR:
+      _initialized = s6.begin(&configuration, _WirePort0);
+      break;
+    case AFE_BME280_SENSOR:
       _initialized = s2.begin(&configuration, _WirePort0);
-    break;
-  case AFE_BMP180_SENSOR:
+      break;
+    case AFE_BMP180_SENSOR:
       _initialized = s1.begin(&configuration, _WirePort0);
-    break;
-  default:
-    _initialized = false;
-    break;
+      break;
+    default:
+      _initialized = false;
+      break;
+    }
+
+#ifdef AFE_ESP32
   }
+#endif
 
 #ifdef DEBUG
   Serial << endl

@@ -6,7 +6,25 @@
 
 AFESensorPN532::AFESensorPN532(){};
 
-void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data,
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
+                           AFEDevice *_Device, TwoWire *_WirePort0,
+                           TwoWire *_WirePort1) {
+  WirePort0 = _WirePort0;
+  WirePort1 = _WirePort1;
+  begin(_id, _Data, _Device);
+}
+#else
+void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
+                           AFEDevice *_Device, TwoWire *_WirePort0) {
+  WirePort0 = _WirePort0;
+  begin(_id, _Data, _Device);
+}
+#endif
+#endif
+
+void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
                            AFEDevice *_Device) {
 
 #ifdef DEBUG
@@ -14,8 +32,7 @@ void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data,
 #endif
 
   Data = _Data;
-
-  Data->getConfiguration(id, &configuration);
+  Data->getConfiguration(_id, &configuration);
 
 #ifdef DEBUG
   Serial << endl << "INFO: PN532: Configuration";
@@ -38,61 +55,74 @@ void AFESensorPN532::begin(uint8_t id, AFEDataAccess *_Data,
 #else
   Serial << endl << " - MQTT Topic: " << configuration.mqtt.topic;
 #endif
-#endif
+#endif // DEBUG
 
   if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_UART) {
     PN532UARTInterface.setSerial(configuration.rx, configuration.tx);
     NFCReader.setInterface(PN532UARTInterface);
-  } else {
-    I2CPORT I2C;
-    Data->getConfiguration(&I2C);
+    _initialized = true;
+  }
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
+#ifdef AFE_ESP32
+    WirePort0 = configuration.wirePortId == 0 ? WirePort0 : WirePort1;
+#endif
 
-    if (configuration.i2cAddress != 0) {
+    if (
+#ifdef AFE_ESP32
+        configuration.wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST &&
+#endif
+        configuration.i2cAddress != 0) {
 #ifdef DEBUG
       Serial << endl
              << F("INFO: PN532: Address: 0x") << _HEX(configuration.i2cAddress);
 #endif
-      Wire.begin(I2C.SDA, I2C.SCL);
-      PN532I2CInterface.begin(configuration.i2cAddress, Wire);
+
+      PN532I2CInterface.begin(configuration.i2cAddress, WirePort0);
       NFCReader.setInterface(PN532I2CInterface);
+      _initialized = true;
     }
   }
+#endif // AFE_CONFIG_HARDWARE_I2C
+
+  if (_initialized) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: PN532: Looking for PN532...";
+    Serial << endl << "INFO: PN532: Looking for PN532...";
 #endif
 
-  NFCReader.begin();
+    NFCReader.begin();
 
-  uint32_t versiondata = NFCReader.getFirmwareVersion();
-  if (!versiondata) {
+    uint32_t versiondata = NFCReader.getFirmwareVersion();
+    if (!versiondata) {
 #ifdef DEBUG
-    Serial << endl << "INFO: PN532: Didn't find PN53x board";
+      Serial << endl << "INFO: PN532: Didn't find PN53x board";
 #endif
-    return;
-  }
+      _initialized = false;
+      return;
+    }
 
-  NFCReader.setPassiveActivationRetries(10);
+    NFCReader.setPassiveActivationRetries(10);
 
 // Got ok data, print it out!
 #ifdef DEBUG
-  Serial << endl << "Found chip PN5" << _HEX((versiondata >> 24) & 0xFF);
-  Serial << endl
-         << "Firmware ver. " << _DEC((versiondata >> 16) & 0xFF) << "."
-         << _DEC((versiondata >> 8) & 0xFF) << endl;
+    Serial << endl << "Found chip PN5" << _HEX((versiondata >> 24) & 0xFF);
+    Serial << endl
+           << "Firmware ver. " << _DEC((versiondata >> 16) & 0xFF) << "."
+           << _DEC((versiondata >> 8) & 0xFF) << endl;
 #endif
 
-  // configure board to read RFID tags
-  NFCReader.SAMConfig();
+    // configure board to read RFID tags
+    NFCReader.SAMConfig();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-      _Device->configuration.noOfLEDs >= configuration.ledID) {
-    Led.begin(Data, configuration.ledID);
-  }
+    if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+        _Device->configuration.noOfLEDs >= configuration.ledID) {
+      Led.begin(Data, configuration.ledID);
+    }
 #endif
-
-  _initialized = true;
+  }
+  
 }
 
 boolean AFESensorPN532::authenticatedBlock(uint32_t blockId) {
@@ -167,7 +197,7 @@ uint8_t AFESensorPN532::listener() {
         _request = foundCard();
         Led.off();
         _listenerTime = 0;
-      } 
+      }
       if (_request) {
         _requestTime = millis();
         Led.on();

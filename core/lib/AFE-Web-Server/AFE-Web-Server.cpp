@@ -1191,6 +1191,10 @@ void AFEWebServer::get(DEVICE &data) {
   data.noOfCLEDs = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 #endif
 
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.noOfI2Cs = server.arg("ii").length() > 0 ? server.arg("ii").toInt() : 0;
+#endif
+
   data.timeToAutoLogOff =
       server.arg("al").length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 }
@@ -1825,15 +1829,17 @@ void AFEWebServer::getSerialPortData(SERIALPORT *data) {
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 void AFEWebServer::get(I2CPORT &data) {
-  data.SDA = server.arg("a").length() > 0 ? server.arg("a").toInt()
-                                          : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
-  data.SCL = server.arg("l").length() > 0 ? server.arg("l").toInt()
-                                          : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
+  data.SDA = server.arg("a").length() > 0
+                 ? server.arg("a").toInt()
+                 : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
+  data.SCL = server.arg("l").length() > 0
+                 ? server.arg("l").toInt()
+                 : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
 #ifdef AFE_ESP32
-  data.SDA = server.arg("f").length() > 0 ? server.arg("f").toInt()
-                                          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
+  data.frequency = server.arg("f").length() > 0
+                 ? server.arg("f").toInt()
+                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
 #endif
-
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -1889,6 +1895,11 @@ void AFEWebServer::get(HPMA115S0 &data) {
 void AFEWebServer::get(BMEX80 &data) {
   data.type = server.arg("b").length() > 0 ? server.arg("b").toInt()
                                            : AFE_BMX_UNKNOWN_SENSOR;
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.wirePortId =
+      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
@@ -2002,6 +2013,12 @@ void AFEWebServer::get(BMEX80 &data) {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEWebServer::get(BH1750 &data) {
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.wirePortId =
+      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
   data.interval = server.arg("f").length() > 0
@@ -2313,6 +2330,11 @@ void AFEWebServer::get(PN532_SENSOR &data) {
                              ? server.arg("b").toInt()
                              : AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
 
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.wirePortId =
+      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
 
   data.interface = server.arg("d").length() > 0
@@ -2335,7 +2357,15 @@ void AFEWebServer::get(PN532_SENSOR &data) {
 
 void AFEWebServer::processMiFareCard() {
   AFESensorPN532 PN532Sensor;
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  PN532Sensor.begin(0, Data, Device, WirePort0, WirePort1);
+#else
+  PN532Sensor.begin(0, Data, Device, WirePort0);
+#endif // AFE_ESP32
+#else
   PN532Sensor.begin(0, Data, Device);
+#endif // AFE_CONFIG_HARDWARE_I2C
 
   char tag[AFE_HARDWARE_PN532_BLOCK_SIZE];
   char label[3];
@@ -2377,7 +2407,7 @@ void AFEWebServer::processMiFareCard() {
 
 void AFEWebServer::get(MIFARE_CARD &data) {
   if (server.arg("m").length() > 0) {
-    server.arg("m").toCharArray(data.cardId, sizeof(data.cardId) + 1);
+    server.arg("m").toCharArray(data.cardId, sizeof(data.cardId));
   } else {
     data.cardId[0] = AFE_EMPTY_STRING;
   }

@@ -574,6 +574,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfCLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
 #endif
 
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+      configuration->noOfI2Cs =
+          root["noOfI2Cs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
@@ -706,6 +711,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     root["noOfCLEDs"] = configuration->noOfCLEDs;
+#endif
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  root["noOfI2Cs"] = configuration->noOfI2Cs;
 #endif
 
     root.printTo(configFile);
@@ -862,6 +871,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   deviceConfiguration.noOfCLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#endif
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  deviceConfiguration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
   saveConfiguration(&deviceConfiguration);
@@ -4250,7 +4263,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
       configuration->type = root["type"];
 #ifdef AFE_ESP32
       configuration->wirePortId = root["wirePortId"];
-#endif      
+#endif
       configuration->i2cAddress = root["i2cAddress"];
       sprintf(configuration->name, root["name"]);
       configuration->interval = root["interval"];
@@ -4356,7 +4369,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
     root["name"] = configuration->name;
 #ifdef AFE_ESP32
     root["wirePortId"] = configuration->wirePortId;
-#endif    
+#endif
     root["i2cAddress"] = configuration->i2cAddress;
     root["resolution"] = configuration->resolution;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -4419,7 +4432,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
   configuration.interval = AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
 #ifdef AFE_ESP32
-  configuration.wirePortId = 0;
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
   configuration.i2cAddress = 0;
   configuration.resolution = 3; //  BMP085_ULTRAHIGHRES;
@@ -4602,7 +4615,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
   configuration.i2cAddress = 0;
 
 #ifdef AFE_ESP32
-  configuration.wirePortId = 0;
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -5794,6 +5807,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
           root["requestProcessingTime"].as<int>();
       configuration->interface = root["interface"].as<int>();
       configuration->listenerTimeout = root["listenerTimeout"].as<int>();
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
       configuration->i2cAddress = root["i2cAddress"].as<int>();
 
       configuration->timeout = root["timeout"].as<int>();
@@ -5859,6 +5875,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
     root["timeout"] = configuration->timeout;
     root["interface"] = configuration->interface;
     root["listenerTimeout"] = configuration->listenerTimeout;
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
     root["i2cAddress"] = configuration->i2cAddress;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -5895,14 +5914,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 void AFEDataAccess::createPN532ConfigurationFile() {
   PN532_SENSOR configuration;
   sprintf(configuration.name, "pn532");
+  configuration.interface = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.timeout = AFE_HARDWARE_PN532_DEFUALT_TIMEOUT;
   configuration.requestProcessingTime =
       AFE_HARDWARE_PN532_DEFUALT_REQUEST_PROCESSING_TIME;
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
   configuration.i2cAddress = AFE_HARDWARE_PN532_DEFAULT_INTERFACE;
   configuration.listenerTimeout = AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
-  configuration.i2cAddress = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   configuration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -6011,7 +6033,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
     JsonArray &jsonIdx = root.createNestedArray("idx");
+#endif    
     root["action"] = configuration->action;
     root["cardId"] = configuration->cardId;
     root["relayId"] = configuration->relayId;
@@ -6088,6 +6112,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
   File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
@@ -6211,6 +6238,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDEffectsConfigurationFile();
+  }
   File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
@@ -6333,14 +6363,14 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   CLED_EFFECTS configuration;
 
   /* Wave */
-  configuration.effect[0].brightness = 50;
-  configuration.effect[0].color = 0x00008B; // DarkBlue
-  configuration.effect[0].time = 50;
+  configuration.effect[0].brightness = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+  configuration.effect[0].color = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
+  configuration.effect[0].time = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
 
   /* Fade Out */
-  configuration.effect[1].brightness = 255;
-  configuration.effect[1].color = 0xCD5C5C; // IndigoRed
-  configuration.effect[1].time = 0;
+  configuration.effect[1].brightness = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
+  configuration.effect[1].color = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
+  configuration.effect[1].time = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG

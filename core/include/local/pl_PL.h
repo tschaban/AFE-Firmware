@@ -84,6 +84,7 @@
 #define L_CORRECTIONS "Korekty"
 #define L_UNITS "Jednostki"
 #define L_FREQUENCY "Częstotliwość"
+#define L_I2C_PORT "Port I2C"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -115,6 +116,7 @@
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarnych"
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
+#define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -524,8 +526,10 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_INTERFACE "Interface"
 #define L_PN532_LISTENER_TIMEOUT "Interwał odczytów karty"
 #define L_PN532_SHOW_INTERFACE_CONFIGURATION "Pokaż parametery konfiguracyjne interface'u"
+#define L_PN532_SEARCH_I2C_CONNECTED_DEVICES "Szukaj urządzeń na porcie I2C"
 #define L_PN532_TIMEOUTS "Konfiguracja odczytów"
 #define L_PN532_MQTT_TOPIC "Temat MQTT do wysyłania danych odczytanej kary MiFare"
+
 
 #define L_MIFARE_CARD "Karta MiFare Classic"
 #define L_MIFARE_CARDS "Karty MiFare Classic"

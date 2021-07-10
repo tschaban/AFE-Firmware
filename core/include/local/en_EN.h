@@ -89,6 +89,7 @@
 #define L_CORRECTIONS "Corrections"
 #define L_UNITS "Units"
 #define L_FREQUENCY "Frequency"
+#define L_I2C_PORT "I2C Port"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
@@ -119,6 +120,7 @@
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Number of PN532's sensors"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
 #define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
+#define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -523,6 +525,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_INTERFACE "Interface"
 #define L_PN532_LISTENER_TIMEOUT "Card reading interval"
 #define L_PN532_SHOW_INTERFACE_CONFIGURATION "Show interface configuration parameters"
+#define L_PN532_SEARCH_I2C_CONNECTED_DEVICES "Search for devices on I2C"
 #define L_PN532_TIMEOUTS "Readings configuration"
 #define L_PN532_MQTT_TOPIC "MQTT topic to send MiFare card information"
 

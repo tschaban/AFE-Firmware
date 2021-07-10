@@ -11,6 +11,10 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
     Data->getConfiguration(id, &configuration);
     Data->getConfiguration(id, &effects);
 
+#ifdef DEBUG
+    Serial << endl << "INFO: CLED: Initializing CLED....";
+#endif
+
     FastLED
         .addLeds<AFE_CONFIG_HARDWARE_CLED_0_CHIPSET,
                  AFE_CONFIG_HARDWARE_CLED_0_GPIO,
@@ -18,13 +22,27 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
             leds, AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER)
         .setCorrection(TypicalSMD5050);
 
+#ifdef DEBUG
+    Serial << "completed" << endl
+           << "INFO: CLED: Setting default colors for effect";
+#endif
+
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS; i++) {
       _effectColor[i] = effects.effect[i].color;
     }
+
+#ifdef DEBUG
+    Serial << endl << "INFO: CLED: Preparing effects";
+#endif
+
     /* Effect: fade in/out calcuating step */
-    _fadeStep = round(effects.effect[1].brightness /
-                      (effects.effect[1].time / 2 /
-                       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_INTERVAL));
+    _fadeStep =
+        round(effects.effect[1].brightness /
+              (effects.effect[1].time / 2 /
+              AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
+
+    Serial << endl << "INFO: CLED: Ready";
+
     _initialized = true;
   }
   return _initialized;
@@ -86,6 +104,9 @@ void AFECLED::setColor(uint32_t color) {
 }
 
 void AFECLED::effectOn(uint8_t effectId) {
+#ifdef DEBUG
+  Serial << endl << "INFO: CLED: Tuning on effect: " << effectId << "...";
+#endif
   _currentEffect = effectId;
   if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
     setColor(CRGB::Black);
@@ -99,6 +120,9 @@ void AFECLED::effectOn(uint8_t effectId) {
     _increment = _fadeStep;
   }
   _effectTimer = millis();
+#ifdef DEBUG
+  Serial << "OK";
+#endif
 }
 
 void AFECLED::effectOff() {
@@ -120,7 +144,7 @@ void AFECLED::waveEffect(void) {
 }
 
 void AFECLED::fadeInOutEffect(void) {
-  if (millis() - _effectTimer > 50) {
+  if (millis() - _effectTimer > AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL) {
     if (_currentBrightness >=
             effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT].brightness -
                 _fadeStep - 1 ||

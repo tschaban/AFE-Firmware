@@ -17,30 +17,34 @@ void initializeI2CBUS(void);
 void initializeI2CBUS(void) {
   I2CPORT I2CBUSConfiguration;
   AFEI2CScanner I2CBus;
+  boolean success = false;
 
 #ifdef AFE_ESP32
   if (Device.configuration.noOfI2Cs > 0) {
     Data.getConfiguration(0, &I2CBUSConfiguration);
-    WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
-                    I2CBUSConfiguration.frequency);
+
+    success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
+                              I2CBUSConfiguration.frequency);
 #else
   Data.getConfiguration(&I2CBUSConfiguration);
-  WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
+  success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
 #endif // AFE_ESP32
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: I2C(0): SDA: " << I2CBUSConfiguration.SDA
+           << "INFO: I2C[0]: SDA: " << I2CBUSConfiguration.SDA
            << ", SCL: " << I2CBUSConfiguration.SCL;
 #ifdef AFE_ESP32
-    Serial << ", Frequency: " << I2CBUSConfiguration.frequency / 1000
-           << "Hz, initialized";
+    Serial << ", Frequency: " << I2CBUSConfiguration.frequency / 1000 << "Hz";
 #endif // AFE_ESP32
 
-    Serial << endl << "INFO: Scannings for devices on I2C(0)";
-    I2CBus.begin(&WirePort0);
-    I2CBus.scanAll();
-
+    if (!success) {
+      Serial << endl << "ERROR: I2C[0]: Bus doesn't work";
+    } else {
+      Serial << endl << "INFO: I2C[0]: Scannings for devices";
+      I2CBus.begin(&WirePort0);
+      I2CBus.scanAll();
+    }
 #endif // DEBUG
 
 #ifdef AFE_ESP32
@@ -48,20 +52,26 @@ void initializeI2CBUS(void) {
 
   if (Device.configuration.noOfI2Cs > 1) {
     Data.getConfiguration(1, &I2CBUSConfiguration);
+
 #ifdef DEBUG
     Serial << endl
-           << "INFO: I2C(1): SDA: " << I2CBUSConfiguration.SDA
+           << "INFO: I2C[1]: SDA: " << I2CBUSConfiguration.SDA
            << ", SCL: " << I2CBUSConfiguration.SCL
-           << ", Frequency: " << I2CBUSConfiguration.frequency / 1000
-           << "Hz, initialized";
-
-    Serial << endl << "INFO: Scannings for devices on I2C(1)";
-    I2CBus.begin(&WirePort1);
-    I2CBus.scanAll();
-
+           << ", Frequency: " << I2CBUSConfiguration.frequency / 1000 << "Hz";
 #endif // DEBUG
-    WirePort1.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
-                    I2CBUSConfiguration.frequency);
+
+    success = WirePort1.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
+                              I2CBUSConfiguration.frequency);
+
+#ifdef DEBUG
+    if (!success) {
+      Serial << endl << "ERROR: I2C[1]: Bus doesn't work";
+    } else {
+      Serial << endl << "INFO: I2C[1]: Scannings for devices";
+      I2CBus.begin(&WirePort0);
+      I2CBus.scanAll();
+    }
+#endif // DEBUG
   }
 #endif // AFE_ESP32
 };
