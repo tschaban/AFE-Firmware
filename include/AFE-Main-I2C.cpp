@@ -68,7 +68,7 @@ void initializeI2CBUS(void) {
       Serial << endl << "ERROR: I2C[1]: Bus doesn't work";
     } else {
       Serial << endl << "INFO: I2C[1]: Scannings for devices";
-      I2CBus.begin(&WirePort0);
+      I2CBus.begin(&WirePort1);
       I2CBus.scanAll();
     }
 #endif // DEBUG

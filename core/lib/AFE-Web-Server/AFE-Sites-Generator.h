@@ -333,8 +333,12 @@ public:
   void siteMiFareCard(String &page, uint8_t id);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  void siteCLED(String &page, uint8_t id);
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  void siteCLEDDeviceEffect(String &page, uint8_t id);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
 #endif
 };
 

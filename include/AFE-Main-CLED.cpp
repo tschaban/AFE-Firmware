@@ -8,18 +8,36 @@ void CLedEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeCLed(void) {
-  for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
-    CLed[i].begin(&Data, i);
-    if (i == AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR) {
-      CLed[i].effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
-    }
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  if (Device.configuration.effectDeviceLight) {
+    CLedDeviceLight.begin(&Data,
+                          AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
   }
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  if (Device.configuration.noOfPN532Sensors > 0 && Device.configuration.effectPN532) {
+    CLedPN532Effect.begin(&Data,
+                          AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
+    CLedPN532Effect.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
 };
 
 void CLedEventsListener(void) {
-  for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
-    CLed[i].loop();
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  if (Device.configuration.effectDeviceLight) {
+    CLedDeviceLight.loop();
   }
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  if (Device.configuration.effectPN532) {
+    CLedPN532Effect.loop();
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

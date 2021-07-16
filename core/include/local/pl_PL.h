@@ -535,7 +535,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARDS "Karty MiFare Classic"
 #define L_MIFARE "MiFare"
 #define L_MIFARE_CARD_ID "Identyfikator Karty"
-#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnkem / bramą"
+#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnikem / bramą"
 #define L_MIFARE_CARD_CONTROLS "Steruje"
 #define L_MIFARE_CARD_ACTION "Akcja"
 #define L_MIFARE_CARD_ACTION_ON "ON"
@@ -545,18 +545,19 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_INTEGRATION_HINT "Konfiguracja integracji z systemem automatyki"
 #define L_MIFARE_CARD_SEND_AS_SWITCH "Wysyłaj detekcję kart wartościami: ON/OFF"
 #define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Domyślnie: OPEN/CLOSED"
-#define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytania karty MiFare"
-#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) w systeme do automatyki po wykryciu karty"
+#define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytów karty MiFare"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
-#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic. W wersji AFE Pro dostępna jest obsługa do 10 kart. Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
 
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
 
-
-#define L_CLEDS "Diody LED RGB"
-#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę parametrów konfiguracyjnych paska LED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
+#define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzeni"
+#define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532"
+//#define L_CLEDS "Diody LED RGB"
+#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
 #define L_CLED_COLORS_ORDER "Kolejność kolorów"
 

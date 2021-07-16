@@ -187,6 +187,7 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
   }
 #endif
 }
+
 void AFEDataAccess::createDeviceUIDFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_UID;
@@ -569,10 +570,18 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-      configuration->noOfCLEDs =
-          root["noOfCLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+      configuration->effectPN532 = root["effectPN532"];
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+      configuration->effectDeviceLight = root["effectDeviceLight"];
+#endif
+
+
+Serial << endl << "#######=" << configuration->effectPN532;
+Serial << endl << "#######=" << configuration->effectDeviceLight;
+
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
       configuration->noOfI2Cs =
@@ -709,12 +718,16 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfMiFareCards"] = configuration->noOfMiFareCards;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-    root["noOfCLEDs"] = configuration->noOfCLEDs;
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+    root["noOfI2Cs"] = configuration->noOfI2Cs;
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-  root["noOfI2Cs"] = configuration->noOfI2Cs;
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+    root["effectPN532"] = configuration->effectPN532;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+    root["effectDeviceLight"] = configuration->effectDeviceLight;
 #endif
 
     root.printTo(configFile);
@@ -770,114 +783,114 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_CONFIGURATION;
 #endif
-  DEVICE deviceConfiguration;
-  sprintf(deviceConfiguration.name, "AFE-Device");
-  deviceConfiguration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
+  DEVICE configuration;
+  sprintf(configuration.name, "AFE-Device");
+  configuration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
   /* APIs */
-  deviceConfiguration.api.mqtt = false;
+  configuration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  deviceConfiguration.api.domoticz = false;
-  deviceConfiguration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
+  configuration.api.domoticz = false;
+  configuration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
 #endif
-  deviceConfiguration.api.http = true;
+  configuration.api.http = true;
 
 /* Relay presence */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  deviceConfiguration.noOfRelays = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
+  configuration.noOfRelays = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
   /* Switch presence */
-  deviceConfiguration.noOfSwitches =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
+  configuration.noOfSwitches = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 
 /* LEDs presence */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  deviceConfiguration.noOfLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
+  configuration.noOfLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  deviceConfiguration.isAnalogInput = false;
+  configuration.isAnalogInput = false;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  deviceConfiguration.noOfContactrons =
+  configuration.noOfContactrons =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  deviceConfiguration.noOfGates = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
+  configuration.noOfGates = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  deviceConfiguration.noOfHPMA115S0s =
+  configuration.noOfHPMA115S0s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  deviceConfiguration.noOfBMEX80s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
+  configuration.noOfBMEX80s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  deviceConfiguration.noOfBH1750s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
+  configuration.noOfBH1750s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  deviceConfiguration.noOfAS3935s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+  configuration.noOfAS3935s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  deviceConfiguration.noOfDS18B20s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+  configuration.noOfDS18B20s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  deviceConfiguration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
+  configuration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  deviceConfiguration.noOfAnemometerSensors =
+  configuration.noOfAnemometerSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  deviceConfiguration.noOfRainmeterSensors =
+  configuration.noOfRainmeterSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS;
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  deviceConfiguration.noOfRegulators =
+  configuration.noOfRegulators =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  deviceConfiguration.noOfThermalProtectors =
+  configuration.noOfThermalProtectors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  deviceConfiguration.noOfBinarySensors =
+  configuration.noOfBinarySensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-  deviceConfiguration.noOfPN532Sensors =
+  configuration.noOfPN532Sensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
-  deviceConfiguration.noOfMiFareCards =
+  configuration.noOfMiFareCards =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
+
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  configuration.effectPN532 = false;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  deviceConfiguration.noOfCLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  configuration.effectDeviceLight = false;
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-  deviceConfiguration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
+  configuration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
-  saveConfiguration(&deviceConfiguration);
+  saveConfiguration(&configuration);
 }
 
 void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
@@ -6033,9 +6046,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED    
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     JsonArray &jsonIdx = root.createNestedArray("idx");
-#endif    
+#endif
     root["action"] = configuration->action;
     root["cardId"] = configuration->cardId;
     root["relayId"] = configuration->relayId;
@@ -6215,18 +6228,25 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 
 void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
   configuration.chipset = 0;
-  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
+  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
+  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Creating file: cfg-cled-") << i << F(".json");
+  Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
 #endif
 
-    saveConfiguration(i, &configuration);
-  }
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
+                    &configuration);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_1_GPIO;
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+                    &configuration);
+#endif
 }
 
 void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
@@ -6363,14 +6383,20 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   CLED_EFFECTS configuration;
 
   /* Wave */
-  configuration.effect[0].brightness = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
-  configuration.effect[0].color = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
-  configuration.effect[0].time = AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
+  configuration.effect[0].brightness =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+  configuration.effect[0].color =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
+  configuration.effect[0].time =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
 
   /* Fade Out */
-  configuration.effect[1].brightness = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
-  configuration.effect[1].color = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
-  configuration.effect[1].time = AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
+  configuration.effect[1].brightness =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
+  configuration.effect[1].color =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
+  configuration.effect[1].time =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG

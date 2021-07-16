@@ -119,6 +119,11 @@ void AFEDefaults::set() {
     Data->createMiFareCardConfigurationFile();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    Data->createCLEDConfigurationFile();
+    Data->createCLEDEffectsConfigurationFile();
+#endif
+
   }
 #ifdef DEBUG
   else {

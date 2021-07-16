@@ -42,8 +42,33 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
       Serial << endl
              << F("Sensor address: 0x") << _HEX(configuration.i2cAddress);
 #endif
-      _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
-                                  configuration.i2cAddress, WirePort0);
+
+      _initialized = bh1750.begin(
+          configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+              ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+              : configuration.mode ==
+                        BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                    ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                    : configuration.mode ==
+                              BH1750LightSensor::ONE_TIME_LOW_RES_MODE
+                          ? BH1750LightSensor::ONE_TIME_LOW_RES_MODE
+                          : configuration.mode ==
+                                    BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
+                                ? BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
+                                : configuration.mode ==
+                                          BH1750LightSensor::
+                                              CONTINUOUS_HIGH_RES_MODE_2
+                                      ? BH1750LightSensor::
+                                            CONTINUOUS_HIGH_RES_MODE_2
+                                      : BH1750LightSensor::
+                                            CONTINUOUS_LOW_RES_MODE,
+
+          configuration.i2cAddress, WirePort0);
+      /*
+            _initialized =
+         bh1750.begin(BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE,
+                                        configuration.i2cAddress, WirePort0);
+      */
     }
 #ifdef DEBUG
     else {
@@ -93,6 +118,9 @@ void AFESensorBH1750::listener() {
       Serial << endl << endl << F("----- BH1750: Reading -----");
       Serial << endl << F("Time: ") << (millis() - startTime) / 1000 << F("s");
 #endif
+      while (!bh1750.measurementReady(true)) {
+        yield();
+      }
 
       data = bh1750.readLightLevel();
       if (data >= 0) {
@@ -105,6 +133,16 @@ void AFESensorBH1750::listener() {
 #endif
 
       startTime = millis();
+      if (configuration.mode >= BH1750LightSensor::ONE_TIME_HIGH_RES_MODE) {
+
+        bh1750.configure(
+            configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+                ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+                : configuration.mode ==
+                          BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                      ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                      : BH1750LightSensor::ONE_TIME_LOW_RES_MODE);
+      }
     }
   }
 }

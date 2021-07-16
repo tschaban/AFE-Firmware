@@ -252,11 +252,17 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteMiFareCard(page, siteConfig->deviceID);
     break;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  case AFE_CONFIG_SITE_CLED:
-    Site.siteCLED(page, siteConfig->deviceID);
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  case AFE_CONFIG_SITE_CLED_DEVICE_LIGHT:
+    Site.siteCLEDDeviceEffect(page, AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
     break;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  case AFE_CONFIG_SITE_CLED_PN532_SENSOR:
+    Site.siteCLEDPN532SensoreEffect(page, AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
+    break;
+#endif
+
   }
 
   if (siteConfig->form) {
@@ -541,13 +547,24 @@ void AFEWebServer::generate(boolean upload) {
         processMiFareCard();
       }
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED
-      else if (siteConfig.ID == AFE_CONFIG_SITE_CLED) {
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+      else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_PN532_SENSOR) {
         CLED CLEDConfiguration;
         CLED_EFFECTS CLEDEffectsConfiguration;
         get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(0, &CLEDConfiguration);
-        Data->saveConfiguration(0, &CLEDEffectsConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID, &CLEDConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID, &CLEDEffectsConfiguration);
+        CLEDConfiguration = {0};
+        CLEDEffectsConfiguration = {0};
+      }
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+      else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_DEVICE_LIGHT) {
+        CLED CLEDConfiguration;
+        CLED_EFFECTS CLEDEffectsConfiguration;
+        get(CLEDConfiguration, CLEDEffectsConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID, &CLEDConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID, &CLEDEffectsConfiguration);
         CLEDConfiguration = {0};
         CLEDEffectsConfiguration = {0};
       }
@@ -1187,8 +1204,12 @@ void AFEWebServer::get(DEVICE &data) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  data.noOfCLEDs = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  data.effectDeviceLight = server.arg("e0").length() > 0 ? true : false;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  data.effectPN532 = server.arg("e1").length() > 0 ? true : false;
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
@@ -1837,8 +1858,8 @@ void AFEWebServer::get(I2CPORT &data) {
                  : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
 #ifdef AFE_ESP32
   data.frequency = server.arg("f").length() > 0
-                 ? server.arg("f").toInt()
-                 : AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
+                       ? server.arg("f").toInt()
+                       : AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -1897,8 +1918,8 @@ void AFEWebServer::get(BMEX80 &data) {
                                            : AFE_BMX_UNKNOWN_SENSOR;
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-  data.wirePortId =
-      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.wirePortId = server.arg("wr").length() > 0 ? server.arg("wr").toInt()
+                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
@@ -2015,8 +2036,8 @@ void AFEWebServer::get(BMEX80 &data) {
 void AFEWebServer::get(BH1750 &data) {
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-  data.wirePortId =
-      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.wirePortId = server.arg("wr").length() > 0 ? server.arg("wr").toInt()
+                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
@@ -2331,8 +2352,8 @@ void AFEWebServer::get(PN532_SENSOR &data) {
                              : AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-  data.wirePortId =
-      server.arg("wr").length() > 0 ? server.arg("wr").toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.wirePortId = server.arg("wr").length() > 0 ? server.arg("wr").toInt()
+                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
@@ -2451,17 +2472,17 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
   CLEDData.gpio = server.arg("g").length() > 0
                       ? server.arg("g").toInt()
-                      : AFE_CONFIG_HARDWARE_CLED_0_GPIO;
+                      : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   CLEDData.colorOrder = server.arg("o").length() > 0
                             ? server.arg("o").toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
+                            : AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
 
   CLEDData.chipset = server.arg("m").length() > 0 ? server.arg("m").toInt() : 0;
 
   CLEDData.ledNumber = server.arg("l").length() > 0
                            ? server.arg("l").toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
+                           : AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
 
   char _label[3];
 

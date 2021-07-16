@@ -122,12 +122,6 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  if (Device->configuration.noOfCLEDs > 0) {
-    addMenuItem(page, F(L_CLEDS), AFE_CONFIG_SITE_CLED);
-  }
-#endif // AFE_CONFIG_HARDWARE_CLED
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -265,6 +259,20 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  if (Device->configuration.effectDeviceLight) {
+    addMenuItem(page, F(C_LED_EFFECT_DEVICE_LIGHT),
+                AFE_CONFIG_SITE_CLED_DEVICE_LIGHT);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  if (Device->configuration.effectDeviceLight) {
+    addMenuItem(page, F(C_LED_EFFECT_PN532_SENSOR),
+                AFE_CONFIG_SITE_CLED_PN532_SENSOR);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+
 /* PN532 */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   if (Device->configuration.noOfPN532Sensors > 0) {
@@ -370,13 +378,6 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                         Device->configuration.noOfLEDs, F("l"),
                         F(L_DEVICE_NUMBER_OF_LEDS));
-#endif
-
-/* CLED */
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLEDS,
-                        Device->configuration.noOfCLEDs, F("a"),
-                        F(L_DEVICE_NUMBER_OF_CLEDS));
 #endif
 
 /* Contactrons */
@@ -549,6 +550,25 @@ void AFESitesGenerator::siteDevice(String &page) {
   } // noOfRelays > 0
 
 #endif // AFE_CONFIG_HARDWARE_RELAY
+
+/* Section: lights effects */
+#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+  openSection(page, F("Efekty świetlne"), F(""));
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  addCheckboxFormItem(page, "e0", "Podświetlanie urządzenia", "1",
+                      Device->configuration.effectDeviceLight);
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addCheckboxFormItem(page, "e1", "Effekty czujnika PN532", "1",
+                        Device->configuration.effectPN532);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+
+  closeSection(page);
+#endif
 
   /* Section: APIs */
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
@@ -2355,13 +2375,24 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  /* Item: sensitivness, not possiblity to change
+  /* Item: sensitivness */
   sprintf(_number, "%d", configuration.mode);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", L_SENSITIVENESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, L_ADC_CANT_CHANGE, true);
-*/
+  addSelectFormItemOpen(page, F("m"), F(L_SENSITIVENESS));
+  addSelectOptionFormItem(page, "Ciągły odczyt: ~1 lux 120ms", "16",
+                          configuration.mode == 16);
+  addSelectOptionFormItem(page, "Ciągły odczyt: ~0.5 lux 120ms", "17",
+                          configuration.mode == 17);
+  addSelectOptionFormItem(page, "Ciągły odczyt: 4 lux 16ms", "19",
+                          configuration.mode == 19);
+
+  addSelectOptionFormItem(page, "Jeden odczyt: 1 lux 120ms", "32",
+                          configuration.mode == 32);
+  addSelectOptionFormItem(page, "Jeden odczyt: 0.5 lux 120ms", "33",
+                          configuration.mode == 33);
+  addSelectOptionFormItem(page, "Jeden odczyt: 4 lux 16ms", "35",
+                          configuration.mode == 35);
+  addSelectFormItemClose(page);
+
   closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -3460,16 +3491,16 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
   CLED_EFFECTS CLEDEffectsConfiguration;
-  Data->getConfiguration(0, &CLEDConfiguration);
-  Data->getConfiguration(0, &CLEDEffectsConfiguration);
+  Data->getConfiguration(id, &CLEDConfiguration);
+  Data->getConfiguration(id, &CLEDEffectsConfiguration);
   char _number[10];
 
-  openSection(page, F("Pasek LED RGB"), F(L_CLEDS_HINT));
+  openSection(page, F(C_LED_EFFECT_PN532_SENSOR), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
@@ -3478,28 +3509,32 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, true);
 
-  /* Item: Chipset */
-  sprintf(_number, "%d", 0);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   "WS2811", true);
+  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
 
-  /* Item: number of leds */
-  sprintf(_number, "%d", CLEDConfiguration.ledNumber);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   true);
+  /*
+    // Item: Chipset
+    sprintf(_number, "%d", 0);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     "WS2811", true);
 
-  /* Item: Colors order */
-  sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+    // Item: number of leds
+    sprintf(_number, "%d", CLEDConfiguration.ledNumber);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
+    L_CLED_NUMBER_OF_LEDS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     true);
 
+    // Item: Colors order
+    sprintf(_number, "%d", CLEDConfiguration.colorOrder);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+  */
   closeSection(page);
 
   openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
@@ -3523,7 +3558,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   closeSection(page);
 
-  openSection(page, F("Efekt Fade In/Out"), F(""));
+  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT), F(""));
   /*** Effect: FAde in / out */
 
   /* Item: Led color */
@@ -3543,7 +3578,97 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
       AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
   closeSection(page);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
+
+  CLED CLEDConfiguration;
+  CLED_EFFECTS CLEDEffectsConfiguration;
+  Data->getConfiguration(id, &CLEDConfiguration);
+  Data->getConfiguration(id, &CLEDEffectsConfiguration);
+  char _number[10];
+
+  openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
+
+  /* Item: GPIO */
+  sprintf(_number, "%d", CLEDConfiguration.gpio);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, true);
+
+  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
+
+  /*
+    // Item: Chipset
+    sprintf(_number, "%d", CLEDConfiguration.chipset);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     "WS2812", true);
+
+
+    // Item: number of leds
+    sprintf(_number, "%d", CLEDConfiguration.ledNumber);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
+    L_CLED_NUMBER_OF_LEDS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     true);
+
+    // Item: Colors order
+    sprintf(_number, "%d", CLEDConfiguration.colorOrder);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+  */
+  closeSection(page);
+
+  openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
+  /*** Effect: one led wave */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "20000", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT), F(""));
+  /*** Effect: FAde in / out */
+
+  /* Item: Led color */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: time */
+  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
+  closeSection(page);
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

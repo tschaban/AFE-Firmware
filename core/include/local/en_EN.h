@@ -512,7 +512,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Read TAG</a></div>"
 #define L_PN532_SAVE_TAG "Saving information on the card"
 #define L_PN532_INFO_1 "The card should be formatted to NFC"
-#define L_PN532_INFO_2 "Only alph-numeric characters and basic special characters can be saved on the card"
+#define L_PN532_INFO_2 "Only alpha-numeric characters and basic special characters can be saved on the card"
 #define L_PN532_INFO_3 "Place the card next to the reader and DO NOT move it while formatting, reading or writing information"
 #define L_PN532_CURRENT_TAG "Current information stored on the card"
 #define L_PN532_CURRENT_PRIMARY_TAG "TAG"
@@ -544,18 +544,20 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_SEND_AS_SWITCH "Send card detection using: ON/OFF values"
 #define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Default: OPEN/CLOSED"
 #define L_MIFARE_CARD_MQTT_TOPIC "MQTT Topic to monitor authorizations of MiFare card"
-#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long to keep the CLOSED (ON) state in the automation system after detecting the card"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long CLOSED (ON) state should be kept after detecting a card"
 #define L_MIFARE_CARD_TIME "Time"
-#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards. The AFE Pro version supports up to 10 cards. More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
+#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Backup copy of the TAG stored on the card"
 
 
 #define L_MIFARE_ADMIN_INFO "Information"
 
 
-#define L_CLEDS "RGB Leds"
-#define L_CLEDS_HINT "This firmware version doesn't enable to change the configuration parameters of the WS2812 RGB LED strip. It must be connected as described below"
-#define L_CLED_NUMBER_OF_LEDS "Number of leds strip"
+#define C_LED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
+#define C_LED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
+//#define L_CLEDS "RGB Leds"
+#define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS2812 RGB 8xLED strip. It must be connected as described below"
+#define L_CLED_NUMBER_OF_LEDS "Number of leds build into the strip"
 #define L_CLED_COLORS_ORDER "Colors order"
 
 #define L_CLED_EFFECT_WAVE "Wave effect"
