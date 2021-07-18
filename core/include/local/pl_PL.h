@@ -556,11 +556,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzeni"
 #define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532"
-//#define L_CLEDS "Diody LED RGB"
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
 #define L_CLED_COLORS_ORDER "Kolejność kolorów"
-
 #define L_CLED_EFFECT_WAVE "Efekt fala"
 #define L_CLED_EFFECT_FADE_IN_OUT "Efekt przygaszania"
 #define L_CLED_COLOR "Kolor"
@@ -568,6 +566,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
 #define L_CLED_TIME_WAVE "Szybkość fali"
 #define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
+#define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
+
 
 #endif // _LANG_PL_h
 

@@ -150,6 +150,19 @@ void initializeMQTTAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+    if (Device.configuration.effectDeviceLight) {
+      MqttAPI.addClassEffectDeviceLight(&CLedDeviceLight);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+    if (Device.configuration.effectPN532) {
+      MqttAPI.addClassEffecPN532Sensor(&CLedPN532Effect);
+    }
+#endif
+
+
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif

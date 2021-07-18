@@ -568,5 +568,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_TIME_WAVE "Wave speed"
 #define L_CLED_TIME_FADE_IN_OUT "Fade speed"
 
+
+#define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
 #endif // _LANG_EN_h
 

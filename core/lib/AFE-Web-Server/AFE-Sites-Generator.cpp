@@ -3667,6 +3667,27 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
       page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
       AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
   closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     CLEDConfiguration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 

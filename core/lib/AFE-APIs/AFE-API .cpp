@@ -237,3 +237,25 @@ void AFEAPI::addClass(AFEMiFareCard *Sensor) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+void AFEAPI::addClassEffectDeviceLight(AFECLED *Sensor) {
+  if (_Device->configuration.effectDeviceLight) {
+    _CLedDeviceLight = Sensor;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the CLED: Device Light added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+void AFEAPI::addClassEffecPN532Sensor(AFECLED *Sensor) {
+  if (_Device->configuration.effectPN532) {
+    _CLedPN532Effect = Sensor;
+  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: The reference to the CLED: PN532 sensor added");
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT

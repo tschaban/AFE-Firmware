@@ -578,10 +578,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->effectDeviceLight = root["effectDeviceLight"];
 #endif
 
-
-Serial << endl << "#######=" << configuration->effectPN532;
-Serial << endl << "#######=" << configuration->effectDeviceLight;
-
+      Serial << endl << "#######=" << configuration->effectPN532;
+      Serial << endl << "#######=" << configuration->effectDeviceLight;
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
       configuration->noOfI2Cs =
@@ -6152,6 +6150,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       configuration->colorOrder = root["colorOrder"].as<int>();
       configuration->ledNumber = root["ledNumber"].as<int>();
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+#endif
+
 #ifdef DEBUG
       Serial << endl
              << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
@@ -6203,6 +6207,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     root["colorOrder"] = configuration->colorOrder;
     root["ledNumber"] = configuration->ledNumber;
 
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    root["idx"] = configuration->domoticz.idx;
+#endif
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -6231,6 +6241,12 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   configuration.chipset = 0;
   configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
   configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: cfg-cled-X.json");

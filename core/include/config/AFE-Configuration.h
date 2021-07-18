@@ -1632,7 +1632,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR 238     // AJ check for T6 only
 #define AFE_CONFIG_FILE_BUFFER_PN532_SENSOR 408      // AJ check
 #define AFE_CONFIG_FILE_BUFFER_MIFARE_CARD 317 // AJ Checked
-#define AFE_CONFIG_FILE_BUFFER_CLED 121 // AJ Checked
+#define AFE_CONFIG_FILE_BUFFER_CLED 200 
 #define AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS 228 // AJ Checked
 
 /* Form constants */

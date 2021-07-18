@@ -6,6 +6,12 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CLED
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#include <AFE-DOMOTICZ-Structure.h>
+#endif
+#include <AFE-MQTT-Structure.h>
+
+
 #include <arduino.h>
 
 struct CLED {
@@ -13,6 +19,11 @@ struct CLED {
   uint8_t colorOrder;
   uint8_t chipset;
   int ledNumber;
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif  
 };
 
 struct CLED_EFFECT {

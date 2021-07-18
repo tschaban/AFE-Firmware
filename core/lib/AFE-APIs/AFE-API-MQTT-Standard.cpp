@@ -462,6 +462,16 @@ void AFEAPIMQTTStandard::processRequest() {
         processDHT(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_HARDWARE_DHT
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+      case AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT:
+        processEffectDeviceLight();
+        break;
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+      case AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR:
+        processEffectPN532Sensor();
+        break;
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
       default:
 #ifdef DEBUG
         Serial << endl
@@ -1014,5 +1024,41 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+void AFEAPIMQTTStandard::processEffectDeviceLight() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing CLED: Device Effect");
+#endif
+  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
+    
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) { // Off 
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+void AFEAPIMQTTStandard::processEffectPN532Sensor() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing CLED: PN532 Sensor Effect");
+#endif
+  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
+    
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) { // Off 
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
 
 #endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

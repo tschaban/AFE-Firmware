@@ -2484,6 +2484,18 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
                            ? server.arg("l").toInt()
                            : AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  CLEDData.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(CLEDData.mqtt.topic, sizeof(CLEDData.mqtt.topic));
+  } else {
+    CLEDData.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+
+
   char _label[3];
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {

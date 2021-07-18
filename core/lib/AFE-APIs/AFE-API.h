@@ -82,11 +82,15 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#include <AFE-Sensor-PN532.h>
 #include <AFE-MiFare-Card.h>
+#include <AFE-Sensor-PN532.h>
+
 #endif
 
-
+#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+#include <AFE-CLED.h>
+#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -176,11 +180,18 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-virtual void addClass(AFESensorPN532 *);
+  virtual void addClass(AFESensorPN532 *);
 #endif
-virtual void addClass(AFEMiFareCard *);
+  virtual void addClass(AFEMiFareCard *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  virtual void addClassEffectDeviceLight(AFECLED *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  virtual void addClassEffecPN532Sensor(AFECLED *);
+#endif
 
 protected:
   /* Is API enabled, set in begin() */
@@ -256,12 +267,18 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+  AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 #endif
-AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
+  AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+  AFECLED *_CLedDeviceLight;
+#endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+  AFECLED *_CLedPN532Effect;
+#endif
 };
 
 #endif // _AFE_API_h
