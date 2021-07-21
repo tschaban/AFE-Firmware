@@ -6240,7 +6240,7 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
   configuration.chipset = 0;
   configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;

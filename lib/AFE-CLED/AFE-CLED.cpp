@@ -12,27 +12,29 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
     Data->getConfiguration(id, &effects);
 
 #ifdef DEBUG
-    Serial << endl << "INFO: CLED: Initializing CLED....";
+    Serial << endl << "INFO: CLED[" << id << "]: Initializing CLED....";
 #endif
     if (id == AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID) {
       FastLED
           .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
-                   AFE_CONFIG_HARDWARE_CLED_0_GPIO,
+                   AFE_CONFIG_HARDWARE_CLED_1_GPIO,
                    AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
-              leds, AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER)
+              leds16, AFE_CONFIG_HARDWARE_CLED_16_LEDS)
           .setCorrection(TypicalSMD5050);
+      configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_16_LEDS;
     } else {
-            FastLED
+      FastLED
           .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
                    AFE_CONFIG_HARDWARE_CLED_1_GPIO,
                    AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
-              leds, AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER)
+              leds8, AFE_CONFIG_HARDWARE_CLED_8_LEDS)
           .setCorrection(TypicalSMD5050);
+      configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
     }
 
 #ifdef DEBUG
     Serial << "completed" << endl
-           << "INFO: CLED: Setting default colors for effect";
+           << "INFO: CLED[" << id << "]: Setting default colors for effect";
 #endif
 
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS; i++) {
@@ -40,7 +42,7 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
     }
 
 #ifdef DEBUG
-    Serial << endl << "INFO: CLED: Preparing effects";
+    Serial << endl << "INFO: CLED[" << id << "]: Preparing effects";
 #endif
 
     /* Effect: fade in/out calcuating step */
@@ -48,8 +50,6 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
         effects.effect[1].brightness /
         (effects.effect[1].time / 2 /
          AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
-
-    Serial << endl << "INFO: CLED: Ready";
 
     _initialized = true;
   }
@@ -107,13 +107,17 @@ void AFECLED::setBrightness(uint8_t level) { FastLED.setBrightness(level); }
 
 void AFECLED::setColor(uint32_t color) {
   for (uint8_t i = 0; i < configuration.ledNumber; i++) {
-    leds[i] = color;
+    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
+      leds8[i] = color;
+    } else {
+      leds16[i] = color;
+    }
   }
 }
 
 void AFECLED::effectOn(uint8_t effectId) {
 #ifdef DEBUG
-  Serial << endl << "INFO: CLED: Tuning on effect: " << effectId << "...";
+  Serial << endl << "INFO: CLED Tuning on effect: " << effectId << "...";
 #endif
   _currentEffect = effectId;
   if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
@@ -143,9 +147,20 @@ void AFECLED::waveEffect(void) {
     if (_currentLedId == configuration.ledNumber - 1 || _currentLedId == 0) {
       _increment *= -1;
     }
-    leds[_currentLedId] = CRGB::Black;
+
+    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
+      leds8[_currentLedId] = CRGB::Black;
+    } else {
+      leds16[_currentLedId] = CRGB::Black;
+    }
     _currentLedId += _increment;
-    leds[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
+
+    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
+      leds8[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
+    } else {
+      leds16[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
+    }
+
     FastLED.show();
     _effectTimer = millis();
   }

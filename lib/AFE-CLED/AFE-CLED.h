@@ -22,7 +22,8 @@ private:
   boolean _initialized = false;
   boolean state = false;
 
-  CRGB leds[8];
+  CRGB leds8[AFE_CONFIG_HARDWARE_CLED_8_LEDS];
+  CRGB leds16[AFE_CONFIG_HARDWARE_CLED_16_LEDS];
 
   uint32_t _effectTimer = 0;
   uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;

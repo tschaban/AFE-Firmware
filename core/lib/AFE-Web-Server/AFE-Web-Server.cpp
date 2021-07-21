@@ -2482,7 +2482,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
 
   CLEDData.ledNumber = server.arg("l").length() > 0
                            ? server.arg("l").toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_LEDS_NUMBER;
+                           : AFE_CONFIG_HARDWARE_CLED_8_LEDS;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   CLEDData.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()

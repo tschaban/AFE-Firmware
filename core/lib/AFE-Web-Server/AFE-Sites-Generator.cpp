@@ -267,7 +267,8 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
-  if (Device->configuration.effectDeviceLight) {
+  if (Device->configuration.effectPN532 &&
+      Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(C_LED_EFFECT_PN532_SENSOR),
                 AFE_CONFIG_SITE_CLED_PN532_SENSOR);
   }
@@ -3686,8 +3687,6 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
     closeSection(page);
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
-
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 
