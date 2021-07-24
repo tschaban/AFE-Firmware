@@ -121,8 +121,15 @@ void AFEDefaults::set() {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     Data->createCLEDConfigurationFile();
+#if defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT)
     Data->createCLEDEffectsConfigurationFile();
-#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+    Data->createCLEDBackLightConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT ||
+       // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
 
   }
 #ifdef DEBUG

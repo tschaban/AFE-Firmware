@@ -237,7 +237,7 @@ void AFEAPI::addClass(AFEMiFareCard *Sensor) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-
+/* Not yet implemented 
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 void AFEAPI::addClassEffectDeviceLight(AFECLED *Sensor) {
   if (_Device->configuration.effectDeviceLight) {
@@ -259,3 +259,4 @@ void AFEAPI::addClassEffecPN532Sensor(AFECLED *Sensor) {
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+*/

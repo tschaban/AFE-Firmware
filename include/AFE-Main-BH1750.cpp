@@ -31,6 +31,17 @@ void BH1750SensorEventsListener(void) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
         HttpDomoticzAPI.publishBH1750SensorData(i);
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+ if (Device.configuration.effectDeviceLight) {
+    if (BH1750Sensor[i].data < 100 ) {
+     CLedDeviceLight.on();
+    } else if (BH1750Sensor[i].data >= 100 ) {
+      CLedDeviceLight.off();
+    }
+  }
+#endif
+
       }
     }
   }

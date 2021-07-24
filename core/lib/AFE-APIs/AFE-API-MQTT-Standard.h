@@ -9,6 +9,18 @@
 
 #include <AFE-API.h>
 
+#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+#include <ArduinoJson.h>
+
+struct CLED_COMMAND {
+  char command[10];
+  uint32_t color;
+  uint8_t brightness;
+};
+
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -69,14 +81,21 @@ private:
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS +
                   AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
 #endif
+/* Not yet implemented 
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
                   + 1
 #endif
-
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
                   + 1
 #endif
+*/
   ];
+/* Not yet implemented 
+#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+  void getCLEDCommand(CLED_COMMAND *);
+#endif
+*/
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -187,7 +206,7 @@ public:
   boolean publishPN532SensorData(uint8_t id);
   boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-
+/* Not yet implemented 
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
   void processEffectDeviceLight();
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
@@ -195,6 +214,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
   void processEffectPN532Sensor();
 #endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+*/
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -6265,6 +6265,8 @@ void AFEDataAccess::createCLEDConfigurationFile() {
 #endif
 }
 
+#if defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT)
 void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   char fileName[25];
   sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
@@ -6424,4 +6426,144 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   }
 }
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+void AFEDataAccess::getConfiguration(CLED_BACKLIGHT *configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION
+         << F(" ... ");
 #endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "r");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
+    JsonArray &root = jsonBuffer.parseArray(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      for (uint8_t i = 0;
+           i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; i++) {
+        configuration->config[i].bh1750Id = root[i]["bh1710Id"].as<int>();
+        configuration->config[i].luxLevel = root[i]["luxLevel"].as<int>();
+        configuration->config[i].brightness = root[i]["brightness"].as<int>();
+        configuration->config[i].color = root[i]["color"].as<int>();
+      }
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
+           << F(" not opened");
+  }
+#endif
+}
+
+void AFEDataAccess::saveConfiguration(CLED_BACKLIGHT *configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION
+         << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "w");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
+    JsonArray &root = jsonBuffer.createArray();
+    JsonObject &set = jsonBuffer.createObject();
+    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
+         i++) {
+      set["bh1750Id"] = configuration->config[i].bh1750Id;
+      set["luxLevel"] = configuration->config[i].luxLevel;
+      set["color"] = configuration->config[i].color;
+      set["brightness"] = configuration->config[i].brightness;
+      root[i] = set;
+    }
+    root.printTo(configFile);
+
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDBackLightConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION;
+#endif
+  CLED_BACKLIGHT data;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
+       i++) {
+    data.config[i].bh1750Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+    data.config[i].luxLevel = 0;
+    data.config[i].color = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_COLOR;
+    data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
+  }
+  saveConfiguration(&data);
+}
+
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT ||
+       // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+
+#endif // AFE_CONFIG_HARDWARE_CLED

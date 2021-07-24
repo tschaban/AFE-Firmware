@@ -13,7 +13,7 @@ void initializeCLed(void) {
   if (Device.configuration.effectDeviceLight) {
     CLedDeviceLight.begin(&Data,
                           AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
-    CLedDeviceLight.effectOn(AFE_CONFIG_HARDWARE_EFFECT_WAVE);
+    CLedDeviceLight.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 

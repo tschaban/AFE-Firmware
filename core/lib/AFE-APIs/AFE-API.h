@@ -86,11 +86,12 @@
 #include <AFE-Sensor-PN532.h>
 
 #endif
-
+/* Not yet implemented 
 #if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
     defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
 #include <AFE-CLED.h>
 #endif
+*/
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -184,7 +185,7 @@ public:
 #endif
   virtual void addClass(AFEMiFareCard *);
 #endif
-
+/* Not yet implemented 
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
   virtual void addClassEffectDeviceLight(AFECLED *);
 #endif
@@ -192,7 +193,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
   virtual void addClassEffecPN532Sensor(AFECLED *);
 #endif
-
+*/
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -271,14 +272,14 @@ protected:
 #endif
   AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
-
+/* Not yet implemented 
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
   AFECLED *_CLedDeviceLight;
 #endif
-
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
   AFECLED *_CLedPN532Effect;
 #endif
+*/
 };
 
 #endif // _AFE_API_h
