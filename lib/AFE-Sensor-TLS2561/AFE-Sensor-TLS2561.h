@@ -1,31 +1,34 @@
 /* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Sensor_BH1750_h
-#define _AFE_Sensor_BH1750_h
+#ifndef _AFE_Sensor_TLS2561_h
+#define _AFE_Sensor_TLS2561_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_BH1750
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
 
 #include <arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-I2C-Scanner.h>
-#include <BH1750.h>
+#include <Adafruit_TSL2561_U.h>
 #include <Wire.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-class AFESensorBH1750 {
+class AFESensorTLS2561 {
 
 private:
-  BH1750LightSensor bh1750;
+  Adafruit_TSL2561_Unified tls2561;
 
   boolean ready = false;
   boolean _initialized = false;
 
   unsigned long startTime = 0;
+
+  /* Sensor's data */
+  uint16_t broadband, ir;
 
   TwoWire *_WirePort0;
 #ifdef AFE_ESP32
@@ -34,11 +37,11 @@ private:
 #endif
 
 public:
-  BH1750 configuration;
-  float data = -1; // stories lux value
+  TLS2561 configuration;
+  uint32_t data = 0; // keeps lx value
 
   /* Constructor */
-  AFESensorBH1750();
+  AFESensorTLS2561();
 
 /* Turns On sensor */
 #ifdef AFE_ESP32
@@ -47,16 +50,13 @@ public:
   void begin(uint8_t _id, TwoWire *WirePort0);
 #endif
 
-  /* Is true when data has been read from the sensor */
-  boolean isReady();
-
   /* Method has to be added to the loop in order to listen for sensor value
-   * changes */
-  void listener();
+   * changes, Is true when data has been read from the sensor */
+  boolean listener();
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 };
 
-#endif // AFE_CONFIG_HARDWARE_BH1750
-#endif // _AFE_Sensor_BH1750_h
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // _AFE_Sensor_TLS2561_h

@@ -393,6 +393,24 @@ boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEAPIHTTPDomoticz::addClass(AFESensorTLS2561 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIHTTPDomoticz::publishTLS2561SensorData(uint8_t id) {
+  boolean _ret = false;
+  if (enabled && _TLS2561Sensor[id]->configuration.domoticz.idx > 0) {
+    char value[6]; // max 65536 
+    sprintf(value, "%-.2f", _TLS2561Sensor[id]->data);
+    sendCustomSensorCommand(_TLS2561Sensor[id]->configuration.domoticz.idx,
+                            value);
+    _ret = true;
+  }
+  return _ret;
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIHTTPDomoticz::addClass(AFESensorAS3935 *Sensor) {
   AFEAPI::addClass(Sensor);

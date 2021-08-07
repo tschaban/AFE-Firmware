@@ -214,6 +214,10 @@ private:
   void get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  void get(TLS2561 &data);
+#endif
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
 #ifndef AFE_ESP32 /* ESP82xx */

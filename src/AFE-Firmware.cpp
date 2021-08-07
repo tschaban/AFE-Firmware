@@ -246,6 +246,10 @@ void setup() {
     initializeBH1750Sensor();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    initializeTLS2561Sensor();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     initializeAS3935Sensor();
 #endif
@@ -366,6 +370,10 @@ void loop() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         BH1750SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+        TLS2561SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935

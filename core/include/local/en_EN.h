@@ -90,6 +90,7 @@
 #define L_UNITS "Units"
 #define L_FREQUENCY "Frequency"
 #define L_I2C_PORT "I2C Port"
+#define L_GAIN "Gain"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
@@ -121,6 +122,7 @@
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
 #define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
 #define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
+#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Number of TLS2561's sensors"  
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -372,6 +374,25 @@
 #define L_BH1750_SENSOR "BH1750 Sensor"
 #define L_BH1750_SENSORS "BH1750 Sensors"
 #define L_BH1750_MQTT_TOPIC "BH1750 Sensor's MQTT Topic"
+#define L_BH1750_CONTINUES_1_LUX "Continuous reading: ~1 lux 120ms"
+#define L_BH1750_CONTINUES_05_LUX "Continuous reading: ~0.5 lux 120ms"
+#define L_BH1750_CONTINUES_4_LUX "Continuous reading: 4 lux 16ms"
+#define L_BH1750_ONE_READ_1_LUX "One read: 1 lux 120ms"
+#define L_BH1750_ONE_READ_05_LUX "One read: 0.5 lux 120ms"
+#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16mss"
+
+
+/* TLS2561 */
+#define L_TLS2561_SENSOR "TLS2561 Sensor"
+#define L_TLS2561_SENSORS "TLS2561 Sensors"
+#define L_TLS2561_MQTT_TOPIC "TLS2561 Sensor's MQTT Topic"
+#define L_TLS2561_SENSITIVENESS_LOW "Low: fast reading: 14ms"
+#define L_TLS2561_SENSITIVENESS_MID "Mid: quite reading read: 100ms"
+#define L_TLS2561_SENSITIVENESS_HIGH "High: slow reading: 400ms"
+#define L_TLS2561_GAIN_AUTO "Auto"
+#define L_TLS2561_GAIN_NONE "1x"
+#define L_TLS2561_GAIN_16 "16x"
+
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"

@@ -51,9 +51,10 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
     Serial << endl << F("INFO: WIFI: Starting HotSpot: ");
 #endif
     IPAddress apIP(192, 168, 5, 1);
-    WirelessNetwork.mode(WIFI_AP);
+    WirelessNetwork.mode(WIFI_AP_STA);
     WirelessNetwork.softAP(Device->configuration.name);
     WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WirelessNetwork.softAPsetHostname(Device->configuration.name);
 #ifdef DEBUG
     Serial << F("completed");
 #endif

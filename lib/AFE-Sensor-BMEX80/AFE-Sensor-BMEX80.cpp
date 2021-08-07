@@ -19,7 +19,7 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0) {
   Data.getConfiguration(id, &configuration);
 
 #ifdef AFE_ESP32
-  _WirePort0 = configuration.wirePortId == 0 ? _WirePort0 : _WirePort1;
+  _WirePort0 = configuration.wirePortId == 0 ? WirePort0 : _WirePort1;
 #endif
 
 #if defined(DEBUG)

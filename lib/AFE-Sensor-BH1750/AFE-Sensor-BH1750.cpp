@@ -6,19 +6,19 @@
 
 AFESensorBH1750::AFESensorBH1750(){};
 
-void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0,
-                            TwoWire *_WirePort1) {
-  WirePort1 = _WirePort1;
-  begin(_id, _WirePort0);
+void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0,
+                            TwoWire *WirePort1) {
+  _WirePort1 = WirePort1;
+  begin(_id, WirePort0);
 }
 
-void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
+void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0) {
   AFEDataAccess Data;
   Data.getConfiguration(_id, &configuration);
 
 #ifdef AFE_ESP32
   /* Setting the WirePort used by the sensor to WirePort0 */
-  WirePort0 = configuration.wirePortId == 0 ? WirePort0 : WirePort1;
+  _WirePort0 = configuration.wirePortId == 0 ? WirePort0 : _WirePort1;
 #endif
 
 #ifdef DEBUG
@@ -34,7 +34,7 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
     Serial << endl << F("Checking if the sensor is connected");
 #endif
     AFEI2CScanner I2CScanner;
-    I2CScanner.begin(WirePort0);
+    I2CScanner.begin(_WirePort0);
 
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
@@ -63,7 +63,7 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *_WirePort0) {
                                       : BH1750LightSensor::
                                             CONTINUOUS_LOW_RES_MODE,
 
-          configuration.i2cAddress, WirePort0);
+          configuration.i2cAddress, _WirePort0);
       /*
             _initialized =
          bh1750.begin(BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE,

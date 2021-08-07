@@ -98,6 +98,19 @@ void AFEAPI::addClass(AFESensorBH1750 *Sensor) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEAPI::addClass(AFESensorTLS2561 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
+    _TLS2561Sensor[i] = Sensor + i;
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: The reference to the TLS2561 added: ") << i + 1
+           << F(" added");
+#endif
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPI::addClass(AFESensorAS3935 *Sensor) {
   for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {

@@ -705,6 +705,25 @@ boolean AFEAPIMQTTDomoticz::publishBH1750SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEAPIMQTTDomoticz::addClass(AFESensorTLS2561 *Sensor) {
+  AFEAPI::addClass(Sensor);
+}
+boolean AFEAPIMQTTDomoticz::publishTLS2561SensorData(uint8_t id) {
+  if (enabled) {
+    if (_TLS2561Sensor[id]->configuration.domoticz.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
+      char value[6];
+      sprintf(value, "%-.0f", _TLS2561Sensor[id]->data);
+      generateDeviceValue(json, _TLS2561Sensor[id]->configuration.domoticz.idx,
+                          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIMQTTDomoticz::addClass(AFESensorAS3935 *Sensor) {
   AFEAPI::addClass(Sensor);

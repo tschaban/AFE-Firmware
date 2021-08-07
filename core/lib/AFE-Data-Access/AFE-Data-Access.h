@@ -259,5 +259,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT ||
        // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  void getConfiguration(uint8_t id, TLS2561 *);
+  void saveConfiguration(uint8_t id, TLS2561 *);
+  void createTLS2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+
+
 };
-#endif
+#endif // _AFE_Data_Access_h

@@ -561,6 +561,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+      configuration->noOfTLS2561s =
+          root["noOfTLS2561s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_TLS2561;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
       configuration->noOfPN532Sensors =
           root["noOfPN532Sensors"] |
@@ -577,9 +582,6 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
       configuration->effectDeviceLight = root["effectDeviceLight"];
 #endif
-
-      Serial << endl << "#######=" << configuration->effectPN532;
-      Serial << endl << "#######=" << configuration->effectDeviceLight;
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
       configuration->noOfI2Cs =
@@ -709,6 +711,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    root["noOfTLS2561s"] = configuration->noOfTLS2561s;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -866,6 +872,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   configuration.noOfBinarySensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  configuration.noOfTLS2561s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_TLS2561;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -4445,7 +4455,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 #ifdef AFE_ESP32
   configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
-  configuration.i2cAddress = 0;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   configuration.resolution = 3; //  BMP085_ULTRAHIGHRES;
   configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
   configuration.temperature.correction = 0;
@@ -4623,7 +4633,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 void AFEDataAccess::createBH1750SensorConfigurationFile() {
   BH1750 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
-  configuration.i2cAddress = 0;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 
 #ifdef AFE_ESP32
   configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -4638,7 +4648,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
     Serial << endl << F("INFO: Creating file: cfg-bh1750-") << i << F(".json");
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "BH1750-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -6567,3 +6577,166 @@ void AFEDataAccess::createCLEDBackLightConfigurationFile() {
        // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEDataAccess::getConfiguration(uint8_t id, TLS2561 *configuration) {
+  char fileName[20];
+  sprintf(fileName, AFE_FILE_TLS2561_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TLS2561> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["name"]);
+      configuration->sensitiveness = root["sensitiveness"];
+      configuration->interval = root["interval"];
+      configuration->gain = root["gain"];
+
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
+
+      configuration->i2cAddress = root["i2cAddress"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TLS2561
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_TLS2561 < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+void AFEDataAccess::saveConfiguration(uint8_t id, TLS2561 *configuration) {
+  char fileName[20];
+  sprintf(fileName, AFE_FILE_TLS2561_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TLS2561> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["name"] = configuration->name;
+    root["sensitiveness"] = configuration->sensitiveness;
+    root["gain"] = configuration->gain;
+    root["interval"] = configuration->interval;
+
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
+
+    root["i2cAddress"] = configuration->i2cAddress;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    root["idx"] = configuration->domoticz.idx;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TLS2561
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_TLS2561 < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createTLS2561SensorConfigurationFile() {
+  TLS2561 configuration;
+  configuration.interval = AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  configuration.gain = AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
+  configuration.sensitiveness =
+      AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TLS2561; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Creating file: cfg-tls2561-") << i << F(".json");
+#endif
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+    sprintf(configuration.name, "TLS2561-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561

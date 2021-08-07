@@ -131,6 +131,10 @@ void AFEDefaults::set() {
        // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    Data->createTLS2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+
   }
 #ifdef DEBUG
   else {

@@ -146,6 +146,10 @@ public:
   boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  virtual void addClass(AFESensorTLS2561 *);
+  boolean publishTLS2561SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 };
 

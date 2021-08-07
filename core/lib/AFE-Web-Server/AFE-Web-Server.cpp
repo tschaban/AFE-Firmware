@@ -52,7 +52,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
                          AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI) {
-  server.begin();
+  server.begin(80);
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
   Site.begin(_Data, _Device, _FirmwarePro, _RestAPI, WirePort0, WirePort1);
@@ -177,47 +177,47 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteI2CBUS(page);
 #endif
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   case AFE_CONFIG_SITE_BMEX80:
     Site.siteBMEX80Sensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   case AFE_CONFIG_SITE_HPMA115S0:
     Site.siteHPMA115S0Sensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   case AFE_CONFIG_SITE_BH1750:
     Site.siteBH1750Sensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   case AFE_CONFIG_SITE_AS3935:
     Site.siteAS3935Sensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   case AFE_CONFIG_SITE_DS18B20:
     Site.siteDS18B20Sensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 #ifdef AFE_CONFIG_HARDWARE_DHT
   case AFE_CONFIG_SITE_DHT:
     Site.siteDHTSensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
     Site.siteAnemometerSensor(page);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   case AFE_CONFIG_SITE_RAINMETER_SENSOR:
     Site.siteRainmeterSensor(page);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
     Site.siteLED(page, siteConfig->deviceID);
@@ -225,22 +225,22 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_SYSTEM_LED:
     Site.siteSystemLED(page);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   case AFE_CONFIG_SITE_REGULATOR:
     Site.siteRegulator(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   case AFE_CONFIG_SITE_THERMAL_PROTECTOR:
     Site.siteThermalProtector(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   case AFE_CONFIG_SITE_BINARY_SENSOR:
     Site.siteBinarySensor(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   case AFE_CONFIG_SITE_PN532_SENSOR:
     Site.sitePN532Sensor(page, siteConfig->deviceID);
@@ -251,18 +251,24 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_MIFARE_CARDS:
     Site.siteMiFareCard(page, siteConfig->deviceID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
   case AFE_CONFIG_SITE_CLED_DEVICE_LIGHT:
-    Site.siteCLEDDeviceEffect(page, AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
+    Site.siteCLEDDeviceEffect(page,
+                              AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
     break;
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
   case AFE_CONFIG_SITE_CLED_PN532_SENSOR:
-    Site.siteCLEDPN532SensoreEffect(page, AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
+    Site.siteCLEDPN532SensoreEffect(
+        page, AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
     break;
-#endif
-
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  case AFE_CONFIG_SITE_TLS2561:
+    Site.siteTLS2561Sensor(page, siteConfig->deviceID);
+    break;
+#endif // AFE_CONFIG_HARDWARE_TLS2561
   }
 
   if (siteConfig->form) {
@@ -487,7 +493,7 @@ void AFEWebServer::generate(boolean upload) {
         Data->saveConfiguration(siteConfig.deviceID, &dhtConfiguration);
         dhtConfiguration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 #ifdef AFE_CONFIG_HARDWARE_UART
       else if (siteConfig.ID == AFE_CONFIG_SITE_UART) {
         SERIALPORT configuration;
@@ -495,7 +501,7 @@ void AFEWebServer::generate(boolean upload) {
         Data->saveConfiguration(&configuration);
         configuration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 #ifdef AFE_CONFIG_HARDWARE_I2C
       else if (siteConfig.ID == AFE_CONFIG_SITE_I2C) {
         I2CPORT configuration;
@@ -507,7 +513,7 @@ void AFEWebServer::generate(boolean upload) {
 #endif
         configuration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       else if (siteConfig.ID == AFE_CONFIG_SITE_REGULATOR) {
         REGULATOR configuration;
@@ -515,7 +521,7 @@ void AFEWebServer::generate(boolean upload) {
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
       else if (siteConfig.ID == AFE_CONFIG_SITE_THERMAL_PROTECTOR) {
         THERMAL_PROTECTOR configuration;
@@ -523,7 +529,7 @@ void AFEWebServer::generate(boolean upload) {
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
       else if (siteConfig.ID == AFE_CONFIG_SITE_BINARY_SENSOR) {
         BINARY_SENSOR configuration;
@@ -531,7 +537,7 @@ void AFEWebServer::generate(boolean upload) {
         Data->saveConfiguration(siteConfig.deviceID, &configuration);
         configuration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
       else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR) {
         PN532_SENSOR configuration;
@@ -546,29 +552,41 @@ void AFEWebServer::generate(boolean upload) {
       } else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN) {
         processMiFareCard();
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
       else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_PN532_SENSOR) {
         CLED CLEDConfiguration;
         CLED_EFFECTS CLEDEffectsConfiguration;
         get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID, &CLEDConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID, &CLEDEffectsConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+                                &CLEDConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+                                &CLEDEffectsConfiguration);
         CLEDConfiguration = {0};
         CLEDEffectsConfiguration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
       else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_DEVICE_LIGHT) {
         CLED CLEDConfiguration;
         CLED_EFFECTS CLEDEffectsConfiguration;
         get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID, &CLEDConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID, &CLEDEffectsConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
+                                &CLEDConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
+                                &CLEDEffectsConfiguration);
         CLEDConfiguration = {0};
         CLEDEffectsConfiguration = {0};
       }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+      else if (siteConfig.ID == AFE_CONFIG_SITE_TLS2561) {
+        TLS2561 configuration;
+        get(configuration);
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+        configuration = {0};
+      }
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
     } else if (command == AFE_SERVER_CMD_NONE) {
       if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
@@ -776,7 +794,7 @@ boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::publishHTML(const String &page) {
   uint16_t pageSize = page.length();
-// uint16_t size = 1024;
+// uint16_t size = 2048;
 
 #ifdef DEBUG
   Serial << endl
@@ -789,35 +807,35 @@ void AFEWebServer::publishHTML(const String &page) {
            << F("B too small : ") << pageSize << F(" ... ");
   }
 #endif
+
   server.sendHeader("Content-Length", String(page.length()));
   server.setContentLength(pageSize);
   server.send(200, "text/html", page);
-
 /*
   if (pageSize > size) {
 #ifdef DEBUG
+#ifndef AFE_ESP32
     Serial << endl
            << F("INFO: MEMORY: Free :  size after sending Header: ")
-           << system_get_free_heap_size() / 1024 << F("kB") << endl
-           << F("INFO: Transfering site over TCP: ");
+           << system_get_free_heap_size() / 1024 << F("kB");
+#endif
+    Serial << endl << F("INFO: Transfering site over TCP: ");
 #endif
     server.send(200, "text/html", page.substring(0, size));
     uint16_t transfered = size;
     uint16_t nextChunk;
     while (transfered < pageSize) {
       nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-#ifdef DEBUG
-      Serial << F(".");
-#endif
-
       server.sendContent(page.substring(transfered, nextChunk));
       transfered = nextChunk;
+#ifdef DEBUG
+      Serial << endl << " : " << (transfered * 100 / pageSize) << "%";
+#endif
     }
   } else {
     server.send(200, "text/html", page);
   }
 */
-
 #ifdef DEBUG
   Serial << endl << F("INFO: SITE: Published");
 #endif
@@ -1214,6 +1232,11 @@ void AFEWebServer::get(DEVICE &data) {
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.noOfI2Cs = server.arg("ii").length() > 0 ? server.arg("ii").toInt() : 0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  data.noOfTLS2561s =
+      server.arg("tl").length() > 0 ? server.arg("tl").toInt() : 0;
 #endif
 
   data.timeToAutoLogOff =
@@ -2470,9 +2493,8 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
-  CLEDData.gpio = server.arg("g").length() > 0
-                      ? server.arg("g").toInt()
-                      : AFE_HARDWARE_ITEM_NOT_EXIST;
+  CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
+                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   CLEDData.colorOrder = server.arg("o").length() > 0
                             ? server.arg("o").toInt()
@@ -2485,16 +2507,17 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
                            : AFE_CONFIG_HARDWARE_CLED_8_LEDS;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  CLEDData.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
-                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+  CLEDData.domoticz.idx = server.arg("d").length() > 0
+                              ? server.arg("d").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
-    server.arg("t").toCharArray(CLEDData.mqtt.topic, sizeof(CLEDData.mqtt.topic));
+    server.arg("t").toCharArray(CLEDData.mqtt.topic,
+                                sizeof(CLEDData.mqtt.topic));
   } else {
     CLEDData.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
-
 
   char _label[3];
 
@@ -2512,4 +2535,46 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
   }
 }
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEWebServer::get(TLS2561 &data) {
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.wirePortId = server.arg("wr").length() > 0 ? server.arg("wr").toInt()
+                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
+
+  data.i2cAddress = server.arg("a").length() > 0 ? server.arg("a").toInt() : 0;
+
+  data.interval = server.arg("f").length() > 0
+                      ? server.arg("f").toInt()
+                      : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;
+
+  data.sensitiveness = server.arg("s").length() > 0
+                  ? server.arg("s").toInt()
+                  : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
+
+  data.gain = server.arg("g").length() > 0
+                  ? server.arg("g").toInt()
+                  : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
+
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+
+  if (server.arg("n").length() > 0) {
+    server.arg("n").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561

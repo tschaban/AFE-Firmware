@@ -149,7 +149,7 @@ void initializeMQTTAPI(void) {
       MqttAPI.addClass(&MiFareCard[0]);
     }
 #endif
-/* Not yet implemented 
+/* Not yet implemented
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
     if (Device.configuration.effectDeviceLight) {
       MqttAPI.addClassEffectDeviceLight(&CLedDeviceLight);
@@ -162,6 +162,12 @@ void initializeMQTTAPI(void) {
     }
 #endif
 */
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    if (Device.configuration.noOfTLS2561s > 0) {
+      MqttAPI.addClass(&TLS2561Sensor[0]);
+    }
+#endif
 
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");
@@ -197,38 +203,51 @@ void initializeHTTPAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     // @TODO Missing noOf check
-    HttpAPI.addClass(&BMEX80Sensor[0]);
+    if (Device.configuration.noOfBMEX80s > 0) {
+      HttpAPI.addClass(&BMEX80Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpAPI.addClass(&HPMA115S0Sensor[0]);
+    if (Device.configuration.noOfHPMA115S0s > 0) {
+      HttpAPI.addClass(&HPMA115S0Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    // @TODO Missing noOf check
-    HttpAPI.addClass(&BH1750Sensor[0]);
+    if (Device.configuration.noOfBH1750s > 0) {
+      HttpAPI.addClass(&BH1750Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-    HttpAPI.addClass(&AS3935Sensor[0]);
+    if (Device.configuration.noOfAS3935s > 0) {
+      HttpAPI.addClass(&AS3935Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-    HttpAPI.addClass(&AnemometerSensor);
+    if (Device.configuration.noOfAnemometerSensors > 0) {
+      HttpAPI.addClass(&AnemometerSensor);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-    HttpAPI.addClass(&RainSensor);
+    if (Device.configuration.noOfRainmeterSensors > 0) {
+      HttpAPI.addClass(&RainSensor);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    // @TODO Missing noOf check
-    HttpAPI.addClass(&Gate[0]);
+    if (Device.configuration.noOfGates > 0) {
+      HttpAPI.addClass(&Gate[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    // @TODO Missing noOf check
-    HttpAPI.addClass(&Contactron[0]);
+    if (Device.configuration.noOfContactrons > 0) {
+      HttpAPI.addClass(&Contactron[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -267,6 +286,11 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    if (Device.configuration.noOfTLS2561s > 0) {
+      HttpAPI.addClass(&TLS2561Sensor[0]);
+    }
+#endif
 
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: HTTP init completed");
@@ -306,39 +330,51 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-    // @TODO Missing noOf check
-    HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
+    if (Device.configuration.noOfBMEX80s > 0) {
+      HttpDomoticzAPI.addClass(&BMEX80Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-    HttpDomoticzAPI.addClass(&HPMA115S0Sensor[0]);
+    if (Device.configuration.noOfHPMA115S0s > 0) {
+      HttpDomoticzAPI.addClass(&HPMA115S0Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-    // @TODO Missing noOf check
-    HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
+    if (Device.configuration.noOfBH1750s > 0) {
+      HttpDomoticzAPI.addClass(&BH1750Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-    HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
+    if (Device.configuration.noOfAS3935s > 0) {
+      HttpDomoticzAPI.addClass(&AS3935Sensor[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-    HttpDomoticzAPI.addClass(&AnemometerSensor);
+    if (Device.configuration.noOfAnemometerSensors > 0) {
+      HttpDomoticzAPI.addClass(&AnemometerSensor);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-    HttpDomoticzAPI.addClass(&RainSensor);
+    if (Device.configuration.noOfRainmeterSensors > 0) {
+      HttpDomoticzAPI.addClass(&RainSensor);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-    // @TODO Missing noOf check
-    HttpDomoticzAPI.addClass(&Contactron[0]);
+    if (Device.configuration.noOfContactrons > 0) {
+      HttpDomoticzAPI.addClass(&Contactron[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    // @TODO Missing noOf check
-    HttpDomoticzAPI.addClass(&Gate[0]);
+    if (Device.configuration.noOfGates > 0) {
+      HttpDomoticzAPI.addClass(&Gate[0]);
+    }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -374,6 +410,12 @@ void initializeHTTPDomoticzAPI(void) {
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     if (Device.configuration.noOfMiFareCards > 0) {
       HttpDomoticzAPI.addClass(&MiFareCard[0]);
+    }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    if (Device.configuration.noOfTLS2561s > 0) {
+      HttpDomoticzAPI.addClass(&TLS2561Sensor[0]);
     }
 #endif
 

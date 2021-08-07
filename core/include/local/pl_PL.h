@@ -85,6 +85,7 @@
 #define L_UNITS "Jednostki"
 #define L_FREQUENCY "Częstotliwość"
 #define L_I2C_PORT "Port I2C"
+#define L_GAIN "Wzmocnienie"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -117,6 +118,7 @@
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
 #define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
+#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Ilość czujników TLS2561"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -371,6 +373,23 @@
 #define L_BH1750_SENSOR "Czujnik BH1750"
 #define L_BH1750_SENSORS "Czujniki BH1750"
 #define L_BH1750_MQTT_TOPIC "Temat MQTT czujnika BH1750"
+#define L_BH1750_CONTINUES_1_LUX "Ciągły odczyt: ~1 lux 120ms"
+#define L_BH1750_CONTINUES_05_LUX "Ciągły odczyt: ~0.5 lux 120ms"
+#define L_BH1750_CONTINUES_4_LUX "Ciągły odczyt: 4 lux 16ms"
+#define L_BH1750_ONE_READ_1_LUX "Jeden odczyt: 1 lux 120ms"
+#define L_BH1750_ONE_READ_05_LUX "Jeden odczyt: 0.5 lux 120ms"
+#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16mss"
+
+/* TLS2561 */
+#define L_TLS2561_SENSOR "Czujnik TLS2561"
+#define L_TLS2561_SENSORS "Czujniki TLS2561"
+#define L_TLS2561_MQTT_TOPIC "Temat MQTT czujnika TLS2561"
+#define L_TLS2561_SENSITIVENESS_LOW "Niska; szybkie odczyty: 14ms"
+#define L_TLS2561_SENSITIVENESS_MID "Średnia; dość szybkie odczyty: 100ms"
+#define L_TLS2561_SENSITIVENESS_HIGH "Wysoka; wolne odczyty: 400ms"
+#define L_TLS2561_GAIN_AUTO "Automatyczne"
+#define L_TLS2561_GAIN_NONE "1x (brak)"
+#define L_TLS2561_GAIN_16 "16x"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"

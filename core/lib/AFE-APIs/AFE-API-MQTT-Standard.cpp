@@ -199,6 +199,22 @@ void AFEAPIMQTTStandard::subscribe() {
   }
 #endif
 
+/* Subscribe: TLS2561 */
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
+    if (strlen(_TLS2561Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _TLS2561Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_TLS2561;
+      currentCacheSize++;
+    }
+  }
+#endif
+
 /* Subscribe: AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
@@ -462,7 +478,7 @@ void AFEAPIMQTTStandard::processRequest() {
         processDHT(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_HARDWARE_DHT
-/* Not yet implemented 
+/* Not yet implemented
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
       case AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT:
         processEffectDeviceLight();
@@ -474,6 +490,11 @@ void AFEAPIMQTTStandard::processRequest() {
         break;
 #endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 */
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+      case AFE_MQTT_DEVICE_TLS2561:
+        processTLS2561(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_HARDWARE_TLS2561
       default:
 #ifdef DEBUG
         Serial << endl
@@ -685,7 +706,33 @@ boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
   }
   return publishStatus;
 }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEAPIMQTTStandard::processTLS2561(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing TLS2561 ID: ") << *id;
 #endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishTLS2561SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishTLS2561SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_TLS2561_DATA_LENGTH];
+    _TLS2561Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_TLS2561Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
@@ -1027,17 +1074,16 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-
-
-/* Not yet implemented 
+/* Not yet implemented
 #ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
 void AFEAPIMQTTStandard::processEffectDeviceLight() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing CLED: Device Effect");
 #endif
   if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
-    
-  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) { // Off 
+
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
+// Off
 
   }
 #ifdef DEBUG
@@ -1055,7 +1101,8 @@ void AFEAPIMQTTStandard::processEffectPN532Sensor() {
 #endif
   if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
     _CLedDeviceLight->on();
-  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) { // Off 
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
+// Off
 
   }
 #ifdef DEBUG
@@ -1070,7 +1117,8 @@ void AFEAPIMQTTStandard::processEffectPN532Sensor() {
     defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
   void AFEAPIMQTTStandard::getCLEDCommand(CLED_COMMAND *command) {}
 
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT || AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT ||
+AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
 */
 
 #endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

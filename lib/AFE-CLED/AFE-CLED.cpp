@@ -17,7 +17,7 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
     if (id == AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID) {
       FastLED
           .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
-                   AFE_CONFIG_HARDWARE_CLED_1_GPIO,
+                   AFE_CONFIG_HARDWARE_CLED_0_GPIO,
                    AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
               leds16, AFE_CONFIG_HARDWARE_CLED_16_LEDS)
           .setCorrection(TypicalSMD5050);

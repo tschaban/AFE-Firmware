@@ -201,6 +201,15 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  if (Device->configuration.noOfTLS2561s > 0) {
+
+    addMenuHeaderItem(page, F(L_TLS2561_SENSORS));
+    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfTLS2561s,
+                   AFE_CONFIG_SITE_TLS2561);
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
@@ -448,6 +457,10 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                         Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
+
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561,
+                        Device->configuration.noOfTLS2561s, F("tl"),
+                        F(L_DEVICE_NUMBER_OF_TLS2561_SENSORS), _itemDisabled);                        
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -612,41 +625,53 @@ void AFESitesGenerator::siteNetwork(String &page) {
   NETWORK configuration;
   char _ip[18];
   char _int[4];
+  int numberOfNetworks = 0;
+  char _ssid[sizeof(configuration.ssid)];
   Data->getConfiguration(&configuration);
 
   /* Section: WiFi selection, user and password */
   openSection(page, F(L_NETWORK_CONFIGURATION),
               F(L_NETWORK_CONFIGURATION_INFO));
 
-  addSelectFormItemOpen(page, F("s"), F(L_NETWORK_SSID));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  if (WiFi.getMode() == WIFI_MODE_STA) {
+#endif // AFE_ESP32
 
 #ifdef DEBUG
-  Serial << endl << F("Searching for WiFi networks: ");
+    Serial << endl << F("INFO: WIFI: Searching for WiFis: ");
 #endif
-  int numberOfNetworks = WiFi.scanNetworks();
-  char _ssid[sizeof(configuration.ssid)];
-
+    numberOfNetworks = WiFi.scanNetworks();
 #ifdef DEBUG
-  Serial << endl << F(" - found: ") << numberOfNetworks;
+    Serial << F(" - found: ") << numberOfNetworks;
 #endif
-
-  for (int i = 0; i < numberOfNetworks; i++) {
-
+    addSelectFormItemOpen(page, F("s"), F(L_NETWORK_SSID));
+    if (numberOfNetworks > 0) {
+      for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
-    Serial << endl << " - " << WiFi.SSID(i);
+        Serial << endl << " - " << WiFi.SSID(i);
 #endif
+        WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        addSelectOptionFormItem(page, _ssid, _ssid,
+                                strcmp(_ssid, configuration.ssid) == 0);
+      }
+    } else {
+      addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
+                              strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
+                                     configuration.ssid) == 0);
+    }
 
-    WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-    addSelectOptionFormItem(page, _ssid, _ssid,
-                            strcmp(_ssid, configuration.ssid) == 0);
+    page.concat(F("</select>"));
+    page.concat(F("<input type=\"submit\" class =\"b bc\" value=\""));
+    page.concat(F(L_NETWORK_REFRESH));
+    page.concat(F("\" formaction=\"/?o="));
+    page += AFE_CONFIG_SITE_NETWORK;
+    page.concat(F("&c=0\"></div>"));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  } else {
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "s", L_NETWORK_SSID,
+                     configuration.ssid, "32");
   }
-  page.concat(F("</select>"));
-
-  page.concat(F("<input type=\"submit\" class =\"b bc\" value=\""));
-  page.concat(F(L_NETWORK_REFRESH));
-  page.concat(F("\" formaction=\"/?o="));
-  page += AFE_CONFIG_SITE_NETWORK;
-  page.concat(F("&c=0\"></div>"));
+#endif // AFE_ESP32
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "p", L_PASSWORD,
                    configuration.password, "32");
@@ -675,18 +700,29 @@ void AFESitesGenerator::siteNetwork(String &page) {
   openSection(page, F(L_NETWORK_BACKUP_CONFIGURATION),
               F(L_NETWORK_BACKUP_CONFIGURATION_HINT));
 
-  addSelectFormItemOpen(page, F("sb"), F(L_NETWORK_SSID));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  if (WiFi.getMode() == WIFI_MODE_STA) {
+#endif // AFE_EPS32
 
-  addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
-                          strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
-                                 configuration.ssidBackup) == 0);
+    addSelectFormItemOpen(page, F("sb"), F(L_NETWORK_SSID));
 
-  for (int i = 0; i < numberOfNetworks; i++) {
-    WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-    addSelectOptionFormItem(page, _ssid, _ssid,
-                            strcmp(_ssid, configuration.ssidBackup) == 0);
+    addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
+                            strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
+                                   configuration.ssidBackup) == 0);
+    if (numberOfNetworks > 0) {
+      for (int i = 0; i < numberOfNetworks; i++) {
+        WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        addSelectOptionFormItem(page, _ssid, _ssid,
+                                strcmp(_ssid, configuration.ssidBackup) == 0);
+      }
+    }
+    page.concat(F("</select>"));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  } else {
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "sb", L_NETWORK_SSID,
+                     configuration.ssidBackup, "32");
   }
-  page.concat(F("</select>"));
+#endif // AFE_ESP32
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "pb", L_PASSWORD,
                    configuration.passwordBackup, "32");
@@ -2379,18 +2415,18 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
   /* Item: sensitivness */
   sprintf(_number, "%d", configuration.mode);
   addSelectFormItemOpen(page, F("m"), F(L_SENSITIVENESS));
-  addSelectOptionFormItem(page, "Ciągły odczyt: ~1 lux 120ms", "16",
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_1_LUX, "16",
                           configuration.mode == 16);
-  addSelectOptionFormItem(page, "Ciągły odczyt: ~0.5 lux 120ms", "17",
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_05_LUX, "17",
                           configuration.mode == 17);
-  addSelectOptionFormItem(page, "Ciągły odczyt: 4 lux 16ms", "19",
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_4_LUX, "19",
                           configuration.mode == 19);
 
-  addSelectOptionFormItem(page, "Jeden odczyt: 1 lux 120ms", "32",
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_1_LUX , "32",
                           configuration.mode == 32);
-  addSelectOptionFormItem(page, "Jeden odczyt: 0.5 lux 120ms", "33",
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_05_LUX, "33",
                           configuration.mode == 33);
-  addSelectOptionFormItem(page, "Jeden odczyt: 4 lux 16ms", "35",
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_4_LUX , "35",
                           configuration.mode == 35);
   addSelectFormItemClose(page);
 
@@ -2416,6 +2452,78 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
+
+  TLS2561 configuration;
+  Data->getConfiguration(id, &configuration);
+  openSection(page, F(L_TLS2561_SENSOR), F(""));
+
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
+  addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: interval */
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
+                   L_SECONDS);
+
+  /* Item: sensitivness */
+  sprintf(_number, "%d", configuration.sensitiveness);
+  addSelectFormItemOpen(page, F("s"), F(L_SENSITIVENESS));
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_LOW, "0",
+                          configuration.sensitiveness == 0);
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_MID, "1",
+                          configuration.sensitiveness == 1);
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_HIGH, "2",
+                          configuration.sensitiveness == 2);
+  addSelectFormItemClose(page);
+
+    /* Item: gain */
+  sprintf(_number, "%d", configuration.gain);
+  addSelectFormItemOpen(page, F("g"), F(L_GAIN));
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_AUTO, "255",
+                          configuration.gain == AFE_CONFIG_HARDWARE_TLS2561_GAIN_AUTO);
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_NONE, "0",
+                          configuration.gain == 0);
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_16, "16",
+                          configuration.gain == 16);
+  addSelectFormItemClose(page);
+
+
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_TLS2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 // String AFESitesGenerator::siteAS3935Sensor(uint8_t id) {

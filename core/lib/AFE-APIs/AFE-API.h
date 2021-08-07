@@ -84,14 +84,18 @@
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-MiFare-Card.h>
 #include <AFE-Sensor-PN532.h>
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#endif
 /* Not yet implemented 
 #if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
     defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
 #include <AFE-CLED.h>
 #endif
 */
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#include <AFE-Sensor-TLS2561.h>
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -194,6 +198,11 @@ public:
   virtual void addClassEffecPN532Sensor(AFECLED *);
 #endif
 */
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  virtual void addClass(AFESensorTLS2561 *);
+#endif
+
 protected:
   /* Is API enabled, set in begin() */
   boolean enabled = false;
@@ -280,6 +289,11 @@ protected:
   AFECLED *_CLedPN532Effect;
 #endif
 */
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  AFESensorTLS2561 *_TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
+#endif
+
 };
 
 #endif // _AFE_API_h

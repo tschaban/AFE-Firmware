@@ -59,9 +59,9 @@ private:
   uint32_t _listenerTime = 0;
 
   AFEDataAccess *Data;
-  TwoWire *WirePort0;
+  TwoWire *_WirePort0;
 #ifdef AFE_ESP32
-  TwoWire *WirePort1;
+  TwoWire *_WirePort1;
 #endif
 
 #ifdef AFE_ESP32

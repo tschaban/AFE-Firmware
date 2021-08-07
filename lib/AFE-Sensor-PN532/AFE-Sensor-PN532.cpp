@@ -9,20 +9,20 @@ AFESensorPN532::AFESensorPN532(){};
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
 void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
-                           AFEDevice *_Device, TwoWire *_WirePort0,
-                           TwoWire *_WirePort1) {
-  WirePort0 = _WirePort0;
-  WirePort1 = _WirePort1;
+                           AFEDevice *_Device, TwoWire *WirePort0,
+                           TwoWire *WirePort1) {
+  _WirePort0 = WirePort0;
+  _WirePort1 = WirePort1;
   begin(_id, _Data, _Device);
 }
 #else
 void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
-                           AFEDevice *_Device, TwoWire *_WirePort0) {
-  WirePort0 = _WirePort0;
+                           AFEDevice *_Device, TwoWire *WirePort0) {
+  _WirePort0 = WirePort0;
   begin(_id, _Data, _Device);
 }
-#endif
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
                            AFEDevice *_Device) {
@@ -65,7 +65,7 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
 #ifdef AFE_CONFIG_HARDWARE_I2C
   else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
 #ifdef AFE_ESP32
-    WirePort0 = configuration.wirePortId == 0 ? WirePort0 : WirePort1;
+    _WirePort0 = configuration.wirePortId == 0 ? _WirePort0 : _WirePort1;
 #endif
 
     if (
@@ -78,7 +78,7 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
              << F("INFO: PN532: Address: 0x") << _HEX(configuration.i2cAddress);
 #endif
 
-      PN532I2CInterface.begin(configuration.i2cAddress, WirePort0);
+      PN532I2CInterface.begin(configuration.i2cAddress, _WirePort0);
       NFCReader.setInterface(PN532I2CInterface);
       _initialized = true;
     }

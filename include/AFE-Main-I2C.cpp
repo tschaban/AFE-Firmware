@@ -23,21 +23,29 @@ void initializeI2CBUS(void) {
   if (Device.configuration.noOfI2Cs > 0) {
     Data.getConfiguration(0, &I2CBUSConfiguration);
 
+#ifdef DEBUG
+    Serial << endl
+           << "INFO: I2C[0]: SDA: " << I2CBUSConfiguration.SDA
+           << ", SCL: " << I2CBUSConfiguration.SCL
+           << ", Frequency: " << (I2CBUSConfiguration.frequency / 1000) << "Hz";
+#endif
+
     success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
                               I2CBUSConfiguration.frequency);
 #else
   Data.getConfiguration(&I2CBUSConfiguration);
+
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: I2C: SDA: " << I2CBUSConfiguration.SDA
+         << ", SCL: " << I2CBUSConfiguration.SCL;
+#endif
+
   success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
 #endif // AFE_ESP32
 
 #ifdef DEBUG
-    Serial << endl
-           << "INFO: I2C[0]: SDA: " << I2CBUSConfiguration.SDA
-           << ", SCL: " << I2CBUSConfiguration.SCL;
-#ifdef AFE_ESP32
-    Serial << ", Frequency: " << I2CBUSConfiguration.frequency / 1000 << "Hz";
-#endif // AFE_ESP32
-
+     yield();
     if (!success) {
       Serial << endl << "ERROR: I2C[0]: Bus doesn't work";
     } else {

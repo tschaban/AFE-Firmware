@@ -78,6 +78,9 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
   AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 17,
 #endif
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  AFE_MQTT_DEVICE_TLS2561 = 18,
+#endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */

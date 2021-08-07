@@ -30,7 +30,7 @@ private:
   void generateDeviceValue(char *json, uint32_t idx, const char *svalue,
                            uint16_t nvalue = 0);
 
-  /* Cache that stories IDXs */
+  /* Cache that stories IDXs for devices that are controlled by Domoticz */
   uint8_t lastIDXChacheIndex = 0;
   DOMOTICZ_IDX_CACHE idxCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
@@ -173,7 +173,10 @@ public:
   boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  virtual void addClass(AFESensorTLS2561 *);
+  boolean publishTLS2561SensorData(uint8_t id);
+#endif //  AFE_CONFIG_HARDWARE_TLS2561
 
 };
 
