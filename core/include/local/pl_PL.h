@@ -585,6 +585,11 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
 #define L_CLED_TIME_WAVE "Szybkość fali"
 #define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
+#define L_CLED_LIGHT_SENSOR "Czujnik natężenia oświetlenia"
+#define L_CLED_LIGHT_LEVEL "Poziom natężenia oświetlenia"
+#define L_CLED_BACKLIGHT_CONFIG "Konfiguracja podświetlenia"
+#define L_CLED_RULE "Reguła"
+#define L_CLED_RULE_HINT "Reguła podświetlenia jest uruchamiana, jeśli poziom światła jest poniżej odczytu czujnika. Pierwszy spełniony warunek zatrzymuje przetwarzanie kolejnych reguł"
 #define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
 
 

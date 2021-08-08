@@ -479,16 +479,16 @@ void AFEAPIMQTTStandard::processRequest() {
         break;
 #endif // AFE_CONFIG_HARDWARE_DHT
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
       case AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT:
         processEffectDeviceLight();
         break;
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
       case AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR:
         processEffectPN532Sensor();
         break;
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 */
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
       case AFE_MQTT_DEVICE_TLS2561:
@@ -1075,7 +1075,7 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 void AFEAPIMQTTStandard::processEffectDeviceLight() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing CLED: Device Effect");
@@ -1092,15 +1092,15 @@ void AFEAPIMQTTStandard::processEffectDeviceLight() {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFEAPIMQTTStandard::processEffectPN532Sensor() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing CLED: PN532 Sensor Effect");
 #endif
   if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
-    _CLedDeviceLight->on();
+    _CLEDBacklight->on();
   } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
 // Off
 
@@ -1111,14 +1111,14 @@ void AFEAPIMQTTStandard::processEffectPN532Sensor() {
   }
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
   void AFEAPIMQTTStandard::getCLEDCommand(CLED_COMMAND *command) {}
 
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT ||
-AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT ||
+AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 */
 
 #endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -14,7 +14,7 @@ void initializeBH1750Sensor(void) {
 #ifdef AFE_ESP32
       BH1750Sensor[i].begin(i, &WirePort0, &WirePort1);
 #else
-      BH1750Sensor[i].begin(i, WirePort0);
+      BH1750Sensor[i].begin(i, &WirePort0);
 #endif
     }
   }
@@ -32,16 +32,14 @@ void BH1750SensorEventsListener(void) {
         HttpDomoticzAPI.publishBH1750SensorData(i);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
- if (Device.configuration.effectDeviceLight) {
-    if (BH1750Sensor[i].data < 100 ) {
-     CLedDeviceLight.on();
-    } else if (BH1750Sensor[i].data >= 100 ) {
-      CLedDeviceLight.off();
-    }
-  }
-#endif
-
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+        if (Device.configuration.effectDeviceLight) {
+          if (CLEDBacklight.lightSensorType ==
+              AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750) {
+            CLEDBacklight.backlightEffect(BH1750Sensor[i].data);
+          }
+        }
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
       }
     }
   }

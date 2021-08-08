@@ -9,38 +9,37 @@ void CLedEventsListener(void);
 
 void initializeCLed(void) {
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   if (Device.configuration.effectDeviceLight) {
-    CLedDeviceLight.begin(&Data,
-                          AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
-    CLedDeviceLight.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+    CLEDBacklight.begin(&Data,
+                          AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device.configuration.noOfPN532Sensors > 0 &&
       Device.configuration.effectPN532) {
-    CLedPN532Effect.begin(&Data,
-                          AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
-    CLedPN532Effect.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+    CLEDAccessControl.begin(&Data,
+                          AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID);
+    CLEDAccessControl.effectOn(AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 };
 
 void CLedEventsListener(void) {
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   if (Device.configuration.effectDeviceLight) {
-    CLedDeviceLight.loop();
+    CLEDBacklight.loop();
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device.configuration.effectPN532 &&
       Device.configuration.noOfPN532Sensors > 0) {
-    CLedPN532Effect.loop();
+    CLEDAccessControl.loop();
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

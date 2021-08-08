@@ -6,11 +6,14 @@
 
 AFESensorTLS2561::AFESensorTLS2561(){};
 
+#ifdef AFE_ESP32
 void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0,
                              TwoWire *WirePort1) {
   _WirePort1 = WirePort1;
   begin(_id, WirePort0);
 }
+
+#endif
 
 void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
   AFEDataAccess Data;
@@ -127,23 +130,23 @@ boolean AFESensorTLS2561::listener() {
 
       if (tls2561.init()) {
         tls2561.getLuminosity(&broadband, &ir);
-#ifdef DEBUG
-        Serial << endl << F("Broadband: ") << broadband << F("IR: ") << ir;
-#endif
         data = tls2561.calculateLux(broadband, ir);
+#ifdef DEBUG
+        Serial << endl
+               << F("Lux: ") << data << F(" lux") << endl
+               << F("Broadband: ") << broadband << endl
+               << F("IR: ") << ir;
+#endif
+
+        ready = true;
 #ifdef DEBUG
       } else {
         Serial << endl << F("ERROR: TLS2561: Sensor not found and initialized");
 #endif
       }
 
-      if (data >= 0) {
-        ready = true;
-      }
-
 #ifdef DEBUG
-      Serial << endl << F("Lux: ") << data << F("lx");
-      Serial << endl << F("---------------------------");
+      Serial << Serial << endl << F("---------------------------");
 #endif
 
       startTime = millis();
@@ -153,7 +156,10 @@ boolean AFESensorTLS2561::listener() {
 }
 
 void AFESensorTLS2561::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}", data);
+  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"},"
+                "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
+                "%d,\"unit\":\"?\"}}",
+          data, broadband, ir);
 }
 
 #endif // AFE_CONFIG_HARDWARE_TLS2561

@@ -589,6 +589,12 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_TIME_WAVE "Wave speed"
 #define L_CLED_TIME_FADE_IN_OUT "Fade speed"
 
+#define L_CLED_LIGHT_SENSOR "Light sensor"
+#define L_CLED_LIGHT_LEVEL "Light level"
+#define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
+#define L_CLED_RULE "Rule"
+#define L_CLED_RULE_HINT "The backlight rule is triggered if the light level is below the sensor's reading. The first condition met stops processing following rules"
+
 
 #define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
 #endif // _LANG_EN_h

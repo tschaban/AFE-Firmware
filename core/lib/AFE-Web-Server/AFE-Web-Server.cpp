@@ -252,18 +252,18 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteMiFareCard(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   case AFE_CONFIG_SITE_CLED_DEVICE_LIGHT:
     Site.siteCLEDDeviceEffect(page,
-                              AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID);
+                              AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID);
     break;
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   case AFE_CONFIG_SITE_CLED_PN532_SENSOR:
     Site.siteCLEDPN532SensoreEffect(
-        page, AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID);
+        page, AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID);
     break;
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
   case AFE_CONFIG_SITE_TLS2561:
     Site.siteTLS2561Sensor(page, siteConfig->deviceID);
@@ -553,32 +553,32 @@ void AFEWebServer::generate(boolean upload) {
         processMiFareCard();
       }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
       else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_PN532_SENSOR) {
         CLED CLEDConfiguration;
         CLED_EFFECTS CLEDEffectsConfiguration;
         get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                                 &CLEDConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                                 &CLEDEffectsConfiguration);
         CLEDConfiguration = {0};
         CLEDEffectsConfiguration = {0};
       }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
       else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_DEVICE_LIGHT) {
         CLED CLEDConfiguration;
-        CLED_EFFECTS CLEDEffectsConfiguration;
-        get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
+        CLED_BACKLIGHT CLEDBacklightConfiguration;
+        get(CLEDConfiguration, CLEDBacklightConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
                                 &CLEDConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
-                                &CLEDEffectsConfiguration);
+        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                                &CLEDBacklightConfiguration);
         CLEDConfiguration = {0};
-        CLEDEffectsConfiguration = {0};
+        CLEDBacklightConfiguration = {0};
       }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
       else if (siteConfig.ID == AFE_CONFIG_SITE_TLS2561) {
         TLS2561 configuration;
@@ -1222,11 +1222,11 @@ void AFEWebServer::get(DEVICE &data) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   data.effectDeviceLight = server.arg("e0").length() > 0 ? true : false;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   data.effectPN532 = server.arg("e1").length() > 0 ? true : false;
 #endif
 
@@ -2492,6 +2492,7 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
   CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -2535,6 +2536,58 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
   }
 }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
+  CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
+                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  CLEDData.colorOrder = server.arg("o").length() > 0
+                            ? server.arg("o").toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
+
+  CLEDData.chipset = server.arg("m").length() > 0 ? server.arg("m").toInt() : 0;
+
+  CLEDData.ledNumber = server.arg("l").length() > 0
+                           ? server.arg("l").toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_8_LEDS;
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  CLEDData.domoticz.idx = server.arg("d").length() > 0
+                              ? server.arg("d").toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg("t").length() > 0) {
+    server.arg("t").toCharArray(CLEDData.mqtt.topic,
+                                sizeof(CLEDData.mqtt.topic));
+  } else {
+    CLEDData.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
+
+  char _label[3];
+
+  CLEDBacklightData.lightSensorId = server.arg("s").length() > 0
+                                        ? server.arg("s").toInt()
+                                        : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
+       i++) {
+    sprintf(_label, "b%d", i);
+    CLEDBacklightData.config[i].brightness =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+
+    sprintf(_label, "l%d", i);
+    CLEDBacklightData.config[i].luxLevel =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+
+    sprintf(_label, "k%d", i);
+    CLEDBacklightData.config[i].color =
+        server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
@@ -2552,13 +2605,12 @@ void AFEWebServer::get(TLS2561 &data) {
                       : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;
 
   data.sensitiveness = server.arg("s").length() > 0
-                  ? server.arg("s").toInt()
-                  : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
+                           ? server.arg("s").toInt()
+                           : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
 
   data.gain = server.arg("g").length() > 0
                   ? server.arg("g").toInt()
                   : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
-
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()

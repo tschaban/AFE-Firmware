@@ -575,11 +575,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
       configuration->effectPN532 = root["effectPN532"];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
       configuration->effectDeviceLight = root["effectDeviceLight"];
 #endif
 
@@ -726,11 +726,11 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfI2Cs"] = configuration->noOfI2Cs;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     root["effectPN532"] = configuration->effectPN532;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
     root["effectDeviceLight"] = configuration->effectDeviceLight;
 #endif
 
@@ -886,11 +886,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   configuration.effectPN532 = false;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   configuration.effectDeviceLight = false;
 #endif
 
@@ -4244,8 +4244,8 @@ void AFEDataAccess::createI2CConfigurationFile() {
   configuration.SCL = AFE_CONFIG_HARDWARE_I2C_1_DEFAULT_SCL;
   saveConfiguration(1, &configuration);
 #else
-  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
-  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
+  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
   saveConfiguration(&configuration);
 #endif
 }
@@ -6190,7 +6190,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   char fileName[17];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
@@ -6245,7 +6244,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
   configuration.chipset = 0;
@@ -6262,21 +6260,20 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID,
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
                     &configuration);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   configuration.gpio = AFE_CONFIG_HARDWARE_CLED_1_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT_ID,
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                     &configuration);
 #endif
 }
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT)
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   char fileName[25];
   sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
@@ -6350,7 +6347,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   char fileName[25];
   sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
@@ -6406,7 +6402,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   CLED_EFFECTS configuration;
 
@@ -6429,26 +6424,28 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+           << F("INFO: Creating file: cfg-cled-effects-") << i << F(".json");
 #endif
 
     saveConfiguration(i, &configuration);
   }
 }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-void AFEDataAccess::getConfiguration(CLED_BACKLIGHT *configuration) {
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFEDataAccess::getConfiguration(uint8_t id,
+                                     CLED_BACKLIGHT *configuration) {
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "r");
+  File configFile = SPIFFS.open(fileName, "r");
 #endif
 
   if (configFile) {
@@ -6460,18 +6457,22 @@ void AFEDataAccess::getConfiguration(CLED_BACKLIGHT *configuration) {
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
-    JsonArray &root = jsonBuffer.parseArray(buf.get());
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
 
+      configuration->lightSensorId = root["lightSensorId"].as<int>();
+
       for (uint8_t i = 0;
            i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; i++) {
-        configuration->config[i].bh1750Id = root[i]["bh1710Id"].as<int>();
-        configuration->config[i].luxLevel = root[i]["luxLevel"].as<int>();
-        configuration->config[i].brightness = root[i]["brightness"].as<int>();
-        configuration->config[i].color = root[i]["color"].as<int>();
+
+        configuration->config[i].luxLevel =
+            root["configs"][i]["luxLevel"].as<int>();
+        configuration->config[i].brightness =
+            root["configs"][i]["brightness"].as<int>();
+        configuration->config[i].color = root["configs"][i]["color"].as<int>();
       }
 
 #ifdef DEBUG
@@ -6496,24 +6497,23 @@ void AFEDataAccess::getConfiguration(CLED_BACKLIGHT *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
-           << F(" not opened");
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
 }
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_BACKLIGHT *configuration) {
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
 
-void AFEDataAccess::saveConfiguration(CLED_BACKLIGHT *configuration) {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, "w");
+  File configFile = SPIFFS.open(fileName, "w");
 #endif
 
   if (configFile) {
@@ -6521,16 +6521,26 @@ void AFEDataAccess::saveConfiguration(CLED_BACKLIGHT *configuration) {
     Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
-    JsonArray &root = jsonBuffer.createArray();
-    JsonObject &set = jsonBuffer.createObject();
-    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
-         i++) {
-      set["bh1750Id"] = configuration->config[i].bh1750Id;
-      set["luxLevel"] = configuration->config[i].luxLevel;
-      set["color"] = configuration->config[i].color;
-      set["brightness"] = configuration->config[i].brightness;
-      root[i] = set;
-    }
+    JsonObject &root = jsonBuffer.createObject();
+    JsonArray &configs = root.createNestedArray("configs");
+    JsonObject &l1 = configs.createNestedObject();
+    JsonObject &l2 = configs.createNestedObject();
+    JsonObject &l3 = configs.createNestedObject();
+
+    root["lightSensorId"] = configuration->lightSensorId;
+
+    l1["luxLevel"] = configuration->config[0].luxLevel;
+    l1["color"] = configuration->config[0].color;
+    l1["brightness"] = configuration->config[0].brightness;
+
+    l2["luxLevel"] = configuration->config[1].luxLevel;
+    l2["color"] = configuration->config[1].color;
+    l2["brightness"] = configuration->config[1].brightness;
+
+    l3["luxLevel"] = configuration->config[2].luxLevel;
+    l3["color"] = configuration->config[2].color;
+    l3["brightness"] = configuration->config[2].brightness;
+
     root.printTo(configFile);
 
 #ifdef DEBUG
@@ -6555,27 +6565,33 @@ void AFEDataAccess::saveConfiguration(CLED_BACKLIGHT *configuration) {
   }
 #endif
 }
-
-void AFEDataAccess::createCLEDBackLightConfigurationFile() {
+void AFEDataAccess::createCLEDBacklightConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Creating file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION;
 #endif
   CLED_BACKLIGHT data;
+
+  data.lightSensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
        i++) {
-    data.config[i].bh1750Id = AFE_HARDWARE_ITEM_NOT_EXIST;
+
     data.config[i].luxLevel = 0;
     data.config[i].color = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_COLOR;
     data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
   }
-  saveConfiguration(&data);
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-cled-backlight-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &data);
+  }
 }
 
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT ||
-       // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
@@ -6711,7 +6727,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TLS2561 *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createTLS2561SensorConfigurationFile() {
   TLS2561 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;

@@ -150,15 +150,15 @@ void initializeMQTTAPI(void) {
     }
 #endif
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
     if (Device.configuration.effectDeviceLight) {
-      MqttAPI.addClassEffectDeviceLight(&CLedDeviceLight);
+      MqttAPI.addClassEffectDeviceLight(&CLEDBacklight);
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     if (Device.configuration.effectPN532) {
-      MqttAPI.addClassEffecPN532Sensor(&CLedPN532Effect);
+      MqttAPI.addClassEffecPN532Sensor(&CLEDAccessControl);
     }
 #endif
 */

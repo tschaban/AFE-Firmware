@@ -41,7 +41,8 @@ void initializeI2CBUS(void) {
          << ", SCL: " << I2CBUSConfiguration.SCL;
 #endif
 
-  success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
+  WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
+  success = true;
 #endif // AFE_ESP32
 
 #ifdef DEBUG

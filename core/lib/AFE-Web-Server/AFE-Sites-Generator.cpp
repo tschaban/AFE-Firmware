@@ -268,20 +268,20 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   if (Device->configuration.effectDeviceLight) {
     addMenuItem(page, F(C_LED_EFFECT_DEVICE_LIGHT),
                 AFE_CONFIG_SITE_CLED_DEVICE_LIGHT);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.effectPN532 &&
       Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(C_LED_EFFECT_PN532_SENSOR),
                 AFE_CONFIG_SITE_CLED_PN532_SENSOR);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
 /* PN532 */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -460,7 +460,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561,
                         Device->configuration.noOfTLS2561s, F("tl"),
-                        F(L_DEVICE_NUMBER_OF_TLS2561_SENSORS), _itemDisabled);                        
+                        F(L_DEVICE_NUMBER_OF_TLS2561_SENSORS), _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -566,20 +566,20 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Section: lights effects */
-#if defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT)
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
   openSection(page, F("Efekty świetlne"), F(""));
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   addCheckboxFormItem(page, "e0", "Podświetlanie urządzenia", "1",
                       Device->configuration.effectDeviceLight);
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.noOfPN532Sensors > 0) {
     addCheckboxFormItem(page, "e1", "Effekty czujnika PN532", "1",
                         Device->configuration.effectPN532);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
   closeSection(page);
 #endif
@@ -2422,11 +2422,11 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
   addSelectOptionFormItem(page, L_BH1750_CONTINUES_4_LUX, "19",
                           configuration.mode == 19);
 
-  addSelectOptionFormItem(page, L_BH1750_ONE_READ_1_LUX , "32",
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_1_LUX, "32",
                           configuration.mode == 32);
   addSelectOptionFormItem(page, L_BH1750_ONE_READ_05_LUX, "33",
                           configuration.mode == 33);
-  addSelectOptionFormItem(page, L_BH1750_ONE_READ_4_LUX , "35",
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_4_LUX, "35",
                           configuration.mode == 35);
   addSelectFormItemClose(page);
 
@@ -2490,17 +2490,17 @@ void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
                           configuration.sensitiveness == 2);
   addSelectFormItemClose(page);
 
-    /* Item: gain */
+  /* Item: gain */
   sprintf(_number, "%d", configuration.gain);
   addSelectFormItemOpen(page, F("g"), F(L_GAIN));
   addSelectOptionFormItem(page, L_TLS2561_GAIN_AUTO, "255",
-                          configuration.gain == AFE_CONFIG_HARDWARE_TLS2561_GAIN_AUTO);
+                          configuration.gain ==
+                              AFE_CONFIG_HARDWARE_TLS2561_GAIN_AUTO);
   addSelectOptionFormItem(page, L_TLS2561_GAIN_NONE, "0",
                           configuration.gain == 0);
   addSelectOptionFormItem(page, L_TLS2561_GAIN_16, "16",
                           configuration.gain == 16);
   addSelectFormItemClose(page);
-
 
   closeSection(page);
 
@@ -3600,7 +3600,7 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
@@ -3687,15 +3687,16 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
       AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
   closeSection(page);
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
-  CLED_EFFECTS CLEDEffectsConfiguration;
+  CLED_BACKLIGHT CLEDBacklightConfiguration;
   Data->getConfiguration(id, &CLEDConfiguration);
-  Data->getConfiguration(id, &CLEDEffectsConfiguration);
+  Data->getConfiguration(id, &CLEDBacklightConfiguration);
+  char _label[26];
   char _number[10];
 
   openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
@@ -3708,95 +3709,105 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, true);
 
   page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
+  closeSection(page);
+
+  openSection(page, F(L_CLED_BACKLIGHT_CONFIG), F(L_CLED_RULE_HINT));
+
+  // uint8_t lightSensorId;
+
+  addSelectFormItemOpen(page, F("s"), F(L_CLED_LIGHT_SENSOR));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          CLEDBacklightConfiguration.lightSensorId ==
+                              AFE_HARDWARE_ITEM_NOT_EXIST);
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  if (Device->configuration.noOfBH1750s > 0) {
+    BH1750 BH1750Configuration;
+    for (uint8_t i = 0; i < Device->configuration.noOfBH1750s; i++) {
+      Data->getConfiguration(i, &BH1750Configuration);
+      sprintf(_label, "BH1750: %s", BH1750Configuration.name);
+      sprintf(_number, "%d", i);
+      addSelectOptionFormItem(page, _label, _number,
+                              CLEDBacklightConfiguration.lightSensorId == i);
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  if (Device->configuration.noOfTLS2561s > 0) {
+    TLS2561 TLS2561Configuration;
+    for (uint8_t i = 0; i < Device->configuration.noOfTLS2561s; i++) {
+      Data->getConfiguration(i, &TLS2561Configuration);
+      sprintf(_label, "TLS2561: %s", TLS2561Configuration.name);
+      sprintf(_number, "%d", 50 + i);
+      addSelectOptionFormItem(page, _label, _number,
+                              CLEDBacklightConfiguration.lightSensorId ==
+                                  50 + i);
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+  addSelectFormItemClose(page);
+
+  for (uint8_t index = 0;
+       index < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; index++) {
+    
+        page.concat(FPSTR(HTTP_ITEM_HINT));
+        sprintf(_label, "{{L}}: %d", index + 1);
+        page.replace("{{i.h}}", _label);
+    
+    /* Item: Lux level */
+    sprintf(_label, "l%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].luxLevel);
+
+    Serial << endl
+           << "CLEDBacklightConfiguration.config[" << index <<"].luxLevel="
+           << CLEDBacklightConfiguration.config[index].luxLevel;
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label,
+                     L_CLED_LIGHT_LEVEL, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     "0", "65535", "1", "Lux");
+
+    /* Item: Led color */
+    sprintf(_label, "k%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].color);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_COLOR,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999",
+                     "1");
+
+    /* Item: brightness */
+    sprintf(_label, "b%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].brightness);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_BRIGHTNESS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  }
+
+  page.replace("{{L}}", L_CLED_RULE);
+
+  closeSection(page);
 
   /*
-    // Item: Chipset
-    sprintf(_number, "%d", CLEDConfiguration.chipset);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     "WS2812", true);
 
-
-    // Item: number of leds
-    sprintf(_number, "%d", CLEDConfiguration.ledNumber);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
-    L_CLED_NUMBER_OF_LEDS,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     true);
-
-    // Item: Colors order
-    sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+      openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+      sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+      closeSection(page);
+    }
+  #else
+    if (Device->configuration.api.mqtt) {
+      openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                       CLEDConfiguration.mqtt.topic, "64");
+      closeSection(page);
+    }
+  #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   */
-  closeSection(page);
-
-  openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
-  /*** Effect: one led wave */
-
-  /* Item: Led color */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
-
-  /* Item: brightness */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
-
-  /* Item: time */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "20000", "1",
-                   L_MILISECONDS);
-
-  closeSection(page);
-
-  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT), F(""));
-  /*** Effect: FAde in / out */
-
-  /* Item: Led color */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
-
-  /* Item: brightness */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
-
-  /* Item: time */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
-  addInputFormItem(
-      page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
-      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
-  closeSection(page);
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
-#else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                     CLEDConfiguration.mqtt.topic, "64");
-    closeSection(page);
-  }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

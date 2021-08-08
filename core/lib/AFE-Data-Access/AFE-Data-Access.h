@@ -245,19 +245,19 @@ public:
   void getConfiguration(uint8_t id, CLED *);
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
-#if defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT)
+  
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   void getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
   void createCLEDEffectsConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-  void getConfiguration(CLED_BACKLIGHT *);
-  void saveConfiguration(CLED_BACKLIGHT *);
-  void createCLEDBackLightConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
-#endif // AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT ||
-       // AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  void getConfiguration(uint8_t id, CLED_BACKLIGHT *);
+  void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
+  void createCLEDBacklightConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561

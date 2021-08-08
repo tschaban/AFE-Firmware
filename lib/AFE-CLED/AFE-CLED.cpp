@@ -9,12 +9,28 @@ AFECLED::AFECLED() {}
 boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
   if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
     Data->getConfiguration(id, &configuration);
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     Data->getConfiguration(id, &effects);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+    Data->getConfiguration(id, &backlight);
+    if (backlight.lightSensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (backlight.lightSensorId >= 50) {
+        lightSensorType =
+            AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561;
+        backlight.lightSensorId -= 50;
+      } else {
+        lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750;
+      }
+    }
+#endif
 
 #ifdef DEBUG
     Serial << endl << "INFO: CLED[" << id << "]: Initializing CLED....";
 #endif
-    if (id == AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT_ID) {
+    if (id == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID) {
       FastLED
           .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
                    AFE_CONFIG_HARDWARE_CLED_0_GPIO,
@@ -37,6 +53,7 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
            << "INFO: CLED[" << id << "]: Setting default colors for effect";
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS; i++) {
       _effectColor[i] = effects.effect[i].color;
     }
@@ -50,6 +67,7 @@ boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
         effects.effect[1].brightness /
         (effects.effect[1].time / 2 /
          AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
     _initialized = true;
   }
@@ -93,17 +111,25 @@ void AFECLED::blink(unsigned int duration, uint32_t onColor,
 
 void AFECLED::loop() {
   if (_initialized) {
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
       waveEffect();
     } else if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT) {
       fadeInOutEffect();
     }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   }
 }
 
 void AFECLED::toggle(uint32_t color) { state ? off() : on(); }
 
-void AFECLED::setBrightness(uint8_t level) { FastLED.setBrightness(level); }
+void AFECLED::setBrightness(uint8_t level) {
+  FastLED.setBrightness(level);
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
+  _currentBrightness = level;
+#endif
+}
 
 void AFECLED::setColor(uint32_t color) {
   for (uint8_t i = 0; i < configuration.ledNumber; i++) {
@@ -113,8 +139,12 @@ void AFECLED::setColor(uint32_t color) {
       leds16[i] = color;
     }
   }
+  #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+    _currentColor = color;
+#endif
 }
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFECLED::effectOn(uint8_t effectId) {
 #ifdef DEBUG
   Serial << endl << "INFO: CLED Tuning on effect: " << effectId << "...";
@@ -185,5 +215,23 @@ void AFECLED::fadeInOutEffect(void) {
 void AFECLED::setCustomEffectColor(uint8_t effectId, uint32_t color) {
   _effectColor[effectId] = color;
 }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFECLED::backlightEffect(uint32_t lightLevel) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
+       i++) {
+    if (lightLevel <= backlight.config[i].luxLevel) {
+      if (_currentColor != backlight.config[i].color) {
+        setColor(backlight.config[i].color);
+      }
+      if (_currentBrightness != backlight.config[i].brightness) {
+        setBrightness(backlight.config[i].brightness);
+      }
+      break;
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 #endif // AFE_CONFIG_HARDWARE_CLED

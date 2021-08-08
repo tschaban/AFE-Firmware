@@ -6,11 +6,13 @@
 
 AFESensorBH1750::AFESensorBH1750(){};
 
+#ifdef AFE_ESP32
 void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0,
                             TwoWire *WirePort1) {
   _WirePort1 = WirePort1;
   begin(_id, WirePort0);
 }
+#endif
 
 void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0) {
   AFEDataAccess Data;

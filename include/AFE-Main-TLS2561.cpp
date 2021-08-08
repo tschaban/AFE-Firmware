@@ -14,7 +14,7 @@ void initializeTLS2561Sensor(void) {
 #ifdef AFE_ESP32
       TLS2561Sensor[i].begin(i, &WirePort0, &WirePort1);
 #else
-      TLS2561Sensor[i].begin(i, WirePort0);
+      TLS2561Sensor[i].begin(i,&WirePort0);
 #endif
     }
   }
@@ -31,15 +31,14 @@ void TLS2561SensorEventsListener(void) {
         HttpDomoticzAPI.publishTLS2561SensorData(i);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
         if (Device.configuration.effectDeviceLight) {
-          if (TLS2561Sensor[i].data < 100) {
-            CLedDeviceLight.on();
-          } else if (TLS2561Sensor[i].data >= 100) {
-            CLedDeviceLight.off();
+          if (CLEDBacklight.lightSensorType ==
+              AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561) {
+            CLEDBacklight.backlightEffect(TLS2561Sensor[i].data);
           }
         }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
       }
     }
   }

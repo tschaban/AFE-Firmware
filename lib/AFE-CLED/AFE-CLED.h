@@ -25,6 +25,7 @@ private:
   CRGB leds8[AFE_CONFIG_HARDWARE_CLED_8_LEDS];
   CRGB leds16[AFE_CONFIG_HARDWARE_CLED_16_LEDS];
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   uint32_t _effectTimer = 0;
   uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
 
@@ -33,10 +34,18 @@ private:
   int8_t _increment = 1;
 
   /* Effect: Fade In/Out */
-  uint8_t _currentBrightness = 0;
   uint8_t _fadeStep = 1;
-
   uint32_t _effectColor[AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS];
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
+  uint8_t _currentBrightness = 0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  uint32_t _currentColor = 0;
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
   uint32_t _offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR;
   uint32_t _onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR;
@@ -47,16 +56,25 @@ private:
   /* Set Color for all leds in the string */
   void setColor(uint32_t color);
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   /* Handles Leds wave effect */
   void waveEffect(void);
 
   /* Handles Fade In/Out effect */
   void fadeInOutEffect(void);
-
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
 public:
   CLED configuration;
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   CLED_EFFECTS effects;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  CLED_BACKLIGHT backlight;
+  uint8_t lightSensorType = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
   /* Constructor */
   AFECLED();
@@ -81,12 +99,18 @@ public:
 
   /* Method must be added to main loop in order to enable effects  */
   void loop();
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   void effectOn(uint8_t effectId);
   void effectOff(void);
 
-/* It set's custom effect color */
+  /* It set's custom effect color */
   void setCustomEffectColor(uint8_t effectId, uint32_t color);
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  void backlightEffect(uint32_t lightLevel);
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

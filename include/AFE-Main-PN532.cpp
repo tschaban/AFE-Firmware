@@ -51,13 +51,13 @@ void PN532EventsListener() {
     case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND:
 
       if (PN532Sensor[i].readTag()) {
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
         /* Changing the CLED Effect card detected, but not authorized yet */
         if (Device.configuration.effectPN532) {
-        CLedPN532Effect.setCustomEffectColor(
+        CLEDAccessControl.setCustomEffectColor(
             AFE_CONFIG_HARDWARE_EFFECT_WAVE,
             AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
-        CLedPN532Effect.effectOn(
+        CLEDAccessControl.effectOn(
             AFE_CONFIG_HARDWARE_EFFECT_WAVE);
       }
 #endif
@@ -65,12 +65,12 @@ void PN532EventsListener() {
           if (strcmp(MiFareCard[j].configuration.cardId,
                      PN532Sensor[i].tag.block[0].value) == 0) {
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
             /* Changing the CLED Effect color to authorized */
             if (Device.configuration.effectPN532) {
-            CLedPN532Effect.setCustomEffectColor(
+            CLEDAccessControl.setCustomEffectColor(
                 AFE_CONFIG_HARDWARE_EFFECT_WAVE,
-                CLedPN532Effect
+                CLEDAccessControl
                     .effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
                     .color);
             }
@@ -127,11 +127,11 @@ void PN532EventsListener() {
       break;
 
 /* End of processing time of a request. Used only by CLED */
-#ifdef AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     case AFE_HARDWARE_PN532_LISTENER_EVENT_PROCESSING_FINISHED:
     if (Device.configuration.effectPN532) {
       /* Changing the CLED Effect to listening mode */
-      CLedPN532Effect.effectOn(
+      CLEDAccessControl.effectOn(
           AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
     }
       break;

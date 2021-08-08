@@ -107,7 +107,7 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "step=\"any\"></div>";
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_PN532_SENSOR_EFFECT) || defined(AFE_CONFIG_HARDWARE_CLED_DEVICE_LIGHT_EFFECT)
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) || defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
 const char HTTP_FIXED_CLED_CONFIG_PARAMS[] PROGMEM = "<input name=\"m\" type=\"hidden\" value=\"0\"><input name=\"l\" type=\"hidden\" value=\"8\"><input name=\"o\" type=\"hidden\" value=\"39\">";
 #endif
 #endif // _AFE_CSS_h
