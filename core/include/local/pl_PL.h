@@ -119,6 +119,7 @@
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
 #define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
 #define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Ilość czujników TLS2561"
+#define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -251,6 +252,7 @@
 #define L_ADC_RESISTOR "Rezystor"
 #define L_ADC_VOLTAGE_DIVIDER "Dzielnik napięcia"
 #define L_ADC_MQTT_TOPIC "Temat MQTT dla informacji z ADC"
+#define L_ADC_INPUT "Wejście"
 
 #define L_BATTERY_METER "Pomiar naładowania baterii"
 #define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
@@ -591,6 +593,10 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_RULE "Reguła"
 #define L_CLED_RULE_HINT "Reguła podświetlenia jest uruchamiana, jeśli poziom światła jest poniżej odczytu czujnika. Pierwszy spełniony warunek zatrzymuje przetwarzanie kolejnych reguł"
 #define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
+
+#define L_CLED_LIGHT_EFFECTS "Efekty świetlne"
+#define L_CLED_DEVICE_BACKLIGHT "Podświetlanie urządzenia"
+#define L_CLED_PN532_EFFECTS "Efekty czujnika PN532"
 
 
 #endif // _LANG_PL_h

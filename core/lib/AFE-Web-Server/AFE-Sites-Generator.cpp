@@ -253,10 +253,18 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  if (Device->configuration.noOfAnalogInputs > 0) {
+    addMenuHeaderItem(page, F(L_ANALOG_INPUT));
+    addMenuSubItem(page, L_ADC_INPUT, Device->configuration.noOfAnalogInputs,
+                   AFE_CONFIG_SITE_MIFARE_CARDS);
+  }
+#else
   if (Device->configuration.isAnalogInput) {
     addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
   }
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F(L_FUNCTIONS));
@@ -506,12 +514,19 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_ESP32
+  /* Number of ADC Inputs */
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS,
+                        Device->configuration.noOfAnalogInputs, F("ad"),
+                        F(L_DEVICE_NUMBER_OF_ADC));
+#else
   addCheckboxFormItem(
       page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",
       Device->configuration.isAnalogInput,
       (!FirmwarePro->Pro.valid ? L_PRO_VERSION : AFE_FORM_ITEM_SKIP_PROPERTY),
       !FirmwarePro->Pro.valid);
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #if defined(T3_CONFIG)
   itemsNumber = 0;
@@ -566,17 +581,17 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Section: lights effects */
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
-  openSection(page, F("Efekty świetlne"), F(""));
+  openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  addCheckboxFormItem(page, "e0", "Podświetlanie urządzenia", "1",
+  addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
                       Device->configuration.effectDeviceLight);
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.noOfPN532Sensors > 0) {
-    addCheckboxFormItem(page, "e1", "Effekty czujnika PN532", "1",
+    addCheckboxFormItem(page, "e1", L_CLED_PN532_EFFECTS, "1",
                         Device->configuration.effectPN532);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -2757,18 +2772,28 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_ESP32
+void AFESitesGenerator::siteADCInput(String &page, uint8_t id) {
+  ADCINPUT configuration;
+  Data->getConfiguration(id, &configuration);
+#else
 void AFESitesGenerator::siteADCInput(String &page) {
   ADCINPUT configuration;
   Data->getConfiguration(&configuration);
+#endif // AFE_ESP32
 
   openSection(page, F(L_ANALOG_INPUT), F(""));
   char _number[13];
 
-  sprintf(_number, "%d", configuration.gpio);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY AFE_FORM_ITEM_SKIP_PROPERTY
-                       AFE_FORM_ITEM_SKIP_PROPERTY,
-                   "?");
+  /* Item: GPIO */
+  addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO", true);
+
+#ifdef AFE_ESP32
+  /* Item: name of the ADC */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "l", L_NAME,
+                   configuration.name, "16");
+#endif // AFE_ESP32
 
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "v", L_MEASURMENTS_INTERVAL,
@@ -3750,18 +3775,14 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
   for (uint8_t index = 0;
        index < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; index++) {
-    
-        page.concat(FPSTR(HTTP_ITEM_HINT));
-        sprintf(_label, "{{L}}: %d", index + 1);
-        page.replace("{{i.h}}", _label);
-    
+
+    page.concat(FPSTR(HTTP_ITEM_HINT));
+    sprintf(_label, "{{L}}: %d", index + 1);
+    page.replace("{{i.h}}", _label);
+
     /* Item: Lux level */
     sprintf(_label, "l%u", index);
     sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].luxLevel);
-
-    Serial << endl
-           << "CLEDBacklightConfiguration.config[" << index <<"].luxLevel="
-           << CLEDBacklightConfiguration.config[index].luxLevel;
 
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label,
                      L_CLED_LIGHT_LEVEL, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -3981,9 +4002,10 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-void AFESitesGenerator::addListOfGPIOs(String &item,
+/*void AFESitesGenerator::addListOfGPIOs(String &item,
                                        const __FlashStringHelper *field,
-                                       uint8_t selected, const char *title) {
+                                       uint8_t selected, const char *title,
+                                       ) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
   item.replace("{{i.n}}", field);
@@ -3995,14 +4017,56 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
                               ? F(" selected=\"selected\"")
                               : F(""));
 
-  for (uint8_t i = 0; i < AFE_NUMBER_OF_GPIOS; i++) {
+  for (uint8_t i = 0;
+       i < generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS;
+       i++) {
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
-    item.replace("{{i.v}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.l}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.s}}", selected == pgm_read_byte(GPIOS + i)
-                                ? F(" selected=\"selected\"")
-                                : F(""));
+    item.replace("{{i.v}}", String(pgm_read_byte(
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) + i)));
+    item.replace("{{i.l}}", String(pgm_read_byte(
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) + i)));
+    item.replace(
+        "{{i.s}}",
+        selected == pgm_read_byte((generatedADCGpios ? GPIOS_ADC : GPIOS) + i)
+            ? F(" selected=\"selected\"")
+            : F(""));
+  }
+  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
+}
+*/
+
+void AFESitesGenerator::addListOfGPIOs(String &item,
+                                       const __FlashStringHelper *field,
+                                       uint8_t selected, const char *title,
+                                       boolean generatedADCGpios) {
+
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  item.replace("{{i.n}}", field);
+  item.replace("{{i.l}}", title);
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{i.l}}", F(L_NONE));
+  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? F(" selected=\"selected\"")
+                              : F(""));
+
+  for (uint8_t i = 0;
+       i < (generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS);
+       i++) {
+    item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+
+    item.replace("{{i.v}}", generatedADCGpios
+                                ? String(pgm_read_byte(GPIOS_ADC + i))
+                                : String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.l}}", generatedADCGpios
+                                ? String(pgm_read_byte(GPIOS_ADC + i))
+                                : String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.s}}",
+                 selected == (generatedADCGpios ? pgm_read_byte(GPIOS_ADC + i)
+                                                : pgm_read_byte(GPIOS + i))
+                     ? F(" selected=\"selected\"")
+                     : F(""));
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }

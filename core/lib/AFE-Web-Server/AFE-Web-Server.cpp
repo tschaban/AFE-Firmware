@@ -151,7 +151,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   case AFE_CONFIG_SITE_ANALOG_INPUT:
+#ifdef AFE_ESP32
+    Site.siteADCInput(page, siteConfig->deviceID);
+#else
     Site.siteADCInput(page);
+#endif // AFE_ESP32
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -384,7 +388,11 @@ void AFEWebServer::generate(boolean upload) {
       else if (siteConfig.ID == AFE_CONFIG_SITE_ANALOG_INPUT) {
         ADCINPUT configuration;
         get(configuration);
+#ifdef AFE_ESP
+        Data->saveConfiguration(siteConfig.deviceID, &configuration);
+#else
         Data->saveConfiguration(&configuration);
+#endif // AFE_ESP
         configuration = {0};
       }
 #endif
@@ -558,10 +566,12 @@ void AFEWebServer::generate(boolean upload) {
         CLED CLEDConfiguration;
         CLED_EFFECTS CLEDEffectsConfiguration;
         get(CLEDConfiguration, CLEDEffectsConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                                &CLEDConfiguration);
-        Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                                &CLEDEffectsConfiguration);
+        Data->saveConfiguration(
+            AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+            &CLEDConfiguration);
+        Data->saveConfiguration(
+            AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+            &CLEDEffectsConfiguration);
         CLEDConfiguration = {0};
         CLEDEffectsConfiguration = {0};
       }
@@ -1045,7 +1055,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
 #endif
     }
   } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
-#ifdef ESP_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
     SystemLED->toggle();
 #endif
 #ifdef DEBUG
@@ -1202,8 +1212,13 @@ void AFEWebServer::get(DEVICE &data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  data.noOfAnalogInputs =
+      server.arg("ad").length() > 0 ? server.arg("ad").toInt() : 0;
+#else
   data.isAnalogInput = server.arg("ad").length() > 0 ? true : false;
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   data.noOfBinarySensors =
@@ -2197,6 +2212,14 @@ void AFEWebServer::get(ADCINPUT &data) {
   data.interval = server.arg("v").length() > 0
                       ? server.arg("v").toInt()
                       : AFE_CONFIG_HARDWARE_ADC_VCC_DEFAULT_INTERVAL;
+
+#ifdef AFE_ESP32
+  if (server.arg("l").length() > 0) {
+    server.arg("l").toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+#endif
 
   data.numberOfSamples =
       server.arg("n").length() > 0

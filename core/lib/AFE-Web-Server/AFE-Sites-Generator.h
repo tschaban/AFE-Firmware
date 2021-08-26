@@ -139,9 +139,11 @@ private:
   void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);
 
-  /* Item: HTML <select> populated with GPIOs */
+  /* Item: HTML <select> populated with GPIOs
+  */
   void addListOfGPIOs(String &item, const __FlashStringHelper *field,
-                      uint8_t selected, const char *title = "GPIO");
+                      uint8_t selected, const char *title = "GPIO",
+                      boolean generatedADCGpios = false);
 
   /* Item: HTML <select> populated with <option> for number of items selection
    */
@@ -304,7 +306,11 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  void siteADCInput(String &page, uint8_t id);
+#else
   void siteADCInput(String &page);
+#endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_UART

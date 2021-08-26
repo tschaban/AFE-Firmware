@@ -123,6 +123,7 @@
 #define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
 #define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
 #define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Number of TLS2561's sensors"  
+#define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -252,6 +253,7 @@
 #define L_ADC_RESISTOR "Resistor"
 #define L_ADC_VOLTAGE_DIVIDER "Voltage Divider"
 #define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
+#define L_ADC_INPUT "Input"
 
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
@@ -594,8 +596,11 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
 #define L_CLED_RULE "Rule"
 #define L_CLED_RULE_HINT "The backlight rule is triggered if the light level is below the sensor's reading. The first condition met stops processing following rules"
-
-
 #define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
+
+#define L_CLED_LIGHT_EFFECTS "Light effects"
+#define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
+#define L_CLED_PN532_EFFECTS "PN532 sensor's light effects"
+
 #endif // _LANG_EN_h
 

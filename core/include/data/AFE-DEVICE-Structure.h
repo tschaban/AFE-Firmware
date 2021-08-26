@@ -29,7 +29,11 @@ struct DEVICE {
   uint8_t noOfLEDs;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
   boolean isAnalogInput;
+#else
+  uint8_t noOfAnalogInputs;
+#endif // AFE_ESP32
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t noOfGates;

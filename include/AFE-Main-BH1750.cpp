@@ -34,9 +34,11 @@ void BH1750SensorEventsListener(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
         if (Device.configuration.effectDeviceLight) {
-          if (CLEDBacklight.lightSensorType ==
+          if (CLEDStrip.lightSensorType ==
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750) {
-            CLEDBacklight.backlightEffect(BH1750Sensor[i].data);
+            CLEDStrip.backlightEffect(
+                AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                BH1750Sensor[i].data);
           }
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT

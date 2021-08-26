@@ -267,9 +267,7 @@ void setup() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    if (Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
-      AnalogInput.begin();
-    }
+    initializeADC();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR

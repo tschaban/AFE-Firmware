@@ -116,8 +116,14 @@ public:
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  void getConfiguration(uint8_t id, ADCINPUT *);
+  void saveConfiguration(uint8_t id, ADCINPUT *);
+#else
   void getConfiguration(ADCINPUT *);
   void saveConfiguration(ADCINPUT *);
+#endif // AFE_ESP32
+
   void createADCInputConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
@@ -245,7 +251,7 @@ public:
   void getConfiguration(uint8_t id, CLED *);
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
-  
+
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   void getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
@@ -265,7 +271,5 @@ public:
   void saveConfiguration(uint8_t id, TLS2561 *);
   void createTLS2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TLS2561
-
-
 };
 #endif // _AFE_Data_Access_h

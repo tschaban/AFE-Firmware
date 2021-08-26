@@ -486,8 +486,17 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfRelays"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-      configuration->isAnalogInput = root["isAnalogInput"] | false;
+
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
+      configuration->isAnalogInput = root["isAnalogInput"] | false;
+#else
+      configuration->noOfAnalogInputs =
+          root["noOfAnalogInputs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS;
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       configuration->noOfContactrons =
@@ -658,8 +667,12 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
     root["isAnalogInput"] = configuration->isAnalogInput;
-#endif
+#else
+    root["noOfAnalogInputs"] = configuration->noOfAnalogInputs;
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     root["noOfContactrons"] = configuration->noOfContactrons;
@@ -812,7 +825,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
   configuration.isAnalogInput = false;
+#else
+  configuration.noOfAnalogInputs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS;
+#endif // AFE_ESP32
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -2619,18 +2636,24 @@ void AFEDataAccess::createSwitchConfigurationFile(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+void AFEDataAccess::getConfiguration(uint8_t id, ADCINPUT *configuration) {
+  char fileName[25];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
+#else
 void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
+  char fileName[22];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+#endif // AFE_ESP32
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_ADC_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
+
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_ADC_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_ADC_CONFIGURATION, "r");
+  File configFile = SPIFFS.open(fileName, "r");
 #endif
 
   if (configFile) {
@@ -2647,6 +2670,11 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
+
+#ifdef AFE_ESP32
+      sprintf(configuration->name, root["name"]);
+#endif
+
       configuration->gpio = root["gpio"];
       configuration->interval = root["interval"];
       configuration->numberOfSamples = root["numberOfSamples"];
@@ -2701,24 +2729,29 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_ADC_CONFIGURATION
-           << F(" not opened");
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
 }
 
+#ifdef AFE_ESP32
+void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration) {
+  char fileName[25];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
+#else
 void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
+  char fileName[22];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+#endif
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_ADC_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_ADC_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_ADC_CONFIGURATION, "w");
+  File configFile = SPIFFS.open(fileName, "w");
 #endif
 
   if (configFile) {
@@ -2737,6 +2770,9 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
     JsonObject &battery = root.createNestedObject("batteryMeter");
 #endif
 
+#ifdef AFE_ESP32
+    root["name"] = configuration->name;
+#endif
     root["gpio"] = configuration->gpio;
     root["interval"] = configuration->interval;
     root["numberOfSamples"] = configuration->numberOfSamples;
@@ -2819,7 +2855,15 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
+#ifdef AFE_ESP32
+  char name[6];
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++) {
+    sprintf(AnalogInputConfiguration.name, "ADC%d", i);
+    saveConfiguration(i, &AnalogInputConfiguration);
+  }
+#else
   saveConfiguration(&AnalogInputConfiguration);
+#endif
 }
 #endif //  AFE_CONFIG_HARDWARE_ADC_VCC
 

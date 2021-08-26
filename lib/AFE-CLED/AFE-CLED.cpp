@@ -6,232 +6,310 @@
 
 AFECLED::AFECLED() {}
 
-boolean AFECLED::begin(AFEDataAccess *Data, uint8_t id) {
-  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data->getConfiguration(id, &configuration);
+boolean AFECLED::begin(AFEDataAccess *Data) {
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    Data->getConfiguration(id, &effects);
-#endif
+  Data->getConfiguration(
+      AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+      &configuration[AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID]);
+  Data->getConfiguration(
+      AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+      &configuration[AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID]);
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-    Data->getConfiguration(id, &backlight);
-    if (backlight.lightSensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-      if (backlight.lightSensorId >= 50) {
-        lightSensorType =
-            AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561;
-        backlight.lightSensorId -= 50;
-      } else {
-        lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750;
-      }
-    }
-#endif
+  Data->getConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                         &effects);
 
-#ifdef DEBUG
-    Serial << endl << "INFO: CLED[" << id << "]: Initializing CLED....";
-#endif
-    if (id == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID) {
-      FastLED
-          .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
-                   AFE_CONFIG_HARDWARE_CLED_0_GPIO,
-                   AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
-              leds16, AFE_CONFIG_HARDWARE_CLED_16_LEDS)
-          .setCorrection(TypicalSMD5050);
-      configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_16_LEDS;
+  Data->getConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                         &backlight);
+
+  if (backlight.lightSensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (backlight.lightSensorId >= 50) {
+      lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561;
+      backlight.lightSensorId -= 50;
     } else {
-      FastLED
-          .addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
-                   AFE_CONFIG_HARDWARE_CLED_1_GPIO,
-                   AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
-              leds8, AFE_CONFIG_HARDWARE_CLED_8_LEDS)
-          .setCorrection(TypicalSMD5050);
-      configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
+      lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750;
     }
-
-#ifdef DEBUG
-    Serial << "completed" << endl
-           << "INFO: CLED[" << id << "]: Setting default colors for effect";
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS; i++) {
-      _effectColor[i] = effects.effect[i].color;
-    }
-
-#ifdef DEBUG
-    Serial << endl << "INFO: CLED[" << id << "]: Preparing effects";
-#endif
-
-    /* Effect: fade in/out calcuating step */
-    _fadeStep = round(
-        effects.effect[1].brightness /
-        (effects.effect[1].time / 2 /
-         AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-
-    _initialized = true;
   }
+
+#ifdef DEBUG
+  Serial << endl << "INFO: CLED: Starting CLED....";
+#endif
+
+  controllers[AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID] =
+      &FastLED.addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
+                       AFE_CONFIG_HARDWARE_CLED_0_GPIO,
+                       AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
+          leds16, AFE_CONFIG_HARDWARE_CLED_16_LEDS);
+
+  controllers[AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID] =
+      &FastLED.addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
+                       AFE_CONFIG_HARDWARE_CLED_1_GPIO,
+                       AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER>(
+          leds8, AFE_CONFIG_HARDWARE_CLED_8_LEDS);
+
+  /* Adding refeence to strip leds */
+  controllers[AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID]->setLeds(
+      leds16, AFE_CONFIG_HARDWARE_CLED_16_LEDS);
+
+  controllers[AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID]->setLeds(
+      leds8, AFE_CONFIG_HARDWARE_CLED_8_LEDS);
+
+  /* Clearning leds */
+  controllers[AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID]->clearLeds(
+      AFE_CONFIG_HARDWARE_CLED_16_LEDS);
+
+  controllers[AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID]->clearLeds(
+      AFE_CONFIG_HARDWARE_CLED_8_LEDS);
+
+#ifdef DEBUG
+  Serial << "completed" << endl
+         << "INFO: CLED: Setting default colors for effect";
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+    _effectColor[i] = effects.effect[i].color;
+  }
+
+#ifdef DEBUG
+  Serial << endl << "INFO: CLED: Preparing effects";
+#endif
+
+  /* Effect: fade in/out calcuating step */
+  _fadeStep = round(
+      effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT].brightness /
+      (effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT].time / 2 /
+       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
+
+  _initialized = true;
+
   return _initialized;
 }
 
-void AFECLED::on() {
+void AFECLED::on(uint8_t stripId) {
   if (_initialized) {
-    setColor(_onColor);
-    FastLED.show();
-    state = true;
+    setColor(stripId, _onColor[stripId]);
+    state[stripId] = true;
   }
 }
 
-void AFECLED::on(uint32_t color) {
-  _onColor = color;
-  on();
+void AFECLED::on(uint8_t stripId, uint32_t color) {
+  _onColor[stripId] = color;
+  on(stripId);
 }
 
-void AFECLED::off() {
+void AFECLED::off(uint8_t stripId) {
   if (_initialized) {
-    setColor(_offColor);
-    FastLED.show();
-    state = false;
+    setColor(stripId, _offColor[stripId]);
+    state[stripId] = false;
   }
 }
 
-void AFECLED::off(uint32_t color) {
-  _offColor = color;
-  off();
+void AFECLED::off(uint8_t stripId, uint32_t color) {
+  _offColor[stripId] = color;
+  off(stripId);
 }
 
-void AFECLED::blink(unsigned int duration, uint32_t onColor,
+void AFECLED::blink(uint8_t stripId, unsigned int duration, uint32_t onColor,
                     uint32_t offColor) {
   if (_initialized) {
-    on(onColor);
+    on(stripId, onColor);
     delay(duration);
-    off(offColor);
+    off(stripId, offColor);
   }
 }
 
 void AFECLED::loop() {
   if (_initialized) {
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
-      waveEffect();
+      waveEffect(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID);
     } else if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT) {
-      fadeInOutEffect();
-    }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  }
-}
-
-void AFECLED::toggle(uint32_t color) { state ? off() : on(); }
-
-void AFECLED::setBrightness(uint8_t level) {
-  FastLED.setBrightness(level);
-#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
-  _currentBrightness = level;
-#endif
-}
-
-void AFECLED::setColor(uint32_t color) {
-  for (uint8_t i = 0; i < configuration.ledNumber; i++) {
-    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
-      leds8[i] = color;
-    } else {
-      leds16[i] = color;
+      fadeInOutEffect(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID);
     }
   }
-  #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-    _currentColor = color;
-#endif
 }
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-void AFECLED::effectOn(uint8_t effectId) {
+void AFECLED::toggle(uint8_t stripId, uint32_t color) {
+  state[stripId] ? off(stripId) : on(stripId);
+}
+
+void AFECLED::setBrightness(uint8_t stripId, uint8_t level) {
 #ifdef DEBUG
-  Serial << endl << "INFO: CLED Tuning on effect: " << effectId << "...";
+  Serial << endl
+         << "INFO: CLED[" << stripId
+         << "]: Setting brightness level: " << level;
+#endif
+  _currentBrightness[stripId] = level;
+  setColor(stripId, _currentColor[stripId]);
+  // FastLED[stripId].showLeds(_currentBrightness[stripId]);
+}
+
+void AFECLED::setColor(uint8_t stripId, uint32_t color) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: CLED[" << stripId << "]: Setting color: " << color
+         << ", brightness: " << _currentBrightness[stripId];
+#endif
+
+  fill_solid(stripId == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID ? leds16
+                                                                     : leds8,
+             controllers[stripId]->size(), color);
+
+  controllers[stripId]->show(
+      stripId == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID ? leds16 : leds8,
+      controllers[stripId]->size(), _currentBrightness[stripId]);
+  controllers[stripId]->showLeds(_currentBrightness[stripId]);
+
+  _currentColor[stripId] = color;
+}
+
+void AFECLED::effectOn(uint8_t stripId, uint8_t effectId) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: CLED[" << stripId << "] Tuning on effect: " << effectId
+         << "...";
 #endif
   _currentEffect = effectId;
   if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_WAVE) {
-    setColor(CRGB::Black);
-    FastLED.setBrightness(
-        effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE].brightness);
+    _currentBrightness[stripId] =
+        effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE].brightness;
+    setColor(stripId, CRGB::Black);
     _increment = 1;
   } else if (_currentEffect == AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT) {
-    _currentBrightness = _fadeStep + 1;
-    FastLED.setBrightness(_currentBrightness);
-    setColor(_effectColor[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT]);
+    _currentBrightness[stripId] = _fadeStep + 1;
+    setColor(stripId, _effectColor[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT]);
     _increment = _fadeStep;
   }
   _effectTimer = millis();
-#ifdef DEBUG
-  Serial << "OK";
-#endif
 }
 
-void AFECLED::effectOff() {
+void AFECLED::effectOff(uint8_t stripId) {
   _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
 }
 
-void AFECLED::waveEffect(void) {
+void AFECLED::waveEffect(uint8_t stripId) {
   if (millis() - _effectTimer >
       effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE].time) {
-    if (_currentLedId == configuration.ledNumber - 1 || _currentLedId == 0) {
+    if (_currentLedId == controllers[stripId]->size() - 1 ||
+        _currentLedId == 0) {
       _increment *= -1;
     }
 
-    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
+    switch (controllers[stripId]->size()) {
+    case AFE_CONFIG_HARDWARE_CLED_8_LEDS:
       leds8[_currentLedId] = CRGB::Black;
-    } else {
+      break;
+    case AFE_CONFIG_HARDWARE_CLED_16_LEDS:
       leds16[_currentLedId] = CRGB::Black;
+      break;
     }
+
     _currentLedId += _increment;
 
-    if (configuration.ledNumber == AFE_CONFIG_HARDWARE_CLED_8_LEDS) {
+    switch (controllers[stripId]->size()) {
+    case AFE_CONFIG_HARDWARE_CLED_8_LEDS:
       leds8[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
-    } else {
+      break;
+    case AFE_CONFIG_HARDWARE_CLED_16_LEDS:
       leds16[_currentLedId] = _effectColor[AFE_CONFIG_HARDWARE_EFFECT_WAVE];
+      break;
     }
-
-    FastLED.show();
+    controllers[stripId]->show(
+        stripId == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID ? leds16
+                                                                : leds8,
+        controllers[stripId]->size(),
+        _currentBrightness[stripId]);
+    FastLED[stripId].showLeds(_currentBrightness[stripId]);
     _effectTimer = millis();
   }
 }
 
-void AFECLED::fadeInOutEffect(void) {
+void AFECLED::fadeInOutEffect(uint8_t stripId) {
   if (millis() - _effectTimer >
       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL) {
-    if (_currentBrightness >=
+    if (_currentBrightness[stripId] >=
             effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT].brightness -
                 _fadeStep - 1 ||
-        _currentBrightness < _fadeStep + 1) {
+        _currentBrightness[stripId] < _fadeStep + 1) {
       _increment = _increment > 0 ? -1 * _fadeStep : _fadeStep;
     }
-    _currentBrightness += _increment;
-    FastLED.setBrightness(_currentBrightness);
-    FastLED.show();
+    _currentBrightness[stripId] += _increment;
+
+    controllers[stripId]->show(
+        stripId == AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID ? leds16
+                                                                : leds8,
+        controllers[stripId]->size(),
+        _currentBrightness[stripId]);
+
+    controllers[stripId]->showLeds(_currentBrightness[stripId]);
+
     _effectTimer = millis();
   }
 }
 
-void AFECLED::setCustomEffectColor(uint8_t effectId, uint32_t color) {
+void AFECLED::setCustomEffectColor(uint8_t stripId, uint8_t effectId,
+                                   uint32_t color) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: CLED[" << stripId << "]: Setting custom color: " << color
+         << " for effect: " << effectId;
+#endif
   _effectColor[effectId] = color;
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-void AFECLED::backlightEffect(uint32_t lightLevel) {
+void AFECLED::backlightEffect(uint8_t stripId, uint32_t lightLevel) {
+#ifdef DEBUG
+  Serial << endl
+         << "INFO: CLED[" << stripId << "]: Backlight: changing light if needed"
+         << endl
+         << ": light level: " << lightLevel << " lux" << endl
+         << ": current color: " << _currentColor[stripId]
+         << ", brightness: " << _currentBrightness[stripId];
+
+#endif
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
        i++) {
+
+#ifdef DEBUG
+    Serial << endl << " - Rule: " << i;
+#endif
+
     if (lightLevel <= backlight.config[i].luxLevel) {
-      if (_currentColor != backlight.config[i].color) {
-        setColor(backlight.config[i].color);
+
+#ifdef DEBUG
+      Serial << endl << ": Applying rule: " << i;
+#endif
+
+      if (_currentColor[stripId] != backlight.config[i].color ||
+          _currentBrightness[stripId] != backlight.config[i].brightness) {
+
+#ifdef DEBUG
+        if (_currentColor[stripId] != backlight.config[i].color) {
+          Serial << endl
+                 << ": changing color from  " << _currentColor[stripId]
+                 << " to " << backlight.config[i].color;
+        }
+
+        if (_currentBrightness[stripId] != backlight.config[i].brightness) {
+          Serial << endl
+                 << ": changing brigtness from  " << _currentBrightness[stripId]
+                 << " to " << backlight.config[i].brightness;
+        }
+#endif
+
+        _currentBrightness[stripId] = backlight.config[i].brightness;
+        setColor(stripId, backlight.config[i].color);
       }
-      if (_currentBrightness != backlight.config[i].brightness) {
-        setBrightness(backlight.config[i].brightness);
+
+      if (_currentBrightness[stripId] > 0 && state[stripId] == false) {
+        state[stripId] = true;
+      } else if (backlight.config[i].brightness == 0 &&
+                 state[stripId] == true) {
+        state[stripId] = false;
       }
+
       break;
     }
   }
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 #endif // AFE_CONFIG_HARDWARE_CLED
