@@ -30,6 +30,8 @@
 /* HTTP API */
 #define L_DEVICE_NOT_EXIST "\"Urządzenie o takiej nazwie nie istnieje\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Komenda nie jest zaimplementowana\""
+#define L_404 "AFE FIRMWARE: Bład 404: Strona o takim adresie nie istnieje."
+#define L_COMMNAD_NO_COMMAND "\"Brak komendy\""
 
 /* Menu */
 #define L_HARDWARE "Sprzęt"

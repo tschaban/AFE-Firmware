@@ -219,7 +219,11 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Stories reference to global ADC class */
+  #ifdef AFE_ESP32
+  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
+  #else
   AFEAnalogInput *_AnalogInput;
+  #endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

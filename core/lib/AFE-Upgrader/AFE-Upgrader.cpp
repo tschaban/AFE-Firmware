@@ -130,6 +130,8 @@ void AFEUpgrader::upgradeFirmwarType() {
 
 void AFEUpgrader::updateFirmwareVersion() {
 
+#ifndef AFE_ESP32
+
 /* Upgrade to version T0-2.0.3 */
 #ifdef T0_CONFIG
   if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
@@ -137,7 +139,7 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(FirmwareConfiguration.version, "2.0.2") == 0) {
     upgradeToT0V210();
   }
-#endif
+#endif // T0_CONFIG
 
 #ifdef T5_CONFIG
   if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
@@ -145,7 +147,7 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(FirmwareConfiguration.version, "2.2.0.B1") == 0) {
     upgradeToT5V220();
   }
-#endif
+#endif // T5_CONFIG
 
 #ifdef T6_CONFIG
   if (strcmp(FirmwareConfiguration.version, "2.0.0") == 0 ||
@@ -162,7 +164,9 @@ void AFEUpgrader::updateFirmwareVersion() {
     upgradeToT6V250();
   }
 
-#endif
+#endif // T6_CONFIG
+
+#endif // !ESP32
 
   Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
 }
@@ -182,6 +186,9 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
   Data->saveFirmwareAPIVersion();
 }
 
+
+#ifndef AFE_ESP32
+
 /* Specyfic upgrade to version T0 2.1 from version 2.0 */
 
 #ifdef T0_CONFIG
@@ -200,7 +207,7 @@ void AFEUpgrader::upgradeToT0V210() {
   newDevice.api.domoticz = oldDevice.api.domoticz;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#if defined(AFE_CONFIG_HARDWARE_ADC_VCC) && !defined(AFE_ESP32)
   newDevice.isAnalogInput = oldDevice.isAnalogInput;
 #endif
 
@@ -274,3 +281,5 @@ void AFEUpgrader::upgradeToT6V250() {
 }
 
 #endif // T6_CONFIG
+
+#endif // !ESP32

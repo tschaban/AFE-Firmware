@@ -33,7 +33,7 @@ AFEDataAccess Data;
 AFEFirmwarePro FirmwarePro;
 AFEDevice Device;
 AFEWiFi Network;
-AFEWebServer WebServer;
+AFEWebServer HTTPServer;
 AFEJSONRPC RestAPI;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -151,6 +151,10 @@ AFERainmeter RainSensor;
 AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 #include <AFE-MiFare-Card.h>
 AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
+#endif
+
+#ifdef DEBUG
+
 #endif
 
 #include <AFE-Main-APIs.cpp>

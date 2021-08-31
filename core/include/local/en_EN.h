@@ -30,6 +30,8 @@
 /* HTTP API */
 #define L_DEVICE_NOT_EXIST "\"Device does not exist\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
+#define L_404 "AFE FIRMWARE: Error 404: Page doesn't exist"
+#define L_COMMNAD_NO_COMMAND "\"No command\""
 
 #define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
 

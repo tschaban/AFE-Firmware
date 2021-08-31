@@ -16,7 +16,6 @@ void setup() {
          << F("INFO: All classes and global variables initialized") << endl
          << F("INFO: Initializing device") << endl;
 
-
 #ifndef AFE_ESP32 /* ESP82xx */
 
   Serial << endl << "INFO: ESP: ID " << ESP.getFlashChipId();
@@ -39,16 +38,10 @@ void setup() {
          << " MHz";
   Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
 
-#else /* ESP32 */
-
+#else  /* ESP32 */
 // @TODO ESP32
-#endif
-
-
-
-
-#endif
-
+#endif // ESP32
+#endif // DEBUG
 
 #ifndef AFE_ESP32 /* ESP82xx */
   // Erase all config
@@ -60,11 +53,7 @@ void setup() {
 //@TODO ESP32
 #endif
 
-
-
-
 /* Initializing SPIFFS file system */
-
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
   bool _fileSystemReady = LITTLEFS.begin();
 #else
@@ -83,7 +72,6 @@ void setup() {
     yield();
     SPIFFS.gc();
 #endif
-
   }
 
   Device.begin();
@@ -184,7 +172,6 @@ void setup() {
 #ifdef AFE_CONFIG_HARDWARE_I2C
   initializeI2CBUS();
 #endif // ESP_CONFIG_HARDWARE_I2C
-
 
 /* Initializating REST API */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -326,7 +313,7 @@ void setup() {
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
-#endif         
+#endif
 #endif
 }
 
@@ -345,10 +332,7 @@ void loop() {
 
         /* Listens for HTTP requsts. Both for configuration panel HTTP
          * requests or HTTP API requests if it's turned on */
-        WebServer.listener();
-
-        /* Checking if there was received HTTP API Command */
-        HttpAPI.listener();
+        HTTPServer.listener();
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
         contractonEventsListener();
@@ -408,7 +392,7 @@ void loop() {
           Led.blinkingOn(100);
         }
 #endif
-        WebServer.listener();
+        HTTPServer.listener();
       }
     }
 
@@ -451,7 +435,7 @@ void loop() {
     eventsListener();
 
   } else { /* Deviced runs in Access Point mode */
-    WebServer.listener();
+    HTTPServer.listener();
   }
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -466,9 +450,9 @@ void loop() {
 #endif
 
 /* Debug information */
-#if defined(DEBUG)
+#ifdef DEBUG
   if (Device.getMode() == AFE_MODE_NORMAL) {
     //  debugListener();
   }
-#endif
+#endif // DEBUG
 }

@@ -82,6 +82,39 @@ void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
   }
 #endif
 }
+#ifdef AFE_ESP32
+void AFEDataAccess::saveWelecomeMessage(const char *message) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl
+           << F("INFO: Writing to file: ") << message;
+#endif
+
+    configFile.print(message);
+    configFile.close();
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: File ") << AFE_FILE_WELCOME_MESSAGE
+           << F(" not opened for writing");
+  }
+#endif
+}
+#endif // ESP32
 
 const String AFEDataAccess::getDeviceUID() {
   String uid;

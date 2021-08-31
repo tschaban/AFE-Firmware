@@ -154,6 +154,20 @@ void AFEAPIMQTTStandard::subscribe() {
 
 /* Subscribe: ADC */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
+    if (strlen(_AnalogInput[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _AnalogInput[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ADC;
+      currentCacheSize++;
+    }
+  }
+#else
   if (_Device->configuration.isAnalogInput) {
     if (strlen(_AnalogInput->configuration.mqtt.topic) > 0) {
       sprintf(mqttCommandTopic, "%s/cmd",
@@ -165,6 +179,7 @@ void AFEAPIMQTTStandard::subscribe() {
       currentCacheSize++;
     }
   }
+#endif // AFE_ESP32
 #endif
 
 /* Subscribe: BMx80 */
@@ -414,8 +429,13 @@ void AFEAPIMQTTStandard::processRequest() {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
+#ifdef AFE_ESP32
+        processADC(&mqttTopicsCache[i].id);
+#else
         processADC();
+#endif
         break;
+
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_CONFIG_HARDWARE_BH1750
       case AFE_MQTT_DEVICE_BH1750:
@@ -580,6 +600,28 @@ boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+void AFEAPIMQTTStandard::publishADCValues(uint8_t id) {
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _AnalogInput[id]->getJSON(message);
+    Mqtt.publish(_AnalogInput[id]->configuration.mqtt.topic, message);
+  }
+}
+void AFEAPIMQTTStandard::processADC(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing ADC: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishADCValues(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#else // AFE_ESP8266
 void AFEAPIMQTTStandard::publishADCValues() {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
@@ -600,6 +642,7 @@ void AFEAPIMQTTStandard::processADC() {
   }
 #endif
 }
+#endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER

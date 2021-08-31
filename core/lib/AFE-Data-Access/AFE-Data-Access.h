@@ -70,6 +70,9 @@ public:
 
   void getWelcomeMessage(String &message);
   void saveWelecomeMessage(const __FlashStringHelper *message);
+  #ifdef AFE_ESP32
+  void saveWelecomeMessage(const char *);
+  #endif // ESP32
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void getConfiguration(DOMOTICZ *);

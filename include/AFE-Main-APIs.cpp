@@ -56,9 +56,15 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+    if (Device.configuration.noOfAnalogInputs > 0) {
+      MqttAPI.addClass(&AnalogInput[0]);
+    }
+#else // ESP8266
     if (Device.configuration.isAnalogInput) {
       MqttAPI.addClass(&AnalogInput);
     }
+#endif // AFE_ESP32
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -184,9 +190,9 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI, &HttpDomoticzAPI);
+    HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI, &HttpDomoticzAPI);
 #else
-    HttpAPI.begin(&Device, &WebServer, &Data, &MqttAPI);
+    HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -196,13 +202,18 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+    if (Device.configuration.noOfAnalogInputs > 0) {
+      HttpAPI.addClass(&AnalogInput[0]);
+    }
+#else // ESP8266
     if (Device.configuration.isAnalogInput) {
       HttpAPI.addClass(&AnalogInput);
     }
+#endif // AFE_ESP32    
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-    // @TODO Missing noOf check
     if (Device.configuration.noOfBMEX80s > 0) {
       HttpAPI.addClass(&BMEX80Sensor[0]);
     }

@@ -28,6 +28,8 @@ private:
   /* Upgrades configuration files structure after firmware API Change */
   void updateFirmwareAPIVersion();
 
+#ifndef AFE_ESP32
+
 #ifdef T0_CONFIG
   /* Upgrades firmware from version T0-2.0.x to T0-2.1.x */
   void upgradeToT0V210();
@@ -42,6 +44,8 @@ private:
   void upgradeToT6V230();
   void upgradeToT6V250();
 #endif
+
+#endif // !ESP32
 
 public:
   /* Constructor */

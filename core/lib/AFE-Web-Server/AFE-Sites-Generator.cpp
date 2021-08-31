@@ -257,7 +257,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   if (Device->configuration.noOfAnalogInputs > 0) {
     addMenuHeaderItem(page, F(L_ANALOG_INPUT));
     addMenuSubItem(page, L_ADC_INPUT, Device->configuration.noOfAnalogInputs,
-                   AFE_CONFIG_SITE_MIFARE_CARDS);
+                   AFE_CONFIG_SITE_ANALOG_INPUT);
   }
 #else
   if (Device->configuration.isAnalogInput) {
@@ -2997,6 +2997,13 @@ void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
 void AFESitesGenerator::siteWANUpgrade(String &page,
                                        const __FlashStringHelper *title) {
   openMessageSection(page, title, F(""));
+
+  Data->getWelcomeMessage(_HtmlResponse);
+  if (_HtmlResponse.length() > 0) {
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace("{{I}}", _HtmlResponse);
+  }
+
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_INTERUPTED));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));

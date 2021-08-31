@@ -51,225 +51,233 @@ void AFEAPI::addClass(AFESwitch *Switch) {
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 void AFEAPI::addClass(AFEAnalogInput *Analog) {
+#ifdef AFE_ESP32
+  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
+    _AnalogInput[i] = Analog + i;
+  }
+#else
   if (_Device->configuration.isAnalogInput) {
     _AnalogInput = Analog;
+  }
+#endif // AFE_ESP32
 #ifdef DEBUG
     Serial << endl << F("INFO: The reference to the ADC added");
 #endif
   }
-}
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEAPI::addClass(AFESensorBMEX80 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    _BMx80Sensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorBMEX80 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
+      _BMx80Sensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the BMEX80: ") << i + 1 << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the BMEX80: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFEAPI::addClass(AFESensorHPMA115S0 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    _HPMA115S0Sensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorHPMA115S0 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
+      _HPMA115S0Sensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the HPMA115S0 added: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the HPMA115S0 added: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEAPI::addClass(AFESensorBH1750 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    _BH1750Sensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorBH1750 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
+      _BH1750Sensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the BH1750 added: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the BH1750 added: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEAPI::addClass(AFESensorTLS2561 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
-    _TLS2561Sensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorTLS2561 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
+      _TLS2561Sensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the TLS2561 added: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the TLS2561 added: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-void AFEAPI::addClass(AFESensorAS3935 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    _AS3935Sensor[i] = Sensor + i;
-  }
+  void AFEAPI::addClass(AFESensorAS3935 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
+      _AS3935Sensor[i] = Sensor + i;
+    }
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: The reference to the AS3935 added: ") << i + 1
-         << F(" added");
+    Serial << endl
+           << F("INFO: The reference to the AS3935 added: ") << i + 1
+           << F(" added");
 #endif
-}
+  }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-void AFEAPI::addClass(AFEAnemometer *AnemometerSensor) {
-  if (_Device->configuration.noOfAnemometerSensors > 0) {
-    _AnemometerSensor = AnemometerSensor;
+  void AFEAPI::addClass(AFEAnemometer * AnemometerSensor) {
+    if (_Device->configuration.noOfAnemometerSensors > 0) {
+      _AnemometerSensor = AnemometerSensor;
 #ifdef DEBUG
-    Serial << endl << F("INFO: The reference to the Anemometer added");
+      Serial << endl << F("INFO: The reference to the Anemometer added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-void AFEAPI::addClass(AFERainmeter *RainmeterSensor) {
-  _RainmeterSensor = RainmeterSensor;
+  void AFEAPI::addClass(AFERainmeter * RainmeterSensor) {
+    _RainmeterSensor = RainmeterSensor;
 #ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the Rain added");
+    Serial << endl << F("INFO: The reference to the Rain added");
 #endif
-}
+  }
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEAPI::addClass(AFEGate *Item) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    _Gate[i] = Item + i;
+  void AFEAPI::addClass(AFEGate * Item) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+      _Gate[i] = Item + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the Gate: ") << i + 1 << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the Gate: ") << i + 1 << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEAPI::addClass(AFEContactron *Item) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    _Contactron[i] = Item + i;
+  void AFEAPI::addClass(AFEContactron * Item) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
+      _Contactron[i] = Item + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the Contactron: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the Contactron: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFEAPI::addClass(AFESensorDS18B20 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    _DS18B20Sensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorDS18B20 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+      _DS18B20Sensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the DS18B20: ") << i + 1 << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the DS18B20: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEAPI::addClass(AFERegulator *Regulator) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    _Regulator[i] = Regulator + i;
+  void AFEAPI::addClass(AFERegulator * Regulator) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+      _Regulator[i] = Regulator + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the Regulator: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the Regulator: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-void AFEAPI::addClass(AFEThermalProtector *Protector) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    _ThermalProtector[i] = Protector + i;
+  void AFEAPI::addClass(AFEThermalProtector * Protector) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+      _ThermalProtector[i] = Protector + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the Thermal Protector: ") << i + 1
-           << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the Thermal Protector: ") << i + 1
+             << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEAPI::addClass(AFESensorDHT *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    _DHTSensor[i] = Sensor + i;
+  void AFEAPI::addClass(AFESensorDHT * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+      _DHTSensor[i] = Sensor + i;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: The reference to the DHT: ") << i + 1 << F(" added");
+      Serial << endl
+             << F("INFO: The reference to the DHT: ") << i + 1 << F(" added");
 #endif
+    }
   }
-}
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPI::addClass(AFESensorBinary *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    _BinarySensor[i] = Sensor + i;
-  }
+  void AFEAPI::addClass(AFESensorBinary * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+      _BinarySensor[i] = Sensor + i;
+    }
 #ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the Binary sensor added");
+    Serial << endl << F("INFO: The reference to the Binary sensor added");
 #endif
-}
+  }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-void AFEAPI::addClass(AFESensorPN532 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfPN532Sensors; i++) {
-    _PN532Sensor[i] = Sensor + i;
-  }
+  void AFEAPI::addClass(AFESensorPN532 * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfPN532Sensors; i++) {
+      _PN532Sensor[i] = Sensor + i;
+    }
 #ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the PN532 sensor added");
+    Serial << endl << F("INFO: The reference to the PN532 sensor added");
 #endif
-}
-#endif
-void AFEAPI::addClass(AFEMiFareCard *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfMiFareCards; i++) {
-    _MiFareCard[i] = Sensor + i;
   }
-#ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the MiFare Card added");
 #endif
-}
+  void AFEAPI::addClass(AFEMiFareCard * Sensor) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfMiFareCards; i++) {
+      _MiFareCard[i] = Sensor + i;
+    }
+#ifdef DEBUG
+    Serial << endl << F("INFO: The reference to the MiFare Card added");
+#endif
+  }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-/* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-void AFEAPI::addClassEffectDeviceLight(AFECLED *Sensor) {
-  if (_Device->configuration.effectDeviceLight) {
-    _CLEDBacklight = Sensor;
-  }
-#ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the CLED: Device Light added");
-#endif
-}
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-void AFEAPI::addClassEffecPN532Sensor(AFECLED *Sensor) {
-  if (_Device->configuration.effectPN532) {
-    _CLEDAccessControl = Sensor;
-  }
-#ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the CLED: PN532 sensor added");
-#endif
-}
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-*/
+       /* Not yet implemented
+       #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+       void AFEAPI::addClassEffectDeviceLight(AFECLED *Sensor) {
+         if (_Device->configuration.effectDeviceLight) {
+           _CLEDBacklight = Sensor;
+         }
+       #ifdef DEBUG
+         Serial << endl << F("INFO: The reference to the CLED: Device Light added");
+       #endif
+       }
+       #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+     
+       #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+       void AFEAPI::addClassEffecPN532Sensor(AFECLED *Sensor) {
+         if (_Device->configuration.effectPN532) {
+           _CLEDAccessControl = Sensor;
+         }
+       #ifdef DEBUG
+         Serial << endl << F("INFO: The reference to the CLED: PN532 sensor added");
+       #endif
+       }
+       #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+       */

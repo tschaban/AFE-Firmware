@@ -86,7 +86,7 @@
 #else // ESP32_38_PINS
 #define AFE_NUMBER_OF_GPIOS 34
 #endif // ESP32_30_PINS
-#define AFE_NUMBER_OF_ADC_GPIOS 15
+#define AFE_NUMBER_OF_ADC_GPIOS 4
 #endif
 
 

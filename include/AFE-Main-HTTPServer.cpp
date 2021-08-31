@@ -14,43 +14,42 @@ void initializeHTTPServer(void);
 void handleFavicon(void) {}
 
 /* Method handles all HTTP request */
-void handleHTTPRequests(void) { WebServer.generate(); }
-void handleUpload(void) { WebServer.generate(true); }
+void handleHTTPRequests(void) {
+  if (!HTTPServer.generate()) {
+    HttpAPI.listener();
+  }
+}
+void handleUpload(void) { HTTPServer.generate(true); }
 
 void handleOnNotFound(void) {
-  String page = "<head><meta http-equiv=\"refresh\" content=\"0; "
-                "url=http://192.168.5.1/\" /></head><body><p>";
-  page += L_INDEX_OPENING_CONFIG_PANEL;
-  page += "</p></body>";
-  WebServer.publishHTML(page);
+  HTTPServer.server.send(404, "text/plain", F(L_404));
 }
 
 void initializeHTTPServer(void) {
   /* Initializing HTTP HTTPServer */
-  WebServer.handle("/", handleHTTPRequests);
-  WebServer.handle("/favicon.ico", handleFavicon);
-  WebServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests, handleUpload);
-  if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    WebServer.onNotFound(handleOnNotFound);
-  }
+  HTTPServer.handle("/", handleHTTPRequests);
+  HTTPServer.handle("/favicon.ico", handleFavicon);
+  HTTPServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
+                                   handleUpload);
+  HTTPServer.onNotFound(handleOnNotFound);
 #if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led);
 #elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0,
-                  &WirePort1);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0,
+                   &WirePort1);
 #else
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &Led, &WirePort0);
 #endif // AFE_ESP32
 #elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0,
-                  &WirePort1);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0,
+                   &WirePort1);
 #else
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI, &WirePort0);
 #endif // AFE_ESP32
 #else
-  WebServer.begin(&Data, &Device, &FirmwarePro, &RestAPI);
+  HTTPServer.begin(&Data, &Device, &FirmwarePro, &RestAPI);
 #endif
 
 #ifdef DEBUG

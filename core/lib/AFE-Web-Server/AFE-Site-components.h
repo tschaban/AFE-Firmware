@@ -57,7 +57,7 @@ const uint8_t GPIOS[] PROGMEM = {1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 
 #else // ESP32_38_PINS
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
 #endif // ESP32_30_PINS
-const uint8_t GPIOS_ADC[] PROGMEM = {2, 4, 12, 13, 14, 15, 25, 26, 27, 32, 33, 34, 35, 36, 39};
+const uint8_t GPIOS_ADC[] PROGMEM = {32, 33, 34, 35};
 #endif // !AFE_ESP32
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017

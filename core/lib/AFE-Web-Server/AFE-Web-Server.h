@@ -17,12 +17,12 @@
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 #include <WiFiClient.h>
-#ifndef AFE_ESP32 /* ESP82xx */
+#ifdef AFE_ESP32 /* ESP32 */
+#include <Update.h>
+#else /* ESP8266 */
 #include <WiFiUdp.h>
 #include <esp8266httpupdate.h>
-#else /* ESP32 */
-#include <Update.h>
-#endif
+#endif // ESP32/ESP8266
 
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
@@ -59,12 +59,6 @@ struct AFE_SITE_PARAMETERS {
 class AFEWebServer {
 
 private:
-#ifndef AFE_ESP32 /* ESP82xx */
-  ESP8266WebServer server;
-#else /* ESP32 */
-  WebServer server;
-#endif
-
   AFEDevice *Device;
   AFEFirmwarePro *FirmwarePro;
   AFEDataAccess *Data;
@@ -213,10 +207,10 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   void get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData);
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT  
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT  
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   void get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData);
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT  
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
@@ -225,13 +219,17 @@ private:
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
-#ifndef AFE_ESP32 /* ESP82xx */
   boolean upgradeOTAWAN(uint16_t firmwareId);
-#endif
   boolean upgradOTAFile(void);
 #endif
 
 public:
+#ifndef AFE_ESP32 /* ESP82xx */
+  ESP8266WebServer server;
+#else /* ESP32 */
+  WebServer server;
+#endif
+
   AFEWebServer();
 
   /* Method pushes HTML site from WebServer */
@@ -244,9 +242,8 @@ public:
 #elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
   void begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
-                         AFELED *_Led, TwoWire *_WirePort0,
-                         TwoWire *_WirePort1);
+             AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI, AFELED *_Led,
+             TwoWire *_WirePort0, TwoWire *_WirePort1);
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              AFELED *, TwoWire *);
@@ -289,12 +286,15 @@ public:
   void handleFirmwareUpgrade(const char *uri,
                              WebServer::THandlerFunction handlerUpgrade,
                              WebServer::THandlerFunction handlerUpload);
+  String getHeaderValue(String header, String headerName);
 #endif
 
   /* Method generate HTML side. It reads also data from HTTP requests
    * arguments
-   * and pass them to Configuration Panel class */
-  void generate(boolean upload = false);
+   * and pass them to Configuration Panel class.
+   * True: site generated
+   * False: HTTP API */
+  boolean generate(boolean upload = false);
 
   /* Method listens for HTTP API requests. If get True command is in
    * httpCommand

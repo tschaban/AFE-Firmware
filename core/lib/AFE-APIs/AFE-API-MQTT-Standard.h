@@ -9,7 +9,7 @@
 
 #include <AFE-API.h>
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
 #include <ArduinoJson.h>
 
@@ -81,7 +81,14 @@ private:
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS +
                   AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
 #endif
-/* Not yet implemented 
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS
+#else
+                  + 1
+#endif
+#endif
+/* Not yet implemented
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
                   + 1
 #endif
@@ -93,12 +100,12 @@ private:
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561
 #endif
   ];
-/* Not yet implemented 
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
-  void getCLEDCommand(CLED_COMMAND *);
-#endif
-*/
+  /* Not yet implemented
+  #if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+      defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+    void getCLEDCommand(CLED_COMMAND *);
+  #endif
+  */
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -135,8 +142,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSORS
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  void publishADCValues(uint8_t id);
+  void processADC(uint8_t *id);
+#else
   void publishADCValues();
   void processADC();
+#endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -209,7 +221,7 @@ public:
   boolean publishPN532SensorData(uint8_t id);
   boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-/* Not yet implemented 
+/* Not yet implemented
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   void processEffectDeviceLight();
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
