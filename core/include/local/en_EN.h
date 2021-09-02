@@ -302,6 +302,16 @@
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
 
+#define L_UPGRADE_TIMEOUT "Upgrade failed. Problem with connecting to the firmware's server (timeout)"
+#define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Upgrade failed. Problem with connecting to the firmware's server"
+#define L_UPGRADE_SERVER_NONE_200 "Upgrade failed. Problem with firmware server [Error: Not HTTP 200]"
+#define L_UPGRADE_FIRMWARE_SIZE_0 "Upgrade failed. Problem with firmware server [Error: Firmware size: 0kB]"
+#define L_UPGRADE_WRONG_CONTENT_TYPE "Upgrade failed. Problem with firmware server [Error: Content type]"
+#define L_UPGRADE_SUCCESS_MESSAGE "Firmware upgrade: uploaded %s. Size: %dkB"
+#define L_UPGRADE_NOT_FULL_LOADED "Upgrade failed. Written only %dkB out of %dkB"
+#define L_UPGRADE_SOMETHING_WRONG "Upgrade failed. Something went wrong [Error code: %d]"
+#define L_UPGRADE_NO_SPACE "Upgrade failed. Not enough space to begin upgrade"
+#define L_UPGRADE_NO_CONTENT "Upgrade failed. Problem with firmware server [Error: No response]"
 
 
 /* Form: password */

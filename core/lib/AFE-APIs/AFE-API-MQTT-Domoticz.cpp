@@ -377,6 +377,39 @@ void AFEAPIMQTTDomoticz::addClass(AFEAnalogInput *Analog) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+void AFEAPIMQTTDomoticz::publishADCValues(uint8_t id) {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
+    char value[20];
+    if (_AnalogInput[id]->configuration.domoticz.percent > 0) {
+      sprintf(value, "%-.2f", _AnalogInput[id]->data.percent);
+      generateDeviceValue(
+          json, _AnalogInput[id]->configuration.domoticz.percent, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_AnalogInput[id]->configuration.domoticz.voltage > 0) {
+      sprintf(value, "%-.4f", _AnalogInput[id]->data.voltage);
+      generateDeviceValue(
+          json, _AnalogInput[id]->configuration.domoticz.voltage, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_AnalogInput[id]->configuration.domoticz.voltageCalculated > 0) {
+      sprintf(value, "%-.4f", _AnalogInput[id]->data.voltageCalculated);
+      generateDeviceValue(
+          json, _AnalogInput[id]->configuration.domoticz.voltageCalculated,
+          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_AnalogInput[id]->configuration.domoticz.raw > 0) {
+      sprintf(value, "%-d", _AnalogInput[id]->data.raw);
+      generateDeviceValue(json, _AnalogInput[id]->configuration.domoticz.raw,
+                          value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#else  // ESP8266
 void AFEAPIMQTTDomoticz::publishADCValues() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH];
@@ -407,7 +440,8 @@ void AFEAPIMQTTDomoticz::publishADCValues() {
     }
   }
 }
-#endif
+#endif // ESP32/ESP8266
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
@@ -431,7 +465,8 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 }
 
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
-                                             const char *svalue, uint16_t nvalue) {
+                                             const char *svalue,
+                                             uint16_t nvalue) {
 
   sprintf(
       json,
@@ -1099,13 +1134,15 @@ void AFEAPIMQTTDomoticz::addClass(AFEMiFareCard *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 
-boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user) {
+boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
+                                                   uint8_t state,
+                                                   const char *user) {
   boolean publishStatus = false;
   if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
     char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
 
-    generateDeviceValue(json, _MiFareCard[id]->configuration.domoticz[tagId].idx, user,
-                        state);
+    generateDeviceValue(
+        json, _MiFareCard[id]->configuration.domoticz[tagId].idx, user, state);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
   }
   return publishStatus;

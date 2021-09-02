@@ -690,7 +690,10 @@ boolean AFEWebServer::generate(boolean upload) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
       if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
-        upgradeSuccess = upgradeOTAWAN(getOTAFirmwareId());
+        if (upgradeOTAWAN(getOTAFirmwareId())) {
+          siteConfig.reboot = true;
+          siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
+        }
       }
     }
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
@@ -925,9 +928,10 @@ String AFEWebServer::getHeaderValue(String header, String headerName) {
 boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   boolean _success = true;
   WiFiClient WirelessClient;
-  String contentLength;
-  bool isValidContentType = false;
-  String firmwareFileName = "";
+  long contentLength = 0;
+  char firmwareFileName[AFE_FIRMARE_FILE_NAME_LENGTH];
+  char _message[164]; //  calcuated based on L_UPGRADE_SUCCESS_MESSAGE and
+                      //  L_UPGRADE_NOT_FULL_LOADED
 
 // firmwareId = 601;
 
@@ -935,132 +939,165 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   SystemLED->on();
 #endif
 
-  Serial << endl << "INFO: UPGRADE WAN: Connecting to: api.smartnydom.pl";
-
+#ifdef DEBUG
+  Serial << endl << F("INFO: UPGRADE WAN: Connecting to: api.smartnydom.pl");
+#endif
   if (WirelessClient.connect("api.smartnydom.pl", 80)) {
 
-    Serial << "... connected" << endl
-           << "INFO: UPGRADE WAN: downloading the firmware ID: " << firmwareId;
+#ifdef DEBUG
+    Serial << F("... connected") << endl
+           << F("INFO: UPGRADE WAN: downloading the firmware ID: ")
+           << firmwareId;
+#endif
 
-    // Get the contents of the bin file
-
-    String url = String("GET ") + "/download/" + firmwareId + " HTTP/1.1\r\n" +
-                 "Host: api.smartnydom.pl" + "\r\n" +
-                 "Cache-Control: no-cache\r\n" + "Connection: close\r\n\r\n";
-
-    Serial << endl << url;
-
-    WirelessClient.print(url);
+    WirelessClient.print(
+        String("GET /download/") + firmwareId +
+        " HTTP/1.1\r\nHost: api.smartnydom.pl\r\nCache-Control: " +
+        "no-cache\r\nConnection: close\r\n\r\n");
 
     unsigned long timeout = millis();
     while (WirelessClient.available() == 0) {
       if (millis() - timeout > 5000) {
-        Serial << endl << "ERROR: UPGRADE WAN: Client Timeout !";
+#ifdef DEBUG
+        Serial << endl << F("ERROR: UPGRADE WAN: ") << F(L_UPGRADE_TIMEOUT);
+#endif
         WirelessClient.stop();
         _success = false;
+        Data->saveWelecomeMessage(F(L_UPGRADE_TIMEOUT));
       }
     }
 
-    while (WirelessClient.available()) {
+    while (_success && WirelessClient.available()) {
       String line = WirelessClient.readStringUntil('\n');
       line.trim();
       if (!line.length()) {
         break;
       }
 
+      /* Expecting reply from the server with HTTP = 200 */
       if (line.startsWith("HTTP/1.1")) {
         if (line.indexOf("200") < 0) {
+#ifdef DEBUG
           Serial << endl
-                 << "ERROR: UPGRADE WAN: Got a non 200 status code from server";
-          Data->saveWelecomeMessage(
-              F("ERROR: UPGRADE WAN: Got a non 200 status code from server"));
+                 << F("ERROR: UPGRADE WAN: Got a non 200 status code from "
+                      "server");
+#endif
+          Data->saveWelecomeMessage(F(L_UPGRADE_SERVER_NONE_200));
+          _success = false;
           break;
         }
       }
 
-      if (line.startsWith("content-length: ")) {
-        contentLength = getHeaderValue(line, "content-length: ");
-        Serial << endl
-               << "INFO: UPGRADE WAN: Got " << (atol(contentLength.c_str()) / 1024)
-               << " kB from server";
-      }
-
-      if (line.startsWith("content-type: ")) {
-        String contentType = getHeaderValue(line, "content-type: ");
-        Serial << endl << "INFO: UPGRADE WAN: Got " + contentType + " payload.";
-        if (contentType == "application/octet-stream") {
-          isValidContentType = true;
+      if (_success) {
+        /* Expeting firmware files size > 0 */
+        if (line.startsWith("content-length: ")) {
+          contentLength =
+              atol(getHeaderValue(line, "content-length: ").c_str());
+#ifdef DEBUG
+          Serial << endl
+                 << F("INFO: UPGRADE WAN: Got ") << (contentLength / 1024)
+                 << F("kB from server");
+#endif
+          if (contentLength == 0) {
+            _success = false;
+            Data->saveWelecomeMessage(F(L_UPGRADE_FIRMWARE_SIZE_0));
+            break;
+          }
         }
-      }
+      } // Success of content-length
+
+      if (_success) {
+        if (line.startsWith("content-type: ")) {
+          if (getHeaderValue(line, "content-type: ") !=
+              "application/octet-stream") {
+            _success = false;
+            Data->saveWelecomeMessage(F(L_UPGRADE_WRONG_CONTENT_TYPE));
+            break;
+          }
+        }
+      } // Success of content-type
 
       if (line.startsWith("content-disposition: attachment; filename=")) {
-        firmwareFileName =
-            getHeaderValue(line, "content-disposition: attachment; filename=");
+        getHeaderValue(line, "content-disposition: attachment; filename=")
+            .toCharArray(firmwareFileName, AFE_FIRMARE_FILE_NAME_LENGTH);
+#ifdef DEBUG
         Serial << endl
-               << "INFO: UPGRADE WAN: Firmware file name " + firmwareFileName;
+               << F("INFO: UPGRADE WAN: Firmware file name: ")
+               << firmwareFileName;
+#endif
       }
     }
+
   } else {
+#ifdef DEBUG
     Serial << endl
-           << "ERROR: UPGRADE WAN: Cannot connected to: api.smartnydom.pl";
+           << F("ERROR: UPGRADE WAN: ")
+           << F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER);
+#endif
+    Data->saveWelecomeMessage(F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER));
     _success = false;
   }
 
-  if (atol(contentLength.c_str()) && isValidContentType) {
-    // Check if there is enough to OTA Update
-
-    char _message[1000]; 
-    sprintf(_message,"Downloaded %s firmware. Firmware size: %dkB.",firmwareFileName,atol(contentLength.c_str())/1024);
-    Data->saveWelecomeMessage(_message);
-
-    bool canBegin = Update.begin(atol(contentLength.c_str()));
-
-    // If yes, begin
-    if (canBegin) {
-      Serial << endl
-             << "INFO: UPGRADE WAN: Begin OTA. This may take 2 - 5 mins to "
-                "complete. Device might be quite for a while.. Patience!";
-
+  if (_success) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: UPGRADE WAN: Upgrade started. Device might be quite "
+                "for a while");
+#endif
+    if (Update.begin(contentLength)) {
       size_t written = Update.writeStream(WirelessClient);
 
-      if (written == atol(contentLength.c_str())) {
-        Serial << endl
-               << "INFO: UPGRADE WAN: Written : " << (written / 1024)
-               << " kB successfully";
+      if (written != contentLength) {
+        _success = false;
+        sprintf(_message, L_UPGRADE_NOT_FULL_LOADED, written / 1024,
+                (uint16_t)(contentLength / 1024));
+        Data->saveWelecomeMessage(_message);
+#ifdef DEBUG
+        Serial << endl << F("ERROR: UPGRADE WAN: ") << _message;
       } else {
         Serial << endl
-               << "ERROR: UPGRADE WAN: Written only :  " << (written / 1024)
-               << "kB out of " << atol(contentLength.c_str()) / 1024 << "kB";
-        _success = false;
+               << F("INFO: UPGRADE WAN: Written : ") << (written / 1024)
+               << F("kB successfully");
+#endif
       }
 
       if (Update.end()) {
-        Serial << endl << "INFO: UPGRADE WAN: Upgrade done!";
+#ifdef DEBUG
+        Serial << endl << F("INFO: UPGRADE WAN: Upgrade done!");
+#endif
         if (Update.isFinished()) {
-          Serial << endl << "INFO: UPGRADE WAN: Update successfully completed.";
-        } else {
+          sprintf(_message, L_UPGRADE_SUCCESS_MESSAGE, firmwareFileName,
+                  (uint16_t)(contentLength / 1024));
+          Data->saveWelecomeMessage(_message);
+#ifdef DEBUG
           Serial << endl
-                 << "ERROR: UPGRADE WAN: Update not finished? Something went "
-                    "wrong!";
+                 << F("INFO: UPGRADE WAN: Update successfully completed");
+#endif
+        } else {
+#ifdef DEBUG
+          Serial << endl
+                 << F("ERROR: UPGRADE WAN: Update not finished. Something went "
+                      "wrong");
+#endif
           _success = false;
         }
       } else {
-        Serial << endl
-               << "ERROR: UPGRADE WAN: Error Occurred #: " << Update.getError();
+        sprintf(_message, L_UPGRADE_SOMETHING_WRONG, Update.getError());
+#ifdef DEBUG
+        Serial << endl << F("ERROR: UPGRADE WAN: ") << _message;
+#endif
+        Data->saveWelecomeMessage(_message);
         _success = false;
       }
     } else {
-      Serial << endl << "ERROR: UPGRADE WAN: Not enough space to begin upgrade";
+#ifdef DEBUG
+      Serial << endl << F("ERROR: UPGRADE WAN: ") << F(L_UPGRADE_NO_SPACE);
+#endif
+      Data->saveWelecomeMessage(F(L_UPGRADE_NO_SPACE));
       WirelessClient.flush();
       _success = false;
     }
-  } else {
-    Serial << endl
-           << "ERROR: UPGRADE WAN: There was no content in the response";
-    WirelessClient.flush();
-    _success = false;
-  }
-
+  } 
 #ifdef AFE_CONFIG_HARDWARE_LED
   SystemLED->off();
 #endif
@@ -1100,8 +1137,9 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         Serial << endl << F("INFO: WAN UPDATE: success");
 #endif
         Data->saveWelecomeMessage(F(L_UPGRADE_SUCCESSFUL));
-        delay(1000);
-        Device->reboot(Device->getMode());
+        // delay(1000);
+        // Device->reboot(Device->getMode());
+        _success = true;
       } else {
         if (ret == HTTP_UPDATE_FAILED) {
 #ifdef DEBUG

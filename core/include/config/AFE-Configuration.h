@@ -89,6 +89,8 @@
 #define AFE_NUMBER_OF_ADC_GPIOS 4
 #endif
 
+/* The size of AFE Firmware file, used by OTA */ 
+#define AFE_FIRMARE_FILE_NAME_LENGTH 100
 
 /* Types of the devices */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -136,6 +138,12 @@
 #elif defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
 #define AFE_DEVICE_TYPE_NAME "iECS Gate Driver v3"
 #define AFE_DEVICE_TYPE_ID 24
+#elif defined(ESP32_30_PINS)
+#define AFE_DEVICE_TYPE_NAME "ESP32 30Pins"
+#define AFE_DEVICE_TYPE_ID 30
+#elif defined(ESP32_38_PINS)
+#define AFE_DEVICE_TYPE_NAME "ESP32 38Pins"
+#define AFE_DEVICE_TYPE_ID 31
 #else
 #define AFE_DEVICE_TYPE_NAME "ESP Generic"
 #define AFE_DEVICE_TYPE_ID 0
@@ -1446,7 +1454,7 @@ typedef enum {
 #else /* ESP32 */
 #define AFE_SITE_REBOOT 5
 #define AFE_SITE_REBOOT_POST_UPGRADE 5
-#define AFE_SITE_REBOOT_POST_WAN_UPGRADE 5
+#define AFE_SITE_REBOOT_POST_WAN_UPGRADE 30
 #endif
 
 /* ***************** APIs: Config and defaults *********************/

@@ -60,7 +60,7 @@ void initializeMQTTAPI(void) {
     if (Device.configuration.noOfAnalogInputs > 0) {
       MqttAPI.addClass(&AnalogInput[0]);
     }
-#else // ESP8266
+#else  // ESP8266
     if (Device.configuration.isAnalogInput) {
       MqttAPI.addClass(&AnalogInput);
     }
@@ -206,11 +206,11 @@ void initializeHTTPAPI(void) {
     if (Device.configuration.noOfAnalogInputs > 0) {
       HttpAPI.addClass(&AnalogInput[0]);
     }
-#else // ESP8266
+#else  // ESP8266
     if (Device.configuration.isAnalogInput) {
       HttpAPI.addClass(&AnalogInput);
     }
-#endif // AFE_ESP32    
+#endif // AFE_ESP32
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -335,9 +335,15 @@ void initializeHTTPDomoticzAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+    if (Device.configuration.noOfAnalogInputs > 0) {
+      HttpDomoticzAPI.addClass(&AnalogInput[0]);
+    }
+#else  // ESP8266
     if (Device.configuration.isAnalogInput) {
       HttpDomoticzAPI.addClass(&AnalogInput);
     }
+#endif // ESP32/8266
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

@@ -9,8 +9,13 @@
                                        // version of Firmware
 
 #include <AFE-API.h>
-#include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#ifdef AFE_ESP32
+#include <HTTPClient.h>
+#else // ESP8266
+#include <ESP8266HTTPClient.h>
+#endif // ESPESP8266
+
 #include <rBase64.h>
 
 #ifdef DEBUG
@@ -43,7 +48,7 @@ private:
                                   uint16_t nvalue = 0);
 
   /* Replace space with %20 */
-//  void replaceSpaceinUrl(const char *inputString, const char &outputString);
+  //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -69,7 +74,11 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   virtual void addClass(AFEAnalogInput *);
+#ifdef AFE_ESP32
+  void publishADCValues(uint8_t id);
+#else  // ESP32
   void publishADCValues();
+#endif // ESP32/8266
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -143,17 +152,15 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   virtual void addClass(AFEMiFareCard *);
-  boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user);
+  boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state,
+                                 const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
   virtual void addClass(AFESensorTLS2561 *);
   boolean publishTLS2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TLS2561
-
 };
-
-
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif // _AFE_API_HTTP_DOMOTICZ_h

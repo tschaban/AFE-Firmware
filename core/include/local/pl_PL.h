@@ -301,6 +301,17 @@
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie automatycznie przeładowana ... czekaj"
 #define L_UPGRADE_REBOOT "Ponowne uruchamianie"
 
+#define L_UPGRADE_TIMEOUT "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania (timeout)"
+#define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania"
+#define L_UPGRADE_SERVER_NONE_200 "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [HTTP<>200]"
+#define L_UPGRADE_FIRMWARE_SIZE_0 "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania  [Firmware: 0kB]"
+#define L_UPGRADE_WRONG_CONTENT_TYPE "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Content type]"
+#define L_UPGRADE_SUCCESS_MESSAGE "Firmware: %s został załadowany. Rozmiar: %dkB"
+#define L_UPGRADE_NOT_FULL_LOADED "Aktualizacja nie powiodła się. Zapisane tylko %dkB z %dkB"
+#define L_UPGRADE_SOMETHING_WRONG "Aktualizacja nie powiodła się. Coś poszło nie tak [Bład: %d]"
+#define L_UPGRADE_NO_SPACE "Aktualizacja nie powiodła się. Za mało miejsca, aby rozpocząć ładowanie firmware"
+#define L_UPGRADE_NO_CONTENT "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Brak odpowiedzi]"
+
 
 /* Form: password */
 #define L_PASSWORD_SET_PASSWORD "Ustaw hasło"

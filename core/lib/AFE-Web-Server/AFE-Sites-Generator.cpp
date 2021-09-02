@@ -350,7 +350,9 @@ void AFESitesGenerator::siteDevice(String &page) {
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace("{{I}}", _HtmlResponse);
-    } else if (RestAPI->accessToWAN()) {
+    }
+
+    if (RestAPI->accessToWAN()) {
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (_HtmlResponse.length() > 0) {
@@ -370,10 +372,11 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-    }
-    closeSection(page);
-  }
 
+      closeSection(page);
+    }
+  }
+  
   /* Section: Device name */
   openSection(page, F(L_DEVICE), F(L_DEVICE_SECTION_INFO));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_DEVICE_NAME,
@@ -2216,9 +2219,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                           configuration.type == AFE_BME680_SENSOR);
   addSelectFormItemClose(page);
 
-  page.concat(
-      "<input type=\"submit\" class=\"b bw\" value=\"" L_BMEX80_REFRESH_SETTINGS
-      "\"><br><br>");
+  page.concat("<input type=\"submit\" class=\"b bw\" "
+              "value=\"" L_BMEX80_REFRESH_SETTINGS "\"><br><br>");
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -2997,13 +2999,6 @@ void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
 void AFESitesGenerator::siteWANUpgrade(String &page,
                                        const __FlashStringHelper *title) {
   openMessageSection(page, title, F(""));
-
-  Data->getWelcomeMessage(_HtmlResponse);
-  if (_HtmlResponse.length() > 0) {
-    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-    page.replace("{{I}}", _HtmlResponse);
-  }
-
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_INTERUPTED));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
@@ -3671,7 +3666,8 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
 
     // Item: Colors order
     sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o",
+    L_CLED_COLORS_ORDER,
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
@@ -3816,7 +3812,8 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
   /*
 
   #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt)
+  {
       openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
       sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
@@ -4030,9 +4027,11 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
     item.replace("{{i.v}}", String(pgm_read_byte(
-                                (generatedADCGpios ? GPIOS_ADC : GPIOS) + i)));
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
+i)));
     item.replace("{{i.l}}", String(pgm_read_byte(
-                                (generatedADCGpios ? GPIOS_ADC : GPIOS) + i)));
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
+i)));
     item.replace(
         "{{i.s}}",
         selected == pgm_read_byte((generatedADCGpios ? GPIOS_ADC : GPIOS) + i)
