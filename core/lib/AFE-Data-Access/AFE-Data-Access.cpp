@@ -40,7 +40,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
     message = configFile.readString();
     configFile.close();
     /* After message is read, it's removed from the file */
-    saveWelecomeMessage(F(""));
+    saveWelecomeMessage("");
   } else {
     message = "";
 #ifdef DEBUG
@@ -51,38 +51,6 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
   }
 }
 
-void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
-#endif
-
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
-#else
-  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
-#endif
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl
-           << F("INFO: Writing to file: ") << FPSTR(message);
-#endif
-
-    configFile.print(FPSTR(message));
-    configFile.close();
-
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl
-           << F("ERROR: File ") << AFE_FILE_WELCOME_MESSAGE
-           << F(" not opened for writing");
-  }
-#endif
-}
-#ifdef AFE_ESP32
 void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #ifdef DEBUG
   Serial << endl
@@ -98,8 +66,7 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << F("success") << endl
-           << F("INFO: Writing to file: ") << message;
+    Serial << F("success") << endl << F("INFO: Writing to file: ") << message;
 #endif
 
     configFile.print(message);
@@ -114,7 +81,6 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
   }
 #endif
 }
-#endif // ESP32
 
 const String AFEDataAccess::getDeviceUID() {
   String uid;

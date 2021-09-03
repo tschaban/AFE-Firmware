@@ -1,9 +1,9 @@
 <?php
 
 /* Set this before run */
-$version = "3.0.3.B0";
-//$language = "en";
-$language = "pl";
+$version = "3.0.3.B1";
+$language = "en";
+//$language = "pl";
 
 /******************/
 $type = "0";
@@ -351,7 +351,7 @@ $sourceFolder[$index]["api"] = $targetAPI[0];
 // Domoticz API ESP32
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -359,7 +359,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
@@ -367,7 +367,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -375,7 +375,7 @@ $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;

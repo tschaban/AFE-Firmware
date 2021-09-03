@@ -69,9 +69,9 @@ public:
   void createMQTTConfigurationFile();
 
   void getWelcomeMessage(String &message);
-  void saveWelecomeMessage(const __FlashStringHelper *message);
-  #ifdef AFE_ESP32
   void saveWelecomeMessage(const char *);
+  #ifdef AFE_ESP32
+  
   #endif // ESP32
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED

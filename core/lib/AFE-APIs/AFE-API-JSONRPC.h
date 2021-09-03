@@ -16,13 +16,11 @@
 
 #ifndef AFE_ESP32 /* ESP82xx */
 #include <ESP8266HTTPClient.h>
+#include <ESP8266Ping.h>
 #else /* ESP32 */
 #include <HTTPClient.h>
 #include <ESP32Ping.h>
 #endif
-
-
-
 
 
 #if AFE_LANGUAGE == 0
@@ -48,6 +46,7 @@ private:
   AFEDataAccess *Data;  
   String message;
   //AsyncPing Pings;
+  PingClass Ping;
   boolean _PingResponded;
 
 #ifdef AFE_CONFIG_HARDWARE_LED

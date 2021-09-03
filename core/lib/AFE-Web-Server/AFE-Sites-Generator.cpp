@@ -376,7 +376,7 @@ void AFESitesGenerator::siteDevice(String &page) {
       closeSection(page);
     }
   }
-  
+
   /* Section: Device name */
   openSection(page, F(L_DEVICE), F(L_DEVICE_SECTION_INFO));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_DEVICE_NAME,
@@ -521,7 +521,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   /* Number of ADC Inputs */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS,
                         Device->configuration.noOfAnalogInputs, F("ad"),
-                        F(L_DEVICE_NUMBER_OF_ADC));
+                        F(L_DEVICE_NUMBER_OF_ADC), !FirmwarePro->Pro.valid);
 #else
   addCheckboxFormItem(
       page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",

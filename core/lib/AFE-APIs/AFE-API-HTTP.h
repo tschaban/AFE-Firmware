@@ -104,8 +104,8 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 #ifdef AFE_ESP32
+AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 #else  // AFE_ESP8266
   AFEAnalogInput *_AnalogInput;
 #endif // AFE_ESP32

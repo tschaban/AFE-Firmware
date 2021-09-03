@@ -10,10 +10,13 @@
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 
-#ifndef AFE_ESP32 /* ESP82xx */
-// @TODO ESP32
-#else /* ESP32 */
+#ifdef AFE_ESP32 /* ESP82xx */
 #include <ESP32Ping.h>
+#else
+#ifndef INT_MAX // Required for ESP8266 Lib
+#define INT_MAX 0
+#endif
+#include <ESP8266Ping.h>
 #endif
 
 
@@ -42,6 +45,7 @@ private:
   NETWORK _NetworkConfiguration;
   //AsyncPing Pings;
   boolean hostReachable;
+  PingClass Ping;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;

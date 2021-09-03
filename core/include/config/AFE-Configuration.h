@@ -153,7 +153,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.3.B0"
+#define AFE_FIRMWARE_VERSION "3.0.3.B1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */

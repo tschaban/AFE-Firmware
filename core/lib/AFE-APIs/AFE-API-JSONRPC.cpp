@@ -193,6 +193,8 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
              << F("INFO: API REST: Response reply code: ") << _httpCode
              << F(", content: ") << response << F(", Size: ")
              << response.length();
+
+//      response = "";
     }
 #endif
     http.end();

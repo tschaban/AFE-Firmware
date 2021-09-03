@@ -286,8 +286,10 @@ public:
   void handleFirmwareUpgrade(const char *uri,
                              WebServer::THandlerFunction handlerUpgrade,
                              WebServer::THandlerFunction handlerUpload);
-  String getHeaderValue(String header, String headerName);
+  
 #endif
+
+String getHeaderValue(String header, String headerName);
 
   /* Method generate HTML side. It reads also data from HTTP requests
    * arguments

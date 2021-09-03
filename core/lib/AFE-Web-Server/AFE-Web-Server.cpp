@@ -919,7 +919,6 @@ void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-#ifdef AFE_ESP32 // ESP32
 
 String AFEWebServer::getHeaderValue(String header, String headerName) {
   return header.substring(strlen(headerName.c_str()));
@@ -963,7 +962,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #endif
         WirelessClient.stop();
         _success = false;
-        Data->saveWelecomeMessage(F(L_UPGRADE_TIMEOUT));
+        Data->saveWelecomeMessage(L_UPGRADE_TIMEOUT);
       }
     }
 
@@ -979,10 +978,10 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         if (line.indexOf("200") < 0) {
 #ifdef DEBUG
           Serial << endl
-                 << F("ERROR: UPGRADE WAN: Got a non 200 status code from "
+                 << F("ERROR: UPGRADE WAN: Got a NONE 200 status code from "
                       "server");
 #endif
-          Data->saveWelecomeMessage(F(L_UPGRADE_SERVER_NONE_200));
+          Data->saveWelecomeMessage(L_UPGRADE_SERVER_NONE_200);
           _success = false;
           break;
         }
@@ -1000,7 +999,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #endif
           if (contentLength == 0) {
             _success = false;
-            Data->saveWelecomeMessage(F(L_UPGRADE_FIRMWARE_SIZE_0));
+            Data->saveWelecomeMessage(L_UPGRADE_FIRMWARE_SIZE_0);
             break;
           }
         }
@@ -1011,7 +1010,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
           if (getHeaderValue(line, "content-type: ") !=
               "application/octet-stream") {
             _success = false;
-            Data->saveWelecomeMessage(F(L_UPGRADE_WRONG_CONTENT_TYPE));
+            Data->saveWelecomeMessage(L_UPGRADE_WRONG_CONTENT_TYPE);
             break;
           }
         }
@@ -1034,7 +1033,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
            << F("ERROR: UPGRADE WAN: ")
            << F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER);
 #endif
-    Data->saveWelecomeMessage(F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER));
+    Data->saveWelecomeMessage(L_UPGRADE_CANNOT_CONNECT_TO_SERVER);
     _success = false;
   }
 
@@ -1093,7 +1092,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #ifdef DEBUG
       Serial << endl << F("ERROR: UPGRADE WAN: ") << F(L_UPGRADE_NO_SPACE);
 #endif
-      Data->saveWelecomeMessage(F(L_UPGRADE_NO_SPACE));
+      Data->saveWelecomeMessage(L_UPGRADE_NO_SPACE);
       WirelessClient.flush();
       _success = false;
     }
@@ -1104,60 +1103,6 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 
   return _success;
 }
-
-#else // ESP8266
-boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
-  t_httpUpdate_return ret;
-  ESP8266HTTPUpdate OTAServerUpdate;
-  WiFiClient WirelessClient;
-  boolean _success = false;
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  SystemLED->on();
-#endif
-
-  if (firmwareId > 0) {
-    OTAServerUpdate.rebootOnUpdate(false);
-
-#ifdef DEBUG
-    Serial << endl << F("INFO: WAN UPDATE: Starting upgrade");
-#endif
-    ret = OTAServerUpdate.update(WirelessClient,
-                                 AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL +
-                                     String(firmwareId));
-
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: WAN UPDATE: Update completed with status: ") << ret;
-#endif
-
-    if (ret != HTTP_UPDATE_NO_UPDATES) {
-      if (ret == HTTP_UPDATE_OK) {
-#ifdef DEBUG
-        Serial << endl << F("INFO: WAN UPDATE: success");
-#endif
-        Data->saveWelecomeMessage(F(L_UPGRADE_SUCCESSFUL));
-        // delay(1000);
-        // Device->reboot(Device->getMode());
-        _success = true;
-      } else {
-        if (ret == HTTP_UPDATE_FAILED) {
-#ifdef DEBUG
-          Serial << endl << F("INFO: WAN UPDATE: failure");
-#endif
-          _success = false;
-          Data->saveWelecomeMessage(F(L_UPGRADE_FAILED));
-        }
-      }
-    }
-  }
-#ifdef AFE_CONFIG_HARDWARE_LED
-  SystemLED->off();
-#endif
-
-  return _success;
-}
-#endif // ESP32/8266
 
 boolean AFEWebServer::upgradOTAFile(void) {
   HTTPUpload &upload = server.upload();

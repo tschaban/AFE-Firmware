@@ -54,7 +54,11 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
     WirelessNetwork.mode(WIFI_AP_STA);
     WirelessNetwork.softAP(Device->configuration.name);
     WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+#ifdef AFE_ESP32
     WirelessNetwork.softAPsetHostname(Device->configuration.name);
+#else
+    WirelessNetwork.hostname(Device->configuration.name);
+#endif
 #ifdef DEBUG
     Serial << F("completed");
 #endif
