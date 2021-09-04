@@ -128,6 +128,10 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_POST_RESET:
     Site.sitePostReset(page);
     break;
+  case AFE_CONFIG_SITE_FIRMWARE:
+    Site.siteFirmware(page);
+    break;
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   case AFE_CONFIG_SITE_UPGRADE:
     Site.siteUpgrade(page);
@@ -631,6 +635,8 @@ boolean AFEWebServer::generate(boolean upload) {
           siteConfig.rebootTime = AFE_SITE_REBOOT;
           siteConfig.form = false;
           siteConfig.twoColumns = false;
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_FIRMWARE) {
+          siteConfig.form = false;
         } else if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME) {
           siteConfig.twoColumns = false;
         } else if (siteConfig.ID == AFE_CONFIG_SITE_RESET) {
@@ -919,7 +925,6 @@ void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-
 String AFEWebServer::getHeaderValue(String header, String headerName) {
   return header.substring(strlen(headerName.c_str()));
 }
@@ -1096,7 +1101,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
       WirelessClient.flush();
       _success = false;
     }
-  } 
+  }
 #ifdef AFE_CONFIG_HARDWARE_LED
   SystemLED->off();
 #endif
@@ -1394,6 +1399,25 @@ void AFEWebServer::get(NETWORK &data) {
     data.subnet[0] = AFE_EMPTY_STRING;
   }
 
+  if (server.arg("i1b").length() > 0) {
+    server.arg("i1b").toCharArray(data.ipBackup, sizeof(data.ipBackup));
+  } else {
+    data.ipBackup[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg("i2b").length() > 0) {
+    server.arg("i2b").toCharArray(data.gatewayBackup,
+                                  sizeof(data.gatewayBackup));
+  } else {
+    data.gatewayBackup[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg("i3b").length() > 0) {
+    server.arg("i3b").toCharArray(data.subnetBackup, sizeof(data.subnetBackup));
+  } else {
+    data.subnetBackup[0] = AFE_EMPTY_STRING;
+  }
+
   data.noConnectionAttempts =
       server.arg("na").length() > 0
           ? server.arg("na").toInt()
@@ -1413,6 +1437,7 @@ void AFEWebServer::get(NETWORK &data) {
           : AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
   data.isDHCP = server.arg("d").length() > 0 ? true : false;
+  data.isDHCPBackup = server.arg("db").length() > 0 ? true : false;
 }
 
 void AFEWebServer::get(MQTT &data) {

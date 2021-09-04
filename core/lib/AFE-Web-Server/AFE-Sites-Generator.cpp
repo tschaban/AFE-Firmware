@@ -329,6 +329,8 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   addMenuItem(page, F(L_PRO_VERSION), AFE_CONFIG_SITE_PRO_VERSION);
 
   addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
+  addMenuItem(page, F(L_VERSION), AFE_CONFIG_SITE_FIRMWARE);
+
   addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
 
   page.concat(F("</ul><h4></h4><ul class=\"lst\">"));
@@ -712,11 +714,16 @@ void AFESitesGenerator::siteNetwork(String &page) {
                    configuration.gateway);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3", L_NETWORK_SUBNET,
                    configuration.subnet);
+
   closeSection(page);
 
   /* Section: Backup WiFI */
-  openSection(page, F(L_NETWORK_BACKUP_CONFIGURATION),
-              F(L_NETWORK_BACKUP_CONFIGURATION_HINT));
+  openSection(page, F(L_NETWORK_BACKUP_CONFIGURATION), F(""));
+
+  sprintf(_int, "%d", configuration.noFailuresToSwitchNetwork);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fs",
+                   L_NETWORK_SWITCH_TO_BACKUP, _int,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
 
 #ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
   if (WiFi.getMode() == WIFI_MODE_STA) {
@@ -734,7 +741,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
                                 strcmp(_ssid, configuration.ssidBackup) == 0);
       }
     }
-    page.concat(F("</select>"));
+    addSelectFormItemClose(page);
 #ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
   } else {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "sb", L_NETWORK_SSID,
@@ -745,11 +752,14 @@ void AFESitesGenerator::siteNetwork(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "pb", L_PASSWORD,
                    configuration.passwordBackup, "32");
 
-  sprintf(_int, "%d", configuration.noFailuresToSwitchNetwork);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fs",
-                   L_NETWORK_SWITCH_TO_BACKUP, _int,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
-
+  addCheckboxFormItem(page, "db", L_NETWORK_DHCP_ENABLED, "1",
+                      configuration.isDHCPBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i1b", L_IP_ADDRESS,
+                   configuration.ipBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i2b", L_NETWORK_GATEWAY,
+                   configuration.gatewayBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3b", L_NETWORK_SUBNET,
+                   configuration.subnetBackup);
   closeSection(page);
 
   /* Section: Advanced settings */
@@ -2970,17 +2980,6 @@ void AFESitesGenerator::siteUpgrade(String &page) {
       closeSection(page);
     }
   }
-
-  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
-  closeMessageSection(page);
 }
 
 void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
@@ -3152,6 +3151,46 @@ void AFESitesGenerator::siteProKey(String &page) {
     page.concat(F("</h3>"));
   }
   closeSection(page);
+}
+
+void AFESitesGenerator::siteFirmware(String &page) {
+
+  char _flashSize[12];
+
+  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_TYPE));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
+
+  if (ESP.getFlashChipRealSize() >= 1048576) {
+    sprintf(_flashSize, "%d Mbits", ESP.getFlashChipRealSize() / 1048576);
+  } else {
+    sprintf(_flashSize, "%,d MbKbitsits", ESP.getFlashChipRealSize() / 1024);
+  }
+  page.replace("{{f.s}}", _flashSize);
+
+  if (ESP.getFlashChipSize() >= 1048576) {
+    sprintf(_flashSize, "%d Mbits", ESP.getFlashChipSize() / 1048576);
+  } else {
+    sprintf(_flashSize, "%,d MbKbitsits", ESP.getFlashChipSize() / 1024);
+  }
+  page.replace("{{f.f}}", _flashSize);
+
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", FirmwarePro->Pro.valid ? F(L_UPGRADE_FIRMWARE_PRO_YES)
+                                               : F(L_UPGRADE_FIRMWARE_PRO_NO));
+  closeMessageSection(page);
 }
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR

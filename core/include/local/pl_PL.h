@@ -155,7 +155,6 @@
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION  "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
-#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Działa tylko z routerami z włączonym DHCPd"
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
 
 

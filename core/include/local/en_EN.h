@@ -160,7 +160,6 @@
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration in your browser using device's IP address"
 #define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
-#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Works only with routers with DHCP enabled"
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 
 /* Form: MQTT Broker */
@@ -278,10 +277,15 @@
 #define L_UPGRADE "Upgrade with binary file"
 
 #define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
-#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
+#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_UPGRADE_FIRMWARE_VERSION "Version {{f.v}}"
+#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
+#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
 #define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
-#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device name: {{f.d}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device type: {{f.d}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_ID "Device ID: {{f.n}}"
+#define L_UPGRADE_FIRMWARE_PRO_YES "Pro version: Yes"
+#define L_UPGRADE_FIRMWARE_PRO_NO "Pro version: No"
 
 #define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
 

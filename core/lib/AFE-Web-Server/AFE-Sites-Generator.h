@@ -232,6 +232,9 @@ public:
   /* Method generates section shown when device is in norma mode */
   void siteIndex(String &page, boolean authorized);
 
+  /* Site: Firmware version */
+  void siteFirmware(String &page);
+
   /* All following methods generates configuration sections */
   void siteDevice(String &page);
   void siteNetwork(String &page);

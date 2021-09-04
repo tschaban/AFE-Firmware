@@ -92,6 +92,12 @@ void AFEWiFi::switchConfiguration() {
 
   /* Setting Fixed IP for Primary Configuration if set */
   if (isPrimaryConfiguration && !configuration.isDHCP) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting fixed IP (")
+                << configuration.ip << F(")  address for primary WiFi "
+                                       "configuration");
+#endif
     IPAddress ip;
     if (!ip.fromString(configuration.ip)) {
 #ifdef DEBUG
@@ -119,12 +125,49 @@ void AFEWiFi::switchConfiguration() {
 
     WirelessNetwork.config(ip, gateway, subnet);
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Settting fixed IP");
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
 #endif
-  } else if (!isPrimaryConfiguration && !configuration.isDHCP) {
+  } else if ((isPrimaryConfiguration && configuration.isDHCP) ||
+             (!isPrimaryConfiguration && configuration.isDHCPBackup)) {
     WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
                            (uint32_t)0x00000000);
+  } else if (!isPrimaryConfiguration && !configuration.isDHCPBackup) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting fixed IP (") << configuration.ipBackup
+                                                 << F(") address for backup WiFi "
+                                                    "configuration");
+#endif
 
+    IPAddress ip;
+    if (!ip.fromString(configuration.ipBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI IP address: ")
+             << configuration.ipBackup;
+#endif
+    }
+    IPAddress gateway;
+    if (!gateway.fromString(configuration.gatewayBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI gateway address: ")
+             << configuration.gatewayBackup;
+#endif
+    }
+    IPAddress subnet;
+    if (!subnet.fromString(configuration.subnetBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI subnet address: ")
+             << configuration.subnetBackup;
+#endif
+    }
+
+    WirelessNetwork.config(ip, gateway, subnet);
+#ifdef DEBUG
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
+#endif
   } /* Endif: Setting Fixed IP for Primary Configuration if set */
 
   WirelessNetwork.mode(WIFI_STA);
@@ -301,9 +344,12 @@ void AFEWiFi::listener() {
 boolean AFEWiFi::connected() {
 
 #ifndef AFE_ESP32 /* ESP82xx */
-  if ((configuration.isDHCP &&
+  if ((((isPrimaryConfiguration && configuration.isDHCP) ||
+        (!isPrimaryConfiguration && configuration.isDHCPBackup)) &&
        WirelessNetwork.localIP().toString() != "(IP unset)") ||
-      (!configuration.isDHCP && WirelessNetwork.status() == WL_CONNECTED)) {
+      (((isPrimaryConfiguration && !configuration.isDHCP) ||
+        (!isPrimaryConfiguration && !configuration.isDHCPBackup)) &&
+       WirelessNetwork.status() == WL_CONNECTED)) {
     yield();
     delay(10);
 #else /* ESP32 */

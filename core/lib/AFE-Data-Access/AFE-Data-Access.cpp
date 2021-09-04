@@ -1182,16 +1182,16 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 
       sprintf(configuration->ssid, root["ssid"]);
       sprintf(configuration->password, root["password"]);
-
       sprintf(configuration->ssidBackup, root["ssidBackup"] | "");
       sprintf(configuration->passwordBackup, root["passwordBackup"] | "");
-
       configuration->isDHCP = root["isDHCP"];
-
       sprintf(configuration->ip, root["ip"]);
       sprintf(configuration->gateway, root["gateway"]);
       sprintf(configuration->subnet, root["subnet"]);
-
+      configuration->isDHCPBackup = root["isDHCPBackup"];
+      sprintf(configuration->ipBackup, root["ipBackup"] | "");
+      sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
+      sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
       configuration->noConnectionAttempts = root["noConnectionAttempts"];
       configuration->waitTimeConnections = root["waitTimeConnections"];
       configuration->waitTimeSeries = root["waitTimeSeries"];
@@ -1254,7 +1254,10 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["ip"] = configuration->ip;
     root["gateway"] = configuration->gateway;
     root["subnet"] = configuration->subnet;
-
+    root["isDHCPBackup"] = configuration->isDHCPBackup;
+    root["ipBackup"] = configuration->ipBackup;
+    root["gatewayBackup"] = configuration->gatewayBackup;
+    root["subnetBackup"] = configuration->subnetBackup;
     root["noConnectionAttempts"] = configuration->noConnectionAttempts;
     root["waitTimeConnections"] = configuration->waitTimeConnections;
     root["waitTimeSeries"] = configuration->waitTimeSeries;
@@ -1299,6 +1302,10 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   configuration.ip[0] = AFE_EMPTY_STRING;
   configuration.gateway[0] = AFE_EMPTY_STRING;
   configuration.subnet[0] = AFE_EMPTY_STRING;
+  configuration.isDHCPBackup = true;
+  configuration.ipBackup[0] = AFE_EMPTY_STRING;
+  configuration.gatewayBackup[0] = AFE_EMPTY_STRING;
+  configuration.subnetBackup[0] = AFE_EMPTY_STRING;
   configuration.noConnectionAttempts =
       AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
   configuration.waitTimeConnections = AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
