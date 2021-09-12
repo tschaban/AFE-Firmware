@@ -11,36 +11,36 @@
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Site-components.h>
 
-#ifndef AFE_ESP32 /* ESP82xx */
-#include <ESP8266WiFi.h>
-#else /* ESP32 */
+#ifdef AFE_ESP32
 #include <WiFi.h>
-#endif
+#else /* ESP8266 */
+#include <ESP8266WiFi.h>
+#endif // ESP32/ESP8266
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #include <Wire.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #include <AFE-Sensor-BMEX80.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <AFE-Sensor-DS18B20.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
 #include <AFE-Sensor-DHT.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -69,9 +69,9 @@ private:
 #ifdef AFE_ESP32
   TwoWire *WirePort0;
   TwoWire *WirePort1;
-#else
+#else // ESP8266
   TwoWire *WirePort0;
-#endif // AFE_ESP32
+#endif // ESP32/ESP8266
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -156,38 +156,38 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
                               const char *title = "MCP23017 GPIO");
-#endif
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void addRegulatorControllerItem(String &item, REGULATOR *configuration);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 /* Item: list of gate states */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void addGateStatesListItem(String &item, const __FlashStringHelper *name,
                              byte state);
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 /* Item: list of contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void addGateContactronsListItem(String &item, const __FlashStringHelper *name,
                                   uint8_t contactronId);
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Item: list discovered IIC devices */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
   void addDeviceI2CAddressSelectionItem(String &item, uint8_t wirePortId,
                                         uint8_t address);
-#else
+#else // ESP8266
   void addDeviceI2CAddressSelectionItem(String &item, uint8_t address);
-#endif // AFE_ESP32
+#endif // ESP32/ESP8266
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 /* Item: list of LEDs */
 #ifdef AFE_CONFIG_HARDWARE_LED
   void addLEDSelectionItem(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 public:
   /* Constructor*/
@@ -197,10 +197,10 @@ public:
 #ifdef AFE_ESP32
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              TwoWire *, TwoWire *);
-#else
+#else // ESP8266
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              TwoWire *);
-#endif // AFE_ESP32
+#endif // ESP32/ESP8266
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -208,8 +208,10 @@ public:
   /* Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
    */
-  void generateEmptyMenu(String &page, uint16_t redirect = 0);
+  void generateMenuHeader(String &page, uint16_t redirect = 0);
   void generateMenu(String &page, uint16_t redirect = 0);
+  void generateEmptyMenu(String &page, uint16_t redirect = 0);
+  
 
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
@@ -219,7 +221,7 @@ public:
   void siteUpgrade(String &page);
   void sitePostUpgrade(String &page, boolean status);
   void siteWANUpgrade(String &page, const __FlashStringHelper *title);
-#endif
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
   /* Method generate restore to defaults section. Command = 0 is pre-reset site,
    * 1 is a post reset site */
@@ -242,39 +244,39 @@ public:
   void siteMQTTBroker(String &page);
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void siteDomoticzServer(String &page);
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   void sitePassword(String &page);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void siteRelay(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   void siteSwitch(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
   void siteProKey(String &page);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void siteLED(String &page, uint8_t id);
   void siteSystemLED(String &page);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void siteDS18B20Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   void siteDHTSensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void siteRegulator(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void siteThermalProtector(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #if defined(T3_CONFIG)
   String sitePIR(uint8_t id);
@@ -282,77 +284,76 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void siteGate(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void siteContactron(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   void siteHPMA115S0Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void siteBMEX80Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   void siteBH1750Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void siteAS3935Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void siteAnemometerSensor(String &page);
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_ESP32
   void siteADCInput(String &page, uint8_t id);
-#else
+#else // ESP8266
   void siteADCInput(String &page);
-#endif
-#endif
+#endif // ESP32/ESP88266
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_UART
   void siteUARTBUS(String &page);
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
   void siteI2CBUS(String &page, uint8_t id);
-#else
+#else // ESP8266
   void siteI2CBUS(String &page);
-#endif // AFE_ESP32
+#endif // ESP32
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void siteRainmeterSensor(String &page);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void siteBinarySensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   void sitePN532Sensor(String &page, uint8_t id);
   void sitePN532SensorAdmin(String &page, uint8_t id);
   void siteMiFareCard(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   void siteCLEDDeviceEffect(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
   void siteTLS2561Sensor(String &page, uint8_t id);
-#endif
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 };
-
-#endif
+#endif // _AFE_Sites_Generator_h

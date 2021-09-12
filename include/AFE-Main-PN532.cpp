@@ -74,6 +74,7 @@ void PN532EventsListener() {
           if (strcmp(MiFareCard[j].configuration.cardId,
                      PN532Sensor[i].tag.block[0].value) == 0) {
 
+            #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
             /* Changing the CLED Effect color to authorized */
             if (Device.configuration.effectPN532) {
 
@@ -83,6 +84,7 @@ void PN532EventsListener() {
                   CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
                       .color);
             }
+            #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
             actionTaken = false;
 #ifdef AFE_CONFIG_HARDWARE_GATE

@@ -167,12 +167,14 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 #endif
       const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 60;
       DynamicJsonBuffer jsonBuffer(capacity);
+      //   StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE> jsonBuffer;
+       
       JsonObject &root = jsonBuffer.parseObject(response);
 #ifdef DEBUG
       Serial << endl
              << F("INFO: API REST: JSON Buffer size: ") << capacity
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE < jsonBuffer.size() + 10) {
+      if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: API REST: Too small buffer size");
       }
 #endif

@@ -277,10 +277,17 @@
 #define L_UPGRADE "Aktualizuj"
 
 #define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
-#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
-#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
+#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_UPGRADE_FIRMWARE_VERSION "Wersja {{f.v}}"
+#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
+#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
+#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
+#define L_UPGRADE_FIRMWARE_PRO_YES "Wersja Pro: Tak"
+#define L_UPGRADE_FIRMWARE_PRO_NO "Wersja Pro: Nie"
+
+
 
 #define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
 
@@ -310,6 +317,8 @@
 #define L_UPGRADE_SOMETHING_WRONG "Aktualizacja nie powiodła się. Coś poszło nie tak [Bład: %d]"
 #define L_UPGRADE_NO_SPACE "Aktualizacja nie powiodła się. Za mało miejsca, aby rozpocząć ładowanie firmware"
 #define L_UPGRADE_NO_CONTENT "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Brak odpowiedzi]"
+
+
 
 
 /* Form: password */

@@ -50,20 +50,22 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
   page.concat(F("<div class=\"c\">"));
 }
 
-void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
+void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}</small></div><div class=\"r\">"));
+  page.concat(F(" T{{f.t}}-{{f.v}}-ESP{{f.e}}</small>"));
+}
+
+void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
+  generateMenuHeader(page, redirect);
+  page.concat(F("</div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
-
-  generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
-  page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}</small><ul class=\"lst\">"));
+  generateMenuHeader(page, redirect);
+  page.concat(F("<ul class=\"lst\">"));
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F("Menu"));
@@ -320,7 +322,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F(L_FIRMWARE));
-
+  addMenuItem(page, F(L_VERSION), AFE_CONFIG_SITE_FIRMWARE);
   addMenuItem(page, F(L_PASSWORD_SET_PASSWORD), AFE_CONFIG_SITE_PASSWORD);
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   addMenuItem(page, F(L_FIRMWARE_UPGRADE), AFE_CONFIG_SITE_UPGRADE);
@@ -329,7 +331,6 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   addMenuItem(page, F(L_PRO_VERSION), AFE_CONFIG_SITE_PRO_VERSION);
 
   addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
-  addMenuItem(page, F(L_VERSION), AFE_CONFIG_SITE_FIRMWARE);
 
   addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
 
@@ -361,6 +362,7 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
 
       RestAPI->sent(_HtmlResponse,
                     AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
@@ -368,12 +370,14 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
 
       closeSection(page);
     }
@@ -2946,6 +2950,8 @@ void AFESitesGenerator::siteI2CBUS(String &page)
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 void AFESitesGenerator::siteUpgrade(String &page) {
 
+  siteFirmware(page);
+
   siteWANUpgrade(page, F(L_UPGRADE_READ_BEFORE));
 
   openSection(page, F(L_UPGRADE_FROM_FILE), F(""));
@@ -3154,9 +3160,6 @@ void AFESitesGenerator::siteProKey(String &page) {
 }
 
 void AFESitesGenerator::siteFirmware(String &page) {
-
-  char _flashSize[12];
-
   openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_TYPE));
@@ -3165,21 +3168,23 @@ void AFESitesGenerator::siteFirmware(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+#ifndef AFE_ESP32
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
-
+  char _flashSize[12];
   if (ESP.getFlashChipRealSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mbits", ESP.getFlashChipRealSize() / 1048576);
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%,d MbKbitsits", ESP.getFlashChipRealSize() / 1024);
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1024);
   }
   page.replace("{{f.s}}", _flashSize);
 
   if (ESP.getFlashChipSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mbits", ESP.getFlashChipSize() / 1048576);
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%,d MbKbitsits", ESP.getFlashChipSize() / 1024);
+    sprintf(_flashSize, "%d Kb", ESP.getFlashChipSize() / 1024);
   }
   page.replace("{{f.f}}", _flashSize);
+#endif // ESP8266
 
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));

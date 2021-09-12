@@ -153,7 +153,7 @@
 
 /* ---- Basic Switch ---- */
 #if defined(T0_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.0.3.B1"
+#define AFE_FIRMWARE_VERSION "3.1.0"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -442,7 +442,7 @@
 
 /* ---- Gate ----*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.1.0.B0"
+#define AFE_FIRMWARE_VERSION "3.1.0.B1"
 #define AFE_FIRMWARE_TYPE 5
 
 /* Define Hardware */
@@ -555,6 +555,14 @@
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 #define AFE_CONFIG_FUNCTIONALITY_GATE
 #define AFE_CONFIG_FUNCTIONALITY_ADC
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_ADC
+#ifdef AFE_ESP32
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS AFE_NUMBER_OF_ADC_GPIOS
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS 0
+#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_ADC
 
 /* ---- Wheater Station ---- */
 #elif defined(T6_CONFIG)
@@ -1644,7 +1652,7 @@ typedef enum {
 #else
 #define AFE_CONFIG_FILE_BUFFER_I2C 54          // AJ check
 #endif
-#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 31  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 41  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ check
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 481      // AJ check
@@ -1655,9 +1663,9 @@ typedef enum {
 #else
 #define AFE_CONFIG_FILE_BUFFER_LED 76         // AJ check
 #endif                                        // AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 30  // AJ check
+#define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 35  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_RELAY 287      // AJ check for T6 only
-#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 36 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 46 // AJ check
 #define AFE_CONFIG_FILE_BUFFER_SWITCH 238     // AJ check for T6 only
 #define AFE_CONFIG_FILE_BUFFER_ADC 489        // AJ check
 #define AFE_CONFIG_FILE_BUFFER_HPMA115S0 202  // AJ check
@@ -1670,7 +1678,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_AS3935 439     // AJ check
 #define AFE_CONFIG_FILE_BUFFER_CONTACTRON 241 // AJ check
 #define AFE_CONFIG_FILE_BUFFER_GATE 319       // AJ check
-#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 32
+#define AFE_CONFIG_FILE_BUFFER_GATE_STATE 42
 #define AFE_CONFIG_FILE_BUFFER_ANEMOMETER 303        // AJ check
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER 259         // AJ check
 #define AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA 1100   // Not verfied

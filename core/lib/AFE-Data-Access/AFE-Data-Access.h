@@ -9,21 +9,16 @@
 #include <IPAddress.h>
 #include <arduino.h>
 
-#ifndef AFE_ESP32 /* ESP82xx */
+#ifdef AFE_ESP32
+#include <LITTLEFS.h>
+#include <WiFi.h>
+#else /* ESP8266 */
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
 #include <LittleFS.h>
 #endif
-#else /* ESP32 */
-#include <LITTLEFS.h>
-#include <WiFi.h>
-#endif
-
-// Disabled with T0 as it was added to the parsher, is it required for T6?
-//#ifdef AFE_CONFIG_HARDWARE_BMEX80
-//#include <Adafruit_BMP085.h>
-//#endif
+#endif // ESP32/ESP8266
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -47,8 +42,10 @@ public:
   void createDeviceUIDFile();
 
   void getConfiguration(DEVICE *);
-#ifdef T0_CONFIG // Version 2.0.0 - 2 Device configuration. Method used only to
-                 // upgrade to new version
+#if defined(T0_CONFIG) &&                                                      \
+    !defined(                                                                  \
+        ESP32) // Version 2.0.0 - 2 Device configuration. Method used only to
+               // upgrade to new version
   DEVICE_T0_200 getDeviceT0v200Configuration();
 #endif
   void saveConfiguration(DEVICE *);
@@ -70,9 +67,6 @@ public:
 
   void getWelcomeMessage(String &message);
   void saveWelecomeMessage(const char *);
-  #ifdef AFE_ESP32
-  
-  #endif // ESP32
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void getConfiguration(DOMOTICZ *);
@@ -95,7 +89,6 @@ public:
   void getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
-  //  void createRelayConfigurationFile(uint8_t id);
   boolean getRelayState(uint8_t id);
   void saveRelayState(uint8_t id, boolean state);
   void createRelayStateFile();
@@ -105,14 +98,12 @@ public:
   void getConfiguration(uint8_t id, SWITCH *);
   void saveConfiguration(uint8_t id, SWITCH *);
   void createSwitchConfigurationFile();
-//  void createSwitchConfigurationFile(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void getConfiguration(uint8_t id, LED *);
   void saveConfiguration(uint8_t id, LED *);
   void createLEDConfigurationFile();
-  //  void createLEDConfigurationFile(uint8_t id);
   uint8_t getSystemLedID();
   void saveSystemLedID(uint8_t id);
   void createSystemLedIDConfigurationFile();
@@ -122,10 +113,10 @@ public:
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, ADCINPUT *);
   void saveConfiguration(uint8_t id, ADCINPUT *);
-#else
+#else // ESP8266
   void getConfiguration(ADCINPUT *);
   void saveConfiguration(ADCINPUT *);
-#endif // AFE_ESP32
+#endif // ESP32/ESP8266
 
   void createADCInputConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
@@ -177,10 +168,10 @@ public:
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, I2CPORT *);
   void saveConfiguration(uint8_t id, I2CPORT *);
-#else
+#else // ESP8266
   void getConfiguration(I2CPORT *);
   void saveConfiguration(I2CPORT *);
-#endif
+#endif // ESP32/ESP8266
   void createI2CConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -244,7 +235,6 @@ public:
   void getConfiguration(uint8_t id, PN532_SENSOR *);
   void saveConfiguration(uint8_t id, PN532_SENSOR *);
   void createPN532ConfigurationFile();
-
   void getConfiguration(uint8_t id, MIFARE_CARD *);
   void saveConfiguration(uint8_t id, MIFARE_CARD *);
   void createMiFareCardConfigurationFile();
@@ -266,7 +256,6 @@ public:
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561

@@ -19,6 +19,16 @@ void AFEDefaults::set() {
 
   if (Data->formatFileSystem()) {
     Data->createDeviceUIDFile();
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    Data->createGateConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Data->createLEDConfigurationFile();
+    Data->createSystemLedIDConfigurationFile();
+#endif
+
     Data->createDeviceConfigurationFile();
     Data->createFirmwareConfigurationFile();
     Data->createNetworkConfigurationFile();
@@ -40,11 +50,6 @@ void AFEDefaults::set() {
     Data->createSwitchConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Data->createLEDConfigurationFile();
-    Data->createSystemLedIDConfigurationFile();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     Data->createADCInputConfigurationFile();
 #endif
@@ -57,9 +62,6 @@ void AFEDefaults::set() {
     Data->createContractonConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    Data->createGateConfigurationFile();
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     Data->createHPMA115S0SensorConfigurationFile();

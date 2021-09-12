@@ -43,15 +43,14 @@ void setup() {
 #endif // ESP32
 #endif // DEBUG
 
-#ifndef AFE_ESP32 /* ESP82xx */
+#ifdef AFE_ESP32
+#else // ESP8266
   // Erase all config
   ESP.eraseConfig();
 #ifdef DEBUG
   Serial << F("INFO: ESP: Erasing internally stored configuration") << endl;
 #endif
-#else /* ESP32 */
-//@TODO ESP32
-#endif
+#endif // ESP32/ESP8266
 
 /* Initializing SPIFFS file system */
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
@@ -98,16 +97,16 @@ void setup() {
 /* Initializing MCP23017 expanders */
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   initializeMCP23017();
-#endif
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 /* Initializing system LED (if exists) and turning it on */
 #ifdef AFE_CONFIG_HARDWARE_LED
   initializeLED();
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   initializeCLed();
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
@@ -149,7 +148,7 @@ void setup() {
       Serial << endl << F("INFO: BOOT: Relay initialized");
 #endif
     }
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
   }
 
 /* Initialzing network */
@@ -157,7 +156,7 @@ void setup() {
   Network.begin(Device.getMode(), &Device, &Data, &Led);
 #else
   Network.begin(Device.getMode(), &Device, &Data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Network initialized");
@@ -178,7 +177,7 @@ void setup() {
   RestAPI.begin(&Data, &Device, &Led);
 #else
   RestAPI.begin(&Data, &Device);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   /* Initializing FirmwarePro */
   FirmwarePro.begin(&Data, &RestAPI);
@@ -189,77 +188,77 @@ void setup() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
   initializeSwitch();
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
   if (Device.getMode() == AFE_MODE_NORMAL) {
 
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     initializeContracton();
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Initializing Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
     initializeGate();
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     initializeRegulator();
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     initializeThermalProtector();
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 /* Initializing DS18B20  */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     initializeDS18B20Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 /* Initializing DHT  */
 #ifdef AFE_CONFIG_HARDWARE_DHT
     initializeDHTSensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     initializeHPMA115S0Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     initializeBMX80Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
     initializeBH1750Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
     initializeTLS2561Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     initializeAS3935Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     initializeBinarySensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     initializeAnemometer();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     initializeRainmeter();
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     initializeADC();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
     /* Initializing APIs */
     initializeMQTTAPI();
@@ -267,7 +266,7 @@ void setup() {
 /* Initializing Domoticz HTTP API */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     initializeHTTPDomoticzAPI();
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
@@ -283,7 +282,7 @@ void setup() {
       Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
   Serial << endl

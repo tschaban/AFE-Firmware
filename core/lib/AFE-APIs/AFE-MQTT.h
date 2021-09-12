@@ -43,8 +43,6 @@ private:
   AFEDataAccess *_Data;
   char *_DeviceName;
   NETWORK _NetworkConfiguration;
-  //AsyncPing Pings;
-  boolean hostReachable;
   PingClass Ping;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -53,7 +51,6 @@ private:
 #endif
 
   unsigned long _sleepStartTime = 0;
-  unsigned long _pingStartTime = 0;
   boolean _sleepMode = false;
   boolean _isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
@@ -76,7 +73,7 @@ private:
   void disconnect();
 
   /* Check if host is available */
-  void pingHost(void);
+  boolean pingHost(void);
 
 public:
   MQTT_MESSAGE message;

@@ -9,11 +9,11 @@
 #include <AFE-Firmware-Pro.h>
 #include <AFE-Sites-Generator.h>
 
-#ifndef AFE_ESP32 /* ESP82xx */
-#include <ESP8266WebServer.h>
-#else /* ESP32 */
+#ifdef AFE_ESP32
 #include <WebServer.h>
-#endif
+#else /* ESP8266 */
+#include <ESP8266WebServer.h>
+#endif // ESP32/ESP8266
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 #include <WiFiClient.h>
@@ -23,7 +23,6 @@
 #include <WiFiUdp.h>
 #include <esp8266httpupdate.h>
 #endif // ESP32/ESP8266
-
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #if AFE_LANGUAGE == 0
@@ -34,11 +33,11 @@
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <Wire.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -115,36 +114,36 @@ private:
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   void get(DOMOTICZ &data);
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void get(RELAY &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   void get(SWITCH &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void get(LED &data);
   uint8_t getSystemLEDData();
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void get(DS18B20 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   void get(DHT &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void get(REGULATOR &data);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void get(THERMAL_PROTECTOR &data);
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #if defined(T3_CONFIG)
   void getPIRData(uint8_t id, PIR *);
@@ -152,57 +151,57 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   void get(CONTACTRON &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void get(GATE &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_UART
   void getSerialPortData(SERIALPORT *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   void get(I2CPORT &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   void get(HPMA115S0 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void get(BMEX80 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   void get(BH1750 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   void get(AS3935 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   void get(ANEMOMETER &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   void get(RAINMETER &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   void get(ADCINPUT &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void get(BINARY_SENSOR &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   void get(PN532_SENSOR &data);
   void processMiFareCard();
   void get(MIFARE_CARD &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -215,20 +214,20 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
   void get(TLS2561 &data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
   boolean upgradeOTAWAN(uint16_t firmwareId);
   boolean upgradOTAFile(void);
-#endif
+#endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 public:
-#ifndef AFE_ESP32 /* ESP82xx */
-  ESP8266WebServer server;
-#else /* ESP32 */
+#ifdef AFE_ESP32 /* ESP82xx */
   WebServer server;
-#endif
+#else  /* ESP8266 */
+  ESP8266WebServer server;
+#endif // ESP32/ESP8266
 
   AFEWebServer();
 
@@ -263,21 +262,12 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */
   void initSystemLED(AFELED *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   /* Method listens for HTTP requests */
   void listener();
 
-#ifndef AFE_ESP32 /* ESP82xx */
-  /* Method listens for onNotFound */
-  void onNotFound(ESP8266WebServer::THandlerFunction fn);
-
-  /* Method adds URL for listen */
-  void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
-  void handleFirmwareUpgrade(const char *uri,
-                             ESP8266WebServer::THandlerFunction handlerUpgrade,
-                             ESP8266WebServer::THandlerFunction handlerUpload);
-#else /* ESP32 */
+#ifdef AFE_ESP32
   /* Method listens for onNotFound */
   void onNotFound(WebServer::THandlerFunction fn);
 
@@ -286,10 +276,19 @@ public:
   void handleFirmwareUpgrade(const char *uri,
                              WebServer::THandlerFunction handlerUpgrade,
                              WebServer::THandlerFunction handlerUpload);
-  
-#endif
+#else // ESP8266
+  /* Method listens for onNotFound */
+  void onNotFound(ESP8266WebServer::THandlerFunction fn);
 
-String getHeaderValue(String header, String headerName);
+  /* Method adds URL for listen */
+  void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
+  void handleFirmwareUpgrade(const char *uri,
+                             ESP8266WebServer::THandlerFunction handlerUpgrade,
+                             ESP8266WebServer::THandlerFunction handlerUpload);
+
+#endif // ESP32/ESP8266
+
+  String getHeaderValue(String header, String headerName);
 
   /* Method generate HTML side. It reads also data from HTTP requests
    * arguments
@@ -311,4 +310,4 @@ String getHeaderValue(String header, String headerName);
   void sendJSON(const String &json);
 };
 
-#endif
+#endif // _AFE_Web_Server_h

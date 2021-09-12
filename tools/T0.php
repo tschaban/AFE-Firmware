@@ -1,9 +1,9 @@
 <?php
 
 /* Set this before run */
-$version = "3.0.3.B1";
-$language = "en";
-//$language = "pl";
+$version = "3.1.0";
+$language = "pl";
+//$language = "en";
 
 /******************/
 $type = "0";
