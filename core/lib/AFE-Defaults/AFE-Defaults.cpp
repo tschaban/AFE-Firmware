@@ -19,6 +19,16 @@ void AFEDefaults::set() {
 
   if (Data->formatFileSystem()) {
     Data->createDeviceUIDFile();
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    Data->createGateConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Data->createLEDConfigurationFile();
+    Data->createSystemLedIDConfigurationFile();
+#endif
+
     Data->createDeviceConfigurationFile();
     Data->createFirmwareConfigurationFile();
     Data->createNetworkConfigurationFile();
@@ -40,11 +50,6 @@ void AFEDefaults::set() {
     Data->createSwitchConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Data->createLEDConfigurationFile();
-    Data->createSystemLedIDConfigurationFile();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
     Data->createADCInputConfigurationFile();
 #endif
@@ -57,9 +62,6 @@ void AFEDefaults::set() {
     Data->createContractonConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    Data->createGateConfigurationFile();
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     Data->createHPMA115S0SensorConfigurationFile();
@@ -118,6 +120,22 @@ void AFEDefaults::set() {
     Data->createPN532ConfigurationFile();
     Data->createMiFareCardConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    Data->createCLEDConfigurationFile();
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
+    Data->createCLEDEffectsConfigurationFile();
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+    Data->createCLEDBacklightConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT ||
+       // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    Data->createTLS2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
   }
 #ifdef DEBUG

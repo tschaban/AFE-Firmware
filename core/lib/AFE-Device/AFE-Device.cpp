@@ -12,6 +12,14 @@ void AFEDevice::begin() {
 void AFEDevice::reboot(uint8_t mode) {
   saveMode(mode);
   yield();
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << "##################################################" << endl
+         << "####      INFO: Rebooting device in 1sec      ####" << endl
+         << "##################################################" << endl
+         << endl;
+#endif
   delay(1000);
   ESP.restart();
 }

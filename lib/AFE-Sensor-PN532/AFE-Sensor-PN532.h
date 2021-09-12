@@ -10,12 +10,17 @@
 
 #include <PN532.h>
 #include <PN532_I2C.h>
+#ifdef AFE_ESP32
+#include <PN532_HSU.h>
+#else
 #include <PN532_SWHSU.h>
-
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
+
+#include <Wire.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -54,8 +59,16 @@ private:
   uint32_t _listenerTime = 0;
 
   AFEDataAccess *Data;
+  TwoWire *_WirePort0;
+#ifdef AFE_ESP32
+  TwoWire *_WirePort1;
+#endif
 
+#ifdef AFE_ESP32
+  PN532_HSU PN532UARTInterface;
+#else
   PN532_SWHSU PN532UARTInterface;
+#endif
   PN532_I2C PN532I2CInterface;
   PN532 NFCReader;
 
@@ -65,13 +78,16 @@ private:
   uint8_t cardUIDLength; // Length of the UID (4 or 7 bytes depending on
                          // ISO14443A card type)
 
-
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
 #endif
 
   boolean foundCard();
   boolean authenticatedBlock(uint32_t blockId);
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void begin(uint8_t _id, AFEDataAccess *, AFEDevice *);
+#endif
 
 public:
   PN532_SENSOR configuration;
@@ -80,8 +96,16 @@ public:
   /* Constructor */
   AFESensorPN532();
 
-  /* Init switch */
-  void begin(uint8_t id, AFEDataAccess *, AFEDevice *);
+/* Init switch */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  void begin(uint8_t _id, AFEDataAccess *, AFEDevice *, TwoWire *, TwoWire *);
+#else
+  void begin(uint8_t _id, AFEDataAccess *, AFEDevice *, TwoWire *);
+#endif
+#else
+  void begin(uint8_t _id, AFEDataAccess *, AFEDevice *);
+#endif // AFE_CONFIG_HARDWARE_I2C
 
   /* Listens for state changes, taking into account bouncing */
   uint8_t listener(void);
@@ -99,12 +123,13 @@ public:
 
   /* Write data to the block */
   void writeBlock(uint8_t blockId, const char *data);
-  
+
   /* Read AFE TAG, uses backup TAG in case of problems */
   boolean readTag();
 
 #ifdef DEBUG
-  /* Reads all blocks. Only available in DEBUG mode. It's logged to the Serial port */
+  /* Reads all blocks. Only available in DEBUG mode. It's logged to the Serial
+   * port */
   void readNFC();
 #endif
 };

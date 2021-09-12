@@ -9,7 +9,7 @@ boolean AFEDataAccess::formatFileSystem() {
   Serial << endl << endl << F("INFO: Formatig File System");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  return LittleFS.format();
+  return LITTLEFS.format();
 #else
   return SPIFFS.format();
 #endif
@@ -17,7 +17,7 @@ boolean AFEDataAccess::formatFileSystem() {
 
 boolean AFEDataAccess::fileExist(const char *path) {
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  return LittleFS.exists(path);
+  return LITTLEFS.exists(path);
 #else
   return SPIFFS.exists(path);
 #endif
@@ -31,7 +31,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
 #endif
@@ -40,7 +40,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
     message = configFile.readString();
     configFile.close();
     /* After message is read, it's removed from the file */
-    saveWelecomeMessage(F(""));
+    saveWelecomeMessage("");
   } else {
     message = "";
 #ifdef DEBUG
@@ -51,7 +51,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
   }
 }
 
-void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
+void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -59,18 +59,17 @@ void AFEDataAccess::saveWelecomeMessage(const __FlashStringHelper *message) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
 #endif
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << F("success") << endl
-           << F("INFO: Writing to file: ") << FPSTR(message);
+    Serial << F("success") << endl << F("INFO: Writing to file: ") << message;
 #endif
 
-    configFile.print(FPSTR(message));
+    configFile.print(message);
     configFile.close();
 
   }
@@ -92,7 +91,7 @@ const String AFEDataAccess::getDeviceUID() {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_UID, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_UID, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "r");
 #endif
@@ -150,7 +149,7 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_UID, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_UID, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "w");
 #endif
@@ -187,6 +186,7 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
   }
 #endif
 }
+
 void AFEDataAccess::createDeviceUIDFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_UID;
@@ -210,7 +210,7 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
 #endif
@@ -267,7 +267,7 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
 #endif
@@ -326,7 +326,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
 #endif
@@ -382,7 +382,7 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
 #endif
@@ -438,7 +438,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #endif
@@ -485,8 +485,17 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfRelays"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-      configuration->isAnalogInput = root["isAnalogInput"] | false;
+
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
+      configuration->isAnalogInput = root["isAnalogInput"] | false;
+#else
+      configuration->noOfAnalogInputs =
+          root["noOfAnalogInputs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS;
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
       configuration->noOfContactrons =
@@ -560,6 +569,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+      configuration->noOfTLS2561s =
+          root["noOfTLS2561s"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_TLS2561;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
       configuration->noOfPN532Sensors =
           root["noOfPN532Sensors"] |
@@ -569,9 +583,17 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-      configuration->noOfCLEDs =
-          root["noOfCLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+      configuration->effectPN532 = root["effectPN532"];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+      configuration->effectDeviceLight = root["effectDeviceLight"];
+#endif
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+      configuration->noOfI2Cs =
+          root["noOfI2Cs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
 #ifdef DEBUG
@@ -610,7 +632,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
 #endif
@@ -644,8 +666,12 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
     root["isAnalogInput"] = configuration->isAnalogInput;
-#endif
+#else
+    root["noOfAnalogInputs"] = configuration->noOfAnalogInputs;
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     root["noOfContactrons"] = configuration->noOfContactrons;
@@ -699,13 +725,25 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfBinarySensors"] = configuration->noOfBinarySensors;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    root["noOfTLS2561s"] = configuration->noOfTLS2561s;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     root["noOfPN532Sensors"] = configuration->noOfPN532Sensors;
     root["noOfMiFareCards"] = configuration->noOfMiFareCards;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-    root["noOfCLEDs"] = configuration->noOfCLEDs;
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+    root["noOfI2Cs"] = configuration->noOfI2Cs;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+    root["effectPN532"] = configuration->effectPN532;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+    root["effectDeviceLight"] = configuration->effectDeviceLight;
 #endif
 
     root.printTo(configFile);
@@ -761,110 +799,122 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_CONFIGURATION;
 #endif
-  DEVICE deviceConfiguration;
-  sprintf(deviceConfiguration.name, "AFE-Device");
-  deviceConfiguration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
+  DEVICE configuration;
+  sprintf(configuration.name, "AFE-Device");
+  configuration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
   /* APIs */
-  deviceConfiguration.api.mqtt = false;
+  configuration.api.mqtt = false;
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  deviceConfiguration.api.domoticz = false;
-  deviceConfiguration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
+  configuration.api.domoticz = false;
+  configuration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
 #endif
-  deviceConfiguration.api.http = true;
+  configuration.api.http = true;
 
 /* Relay presence */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  deviceConfiguration.noOfRelays = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
+  configuration.noOfRelays = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RELAYS;
 #endif
 
   /* Switch presence */
-  deviceConfiguration.noOfSwitches =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
+  configuration.noOfSwitches = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES;
 
 /* LEDs presence */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  deviceConfiguration.noOfLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
+  configuration.noOfLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  deviceConfiguration.isAnalogInput = false;
+#ifndef AFE_ESP32
+  configuration.isAnalogInput = false;
+#else
+  configuration.noOfAnalogInputs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS;
+#endif // AFE_ESP32
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  deviceConfiguration.noOfContactrons =
+  configuration.noOfContactrons =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CONTACTRONS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  deviceConfiguration.noOfGates = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
+  configuration.noOfGates = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  deviceConfiguration.noOfHPMA115S0s =
+  configuration.noOfHPMA115S0s =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_HPMA115S0;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  deviceConfiguration.noOfBMEX80s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
+  configuration.noOfBMEX80s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  deviceConfiguration.noOfBH1750s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
+  configuration.noOfBH1750s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  deviceConfiguration.noOfAS3935s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
+  configuration.noOfAS3935s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_AS3935;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  deviceConfiguration.noOfDS18B20s =
-      AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
+  configuration.noOfDS18B20s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  deviceConfiguration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
+  configuration.noOfDHTs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  deviceConfiguration.noOfAnemometerSensors =
+  configuration.noOfAnemometerSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ANEMOMETER_SENSORS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  deviceConfiguration.noOfRainmeterSensors =
+  configuration.noOfRainmeterSensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_RAINMETER_SENSORS;
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  deviceConfiguration.noOfRegulators =
+  configuration.noOfRegulators =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_REGULATORS;
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  deviceConfiguration.noOfThermalProtectors =
+  configuration.noOfThermalProtectors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_THERMAL_PROTECTIORS;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  deviceConfiguration.noOfBinarySensors =
+  configuration.noOfBinarySensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  configuration.noOfTLS2561s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_TLS2561;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-  deviceConfiguration.noOfPN532Sensors =
+  configuration.noOfPN532Sensors =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_PN532_SENSORS;
-  deviceConfiguration.noOfMiFareCards =
+  configuration.noOfMiFareCards =
       AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
+
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  configuration.effectPN532 = false;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  deviceConfiguration.noOfCLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLEDS;
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  configuration.effectDeviceLight = false;
 #endif
 
-  saveConfiguration(&deviceConfiguration);
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  configuration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
+#endif
+
+  saveConfiguration(&configuration);
 }
 
 void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
@@ -875,7 +925,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
 #endif
@@ -936,7 +986,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
 #endif
@@ -1011,7 +1061,7 @@ uint8_t AFEDataAccess::getDeviceMode() {
          << F("INFO: Opening file: ") << AFE_FILE_DEVICE_MODE << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_MODE, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_MODE, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "r");
 #endif
@@ -1067,7 +1117,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_MODE, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_MODE, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "w");
 #endif
@@ -1081,6 +1131,10 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     JsonObject &root = jsonBuffer.createObject();
     root["mode"] = mode;
     root.printTo(configFile);
+
+    #ifdef DEBUG
+    root.printTo(Serial);
+#endif
 
     configFile.close();
 
@@ -1110,7 +1164,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
 #endif
@@ -1132,16 +1186,16 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 
       sprintf(configuration->ssid, root["ssid"]);
       sprintf(configuration->password, root["password"]);
-
       sprintf(configuration->ssidBackup, root["ssidBackup"] | "");
       sprintf(configuration->passwordBackup, root["passwordBackup"] | "");
-
       configuration->isDHCP = root["isDHCP"];
-
       sprintf(configuration->ip, root["ip"]);
       sprintf(configuration->gateway, root["gateway"]);
       sprintf(configuration->subnet, root["subnet"]);
-
+      configuration->isDHCPBackup = root["isDHCPBackup"];
+      sprintf(configuration->ipBackup, root["ipBackup"] | "");
+      sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
+      sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
       configuration->noConnectionAttempts = root["noConnectionAttempts"];
       configuration->waitTimeConnections = root["waitTimeConnections"];
       configuration->waitTimeSeries = root["waitTimeSeries"];
@@ -1184,7 +1238,7 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
 #endif
@@ -1204,7 +1258,10 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["ip"] = configuration->ip;
     root["gateway"] = configuration->gateway;
     root["subnet"] = configuration->subnet;
-
+    root["isDHCPBackup"] = configuration->isDHCPBackup;
+    root["ipBackup"] = configuration->ipBackup;
+    root["gatewayBackup"] = configuration->gatewayBackup;
+    root["subnetBackup"] = configuration->subnetBackup;
     root["noConnectionAttempts"] = configuration->noConnectionAttempts;
     root["waitTimeConnections"] = configuration->waitTimeConnections;
     root["waitTimeSeries"] = configuration->waitTimeSeries;
@@ -1249,6 +1306,10 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   configuration.ip[0] = AFE_EMPTY_STRING;
   configuration.gateway[0] = AFE_EMPTY_STRING;
   configuration.subnet[0] = AFE_EMPTY_STRING;
+  configuration.isDHCPBackup = true;
+  configuration.ipBackup[0] = AFE_EMPTY_STRING;
+  configuration.gatewayBackup[0] = AFE_EMPTY_STRING;
+  configuration.subnetBackup[0] = AFE_EMPTY_STRING;
   configuration.noConnectionAttempts =
       AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
   configuration.waitTimeConnections = AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
@@ -1267,7 +1328,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
 #endif
@@ -1344,7 +1405,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
 #endif
@@ -1429,7 +1490,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
 #endif
@@ -1491,7 +1552,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
 #endif
@@ -1548,7 +1609,7 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
-  char fileName[16];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1556,10 +1617,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  // if (!LittleFS.exists(fileName)) {
+  // if (!LITTLEFS.exists(fileName)) {
   //  createLEDConfigurationFile(id);
   // }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   //  if (!SPIFFS.exists(fileName)) {
   //    createLEDConfigurationFile(id);
@@ -1616,7 +1677,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
-  char fileName[16];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1624,10 +1685,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -1758,7 +1819,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
 #endif
@@ -1816,7 +1877,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
 #endif
@@ -1865,7 +1926,7 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
 void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1874,11 +1935,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
 
-  // if (!LittleFS.exists(fileName)) {
+  // if (!LITTLEFS.exists(fileName)) {
   //    createRelayConfigurationFile(id);
   // }
 
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
 
   //  if (!SPIFFS.exists(fileName)) {
@@ -1957,7 +2018,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1965,7 +2026,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2187,7 +2248,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 /* Relay state methods*/
 boolean AFEDataAccess::getRelayState(uint8_t id) {
   boolean state = false;
-  char fileName[23];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2195,7 +2256,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2243,7 +2304,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
   return state;
 }
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
-  char fileName[23];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2251,7 +2312,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2293,7 +2354,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[19];
+  char fileName[21];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2301,7 +2362,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2365,7 +2426,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[19];
+  char fileName[21];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2373,7 +2434,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2585,18 +2646,24 @@ void AFEDataAccess::createSwitchConfigurationFile(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+void AFEDataAccess::getConfiguration(uint8_t id, ADCINPUT *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
+#else
 void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
+  char fileName[23];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+#endif // AFE_ESP32
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_ADC_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
+
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_ADC_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_ADC_CONFIGURATION, "r");
+  File configFile = SPIFFS.open(fileName, "r");
 #endif
 
   if (configFile) {
@@ -2613,6 +2680,11 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
+
+#ifdef AFE_ESP32
+      sprintf(configuration->name, root["name"]);
+#endif
+
       configuration->gpio = root["gpio"];
       configuration->interval = root["interval"];
       configuration->numberOfSamples = root["numberOfSamples"];
@@ -2667,24 +2739,29 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_ADC_CONFIGURATION
-           << F(" not opened");
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
 }
 
+#ifdef AFE_ESP32
+void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration) {
+  char fileName[26];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
+#else
 void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
+  char fileName[23];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+#endif
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_ADC_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_ADC_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_ADC_CONFIGURATION, "w");
+  File configFile = SPIFFS.open(fileName, "w");
 #endif
 
   if (configFile) {
@@ -2703,6 +2780,9 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
     JsonObject &battery = root.createNestedObject("batteryMeter");
 #endif
 
+#ifdef AFE_ESP32
+    root["name"] = configuration->name;
+#endif
     root["gpio"] = configuration->gpio;
     root["interval"] = configuration->interval;
     root["numberOfSamples"] = configuration->numberOfSamples;
@@ -2785,14 +2865,22 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
+#ifdef AFE_ESP32
+  char name[6];
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++) {
+    sprintf(AnalogInputConfiguration.name, "ADC%d", i);
+    saveConfiguration(i, &AnalogInputConfiguration);
+  }
+#else
   saveConfiguration(&AnalogInputConfiguration);
+#endif
 }
 #endif //  AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 
-  char fileName[20];
+  char fileName[22];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2800,7 +2888,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2865,7 +2953,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
-  char fileName[20];
+  char fileName[22];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2873,7 +2961,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2957,7 +3045,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
-  char fileName[22];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2965,7 +3053,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3023,7 +3111,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
-  char fileName[22];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3031,7 +3119,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3080,7 +3168,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
 
 void AFEDataAccess::createContractonConfigurationFile() {
   CONTACTRON ContactronConfiguration;
-  uint8 index = 0;
+  uint8_t index = 0;
   ContactronConfiguration.bouncing =
       AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
   ContactronConfiguration.type =
@@ -3128,7 +3216,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
 void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
-  char fileName[16];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3136,7 +3224,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3200,7 +3288,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 
-  char fileName[16];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3208,7 +3296,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3317,7 +3405,7 @@ void AFEDataAccess::createGateConfigurationFile() {
 uint8_t AFEDataAccess::getGateState(uint8_t id) {
   uint8_t state = AFE_GATE_CLOSED;
 
-  char fileName[22];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3325,7 +3413,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3376,7 +3464,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 }
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 
-  char fileName[22];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3384,7 +3472,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3431,7 +3519,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 
-  char fileName[23];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3439,7 +3527,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3513,7 +3601,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
-  char fileName[23];
+  char fileName[24];
   sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3521,7 +3609,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3613,7 +3701,7 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 void AFEDataAccess::getConfiguration(uint8_t id,
                                      THERMAL_PROTECTOR *configuration) {
 
-  char fileName[31];
+  char fileName[33];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3621,7 +3709,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3685,7 +3773,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       THERMAL_PROTECTOR *configuration) {
-  char fileName[31];
+  char fileName[33];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3693,7 +3781,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3785,7 +3873,7 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
-  char fileName[21];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3793,7 +3881,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3861,7 +3949,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
-  char fileName[21];
+  char fileName[23];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -3869,7 +3957,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3945,7 +4033,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
            << F("INFO: Creating file: cfg-hpma115s0-") << i << F(".json");
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "HPMA115S0/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "HPMA115S0-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -3962,7 +4050,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_UART_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_UART_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_UART_CONFIGURATION, "r");
 #endif
@@ -4019,7 +4107,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_UART_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_UART_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_UART_CONFIGURATION, "w");
 #endif
@@ -4066,17 +4154,27 @@ void AFEDataAccess::createSerialConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
+#if AFE_ESP32
+void AFEDataAccess::getConfiguration(uint8_t id, I2CPORT *configuration)
+#else
+void AFEDataAccess::getConfiguration(I2CPORT *configuration)
+#endif
+{
+  char fileName[17];
+
+#ifdef AFE_ESP32
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION, id);
+#else
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
+#endif
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_I2C_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_I2C_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_I2C_CONFIGURATION, "r");
+  File configFile = SPIFFS.open(fileName, "r");
 #endif
 
   if (configFile) {
@@ -4096,6 +4194,10 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
 
       configuration->SDA = root["SDA"];
       configuration->SCL = root["SCL"];
+
+#ifdef AFE_ESP32
+      configuration->frequency = root["frequency"];
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -4123,18 +4225,28 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration) {
   }
 #endif
 }
-void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
+#ifdef AFE_ESP32
+void AFEDataAccess::saveConfiguration(uint8_t id, I2CPORT *configuration)
+#else
+void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
+#endif
+{
+  char fileName[17];
+
+#ifdef AFE_ESP32
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION, id);
+#else
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
+#endif
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_I2C_CONFIGURATION
-         << F(" ... ");
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_I2C_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
-  File configFile = SPIFFS.open(AFE_FILE_I2C_CONFIGURATION, "w");
+  File configFile = SPIFFS.open(fileName, "w");
 #endif
 
   if (configFile) {
@@ -4146,6 +4258,10 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     root["SDA"] = configuration->SDA;
     root["SCL"] = configuration->SCL;
+#ifdef AFE_ESP32
+    root["frequency"] = configuration->frequency;
+#endif
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -4170,18 +4286,28 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration) {
 }
 void AFEDataAccess::createI2CConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_I2C_CONFIGURATION;
+  Serial << endl << F("INFO: Creating I2C confifuration file: ");
 #endif
   I2CPORT configuration;
-  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SDA;
-  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_DEFAULT_SCL;
+#ifdef AFE_ESP32
+  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
+  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
+  configuration.frequency = AFE_CONFIG_HARDWARE_I2C_DEFAULT_FREQUENCY;
+  saveConfiguration(0, &configuration);
+  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_1_DEFAULT_SDA;
+  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_1_DEFAULT_SCL;
+  saveConfiguration(1, &configuration);
+#else
+  configuration.SDA = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
+  configuration.SCL = AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SCL;
   saveConfiguration(&configuration);
+#endif
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
-  char fileName[17];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4189,7 +4315,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4210,6 +4336,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 
       configuration->type = root["type"];
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
       configuration->i2cAddress = root["i2cAddress"];
       sprintf(configuration->name, root["name"]);
       configuration->interval = root["interval"];
@@ -4283,7 +4412,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
-  char fileName[17];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4291,7 +4420,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4313,6 +4442,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
     root["type"] = configuration->type;
     root["interval"] = configuration->interval;
     root["name"] = configuration->name;
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
     root["i2cAddress"] = configuration->i2cAddress;
     root["resolution"] = configuration->resolution;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -4374,7 +4506,10 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   BMEX80 configuration;
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
   configuration.interval = AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
-  configuration.i2cAddress = 0;
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   configuration.resolution = 3; //  BMP085_ULTRAHIGHRES;
   configuration.temperature.unit = AFE_TEMPERATURE_UNIT_CELSIUS;
   configuration.temperature.correction = 0;
@@ -4409,7 +4544,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
     Serial << endl << F("INFO: Creating file: cfg-BMEX80-") << i << F(".json");
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "BMEX80/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "BMEX80-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4419,7 +4554,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4427,7 +4562,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4450,6 +4585,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
       sprintf(configuration->name, root["name"]);
       configuration->mode = root["mode"];
       configuration->interval = root["interval"];
+
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
+
       configuration->i2cAddress = root["i2cAddress"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -4484,7 +4624,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4492,7 +4632,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4508,7 +4648,13 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
     root["name"] = configuration->name;
     root["mode"] = configuration->mode;
     root["interval"] = configuration->interval;
+
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
+
     root["i2cAddress"] = configuration->i2cAddress;
+
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration->mqtt.topic;
 #else
@@ -4541,7 +4687,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 void AFEDataAccess::createBH1750SensorConfigurationFile() {
   BH1750 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
-  configuration.i2cAddress = 0;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
@@ -4551,7 +4702,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
     Serial << endl << F("INFO: Creating file: cfg-bh1750-") << i << F(".json");
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "BH1750/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "BH1750-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4561,7 +4712,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4569,7 +4720,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4635,7 +4786,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 
 void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 
-  char fileName[18];
+  char fileName[20];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4643,7 +4794,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4729,7 +4880,7 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_DHT
 void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4737,7 +4888,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4831,7 +4982,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
 
-  char fileName[16];
+  char fileName[17];
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -4839,7 +4990,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4933,7 +5084,7 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
     Serial << endl << "INFO: Creating file: /cfg-dht-" << i << ".json";
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "DHT/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "DHT-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4956,7 +5107,7 @@ IPAddress AFEDataAccess::IPfromString(const char *address) {
 
 /*************** OLD METHODS USED FOR UPGRADE ONLY ******************/
 
-#ifdef T0_CONFIG
+#if defined(T0_CONFIG) && !defined(ESP32)
 DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
   DEVICE_T0_200 configuration;
 #ifdef DEBUG
@@ -4968,7 +5119,7 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open("cfg-device.json", "r");
+  File configFile = LITTLEFS.open("cfg-device.json", "r");
 #else
   File configFile = SPIFFS.open("cfg-device.json", "r");
 #endif
@@ -5050,7 +5201,7 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
   File configFile =
-      LittleFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
+      LITTLEFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
 #endif
@@ -5124,7 +5275,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
   File configFile =
-      LittleFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
+      LITTLEFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
 #endif
@@ -5206,7 +5357,7 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
 #endif
@@ -5276,7 +5427,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
 #endif
@@ -5352,7 +5503,7 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
 #endif
@@ -5426,7 +5577,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
 #endif
@@ -5511,7 +5662,7 @@ void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
-  char fileName[27];
+  char fileName[28];
   sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5519,7 +5670,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5591,7 +5742,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       BINARY_SENSOR *configuration) {
-  char fileName[27];
+  char fileName[28];
   sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5599,7 +5750,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5686,7 +5837,7 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 #endif
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "binary/%d", i + 1);
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.name, "binary-%d", i + 1);
 
@@ -5697,7 +5848,7 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
-  char fileName[26];
+  char fileName[27];
   sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5705,7 +5856,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5731,6 +5882,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
           root["requestProcessingTime"].as<int>();
       configuration->interface = root["interface"].as<int>();
       configuration->listenerTimeout = root["listenerTimeout"].as<int>();
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
       configuration->i2cAddress = root["i2cAddress"].as<int>();
 
       configuration->timeout = root["timeout"].as<int>();
@@ -5769,7 +5923,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
-  char fileName[26];
+  char fileName[27];
   sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5777,7 +5931,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5796,6 +5950,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
     root["timeout"] = configuration->timeout;
     root["interface"] = configuration->interface;
     root["listenerTimeout"] = configuration->listenerTimeout;
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
     root["i2cAddress"] = configuration->i2cAddress;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -5832,14 +5989,17 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 void AFEDataAccess::createPN532ConfigurationFile() {
   PN532_SENSOR configuration;
   sprintf(configuration.name, "pn532");
+  configuration.interface = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.timeout = AFE_HARDWARE_PN532_DEFUALT_TIMEOUT;
   configuration.requestProcessingTime =
       AFE_HARDWARE_PN532_DEFUALT_REQUEST_PROCESSING_TIME;
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
   configuration.i2cAddress = AFE_HARDWARE_PN532_DEFAULT_INTERFACE;
   configuration.listenerTimeout = AFE_HARDWARE_PN532_DEFUALT_LISTENER_TIMEOUT;
-  configuration.i2cAddress = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   configuration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -5860,7 +6020,7 @@ void AFEDataAccess::createPN532ConfigurationFile() {
 }
 
 void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
-  char fileName[24];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5868,7 +6028,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5928,7 +6088,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
-  char fileName[24];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -5936,7 +6096,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5948,7 +6108,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     JsonArray &jsonIdx = root.createNestedArray("idx");
+#endif
     root["action"] = configuration->action;
     root["cardId"] = configuration->cardId;
     root["relayId"] = configuration->relayId;
@@ -6017,7 +6179,7 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
-  char fileName[17];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6025,7 +6187,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6048,6 +6213,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       configuration->chipset = root["chipset"].as<int>();
       configuration->colorOrder = root["colorOrder"].as<int>();
       configuration->ledNumber = root["ledNumber"].as<int>();
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+#endif
 
 #ifdef DEBUG
       Serial << endl
@@ -6073,9 +6244,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
-  char fileName[17];
+  char fileName[18];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6083,7 +6253,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6099,6 +6269,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     root["chipset"] = configuration->chipset;
     root["colorOrder"] = configuration->colorOrder;
     root["ledNumber"] = configuration->ledNumber;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    root["idx"] = configuration->domoticz.idx;
+#endif
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -6122,25 +6298,38 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
   configuration.chipset = 0;
-  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_0_COLORS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_0_LEDS_NUMBER;
+  configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
+  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
-#ifdef DEBUG
-    Serial << endl << F("INFO: Creating file: cfg-cled-") << i << F(".json");
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-    saveConfiguration(i, &configuration);
-  }
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                    &configuration);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_1_GPIO;
+  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                    &configuration);
+#endif
 }
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
-  char fileName[25];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6148,7 +6337,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDEffectsConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6209,9 +6401,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
-  char fileName[25];
+  char fileName[26];
   sprintf(fileName, AFE_FILE_CLED_EFFECTS_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6219,7 +6410,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6241,7 +6432,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
     e2["brightness"] = configuration->effect[1].brightness;
     e2["color"] = configuration->effect[1].color;
     e2["time"] = configuration->effect[1].time;
-
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -6266,28 +6456,356 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED_EFFECTS *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   CLED_EFFECTS configuration;
 
   /* Wave */
-  configuration.effect[0].brightness = 50;
-  configuration.effect[0].color = 0x00008B; // DarkBlue
-  configuration.effect[0].time = 50;
+  configuration.effect[0].brightness =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+  configuration.effect[0].color =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
+  configuration.effect[0].time =
+      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
 
   /* Fade Out */
-  configuration.effect[1].brightness = 255;
-  configuration.effect[1].color = 0xCD5C5C; // IndigoRed
-  configuration.effect[1].time = 0;
+  configuration.effect[1].brightness =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
+  configuration.effect[1].color =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
+  configuration.effect[1].time =
+      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+           << F("INFO: Creating file: cfg-cled-effects-") << i << F(".json");
 #endif
 
     saveConfiguration(i, &configuration);
   }
 }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFEDataAccess::getConfiguration(uint8_t id,
+                                     CLED_BACKLIGHT *configuration) {
+  char fileName[28];
+  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->lightSensorId = root["lightSensorId"].as<int>();
+
+      for (uint8_t i = 0;
+           i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; i++) {
+
+        configuration->config[i].luxLevel =
+            root["configs"][i]["luxLevel"].as<int>();
+        configuration->config[i].brightness =
+            root["configs"][i]["brightness"].as<int>();
+        configuration->config[i].color = root["configs"][i]["color"].as<int>();
+      }
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_BACKLIGHT *configuration) {
+  char fileName[28];
+  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonArray &configs = root.createNestedArray("configs");
+    JsonObject &l1 = configs.createNestedObject();
+    JsonObject &l2 = configs.createNestedObject();
+    JsonObject &l3 = configs.createNestedObject();
+
+    root["lightSensorId"] = configuration->lightSensorId;
+
+    l1["luxLevel"] = configuration->config[0].luxLevel;
+    l1["color"] = configuration->config[0].color;
+    l1["brightness"] = configuration->config[0].brightness;
+
+    l2["luxLevel"] = configuration->config[1].luxLevel;
+    l2["color"] = configuration->config[1].color;
+    l2["brightness"] = configuration->config[1].brightness;
+
+    l3["luxLevel"] = configuration->config[2].luxLevel;
+    l3["color"] = configuration->config[2].color;
+    l3["brightness"] = configuration->config[2].brightness;
+
+    root.printTo(configFile);
+
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createCLEDBacklightConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION;
+#endif
+  CLED_BACKLIGHT data;
+
+  data.lightSensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
+       i++) {
+
+    data.config[i].luxLevel = 0;
+    data.config[i].color = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_COLOR;
+    data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
+  }
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-cled-backlight-") << i << F(".json");
+#endif
+
+    saveConfiguration(i, &data);
+  }
+}
+
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEDataAccess::getConfiguration(uint8_t id, TLS2561 *configuration) {
+  char fileName[22];
+  sprintf(fileName, AFE_FILE_TLS2561_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TLS2561> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["name"]);
+      configuration->sensitiveness = root["sensitiveness"];
+      configuration->interval = root["interval"];
+      configuration->gain = root["gain"];
+
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["wirePortId"];
+#endif
+
+      configuration->i2cAddress = root["i2cAddress"];
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+#endif
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TLS2561
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_TLS2561 < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    }
+
+#ifdef DEBUG
+    else {
+      Serial << F("ERROR: JSON not pharsed");
+    }
+#endif
+
+    configFile.close();
+  }
+
+#ifdef DEBUG
+  else {
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+  }
+#endif
+}
+void AFEDataAccess::saveConfiguration(uint8_t id, TLS2561 *configuration) {
+  char fileName[22];
+  sprintf(fileName, AFE_FILE_TLS2561_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TLS2561> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["name"] = configuration->name;
+    root["sensitiveness"] = configuration->sensitiveness;
+    root["gain"] = configuration->gain;
+    root["interval"] = configuration->interval;
+
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
+
+    root["i2cAddress"] = configuration->i2cAddress;
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    root["mqttTopic"] = configuration->mqtt.topic;
+#else
+    root["idx"] = configuration->domoticz.idx;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TLS2561
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_TLS2561 < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createTLS2561SensorConfigurationFile() {
+  TLS2561 configuration;
+  configuration.interval = AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  configuration.gain = AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
+  configuration.sensitiveness =
+      AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TLS2561; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Creating file: cfg-tls2561-") << i << F(".json");
+#endif
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+    sprintf(configuration.name, "TLS2561-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561

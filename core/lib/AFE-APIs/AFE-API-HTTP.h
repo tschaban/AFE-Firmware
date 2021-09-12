@@ -74,6 +74,10 @@
 #include <AFE-Sensor-Binary.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#include <AFE-Sensor-TLS2561.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -100,7 +104,11 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
+#else  // AFE_ESP8266
   AFEAnalogInput *_AnalogInput;
+#endif // AFE_ESP32
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -154,6 +162,10 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  AFESensorTLS2561 *_TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
 #endif
 
   /* Classifies and invokes code for HTTP request processing */
@@ -221,6 +233,10 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   void processDHT(HTTPCOMMAND *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  void processTLS2561(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -309,6 +325,10 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void addClass(AFESensorBinary *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  void addClass(AFESensorTLS2561 *);
 #endif
 };
 

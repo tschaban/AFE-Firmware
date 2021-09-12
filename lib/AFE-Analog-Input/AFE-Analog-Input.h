@@ -21,7 +21,7 @@ private:
   boolean _initialized = false;
   uint8_t counterOfSamplings = 0;
   uint16_t temporaryAnalogData = 0;
-  
+
 public:
   ADCINPUT configuration;
   ADCINPUT_DATA data;
@@ -33,8 +33,12 @@ public:
   /* Constructor */
   AFEAnalogInput();
 
-  /* Initialized analog input using configuration parameters */
+/* Initialized analog input using configuration parameters */
+#ifdef AFE_ESP32
+  void begin(uint8_t id);
+#else  // ESP8266
   void begin();
+#endif // AFE_ESP32
 
   /* Returns values from Analog Input */
   ADCINPUT_DATA get();
@@ -48,12 +52,10 @@ public:
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 
-
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   /* Returns the batter data in JSON format */
   void getBatteryMeterJSON(char *json);
-#endif  
-
+#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC

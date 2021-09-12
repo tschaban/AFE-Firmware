@@ -16,6 +16,26 @@ void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   _HtmlResponse.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
 }
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                              AFEFirmwarePro *_FirmwarePro,
+                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0,
+                              TwoWire *_WirePort1) {
+  WirePort0 = _WirePort0;
+  WirePort1 = _WirePort1;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#else
+void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
+                              AFEFirmwarePro *_FirmwarePro,
+                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0) {
+  WirePort0 = _WirePort0;
+  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+}
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_I2C
+
 void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
 
   page += FPSTR(HTTP_HEADER);
@@ -30,20 +50,22 @@ void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
   page.concat(F("<div class=\"c\">"));
 }
 
-void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
+void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}</small></div><div class=\"r\">"));
+  page.concat(F(" T{{f.t}}-{{f.v}}-ESP{{f.e}}</small>"));
+}
+
+void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
+  generateMenuHeader(page, redirect);
+  page.concat(F("</div><div class=\"r\">"));
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   Device->begin();
-
-  generateHeader(page, redirect);
-  page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
-  page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}</small><ul class=\"lst\">"));
+  generateMenuHeader(page, redirect);
+  page.concat(F("<ul class=\"lst\">"));
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F("Menu"));
@@ -68,7 +90,15 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  if (Device->configuration.noOfI2Cs > 0) {
+    addMenuHeaderItem(page, F("I2C"));
+    addMenuSubItem(page, "Port", Device->configuration.noOfI2Cs,
+                   AFE_CONFIG_SITE_I2C);
+  }
+#else
   addMenuItem(page, F("I2C"), AFE_CONFIG_SITE_I2C);
+#endif
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 /* UART */
@@ -93,12 +123,6 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
                    AFE_CONFIG_SITE_LED);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
-
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  if (Device->configuration.noOfCLEDs > 0) {
-    addMenuItem(page, F(L_CLEDS), AFE_CONFIG_SITE_CLED);
-  }
-#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
@@ -179,6 +203,15 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  if (Device->configuration.noOfTLS2561s > 0) {
+
+    addMenuHeaderItem(page, F(L_TLS2561_SENSORS));
+    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfTLS2561s,
+                   AFE_CONFIG_SITE_TLS2561);
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
   if (Device->configuration.noOfHPMA115S0s > 0) {
@@ -222,10 +255,18 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  if (Device->configuration.noOfAnalogInputs > 0) {
+    addMenuHeaderItem(page, F(L_ANALOG_INPUT));
+    addMenuSubItem(page, L_ADC_INPUT, Device->configuration.noOfAnalogInputs,
+                   AFE_CONFIG_SITE_ANALOG_INPUT);
+  }
+#else
   if (Device->configuration.isAnalogInput) {
     addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
   }
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F(L_FUNCTIONS));
@@ -236,6 +277,21 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
     addMenuItem(page, F(L_LED_SYSTEM), AFE_CONFIG_SITE_SYSTEM_LED);
   }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  if (Device->configuration.effectDeviceLight) {
+    addMenuItem(page, F(C_LED_EFFECT_DEVICE_LIGHT),
+                AFE_CONFIG_SITE_CLED_DEVICE_LIGHT);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  if (Device->configuration.effectPN532 &&
+      Device->configuration.noOfPN532Sensors > 0) {
+    addMenuItem(page, F(C_LED_EFFECT_PN532_SENSOR),
+                AFE_CONFIG_SITE_CLED_PN532_SENSOR);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
 /* PN532 */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -266,7 +322,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F(L_FIRMWARE));
-
+  addMenuItem(page, F(L_VERSION), AFE_CONFIG_SITE_FIRMWARE);
   addMenuItem(page, F(L_PASSWORD_SET_PASSWORD), AFE_CONFIG_SITE_PASSWORD);
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   addMenuItem(page, F(L_FIRMWARE_UPGRADE), AFE_CONFIG_SITE_UPGRADE);
@@ -275,6 +331,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   addMenuItem(page, F(L_PRO_VERSION), AFE_CONFIG_SITE_PRO_VERSION);
 
   addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
+
   addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
 
   page.concat(F("</ul><h4></h4><ul class=\"lst\">"));
@@ -296,13 +353,16 @@ void AFESitesGenerator::siteDevice(String &page) {
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace("{{I}}", _HtmlResponse);
-    } else if (RestAPI->accessToWAN()) {
+    }
+
+    if (RestAPI->accessToWAN()) {
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
 
       RestAPI->sent(_HtmlResponse,
                     AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
@@ -310,14 +370,17 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      yield();
+
+      closeSection(page);
     }
-    closeSection(page);
   }
 
   /* Section: Device name */
@@ -330,18 +393,18 @@ void AFESitesGenerator::siteDevice(String &page) {
   openSection(page, F(L_DEVICE_HARDWARE_CONFIGURATION),
               F(L_DEVICE_HARDWARE_CONFIGURATION_INFO));
 
+/* I2C */
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_I2C,
+                        Device->configuration.noOfI2Cs, F("ii"),
+                        F(L_DEVICE_NUMBER_OF_I2CS));
+#endif
+
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                         Device->configuration.noOfLEDs, F("l"),
                         F(L_DEVICE_NUMBER_OF_LEDS));
-#endif
-
-/* CLED */
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLEDS,
-                        Device->configuration.noOfCLEDs, F("a"),
-                        F(L_DEVICE_NUMBER_OF_CLEDS));
 #endif
 
 /* Contactrons */
@@ -411,6 +474,10 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                         Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
+
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561,
+                        Device->configuration.noOfTLS2561s, F("tl"),
+                        F(L_DEVICE_NUMBER_OF_TLS2561_SENSORS), _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -456,12 +523,19 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 
+#ifdef AFE_ESP32
+  /* Number of ADC Inputs */
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS,
+                        Device->configuration.noOfAnalogInputs, F("ad"),
+                        F(L_DEVICE_NUMBER_OF_ADC), !FirmwarePro->Pro.valid);
+#else
   addCheckboxFormItem(
       page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",
       Device->configuration.isAnalogInput,
       (!FirmwarePro->Pro.valid ? L_PRO_VERSION : AFE_FORM_ITEM_SKIP_PROPERTY),
       !FirmwarePro->Pro.valid);
-#endif
+#endif // AFE_ESP32
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #if defined(T3_CONFIG)
   itemsNumber = 0;
@@ -515,6 +589,25 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
+/* Section: lights effects */
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+  openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
+                      Device->configuration.effectDeviceLight);
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  if (Device->configuration.noOfPN532Sensors > 0) {
+    addCheckboxFormItem(page, "e1", L_CLED_PN532_EFFECTS, "1",
+                        Device->configuration.effectPN532);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+  closeSection(page);
+#endif
+
   /* Section: APIs */
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
 
@@ -556,41 +649,53 @@ void AFESitesGenerator::siteNetwork(String &page) {
   NETWORK configuration;
   char _ip[18];
   char _int[4];
+  int numberOfNetworks = 0;
+  char _ssid[sizeof(configuration.ssid)];
   Data->getConfiguration(&configuration);
 
   /* Section: WiFi selection, user and password */
   openSection(page, F(L_NETWORK_CONFIGURATION),
               F(L_NETWORK_CONFIGURATION_INFO));
 
-  addSelectFormItemOpen(page, F("s"), F(L_NETWORK_SSID));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  if (WiFi.getMode() == WIFI_MODE_STA) {
+#endif // AFE_ESP32
 
 #ifdef DEBUG
-  Serial << endl << F("Searching for WiFi networks: ");
+    Serial << endl << F("INFO: WIFI: Searching for WiFis: ");
 #endif
-  int numberOfNetworks = WiFi.scanNetworks();
-  char _ssid[sizeof(configuration.ssid)];
-
+    numberOfNetworks = WiFi.scanNetworks();
 #ifdef DEBUG
-  Serial << endl << F(" - found: ") << numberOfNetworks;
+    Serial << F(" - found: ") << numberOfNetworks;
 #endif
-
-  for (int i = 0; i < numberOfNetworks; i++) {
-
+    addSelectFormItemOpen(page, F("s"), F(L_NETWORK_SSID));
+    if (numberOfNetworks > 0) {
+      for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
-    Serial << endl << " - " << WiFi.SSID(i);
+        Serial << endl << " - " << WiFi.SSID(i);
 #endif
+        WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        addSelectOptionFormItem(page, _ssid, _ssid,
+                                strcmp(_ssid, configuration.ssid) == 0);
+      }
+    } else {
+      addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
+                              strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
+                                     configuration.ssid) == 0);
+    }
 
-    WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-    addSelectOptionFormItem(page, _ssid, _ssid,
-                            strcmp(_ssid, configuration.ssid) == 0);
+    page.concat(F("</select>"));
+    page.concat(F("<input type=\"submit\" class =\"b bc\" value=\""));
+    page.concat(F(L_NETWORK_REFRESH));
+    page.concat(F("\" formaction=\"/?o="));
+    page += AFE_CONFIG_SITE_NETWORK;
+    page.concat(F("&c=0\"></div>"));
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  } else {
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "s", L_NETWORK_SSID,
+                     configuration.ssid, "32");
   }
-  page.concat(F("</select>"));
-
-  page.concat(F("<input type=\"submit\" class =\"b bc\" value=\""));
-  page.concat(F(L_NETWORK_REFRESH));
-  page.concat(F("\" formaction=\"/?o="));
-  page += AFE_CONFIG_SITE_NETWORK;
-  page.concat(F("&c=0\"></div>"));
+#endif // AFE_ESP32
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "p", L_PASSWORD,
                    configuration.password, "32");
@@ -613,33 +718,52 @@ void AFESitesGenerator::siteNetwork(String &page) {
                    configuration.gateway);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3", L_NETWORK_SUBNET,
                    configuration.subnet);
+
   closeSection(page);
 
   /* Section: Backup WiFI */
-  openSection(page, F(L_NETWORK_BACKUP_CONFIGURATION),
-              F(L_NETWORK_BACKUP_CONFIGURATION_HINT));
-
-  addSelectFormItemOpen(page, F("sb"), F(L_NETWORK_SSID));
-
-  addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
-                          strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
-                                 configuration.ssidBackup) == 0);
-
-  for (int i = 0; i < numberOfNetworks; i++) {
-    WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-    addSelectOptionFormItem(page, _ssid, _ssid,
-                            strcmp(_ssid, configuration.ssidBackup) == 0);
-  }
-  page.concat(F("</select>"));
-
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "pb", L_PASSWORD,
-                   configuration.passwordBackup, "32");
+  openSection(page, F(L_NETWORK_BACKUP_CONFIGURATION), F(""));
 
   sprintf(_int, "%d", configuration.noFailuresToSwitchNetwork);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fs",
                    L_NETWORK_SWITCH_TO_BACKUP, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
 
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  if (WiFi.getMode() == WIFI_MODE_STA) {
+#endif // AFE_EPS32
+
+    addSelectFormItemOpen(page, F("sb"), F(L_NETWORK_SSID));
+
+    addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
+                            strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
+                                   configuration.ssidBackup) == 0);
+    if (numberOfNetworks > 0) {
+      for (int i = 0; i < numberOfNetworks; i++) {
+        WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        addSelectOptionFormItem(page, _ssid, _ssid,
+                                strcmp(_ssid, configuration.ssidBackup) == 0);
+      }
+    }
+    addSelectFormItemClose(page);
+#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+  } else {
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "sb", L_NETWORK_SSID,
+                     configuration.ssidBackup, "32");
+  }
+#endif // AFE_ESP32
+
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "pb", L_PASSWORD,
+                   configuration.passwordBackup, "32");
+
+  addCheckboxFormItem(page, "db", L_NETWORK_DHCP_ENABLED, "1",
+                      configuration.isDHCPBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i1b", L_IP_ADDRESS,
+                   configuration.ipBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i2b", L_NETWORK_GATEWAY,
+                   configuration.gatewayBackup);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3b", L_NETWORK_SUBNET,
+                   configuration.subnetBackup);
   closeSection(page);
 
   /* Section: Advanced settings */
@@ -2089,8 +2213,13 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 
   openSection(page, F(L_BMEX80_SENSOR), F(""));
 
-  /* Item: IIC address selection */
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
 
   /* Item: type of the sensor */
   addSelectFormItemOpen(page, F("b"), F(L_BMEX80_SENSOR_TYPE));
@@ -2104,9 +2233,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                           configuration.type == AFE_BME680_SENSOR);
   addSelectFormItemClose(page);
 
-  page.concat(
-      "<input type=\"submit\" class=\"b bw\" value=\"" L_BMEX80_REFRESH_SETTINGS
-      "\"><br><br>");
+  page.concat("<input type=\"submit\" class=\"b bw\" "
+              "value=\"" L_BMEX80_REFRESH_SETTINGS "\"><br><br>");
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -2296,8 +2424,13 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
   Data->getConfiguration(id, &configuration);
   openSection(page, F(L_BH1750_SENSOR), F(""));
 
-  /* Item: I2C Address selection */
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
   addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
 
   /* Item: name of the sensor */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -2310,13 +2443,24 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  /* Item: sensitivness, not possiblity to change
+  /* Item: sensitivness */
   sprintf(_number, "%d", configuration.mode);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", L_SENSITIVENESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, L_ADC_CANT_CHANGE, true);
-*/
+  addSelectFormItemOpen(page, F("m"), F(L_SENSITIVENESS));
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_1_LUX, "16",
+                          configuration.mode == 16);
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_05_LUX, "17",
+                          configuration.mode == 17);
+  addSelectOptionFormItem(page, L_BH1750_CONTINUES_4_LUX, "19",
+                          configuration.mode == 19);
+
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_1_LUX, "32",
+                          configuration.mode == 32);
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_05_LUX, "33",
+                          configuration.mode == 33);
+  addSelectOptionFormItem(page, L_BH1750_ONE_READ_4_LUX, "35",
+                          configuration.mode == 35);
+  addSelectFormItemClose(page);
+
   closeSection(page);
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2339,6 +2483,78 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
+
+  TLS2561 configuration;
+  Data->getConfiguration(id, &configuration);
+  openSection(page, F(L_TLS2561_SENSOR), F(""));
+
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
+  addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: interval */
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
+                   L_SECONDS);
+
+  /* Item: sensitivness */
+  sprintf(_number, "%d", configuration.sensitiveness);
+  addSelectFormItemOpen(page, F("s"), F(L_SENSITIVENESS));
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_LOW, "0",
+                          configuration.sensitiveness == 0);
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_MID, "1",
+                          configuration.sensitiveness == 1);
+  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_HIGH, "2",
+                          configuration.sensitiveness == 2);
+  addSelectFormItemClose(page);
+
+  /* Item: gain */
+  sprintf(_number, "%d", configuration.gain);
+  addSelectFormItemOpen(page, F("g"), F(L_GAIN));
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_AUTO, "255",
+                          configuration.gain ==
+                              AFE_CONFIG_HARDWARE_TLS2561_GAIN_AUTO);
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_NONE, "0",
+                          configuration.gain == 0);
+  addSelectOptionFormItem(page, L_TLS2561_GAIN_16, "16",
+                          configuration.gain == 16);
+  addSelectFormItemClose(page);
+
+  closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_TLS2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 // String AFESitesGenerator::siteAS3935Sensor(uint8_t id) {
@@ -2572,18 +2788,28 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+
+#ifdef AFE_ESP32
+void AFESitesGenerator::siteADCInput(String &page, uint8_t id) {
+  ADCINPUT configuration;
+  Data->getConfiguration(id, &configuration);
+#else
 void AFESitesGenerator::siteADCInput(String &page) {
   ADCINPUT configuration;
   Data->getConfiguration(&configuration);
+#endif // AFE_ESP32
 
   openSection(page, F(L_ANALOG_INPUT), F(""));
   char _number[13];
 
-  sprintf(_number, "%d", configuration.gpio);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY AFE_FORM_ITEM_SKIP_PROPERTY
-                       AFE_FORM_ITEM_SKIP_PROPERTY,
-                   "?");
+  /* Item: GPIO */
+  addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO", true);
+
+#ifdef AFE_ESP32
+  /* Item: name of the ADC */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "l", L_NAME,
+                   configuration.name, "16");
+#endif // AFE_ESP32
 
   sprintf(_number, "%d", configuration.interval);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "v", L_MEASURMENTS_INTERVAL,
@@ -2696,18 +2922,35 @@ void AFESitesGenerator::siteUARTBUS(String &page) {
 #endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFESitesGenerator::siteI2CBUS(String &page) {
+#ifdef AFE_ESP32
+void AFESitesGenerator::siteI2CBUS(String &page, uint8_t id)
+#else
+void AFESitesGenerator::siteI2CBUS(String &page)
+#endif
+{
   I2CPORT configuration;
+#ifdef AFE_ESP32
+  Data->getConfiguration(id, &configuration);
+#else
   Data->getConfiguration(&configuration);
+#endif
   openSection(page, F("I2C"), F(""));
   addListOfGPIOs(page, F("a"), configuration.SDA, "GPIO SDA");
   addListOfGPIOs(page, F("l"), configuration.SCL, "GPIO SCL");
+#ifdef AFE_ESP32
+  char _int[7];
+  sprintf(_int, "%d", configuration.frequency);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_FREQUENCY, _int,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "400000", "1", "Hz");
+#endif
   closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 void AFESitesGenerator::siteUpgrade(String &page) {
+
+  siteFirmware(page);
 
   siteWANUpgrade(page, F(L_UPGRADE_READ_BEFORE));
 
@@ -2743,17 +2986,6 @@ void AFESitesGenerator::siteUpgrade(String &page) {
       closeSection(page);
     }
   }
-
-  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
-  closeMessageSection(page);
 }
 
 void AFESitesGenerator::sitePostUpgrade(String &page, boolean status) {
@@ -2927,6 +3159,45 @@ void AFESitesGenerator::siteProKey(String &page) {
   closeSection(page);
 }
 
+void AFESitesGenerator::siteFirmware(String &page) {
+  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_TYPE));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+#ifndef AFE_ESP32
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
+  char _flashSize[12];
+  if (ESP.getFlashChipRealSize() >= 1048576) {
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
+  } else {
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1024);
+  }
+  page.replace("{{f.s}}", _flashSize);
+
+  if (ESP.getFlashChipSize() >= 1048576) {
+    sprintf(_flashSize, "%d Mb", ESP.getFlashChipSize() / 1048576);
+  } else {
+    sprintf(_flashSize, "%d Kb", ESP.getFlashChipSize() / 1024);
+  }
+  page.replace("{{f.f}}", _flashSize);
+#endif // ESP8266
+
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", FirmwarePro->Pro.valid ? F(L_UPGRADE_FIRMWARE_PRO_YES)
+                                               : F(L_UPGRADE_FIRMWARE_PRO_NO));
+  closeMessageSection(page);
+}
+
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   BINARY_SENSOR configuration;
@@ -3039,10 +3310,19 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
     /* Item: UART GPIOs */
     addListOfGPIOs(page, F("rx"), configuration.rx, "GPIO RXD");
     addListOfGPIOs(page, F("tx"), configuration.tx, "GPIO TXD");
-  } else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
-    /* Item: IIC address */
-    addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
   }
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  else if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC) {
+/* Item: IIC address */
+#ifdef AFE_ESP32
+
+    addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                     configuration.i2cAddress);
+#else
+    addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
+  }
+#endif // AFE_CONFIG_HARDWARE_I2C
 
   closeSection(page);
 
@@ -3222,20 +3502,30 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
                        AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
     }
+    closeSection(page);
   }
 #else
   if (Device->configuration.api.mqtt) {
     openSection(page, F(L_MIFARE_CARD_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
+    closeSection(page);
   }
 #endif
-  closeSection(page);
 }
 
 void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
   AFESensorPN532 PN532Sensor;
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+  PN532Sensor.begin(0, Data, Device, WirePort0, WirePort1);
+#else
+  PN532Sensor.begin(0, Data, Device, WirePort0);
+#endif // AFE_ESP32
+#else
   PN532Sensor.begin(0, Data, Device);
+#endif // AFE_CONFIG_HARDWARE_I2C
+
   char _number[6];
 
   switch (id) {
@@ -3381,16 +3671,16 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
   CLED_EFFECTS CLEDEffectsConfiguration;
-  Data->getConfiguration(0, &CLEDConfiguration);
-  Data->getConfiguration(0, &CLEDEffectsConfiguration);
+  Data->getConfiguration(id, &CLEDConfiguration);
+  Data->getConfiguration(id, &CLEDEffectsConfiguration);
   char _number[10];
 
-  openSection(page, F("Pasek LED RGB"), F(L_CLEDS_HINT));
+  openSection(page, F(C_LED_EFFECT_PN532_SENSOR), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
@@ -3399,28 +3689,33 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, true);
 
-  /* Item: Chipset */
-  sprintf(_number, "%d", 0);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   "WS2811", true);
+  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
 
-  /* Item: number of leds */
-  sprintf(_number, "%d", CLEDConfiguration.ledNumber);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   true);
+  /*
+    // Item: Chipset
+    sprintf(_number, "%d", 0);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     "WS2811", true);
 
-  /* Item: Colors order */
-  sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o", L_CLED_COLORS_ORDER,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+    // Item: number of leds
+    sprintf(_number, "%d", CLEDConfiguration.ledNumber);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
+    L_CLED_NUMBER_OF_LEDS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     true);
 
+    // Item: Colors order
+    sprintf(_number, "%d", CLEDConfiguration.colorOrder);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o",
+    L_CLED_COLORS_ORDER,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+  */
   closeSection(page);
 
   openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
@@ -3433,18 +3728,18 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "20000", "1",
                    L_MILISECONDS);
 
   closeSection(page);
 
-  openSection(page, F("Efekt Fade In/Out"), F(""));
+  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT), F(""));
   /*** Effect: FAde in / out */
 
   /* Item: Led color */
@@ -3454,17 +3749,134 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: brightness */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: time */
   sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "20000", "1",
-                   L_MILISECONDS);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
   closeSection(page);
 }
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
+
+  CLED CLEDConfiguration;
+  CLED_BACKLIGHT CLEDBacklightConfiguration;
+  Data->getConfiguration(id, &CLEDConfiguration);
+  Data->getConfiguration(id, &CLEDBacklightConfiguration);
+  char _label[26];
+  char _number[10];
+
+  openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
+
+  /* Item: GPIO */
+  sprintf(_number, "%d", CLEDConfiguration.gpio);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, true);
+
+  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
+  closeSection(page);
+
+  openSection(page, F(L_CLED_BACKLIGHT_CONFIG), F(L_CLED_RULE_HINT));
+
+  // uint8_t lightSensorId;
+
+  addSelectFormItemOpen(page, F("s"), F(L_CLED_LIGHT_SENSOR));
+  addSelectOptionFormItem(page, L_NONE, "255",
+                          CLEDBacklightConfiguration.lightSensorId ==
+                              AFE_HARDWARE_ITEM_NOT_EXIST);
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  if (Device->configuration.noOfBH1750s > 0) {
+    BH1750 BH1750Configuration;
+    for (uint8_t i = 0; i < Device->configuration.noOfBH1750s; i++) {
+      Data->getConfiguration(i, &BH1750Configuration);
+      sprintf(_label, "BH1750: %s", BH1750Configuration.name);
+      sprintf(_number, "%d", i);
+      addSelectOptionFormItem(page, _label, _number,
+                              CLEDBacklightConfiguration.lightSensorId == i);
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  if (Device->configuration.noOfTLS2561s > 0) {
+    TLS2561 TLS2561Configuration;
+    for (uint8_t i = 0; i < Device->configuration.noOfTLS2561s; i++) {
+      Data->getConfiguration(i, &TLS2561Configuration);
+      sprintf(_label, "TLS2561: %s", TLS2561Configuration.name);
+      sprintf(_number, "%d", 50 + i);
+      addSelectOptionFormItem(page, _label, _number,
+                              CLEDBacklightConfiguration.lightSensorId ==
+                                  50 + i);
+    }
+  }
+#endif // AFE_CONFIG_HARDWARE_TLS2561
+  addSelectFormItemClose(page);
+
+  for (uint8_t index = 0;
+       index < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; index++) {
+
+    page.concat(FPSTR(HTTP_ITEM_HINT));
+    sprintf(_label, "{{L}}: %d", index + 1);
+    page.replace("{{i.h}}", _label);
+
+    /* Item: Lux level */
+    sprintf(_label, "l%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].luxLevel);
+
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label,
+                     L_CLED_LIGHT_LEVEL, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     "0", "65535", "1", "Lux");
+
+    /* Item: Led color */
+    sprintf(_label, "k%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].color);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_COLOR,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999",
+                     "1");
+
+    /* Item: brightness */
+    sprintf(_label, "b%u", index);
+    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].brightness);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_BRIGHTNESS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+  }
+
+  page.replace("{{L}}", L_CLED_RULE);
+
+  closeSection(page);
+
+  /*
+
+  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt)
+  {
+      openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+      sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                       AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+      closeSection(page);
+    }
+  #else
+    if (Device->configuration.api.mqtt) {
+      openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                       CLEDConfiguration.mqtt.topic, "64");
+      closeSection(page);
+    }
+  #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+  */
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {
@@ -3475,7 +3887,6 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   }
 
   page.concat(F("</div></div>"));
-  page.replace("{{e.f}}", String(system_get_free_heap_size() / 1024));
 
   page.replace("{{A}}",
                RestAPI->accessToWAN()
@@ -3639,9 +4050,10 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-void AFESitesGenerator::addListOfGPIOs(String &item,
+/*void AFESitesGenerator::addListOfGPIOs(String &item,
                                        const __FlashStringHelper *field,
-                                       uint8_t selected, const char *title) {
+                                       uint8_t selected, const char *title,
+                                       ) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
   item.replace("{{i.n}}", field);
@@ -3653,14 +4065,58 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
                               ? F(" selected=\"selected\"")
                               : F(""));
 
-  for (uint8_t i = 0; i < AFE_NUMBER_OF_GPIOS; i++) {
+  for (uint8_t i = 0;
+       i < generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS;
+       i++) {
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
-    item.replace("{{i.v}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.l}}", String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.s}}", selected == pgm_read_byte(GPIOS + i)
-                                ? F(" selected=\"selected\"")
-                                : F(""));
+    item.replace("{{i.v}}", String(pgm_read_byte(
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
+i)));
+    item.replace("{{i.l}}", String(pgm_read_byte(
+                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
+i)));
+    item.replace(
+        "{{i.s}}",
+        selected == pgm_read_byte((generatedADCGpios ? GPIOS_ADC : GPIOS) + i)
+            ? F(" selected=\"selected\"")
+            : F(""));
+  }
+  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
+}
+*/
+
+void AFESitesGenerator::addListOfGPIOs(String &item,
+                                       const __FlashStringHelper *field,
+                                       uint8_t selected, const char *title,
+                                       boolean generatedADCGpios) {
+
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  item.replace("{{i.n}}", field);
+  item.replace("{{i.l}}", title);
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{i.l}}", F(L_NONE));
+  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? F(" selected=\"selected\"")
+                              : F(""));
+
+  for (uint8_t i = 0;
+       i < (generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS);
+       i++) {
+    item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+
+    item.replace("{{i.v}}", generatedADCGpios
+                                ? String(pgm_read_byte(GPIOS_ADC + i))
+                                : String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.l}}", generatedADCGpios
+                                ? String(pgm_read_byte(GPIOS_ADC + i))
+                                : String(pgm_read_byte(GPIOS + i)));
+    item.replace("{{i.s}}",
+                 selected == (generatedADCGpios ? pgm_read_byte(GPIOS_ADC + i)
+                                                : pgm_read_byte(GPIOS + i))
+                     ? F(" selected=\"selected\"")
+                     : F(""));
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
@@ -3855,16 +4311,46 @@ void AFESitesGenerator::addSelectFormItemClose(String &item) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
 void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
-                                                         uint8_t address) {
+                                                         uint8_t wirePortId,
+                                                         uint8_t address)
+#else
+void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
+                                                         uint8_t address)
+#endif // AFE_ESP32
+{
+  char _number[4];
+
+#ifdef AFE_ESP32
+  /* Item: I2C Port Id */
+  addSelectFormItemOpen(item, F("wr"), F(L_I2C_PORT));
+  addSelectOptionFormItem(item, L_NONE, "255",
+                          wirePortId == AFE_HARDWARE_ITEM_NOT_EXIST);
+  char _label[8];
+  for (uint8_t i = 0; i < Device->configuration.noOfI2Cs; i++) {
+    sprintf(_label, "Port: %d", i + 1);
+    sprintf(_number, "%d", i);
+    addSelectOptionFormItem(item, _label, _number, wirePortId == i);
+  }
+  addSelectFormItemClose(item);
+
+  item.concat("<input type=\"submit\" class=\"b bw\" "
+              "value=\"" L_PN532_SEARCH_I2C_CONNECTED_DEVICES "\"><br><br>");
+
+#endif
+
   AFEI2CScanner I2CScanner;
-  I2CScanner.begin();
+#ifdef AFE_ESP32
+  I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1);
+#else
+  I2CScanner.begin(WirePort0);
+#endif
 
   addSelectFormItemOpen(item, F("a"), F("I2C " L_ADDRESS));
   addSelectOptionFormItem(item, L_NONE, "0", address == 0);
 
   char _i2cItemName[90];
-  char _number[4];
   for (uint8_t addressToScan = 1; addressToScan < 127; addressToScan++) {
     if (I2CScanner.scan(addressToScan)) {
       sprintf(_i2cItemName, "[0x%X] : %s", addressToScan,

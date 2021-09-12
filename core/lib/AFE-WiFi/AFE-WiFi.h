@@ -8,16 +8,19 @@
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
+#ifdef AFE_ESP32
+#include <WiFi.h>
+#else // ESP8266
 #include <ESP8266WiFi.h>
+#endif // ESP32/ESP8266
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
 /* WiFi Class */
-
 class AFEWiFi {
 
 private:
@@ -28,7 +31,7 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   /* Used to count connection attemps before going to sleep mode */
   uint8_t connections = 0;
@@ -42,7 +45,7 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   boolean eventConnectionEstablished = false;
   boolean eventConnectionLost = false;
@@ -56,7 +59,12 @@ private:
 public:
   /* Constructor: no actions */
   AFEWiFi();
+
+#ifdef AFE_ESP32
+  WiFiClass WirelessNetwork;
+#else  // ESP8266
   ESP8266WiFiClass WirelessNetwork;
+#endif // ESP32/ESP8266
 
   /* Indicates on to which router the device is connected */
   boolean isPrimaryConfiguration = false;
@@ -67,7 +75,7 @@ public:
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *, AFELED *);
 #else
   void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   /* Return TRUE if device is connected to WiFi Acces Point */
   boolean connected();

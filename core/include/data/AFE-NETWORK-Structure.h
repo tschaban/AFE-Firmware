@@ -17,6 +17,10 @@ struct NETWORK {
   uint8_t waitTimeSeries;
   char ssidBackup[33];
   char passwordBackup[33];
+  uint8_t isDHCPBackup;
+  char ipBackup[16];
+  char gatewayBackup[16];
+  char subnetBackup[16];
   uint8_t noFailuresToSwitchNetwork;
 };
 

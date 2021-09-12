@@ -30,6 +30,8 @@
 /* HTTP API */
 #define L_DEVICE_NOT_EXIST "\"Urządzenie o takiej nazwie nie istnieje\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Komenda nie jest zaimplementowana\""
+#define L_404 "AFE FIRMWARE: Bład 404: Strona o takim adresie nie istnieje."
+#define L_COMMNAD_NO_COMMAND "\"Brak komendy\""
 
 /* Menu */
 #define L_HARDWARE "Sprzęt"
@@ -83,6 +85,9 @@
 #define L_ADDRESS "Adres"
 #define L_CORRECTIONS "Korekty"
 #define L_UNITS "Jednostki"
+#define L_FREQUENCY "Częstotliwość"
+#define L_I2C_PORT "Port I2C"
+#define L_GAIN "Wzmocnienie"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -114,6 +119,9 @@
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Ilość czujników binarnych"
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
+#define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
+#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Ilość czujników TLS2561"
+#define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -147,7 +155,6 @@
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION  "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
-#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Działa tylko z routerami z włączonym DHCPd"
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
 
 
@@ -246,6 +253,7 @@
 #define L_ADC_RESISTOR "Rezystor"
 #define L_ADC_VOLTAGE_DIVIDER "Dzielnik napięcia"
 #define L_ADC_MQTT_TOPIC "Temat MQTT dla informacji z ADC"
+#define L_ADC_INPUT "Wejście"
 
 #define L_BATTERY_METER "Pomiar naładowania baterii"
 #define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
@@ -269,10 +277,17 @@
 #define L_UPGRADE "Aktualizuj"
 
 #define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
-#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
-#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
+#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_UPGRADE_FIRMWARE_VERSION "Wersja {{f.v}}"
+#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
+#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
+#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
+#define L_UPGRADE_FIRMWARE_PRO_YES "Wersja Pro: Tak"
+#define L_UPGRADE_FIRMWARE_PRO_NO "Wersja Pro: Nie"
+
+
 
 #define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
 
@@ -291,6 +306,19 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Trwa ponowne uruchamianie"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie automatycznie przeładowana ... czekaj"
 #define L_UPGRADE_REBOOT "Ponowne uruchamianie"
+
+#define L_UPGRADE_TIMEOUT "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania (timeout)"
+#define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania"
+#define L_UPGRADE_SERVER_NONE_200 "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [HTTP<>200]"
+#define L_UPGRADE_FIRMWARE_SIZE_0 "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania  [Firmware: 0kB]"
+#define L_UPGRADE_WRONG_CONTENT_TYPE "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Content type]"
+#define L_UPGRADE_SUCCESS_MESSAGE "Firmware: %s został załadowany. Rozmiar: %dkB"
+#define L_UPGRADE_NOT_FULL_LOADED "Aktualizacja nie powiodła się. Zapisane tylko %dkB z %dkB"
+#define L_UPGRADE_SOMETHING_WRONG "Aktualizacja nie powiodła się. Coś poszło nie tak [Bład: %d]"
+#define L_UPGRADE_NO_SPACE "Aktualizacja nie powiodła się. Za mało miejsca, aby rozpocząć ładowanie firmware"
+#define L_UPGRADE_NO_CONTENT "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Brak odpowiedzi]"
+
+
 
 
 /* Form: password */
@@ -368,6 +396,23 @@
 #define L_BH1750_SENSOR "Czujnik BH1750"
 #define L_BH1750_SENSORS "Czujniki BH1750"
 #define L_BH1750_MQTT_TOPIC "Temat MQTT czujnika BH1750"
+#define L_BH1750_CONTINUES_1_LUX "Ciągły odczyt: ~1 lux 120ms"
+#define L_BH1750_CONTINUES_05_LUX "Ciągły odczyt: ~0.5 lux 120ms"
+#define L_BH1750_CONTINUES_4_LUX "Ciągły odczyt: 4 lux 16ms"
+#define L_BH1750_ONE_READ_1_LUX "Jeden odczyt: 1 lux 120ms"
+#define L_BH1750_ONE_READ_05_LUX "Jeden odczyt: 0.5 lux 120ms"
+#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16mss"
+
+/* TLS2561 */
+#define L_TLS2561_SENSOR "Czujnik TLS2561"
+#define L_TLS2561_SENSORS "Czujniki TLS2561"
+#define L_TLS2561_MQTT_TOPIC "Temat MQTT czujnika TLS2561"
+#define L_TLS2561_SENSITIVENESS_LOW "Niska; szybkie odczyty: 14ms"
+#define L_TLS2561_SENSITIVENESS_MID "Średnia; dość szybkie odczyty: 100ms"
+#define L_TLS2561_SENSITIVENESS_HIGH "Wysoka; wolne odczyty: 400ms"
+#define L_TLS2561_GAIN_AUTO "Automatyczne"
+#define L_TLS2561_GAIN_NONE "1x (brak)"
+#define L_TLS2561_GAIN_16 "16x"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"
@@ -523,14 +568,16 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_INTERFACE "Interface"
 #define L_PN532_LISTENER_TIMEOUT "Interwał odczytów karty"
 #define L_PN532_SHOW_INTERFACE_CONFIGURATION "Pokaż parametery konfiguracyjne interface'u"
+#define L_PN532_SEARCH_I2C_CONNECTED_DEVICES "Szukaj urządzeń na porcie I2C"
 #define L_PN532_TIMEOUTS "Konfiguracja odczytów"
 #define L_PN532_MQTT_TOPIC "Temat MQTT do wysyłania danych odczytanej kary MiFare"
+
 
 #define L_MIFARE_CARD "Karta MiFare Classic"
 #define L_MIFARE_CARDS "Karty MiFare Classic"
 #define L_MIFARE "MiFare"
 #define L_MIFARE_CARD_ID "Identyfikator Karty"
-#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnkem / bramą"
+#define L_MIFARE_CARD_CONTROLS_RELAY_GATE "Sterowanie przekaźnikem / bramą"
 #define L_MIFARE_CARD_CONTROLS "Steruje"
 #define L_MIFARE_CARD_ACTION "Akcja"
 #define L_MIFARE_CARD_ACTION_ON "ON"
@@ -540,21 +587,20 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_INTEGRATION_HINT "Konfiguracja integracji z systemem automatyki"
 #define L_MIFARE_CARD_SEND_AS_SWITCH "Wysyłaj detekcję kart wartościami: ON/OFF"
 #define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Domyślnie: OPEN/CLOSED"
-#define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytania karty MiFare"
-#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) w systeme do automatyki po wykryciu karty"
+#define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytów karty MiFare"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
-#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic. W wersji AFE Pro dostępna jest obsługa do 10 kart. Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
 
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
 
-
-#define L_CLEDS "Diody LED RGB"
-#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę parametrów konfiguracyjnych paska LED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
+#define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzeni"
+#define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532"
+#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
 #define L_CLED_COLORS_ORDER "Kolejność kolorów"
-
 #define L_CLED_EFFECT_WAVE "Efekt fala"
 #define L_CLED_EFFECT_FADE_IN_OUT "Efekt przygaszania"
 #define L_CLED_COLOR "Kolor"
@@ -562,6 +608,17 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
 #define L_CLED_TIME_WAVE "Szybkość fali"
 #define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
+#define L_CLED_LIGHT_SENSOR "Czujnik natężenia oświetlenia"
+#define L_CLED_LIGHT_LEVEL "Poziom natężenia oświetlenia"
+#define L_CLED_BACKLIGHT_CONFIG "Konfiguracja podświetlenia"
+#define L_CLED_RULE "Reguła"
+#define L_CLED_RULE_HINT "Reguła podświetlenia jest uruchamiana, jeśli poziom światła jest poniżej odczytu czujnika. Pierwszy spełniony warunek zatrzymuje przetwarzanie kolejnych reguł"
+#define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
+
+#define L_CLED_LIGHT_EFFECTS "Efekty świetlne"
+#define L_CLED_DEVICE_BACKLIGHT "Podświetlanie urządzenia"
+#define L_CLED_PN532_EFFECTS "Efekty czujnika PN532"
+
 
 #endif // _LANG_PL_h
 

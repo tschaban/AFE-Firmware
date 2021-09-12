@@ -6,11 +6,9 @@
 
 AFEI2CScanner::AFEI2CScanner() {};
 
- void AFEI2CScanner::begin() {
+ void AFEI2CScanner::begin(TwoWire *_WirePort) {
   AFEDataAccess Data;
-  I2CPORT I2C;
-  Data.getConfiguration(&I2C);
-  WirePort.begin(I2C.SDA, I2C.SCL);
+  WirePort = _WirePort; 
  }
 
 #ifdef DEBUG
@@ -44,8 +42,8 @@ void AFEI2CScanner::scanAll() {
 
 boolean AFEI2CScanner::scan(byte address) {
   byte status;
-  WirePort.beginTransmission(address);
-  status = WirePort.endTransmission();
+  WirePort->beginTransmission(address);
+  status = WirePort->endTransmission();
   if (status == 0) {
 #ifdef DEBUG
     Serial << endl << F(" - Sensor Found [0x");

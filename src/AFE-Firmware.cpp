@@ -16,6 +16,8 @@ void setup() {
          << F("INFO: All classes and global variables initialized") << endl
          << F("INFO: Initializing device") << endl;
 
+#ifndef AFE_ESP32 /* ESP82xx */
+
   Serial << endl << "INFO: ESP: ID " << ESP.getFlashChipId();
   Serial << endl << "INFO: ESP: Real flash size: ";
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -36,18 +38,23 @@ void setup() {
          << " MHz";
   Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
 
-#endif
+#else  /* ESP32 */
+// @TODO ESP32
+#endif // ESP32
+#endif // DEBUG
 
+#ifdef AFE_ESP32
+#else // ESP8266
   // Erase all config
   ESP.eraseConfig();
 #ifdef DEBUG
   Serial << F("INFO: ESP: Erasing internally stored configuration") << endl;
 #endif
+#endif // ESP32/ESP8266
 
 /* Initializing SPIFFS file system */
-
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
-  bool _fileSystemReady = LittleFS.begin();
+  bool _fileSystemReady = LITTLEFS.begin();
 #else
   bool _fileSystemReady = SPIFFS.begin();
 #endif
@@ -59,8 +66,11 @@ void setup() {
   } else {
     Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_SPIFFS
     yield();
     SPIFFS.gc();
+#endif
   }
 
   Device.begin();
@@ -87,16 +97,16 @@ void setup() {
 /* Initializing MCP23017 expanders */
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   initializeMCP23017();
-#endif
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 /* Initializing system LED (if exists) and turning it on */
 #ifdef AFE_CONFIG_HARDWARE_LED
   initializeLED();
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   initializeCLed();
-#endif
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
@@ -138,7 +148,7 @@ void setup() {
       Serial << endl << F("INFO: BOOT: Relay initialized");
 #endif
     }
-#endif
+#endif // AFE_CONFIG_HARDWARE_RELAY
   }
 
 /* Initialzing network */
@@ -146,7 +156,7 @@ void setup() {
   Network.begin(Device.getMode(), &Device, &Data, &Led);
 #else
   Network.begin(Device.getMode(), &Device, &Data);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Network initialized");
@@ -157,12 +167,17 @@ void setup() {
 #endif
   Network.listener();
 
+/* Initializing I2C BUS */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  initializeI2CBUS();
+#endif // ESP_CONFIG_HARDWARE_I2C
+
 /* Initializating REST API */
 #ifdef AFE_CONFIG_HARDWARE_LED
   RestAPI.begin(&Data, &Device, &Led);
 #else
   RestAPI.begin(&Data, &Device);
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
   /* Initializing FirmwarePro */
   FirmwarePro.begin(&Data, &RestAPI);
@@ -173,75 +188,77 @@ void setup() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Initializing switches */
   initializeSwitch();
-#endif
+#endif // AFE_CONFIG_HARDWARE_SWITCH
 
   if (Device.getMode() == AFE_MODE_NORMAL) {
 
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     initializeContracton();
-#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Initializing Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
     initializeGate();
-#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     initializeRegulator();
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     initializeThermalProtector();
-#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 /* Initializing DS18B20  */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
     initializeDS18B20Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
 
 /* Initializing DHT  */
 #ifdef AFE_CONFIG_HARDWARE_DHT
     initializeDHTSensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     initializeHPMA115S0Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
     initializeBMX80Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
     initializeBH1750Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+    initializeTLS2561Sensor();
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     initializeAS3935Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
     initializeBinarySensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     initializeAnemometer();
-#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     initializeRainmeter();
-#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-    if (Device.configuration.isAnalogInput && FirmwarePro.Pro.valid) {
-      AnalogInput.begin();
-    }
-#endif
+    initializeADC();
+#endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();
-#endif
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
     /* Initializing APIs */
     initializeMQTTAPI();
@@ -249,7 +266,7 @@ void setup() {
 /* Initializing Domoticz HTTP API */
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     initializeHTTPDomoticzAPI();
-#endif
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
@@ -258,14 +275,6 @@ void setup() {
 /* End of initialization for operating mode. Initialization for all devices
  * modes */
 
-#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
-  /* Scanning I2C for devices */
-  if (Device.getMode() == AFE_MODE_NORMAL) {
-    I2CScanner.begin();
-    I2CScanner.scanAll();
-  }
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_LED
   Led.off();
   /* If device in configuration mode then it starts LED blinking */
@@ -273,7 +282,7 @@ void setup() {
       Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
-#endif
+#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
   Serial << endl
@@ -299,10 +308,11 @@ void setup() {
          << F("############################################################"
               "####"
               "########");
-
+#ifndef AFE_ESP32
   Serial << endl
          << "INFO: MEMORY: Free: [Boot end] : "
          << String(system_get_free_heap_size() / 1024) << "kB";
+#endif
 #endif
 }
 
@@ -321,10 +331,7 @@ void loop() {
 
         /* Listens for HTTP requsts. Both for configuration panel HTTP
          * requests or HTTP API requests if it's turned on */
-        WebServer.listener();
-
-        /* Checking if there was received HTTP API Command */
-        HttpAPI.listener();
+        HTTPServer.listener();
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
         contractonEventsListener();
@@ -344,6 +351,10 @@ void loop() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         BH1750SensorEventsListener();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+        TLS2561SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
@@ -380,7 +391,7 @@ void loop() {
           Led.blinkingOn(100);
         }
 #endif
-        WebServer.listener();
+        HTTPServer.listener();
       }
     }
 
@@ -423,7 +434,7 @@ void loop() {
     eventsListener();
 
   } else { /* Deviced runs in Access Point mode */
-    WebServer.listener();
+    HTTPServer.listener();
   }
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -438,9 +449,9 @@ void loop() {
 #endif
 
 /* Debug information */
-#if defined(DEBUG)
+#ifdef DEBUG
   if (Device.getMode() == AFE_MODE_NORMAL) {
     //  debugListener();
   }
-#endif
+#endif // DEBUG
 }

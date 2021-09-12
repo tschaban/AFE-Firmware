@@ -15,12 +15,27 @@ void initializePN532Sensor() {
   Serial << endl << F("INFO: BOOT: Initializing PN532");
 #endif
   for (uint8_t i = 0; i < Device.configuration.noOfPN532Sensors; i++) {
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+    PN532Sensor[i].begin(i, &Data, &Device, &WirePort0, &WirePort1);
+#else
+    PN532Sensor[i].begin(i, &Data, &Device, &WirePort0);
+#endif
+#else
     PN532Sensor[i].begin(i, &Data, &Device);
+#endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: PN532: ") << i << F(" initialized");
 #endif
   }
-
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  if (Device.configuration.noOfPN532Sensors > 0 &&
+      Device.configuration.effectPN532) {
+    /* Changing the CLED Effect to listening mode */
+    CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Initializing MiFare Cards");
 #endif
@@ -40,29 +55,36 @@ void PN532EventsListener() {
     switch (PN532Sensor[i].listener()) {
 
     /* Card detected */
-    case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND: 
+    case AFE_HARDWARE_PN532_LISTENER_EVENT_FOUND:
 
       if (PN532Sensor[i].readTag()) {
-#ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
         /* Changing the CLED Effect card detected, but not authorized yet */
-        CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].setCustomEffectColor(
-            AFE_CONFIG_HARDWARE_EFFECT_WAVE,
-            AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
-        CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].effectOn(
-            AFE_CONFIG_HARDWARE_EFFECT_WAVE);
-#endif
+        if (Device.configuration.effectPN532) {
+          CLEDStrip.setCustomEffectColor(
+              AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+              AFE_CONFIG_HARDWARE_EFFECT_WAVE,
+              AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
+
+          CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                             AFE_CONFIG_HARDWARE_EFFECT_WAVE);
+        }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
         for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
           if (strcmp(MiFareCard[j].configuration.cardId,
                      PN532Sensor[i].tag.block[0].value) == 0) {
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-          /* Changing the CLED Effect color to authorized */
-            CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].setCustomEffectColor(
-                AFE_CONFIG_HARDWARE_EFFECT_WAVE,
-                CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR]
-                    .effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
-                    .color);
-#endif
+            #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+            /* Changing the CLED Effect color to authorized */
+            if (Device.configuration.effectPN532) {
+
+              CLEDStrip.setCustomEffectColor(
+                  AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                  AFE_CONFIG_HARDWARE_EFFECT_WAVE,
+                  CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
+                      .color);
+            }
+            #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
             actionTaken = false;
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -113,17 +135,17 @@ void PN532EventsListener() {
 #endif
       }
       break;
-
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     /* End of processing time of a request. Used only by CLED */
-#ifdef AFE_CONFIG_HARDWARE_CLED
     case AFE_HARDWARE_PN532_LISTENER_EVENT_PROCESSING_FINISHED:
-    /* Changing the CLED Effect to listening mode */
-      CLed[AFE_CONFIG_HARDWARE_CLED_ID_PN532_SENSOR].effectOn(
-            AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+      if (Device.configuration.effectPN532) {
+        /* Changing the CLED Effect to listening mode */
+        CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                           AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+      }
       break;
-#endif;      
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT      
     }
-
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {

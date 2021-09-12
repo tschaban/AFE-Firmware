@@ -5,7 +5,7 @@
 
 AFESensorBME280::AFESensorBME280(){};
 
-boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
+boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
   configuration = _configuration;
 
 #if defined(DEBUG)
@@ -13,15 +13,11 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, I2CPORT *I2C) {
 #endif
 
   if (configuration->i2cAddress != 0) {
-#ifdef DEBUG
-    Serial << endl << F("INFO: Setting I2C: SDA:") << I2C->SDA << F(", SCL:") << I2C->SCL;
-#endif
-    Wire.begin(I2C->SDA,I2C->SCL);
-
+    
 #ifdef DEBUG
     Serial << endl << F("INFO: Address: 0x") << _HEX(configuration->i2cAddress);
 #endif
-    if (!bme.begin(configuration->i2cAddress,&Wire)) {
+    if (!bme.begin(configuration->i2cAddress,_wirePort)) {
       return false;
     } else {
       bme.setSampling(

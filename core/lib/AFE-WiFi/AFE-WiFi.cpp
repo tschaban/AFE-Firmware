@@ -39,7 +39,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
 #endif
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(ESP32)
   Serial << endl
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
          << WirelessNetwork.getPhyMode();
@@ -51,9 +51,14 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
     Serial << endl << F("INFO: WIFI: Starting HotSpot: ");
 #endif
     IPAddress apIP(192, 168, 5, 1);
-    WirelessNetwork.mode(WIFI_AP);
+    WirelessNetwork.mode(WIFI_AP_STA);
+    WirelessNetwork.softAP("AFE Device");
     WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-    WirelessNetwork.softAP(Device->configuration.name);
+#ifdef AFE_ESP32
+    WirelessNetwork.softAPsetHostname(Device->configuration.name);
+#else
+    WirelessNetwork.hostname(Device->configuration.name);
+#endif
 #ifdef DEBUG
     Serial << F("completed");
 #endif
@@ -78,10 +83,21 @@ void AFEWiFi::switchConfiguration() {
            << Device->configuration.name;
 #endif
   }
+
+#ifndef AFE_ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
+#else
+  WiFi.setSleep(false);
+#endif
 
   /* Setting Fixed IP for Primary Configuration if set */
   if (isPrimaryConfiguration && !configuration.isDHCP) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting fixed IP (")
+                << configuration.ip << F(")  address for primary WiFi "
+                                       "configuration");
+#endif
     IPAddress ip;
     if (!ip.fromString(configuration.ip)) {
 #ifdef DEBUG
@@ -109,12 +125,49 @@ void AFEWiFi::switchConfiguration() {
 
     WirelessNetwork.config(ip, gateway, subnet);
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Settting fixed IP");
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
 #endif
-  } else if (!isPrimaryConfiguration && !configuration.isDHCP) {
+  } else if ((isPrimaryConfiguration && configuration.isDHCP) ||
+             (!isPrimaryConfiguration && configuration.isDHCPBackup)) {
     WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
                            (uint32_t)0x00000000);
+  } else if (!isPrimaryConfiguration && !configuration.isDHCPBackup) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting fixed IP (") << configuration.ipBackup
+                                                 << F(") address for backup WiFi "
+                                                    "configuration");
+#endif
 
+    IPAddress ip;
+    if (!ip.fromString(configuration.ipBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI IP address: ")
+             << configuration.ipBackup;
+#endif
+    }
+    IPAddress gateway;
+    if (!gateway.fromString(configuration.gatewayBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI gateway address: ")
+             << configuration.gatewayBackup;
+#endif
+    }
+    IPAddress subnet;
+    if (!subnet.fromString(configuration.subnetBackup)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI subnet address: ")
+             << configuration.subnetBackup;
+#endif
+    }
+
+    WirelessNetwork.config(ip, gateway, subnet);
+#ifdef DEBUG
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
+#endif
   } /* Endif: Setting Fixed IP for Primary Configuration if set */
 
   WirelessNetwork.mode(WIFI_STA);
@@ -172,13 +225,18 @@ void AFEWiFi::listener() {
                    << endl
                    << " - getAutoReconnect="
                    << WirelessNetwork.getAutoReconnect() << endl
+                   << " - getMode=" << WirelessNetwork.getMode();
+
+#ifndef ESP32
+            Serial << endl
                    << " - getListenInterval="
                    << WirelessNetwork.getListenInterval() << endl
-                   << " - getMode=" << WirelessNetwork.getMode() << endl
+
                    << " - getPersistent=" << WirelessNetwork.getPersistent()
                    << endl
                    << " - getPhyMode=" << WirelessNetwork.getPhyMode() << endl
                    << " - getSleepMode=" << WirelessNetwork.getSleepMode();
+#endif // !ESP32
 #endif
           }
         }
@@ -256,20 +314,21 @@ void AFEWiFi::listener() {
 #endif
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Setting hostname to: ") << Device->configuration.name;
+        Serial << endl
+               << F("INFO: WIFI: Setting hostname to: ")
+               << Device->configuration.name;
 #endif
 
-   yield();
+        yield();
 
-  if (WirelessNetwork.hostname(Device->configuration.name)) {
-    yield();
+        if (WirelessNetwork.hostname(Device->configuration.name)) {
+          yield();
 #ifdef DEBUG
-    Serial << F(" ... Success");
-  } else {
-    Serial << F(" ... Error");
+          Serial << F(" ... Success");
+        } else {
+          Serial << F(" ... Error");
 #endif
-  }
+        }
 
 #ifdef DEBUG
         Serial << endl
@@ -283,14 +342,19 @@ void AFEWiFi::listener() {
 }
 
 boolean AFEWiFi::connected() {
-  if ((configuration.isDHCP &&
+
+#ifndef AFE_ESP32 /* ESP82xx */
+  if ((((isPrimaryConfiguration && configuration.isDHCP) ||
+        (!isPrimaryConfiguration && configuration.isDHCPBackup)) &&
        WirelessNetwork.localIP().toString() != "(IP unset)") ||
-      (!configuration.isDHCP && WirelessNetwork.status() == WL_CONNECTED)) {
-
-    // if (WirelessNetwork.waitForConnectResult() == WL_NETWORK_CONNECTED) {
-
+      (((isPrimaryConfiguration && !configuration.isDHCP) ||
+        (!isPrimaryConfiguration && !configuration.isDHCPBackup)) &&
+       WirelessNetwork.status() == WL_CONNECTED)) {
     yield();
     delay(10);
+#else /* ESP32 */
+  if (WiFi.status() == WL_CONNECTED) {
+#endif
 
     if (disconnected) {
       eventConnectionEstablished = true;

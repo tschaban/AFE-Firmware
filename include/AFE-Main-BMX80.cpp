@@ -11,7 +11,11 @@ void BMX80SensorEventsListener(void);
 void initializeBMX80Sensor(void) {
   if (Device.configuration.noOfBMEX80s > 0) {
     for (uint8_t i = 0; i < Device.configuration.noOfBMEX80s; i++) {
-      BMEX80Sensor[i].begin(i);
+#ifdef AFE_ESP32
+      BMEX80Sensor[i].begin(i, &WirePort0, &WirePort1);
+#else
+      BMEX80Sensor[i].begin(i, &WirePort0);
+#endif
     }
   }
 }

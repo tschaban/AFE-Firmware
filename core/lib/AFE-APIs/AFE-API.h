@@ -82,11 +82,20 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#include <AFE-Sensor-PN532.h>
 #include <AFE-MiFare-Card.h>
+#include <AFE-Sensor-PN532.h>
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+/* Not yet implemented 
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+#include <AFE-CLED.h>
 #endif
+*/
 
-
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#include <AFE-Sensor-TLS2561.h>
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -176,11 +185,23 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-virtual void addClass(AFESensorPN532 *);
+  virtual void addClass(AFESensorPN532 *);
 #endif
-virtual void addClass(AFEMiFareCard *);
+  virtual void addClass(AFEMiFareCard *);
+#endif
+/* Not yet implemented 
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  virtual void addClassEffectDeviceLight(AFECLED *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  virtual void addClassEffecPN532Sensor(AFECLED *);
+#endif
+*/
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  virtual void addClass(AFESensorTLS2561 *);
+#endif
 
 protected:
   /* Is API enabled, set in begin() */
@@ -198,7 +219,11 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   /* Stories reference to global ADC class */
+  #ifdef AFE_ESP32
+  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
+  #else
   AFEAnalogInput *_AnalogInput;
+  #endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -256,11 +281,22 @@ protected:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
+  AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 #endif
-AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
+  AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
+/* Not yet implemented 
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  AFECLED *_CLEDBacklight;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  AFECLED *_CLEDAccessControl;
+#endif
+*/
 
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  AFESensorTLS2561 *_TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
+#endif
 
 };
 

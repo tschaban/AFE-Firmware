@@ -154,6 +154,20 @@ void AFEAPIMQTTStandard::subscribe() {
 
 /* Subscribe: ADC */
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
+    if (strlen(_AnalogInput[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _AnalogInput[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ADC;
+      currentCacheSize++;
+    }
+  }
+#else
   if (_Device->configuration.isAnalogInput) {
     if (strlen(_AnalogInput->configuration.mqtt.topic) > 0) {
       sprintf(mqttCommandTopic, "%s/cmd",
@@ -165,6 +179,7 @@ void AFEAPIMQTTStandard::subscribe() {
       currentCacheSize++;
     }
   }
+#endif // AFE_ESP32
 #endif
 
 /* Subscribe: BMx80 */
@@ -194,6 +209,22 @@ void AFEAPIMQTTStandard::subscribe() {
               mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
       mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BH1750;
+      currentCacheSize++;
+    }
+  }
+#endif
+
+/* Subscribe: TLS2561 */
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
+    if (strlen(_TLS2561Sensor[i]->configuration.mqtt.topic) > 0) {
+      sprintf(mqttCommandTopic, "%s/cmd",
+              _TLS2561Sensor[i]->configuration.mqtt.topic);
+      Mqtt.subscribe(mqttCommandTopic);
+      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
+              mqttCommandTopic);
+      mqttTopicsCache[currentCacheSize].id = i;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_TLS2561;
       currentCacheSize++;
     }
   }
@@ -398,8 +429,13 @@ void AFEAPIMQTTStandard::processRequest() {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
       case AFE_MQTT_DEVICE_ADC: // ADC
+#ifdef AFE_ESP32
+        processADC(&mqttTopicsCache[i].id);
+#else
         processADC();
+#endif
         break;
+
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_CONFIG_HARDWARE_BH1750
       case AFE_MQTT_DEVICE_BH1750:
@@ -462,6 +498,23 @@ void AFEAPIMQTTStandard::processRequest() {
         processDHT(&mqttTopicsCache[i].id);
         break;
 #endif // AFE_CONFIG_HARDWARE_DHT
+/* Not yet implemented
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+      case AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT:
+        processEffectDeviceLight();
+        break;
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+      case AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR:
+        processEffectPN532Sensor();
+        break;
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+*/
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+      case AFE_MQTT_DEVICE_TLS2561:
+        processTLS2561(&mqttTopicsCache[i].id);
+        break;
+#endif // AFE_CONFIG_HARDWARE_TLS2561
       default:
 #ifdef DEBUG
         Serial << endl
@@ -547,6 +600,28 @@ boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+void AFEAPIMQTTStandard::publishADCValues(uint8_t id) {
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
+    _AnalogInput[id]->getJSON(message);
+    Mqtt.publish(_AnalogInput[id]->configuration.mqtt.topic, message);
+  }
+}
+void AFEAPIMQTTStandard::processADC(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing ADC: ") << *id;
+#endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishADCValues(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#else // AFE_ESP8266
 void AFEAPIMQTTStandard::publishADCValues() {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
@@ -567,6 +642,7 @@ void AFEAPIMQTTStandard::processADC() {
   }
 #endif
 }
+#endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -673,7 +749,33 @@ boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
   }
   return publishStatus;
 }
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+void AFEAPIMQTTStandard::processTLS2561(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing TLS2561 ID: ") << *id;
 #endif
+  if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
+    publishTLS2561SensorData(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishTLS2561SensorData(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_TLS2561_DATA_LENGTH];
+    _TLS2561Sensor[id]->getJSON(message);
+    publishStatus =
+        Mqtt.publish(_TLS2561Sensor[id]->configuration.mqtt.topic, message);
+  }
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
@@ -1014,5 +1116,52 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+/* Not yet implemented
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+void AFEAPIMQTTStandard::processEffectDeviceLight() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing CLED: Device Effect");
+#endif
+  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
+
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
+// Off
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+void AFEAPIMQTTStandard::processEffectPN532Sensor() {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing CLED: PN532 Sensor Effect");
+#endif
+  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
+    _CLEDBacklight->on();
+  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
+// Off
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+  void AFEAPIMQTTStandard::getCLEDCommand(CLED_COMMAND *command) {}
+
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT ||
+AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+*/
 
 #endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -2,7 +2,7 @@
 
 #include "AFE-API-JSONRPC.h"
 
-/* Required to check access to WAN. Async ping */
+/* Required to check access to WAN. Async ping
 volatile static boolean _PingResponded = false;
 
 boolean _handlePingAnswer(const AsyncPingResponse &response) {
@@ -35,6 +35,8 @@ boolean _handlePingEnd(const AsyncPingResponse &response) {
   _PingResponded = response.total_recv > 0 ? true : false;
   return true;
 };
+
+*/
 
 AFEJSONRPC::AFEJSONRPC(){};
 
@@ -165,12 +167,14 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 #endif
       const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 60;
       DynamicJsonBuffer jsonBuffer(capacity);
+      //   StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE> jsonBuffer;
+       
       JsonObject &root = jsonBuffer.parseObject(response);
 #ifdef DEBUG
       Serial << endl
              << F("INFO: API REST: JSON Buffer size: ") << capacity
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE < jsonBuffer.size() + 10) {
+      if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: API REST: Too small buffer size");
       }
 #endif
@@ -183,6 +187,18 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
         response = root["result"] | "";
       }
     }
+#ifdef DEBUG
+    else {
+      response = http.getString();
+
+      Serial << endl
+             << F("INFO: API REST: Response reply code: ") << _httpCode
+             << F(", content: ") << response << F(", Size: ")
+             << response.length();
+
+//      response = "";
+    }
+#endif
     http.end();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -210,6 +226,25 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 }
 
 void AFEJSONRPC::checkAccessToWAN(void) {
+
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: WAN ACCESS: checking access to : ") << AFE_WAN_ACCSSS_HOST;
+#endif
+
+  IPAddress ip;
+  ip.fromString(AFE_WAN_ACCSSS_HOST);
+  _PingResponded = Ping.ping(ip, AFE_WAN_ACCSSS_PINGS);
+
+#ifdef DEBUG
+
+  Serial << endl
+         << F(" - ") << (_PingResponded ? F("connected to WAN")
+                                        : F("NOT connected to WAN"));
+  Serial << endl << F(" - average time: ") << Ping.averageTime();
+#endif
+
+  /*
   Pings.on(true, _handlePingAnswer);
   Pings.on(false, _handlePingEnd);
   setNoWANAccess();
@@ -222,6 +257,7 @@ void AFEJSONRPC::checkAccessToWAN(void) {
   Serial << endl
          << F("INFO: WAN ACCESS: Sent to ping to: ") << AFE_WAN_ACCSSS_HOST;
 #endif
+*/
 }
 
 boolean AFEJSONRPC::accessToWAN() { return _PingResponded; }

@@ -30,7 +30,7 @@ private:
   void generateDeviceValue(char *json, uint32_t idx, const char *svalue,
                            uint16_t nvalue = 0);
 
-  /* Cache that stories IDXs */
+  /* Cache that stories IDXs for devices that are controlled by Domoticz */
   uint8_t lastIDXChacheIndex = 0;
   DOMOTICZ_IDX_CACHE idxCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
@@ -48,20 +48,16 @@ private:
 
   ];
 
-
   /* It stories IDX of a device that should be excluded from processing */
   DOMOTICZ_BASIC_CONFIG bypassProcessing;
-
 
   /* Get domoticz request/update command in formated form */
   DOMOTICZ_MQTT_COMMAND getCommand();
   /* Classfies and invokes code for processing the request */
   void processRequest();
 
-
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
-
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();
@@ -96,7 +92,11 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
   virtual void addClass(AFEAnalogInput *);
+#ifdef AFE_ESP32
+  void publishADCValues(uint8_t id);
+#else  // ESP32
   void publishADCValues();
+#endif // ESP32/8266
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -170,11 +170,14 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   virtual void addClass(AFEMiFareCard *);
-  boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state, const char *user);
+  boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state,
+                                 const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-
-
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  virtual void addClass(AFESensorTLS2561 *);
+  boolean publishTLS2561SensorData(uint8_t id);
+#endif //  AFE_CONFIG_HARDWARE_TLS2561
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

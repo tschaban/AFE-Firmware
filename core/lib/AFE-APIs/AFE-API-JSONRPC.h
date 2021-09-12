@@ -10,9 +10,18 @@
 #include <AFE-LED.h>
 #endif
 #include <ArduinoJson.h>
-#include <ESP8266HTTPClient.h>
+
 #include <WiFiClient.h>
-#include <AsyncPing.h>
+//#include <AsyncPing.h>
+
+#ifndef AFE_ESP32 /* ESP82xx */
+#include <ESP8266HTTPClient.h>
+#include <ESP8266Ping.h>
+#else /* ESP32 */
+#include <HTTPClient.h>
+#include <ESP32Ping.h>
+#endif
+
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -36,7 +45,9 @@ private:
   AFEDevice *Device;
   AFEDataAccess *Data;  
   String message;
-  AsyncPing Pings;
+  //AsyncPing Pings;
+  PingClass Ping;
+  boolean _PingResponded;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;

@@ -112,4 +112,8 @@
 #include <AFE-CLED-Structure.h>
 #endif
 
-#endif
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#include <AFE-TLS2561-Sensor-Structure.h>
+#endif 
+ 
+#endif // _AFE_Data_Structures_h

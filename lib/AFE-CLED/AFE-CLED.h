@@ -20,71 +20,81 @@ class AFECLED {
 
 private:
   boolean _initialized = false;
-  boolean state = false;
+  boolean state[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS] = {false,false};
 
-  CRGB leds[8];
+  CLEDController *controllers[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS];
+
+  CRGB leds8[AFE_CONFIG_HARDWARE_CLED_8_LEDS];
+  CRGB leds16[AFE_CONFIG_HARDWARE_CLED_16_LEDS];
 
   uint32_t _effectTimer = 0;
-  uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
-
+  
   /* Effect: wave */
   uint8_t _currentLedId = 1;
   int8_t _increment = 1;
 
   /* Effect: Fade In/Out */
-  uint8_t _currentBrightness = 0;
   uint8_t _fadeStep = 1;
-
   uint32_t _effectColor[AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS];
 
-  uint32_t _offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR;
-  uint32_t _onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR;
+  uint8_t _currentBrightness[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS] = {0,0};
+  uint32_t _currentColor[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS] = {0,0};
+
+  uint32_t _offColor[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS] = {AFE_CONFIG_HARDWARE_CLED_OFF_COLOR,AFE_CONFIG_HARDWARE_CLED_OFF_COLOR};
+  uint32_t _onColor[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS] = {AFE_CONFIG_HARDWARE_CLED_ON_COLOR,AFE_CONFIG_HARDWARE_CLED_ON_COLOR};
 
   /* Set LED brightness */
-  void setBrightness(uint8_t level);
+  void setBrightness(uint8_t stripId, uint8_t level);
 
   /* Set Color for all leds in the string */
-  void setColor(uint32_t color);
+  void setColor(uint8_t stripId, uint32_t color);
 
   /* Handles Leds wave effect */
-  void waveEffect(void);
+  void waveEffect(uint8_t stripId);
 
   /* Handles Fade In/Out effect */
-  void fadeInOutEffect(void);
-
+  void fadeInOutEffect(uint8_t stripId);
 
 public:
-  CLED configuration;
+  CLED configuration[AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_STRIPS];
+
   CLED_EFFECTS effects;
+  CLED_BACKLIGHT backlight;
+  uint8_t lightSensorType = AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  uint8_t _currentEffect = AFE_CONFIG_HARDWARE_EFFECT_NO_EFFECTS;
 
   /* Constructor */
   AFECLED();
-  boolean begin(AFEDataAccess *, uint8_t id);
+  boolean begin(AFEDataAccess *);
 
   /* Turns on CLED */
-  void on();
-  void on(uint32_t color);
+  void on(uint8_t stripId);
+  void on(uint8_t stripId, uint32_t color);
 
   /* Turn off CLED */
-  void off();
-  void off(uint32_t color);
+  void off(uint8_t stripId);
+  void off(uint8_t stripId, uint32_t color);
 
   /* Method change the CLED to opposite state */
-  void toggle(uint32_t color);
+  void toggle(uint8_t stripId, uint32_t color);
 
   /* Blink CLED. Duration how lon CLED is ON can be set by input parameter (in
    * milli)*/
-  void blink(unsigned int duration = 100,
+  void blink(uint8_t stripId, unsigned int duration = 100,
              uint32_t onColor = AFE_CONFIG_HARDWARE_CLED_ON_COLOR,
              uint32_t offColor = AFE_CONFIG_HARDWARE_CLED_OFF_COLOR);
 
   /* Method must be added to main loop in order to enable effects  */
   void loop();
-  void effectOn(uint8_t effectId);
-  void effectOff(void);
 
-/* It set's custom effect color */
-  void setCustomEffectColor(uint8_t effectId, uint32_t color);
+  void effectOn(uint8_t stripId, uint8_t effectId);
+  void effectOff(uint8_t stripId);
+
+  /* It set's custom effect color */
+  void setCustomEffectColor(uint8_t stripId, uint8_t effectId, uint32_t color);
+
+  void backlightEffect(uint8_t stripId, uint32_t lightLevel);
 
 };
 

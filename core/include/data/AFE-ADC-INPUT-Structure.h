@@ -54,6 +54,10 @@ struct ADCINPUT {
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   BATTERY_METER battery;
 #endif
+
+#ifdef AFE_ESP32
+  char name[17];
+#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC

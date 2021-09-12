@@ -6,14 +6,24 @@
 
 AFEAnalogInput::AFEAnalogInput(){};
 
+#ifdef AFE_ESP32
+void AFEAnalogInput::begin(uint8_t id) {
+  AFEDataAccess Data;
+  Data.getConfiguration(id, &configuration);
+#else  // ESP8266
 void AFEAnalogInput::begin() {
   AFEDataAccess Data;
   Data.getConfiguration(&configuration);
+#endif // AFE_ESP32
+
   _initialized = true;
 
 #ifdef DEBUG
   Serial << endl << endl << F("------------ AC VCC Input ------------");
   Serial << endl
+#ifdef AFE_ESP32
+         << F("- ID: ") << id << endl
+#endif
          << F("- Initialized") << endl
          << F("- GPIO: ") << configuration.gpio << endl
          << F("- Interval: ") << configuration.interval << endl
@@ -115,9 +125,10 @@ void AFEAnalogInput::getJSON(char *json) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 /* Returns the sensor data in JSON format */
 void AFEAnalogInput::getBatteryMeterJSON(char *json) {
-  sprintf(json, "{\"batterymeter\":[{\"value\":%.3f,\"unit\":\"%%\"},{\"value\":"
-                "%.3f,\"unit\":\"volt\"}]}",
-          batteryPercentage,  (float)data.voltageCalculated);
+  sprintf(json,
+          "{\"batterymeter\":[{\"value\":%.3f,\"unit\":\"%%\"},{\"value\":"
+          "%.3f,\"unit\":\"volt\"}]}",
+          batteryPercentage, (float)data.voltageCalculated);
 }
 #endif
 

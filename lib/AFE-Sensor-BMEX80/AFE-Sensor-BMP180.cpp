@@ -5,7 +5,7 @@
 
 AFESensorBMP180::AFESensorBMP180(){};
 
-boolean AFESensorBMP180::begin(BMEX80 *_configuration, I2CPORT *I2C) {
+boolean AFESensorBMP180::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
 
   configuration = _configuration;
 
@@ -17,9 +17,7 @@ boolean AFESensorBMP180::begin(BMEX80 *_configuration, I2CPORT *I2C) {
     Serial << endl << F("INFO: Address: 0x") << _HEX(configuration->i2cAddress);
 #endif
 
-    Wire.begin(I2C->SDA, I2C->SCL);
-
-    return bme.begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, &Wire);
+    return bme.begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, _wirePort);
   } else {
 #ifdef DEBUG
     Serial << endl << F("INFO: Error: Address not set");

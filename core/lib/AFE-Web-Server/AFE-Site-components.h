@@ -48,12 +48,24 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{s.i}}&i={{i.D}}\">&#8227; "
     "{{i.i}}: {{i.y}}</a></li>";
 
+#ifndef AFE_ESP32
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
+const uint8_t GPIOS_ADC[] PROGMEM = {17};
+#else
+#ifdef ESP32_30_PINS
+const uint8_t GPIOS[] PROGMEM = {1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33, 34, 35, 36, 39};
+#else // ESP32_38_PINS
+const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+#endif // ESP32_30_PINS
+const uint8_t GPIOS_ADC[] PROGMEM = {32, 33, 34, 35};
+#endif // !AFE_ESP32
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 const uint8_t MCP23017_GPIOS_ID[] PROGMEM = {0, 1, 2,  3,  4,  5,  6,  7,
                                              8, 9, 10, 11, 12, 13, 14, 15};
 #endif
+
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 const char HTTP_ITEM_SCANNED_I2C_ADDRESSES_HEADER[] PROGMEM =
@@ -97,4 +109,7 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
     "step=\"any\"></div>";
 #endif
 
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) || defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
+const char HTTP_FIXED_CLED_CONFIG_PARAMS[] PROGMEM = "<input name=\"m\" type=\"hidden\" value=\"0\"><input name=\"l\" type=\"hidden\" value=\"8\"><input name=\"o\" type=\"hidden\" value=\"39\">";
+#endif
 #endif // _AFE_CSS_h

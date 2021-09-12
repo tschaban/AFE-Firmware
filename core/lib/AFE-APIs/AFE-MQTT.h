@@ -6,9 +6,19 @@
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
-#include <AsyncPing.h>
+//#include <AsyncPing.h>
 #include <PubSubClient.h>
 #include <WiFiClient.h>
+
+#ifdef AFE_ESP32 /* ESP82xx */
+#include <ESP32Ping.h>
+#else
+#ifndef INT_MAX // Required for ESP8266 Lib
+#define INT_MAX 0
+#endif
+#include <ESP8266Ping.h>
+#endif
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 #if AFE_LANGUAGE == 0
@@ -33,8 +43,7 @@ private:
   AFEDataAccess *_Data;
   char *_DeviceName;
   NETWORK _NetworkConfiguration;
-
-  AsyncPing Pings;
+  PingClass Ping;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
@@ -42,7 +51,6 @@ private:
 #endif
 
   unsigned long _sleepStartTime = 0;
-  unsigned long _pingStartTime = 0;
   boolean _sleepMode = false;
   boolean _isConfigured =
       true; // if it's falsed it does not connect to MQTT Broker
@@ -65,7 +73,7 @@ private:
   void disconnect();
 
   /* Check if host is available */
-  void pingHost(void);
+  boolean pingHost(void);
 
 public:
   MQTT_MESSAGE message;

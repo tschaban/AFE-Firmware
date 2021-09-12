@@ -6,37 +6,71 @@
 
 AFESensorBH1750::AFESensorBH1750(){};
 
-void AFESensorBH1750::begin(uint8_t id) {
+#ifdef AFE_ESP32
+void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0,
+                            TwoWire *WirePort1) {
+  _WirePort1 = WirePort1;
+  begin(_id, WirePort0);
+}
+#endif
+
+void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0) {
   AFEDataAccess Data;
-  Data.getConfiguration(id, &configuration);
-  I2CPORT I2C;
-  Data.getConfiguration(&I2C);
+  Data.getConfiguration(_id, &configuration);
+
+#ifdef AFE_ESP32
+  /* Setting the WirePort used by the sensor to WirePort0 */
+  _WirePort0 = configuration.wirePortId == 0 ? WirePort0 : _WirePort1;
+#endif
 
 #ifdef DEBUG
   Serial << endl << endl << F("----- BH1750: Initializing -----");
 #endif
-  if (configuration.i2cAddress != 0) {
+  if (
+#ifdef AFE_ESP32
+      configuration.wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST &&
+#endif
+      configuration.i2cAddress != 0) {
 
 #ifdef DEBUG
     Serial << endl << F("Checking if the sensor is connected");
 #endif
     AFEI2CScanner I2CScanner;
-    I2CScanner.begin();
+    I2CScanner.begin(_WirePort0);
+
     if (I2CScanner.scan(configuration.i2cAddress)) {
 
 #ifdef DEBUG
       Serial << endl
-             << F("Setting I2C: SDA:") << I2C.SDA << F(", SCL:") << I2C.SCL;
-#endif
-
-      bh1750.setI2C(I2C.SDA, I2C.SCL);
-#ifdef DEBUG
-      Serial << endl
              << F("Sensor address: 0x") << _HEX(configuration.i2cAddress);
 #endif
-      _initialized = bh1750.begin(BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2,
-                                  configuration.i2cAddress);
 
+      _initialized = bh1750.begin(
+          configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+              ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+              : configuration.mode ==
+                        BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                    ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                    : configuration.mode ==
+                              BH1750LightSensor::ONE_TIME_LOW_RES_MODE
+                          ? BH1750LightSensor::ONE_TIME_LOW_RES_MODE
+                          : configuration.mode ==
+                                    BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
+                                ? BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
+                                : configuration.mode ==
+                                          BH1750LightSensor::
+                                              CONTINUOUS_HIGH_RES_MODE_2
+                                      ? BH1750LightSensor::
+                                            CONTINUOUS_HIGH_RES_MODE_2
+                                      : BH1750LightSensor::
+                                            CONTINUOUS_LOW_RES_MODE,
+
+          configuration.i2cAddress, _WirePort0);
+      /*
+            _initialized =
+         bh1750.begin(BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE,
+                                        configuration.i2cAddress, WirePort0);
+      */
     }
 #ifdef DEBUG
     else {
@@ -86,6 +120,9 @@ void AFESensorBH1750::listener() {
       Serial << endl << endl << F("----- BH1750: Reading -----");
       Serial << endl << F("Time: ") << (millis() - startTime) / 1000 << F("s");
 #endif
+      while (!bh1750.measurementReady(true)) {
+        yield();
+      }
 
       data = bh1750.readLightLevel();
       if (data >= 0) {
@@ -98,6 +135,16 @@ void AFESensorBH1750::listener() {
 #endif
 
       startTime = millis();
+      if (configuration.mode >= BH1750LightSensor::ONE_TIME_HIGH_RES_MODE) {
+
+        bh1750.configure(
+            configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+                ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
+                : configuration.mode ==
+                          BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                      ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
+                      : BH1750LightSensor::ONE_TIME_LOW_RES_MODE);
+      }
     }
   }
 }

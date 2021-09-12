@@ -11,6 +11,7 @@
 #include <EEPROM.h>
 #include <arduino.h>
 #include <bsec.h>
+#include <Wire.h>
 
 //#include <bsec_serialized_configurations_iaq.h>
 //#include "config/generic_33v_3s_4d/bsec_serialized_configurations_iaq.h"
@@ -26,12 +27,7 @@ class AFESensorBME680 {
 
 private:
   Bsec Bme;
-  /*
-    const uint8_t bsec_config_iaq[] = {
-  #include "config/generic_33v_3s_4d/bsec_iaq.txt"
-  };
 
-  */
   const uint8_t bsec_config_iaq[454] = {
       0,   8,   4,   1,   61,  0,   0,   0,   0,   0,   0,   0,   174, 1,   0,
       0,   48,  0,   1,   0,   0,   192, 168, 71,  64,  49,  119, 76,  0,   0,
@@ -84,7 +80,7 @@ public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
-  boolean begin(BMEX80 *, I2CPORT *);
+  boolean begin(BMEX80 *, TwoWire *WirePort);
   boolean read();
 
   void get(BMEX80_DATA &_data);

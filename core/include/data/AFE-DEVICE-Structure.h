@@ -29,7 +29,11 @@ struct DEVICE {
   uint8_t noOfLEDs;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_ESP32
   boolean isAnalogInput;
+#else
+  uint8_t noOfAnalogInputs;
+#endif // AFE_ESP32
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t noOfGates;
@@ -70,83 +74,25 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   uint8_t noOfBinarySensors;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  uint8_t noOfTLS2561s;
+#endif
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   uint8_t noOfPN532Sensors;
   uint8_t noOfMiFareCards;
-#endif
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  uint8_t noOfCLEDs;
+  boolean effectPN532;
 #endif
-};
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-/* Custom DEVICE structure definition
-struct DEVICE {
-  char name[33];
-  AFE_DEVICE_API api;
-#if defined(T0_CONFIG)
-  uint8_t noOfSwitches;
-  uint8_t noOfRelays;
-  uint8_t noOfLEDs;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  boolean effectDeviceLight;
 #endif
-#elif defined(T1_CONFIG)
-  boolean isLED[2];
-  boolean isRelay[1];
-  boolean isSwitch[2];
-  boolean isDS18B20;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
-#elif defined(T2_CONFIG)
-  boolean isLED[2];
-  boolean isRelay[1];
-  boolean isSwitch[2];
-  boolean isDHT;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
-#elif defined(T3_CONFIG)
-  boolean isLED[5];
-  boolean isRelay[4];
-  boolean isSwitch[5];
-  boolean isPIR[4];
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
-#elif defined(T4_CONFIG)
-  boolean isLED[5];
-  boolean isSwitch[5];
-  boolean isRelay[4];
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
-#elif defined(T5_CONFIG)
-  uint8_t noOfGates;
-  uint8_t noOfContactrons;
-  uint8_t noOfSwitches;
-  uint8_t noOfRelays;
-  uint8_t noOfLEDs;
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-  uint8_t noOfBMEX80s;
-#endif
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
-#elif defined(T6_CONFIG)
-  uint8_t noOfSwitches;
-  uint8_t noOfRelays;
-  uint8_t noOfLEDs;
-  uint8_t noOfHPMA115S0s;
-  uint8_t noOfBMEX80s;
-  uint8_t noOfBH1750s;
-  uint8_t noOfAS3935s;
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  boolean isAnalogInput;
-#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  uint8_t noOfI2Cs;
 #endif
 };
-*/
 
 #ifdef T0_CONFIG
 /* Old structure of DEVICE required for upgrade from T0 2.0.0, 2.0.1, 2.0.2 */

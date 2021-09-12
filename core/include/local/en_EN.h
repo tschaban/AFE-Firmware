@@ -30,6 +30,8 @@
 /* HTTP API */
 #define L_DEVICE_NOT_EXIST "\"Device does not exist\""
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
+#define L_404 "AFE FIRMWARE: Error 404: Page doesn't exist"
+#define L_COMMNAD_NO_COMMAND "\"No command\""
 
 #define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
 
@@ -88,6 +90,9 @@
 #define L_ADDRESS "Address"
 #define L_CORRECTIONS "Corrections"
 #define L_UNITS "Units"
+#define L_FREQUENCY "Frequency"
+#define L_I2C_PORT "I2C Port"
+#define L_GAIN "Gain"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
@@ -118,6 +123,9 @@
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Number of PN532's sensors"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
 #define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
+#define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
+#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Number of TLS2561's sensors"  
+#define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -152,7 +160,6 @@
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION "Finish configuration in your browser using device's IP address"
 #define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
-#define L_NETWORK_BACKUP_CONFIGURATION_HINT "Works only with routers with DHCP enabled"
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 
 /* Form: MQTT Broker */
@@ -247,6 +254,7 @@
 #define L_ADC_RESISTOR "Resistor"
 #define L_ADC_VOLTAGE_DIVIDER "Voltage Divider"
 #define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
+#define L_ADC_INPUT "Input"
 
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
@@ -269,10 +277,15 @@
 #define L_UPGRADE "Upgrade with binary file"
 
 #define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
-#define L_UPGRADE_FIRMWARE_VERSION "AFE T{{f.t}}.{{f.v}} ESP{{f.e}}.{{f.s}}"
+#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_UPGRADE_FIRMWARE_VERSION "Version {{f.v}}"
+#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
+#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
 #define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
-#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device name: {{f.d}}"
+#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device type: {{f.d}}"
 #define L_UPGRADE_FIRMWARE_DEVICE_ID "Device ID: {{f.n}}"
+#define L_UPGRADE_FIRMWARE_PRO_YES "Pro version: Yes"
+#define L_UPGRADE_FIRMWARE_PRO_NO "Pro version: No"
 
 #define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
 
@@ -293,6 +306,16 @@
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
 
+#define L_UPGRADE_TIMEOUT "Upgrade failed. Problem with connecting to the firmware's server (timeout)"
+#define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Upgrade failed. Problem with connecting to the firmware's server"
+#define L_UPGRADE_SERVER_NONE_200 "Upgrade failed. Problem with firmware server [Error: Not HTTP 200]"
+#define L_UPGRADE_FIRMWARE_SIZE_0 "Upgrade failed. Problem with firmware server [Error: Firmware size: 0kB]"
+#define L_UPGRADE_WRONG_CONTENT_TYPE "Upgrade failed. Problem with firmware server [Error: Content type]"
+#define L_UPGRADE_SUCCESS_MESSAGE "Firmware upgrade: uploaded %s. Size: %dkB"
+#define L_UPGRADE_NOT_FULL_LOADED "Upgrade failed. Written only %dkB out of %dkB"
+#define L_UPGRADE_SOMETHING_WRONG "Upgrade failed. Something went wrong [Error code: %d]"
+#define L_UPGRADE_NO_SPACE "Upgrade failed. Not enough space to begin upgrade"
+#define L_UPGRADE_NO_CONTENT "Upgrade failed. Problem with firmware server [Error: No response]"
 
 
 /* Form: password */
@@ -369,6 +392,25 @@
 #define L_BH1750_SENSOR "BH1750 Sensor"
 #define L_BH1750_SENSORS "BH1750 Sensors"
 #define L_BH1750_MQTT_TOPIC "BH1750 Sensor's MQTT Topic"
+#define L_BH1750_CONTINUES_1_LUX "Continuous reading: ~1 lux 120ms"
+#define L_BH1750_CONTINUES_05_LUX "Continuous reading: ~0.5 lux 120ms"
+#define L_BH1750_CONTINUES_4_LUX "Continuous reading: 4 lux 16ms"
+#define L_BH1750_ONE_READ_1_LUX "One read: 1 lux 120ms"
+#define L_BH1750_ONE_READ_05_LUX "One read: 0.5 lux 120ms"
+#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16mss"
+
+
+/* TLS2561 */
+#define L_TLS2561_SENSOR "TLS2561 Sensor"
+#define L_TLS2561_SENSORS "TLS2561 Sensors"
+#define L_TLS2561_MQTT_TOPIC "TLS2561 Sensor's MQTT Topic"
+#define L_TLS2561_SENSITIVENESS_LOW "Low: fast reading: 14ms"
+#define L_TLS2561_SENSITIVENESS_MID "Mid: quite reading read: 100ms"
+#define L_TLS2561_SENSITIVENESS_HIGH "High: slow reading: 400ms"
+#define L_TLS2561_GAIN_AUTO "Auto"
+#define L_TLS2561_GAIN_NONE "1x"
+#define L_TLS2561_GAIN_16 "16x"
+
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"
@@ -509,7 +551,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_READ_TAG "<div class=\"cf\"><label> </label><a class=\"b bc\" href=\"/?o=38&i={{o}}\">Read TAG</a></div>"
 #define L_PN532_SAVE_TAG "Saving information on the card"
 #define L_PN532_INFO_1 "The card should be formatted to NFC"
-#define L_PN532_INFO_2 "Only alph-numeric characters and basic special characters can be saved on the card"
+#define L_PN532_INFO_2 "Only alpha-numeric characters and basic special characters can be saved on the card"
 #define L_PN532_INFO_3 "Place the card next to the reader and DO NOT move it while formatting, reading or writing information"
 #define L_PN532_CURRENT_TAG "Current information stored on the card"
 #define L_PN532_CURRENT_PRIMARY_TAG "TAG"
@@ -522,6 +564,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_PN532_INTERFACE "Interface"
 #define L_PN532_LISTENER_TIMEOUT "Card reading interval"
 #define L_PN532_SHOW_INTERFACE_CONFIGURATION "Show interface configuration parameters"
+#define L_PN532_SEARCH_I2C_CONNECTED_DEVICES "Search for devices on I2C"
 #define L_PN532_TIMEOUTS "Readings configuration"
 #define L_PN532_MQTT_TOPIC "MQTT topic to send MiFare card information"
 
@@ -540,18 +583,20 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_SEND_AS_SWITCH "Send card detection using: ON/OFF values"
 #define L_MIFARE_CARD_SEND_AS_SWITCH_HINT "Default: OPEN/CLOSED"
 #define L_MIFARE_CARD_MQTT_TOPIC "MQTT Topic to monitor authorizations of MiFare card"
-#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long to keep the CLOSED (ON) state in the automation system after detecting the card"
+#define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long CLOSED (ON) state should be kept after detecting a card"
 #define L_MIFARE_CARD_TIME "Time"
-#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards. The AFE Pro version supports up to 10 cards. More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
+#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Backup copy of the TAG stored on the card"
 
 
 #define L_MIFARE_ADMIN_INFO "Information"
 
 
-#define L_CLEDS "RGB Leds"
-#define L_CLEDS_HINT "This firmware version doesn't enable to change the configuration parameters of the WS2812 RGB LED strip. It must be connected as described below"
-#define L_CLED_NUMBER_OF_LEDS "Number of leds strip"
+#define C_LED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
+#define C_LED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
+//#define L_CLEDS "RGB Leds"
+#define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS2812 RGB 8xLED strip. It must be connected as described below"
+#define L_CLED_NUMBER_OF_LEDS "Number of leds build into the strip"
 #define L_CLED_COLORS_ORDER "Colors order"
 
 #define L_CLED_EFFECT_WAVE "Wave effect"
@@ -561,6 +606,17 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MAX_BRIGHTNESS "Max brightness"
 #define L_CLED_TIME_WAVE "Wave speed"
 #define L_CLED_TIME_FADE_IN_OUT "Fade speed"
+
+#define L_CLED_LIGHT_SENSOR "Light sensor"
+#define L_CLED_LIGHT_LEVEL "Light level"
+#define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
+#define L_CLED_RULE "Rule"
+#define L_CLED_RULE_HINT "The backlight rule is triggered if the light level is below the sensor's reading. The first condition met stops processing following rules"
+#define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
+
+#define L_CLED_LIGHT_EFFECTS "Light effects"
+#define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
+#define L_CLED_PN532_EFFECTS "PN532 sensor's light effects"
 
 #endif // _LANG_EN_h
 

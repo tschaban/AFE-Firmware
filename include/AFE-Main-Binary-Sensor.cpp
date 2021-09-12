@@ -31,6 +31,30 @@ void binarySensorEventsListener(void) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       HttpDomoticzAPI.publishBinarySensorState(i);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+      /* Changing the CLED Effect card detected, but not authorized yet */
+      if (Device.configuration.effectPN532) {
+        if (CLEDStrip._currentEffect ==
+            AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT) {
+          if (BinarySensor[i].get()) {
+            CLEDStrip.setCustomEffectColor(
+                AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT,
+                CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT]
+                    .color);
+
+          } else {
+            CLEDStrip.setCustomEffectColor(
+                AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT,
+                AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR);
+          }
+          CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+                             AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+        }
+      }
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     }
   }
 }

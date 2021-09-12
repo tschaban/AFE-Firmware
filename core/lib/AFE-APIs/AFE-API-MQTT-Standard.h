@@ -9,6 +9,18 @@
 
 #include <AFE-API.h>
 
+#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
+    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+#include <ArduinoJson.h>
+
+struct CLED_COMMAND {
+  char command[10];
+  uint32_t color;
+  uint8_t brightness;
+};
+
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -22,54 +34,78 @@ private:
   uint8_t currentCacheSize = 0;
   /* Cache with MQTT Topics AFE has subsribed to */
   MQTT_TOPICS_CACHE
-      mqttTopicsCache[1
+  mqttTopicsCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCH
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES
 #endif
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20
 #endif
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
 #endif
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS
 #endif
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
 #endif
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS
-                      + AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS +
+                  AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
+#endif
+#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS
+#else
+                  + 1
+#endif
+#endif
+/* Not yet implemented
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+                  + 1
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+                  + 1
+#endif
+*/
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561
 #endif
   ];
+  /* Not yet implemented
+  #if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+      defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+    void getCLEDCommand(CLED_COMMAND *);
+  #endif
+  */
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -106,8 +142,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSORS
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_ESP32
+  void publishADCValues(uint8_t id);
+  void processADC(uint8_t *id);
+#else
   void publishADCValues();
   void processADC();
+#endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -180,6 +221,19 @@ public:
   boolean publishPN532SensorData(uint8_t id);
   boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+/* Not yet implemented
+#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  void processEffectDeviceLight();
+#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  void processEffectPN532Sensor();
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+*/
+#ifdef AFE_CONFIG_HARDWARE_TLS2561
+  void processTLS2561(uint8_t *id);
+  boolean publishTLS2561SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_TLS2561
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

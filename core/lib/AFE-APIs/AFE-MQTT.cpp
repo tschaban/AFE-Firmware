@@ -2,40 +2,6 @@
 
 #include "AFE-MQTT.h"
 
-// Interuption counter
-volatile static boolean hostReachable = false;
-
-boolean handlePingAnswer(const AsyncPingResponse &response) {
-  IPAddress addr(response.addr);
-  if (response.answer) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: MQTT: PING: Host ") << addr.toString().c_str()
-           << F(" and got response in ") << response.time << F("ms");
-  } else {
-    Serial << endl
-           << F("INFO: MQTT: PING: No answer from host ")
-           << addr.toString().c_str();
-
-#endif
-  }
-  return false;
-};
-
-boolean handlePingEnd(const AsyncPingResponse &response) {
-  IPAddress addr(response.addr);
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: MQTT: PING: Host ") << addr.toString().c_str()
-         << F(" sent pings: ") << response.total_sent << F(", recevied: ")
-         << response.total_recv << F(", time ") << response.total_time
-         << F(" ms");
-#endif
-
-  hostReachable = response.total_recv > 0 ? true : false;
-  return true;
-};
-
 AFEMQTT::AFEMQTT(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -50,7 +16,6 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
   _DeviceName = DeviceName;
   _Data->getConfiguration(&configuration);
   _Data->getConfiguration(&_NetworkConfiguration);
-
   esp.setTimeout(configuration.timeout);
   _Broker.setClient(esp);
   _Broker.setBufferSize(AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE);
@@ -86,8 +51,6 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
          << F("INFO: Host: ") << configuration.host << endl
          << F("INFO: IP: ") << configuration.ip << endl
          << F("INFO: Port: ") << configuration.port << endl
-//         << F("INFO: User: ") << configuration.user << endl
-//         << F("INFO: Password: ") << configuration.password << endl
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
          << F("INFO: LWT IDX: ") << configuration.lwt.idx;
 #else
@@ -140,35 +103,28 @@ void AFEMQTT::connect() {
 
         if (configuration.pingHostBeforeConnection) {
           /* Performing Network PING before starting MQTT connection */
-          if (_pingStartTime == 0) {
-            pingHost();
-            _pingStartTime = millis();
+
+          if (pingHost()) {
+            _sleepMode = false;
           } else {
-            if (millis() - _pingStartTime >=
-                AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT *
-                        AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER +
-                    AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT) {
-              if (hostReachable) {
-                _sleepMode = false;
-              } else {
-                _sleepMode = true;
-                _sleepStartTime = millis();
+            _sleepMode = true;
+            _sleepStartTime = millis();
 #ifdef DEBUG
-                Serial << endl
-                       << F("WARN: MQTT: Looks MQTT host: ") << configuration.ip
-                       << F(" is not reachable. Waiting next ")
-                       << _NetworkConfiguration.waitTimeSeries
-                       << F(" sec. to try again");
+            Serial << endl
+                   << F("WARN: MQTT: Looks MQTT host: ") << configuration.ip
+                   << F(" is not reachable. Waiting next ")
+                   << _NetworkConfiguration.waitTimeSeries
+                   << F(" sec. to try again");
 #endif
-              }
-              _pingStartTime = 0;
-            }
           }
         } else { // No PING Mode
           _sleepMode = false;
         }
       }
     } else {
+
+/* Starting establishing connection to MQTT Broker */
+
 #ifdef AFE_CONFIG_HARDWARE_LED
       if (_ledStartTime == 0) {
         _ledStartTime = millis();
@@ -178,7 +134,15 @@ void AFEMQTT::connect() {
         _delayStartTime = millis();
         /* Connecing to MQTT Broker depending on LWT topics being set or no */
 
-        boolean _connected;
+        boolean _connected = false;
+        if (configuration.pingHostBeforeConnection) {
+          if (!pingHost()) {
+            _sleepMode = true;
+            _sleepStartTime =
+                millis() + _NetworkConfiguration.waitTimeSeries * 1000;
+            return;
+          }
+        }
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
         char lwtMessage
@@ -235,7 +199,7 @@ void AFEMQTT::connect() {
         yield();
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: MQTT Connection attempt: ") << _connections 
+               << F("INFO: MQTT Connection attempt: ") << _connections
                << F(" from ") << _NetworkConfiguration.noConnectionAttempts
                << F(", connection status: ") << _Broker.state()
                << F(", connection time: ") << millis() - _delayStartTime
@@ -278,26 +242,31 @@ void AFEMQTT::setReconnectionParams(
       duration_between_next_connection_attempts_series;
 }
 
-void AFEMQTT::pingHost(void) {
-  hostReachable = false;
-  Pings.on(true, handlePingAnswer);
-  Pings.on(false, handlePingEnd);
-
+boolean AFEMQTT::pingHost(void) {
+  boolean _hostReachable = false;
   if (strlen(configuration.ip) > 0) {
     IPAddress addr;
     addr.fromString(configuration.ip);
-    Pings.begin(addr, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
-                AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.ip;
 #endif
+    _hostReachable = Ping.ping(addr, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER);
+
   } else if (strlen(configuration.host) > 0) {
-    Pings.begin(configuration.host, AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER,
-                AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_TIMEOUT);
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: PING: Sent to ") << configuration.host;
 #endif
+
+    _hostReachable = Ping.ping(configuration.host,
+                               AFE_CONFIG_MQTT_DEFAULT_HOST_PINGS_NUMBER);
   }
+
+#ifdef DEBUG
+  Serial << F(" ... ") << (_hostReachable ? F("") : F("NOT "))
+         << F("reachable");
+#endif
+
+  return _hostReachable;
 }
 
 boolean AFEMQTT::eventConnected() {
