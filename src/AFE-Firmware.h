@@ -1,18 +1,17 @@
-/*
-AFE Firmware for smarthome devices based on ESP8266/ESP8285 chips
-
-This code combains AFE Firmware versions:
-   - T0 and T0 for Shelly-1
-   - T1 (DS18B20)
-   - T2 (DHTxx)
-   - T3 (PIRs)
-   - T4 - decommissioned, T0 took over 100% of it's functionality
-   - T5 Gate
-   - T6 Wheater station
-
-More info: https://afe.smartnydom.pl
-LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-*/
+/************************************************************************
+ * AFE Firmware for devices based on ESP8266/ESP8285/ESP32 chips
+ * This code combains AFE Firmware versions:
+ *  - T0 and T0 for Shelly-1
+ *  - T1 (DS18B20)
+ *  - T2 (DHTxx)
+ *  - T3 (PIRs)
+ *  - T4 (With expander MCP23017)
+ *  - T5 Gate
+ *  - T6 Wheater station
+ *
+ * More info: https://afe.smartnydom.pl
+ * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+**************************************************************************/
 
 #include <AFE-Configuration.h>
 

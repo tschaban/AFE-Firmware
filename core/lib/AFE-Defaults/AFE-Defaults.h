@@ -18,6 +18,6 @@ public:
   AFEDefaults();
 
   /* Set's the default values for a device, creates configuration files */
-  void set();
+  boolean set(void);
 };
 #endif

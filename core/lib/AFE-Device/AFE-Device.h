@@ -38,7 +38,7 @@ public:
   void saveMode(uint8_t mode);
 
   /* Method sets the device to it's default state */
-  void setDevice();
+  boolean setDevice(void);
 };
 
 #endif

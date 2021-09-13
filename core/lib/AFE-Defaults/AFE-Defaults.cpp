@@ -4,8 +4,8 @@
 
 AFEDefaults::AFEDefaults() {}
 
-void AFEDefaults::set() {
-
+boolean AFEDefaults::set(void) {
+  boolean _ret = false;
 /* Turning devicve LED on */
 #ifdef AFE_CONFIG_HARDWARE_LED
 #ifdef DEBUG
@@ -61,7 +61,6 @@ void AFEDefaults::set() {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     Data->createContractonConfigurationFile();
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
     Data->createHPMA115S0SensorConfigurationFile();
@@ -123,7 +122,7 @@ void AFEDefaults::set() {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     Data->createCLEDConfigurationFile();
-#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                   \
+#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                 \
     defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
     Data->createCLEDEffectsConfigurationFile();
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
@@ -137,10 +136,12 @@ void AFEDefaults::set() {
     Data->createTLS2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TLS2561
 
+    _ret = true;
   }
 #ifdef DEBUG
   else {
     Serial << endl << F("ERROR: Formating failed");
   }
 #endif
+  return _ret;
 }

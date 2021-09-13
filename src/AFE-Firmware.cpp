@@ -85,8 +85,11 @@ void setup() {
 #ifdef DEBUG
     Serial << F("YES");
 #endif
-    Device.setDevice();
-    Device.begin();
+    if (Device.setDevice()) {
+      Device.begin();
+    } else {
+      Device.reboot();
+    }
   }
 #ifdef DEBUG
   else {
