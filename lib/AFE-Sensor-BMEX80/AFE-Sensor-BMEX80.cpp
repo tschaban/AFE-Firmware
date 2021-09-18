@@ -8,19 +8,19 @@ AFESensorBMEX80::AFESensorBMEX80(){};
 #ifdef AFE_ESP32
 void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
                             TwoWire *WirePort1) {
-  _WirePort1 = WirePort1;
-  begin(id, WirePort0);
-}
-
-#endif
-
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0) {
   AFEDataAccess Data;
   Data.getConfiguration(id, &configuration);
+  begin(id, configuration.wirePortId == 0 ? WirePort0 : WirePort1);
+}
+#endif // AFE_ESP32
 
-#ifdef AFE_ESP32
-  _WirePort0 = configuration.wirePortId == 0 ? WirePort0 : _WirePort1;
-#endif
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
+#ifndef AFE_ESP32
+  AFEDataAccess Data;
+  Data.getConfiguration(id, &configuration);
+#endif // AFE_ESP32
+
+  _WirePort = WirePort;
 
 #if defined(DEBUG)
   Serial << endl << endl << F("-------- BMEX80: Initializing --------");
@@ -32,14 +32,16 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0) {
 
     switch (configuration.type) {
     case AFE_BME680_SENSOR:
-      _initialized = s6.begin(&configuration, _WirePort0);
+      _initialized = s6.begin(&configuration, _WirePort);
       break;
     case AFE_BME280_SENSOR:
-      _initialized = s2.begin(&configuration, _WirePort0);
+      _initialized = s2.begin(&configuration, _WirePort);
       break;
+#ifndef AFE_ESP32
     case AFE_BMP180_SENSOR:
-      _initialized = s1.begin(&configuration, _WirePort0);
+      _initialized = s1.begin(&configuration, _WirePort);
       break;
+#endif // AFE_ESP32
     default:
       _initialized = false;
       break;
@@ -88,8 +90,12 @@ void AFESensorBMEX80::listener() {
 #endif
 
       if (configuration.type != AFE_BME680_SENSOR) {
+#ifdef AFE_ESP32
+        readStatus = s2.read();
+#else  // ESP8266
         readStatus =
             configuration.type == AFE_BME280_SENSOR ? s2.read() : s1.read();
+#endif // ESP32/ESP8266
       }
 
       if (readStatus) {
@@ -97,7 +103,11 @@ void AFESensorBMEX80::listener() {
         if (configuration.type == AFE_BME680_SENSOR) {
           s6.get(data);
         } else {
+#ifdef AFE_ESP32
+          data = s2.data;
+#else  // ESP8266
           data = configuration.type == AFE_BME280_SENSOR ? s2.data : s1.data;
+#endif // ESP32/ESP8266
         }
         applyCorrections();
         ready = true;
@@ -107,10 +117,14 @@ void AFESensorBMEX80::listener() {
                << F(" - Temperature = ") << data.temperature.value << endl
                << F(" - Pressure = ") << data.pressure.value
                << F(", Relative = ") << data.relativePressure.value;
+#ifndef AFE_ESP32
         if (configuration.type != AFE_BMP180_SENSOR) {
+#endif // AFE_ESP32
           Serial << endl << F(" - Humidity = ") << data.humidity.value;
           Serial << endl << F(" - Dew Point = ") << data.dewPoint.value;
+#ifndef AFE_ESP32
         }
+#endif // AFE_ESP32
         if (configuration.type == AFE_BME680_SENSOR) {
           Serial << endl
                  << F(" - Gas Resistance = ") << data.gasResistance.value;
@@ -171,9 +185,10 @@ void AFESensorBMEX80::getJSON(char *json) {
   relativePressure["value"] = data.relativePressure.value;
   relativePressure["unit"] = pressure["unit"];
 
+#ifndef AFE_ESP32
   /* Not applicable for BMP180 Sensor */
   if (configuration.type != AFE_BMP180_SENSOR) {
-
+#endif                    // AFE_ESP32
     char _perception[90]; // Max size of dewPointPerception from lang.pack
     strcpy_P(_perception,
              (char *)pgm_read_dword(&(dewPointPerception[perception(
@@ -221,7 +236,9 @@ void AFESensorBMEX80::getJSON(char *json) {
         data.temperature.value, data.humidity.value,
         configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
     jsonAbsoluteHumidity["unit"] = "%H";
+#ifndef AFE_ESP32
   }
+#endif // AFE_ESP32
 
   /* Only for BME680 Sensor */
   if (configuration.type == AFE_BME680_SENSOR) {
@@ -270,7 +287,9 @@ void AFESensorBMEX80::applyCorrections() {
     data.temperature.value += configuration.temperature.correction;
   }
 
+#ifndef AFE_ESP32
   if (configuration.type != AFE_BMP180_SENSOR) {
+#endif // AFE_ESP32
     if (configuration.humidity.correction != 0) {
       data.humidity.value += configuration.humidity.correction;
     }
@@ -292,7 +311,9 @@ void AFESensorBMEX80::applyCorrections() {
 #ifdef AFE_CONFIG_HUMIDITY
     data.humidity.rating = humidityRating(data.humidity.value);
 #endif
+#ifndef AFE_ESP32
   }
+#endif // AFE_ESP32  
 
   if (configuration.pressure.correction != 0) {
     data.pressure.value += configuration.pressure.correction;

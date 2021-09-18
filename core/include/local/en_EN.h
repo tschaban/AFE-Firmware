@@ -410,7 +410,9 @@
 #define L_TLS2561_GAIN_AUTO "Auto"
 #define L_TLS2561_GAIN_NONE "1x"
 #define L_TLS2561_GAIN_16 "16x"
-
+#define L_TLS2561_GAIN_ILUMINANCE "IDX Illumination"
+#define L_TLS2561_GAIN_BROADBAND "IDX Broadband"
+#define L_TLS2561_GAIN_IR "IDX Infrared"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"

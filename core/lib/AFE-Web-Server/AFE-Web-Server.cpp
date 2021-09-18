@@ -2081,10 +2081,10 @@ void AFEWebServer::get(BMEX80 &data) {
   data.interval = server.arg("f").length() > 0
                       ? server.arg("f").toInt()
                       : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
-
+#ifndef AFE_ESP32
   data.resolution = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                                  : BMP085_ULTRAHIGHRES;
-
+#endif // AFE_ESP32
   data.seaLevelPressure = server.arg("s").length() > 0
                               ? server.arg("s").toInt()
                               : AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
@@ -2752,7 +2752,13 @@ void AFEWebServer::get(TLS2561 &data) {
                   : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+  data.domoticz.ir.idx = server.arg("d3").length() > 0 ? server.arg("d3").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.illuminance.idx = server.arg("d1").length() > 0 ? server.arg("d1").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.broadband.idx = server.arg("d2").length() > 0 ? server.arg("d2").toInt()
                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {

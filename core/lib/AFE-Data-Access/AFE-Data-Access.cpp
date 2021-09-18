@@ -1132,7 +1132,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     root["mode"] = mode;
     root.printTo(configFile);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     root.printTo(Serial);
 #endif
 
@@ -2866,7 +2866,6 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_ESP32
-  char name[6];
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++) {
     sprintf(AnalogInputConfiguration.name, "ADC%d", i);
     saveConfiguration(i, &AnalogInputConfiguration);
@@ -6689,7 +6688,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, TLS2561 *configuration) {
 
       configuration->i2cAddress = root["i2cAddress"];
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.ir.idx =
+          root["domoticz"]["ir"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.illuminance.idx =
+          root["domoticz"]["illuminance"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.broadband.idx =
+          root["domoticz"]["broadband"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
@@ -6741,6 +6745,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TLS2561 *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TLS2561> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+    JsonObject &domoticz = root.createNestedObject("domoticz");
+#endif
 
     root["name"] = configuration->name;
     root["sensitiveness"] = configuration->sensitiveness;
@@ -6756,7 +6763,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TLS2561 *configuration) {
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration->mqtt.topic;
 #else
-    root["idx"] = configuration->domoticz.idx;
+    domoticz["ir"] = configuration->domoticz.ir.idx;
+    domoticz["illuminance"] = configuration->domoticz.illuminance.idx;
+    domoticz["broadband"] = configuration->domoticz.broadband.idx;
 #endif
 
     root.printTo(configFile);
@@ -6794,7 +6803,9 @@ void AFEDataAccess::createTLS2561SensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.illuminance.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.broadband.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.ir.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TLS2561; i++) {

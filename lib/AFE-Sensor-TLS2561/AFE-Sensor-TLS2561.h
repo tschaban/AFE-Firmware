@@ -27,9 +27,6 @@ private:
 
   unsigned long startTime = 0;
 
-  /* Sensor's data */
-  uint16_t broadband, ir;
-
   TwoWire *_WirePort0;
 #ifdef AFE_ESP32
   TwoWire *_WirePort1;
@@ -38,8 +35,10 @@ private:
 
 public:
   TLS2561 configuration;
-  uint32_t data = 0; // keeps lx value
-
+  /* Sensor's data */
+  uint32_t illuminance = 0;
+  uint16_t broadband, ir;
+  
   /* Constructor */
   AFESensorTLS2561();
 

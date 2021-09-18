@@ -135,6 +135,17 @@
 #elif defined(AFE_T1_CUSTOM_E1)
 #define AFE_DEVICE_TYPE_NAME "T1 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 11
+#elif defined(AFE_T5_CUSTOM_E1)
+#ifdef ESP32_30_PINS
+#define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
+#define AFE_DEVICE_TYPE_ID 12
+#elif defined(ESP32_38_PINS)
+#define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
+#define AFE_DEVICE_TYPE_ID 13
+#else
+#define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
+#define AFE_DEVICE_TYPE_ID 14
+#endif
 #elif defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
 #define AFE_DEVICE_TYPE_NAME "iECS Gate Driver v3"
 #define AFE_DEVICE_TYPE_ID 24
@@ -442,7 +453,7 @@
 
 /* ---- Gate ----*/
 #elif defined(T5_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.1.0"
+#define AFE_FIRMWARE_VERSION "3.1.0.B1"
 #define AFE_FIRMWARE_TYPE 5
 
 /* Hardware */
@@ -1055,7 +1066,7 @@
 #define AFE_HARDWARE_MIFARE_CARD_OPTION_READ_CARD 4
 
 #define AFE_CONFIG_API_JSON_MIFARE_CARD_DATA_LENGTH 300 // @TODO to check
-#define AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH  62 // {"command":"udevice","idx":999999,"nvalue":1,"svalue":"1234567890123456"}
+#define AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH  75 // {"command":"udevice","idx":999999,"nvalue":1,"svalue":"1234567890123456"}
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
@@ -1491,7 +1502,7 @@ typedef enum {
 #define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
       // messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 57 // Outgoing MQTT message size for switch
-#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 70 // Outgoing MQTT message size for custom sensor
+#define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 90 // Outgoing MQTT message size for custom sensor
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
@@ -1694,7 +1705,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_CLED 209 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS 228 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT 418 // AJ Checked
-#define AFE_CONFIG_FILE_BUFFER_TLS2561 285 // AJ Checked
+#define AFE_CONFIG_FILE_BUFFER_TLS2561 290 // AJ Checked
 
 /* Form constants */
 #define AFE_FORM_ITEM_TYPE_NUMBER "number"

@@ -3,6 +3,8 @@
 #ifndef _AFE_Sensor_BMP180_h
 #define _AFE_Sensor_BMP180_h
 
+#ifndef AFE_ESP32
+
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
@@ -36,4 +38,5 @@ public:
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80
+#endif // AFE_ESP32
 #endif // _AFE_Sensor_BMP180_h

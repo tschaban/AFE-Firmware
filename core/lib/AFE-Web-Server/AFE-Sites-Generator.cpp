@@ -2225,8 +2225,10 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   addSelectFormItemOpen(page, F("b"), F(L_BMEX80_SENSOR_TYPE));
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_BMX_UNKNOWN_SENSOR);
+#ifndef AFE_ESP32                          
   addSelectOptionFormItem(page, "BMx085/BMx180", "1",
                           configuration.type == AFE_BMP180_SENSOR);
+#endif // AFE_ESP32                          
   addSelectOptionFormItem(page, "BMx280", "2",
                           configuration.type == AFE_BME280_SENSOR);
   addSelectOptionFormItem(page, "BMx680", "6",
@@ -2538,8 +2540,18 @@ void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    sprintf(_number, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+    sprintf(_number, "%d", configuration.domoticz.illuminance.idx );
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d1", L_TLS2561_GAIN_ILUMINANCE, _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.broadband.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d2", L_TLS2561_GAIN_BROADBAND, _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.ir.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d3", L_TLS2561_GAIN_IR, _number,
                      AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
@@ -3167,8 +3179,8 @@ void AFESitesGenerator::siteFirmware(String &page) {
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
 #ifndef AFE_ESP32
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
   char _flashSize[12];
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -3185,7 +3197,6 @@ void AFESitesGenerator::siteFirmware(String &page) {
   }
   page.replace("{{f.f}}", _flashSize);
 #endif // ESP8266
-
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));

@@ -27,17 +27,17 @@ private:
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
-
+#ifndef AFE_ESP32 // Sensor doesn't work with current libraries
   AFESensorBMP180 s1;
+#endif // ESP32
   AFESensorBME280 s2;
   AFESensorBME680 s6;
 
   void applyCorrections();
 
-  TwoWire *_WirePort0;
+  TwoWire *_WirePort;
 #ifdef AFE_ESP32
-  TwoWire *_WirePort1;
-  void begin(uint8_t id, TwoWire *WirePort0);
+  void begin(uint8_t id, TwoWire *WirePort);
 #endif
 
 public:
@@ -51,7 +51,7 @@ public:
 #ifdef AFE_ESP32
   void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
 #else
-  void begin(uint8_t id, TwoWire *WirePort0);
+  void begin(uint8_t id, TwoWire *WirePort);
 #endif
 
   /* Returns sensor data in JSON format */

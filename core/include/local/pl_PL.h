@@ -413,6 +413,9 @@
 #define L_TLS2561_GAIN_AUTO "Automatyczne"
 #define L_TLS2561_GAIN_NONE "1x (brak)"
 #define L_TLS2561_GAIN_16 "16x"
+#define L_TLS2561_GAIN_ILUMINANCE "IDX Natężenie światła"
+#define L_TLS2561_GAIN_BROADBAND "IDX Światło widzialne"
+#define L_TLS2561_GAIN_IR "IDX Podczerwień"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"

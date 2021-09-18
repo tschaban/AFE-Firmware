@@ -107,9 +107,6 @@ void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F(": Sensitiveness: ") << configuration.sensitiveness;
     Serial << endl << F(": Gain: ") << configuration.gain;
     Serial << endl << F(": Interval: ") << configuration.interval;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    Serial << endl << F("IDX: ") << configuration.domoticz.idx;
-#endif
   }
   Serial << endl
          << F(": Device: ")
@@ -130,10 +127,10 @@ boolean AFESensorTLS2561::listener() {
 
       if (tls2561.init()) {
         tls2561.getLuminosity(&broadband, &ir);
-        data = tls2561.calculateLux(broadband, ir);
+        illuminance = tls2561.calculateLux(broadband, ir);
 #ifdef DEBUG
         Serial << endl
-               << F("Lux: ") << data << F(" lux") << endl
+               << F("Lux: ") << illuminance << F(" lux") << endl
                << F("Broadband: ") << broadband << endl
                << F("IR: ") << ir;
 #endif
@@ -159,7 +156,7 @@ void AFESensorTLS2561::getJSON(char *json) {
   sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"},"
                 "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
                 "%d,\"unit\":\"?\"}}",
-          data, broadband, ir);
+          illuminance, broadband, ir);
 }
 
 #endif // AFE_CONFIG_HARDWARE_TLS2561
