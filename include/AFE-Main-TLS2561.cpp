@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 #ifdef AFE_CONFIG_HARDWARE_TLS2561
 
 /* ---------Headers ---------*/
@@ -36,7 +36,7 @@ void TLS2561SensorEventsListener(void) {
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561) {
             CLEDStrip.backlightEffect(
                 AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
-                TLS2561Sensor[i].data);
+                TLS2561Sensor[i].illuminance);
           }
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT         

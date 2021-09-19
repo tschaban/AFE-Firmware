@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 
 /* Warning: for now it's hardcoded for one sensor only */

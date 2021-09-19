@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sites-Generator.h"
 
@@ -3223,10 +3223,6 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
-  /* Item: send as switch*/
-  addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
-                      configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);
-
   closeSection(page);
 
   openSection(page, F(L_MCP23017_CONNECTION),
@@ -3254,6 +3250,12 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   /* Item: revert signal */
   addCheckboxFormItem(page, "rs", L_BINARY_SENSOR_SENT_REVERTED_STATE, "1",
                       configuration.revertSignal);
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);                      
+#endif
 
   /* Item: Bouncing */
   page.concat(FPSTR(HTTP_INFO_TEXT));
@@ -3785,7 +3787,7 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
   openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
-  sprintf(_number, "%d", CLEDConfiguration.gpio);
+  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_1_GPIO);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,

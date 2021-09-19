@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _LANG_PL_h
 #define _LANG_PL_h
@@ -599,8 +599,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
 
-#define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzeni"
-#define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532"
+#define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzenia"
+#define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532/PIR"
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
 #define L_CLED_COLORS_ORDER "Kolejność kolorów"
@@ -619,7 +619,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
 
 #define L_CLED_LIGHT_EFFECTS "Efekty świetlne"
-#define L_CLED_DEVICE_BACKLIGHT "Podświetlanie urządzenia"
+#define L_CLED_DEVICE_BACKLIGHT "Podświetlenie urządzenia"
 #define L_CLED_PN532_EFFECTS "Efekty czujnika PN532"
 
 

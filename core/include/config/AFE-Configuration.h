@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
@@ -1668,7 +1668,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 41  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ check
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ check
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 481      // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ check
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145    // AJ check
 #define AFE_CONFIG_FILE_BUFFER_NETWORK 708     // AJ check
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
