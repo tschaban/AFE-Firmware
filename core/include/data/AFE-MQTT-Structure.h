@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_MQTT_Structure_h
 #define _AFE_MQTT_Structure_h
@@ -78,8 +78,8 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 17,
 #endif
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  AFE_MQTT_DEVICE_TLS2561 = 18,
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  AFE_MQTT_DEVICE_TSL2561 = 18,
 #endif
 } afe_mqtt_standard_device_type_t;
 

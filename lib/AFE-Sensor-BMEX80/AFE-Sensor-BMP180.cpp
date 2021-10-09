@@ -1,6 +1,6 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
-
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 #include "AFE-Sensor-BMP180.h"
+
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 AFESensorBMP180::AFESensorBMP180(){};
@@ -16,8 +16,9 @@ boolean AFESensorBMP180::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Address: 0x") << _HEX(configuration->i2cAddress);
 #endif
-
-    return bme.begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, _wirePort);
+    boolean ret =
+        bme.begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, _wirePort);
+    return ret;
   } else {
 #ifdef DEBUG
     Serial << endl << F("INFO: Error: Address not set");

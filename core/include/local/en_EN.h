@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _LANG_EN_h
 #define _LANG_EN_h
@@ -93,6 +93,10 @@
 #define L_FREQUENCY "Frequency"
 #define L_I2C_PORT "I2C Port"
 #define L_GAIN "Gain"
+#define L_FILE_NOT_FOUND_1 "The configuration file has not been found or there is a problem with its format"
+#define L_FILE_NOT_FOUND_2 "Refresh page"
+#define L_FILE_NOT_FOUND_3 "If the problem persists, set the configuration again or restore the initial settings"
+#define L_ATTENTION "Attention"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Incorrect password"
@@ -124,7 +128,7 @@
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
 #define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
 #define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
-#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Number of TLS2561's sensors"  
+#define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Number of TSL2561's sensors"  
 #define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
@@ -400,17 +404,19 @@
 #define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16mss"
 
 
-/* TLS2561 */
-#define L_TLS2561_SENSOR "TLS2561 Sensor"
-#define L_TLS2561_SENSORS "TLS2561 Sensors"
-#define L_TLS2561_MQTT_TOPIC "TLS2561 Sensor's MQTT Topic"
-#define L_TLS2561_SENSITIVENESS_LOW "Low: fast reading: 14ms"
-#define L_TLS2561_SENSITIVENESS_MID "Mid: quite reading read: 100ms"
-#define L_TLS2561_SENSITIVENESS_HIGH "High: slow reading: 400ms"
-#define L_TLS2561_GAIN_AUTO "Auto"
-#define L_TLS2561_GAIN_NONE "1x"
-#define L_TLS2561_GAIN_16 "16x"
-
+/* TSL2561 */
+#define L_TSL2561_SENSOR "TSL2561 Sensor"
+#define L_TSL2561_SENSORS "TSL2561 Sensors"
+#define L_TSL2561_MQTT_TOPIC "TSL2561 Sensor's MQTT Topic"
+#define L_TSL2561_SENSITIVENESS_LOW "Low: fast reading: 14ms"
+#define L_TSL2561_SENSITIVENESS_MID "Mid: quite reading read: 100ms"
+#define L_TSL2561_SENSITIVENESS_HIGH "High: slow reading: 400ms"
+#define L_TSL2561_GAIN_AUTO "Auto"
+#define L_TSL2561_GAIN_NONE "1x"
+#define L_TSL2561_GAIN_16 "16x"
+#define L_TSL2561_GAIN_ILUMINANCE "IDX Illumination"
+#define L_TSL2561_GAIN_BROADBAND "IDX Broadband"
+#define L_TSL2561_GAIN_IR "IDX Infrared"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"

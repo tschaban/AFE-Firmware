@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Web-Server.h"
 
@@ -272,11 +272,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
         page, AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID);
     break;
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  case AFE_CONFIG_SITE_TLS2561:
-    Site.siteTLS2561Sensor(page, siteConfig->deviceID);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  case AFE_CONFIG_SITE_TSL2561:
+    Site.siteTSL2561Sensor(page, siteConfig->deviceID);
     break;
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
   }
 
   if (siteConfig->form) {
@@ -598,14 +598,14 @@ boolean AFEWebServer::generate(boolean upload) {
           CLEDBacklightConfiguration = {0};
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-        else if (siteConfig.ID == AFE_CONFIG_SITE_TLS2561) {
-          TLS2561 configuration;
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+        else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561) {
+          TSL2561 configuration;
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};
         }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
       } else if (command == AFE_SERVER_CMD_NONE) {
         if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
@@ -1345,8 +1345,8 @@ void AFEWebServer::get(DEVICE &data) {
   data.noOfI2Cs = server.arg("ii").length() > 0 ? server.arg("ii").toInt() : 0;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  data.noOfTLS2561s =
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  data.noOfTSL2561s =
       server.arg("tl").length() > 0 ? server.arg("tl").toInt() : 0;
 #endif
 
@@ -2081,10 +2081,10 @@ void AFEWebServer::get(BMEX80 &data) {
   data.interval = server.arg("f").length() > 0
                       ? server.arg("f").toInt()
                       : AFE_CONFIG_HARDWARE_BMEX80_DEFAULT_INTERVAL;
-
+#ifndef AFE_ESP32
   data.resolution = server.arg("r").length() > 0 ? server.arg("r").toInt()
                                                  : BMP085_ULTRAHIGHRES;
-
+#endif // AFE_ESP32
   data.seaLevelPressure = server.arg("s").length() > 0
                               ? server.arg("s").toInt()
                               : AFE_CONFIG_DEFAULT_SEA_LEVEL_PRESSURE;
@@ -2729,8 +2729,8 @@ void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEWebServer::get(TLS2561 &data) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEWebServer::get(TSL2561 &data) {
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg("wr").length() > 0 ? server.arg("wr").toInt()
@@ -2741,18 +2741,24 @@ void AFEWebServer::get(TLS2561 &data) {
 
   data.interval = server.arg("f").length() > 0
                       ? server.arg("f").toInt()
-                      : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_INTERVAL;
+                      : AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
 
   data.sensitiveness = server.arg("s").length() > 0
                            ? server.arg("s").toInt()
-                           : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_SENSITIVENESS;
+                           : AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
 
   data.gain = server.arg("g").length() > 0
                   ? server.arg("g").toInt()
-                  : AFE_CONFIG_HARDWARE_TLS2561_DEFAULT_GAIN;
+                  : AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  data.domoticz.idx = server.arg("d").length() > 0 ? server.arg("d").toInt()
+  data.domoticz.ir.idx = server.arg("d3").length() > 0 ? server.arg("d3").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.illuminance.idx = server.arg("d1").length() > 0 ? server.arg("d1").toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.broadband.idx = server.arg("d2").length() > 0 ? server.arg("d2").toInt()
                                                    : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg("t").length() > 0) {
@@ -2768,4 +2774,4 @@ void AFEWebServer::get(TLS2561 &data) {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561

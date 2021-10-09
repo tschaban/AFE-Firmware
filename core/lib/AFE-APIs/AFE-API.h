@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 /* Class
 - establishes connection to MQTT Broker
@@ -93,9 +93,9 @@
 #endif
 */
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-#include <AFE-Sensor-TLS2561.h>
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-Sensor-TSL2561.h>
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -199,8 +199,8 @@ public:
 #endif
 */
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  virtual void addClass(AFESensorTLS2561 *);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  virtual void addClass(AFESensorTSL2561 *);
 #endif
 
 protected:
@@ -294,8 +294,8 @@ protected:
 #endif
 */
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  AFESensorTLS2561 *_TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
 
 };

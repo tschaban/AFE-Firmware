@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Device.h"
 
@@ -28,7 +28,7 @@ uint8_t AFEDevice::getMode() { return deviceMode; }
 
 void AFEDevice::saveMode(uint8_t mode) { Data.saveDeviceMode(mode); }
 
-void AFEDevice::setDevice() {
+boolean AFEDevice::setDevice(void) {
   AFEDefaults Defaults;
-  Defaults.set();
+  return Defaults.set();
 }

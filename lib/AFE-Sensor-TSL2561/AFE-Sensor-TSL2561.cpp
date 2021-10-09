@@ -1,13 +1,13 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include "AFE-Sensor-TLS2561.h"
+#include "AFE-Sensor-TSL2561.h"
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
 
-AFESensorTLS2561::AFESensorTLS2561(){};
+AFESensorTSL2561::AFESensorTSL2561(){};
 
 #ifdef AFE_ESP32
-void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0,
+void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0,
                              TwoWire *WirePort1) {
   _WirePort1 = WirePort1;
   begin(_id, WirePort0);
@@ -15,7 +15,7 @@ void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0,
 
 #endif
 
-void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
+void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
   AFEDataAccess Data;
   Data.getConfiguration(_id, &configuration);
 
@@ -25,7 +25,7 @@ void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << endl << F("----- TLS2561: Initializing -----");
+  Serial << endl << endl << F("----- TSL2561: Initializing -----");
 #endif
   if (
 #ifdef AFE_ESP32
@@ -107,9 +107,6 @@ void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F(": Sensitiveness: ") << configuration.sensitiveness;
     Serial << endl << F(": Gain: ") << configuration.gain;
     Serial << endl << F(": Interval: ") << configuration.interval;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    Serial << endl << F("IDX: ") << configuration.domoticz.idx;
-#endif
   }
   Serial << endl
          << F(": Device: ")
@@ -118,22 +115,22 @@ void AFESensorTLS2561::begin(uint8_t _id, TwoWire *WirePort0) {
 #endif
 }
 
-boolean AFESensorTLS2561::listener() {
+boolean AFESensorTSL2561::listener() {
   ready = false;
   if (_initialized) {
     if (millis() - startTime >= configuration.interval * 1000) {
 
 #ifdef DEBUG
-      Serial << endl << endl << F("----- TLS2561: Reading -----");
+      Serial << endl << endl << F("----- TSL2561: Reading -----");
       Serial << endl << F("Time: ") << (millis() - startTime) / 1000 << F("s");
 #endif
 
       if (tls2561.init()) {
         tls2561.getLuminosity(&broadband, &ir);
-        data = tls2561.calculateLux(broadband, ir);
+        illuminance = tls2561.calculateLux(broadband, ir);
 #ifdef DEBUG
         Serial << endl
-               << F("Lux: ") << data << F(" lux") << endl
+               << F("Lux: ") << illuminance << F(" lux") << endl
                << F("Broadband: ") << broadband << endl
                << F("IR: ") << ir;
 #endif
@@ -141,7 +138,7 @@ boolean AFESensorTLS2561::listener() {
         ready = true;
 #ifdef DEBUG
       } else {
-        Serial << endl << F("ERROR: TLS2561: Sensor not found and initialized");
+        Serial << endl << F("ERROR: TSL2561: Sensor not found and initialized");
 #endif
       }
 
@@ -155,11 +152,11 @@ boolean AFESensorTLS2561::listener() {
   return ready;
 }
 
-void AFESensorTLS2561::getJSON(char *json) {
+void AFESensorTSL2561::getJSON(char *json) {
   sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"},"
                 "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
                 "%d,\"unit\":\"?\"}}",
-          data, broadband, ir);
+          illuminance, broadband, ir);
 }
 
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561

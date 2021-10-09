@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Sensor_BMEX80_h
 #define _AFE_Sensor_BMEX80_h
@@ -9,7 +9,9 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
+#ifndef AFE_ESP32
 #include <AFE-Sensor-BMP180.h>
+#endif // AFE_ESP32
 #include <AFE-Sensors-Common.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
@@ -27,17 +29,17 @@ private:
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
-
+#ifndef AFE_ESP32 // Sensor doesn't work with current libraries
   AFESensorBMP180 s1;
+#endif // ESP32
   AFESensorBME280 s2;
   AFESensorBME680 s6;
 
   void applyCorrections();
 
-  TwoWire *_WirePort0;
+  TwoWire *_WirePort;
 #ifdef AFE_ESP32
-  TwoWire *_WirePort1;
-  void begin(uint8_t id, TwoWire *WirePort0);
+  void begin(uint8_t id, TwoWire *WirePort);
 #endif
 
 public:
@@ -51,7 +53,7 @@ public:
 #ifdef AFE_ESP32
   void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
 #else
-  void begin(uint8_t id, TwoWire *WirePort0);
+  void begin(uint8_t id, TwoWire *WirePort);
 #endif
 
   /* Returns sensor data in JSON format */

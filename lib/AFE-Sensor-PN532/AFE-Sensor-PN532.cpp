@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sensor-PN532.h"
 
@@ -466,7 +466,7 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
 
   uint8_t _data[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  for (uint8_t i = 0; i <= strlen(data); i++) {
+  for (uint8_t i = 0; i < strlen(data); i++) {
     _data[i] = data[i];
   }
 

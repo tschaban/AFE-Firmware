@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-API-HTTP-Domoticz.h"
 
@@ -415,22 +415,37 @@ boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEAPIHTTPDomoticz::addClass(AFESensorTLS2561 *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEAPIHTTPDomoticz::addClass(AFESensorTSL2561 *Sensor) {
   AFEAPI::addClass(Sensor);
 }
-boolean AFEAPIHTTPDomoticz::publishTLS2561SensorData(uint8_t id) {
+boolean AFEAPIHTTPDomoticz::publishTSL2561SensorData(uint8_t id) {
   boolean _ret = false;
-  if (enabled && _TLS2561Sensor[id]->configuration.domoticz.idx > 0) {
+  if (enabled) {
     char value[6]; // max 65536
-    sprintf(value, "%-.2f", _TLS2561Sensor[id]->data);
-    sendCustomSensorCommand(_TLS2561Sensor[id]->configuration.domoticz.idx,
-                            value);
-    _ret = true;
+    if (_TSL2561Sensor[id]->configuration.domoticz.illuminance.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->illuminance);
+      sendCustomSensorCommand(
+          _TSL2561Sensor[id]->configuration.domoticz.illuminance.idx, value);
+      _ret = true;
+    }
+    if (_TSL2561Sensor[id]->configuration.domoticz.ir.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->ir);
+      sendCustomSensorCommand(_TSL2561Sensor[id]->configuration.domoticz.ir.idx,
+                              value);
+      _ret = true;
+    }
+    if (_TSL2561Sensor[id]->configuration.domoticz.broadband.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->broadband);
+      sendCustomSensorCommand(
+          _TSL2561Sensor[id]->configuration.domoticz.broadband.idx, value);
+      _ret = true;
+    }
   }
+
   return _ret;
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIHTTPDomoticz::addClass(AFESensorAS3935 *Sensor) {

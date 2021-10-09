@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
@@ -38,7 +38,7 @@ public:
   void saveMode(uint8_t mode);
 
   /* Method sets the device to it's default state */
-  void setDevice();
+  boolean setDevice(void);
 };
 
 #endif

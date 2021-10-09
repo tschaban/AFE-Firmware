@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Data_Structures_h
 #define _AFE_Data_Structures_h
@@ -112,8 +112,8 @@
 #include <AFE-CLED-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-#include <AFE-TLS2561-Sensor-Structure.h>
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-TSL2561-Sensor-Structure.h>
 #endif 
  
 #endif // _AFE_Data_Structures_h

@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sensor-HPMA115S0.h"
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0

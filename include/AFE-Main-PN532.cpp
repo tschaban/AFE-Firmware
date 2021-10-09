@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 
@@ -74,7 +74,7 @@ void PN532EventsListener() {
           if (strcmp(MiFareCard[j].configuration.cardId,
                      PN532Sensor[i].tag.block[0].value) == 0) {
 
-            #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
             /* Changing the CLED Effect color to authorized */
             if (Device.configuration.effectPN532) {
 
@@ -84,7 +84,7 @@ void PN532EventsListener() {
                   CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
                       .color);
             }
-            #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
             actionTaken = false;
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -144,7 +144,7 @@ void PN532EventsListener() {
                            AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
       }
       break;
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT      
+#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
     }
 
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
@@ -159,6 +159,12 @@ void PN532EventsListener() {
           HttpDomoticzAPI.publishMiFareCardState(
               j, idxId, MiFareCard[j].state,
               PN532Sensor[i].tag.block[idxId].value);
+
+#ifdef DEBUG
+          Serial << endl
+                 << "INFO: MiFare: TAG[" << (idxId + 1)
+                 << "]: MQTT publishing processed";
+#endif
         }
 #else
         MqttAPI.publishMiFareCardState(j, MiFareCard[j].state);

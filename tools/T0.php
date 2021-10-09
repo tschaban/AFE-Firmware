@@ -56,16 +56,13 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 */
 
 
-
-
-
 $targetHardware[0][0] = "esp8266";  // Folder name
 $targetHardware[0][1] = 0;          // AFE_DEVICE_ID
 $targetHardware[0][2] = "generic";  // Part of the file
 
 $targetHardware[1][0] = "esp8285";
 $targetHardware[1][1] = 0; 
-$targetHardware[1][2] = "generic    ";
+$targetHardware[1][2] = "generic";
 
 $targetHardware[2][0] = "esp32";
 $targetHardware[2][1] = 30; 
@@ -388,7 +385,6 @@ function createdIndexFile($path) {
     fclose($handle);
 }
 
-
 echo "\nCreating folders structure";
 if (!file_exists($targetFolder)) {
     mkdir($targetFolder);
@@ -423,7 +419,7 @@ echo "\nCoping firmwares";
 
 foreach ($sourceFolder as &$source) {
     $sourceToCopy = $source["file"];
-    $fileName = "afe.firmware.t".$type.".".$version.".".$language.".esp".$source["chip"].".". $targetHardware[$source["hardware"]][2] . "." . $source["size"]."mb".($source["debug"]?".debug":"").".bin";
+    $fileName = "afe.firmware.t".$type.".".$version.".".$language.".esp".$source["chip"].".". ($targetHardware[$source["hardware"]][2]?$targetHardware[$source["hardware"]][2].".":"") . $source["size"]."mb".($source["debug"]?".debug":"").".bin";
     $copyTo = $finalFolder[$language][$source["api"]][$targetHardware[$source["hardware"]][0]]."/".$fileName ;
      
     if (file_exists($sourceToCopy)) {

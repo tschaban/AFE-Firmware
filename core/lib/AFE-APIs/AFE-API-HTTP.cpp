@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-API-HTTP.h"
 
@@ -202,14 +202,14 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processBinarySensor(request);
   }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
   else if (strcmp(request->device, "tls2561") == 0) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Processing TLS2561 requests");
+    Serial << endl << F("INFO: Processing TSL2561 requests");
 #endif
-    processTLS2561(request);
+    processTSL2561(request);
   }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
   /* Checking if reboot command */
   else if (strcmp(request->command, "reboot") == 0) {
     send(request, true);
@@ -475,21 +475,21 @@ void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEAPIHTTP::addClass(AFESensorTLS2561 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
-    _TLS2561Sensor[i] = Sensor + i;
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEAPIHTTP::addClass(AFESensorTSL2561 *Sensor) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
+    _TSL2561Sensor[i] = Sensor + i;
   }
 }
-void AFEAPIHTTP::processTLS2561(HTTPCOMMAND *request) {
+void AFEAPIHTTP::processTSL2561(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
-    if (strcmp(request->name, _TLS2561Sensor[i]->configuration.name) == 0) {
+  for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
+    if (strcmp(request->name, _TSL2561Sensor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
-        char json[AFE_CONFIG_API_JSON_TLS2561_DATA_LENGTH];
-        _TLS2561Sensor[i]->getJSON(json);
+        char json[AFE_CONFIG_API_JSON_TSL2561_DATA_LENGTH];
+        _TSL2561Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -500,7 +500,7 @@ void AFEAPIHTTP::processTLS2561(HTTPCOMMAND *request) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEAPIHTTP::addClass(AFESensorHPMA115S0 *Sensor) {

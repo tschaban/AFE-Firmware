@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/
 The class is used to handle On/Off or Open/Closed states
 */
 

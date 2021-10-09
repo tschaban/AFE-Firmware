@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-CLED.h"
 
@@ -23,7 +23,7 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
 
   if (backlight.lightSensorId != AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (backlight.lightSensorId >= 50) {
-      lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TLS2561;
+      lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TSL2561;
       backlight.lightSensorId -= 50;
     } else {
       lightSensorType = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750;

@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_API_HTTP_DOMOTICZ_h
 #define _AFE_API_HTTP_DOMOTICZ_h
@@ -156,10 +156,10 @@ public:
                                  const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  virtual void addClass(AFESensorTLS2561 *);
-  boolean publishTLS2561SensorData(uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  virtual void addClass(AFESensorTSL2561 *);
+  boolean publishTSL2561SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

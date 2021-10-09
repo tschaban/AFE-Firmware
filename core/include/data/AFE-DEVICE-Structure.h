@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
@@ -74,8 +74,8 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   uint8_t noOfBinarySensors;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  uint8_t noOfTLS2561s;
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  uint8_t noOfTSL2561s;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   uint8_t noOfPN532Sensors;

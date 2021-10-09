@@ -1,18 +1,17 @@
-/*
-AFE Firmware for smarthome devices based on ESP8266/ESP8285 chips
-
-This code combains AFE Firmware versions:
-   - T0 and T0 for Shelly-1
-   - T1 (DS18B20)
-   - T2 (DHTxx)
-   - T3 (PIRs)
-   - T4 - decommissioned, T0 took over 100% of it's functionality
-   - T5 Gate
-   - T6 Wheater station
-
-More info: https://afe.smartnydom.pl
-LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-*/
+/************************************************************************
+ * AFE Firmware for devices based on ESP8266/ESP8285/ESP32 chips
+ * This code combains AFE Firmware versions:
+ *  - T0 and T0 for Shelly-1
+ *  - T1 (DS18B20)
+ *  - T2 (DHTxx)
+ *  - T3 (PIRs)
+ *  - T4 (With expander MCP23017)
+ *  - T5 Gate
+ *  - T6 Wheater station
+ *
+ * More info: https://afe.smartnydom.pl
+ * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
+**************************************************************************/
 
 #include <AFE-Configuration.h>
 
@@ -109,9 +108,9 @@ AFESensorDHT DHTSensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT];
 AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-#include <AFE-Sensor-TLS2561.h>
-AFESensorTLS2561 TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-Sensor-TSL2561.h>
+AFESensorTSL2561 TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -215,8 +214,8 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #include <AFE-Main-BH1750.cpp>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-#include <AFE-Main-TLS2561.cpp>
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-Main-TSL2561.cpp>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT

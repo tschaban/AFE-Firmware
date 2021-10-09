@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Web_Server_h
 #define _AFE_Web_Server_h
@@ -212,9 +212,9 @@ private:
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void get(TLS2561 &data);
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void get(TSL2561 &data);
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();

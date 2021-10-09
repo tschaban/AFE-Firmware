@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #include "AFE-Sites-Generator.h"
 
@@ -203,12 +203,12 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  if (Device->configuration.noOfTLS2561s > 0) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  if (Device->configuration.noOfTSL2561s > 0) {
 
-    addMenuHeaderItem(page, F(L_TLS2561_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfTLS2561s,
-                   AFE_CONFIG_SITE_TLS2561);
+    addMenuHeaderItem(page, F(L_TSL2561_SENSORS));
+    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfTSL2561s,
+                   AFE_CONFIG_SITE_TSL2561);
   }
 #endif
 
@@ -475,9 +475,9 @@ void AFESitesGenerator::siteDevice(String &page) {
                         Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
 
-  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561,
-                        Device->configuration.noOfTLS2561s, F("tl"),
-                        F(L_DEVICE_NUMBER_OF_TLS2561_SENSORS), _itemDisabled);
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561,
+                        Device->configuration.noOfTSL2561s, F("tl"),
+                        F(L_DEVICE_NUMBER_OF_TSL2561_SENSORS), _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -2225,8 +2225,10 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   addSelectFormItemOpen(page, F("b"), F(L_BMEX80_SENSOR_TYPE));
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_BMX_UNKNOWN_SENSOR);
+#ifndef AFE_ESP32
   addSelectOptionFormItem(page, "BMx085/BMx180", "1",
                           configuration.type == AFE_BMP180_SENSOR);
+#endif // AFE_ESP32
   addSelectOptionFormItem(page, "BMx280", "2",
                           configuration.type == AFE_BME280_SENSOR);
   addSelectOptionFormItem(page, "BMx680", "6",
@@ -2484,12 +2486,12 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
 
-  TLS2561 configuration;
+  TSL2561 configuration;
   Data->getConfiguration(id, &configuration);
-  openSection(page, F(L_TLS2561_SENSOR), F(""));
+  openSection(page, F(L_TSL2561_SENSOR), F(""));
 
 /* Item: I2C Address selection */
 #ifdef AFE_ESP32
@@ -2513,23 +2515,23 @@ void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
   /* Item: sensitivness */
   sprintf(_number, "%d", configuration.sensitiveness);
   addSelectFormItemOpen(page, F("s"), F(L_SENSITIVENESS));
-  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_LOW, "0",
+  addSelectOptionFormItem(page, L_TSL2561_SENSITIVENESS_LOW, "0",
                           configuration.sensitiveness == 0);
-  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_MID, "1",
+  addSelectOptionFormItem(page, L_TSL2561_SENSITIVENESS_MID, "1",
                           configuration.sensitiveness == 1);
-  addSelectOptionFormItem(page, L_TLS2561_SENSITIVENESS_HIGH, "2",
+  addSelectOptionFormItem(page, L_TSL2561_SENSITIVENESS_HIGH, "2",
                           configuration.sensitiveness == 2);
   addSelectFormItemClose(page);
 
   /* Item: gain */
   sprintf(_number, "%d", configuration.gain);
   addSelectFormItemOpen(page, F("g"), F(L_GAIN));
-  addSelectOptionFormItem(page, L_TLS2561_GAIN_AUTO, "255",
+  addSelectOptionFormItem(page, L_TSL2561_GAIN_AUTO, "255",
                           configuration.gain ==
-                              AFE_CONFIG_HARDWARE_TLS2561_GAIN_AUTO);
-  addSelectOptionFormItem(page, L_TLS2561_GAIN_NONE, "0",
+                              AFE_CONFIG_HARDWARE_TSL2561_GAIN_AUTO);
+  addSelectOptionFormItem(page, L_TSL2561_GAIN_NONE, "0",
                           configuration.gain == 0);
-  addSelectOptionFormItem(page, L_TLS2561_GAIN_16, "16",
+  addSelectOptionFormItem(page, L_TSL2561_GAIN_16, "16",
                           configuration.gain == 16);
   addSelectFormItemClose(page);
 
@@ -2538,23 +2540,33 @@ void AFESitesGenerator::siteTLS2561Sensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    sprintf(_number, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
+    sprintf(_number, "%d", configuration.domoticz.illuminance.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "d1", L_TSL2561_GAIN_ILUMINANCE,
+        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.broadband.idx);
+    addInputFormItem(
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "d2", L_TSL2561_GAIN_BROADBAND,
+        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.ir.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d3", L_TSL2561_GAIN_IR,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
     closeSection(page);
   }
 #else
   if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_TLS2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    openSection(page, F(L_TSL2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 // String AFESitesGenerator::siteAS3935Sensor(uint8_t id) {
@@ -3167,8 +3179,8 @@ void AFESitesGenerator::siteFirmware(String &page) {
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
-  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
 #ifndef AFE_ESP32
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
   char _flashSize[12];
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -3185,7 +3197,6 @@ void AFESitesGenerator::siteFirmware(String &page) {
   }
   page.replace("{{f.f}}", _flashSize);
 #endif // ESP8266
-
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
@@ -3211,10 +3222,6 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   /* Item: name of the sensor */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
-
-  /* Item: send as switch*/
-  addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
-                      configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);
 
   closeSection(page);
 
@@ -3243,6 +3250,12 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   /* Item: revert signal */
   addCheckboxFormItem(page, "rs", L_BINARY_SENSOR_SENT_REVERTED_STATE, "1",
                       configuration.revertSignal);
+
+#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  /* Item: send as switch*/
+  addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
+                      configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);
+#endif
 
   /* Item: Bouncing */
   page.concat(FPSTR(HTTP_INFO_TEXT));
@@ -3677,8 +3690,11 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
   CLED CLEDConfiguration;
   CLED_EFFECTS CLEDEffectsConfiguration;
   Data->getConfiguration(id, &CLEDConfiguration);
-  Data->getConfiguration(id, &CLEDEffectsConfiguration);
   char _number[10];
+
+  if (!Data->getConfiguration(id, &CLEDEffectsConfiguration)) {
+    addFileNotFound(page);
+  }
 
   openSection(page, F(C_LED_EFFECT_PN532_SENSOR), F(L_CLEDS_HINT));
 
@@ -3766,15 +3782,17 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
   CLED_BACKLIGHT CLEDBacklightConfiguration;
-  Data->getConfiguration(id, &CLEDConfiguration);
-  Data->getConfiguration(id, &CLEDBacklightConfiguration);
   char _label[26];
   char _number[10];
+  Data->getConfiguration(id, &CLEDConfiguration);
+
+  if (!Data->getConfiguration(id, &CLEDBacklightConfiguration)) {
+    addFileNotFound(page);
+  }
 
   openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
-
   /* Item: GPIO */
-  sprintf(_number, "%d", CLEDConfiguration.gpio);
+  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_1_GPIO);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -3805,19 +3823,19 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
   }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  if (Device->configuration.noOfTLS2561s > 0) {
-    TLS2561 TLS2561Configuration;
-    for (uint8_t i = 0; i < Device->configuration.noOfTLS2561s; i++) {
-      Data->getConfiguration(i, &TLS2561Configuration);
-      sprintf(_label, "TLS2561: %s", TLS2561Configuration.name);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  if (Device->configuration.noOfTSL2561s > 0) {
+    TSL2561 TSL2561Configuration;
+    for (uint8_t i = 0; i < Device->configuration.noOfTSL2561s; i++) {
+      Data->getConfiguration(i, &TSL2561Configuration);
+      sprintf(_label, "TSL2561: %s", TSL2561Configuration.name);
       sprintf(_number, "%d", 50 + i);
       addSelectOptionFormItem(page, _label, _number,
                               CLEDBacklightConfiguration.lightSensorId ==
                                   50 + i);
     }
   }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
   addSelectFormItemClose(page);
 
   for (uint8_t index = 0;
@@ -4423,3 +4441,14 @@ void AFESitesGenerator::addLEDSelectionItem(String &item, uint8_t id) {
   addSelectFormItemClose(item);
 }
 #endif // AFE_CONFIG_HARDWARE_LED
+
+void AFESitesGenerator::addFileNotFound(String &page) {
+  openSection(page, F(L_ATTENTION), F(""));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_FILE_NOT_FOUND_1));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_FILE_NOT_FOUND_2));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_FILE_NOT_FOUND_3));
+  closeSection(page);
+}

@@ -1,4 +1,4 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Defaults_h
 #define _AFE_Defaults_h
@@ -18,6 +18,6 @@ public:
   AFEDefaults();
 
   /* Set's the default values for a device, creates configuration files */
-  void set();
+  boolean set(void);
 };
 #endif

@@ -85,8 +85,11 @@ void setup() {
 #ifdef DEBUG
     Serial << F("YES");
 #endif
-    Device.setDevice();
-    Device.begin();
+    if (Device.setDevice()) {
+      Device.begin();
+    } else {
+      Device.reboot();
+    }
   }
 #ifdef DEBUG
   else {
@@ -232,9 +235,9 @@ void setup() {
     initializeBH1750Sensor();
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-    initializeTLS2561Sensor();
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    initializeTSL2561Sensor();
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     initializeAS3935Sensor();
@@ -353,8 +356,8 @@ void loop() {
         BH1750SensorEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-        TLS2561SensorEventsListener();
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+        TSL2561SensorEventsListener();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935

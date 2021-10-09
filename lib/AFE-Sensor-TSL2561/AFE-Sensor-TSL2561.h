@@ -1,10 +1,10 @@
-/* AFE Firmware for smart home devices, Website: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Sensor_TLS2561_h
-#define _AFE_Sensor_TLS2561_h
+#ifndef _AFE_Sensor_TSL2561_h
+#define _AFE_Sensor_TSL2561_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
 
 #include <arduino.h>
 
@@ -17,7 +17,7 @@
 #include <Streaming.h>
 #endif
 
-class AFESensorTLS2561 {
+class AFESensorTSL2561 {
 
 private:
   Adafruit_TSL2561_Unified tls2561;
@@ -27,9 +27,6 @@ private:
 
   unsigned long startTime = 0;
 
-  /* Sensor's data */
-  uint16_t broadband, ir;
-
   TwoWire *_WirePort0;
 #ifdef AFE_ESP32
   TwoWire *_WirePort1;
@@ -37,11 +34,13 @@ private:
 #endif
 
 public:
-  TLS2561 configuration;
-  uint32_t data = 0; // keeps lx value
-
+  TSL2561 configuration;
+  /* Sensor's data */
+  uint32_t illuminance = 0;
+  uint16_t broadband, ir;
+  
   /* Constructor */
-  AFESensorTLS2561();
+  AFESensorTSL2561();
 
 /* Turns On sensor */
 #ifdef AFE_ESP32
@@ -58,5 +57,5 @@ public:
   void getJSON(char *json);
 };
 
-#endif // AFE_CONFIG_HARDWARE_TLS2561
-#endif // _AFE_Sensor_TLS2561_h
+#endif // AFE_CONFIG_HARDWARE_TSL2561
+#endif // _AFE_Sensor_TSL2561_h
