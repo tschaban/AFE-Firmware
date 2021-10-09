@@ -214,17 +214,17 @@ void AFEAPIMQTTStandard::subscribe() {
   }
 #endif
 
-/* Subscribe: TLS2561 */
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  for (uint8_t i = 0; i < _Device->configuration.noOfTLS2561s; i++) {
-    if (strlen(_TLS2561Sensor[i]->configuration.mqtt.topic) > 0) {
+/* Subscribe: TSL2561 */
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
+    if (strlen(_TSL2561Sensor[i]->configuration.mqtt.topic) > 0) {
       sprintf(mqttCommandTopic, "%s/cmd",
-              _TLS2561Sensor[i]->configuration.mqtt.topic);
+              _TSL2561Sensor[i]->configuration.mqtt.topic);
       Mqtt.subscribe(mqttCommandTopic);
       sprintf(mqttTopicsCache[currentCacheSize].message.topic,
               mqttCommandTopic);
       mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_TLS2561;
+      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_TSL2561;
       currentCacheSize++;
     }
   }
@@ -510,11 +510,11 @@ void AFEAPIMQTTStandard::processRequest() {
         break;
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 */
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-      case AFE_MQTT_DEVICE_TLS2561:
-        processTLS2561(&mqttTopicsCache[i].id);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+      case AFE_MQTT_DEVICE_TSL2561:
+        processTSL2561(&mqttTopicsCache[i].id);
         break;
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
       default:
 #ifdef DEBUG
         Serial << endl
@@ -751,13 +751,13 @@ boolean AFEAPIMQTTStandard::publishBH1750SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEAPIMQTTStandard::processTLS2561(uint8_t *id) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEAPIMQTTStandard::processTSL2561(uint8_t *id) {
 #ifdef DEBUG
-  Serial << endl << F("INFO: MQTT: Processing TLS2561 ID: ") << *id;
+  Serial << endl << F("INFO: MQTT: Processing TSL2561 ID: ") << *id;
 #endif
   if ((char)Mqtt.message.content[0] == 'g' && Mqtt.message.length == 3) {
-    publishTLS2561SensorData(*id);
+    publishTSL2561SensorData(*id);
   }
 #ifdef DEBUG
   else {
@@ -765,17 +765,17 @@ void AFEAPIMQTTStandard::processTLS2561(uint8_t *id) {
   }
 #endif
 }
-boolean AFEAPIMQTTStandard::publishTLS2561SensorData(uint8_t id) {
+boolean AFEAPIMQTTStandard::publishTSL2561SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_TLS2561_DATA_LENGTH];
-    _TLS2561Sensor[id]->getJSON(message);
+    char message[AFE_CONFIG_API_JSON_TSL2561_DATA_LENGTH];
+    _TSL2561Sensor[id]->getJSON(message);
     publishStatus =
-        Mqtt.publish(_TLS2561Sensor[id]->configuration.mqtt.topic, message);
+        Mqtt.publish(_TSL2561Sensor[id]->configuration.mqtt.topic, message);
   }
   return publishStatus;
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {

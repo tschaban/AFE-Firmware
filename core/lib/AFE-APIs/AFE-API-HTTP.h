@@ -74,8 +74,8 @@
 #include <AFE-Sensor-Binary.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-#include <AFE-Sensor-TLS2561.h>
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-Sensor-TSL2561.h>
 #endif
 
 #ifdef DEBUG
@@ -164,8 +164,8 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  AFESensorTLS2561 *_TLS2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561];
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
 
   /* Classifies and invokes code for HTTP request processing */
@@ -235,8 +235,8 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   void processDHT(HTTPCOMMAND *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void processTLS2561(HTTPCOMMAND *);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void processTSL2561(HTTPCOMMAND *);
 #endif
 
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
@@ -327,8 +327,8 @@ public:
   void addClass(AFESensorBinary *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void addClass(AFESensorTLS2561 *);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void addClass(AFESensorTSL2561 *);
 #endif
 };
 

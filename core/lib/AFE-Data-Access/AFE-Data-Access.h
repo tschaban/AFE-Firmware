@@ -246,22 +246,22 @@ public:
   void createCLEDConfigurationFile();
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  void getConfiguration(uint8_t id, CLED_EFFECTS *);
+  boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
   void createCLEDEffectsConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  void getConfiguration(uint8_t id, CLED_BACKLIGHT *);
+  boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void getConfiguration(uint8_t id, TLS2561 *);
-  void saveConfiguration(uint8_t id, TLS2561 *);
-  void createTLS2561SensorConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void getConfiguration(uint8_t id, TSL2561 *);
+  void saveConfiguration(uint8_t id, TSL2561 *);
+  void createTSL2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 };
 #endif // _AFE_Data_Access_h

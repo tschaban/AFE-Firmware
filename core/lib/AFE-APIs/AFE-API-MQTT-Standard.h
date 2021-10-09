@@ -96,8 +96,8 @@ private:
                   + 1
 #endif
 */
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561
 #endif
   ];
   /* Not yet implemented
@@ -230,10 +230,10 @@ public:
   void processEffectPN532Sensor();
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 */
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void processTLS2561(uint8_t *id);
-  boolean publishTLS2561SensorData(uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void processTSL2561(uint8_t *id);
+  boolean publishTSL2561SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

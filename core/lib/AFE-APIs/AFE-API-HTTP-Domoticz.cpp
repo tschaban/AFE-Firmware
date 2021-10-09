@@ -415,37 +415,37 @@ boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-void AFEAPIHTTPDomoticz::addClass(AFESensorTLS2561 *Sensor) {
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEAPIHTTPDomoticz::addClass(AFESensorTSL2561 *Sensor) {
   AFEAPI::addClass(Sensor);
 }
-boolean AFEAPIHTTPDomoticz::publishTLS2561SensorData(uint8_t id) {
+boolean AFEAPIHTTPDomoticz::publishTSL2561SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled) {
     char value[6]; // max 65536
-    if (_TLS2561Sensor[id]->configuration.domoticz.illuminance.idx > 0) {
-      sprintf(value, "%d", _TLS2561Sensor[id]->illuminance);
+    if (_TSL2561Sensor[id]->configuration.domoticz.illuminance.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->illuminance);
       sendCustomSensorCommand(
-          _TLS2561Sensor[id]->configuration.domoticz.illuminance.idx, value);
+          _TSL2561Sensor[id]->configuration.domoticz.illuminance.idx, value);
       _ret = true;
     }
-    if (_TLS2561Sensor[id]->configuration.domoticz.ir.idx > 0) {
-      sprintf(value, "%d", _TLS2561Sensor[id]->ir);
-      sendCustomSensorCommand(_TLS2561Sensor[id]->configuration.domoticz.ir.idx,
+    if (_TSL2561Sensor[id]->configuration.domoticz.ir.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->ir);
+      sendCustomSensorCommand(_TSL2561Sensor[id]->configuration.domoticz.ir.idx,
                               value);
       _ret = true;
     }
-    if (_TLS2561Sensor[id]->configuration.domoticz.broadband.idx > 0) {
-      sprintf(value, "%d", _TLS2561Sensor[id]->broadband);
+    if (_TSL2561Sensor[id]->configuration.domoticz.broadband.idx > 0) {
+      sprintf(value, "%d", _TSL2561Sensor[id]->broadband);
       sendCustomSensorCommand(
-          _TLS2561Sensor[id]->configuration.domoticz.broadband.idx, value);
+          _TSL2561Sensor[id]->configuration.domoticz.broadband.idx, value);
       _ret = true;
     }
   }
 
   return _ret;
 }
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEAPIHTTPDomoticz::addClass(AFESensorAS3935 *Sensor) {

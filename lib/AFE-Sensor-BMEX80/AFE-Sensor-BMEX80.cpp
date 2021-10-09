@@ -145,7 +145,7 @@ void AFESensorBMEX80::listener() {
 
       } else {
         Serial << endl << F("WARN: No data found");
-#endif
+#endif // DEBUG
       }
       startTime = 0;
 #ifdef DEBUG

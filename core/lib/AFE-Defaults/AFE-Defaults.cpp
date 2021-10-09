@@ -132,9 +132,9 @@ boolean AFEDefaults::set(void) {
        // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-    Data->createTLS2561SensorConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    Data->createTSL2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
     _ret = true;
   }

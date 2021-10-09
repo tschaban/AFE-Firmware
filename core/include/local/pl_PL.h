@@ -88,6 +88,10 @@
 #define L_FREQUENCY "Częstotliwość"
 #define L_I2C_PORT "Port I2C"
 #define L_GAIN "Wzmocnienie"
+#define L_FILE_NOT_FOUND_1 "Brak pliku konfiguracyjnego lub wystąpił problem z jego odczytem."
+#define L_FILE_NOT_FOUND_2 "Odśwież stronę"
+#define L_FILE_NOT_FOUND_3 "Jeśli problem będzie występował to ustaw ponownie konfigurację lub przywróć ustawienia początkowe"
+#define L_ATTENTION "Uwaga"
 
 /* Form: index */
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
@@ -120,7 +124,7 @@
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Ilość czujników PN532"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Ilość obsługiwanych kart MiFare"
 #define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
-#define L_DEVICE_NUMBER_OF_TLS2561_SENSORS "Ilość czujników TLS2561"
+#define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Ilość czujników TSL2561"
 #define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
@@ -403,19 +407,19 @@
 #define L_BH1750_ONE_READ_05_LUX "Jeden odczyt: 0.5 lux 120ms"
 #define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16mss"
 
-/* TLS2561 */
-#define L_TLS2561_SENSOR "Czujnik TLS2561"
-#define L_TLS2561_SENSORS "Czujniki TLS2561"
-#define L_TLS2561_MQTT_TOPIC "Temat MQTT czujnika TLS2561"
-#define L_TLS2561_SENSITIVENESS_LOW "Niska; szybkie odczyty: 14ms"
-#define L_TLS2561_SENSITIVENESS_MID "Średnia; dość szybkie odczyty: 100ms"
-#define L_TLS2561_SENSITIVENESS_HIGH "Wysoka; wolne odczyty: 400ms"
-#define L_TLS2561_GAIN_AUTO "Automatyczne"
-#define L_TLS2561_GAIN_NONE "1x (brak)"
-#define L_TLS2561_GAIN_16 "16x"
-#define L_TLS2561_GAIN_ILUMINANCE "IDX Natężenie światła"
-#define L_TLS2561_GAIN_BROADBAND "IDX Światło widzialne"
-#define L_TLS2561_GAIN_IR "IDX Podczerwień"
+/* TSL2561 */
+#define L_TSL2561_SENSOR "Czujnik TSL2561"
+#define L_TSL2561_SENSORS "Czujniki TSL2561"
+#define L_TSL2561_MQTT_TOPIC "Temat MQTT czujnika TSL2561"
+#define L_TSL2561_SENSITIVENESS_LOW "Niska; szybkie odczyty: 14ms"
+#define L_TSL2561_SENSITIVENESS_MID "Średnia; dość szybkie odczyty: 100ms"
+#define L_TSL2561_SENSITIVENESS_HIGH "Wysoka; wolne odczyty: 400ms"
+#define L_TSL2561_GAIN_AUTO "Automatyczne"
+#define L_TSL2561_GAIN_NONE "1x (brak)"
+#define L_TSL2561_GAIN_16 "16x"
+#define L_TSL2561_GAIN_ILUMINANCE "IDX Natężenie światła"
+#define L_TSL2561_GAIN_BROADBAND "IDX Światło widzialne"
+#define L_TSL2561_GAIN_IR "IDX Podczerwień"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"

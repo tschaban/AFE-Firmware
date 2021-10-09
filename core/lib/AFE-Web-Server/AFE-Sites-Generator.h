@@ -69,7 +69,7 @@ private:
 #ifdef AFE_ESP32
   TwoWire *WirePort0;
   TwoWire *WirePort1;
-#else // ESP8266
+#else  // ESP8266
   TwoWire *WirePort0;
 #endif // ESP32/ESP8266
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
@@ -179,7 +179,7 @@ private:
 #ifdef AFE_ESP32
   void addDeviceI2CAddressSelectionItem(String &item, uint8_t wirePortId,
                                         uint8_t address);
-#else // ESP8266
+#else  // ESP8266
   void addDeviceI2CAddressSelectionItem(String &item, uint8_t address);
 #endif // ESP32/ESP8266
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -189,6 +189,9 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
+  /* Adding section file not found */
+  void addFileNotFound(String &page);
+
 public:
   /* Constructor*/
   AFESitesGenerator();
@@ -197,7 +200,7 @@ public:
 #ifdef AFE_ESP32
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              TwoWire *, TwoWire *);
-#else // ESP8266
+#else  // ESP8266
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              TwoWire *);
 #endif // ESP32/ESP8266
@@ -211,7 +214,6 @@ public:
   void generateMenuHeader(String &page, uint16_t redirect = 0);
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
-  
 
   /* Method generates site footer */
   void generateFooter(String &page, boolean extended = false);
@@ -313,7 +315,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_ESP32
   void siteADCInput(String &page, uint8_t id);
-#else // ESP8266
+#else  // ESP8266
   void siteADCInput(String &page);
 #endif // ESP32/ESP88266
 #endif // AFE_CONFIG_HARDWARE_ADC_VCC
@@ -325,7 +327,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
   void siteI2CBUS(String &page, uint8_t id);
-#else // ESP8266
+#else  // ESP8266
   void siteI2CBUS(String &page);
 #endif // ESP32
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -352,8 +354,8 @@ public:
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-  void siteTLS2561Sensor(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_TLS2561
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  void siteTSL2561Sensor(String &page, uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 };
 #endif // _AFE_Sites_Generator_h

@@ -169,9 +169,9 @@ void initializeMQTTAPI(void) {
 #endif
 */
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-    if (Device.configuration.noOfTLS2561s > 0) {
-      MqttAPI.addClass(&TLS2561Sensor[0]);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    if (Device.configuration.noOfTSL2561s > 0) {
+      MqttAPI.addClass(&TSL2561Sensor[0]);
     }
 #endif
 
@@ -297,9 +297,9 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-    if (Device.configuration.noOfTLS2561s > 0) {
-      HttpAPI.addClass(&TLS2561Sensor[0]);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    if (Device.configuration.noOfTSL2561s > 0) {
+      HttpAPI.addClass(&TSL2561Sensor[0]);
     }
 #endif
 
@@ -430,9 +430,9 @@ void initializeHTTPDomoticzAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_TLS2561
-    if (Device.configuration.noOfTLS2561s > 0) {
-      HttpDomoticzAPI.addClass(&TLS2561Sensor[0]);
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    if (Device.configuration.noOfTSL2561s > 0) {
+      HttpDomoticzAPI.addClass(&TSL2561Sensor[0]);
     }
 #endif
 

@@ -9,7 +9,9 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Sensor-BME280.h>
 #include <AFE-Sensor-BME680.h>
+#ifndef AFE_ESP32
 #include <AFE-Sensor-BMP180.h>
+#endif // AFE_ESP32
 #include <AFE-Sensors-Common.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
