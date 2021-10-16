@@ -394,6 +394,7 @@ void loop() {
           Led.blinkingOn(100);
         }
 #endif
+
         HTTPServer.listener();
       }
     }
@@ -405,7 +406,7 @@ void loop() {
       }
     }
 #endif
-    yield();
+    //yield();
     Network.listener();
 
     /** Here: Code that will be run no matter if connected or disconnected

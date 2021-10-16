@@ -156,7 +156,7 @@ void initializeMQTTAPI(void) {
     }
 #endif
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
     if (Device.configuration.effectDeviceLight) {
       MqttAPI.addClassEffectDeviceLight(&CLEDBacklight);
     }

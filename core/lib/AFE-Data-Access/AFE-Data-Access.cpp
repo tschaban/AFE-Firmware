@@ -587,7 +587,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->effectPN532 = root["effectPN532"];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
       configuration->effectDeviceLight = root["effectDeviceLight"];
 #endif
 
@@ -742,7 +742,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["effectPN532"] = configuration->effectPN532;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
     root["effectDeviceLight"] = configuration->effectDeviceLight;
 #endif
 
@@ -906,7 +906,7 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   configuration.effectPN532 = false;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   configuration.effectDeviceLight = false;
 #endif
 
@@ -6211,7 +6211,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       configuration->gpio = root["gpio"].as<int>();
       configuration->chipset = root["chipset"].as<int>();
       configuration->colorOrder = root["colorOrder"].as<int>();
-      configuration->ledNumber = root["ledNumber"].as<int>();
+      configuration->ledNumbers = root["ledNumbers"].as<int>();
+      configuration->on.color = root["on"]["color"].as<int>();
+      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->off.brightness = root["off"]["brightness"].as<int>();
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6264,10 +6269,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    JsonObject &on = root.createNestedObject("on");
+    JsonObject &off = root.createNestedObject("off");
     root["gpio"] = configuration->gpio;
     root["chipset"] = configuration->chipset;
     root["colorOrder"] = configuration->colorOrder;
-    root["ledNumber"] = configuration->ledNumber;
+    root["ledNumbers"] = configuration->ledNumbers;
+    on["color"] = configuration->on.color;
+    on["brightness"] = configuration->on.brightness;
+    off["color"] = configuration->off.color;
+    off["brightness"] = configuration->off.brightness;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration->mqtt.topic;
@@ -6301,7 +6312,12 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
   configuration.chipset = 0;
   configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
+  configuration.ledNumbers = AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
+  configuration.on.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
+  configuration.off.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.brightness =
+      AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6313,20 +6329,13 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
-                    &configuration);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_1_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                    &configuration);
-#endif
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    configuration.gpio = i == 0 ? AFE_CONFIG_HARDWARE_CLED_0_GPIO
+                                : AFE_CONFIG_HARDWARE_CLED_1_GPIO;
+    saveConfiguration(i, &configuration);
+  }
 }
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECTS *configuration) {
   boolean _ret = true;
@@ -6363,7 +6372,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       root.printTo(Serial);
 #endif
 
-      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS; i++) {
         JsonObject &effect = root.get<JsonObject &>(i);
         if (effect.success()) {
           configuration->effect[i].brightness = effect["brightness"].as<int>();
@@ -6463,21 +6472,21 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
 
   /* Wave */
   configuration.effect[0].brightness =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
   configuration.effect[0].color =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
   configuration.effect[0].time =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIME;
 
   /* Fade Out */
   configuration.effect[1].brightness =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
   configuration.effect[1].color =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
   configuration.effect[1].time =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-cled-effects-") << i << F(".json");
@@ -6486,9 +6495,7 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_BACKLIGHT *configuration) {
   boolean _ret = true;
@@ -6638,7 +6645,7 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
     data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
   }
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-cled-backlight-") << i << F(".json");
@@ -6648,7 +6655,7 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
   }
 }
 
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

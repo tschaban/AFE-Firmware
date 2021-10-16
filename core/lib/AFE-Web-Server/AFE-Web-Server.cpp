@@ -260,12 +260,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteMiFareCard(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   case AFE_CONFIG_SITE_CLED_DEVICE_LIGHT:
     Site.siteCLEDDeviceEffect(page,
-                              AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID);
+                              AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID);
     break;
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   case AFE_CONFIG_SITE_CLED_PN532_SENSOR:
     Site.siteCLEDPN532SensoreEffect(
@@ -585,19 +585,19 @@ boolean AFEWebServer::generate(boolean upload) {
           CLEDEffectsConfiguration = {0};
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_DEVICE_LIGHT) {
           CLED CLEDConfiguration;
           CLED_BACKLIGHT CLEDBacklightConfiguration;
           get(CLEDConfiguration, CLEDBacklightConfiguration);
-          Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+          Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID,
                                   &CLEDConfiguration);
-          Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+          Data->saveConfiguration(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID,
                                   &CLEDBacklightConfiguration);
           CLEDConfiguration = {0};
           CLEDBacklightConfiguration = {0};
         }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
         else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561) {
           TSL2561 configuration;
@@ -1187,7 +1187,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
     Serial << endl << F("ERROR: UPGRADE: Update was aborted");
 #endif
   }
-  yield();
+  //yield(); // @TODO removed with T7
   return _success;
 }
 
@@ -1333,7 +1333,7 @@ void AFEWebServer::get(DEVICE &data) {
 
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   data.effectDeviceLight = server.arg("e0").length() > 0 ? true : false;
 #endif
 
@@ -2661,7 +2661,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
 
   char _label[3];
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS; i++) {
     sprintf(_label, "b%d", i);
     CLEDEffectsData.effect[i].brightness =
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
@@ -2677,7 +2677,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData) {
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
   CLEDData.gpio = server.arg("g").length() > 0 ? server.arg("g").toInt()
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -2726,7 +2726,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
         server.arg(_label).length() > 0 ? server.arg(_label).toInt() : 0;
   }
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

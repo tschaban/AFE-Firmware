@@ -278,12 +278,12 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   if (Device->configuration.effectDeviceLight) {
     addMenuItem(page, F(C_LED_EFFECT_DEVICE_LIGHT),
                 AFE_CONFIG_SITE_CLED_DEVICE_LIGHT);
   }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.effectPN532 &&
@@ -362,7 +362,7 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-      yield();
+      //yield(); // @TODO removed with T7
 
       RestAPI->sent(_HtmlResponse,
                     AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
@@ -370,14 +370,14 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-      yield();
+     //yield(); // @TODO removed with T7
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-      yield();
+      //yield(); // @TODO removed with T7
 
       closeSection(page);
     }
@@ -590,13 +590,13 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Section: lights effects */
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
+#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                      \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
   openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
                       Device->configuration.effectDeviceLight);
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.noOfPN532Sensors > 0) {
@@ -3777,7 +3777,7 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
   CLED CLEDConfiguration;
@@ -3894,7 +3894,7 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
   #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   */
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {

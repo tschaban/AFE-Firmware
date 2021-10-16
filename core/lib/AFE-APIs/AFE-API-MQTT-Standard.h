@@ -9,7 +9,7 @@
 
 #include <AFE-API.h>
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                      \
+#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                      \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
 #include <ArduinoJson.h>
 
@@ -89,7 +89,7 @@ private:
 #endif
 #endif
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
                   + 1
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -101,7 +101,7 @@ private:
 #endif
   ];
   /* Not yet implemented
-  #if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+  #if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
       defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
     void getCLEDCommand(CLED_COMMAND *);
   #endif
@@ -222,9 +222,9 @@ public:
   boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 /* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   void processEffectDeviceLight();
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   void processEffectPN532Sensor();

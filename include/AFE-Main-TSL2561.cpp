@@ -30,16 +30,16 @@ void TSL2561SensorEventsListener(void) {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
         HttpDomoticzAPI.publishTSL2561SensorData(i);
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         if (Device.configuration.effectDeviceLight) {
           if (CLEDStrip.lightSensorType ==
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TSL2561) {
             CLEDStrip.backlightEffect(
-                AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID,
                 TSL2561Sensor[i].illuminance);
           }
         }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT         
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT         
       }
     }
   }

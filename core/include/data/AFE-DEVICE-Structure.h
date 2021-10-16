@@ -86,8 +86,10 @@ struct DEVICE {
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
+  uint8_t noOfCLEDs;
   boolean effectDeviceLight;
 #endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   uint8_t noOfI2Cs;

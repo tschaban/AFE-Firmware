@@ -245,17 +245,17 @@ public:
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
   void createCLEDEffectsConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
