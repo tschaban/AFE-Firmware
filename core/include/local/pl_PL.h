@@ -603,8 +603,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
 
-#define C_LED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzenia"
-#define C_LED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532/PIR"
+#define L_CLED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzenia"
+#define L_CLED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532/PIR"
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
 #define L_CLED_COLORS_ORDER "Kolejność kolorów"

@@ -50,8 +50,10 @@ struct CLED_EFFECT_STANDARD {
 
 struct CLED {
   uint8_t gpio;
+  /*
   uint8_t colorOrder;
   uint8_t chipset;
+  */
   uint16_t ledNumbers;
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;

@@ -34,8 +34,7 @@ public:
   /* It formats SPIFFS */
   boolean formatFileSystem();
 
-  /* Returns true if a file exists */
-  boolean fileExist(const char *);
+  boolean fileExist(const char *path);
 
   const String getDeviceUID();
   void saveDeviceUID(const char *);
@@ -241,7 +240,7 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  void getConfiguration(uint8_t id, CLED *);
+  boolean getConfiguration(uint8_t id, CLED *);
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
 
@@ -250,7 +249,6 @@ public:
   boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
   void createCLEDEffectsConfigurationFile();
-
 
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);

@@ -1,4 +1,13 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
+/**
+ * @file AFE-Configuration.h
+ * @author Tschaban-A (github@adrian.czabanowski.com)
+ * @brief files contains firmware configuration parameters
+ * @version 3.1.0
+ * @date 2021-10-17
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
 
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
@@ -7,7 +16,6 @@
 //#define AFE_CONFIG_SERIAL_SPEED 9600
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
-/* Max size of the configuration HTML page */
 #define AFE_MAX_PAGE_SIZE 12000
 
 /* Turn On/Off debbuging of Ping class */
@@ -1549,7 +1557,7 @@ typedef enum {
 #define AFE_CONFIG_SITE_PN532_SENSOR 36
 #define AFE_CONFIG_SITE_MIFARE_CARDS 37
 #define AFE_CONFIG_SITE_PN532_SENSOR_ADMIN 38
-#define AFE_CONFIG_SITE_CLED_DEVICE_LIGHT 39
+#define AFE_CONFIG_SITE_CLED 39
 #define AFE_CONFIG_SITE_CLED_PN532_SENSOR 40
 #define AFE_CONFIG_SITE_TSL2561 41
 #define AFE_CONFIG_SITE_FIRMWARE 42
@@ -1789,7 +1797,7 @@ typedef enum {
 #define AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR 238     // AJ check for T6 only
 #define AFE_CONFIG_FILE_BUFFER_PN532_SENSOR 408      // AJ check
 #define AFE_CONFIG_FILE_BUFFER_MIFARE_CARD 317 // AJ Checked
-#define AFE_CONFIG_FILE_BUFFER_CLED 500 // 
+#define AFE_CONFIG_FILE_BUFFER_CLED 332 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_CLED_EFFECTS 228 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT 418 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_TSL2561 290 // AJ Checked

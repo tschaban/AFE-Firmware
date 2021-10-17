@@ -93,7 +93,21 @@ private:
 
   void closeMessageSection(String &page);
 
-  /* Item: HTML <input type=""> */
+  /**
+ * @brief Generates HTML <input> tag
+ * 
+ * @param  item             return string with generated tag
+ * @param  type             type of the input
+ * @param  name             name if the input itme
+ * @param  label            desc
+ * @param  value            value of the input
+ * @param  size             size of the input
+ * @param  min              minimal value if a number
+ * @param  max              maximum value if a number
+ * @param  step             step if a number value
+ * @param  hint             hint text
+ * @param  readonly         if true then input is readonly
+ */
   void addInputFormItem(String &item, const char *type, const char *name,
                         const char *label, const char *value,
                         const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -191,6 +205,14 @@ private:
 
   /* Adding section file not found */
   void addFileNotFound(String &page);
+
+  /**
+   * @brief Adds information item in the form
+   * 
+   * @param  item             return string
+   * @param  information      information text
+   */
+  void addInformationItem(String &item, const __FlashStringHelper *information);
 
 public:
   /* Constructor*/
@@ -346,13 +368,10 @@ public:
   void siteMiFareCard(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  void siteCLEDDeviceEffect(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void siteCLED(String &page, uint8_t id);
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void siteTSL2561Sensor(String &page, uint8_t id);

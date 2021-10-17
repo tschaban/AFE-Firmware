@@ -1,4 +1,13 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
+/**
+ * @file AFE-CLED.h
+ * @author Tschaban-A (github@adrian.czabanowski.com)
+ * @brief Controls RGB LEDs WS281x
+ * @version 3.1.0
+ * @date 2021-10-17
+ * 
+ * @copyright AFE-FIRMWARE (c) 2021
+ * 
+ */
 
 #ifndef _AFE_CLED_h
 #define _AFE_CLED_h
@@ -19,8 +28,6 @@
 class AFECLED {
 
 private:
-
-
   struct CLED_EFFECT_FADE_IN_OUT {
     int8_t increment;
     uint8_t step;
@@ -39,21 +46,23 @@ private:
   };
 
   struct CLED_CURRENT_STATE {
-    boolean state = false;
     CLED_PARAMETERS config;
+    boolean state = false;
+    CLED_PARAMETERS off;
+    CLED_PARAMETERS on;
     CLED_EFFECT_CONFIG effect;
   };
 
   boolean _initialized = false;
 
+  CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
   CLEDController *controllers[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
   CRGB leds[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS]
            [AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED];
 
   CLED_CURRENT_STATE _currentState[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
-  CLED_PARAMETERS _off[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
-  CLED_PARAMETERS _on[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  
 
   /* Tunes On/Off CLEDs */
   void _turnOnOff(uint8_t stripId, boolean state);
@@ -66,7 +75,7 @@ private:
   void _setColor(uint8_t stripId, uint32_t color, uint8_t brightness);
 
 public:
-  CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  //CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ON_OFF_EFFECT
 

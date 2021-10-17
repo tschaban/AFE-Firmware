@@ -124,6 +124,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  if (Device->configuration.noOfCLEDs) {
+    addMenuHeaderItem(page, F(L_CLEDS));
+    addMenuSubItem(page, L_CLED_STRIP, Device->configuration.noOfCLEDs,
+                   AFE_CONFIG_SITE_CLED);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -278,17 +286,10 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  if (Device->configuration.effectDeviceLight) {
-    addMenuItem(page, F(C_LED_EFFECT_DEVICE_LIGHT),
-                AFE_CONFIG_SITE_CLED_DEVICE_LIGHT);
-  }
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.effectPN532 &&
       Device->configuration.noOfPN532Sensors > 0) {
-    addMenuItem(page, F(C_LED_EFFECT_PN532_SENSOR),
+    addMenuItem(page, F(L_CLED_EFFECT_PN532_SENSOR),
                 AFE_CONFIG_SITE_CLED_PN532_SENSOR);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -362,7 +363,7 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-      //yield(); // @TODO removed with T7
+      // yield(); // @TODO removed with T7
 
       RestAPI->sent(_HtmlResponse,
                     AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
@@ -370,14 +371,14 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-     //yield(); // @TODO removed with T7
+      // yield(); // @TODO removed with T7
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
-      //yield(); // @TODO removed with T7
+      // yield(); // @TODO removed with T7
 
       closeSection(page);
     }
@@ -405,6 +406,13 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
                         Device->configuration.noOfLEDs, F("l"),
                         F(L_DEVICE_NUMBER_OF_LEDS));
+#endif
+
+/* CLED */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS,
+                        Device->configuration.noOfCLEDs, F("cl"),
+                        F(L_DEVICE_NUMBER_OF_CLEDS));
 #endif
 
 /* Contactrons */
@@ -590,7 +598,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Section: lights effects */
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                      \
+#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||               \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
   openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
@@ -903,8 +911,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   addListOfGPIOs(page, F("g"), configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
   closeSection(page);
@@ -968,8 +975,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   addListOfGPIOs(page, F("g"), configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
@@ -1433,9 +1439,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                           configuration.type == 1);
   addSelectFormItemClose(page);
 
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_SWITCH_SENSITIVENESS_HINT));
-
+  addInformationItem(page, F(L_SWITCH_SENSITIVENESS_HINT));
   char _number[4];
   sprintf(_number, "%d", configuration.sensitiveness);
 
@@ -1447,8 +1451,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
   addListOfGPIOs(page, F("g"), configuration.gpio);
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
@@ -2146,8 +2149,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "5", "86400", "1",
                    L_SECONDS);
 
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_HPMA115S0_POST_SLEEP_INTERVAL));
+  addInformationItem(page, F(L_HPMA115S0_POST_SLEEP_INTERVAL));
 
   sprintf(_number, "%d", configuration.timeToMeasure);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m",
@@ -2721,8 +2723,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
                                                AFE_DISTANCE_KILOMETER);
   addSelectFormItemClose(page);
 
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_ANEMOMETER_SENSITIVENESS_HINT));
+  addInformationItem(page, F(L_ANEMOMETER_SENSITIVENESS_HINT));
 
   sprintf(_number, "%d", configuration.sensitiveness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "s", L_SENSITIVENESS,
@@ -3233,8 +3234,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   /* Item: GPIO from expander */
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_MCP23017_CONNECTION_VIA_MCP));
+  addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
   addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 #endif // AFE_CONFIG_HARDWARE_MCP23017
@@ -3258,8 +3258,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #endif
 
   /* Item: Bouncing */
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_SWITCH_SENSITIVENESS_HINT));
+  addInformationItem(page, F(L_SWITCH_SENSITIVENESS_HINT));
 
   char _number[4];
   sprintf(_number, "%d", configuration.bouncing);
@@ -3381,8 +3380,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
   if (!FirmwarePro->Pro.valid) {
     if (id > AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION - 1) {
-      page.concat(FPSTR(HTTP_INFO_TEXT));
-      page.replace("{{i.v}}", F(L_MIFARE_CARD_NONE_PRO));
+      addInformationItem(page, F(L_MIFARE_CARD_NONE_PRO));
       return;
     }
   }
@@ -3472,8 +3470,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   openSection(page, F(L_MIFARE_CARD_INTEGRATION),
               F(L_MIFARE_CARD_INTEGRATION_HINT));
 
-  page.concat(FPSTR(HTTP_INFO_TEXT));
-  page.replace("{{i.v}}", F(L_MIFARE_CARD_HOW_LONG_KEEP_STATE));
+  addInformationItem(page, F(L_MIFARE_CARD_HOW_LONG_KEEP_STATE));
 
   /* Item: How long keep the card state */
   sprintf(_number, "%d", configuration.howLongKeepState);
@@ -3622,8 +3619,7 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 
   if (id == AFE_HARDWARE_MIFARE_CARD_OPTION_READ_TAG) {
 
-    page.concat(FPSTR(HTTP_INFO_TEXT));
-    page.replace("{{i.v}}", F(L_MIFARE_CARD_BACKUP_TAG));
+    addInformationItem(page, F(L_MIFARE_CARD_BACKUP_TAG));
 
     PN532Sensor.readBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK +
                               AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR,
@@ -3684,19 +3680,19 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
-  CLED CLEDConfiguration;
-  CLED_EFFECTS CLEDEffectsConfiguration;
-  Data->getConfiguration(id, &CLEDConfiguration);
-  char _number[10];
+  CLED configuration;
 
-  if (!Data->getConfiguration(id, &CLEDEffectsConfiguration)) {
+  if (!Data->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
-  openSection(page, F(C_LED_EFFECT_PN532_SENSOR), F(L_CLEDS_HINT));
+  char _number[10];
+  char _numberShort[4];
+
+  openSection(page, F(L_CLED_CONFIGURATION), F(L_CLEDS_HINT));
 
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
@@ -3705,8 +3701,6 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, true);
 
-  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
-
   /*
     // Item: Chipset
     sprintf(_number, "%d", 0);
@@ -3714,83 +3708,90 @@ void AFESitesGenerator::siteCLEDPN532SensoreEffect(String &page, uint8_t id) {
                      AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                      "WS2811", true);
+*/
 
-    // Item: number of leds
-    sprintf(_number, "%d", CLEDConfiguration.ledNumber);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l",
-    L_CLED_NUMBER_OF_LEDS,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     true);
+  // Item: number of leds
+  sprintf(_number, "%d", configuration.ledNumbers);
+  sprintf(_numberShort, "%d", AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED);
 
-    // Item: Colors order
-    sprintf(_number, "%d", CLEDConfiguration.colorOrder);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o",
-    L_CLED_COLORS_ORDER,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
-  */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", _numberShort,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   false);
+  /*
+      // Item: Colors order
+      sprintf(_number, "%d", configuration.colorOrder);
+      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o",
+      L_CLED_COLORS_ORDER,
+                       _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
+                       AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
+    */
   closeSection(page);
 
-  openSection(page, F(L_CLED_EFFECT_WAVE), F(""));
-  /*** Effect: one led wave */
+  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_ON), F(""));
 
-  /* Item: Led color */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k0", L_CLED_COLOR, _number,
+  /* Item: On Led color */
+  sprintf(_number, "%d", configuration.on.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
-  /* Item: brightness */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].brightness);
+  /* Item: On brightness */
+  sprintf(_number, "%d", configuration.on.brightness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
-  /* Item: time */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[0].time);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIME_WAVE,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "20000", "1",
-                   L_MILISECONDS);
-
   closeSection(page);
 
-  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT), F(""));
-  /*** Effect: FAde in / out */
+  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
 
-  /* Item: Led color */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k1", L_CLED_COLOR, _number,
+  /* Item: Off Led color */
+  sprintf(_number, "%d", configuration.off.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
-  /* Item: brightness */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MAX_BRIGHTNESS,
+  /* Item: Off brightness */
+  sprintf(_number, "%d", configuration.off.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
-  /* Item: time */
-  sprintf(_number, "%d", CLEDEffectsConfiguration.effect[1].time);
-  addInputFormItem(
-      page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIME_FADE_IN_OUT, _number,
-      AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1", L_MILISECONDS);
   closeSection(page);
+
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.domoticz.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+#else
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
-  CLED CLEDConfiguration;
+  CLED configuration;
   CLED_BACKLIGHT CLEDBacklightConfiguration;
   char _label[26];
   char _number[10];
-  Data->getConfiguration(id, &CLEDConfiguration);
+  Data->getConfiguration(id, &configuration);
 
   if (!Data->getConfiguration(id, &CLEDBacklightConfiguration)) {
     addFileNotFound(page);
   }
 
-  openSection(page, F(C_LED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
+  openSection(page, F(L_CLED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_1_GPIO);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
@@ -3877,7 +3878,7 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
     if (Device->configuration.api.domoticz || Device->configuration.api.mqtt)
   {
       openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-      sprintf(_number, "%d", CLEDConfiguration.domoticz.idx);
+      sprintf(_number, "%d", configuration.domoticz.idx);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
                        AFE_FORM_ITEM_SKIP_PROPERTY,
                        AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
@@ -3888,7 +3889,7 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
     if (Device->configuration.api.mqtt) {
       openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                       CLEDConfiguration.mqtt.topic, "64");
+                       configuration.mqtt.topic, "64");
       closeSection(page);
     }
   #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -4451,4 +4452,10 @@ void AFESitesGenerator::addFileNotFound(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_FILE_NOT_FOUND_3));
   closeSection(page);
+}
+
+void AFESitesGenerator::addInformationItem(
+    String &item, const __FlashStringHelper *information) {
+  item.concat(FPSTR(HTTP_INFO_TEXT));
+  item.replace("{{i.v}}", information);
 }

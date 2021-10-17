@@ -13,7 +13,9 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
   Serial << endl << "INFO: CLED: Initializing CLED...";
 #endif
 
-  CLED configuration;
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
+    Data->getConfiguration(i, configuration);
+  }
 
   FastLED.addLeds<AFE_CONFIG_HARDWARE_CLED_CHIPSET,
                   AFE_CONFIG_HARDWARE_CLED_0_GPIO,
@@ -40,47 +42,50 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
-    _on[i].color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
-    _on[i].brightness =
-        AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
-    _off[i].color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-    _off[i].brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
-    _currentState[i].config.color = _off[i].color;
-    _currentState[i].config.brightness = _off[i].brightness;
+    _currentState[i].on.color = configuration[i].on.color;
+    _currentState[i].on.brightness = configuration[i].on.brightness;
+    _currentState[i].off.color = configuration[i].off.color;
+    _currentState[i].off.brightness = configuration[i].off.brightness;
+    //_currentState[i].config.color = _off[i].color;
+    //_currentState[i].config.brightness = _off[i].brightness;
   }
 
   _initialized = true;
 
-  // on(0, CRGB::DarkRed, 255);
-  // delay(2000);
-  // on(0, CRGB::DarkGreen, 5);
+  on(0);
+  delay(2000);
+  off(0);
 
-  activateEffect(0, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+  // activateEffect(0, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
 
   return _initialized;
 }
 
-void AFECLED::on(uint8_t stripId) { _turnOnOff(stripId, true); }
-void AFECLED::off(uint8_t stripId) { _turnOnOff(stripId, false); }
+void AFECLED::on(uint8_t stripId) {
+  on(stripId, configuration[stripId].on.color,
+     configuration[stripId].on.brightness);
+}
+void AFECLED::off(uint8_t stripId) {
+  off(stripId, configuration[stripId].off.color,
+      configuration[stripId].off.brightness);
+}
 
 void AFECLED::on(uint8_t stripId, uint32_t color) {
-  _on[stripId].color = color;
-  on(stripId);
+  on(stripId, color, _currentState[stripId].on.brightness);
 }
 void AFECLED::off(uint8_t stripId, uint32_t color) {
-  _off[stripId].color = color;
-  off(stripId);
+  off(stripId, color, _currentState[stripId].off.brightness);
 }
 
 void AFECLED::on(uint8_t stripId, uint32_t color, uint8_t brightness) {
-  _on[stripId].color = color;
-  _on[stripId].brightness = brightness;
-  on(stripId);
+  _currentState[stripId].on.color = color;
+  _currentState[stripId].on.brightness = brightness;
+  _turnOnOff(stripId, true);
 }
 void AFECLED::off(uint8_t stripId, uint32_t color, uint8_t brightness) {
-  _off[stripId].color = color;
-  _off[stripId].brightness = brightness;
-  off(stripId);
+  _currentState[stripId].off.color = color;
+  _currentState[stripId].off.brightness = brightness;
+  _turnOnOff(stripId, false);
 }
 
 void AFECLED::activateEffect(uint8_t stripId, uint8_t effectId) {
@@ -242,8 +247,8 @@ void AFECLED::toggle(uint8_t stripId, uint32_t color) {
 
 void AFECLED::_turnOnOff(uint8_t stripId, boolean state) {
   if (_initialized) {
-    _setColor(stripId, state ? _on[stripId].color : _off[stripId].color,
-              state ? _on[stripId].brightness : _off[stripId].brightness);
+    _setColor(stripId, state ? _currentState[stripId].on.color : _currentState[stripId].off.color,
+              state ? _currentState[stripId].on.brightness : _currentState[stripId].off.brightness);
     _currentState[stripId].state = state;
   }
 }
