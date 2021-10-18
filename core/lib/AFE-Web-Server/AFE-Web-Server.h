@@ -205,11 +205,18 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 /**
- * @brief Gets CLED configuration parameters from HTML form
+ * @brief Gets RGB LED configuration parameters from HTML form
  * 
- * @param  data         Configuration data
+ * @param  data Configuration data
  */
   void get(CLED &data);
+
+/**
+ * @brief Gets RGB LED Blinking effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_BLINKING &data);
 
 
 #endif // AFE_CONFIG_HARDWARE_CLED

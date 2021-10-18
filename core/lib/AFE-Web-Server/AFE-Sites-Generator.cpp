@@ -3682,7 +3682,6 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
-
   CLED configuration;
 
   if (!Data->getConfiguration(id, &configuration)) {
@@ -3701,32 +3700,13 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, true);
 
-  /*
-    // Item: Chipset
-    sprintf(_number, "%d", 0);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "m", "Chipset", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     "WS2811", true);
-*/
-
   // Item: number of leds
   sprintf(_number, "%d", configuration.ledNumbers);
   sprintf(_numberShort, "%d", AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED);
-
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "l", L_CLED_NUMBER_OF_LEDS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", _numberShort,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    false);
-  /*
-      // Item: Colors order
-      sprintf(_number, "%d", configuration.colorOrder);
-      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "o",
-      L_CLED_COLORS_ORDER,
-                       _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                       AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                       AFE_FORM_ITEM_SKIP_PROPERTY, "GRB", true);
-    */
   closeSection(page);
 
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_ON), F(""));
@@ -3775,6 +3755,64 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
     closeSection(page);
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+  openMessageSection(page, F(L_CLED_EFFECTS_CONFIGURATION), F(""));
+  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_BLINKING, id,
+             L_CLED_EFFECT_BLINKING_CONFIGURATION);
+  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_WAVE, id,
+             L_CLED_EFFECT_WAVE_CONFIGURATION);
+  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT, id,
+             L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION);
+  closeMessageSection(page);
+}
+
+void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
+  CLED_EFFECT_BLINKING configuration;
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
+  char _number[10];
+
+  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_ON), F(""));
+
+  /* Item: On Led color */
+  sprintf(_number, "%d", configuration.on.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: On brightness */
+  sprintf(_number, "%d", configuration.on.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: On timeout */
+  sprintf(_number, "%d", configuration.onTimeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIMEOUT,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
+
+  /* Item: Off Led color */
+  sprintf(_number, "%d", configuration.off.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: Off brightness */
+  sprintf(_number, "%d", configuration.off.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: Off timeout */
+  sprintf(_number, "%d", configuration.offTimeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIMEOUT,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
+                   L_MILISECONDS);
+  closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
 
@@ -4459,3 +4497,17 @@ void AFESitesGenerator::addInformationItem(
   item.concat(FPSTR(HTTP_INFO_TEXT));
   item.replace("{{i.v}}", information);
 }
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFESitesGenerator::addUrlItem(String &item, uint8_t option, uint8_t id,
+                                   const char *label) {
+  char _number[4];
+  item.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  item.replace("{{I}}", F(L_CLED_EFFECTS_URL));
+  sprintf(_number, "%d", option);
+  item.replace("{{u.u}}", _number);
+  sprintf(_number, "%d", id);
+  item.replace("{{u.i}}", _number);
+  item.replace("{{u.l}}", label);
+}
+#endif // AFE_CONFIG_HARDWARE_CLED

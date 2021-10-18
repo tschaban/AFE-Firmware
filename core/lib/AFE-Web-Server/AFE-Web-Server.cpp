@@ -264,7 +264,10 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_CLED:
     Site.siteCLED(page, siteConfig->deviceID);
     break;
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  case AFE_CONFIG_SITE_CLED_EFFECT_BLINKING:
+    Site.siteCLEDEffectBlinking(page, siteConfig->deviceID);
+    break;
+#endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   case AFE_CONFIG_SITE_TSL2561:
     Site.siteTSL2561Sensor(page, siteConfig->deviceID);
@@ -566,6 +569,11 @@ boolean AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
         else if (siteConfig.ID == AFE_CONFIG_SITE_CLED) {
           CLED configuration;
+          get(configuration);
+          Data->saveConfiguration(siteConfig.deviceID, &configuration);
+          configuration = {0};
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_BLINKING) {
+          CLED_EFFECT_BLINKING configuration;
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};
@@ -2674,6 +2682,34 @@ void AFEWebServer::get(CLED &data) {
   }
 #endif
 }
+
+void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
+  data.on.color = server.arg(F("c0")).length() > 0
+                      ? server.arg(F("c0")).toInt()
+                      : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
+
+  data.off.color = server.arg(F("c1")).length() > 0
+                       ? server.arg(F("c1")).toInt()
+                       : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+
+  data.on.brightness = server.arg(F("b0")).length() > 0
+                           ? server.arg(F("b0")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
+
+  data.off.brightness = server.arg(F("b1")).length() > 0
+                            ? server.arg(F("b1")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
+
+  data.onTimeout = server.arg(F("t0")).length() > 0
+                           ? server.arg(F("t0")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
+
+  data.offTimeout = server.arg(F("t1")).length() > 0
+                            ? server.arg(F("t1")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
+
+}
+
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {

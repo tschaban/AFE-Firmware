@@ -605,7 +605,14 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_CONFIGURATION "RGB LEDs configuration"
 #define L_CLED_ONOFF_CONFIGURATION "LEDs: ON/OFF configuration"
 #define L_CLED_ONOFF_CONFIGURATION_ON "LED's turned ON settings"
-#define L_CLED_ONOFF_CONFIGURATION_OFF "LED's turned ON settings"
+#define L_CLED_ONOFF_CONFIGURATION_OFF "LED's turned OFF settings"
+#define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
+#define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
+#define L_CLED_TIMEOUT "How long keep this state"
+#define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
+#define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
+#define L_CLED_EFFECT_WAVE_CONFIGURATION "Wave effect"
+
 
 
 #define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"

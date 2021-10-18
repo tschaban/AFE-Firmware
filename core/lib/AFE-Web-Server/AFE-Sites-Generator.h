@@ -203,7 +203,12 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-  /* Adding section file not found */
+
+/**
+ * @brief Adds warning session to the configuration form is a configuration file doesn't exist
+ * 
+ * @param  page             return string
+ */
   void addFileNotFound(String &page);
 
   /**
@@ -213,6 +218,19 @@ private:
    * @param  information      information text
    */
   void addInformationItem(String &item, const __FlashStringHelper *information);
+
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+/**
+ * @brief Adds url item (<a> html tag) to the list group. openMessageSection and closeMessageSection are required
+ * 
+ * @param  item             return string
+ * @param  option           site ID -> url option "o"
+ * @param  id               object id -> url option "i"
+ * @param  label            label of <a>label</a>
+ */
+  void addUrlItem(String &item,uint8_t option, uint8_t id, const char *label);
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 public:
   /* Constructor*/
@@ -370,6 +388,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   void siteCLED(String &page, uint8_t id);
+  void siteCLEDEffectBlinking(String &page, uint8_t id);
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 

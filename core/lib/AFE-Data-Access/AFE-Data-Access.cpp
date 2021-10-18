@@ -623,7 +623,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
-                                 configuration->noOfI2Cs =
+      configuration->noOfI2Cs =
           root["noOfI2Cs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
@@ -6249,11 +6249,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
 
-
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CLED
+             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
              << F(", actual JSON size: ") << jsonBuffer.size();
       if (AFE_CONFIG_FILE_BUFFER_CLED < jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: Too small buffer size");
@@ -6367,6 +6365,155 @@ void AFEDataAccess::createCLEDConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
+
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        CLED_EFFECT_BLINKING *configuration) {
+  boolean _ret = true;
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->on.color = root["on"]["color"].as<int>();
+      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->onTimeout = root["on"]["timeout"].as<int>();
+      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->off.brightness = root["off"]["brightness"].as<int>();
+      configuration->offTimeout = root["off"]["timeout"].as<int>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING <
+          jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_EFFECT_BLINKING *configuration) {
+  char fileName[18];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &on = root.createNestedObject("on");
+    JsonObject &off = root.createNestedObject("off");
+
+    on["color"] = configuration->on.color;
+    on["brightness"] = configuration->on.brightness;
+    on["timeout"] = configuration->onTimeout;
+    off["color"] = configuration->off.color;
+    off["brightness"] = configuration->off.brightness;
+    off["timeout"] = configuration->offTimeout;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
+  CLED_EFFECT_BLINKING configuration;
+  configuration.on.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
+  configuration.on.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
+  configuration.off.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+  configuration.off.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
+  configuration.onTimeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
+  configuration.offTimeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating CLED EFFECT Blinking configuration file");
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    saveConfiguration(i, &configuration);
+  }
+}
+
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECTS *configuration) {

@@ -56,6 +56,8 @@ private:
   boolean _initialized = false;
 
   CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  CLED_EFFECT_BLINKING configurationEffectBlinking[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+
   CLEDController *controllers[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
   CRGB leds[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS]
@@ -81,13 +83,42 @@ public:
 
 #endif
 
-  /* Constructor */
+  /**
+   * @brief Construct a new AFECLED object
+   * 
+   */
   AFECLED();
-  boolean begin(AFEDataAccess *);
 
-  /* Turns on CLED */
+  /**
+   * @brief Initialize all RGB LED string
+   * 
+   * @param  Data             Reference to data access API
+   * @return boolean          True: when succesfully initialized
+   */
+  boolean begin(AFEDataAccess *Data);
+
+  /**
+   * @brief Turns ON LED strip: color and brightness from the configuration file
+   * 
+   * @param  stripId          ID of the LED Strip
+   */
   void on(uint8_t stripId);
+
+  /**
+   * @brief Turns ON LED strip: color as parameter and brightness the last one used
+   * 
+   * @param  stripId          ID of the LED Strip
+   * @param  color            Color ID
+   */
   void on(uint8_t stripId, uint32_t color);
+
+  /**
+   * @brief Turns ON LED strip: color and brightness as parameters
+   * 
+   * @param  stripId          ID of the LED Strip
+   * @param  color            Color ID
+   * @param  brightness       Brightness 0 .. 255
+   */
   void on(uint8_t stripId, uint32_t color, uint8_t brightness);
 
   /* Turn off CLED */

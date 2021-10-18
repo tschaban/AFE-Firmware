@@ -244,6 +244,13 @@ public:
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
 
+  boolean getConfiguration(uint8_t id, CLED_EFFECT_BLINKING *);
+  void saveConfiguration(uint8_t id, CLED_EFFECT_BLINKING *);
+  void createCLEDEffectBlinkingConfigurationFile();
+
+
+
+
   
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
