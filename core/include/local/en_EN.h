@@ -61,6 +61,8 @@
 #define L_DISCONNECTED "Disconnected"
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
 #define L_CONNECTIONS "Connections"
+#define L_CLEDS "RGB LEDs"
+#define L_HOME_ASSISTANT_INTEGRATION "Home Assistant Integration"
 
 
 /* Forms commons */
@@ -126,7 +128,7 @@
 #define L_DEVICE_NUMBER_OF_BINARY_SENSORS "Number of binary's sensors"
 #define L_DEVICE_NUMBER_OF_PN532_SENSORS "Number of PN532's sensors"
 #define L_DEVICE_NUMBER_OF_MIFARE_CARDS "Number of MiFare cards"
-#define L_DEVICE_NUMBER_OF_CLEDS "Number of WS2812 RGB Leds"
+#define L_DEVICE_NUMBER_OF_CLEDS "Number of WS281x RGB Leds"
 #define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Number of TSL2561's sensors"  
 #define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
@@ -598,11 +600,27 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_ADMIN_INFO "Information"
 
 
-#define C_LED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
-#define C_LED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
+/* CLED */
+
+#define L_CLED_STRIP "LED Strip"
+#define L_CLED_CONFIGURATION "RGB LEDs configuration"
+#define L_CLED_ONOFF_CONFIGURATION "LEDs: ON/OFF configuration"
+#define L_CLED_ONOFF_CONFIGURATION_ON "LED's turned ON settings"
+#define L_CLED_ONOFF_CONFIGURATION_OFF "LED's turned OFF settings"
+#define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
+#define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
+#define L_CLED_TIMEOUT "How long keep this state"
+#define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
+#define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
+#define L_CLED_EFFECT_WAVE_CONFIGURATION "Wave effect"
+
+
+
+#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
+#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
 //#define L_CLEDS "RGB Leds"
-#define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS2812 RGB 8xLED strip. It must be connected as described below"
-#define L_CLED_NUMBER_OF_LEDS "Number of leds build into the strip"
+#define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
+#define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
 #define L_CLED_COLORS_ORDER "Colors order"
 
 #define L_CLED_EFFECT_WAVE "Wave effect"

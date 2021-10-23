@@ -1,9 +1,13 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
-
 #include "AFE-Data-Access.h"
 
 AFEDataAccess::AFEDataAccess() {}
 
+/**
+ * @brief Formats the file system to LittleFS or SPIFFS, depending on
+ * AFE_FILE_SYSTEM_USED
+ *
+ * @return boolean
+ */
 boolean AFEDataAccess::formatFileSystem() {
 #ifdef DEBUG
   Serial << endl << endl << F("INFO: Formatig File System");
@@ -15,6 +19,12 @@ boolean AFEDataAccess::formatFileSystem() {
 #endif
 }
 
+/**
+ * @brief Checks if a file exists
+ *
+ * @param  path             full path to the file: folder and file name
+ * @return boolean
+ */
 boolean AFEDataAccess::fileExist(const char *path) {
 #if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
   return LITTLEFS.exists(path);
@@ -23,6 +33,12 @@ boolean AFEDataAccess::fileExist(const char *path) {
 #endif
 }
 
+/**
+ * @brief Reads a string from AFE_FILE_WELCOME_MESSAGE file. After it's read the
+ * string is removed from the file
+ *
+ * @param  message          read string
+ */
 void AFEDataAccess::getWelcomeMessage(String &message) {
 #ifdef DEBUG
   Serial << endl
@@ -39,7 +55,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
   if (configFile) {
     message = configFile.readString();
     configFile.close();
-    /* After message is read, it's removed from the file */
+
     saveWelecomeMessage("");
   } else {
     message = "";
@@ -51,6 +67,11 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
   }
 }
 
+/**
+ * @brief Saves a string in AFE_FILE_WELCOME_MESSAGE file
+ *
+ * @param  message          string to be saved
+ */
 void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #ifdef DEBUG
   Serial << endl
@@ -82,6 +103,11 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #endif
 }
 
+/**
+ * @brief Reads the device UID
+ *
+ * @return const String
+ */
 const String AFEDataAccess::getDeviceUID() {
   String uid;
 #ifdef DEBUG
@@ -141,6 +167,11 @@ const String AFEDataAccess::getDeviceUID() {
   return uid;
 }
 
+/**
+ * @brief Saves the devicde UID
+ *
+ * @param  uid              Device unique identyfier
+ */
 void AFEDataAccess::saveDeviceUID(const char *uid) {
 #ifdef DEBUG
   Serial << endl
@@ -187,6 +218,10 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
 #endif
 }
 
+/**
+ * @brief Creates and saves device unique identyfier
+ *
+ */
 void AFEDataAccess::createDeviceUIDFile() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_UID;
@@ -583,12 +618,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-      configuration->effectPN532 = root["effectPN532"];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-      configuration->effectDeviceLight = root["effectDeviceLight"];
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      configuration->noOfCLEDs = root["noOfCLEDs"];
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
@@ -738,12 +769,8 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfI2Cs"] = configuration->noOfI2Cs;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    root["effectPN532"] = configuration->effectPN532;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-    root["effectDeviceLight"] = configuration->effectDeviceLight;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    root["noOfCLEDs"] = configuration->noOfCLEDs;
 #endif
 
     root.printTo(configFile);
@@ -902,12 +929,8 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  configuration.effectPN532 = false;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  configuration.effectDeviceLight = false;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  configuration.noOfCLEDs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLED_STRIPS;
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
@@ -947,8 +970,6 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
       configuration->type = root["type"].as<int>();
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       sprintf(configuration->version, root["version"]);
-      sprintf(configuration->upgradeURL, root["upgradeURL"]);
-      configuration->autoUpgrade = root["autoUpgrade"];
 
 #ifdef DEBUG
       Serial << endl
@@ -1001,8 +1022,6 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     root["type"] = configuration->type;
     root["api"] = configuration->api;
     root["version"] = configuration->version;
-    root["autoUpgrade"] = configuration->autoUpgrade;
-    root["upgradeURL"] = configuration->upgradeURL;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1033,9 +1052,7 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
-  firmwareConfiguration.api = AFE_FIRMARE_API;
-  firmwareConfiguration.autoUpgrade = 0;
-  firmwareConfiguration.upgradeURL[0] = AFE_EMPTY_STRING;
+  firmwareConfiguration.api = AFE_FIRMWARE_API;
   saveConfiguration(&firmwareConfiguration);
 }
 
@@ -1049,7 +1066,7 @@ void AFEDataAccess::saveFirmwareVersion(const char *version) {
 void AFEDataAccess::saveFirmwareAPIVersion() {
   FIRMWARE configuration;
   getConfiguration(&configuration);
-  configuration.api = AFE_FIRMARE_API;
+  configuration.api = AFE_FIRMWARE_API;
   saveConfiguration(&configuration);
 }
 
@@ -6177,7 +6194,8 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
+  boolean _ret = true;
   char fileName[18];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
@@ -6209,9 +6227,15 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       root.printTo(Serial);
 #endif
       configuration->gpio = root["gpio"].as<int>();
+      /*
       configuration->chipset = root["chipset"].as<int>();
       configuration->colorOrder = root["colorOrder"].as<int>();
-      configuration->ledNumber = root["ledNumber"].as<int>();
+      */
+      configuration->ledNumbers = root["ledNumbers"].as<int>();
+      configuration->on.color = root["on"]["color"].as<int>();
+      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->off.brightness = root["off"]["brightness"].as<int>();
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6227,21 +6251,22 @@ void AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
         Serial << endl << F("WARN: Too small buffer size");
       }
 #endif
-    }
+    } else {
+      _ret = false;
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
-#endif
-    configFile.close();
-  }
 
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
-  }
 #endif
+  }
+  return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   char fileName[18];
@@ -6264,10 +6289,18 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    JsonObject &on = root.createNestedObject("on");
+    JsonObject &off = root.createNestedObject("off");
     root["gpio"] = configuration->gpio;
+    /*
     root["chipset"] = configuration->chipset;
     root["colorOrder"] = configuration->colorOrder;
-    root["ledNumber"] = configuration->ledNumber;
+    */
+    root["ledNumbers"] = configuration->ledNumbers;
+    on["color"] = configuration->on.color;
+    on["brightness"] = configuration->on.brightness;
+    off["color"] = configuration->off.color;
+    off["brightness"] = configuration->off.brightness;
 
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["mqttTopic"] = configuration->mqtt.topic;
@@ -6299,9 +6332,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 }
 void AFEDataAccess::createCLEDConfigurationFile() {
   CLED configuration;
+  /*
   configuration.chipset = 0;
   configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
-  configuration.ledNumber = AFE_CONFIG_HARDWARE_CLED_8_LEDS;
+  */
+  configuration.ledNumbers = AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
+  configuration.on.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
+  configuration.off.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.brightness =
+      AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6313,20 +6353,162 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_0_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
-                    &configuration);
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    configuration.gpio = i == 0 ? AFE_CONFIG_HARDWARE_CLED_0_GPIO
+                                : AFE_CONFIG_HARDWARE_CLED_1_GPIO;
+    saveConfiguration(i, &configuration);
+  }
+}
+
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        CLED_EFFECT_BLINKING *configuration) {
+  boolean _ret = true;
+  char fileName[27];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  configuration.gpio = AFE_CONFIG_HARDWARE_CLED_1_GPIO;
-  saveConfiguration(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                    &configuration);
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->on.color = root["on"]["color"].as<int>();
+      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->onTimeout = root["on"]["timeout"].as<int>();
+      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->off.brightness = root["off"]["brightness"].as<int>();
+      configuration->offTimeout = root["off"]["timeout"].as<int>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING <
+          jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_EFFECT_BLINKING *configuration) {
+  char fileName[18];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &on = root.createNestedObject("on");
+    JsonObject &off = root.createNestedObject("off");
+
+    on["color"] = configuration->on.color;
+    on["brightness"] = configuration->on.brightness;
+    on["timeout"] = configuration->onTimeout;
+    off["color"] = configuration->off.color;
+    off["brightness"] = configuration->off.brightness;
+    off["timeout"] = configuration->offTimeout;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
 #endif
 }
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
+  CLED_EFFECT_BLINKING configuration;
+  configuration.on.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
+  configuration.on.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
+  configuration.off.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+  configuration.off.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
+  configuration.onTimeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
+  configuration.offTimeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating CLED EFFECT Blinking configuration file");
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    saveConfiguration(i, &configuration);
+  }
+}
+
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECTS *configuration) {
   boolean _ret = true;
@@ -6363,7 +6545,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       root.printTo(Serial);
 #endif
 
-      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_EFFECTS; i++) {
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS; i++) {
         JsonObject &effect = root.get<JsonObject &>(i);
         if (effect.success()) {
           configuration->effect[i].brightness = effect["brightness"].as<int>();
@@ -6463,21 +6645,21 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
 
   /* Wave */
   configuration.effect[0].brightness =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
   configuration.effect[0].color =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
   configuration.effect[0].time =
-      AFE_CONFIG_HARDWARE_EFFECT_WAVE_DEFAULT_WAVE_TIME;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIME;
 
   /* Fade Out */
   configuration.effect[1].brightness =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_BRIGHTNESS;
   configuration.effect[1].color =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
   configuration.effect[1].time =
-      AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-cled-effects-") << i << F(".json");
@@ -6486,9 +6668,7 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_BACKLIGHT *configuration) {
   boolean _ret = true;
@@ -6638,7 +6818,7 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
     data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
   }
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLEDS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-cled-backlight-") << i << F(".json");
@@ -6648,7 +6828,7 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
   }
 }
 
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

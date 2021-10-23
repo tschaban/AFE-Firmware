@@ -43,6 +43,13 @@
 #include <Streaming.h>
 #endif
 
+/*
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#include <AFE-API-HomeAssistant-Integration.h>
+AFEAPIHomeAssistantIntegration _HomeAssistantDiscoveryAPI;
+#endif
+*/
+
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
   boolean twoColumns = true;
@@ -204,12 +211,21 @@ private:
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  void get(CLED &CLEDData, CLED_EFFECTS &CLEDEffectsData);
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  void get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData);
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+/**
+ * @brief Gets RGB LED configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED &data);
+
+/**
+ * @brief Gets RGB LED Blinking effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_BLINKING &data);
+
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
@@ -258,6 +274,11 @@ public:
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
+/*
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  void addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration *HomeAssistantIntegration)
+#endif
+*/
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */

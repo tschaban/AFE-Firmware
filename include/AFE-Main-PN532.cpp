@@ -33,7 +33,7 @@ void initializePN532Sensor() {
       Device.configuration.effectPN532) {
     /* Changing the CLED Effect to listening mode */
     CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                       AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+                       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 #ifdef DEBUG
@@ -63,11 +63,11 @@ void PN532EventsListener() {
         if (Device.configuration.effectPN532) {
           CLEDStrip.setCustomEffectColor(
               AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-              AFE_CONFIG_HARDWARE_EFFECT_WAVE,
+              AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE,
               AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
 
           CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                             AFE_CONFIG_HARDWARE_EFFECT_WAVE);
+                             AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
         for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
@@ -80,8 +80,8 @@ void PN532EventsListener() {
 
               CLEDStrip.setCustomEffectColor(
                   AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                  AFE_CONFIG_HARDWARE_EFFECT_WAVE,
-                  CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_EFFECT_WAVE]
+                  AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE,
+                  CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE]
                       .color);
             }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -141,7 +141,7 @@ void PN532EventsListener() {
       if (Device.configuration.effectPN532) {
         /* Changing the CLED Effect to listening mode */
         CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
-                           AFE_CONFIG_HARDWARE_EFFECT_FADE_IN_OUT);
+                           AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
       }
       break;
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT

@@ -8,17 +8,16 @@ void CLedEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeCLed(void) {
+  
+  Device.configuration.noOfCLEDs = 1;
 
-  if (Device.configuration.effectDeviceLight ||
-      (Device.configuration.effectPN532 &&
-       Device.configuration.noOfPN532Sensors)) {
+  if (Device.configuration.noOfCLEDs > 0) {
     CLEDStrip.begin(&Data);
   }
 };
 
 void CLedEventsListener(void) {
-  if (Device.configuration.effectPN532 &&
-      Device.configuration.noOfPN532Sensors > 0) {
+  if (Device.configuration.noOfCLEDs > 0) {
     CLEDStrip.loop();
   }
 };

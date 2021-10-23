@@ -122,14 +122,8 @@ boolean AFEDefaults::set(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     Data->createCLEDConfigurationFile();
-#if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) ||                 \
-    defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT)
-    Data->createCLEDEffectsConfigurationFile();
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-    Data->createCLEDBacklightConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT ||
-       // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+    Data->createCLEDEffectBlinkingConfigurationFile();
+    // @TODO T7 add missing files
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

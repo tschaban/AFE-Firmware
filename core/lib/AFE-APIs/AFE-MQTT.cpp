@@ -196,7 +196,7 @@ void AFEMQTT::connect() {
                          (_NetworkConfiguration.waitTimeConnections * 1000)) {
 
         _connections++;
-        yield();
+        //yield(); // @TODO removed with T7
 #ifdef DEBUG
         Serial << endl
                << F("INFO: MQTT Connection attempt: ") << _connections
