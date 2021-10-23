@@ -95,7 +95,7 @@ private:
 
   /**
  * @brief Generates HTML <input> tag
- * 
+ *
  * @param  item             return string with generated tag
  * @param  type             type of the input
  * @param  name             name if the input itme
@@ -203,33 +203,33 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-
-/**
- * @brief Adds warning session to the configuration form is a configuration file doesn't exist
- * 
- * @param  page             return string
- */
+  /**
+   * @brief Adds warning session to the configuration form is a configuration
+   * file doesn't exist
+   *
+   * @param  page             return string
+   */
   void addFileNotFound(String &page);
 
   /**
    * @brief Adds information item in the form
-   * 
+   *
    * @param  item             return string
    * @param  information      information text
    */
   void addInformationItem(String &item, const __FlashStringHelper *information);
 
-
 #ifdef AFE_CONFIG_HARDWARE_CLED
-/**
- * @brief Adds url item (<a> html tag) to the list group. openMessageSection and closeMessageSection are required
- * 
- * @param  item             return string
- * @param  option           site ID -> url option "o"
- * @param  id               object id -> url option "i"
- * @param  label            label of <a>label</a>
- */
-  void addUrlItem(String &item,uint8_t option, uint8_t id, const char *label);
+  /**
+   * @brief Adds url item (<a> html tag) to the list group. openMessageSection
+   * and closeMessageSection are required
+   *
+   * @param  item             return string
+   * @param  option           site ID -> url option "o"
+   * @param  id               object id -> url option "i"
+   * @param  label            label of <a>label</a>
+   */
+  void addUrlItem(String &item, uint8_t option, uint8_t id, const char *label);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 public:
@@ -255,12 +255,14 @@ public:
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
 
-/**
- * @brief Generates the site footer part. It also replace the site template {{parameters}} to thier values
- * 
- * @param  page             return string
- * @param  extended         if true addess additinal information to the site. @TODO check if still used
- */
+  /**
+   * @brief Generates the site footer part. It also replace the site template
+   * {{parameters}} to thier values
+   *
+   * @param  page             return string
+   * @param  extended         if true addess additinal information to the site.
+   * @TODO check if still used
+   */
   void generateFooter(String &page, boolean extended = false);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
@@ -289,9 +291,12 @@ public:
   void siteNetwork(String &page);
   void siteConnecting(String &page);
   void siteMQTTBroker(String &page);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   void siteDomoticzServer(String &page);
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  void siteHomeAssistantDiscoveryConfiguration(String &page);
+#endif // Domoticz or Home Assistant API
+
   void sitePassword(String &page);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY

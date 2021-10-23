@@ -68,6 +68,13 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   FirmwarePro = _FirmwarePro;
 }
 
+/*
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  void AFEWebServer::addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration *HomeAssistantIntegration) {
+    _HomeAssistantDiscoveryAPI = HomeAssistantIntegration;
+  }
+#endif
+*/
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
@@ -108,11 +115,16 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_MQTT:
     Site.siteMQTTBroker(page);
     break;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   case AFE_CONFIG_SITE_DOMOTICZ:
     Site.siteDomoticzServer(page);
     break;
+#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  case AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION:
+    Site.siteHomeAssistantDiscoveryConfiguration(page);
+    break;
 #endif
+
   case AFE_CONFIG_SITE_PASSWORD:
     Site.sitePassword(page);
     break;
@@ -381,7 +393,7 @@ boolean AFEWebServer::generate(boolean upload) {
           Data->saveConfiguration(&configuration);
           configuration = {0};
         }
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
         else if (siteConfig.ID == AFE_CONFIG_SITE_DOMOTICZ) {
           DOMOTICZ configuration;
           get(configuration);
@@ -389,6 +401,12 @@ boolean AFEWebServer::generate(boolean upload) {
           configuration = {0};
         }
 #endif
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+        else if (siteConfig.ID == AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION) {
+        //  _HomeAssistantIntegration->publishRelay(0);
+        }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
         else if (siteConfig.ID == AFE_CONFIG_SITE_ANALOG_INPUT) {
           ADCINPUT configuration;
@@ -2641,15 +2659,15 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 void AFEWebServer::get(CLED &data) {
   data.gpio =
       server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : AFE_NONE;
-/*
-  data.colorOrder = server.arg(F("o")).length() > 0
-                        ? server.arg(F("o")).toInt()
-                        : AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
+  /*
+    data.colorOrder = server.arg(F("o")).length() > 0
+                          ? server.arg(F("o")).toInt()
+                          : AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
 
-  data.chipset = server.arg(F("m")).length() > 0
-                     ? server.arg(F("m")).toInt()
-                     : 0;
-*/
+    data.chipset = server.arg(F("m")).length() > 0
+                       ? server.arg(F("m")).toInt()
+                       : 0;
+  */
   data.ledNumbers = server.arg(F("l")).length() > 0
                         ? server.arg(F("l")).toInt()
                         : AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
@@ -2684,32 +2702,36 @@ void AFEWebServer::get(CLED &data) {
 }
 
 void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
-  data.on.color = server.arg(F("c0")).length() > 0
-                      ? server.arg(F("c0")).toInt()
-                      : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
+  data.on.color =
+      server.arg(F("c0")).length() > 0
+          ? server.arg(F("c0")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
 
-  data.off.color = server.arg(F("c1")).length() > 0
-                       ? server.arg(F("c1")).toInt()
-                       : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+  data.off.color =
+      server.arg(F("c1")).length() > 0
+          ? server.arg(F("c1")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
 
-  data.on.brightness = server.arg(F("b0")).length() > 0
-                           ? server.arg(F("b0")).toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
+  data.on.brightness =
+      server.arg(F("b0")).length() > 0
+          ? server.arg(F("b0")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
 
-  data.off.brightness = server.arg(F("b1")).length() > 0
-                            ? server.arg(F("b1")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
+  data.off.brightness =
+      server.arg(F("b1")).length() > 0
+          ? server.arg(F("b1")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
 
-  data.onTimeout = server.arg(F("t0")).length() > 0
-                           ? server.arg(F("t0")).toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
+  data.onTimeout =
+      server.arg(F("t0")).length() > 0
+          ? server.arg(F("t0")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
 
-  data.offTimeout = server.arg(F("t1")).length() > 0
-                            ? server.arg(F("t1")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
-
+  data.offTimeout =
+      server.arg(F("t1")).length() > 0
+          ? server.arg(F("t1")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 }
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {

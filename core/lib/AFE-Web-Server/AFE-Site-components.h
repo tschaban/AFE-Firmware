@@ -112,4 +112,10 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
 #if defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT) || defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT)
 const char HTTP_FIXED_CLED_CONFIG_PARAMS[] PROGMEM = "<input name=\"m\" type=\"hidden\" value=\"0\"><input name=\"l\" type=\"hidden\" value=\"8\"><input name=\"o\" type=\"hidden\" value=\"39\">";
 #endif
+
+
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+//const char HA_CONFIG_TOPIC[] PROGMEM = "{{ha.d}}/";
+#endif
+
 #endif // _AFE_CSS_h

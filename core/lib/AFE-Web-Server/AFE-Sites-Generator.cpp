@@ -862,7 +862,7 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   closeSection(page);
 }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
 void AFESitesGenerator::siteDomoticzServer(String &page) {
   DOMOTICZ configuration;
   Data->getConfiguration(&configuration);
@@ -889,7 +889,15 @@ void AFESitesGenerator::siteDomoticzServer(String &page) {
 
   closeSection(page);
 }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // Domoticz API
+
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
+  openSection(page, F("HA Discover"), F(""));
+
+  closeSection(page);
+}
+#endif // Home Assistant Discovery API
 
 void AFESitesGenerator::sitePassword(String &page) {
   PASSWORD configuration;

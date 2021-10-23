@@ -43,6 +43,13 @@
 #include <Streaming.h>
 #endif
 
+/*
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#include <AFE-API-HomeAssistant-Integration.h>
+AFEAPIHomeAssistantIntegration _HomeAssistantDiscoveryAPI;
+#endif
+*/
+
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
   boolean twoColumns = true;
@@ -267,6 +274,11 @@ public:
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
+/*
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  void addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration *HomeAssistantIntegration)
+#endif
+*/
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */

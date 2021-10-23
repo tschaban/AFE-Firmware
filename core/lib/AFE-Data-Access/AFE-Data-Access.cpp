@@ -970,8 +970,6 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
       configuration->type = root["type"].as<int>();
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       sprintf(configuration->version, root["version"]);
-      sprintf(configuration->upgradeURL, root["upgradeURL"]);
-      configuration->autoUpgrade = root["autoUpgrade"];
 
 #ifdef DEBUG
       Serial << endl
@@ -1024,8 +1022,6 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     root["type"] = configuration->type;
     root["api"] = configuration->api;
     root["version"] = configuration->version;
-    root["autoUpgrade"] = configuration->autoUpgrade;
-    root["upgradeURL"] = configuration->upgradeURL;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1057,8 +1053,6 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
   firmwareConfiguration.api = AFE_FIRMWARE_API;
-  firmwareConfiguration.autoUpgrade = 0;
-  firmwareConfiguration.upgradeURL[0] = AFE_EMPTY_STRING;
   saveConfiguration(&firmwareConfiguration);
 }
 

@@ -2,42 +2,6 @@
 
 #include "AFE-API-JSONRPC.h"
 
-/* Required to check access to WAN. Async ping
-volatile static boolean _PingResponded = false;
-
-boolean _handlePingAnswer(const AsyncPingResponse &response) {
-  IPAddress addr(response.addr);
-  if (response.answer) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: WAN ACCESS: Host ") << addr.toString().c_str()
-           << F(" and got response in ") << response.time << F("ms");
-  } else {
-    Serial << endl
-           << F("INFO: WAN ACCESS: No answer from host ")
-           << addr.toString().c_str();
-
-#endif
-  }
-  return false;
-};
-
-boolean _handlePingEnd(const AsyncPingResponse &response) {
-  IPAddress addr(response.addr);
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: WAN ACCESS: Host ") << addr.toString().c_str()
-         << F(" sent pings: ") << response.total_sent << F(", recevied: ")
-         << response.total_recv << F(", time ") << response.total_time
-         << F(" ms");
-#endif
-
-  _PingResponded = response.total_recv > 0 ? true : false;
-  return true;
-};
-
-*/
-
 AFEJSONRPC::AFEJSONRPC(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED

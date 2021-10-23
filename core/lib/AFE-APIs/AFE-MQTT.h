@@ -6,7 +6,6 @@
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
-//#include <AsyncPing.h>
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 

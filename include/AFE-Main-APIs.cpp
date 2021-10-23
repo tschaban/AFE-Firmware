@@ -3,11 +3,14 @@
 #include <AFE-API-HTTP.h>
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLE
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
-#else
+#else // Standards and Home Assistant API
 #include <AFE-API-MQTT-Standard.h>
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#include <AFE-API-HomeAssistant-Integration.h>
+#endif
 #endif
 
 /* ---------Headers ---------*/
@@ -21,11 +24,14 @@ void initializeHTTPDomoticzAPI(void);
 /* --------- Body -----------*/
 
 AFEAPIHTTP HttpAPI;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
 AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
 AFEAPIMQTTStandard MqttAPI;
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+AFEAPIHomeAssistantIntegration HomeAssistantDiscoveryAPI;
+#endif // Home Assistant
 #endif
 
 /* Initializing MQTT API */
@@ -41,6 +47,11 @@ void initializeMQTTAPI(void) {
     MqttAPI.begin(&Data, &Device, &Led);
 #else
     MqttAPI.begin(&Data, &Device);
+#endif
+
+/* Inititializing Home Assistant Discovery */
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+    HomeAssistantDiscoveryAPI.begin(&Data, &Device, &MqttAPI);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -310,7 +321,7 @@ void initializeHTTPAPI(void) {
 }
 
 /* Initializing Domoticz HTTP API */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
 
 void initializeHTTPDomoticzAPI(void) {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
@@ -442,4 +453,4 @@ void initializeHTTPDomoticzAPI(void) {
   }
 }
 
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // Domoticz API
