@@ -80,13 +80,18 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
   if (Device->configuration.api.mqtt) {
     addMenuItem(page, F(L_MQTT_BROKER), AFE_CONFIG_SITE_MQTT);
+
+#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+    addMenuItem(page, F(L_HOME_ASSISTANT_INTEGRATION),
+                AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION);
+#endif // HomeAssistant
   }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz) {
     addMenuItem(page, F(L_DOMOTICZ_SERVER), AFE_CONFIG_SITE_DOMOTICZ);
   }
-#endif
+#endif // Domoticz
 
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
@@ -633,11 +638,14 @@ void AFESitesGenerator::siteDevice(String &page) {
   addCheckboxFormItem(page, "h", "HTTP API", "1",
                       Device->configuration.api.http);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   addRadioButtonFormItem(page, "m", "Domoticz HTTP API", "1",
                          Device->configuration.api.domoticz);
   addRadioButtonFormItem(page, "m", "Domoticz MQTT API", "2",
                          Device->configuration.api.mqtt);
+#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  addCheckboxFormItem(page, "m", "Home Assistant MQTT API", "1",
+                      Device->configuration.api.mqtt);
 #else
   addCheckboxFormItem(page, "m", "MQTT API", "1",
                       Device->configuration.api.mqtt);
@@ -3952,8 +3960,10 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
                        "afe-logo.png\"><br>")
                    : F("<h1 style=\"margin-bottom:0\">AFE Firmware</h1>"));
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   page.replace("{{f.a}}", F("Domoticz"));
+#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  page.replace("{{f.a}}", F("HomeAssistant"));
 #else
   page.replace("{{f.a}}", F("Standard"));
 #endif

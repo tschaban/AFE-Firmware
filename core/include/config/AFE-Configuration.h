@@ -48,6 +48,7 @@
 /* APIs */
 #define AFE_API_STANDARD 0
 #define AFE_API_DOMOTICZ 1
+#define AFE_API_HOME_ASSISTANT 2
 
 /* URLs to AFE WebService */
 #define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
@@ -1561,10 +1562,10 @@ typedef enum {
 #define AFE_CONFIG_SITE_CLED_EFFECT_BLINKING 40
 #define AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT 41
 #define AFE_CONFIG_SITE_CLED_EFFECT_WAVE 42
-
 #define AFE_CONFIG_SITE_CLED_PN532_SENSOR 43
 #define AFE_CONFIG_SITE_TSL2561 44
 #define AFE_CONFIG_SITE_FIRMWARE 45
+#define AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION 46
 
 
 
@@ -1585,7 +1586,8 @@ typedef enum {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 /* Configs releated to Domoticz APIs */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
+#define AFE_FIRMWARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
 #define AFE_DOMOTICZ_VERSION_0 0 // 4.10x
 #define AFE_DOMOTICZ_VERSION_1 1 // 2020.x
 #define AFE_DOMOTICZ_VERSION_DEFAULT AFE_DOMOTICZ_VERSION_0
@@ -1593,13 +1595,10 @@ typedef enum {
 #define AFE_DOMOTICZ_DEFAULT_IDX 0 // Default value for IDX
 #define AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT "0"
 #define AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT "999999"
-#define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if
-      // Domoticz is Off, button is pressed and HTTP Domoticz API is on
-#define AFE_FIRMARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
+#define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in" // MQTT Topic for outgoing from AFE messages
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for
-      // messages that contains description
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE 380 // Size of the incoming Domoticz MQTT Messages. It may be to small for messages that contains description
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 57 // Outgoing MQTT message size for switch
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 90 // Outgoing MQTT message size for custom sensor
 
@@ -1659,20 +1658,22 @@ typedef enum {
 } afe_humidity_domoticz_state_t;
 #endif
 
-#else // Defauals for None-Domoticz MQTT
+#else // Defauals for None-Domoticz MQTT: Standard and HA
 
-#define AFE_FIRMARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
+#ifdef AFE_API_HOME_ASSISTANT
+#define AFE_FIRMWARE_API AFE_API_HOME_ASSISTANT // Type of the firmware API: STANDRARD
+#else
+#define AFE_FIRMWARE_API AFE_API_STANDARD // Type of the firmware API: STANDRARD
+#endif
 #define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH 69 // Size of a Command topic: MQTT_BASIC_CONFIG + 4
 #define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH 71 // Size of a State topic: MQTT_BASIC_CONFIG + 6
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* Defaults for each MQTT Version (standard and domoticz) */
-#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is
-       // down
+#define AFE_CONFIG_MQTT_DEFAULT_TIMEOUT 5000 // Timeout to shorten wait time, useful to have it low if MQTT server is down
 #define AFE_CONFIG_MQTT_DEFAULT_PORT 1883 // Default MQTT Broker port
-#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 1195 // 768 // Default MQTT Buffer size - must handle entire message, max JSON
-       // is BME680, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH
+#define AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE 1195 // 768 // Default MQTT Buffer size - must handle entire message, max JSON is BME680, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH
 #define AFE_CONFIG_FUNCTIONALITY_MQTT_LWT
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT false
 #define AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL false

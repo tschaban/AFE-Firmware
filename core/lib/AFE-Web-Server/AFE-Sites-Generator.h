@@ -255,7 +255,12 @@ public:
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
 
-  /* Method generates site footer */
+/**
+ * @brief Generates the site footer part. It also replace the site template {{parameters}} to thier values
+ * 
+ * @param  page             return string
+ * @param  extended         if true addess additinal information to the site. @TODO check if still used
+ */
   void generateFooter(String &page, boolean extended = false);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE

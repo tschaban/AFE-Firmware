@@ -62,6 +62,7 @@
 #define L_MEASURMENTS_INTERVAL "Measurement's interval"
 #define L_CONNECTIONS "Connections"
 #define L_CLEDS "RGB LEDs"
+#define L_HOME_ASSISTANT_INTEGRATION "Home Assistant Integration"
 
 
 /* Forms commons */

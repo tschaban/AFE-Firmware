@@ -1056,7 +1056,7 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
-  firmwareConfiguration.api = AFE_FIRMARE_API;
+  firmwareConfiguration.api = AFE_FIRMWARE_API;
   firmwareConfiguration.autoUpgrade = 0;
   firmwareConfiguration.upgradeURL[0] = AFE_EMPTY_STRING;
   saveConfiguration(&firmwareConfiguration);
@@ -1072,7 +1072,7 @@ void AFEDataAccess::saveFirmwareVersion(const char *version) {
 void AFEDataAccess::saveFirmwareAPIVersion() {
   FIRMWARE configuration;
   getConfiguration(&configuration);
-  configuration.api = AFE_FIRMARE_API;
+  configuration.api = AFE_FIRMWARE_API;
   saveConfiguration(&configuration);
 }
 
