@@ -43,6 +43,7 @@ private:
 
   void generateObjectId(char *objectId, const char *deviceClass, uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST);
   void generateTopic(char *topic, const char *deviceClass, const char *objectId);
+  void generateAvailability(char *availability);
   void generateDeviceRegistry(char *device);
 
 public:
@@ -57,6 +58,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void publishRelay(uint8_t id);
+  void publishRelays();
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 

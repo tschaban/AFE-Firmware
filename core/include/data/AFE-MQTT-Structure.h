@@ -4,12 +4,14 @@
 #define _AFE_MQTT_Structure_h
 
 #include <AFE-Configuration.h>
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#include <AFE-DOMOTICZ-Structure.h>
-#endif
-
 #include <arduino.h>
+
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#include <AFE-DOMOTICZ-Structure.h>
+#endif // Domoticz
+
+
 
 struct MQTT_MESSAGE {
   char *topic;
@@ -17,7 +19,7 @@ struct MQTT_MESSAGE {
   uint16_t length;
 };
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_API_DOMOTICZ
 struct MQTT_BASIC_CONFIG {
   char topic[65];
 };
@@ -97,7 +99,7 @@ struct MQTT {
   uint16_t port;
   char user[33];
   char password[33];
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
   MQTT_BASIC_CONFIG lwt;

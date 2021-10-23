@@ -275,13 +275,6 @@ void setup() {
     initializeHTTPAPI();
   }
 
-/* Enabling MQTT API in configuration mode for Home Assistant Discovery */
-#ifdef AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
-  if (Device.getMode() == AFE_MODE_CONFIGURATION) {
-    initializeMQTTAPI();
-  }
-#endif // Home Assistant
-
 /* End of initialization for operating mode. Initialization for all devices
  * modes */
 
@@ -401,14 +394,6 @@ void loop() {
           Led.blinkingOn(100);
         }
 #endif
-
-/* MQTT works in the configuration mode in order to enable to Home Assistant
- * Discovery */
-#ifdef AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
-        if (Device.configuration.api.mqtt) {
-          MqttAPI.listener();
-        }
-#endif // AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
 
         HTTPServer.listener();
       }

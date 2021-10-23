@@ -720,7 +720,7 @@
 
 /* ---- LED Controller ----*/
 #elif defined(T7_CONFIG)
-#define AFE_FIRMWARE_VERSION "3.1.0.B0"
+#define AFE_FIRMWARE_VERSION "3.2.0.B0"
 #define AFE_FIRMWARE_TYPE 7
 
 /* Hardware */

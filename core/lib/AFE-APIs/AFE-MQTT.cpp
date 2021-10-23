@@ -277,7 +277,7 @@ boolean AFEMQTT::eventConnected() {
 
 boolean AFEMQTT::publish(const char *topic, const char *message) {
 
-  boolean pubslishingStatus = false;
+  boolean _status = false;
 
   if (_Broker.state() == MQTT_CONNECTED) {
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -290,7 +290,7 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
     Serial << endl << F("Retain: ") << (configuration.retainAll ? "YES" : "NO");
 #endif
     if (strlen(topic) > 0) {
-      pubslishingStatus =
+      _status =
           _Broker.publish(topic, message, configuration.retainAll);
     }
 #ifdef DEBUG
@@ -304,10 +304,10 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
 #ifdef DEBUG
     Serial << endl
            << F("Status: ")
-           << (pubslishingStatus ? F("published") : F("NOT pubslished"));
+           << (_status ? F("published") : F("NOT pubslished"));
     Serial << endl << F("------------------------------------");
 #endif
   }
 
-  return pubslishingStatus;
+  return _status;
 }

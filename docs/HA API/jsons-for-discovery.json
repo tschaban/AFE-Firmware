@@ -1,4 +1,10 @@
-// #Topic: homeassistant/switch/123456abcde/config
+/* Home Assistant Discovery doc 
+https://www.home-assistant.io/docs/mqtt/discovery/
+*/
+
+
+// Topic: homeassistant/switch/123456abcde/config
+
 // Message SWITCH:
 
 {"avty":{"topic":"parter/salon/przod/lampa/lwt","payload_available":"connected","payload_not_available":"disconnected"},
@@ -13,21 +19,3 @@
 "stat_off":"off",
 "ret":false}
 
-//homeassistant/switch/123456abcde1/config
-
-{"avty":{"topic":"parter/salon/tyl/lampa/lwt","payload_available":"connected","payload_not_available":"disconnected"},
-"device":{"identifiers":"123456abcde","sw":"AFE Firmwate T0 3.1.0","manufacturer":"Producent urządzenia","name":"Nazwa z AFE","via_device":"123456abcde", "model":"Sonoff Basic"},
-"uniq_id":"123456abcde1",
-"name": "Tył", 
-"cmd_t": "parter/salon/tyl/lampa/cmd", 
-"stat_t": "parter/salon/tyl/lampa/state", 
-"pl_on": "on", 
-"pl_off":"off",
-"stat_on":"on",
-"stat_off":"off",
-"ret":false}
-
-
-
-
-{"uniq_id":"123457abcdf","name": "Tylna", "cmd_t": "parter/salon/tyl/lampa/cmd", "stat_t": "parter/salon/tyl/lampa/state", "pl_on": "on", "pl_of":"off"}
