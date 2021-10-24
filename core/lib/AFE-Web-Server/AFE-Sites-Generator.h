@@ -399,6 +399,8 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED
   void siteCLED(String &page, uint8_t id);
   void siteCLEDEffectBlinking(String &page, uint8_t id);
+  void siteCLEDEffectWave(String &page, uint8_t id);
+  void siteCLEDEffectFadeInOut(String &page, uint8_t id);
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 

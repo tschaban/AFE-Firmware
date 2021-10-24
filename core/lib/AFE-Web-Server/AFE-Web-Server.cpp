@@ -279,6 +279,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_CLED_EFFECT_BLINKING:
     Site.siteCLEDEffectBlinking(page, siteConfig->deviceID);
     break;
+case AFE_CONFIG_SITE_CLED_EFFECT_WAVE:
+    Site.siteCLEDEffectWave(page, siteConfig->deviceID);
+    break;
+case AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT:
+    Site.siteCLEDEffectFadeInOut(page, siteConfig->deviceID);
+    break;       
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   case AFE_CONFIG_SITE_TSL2561:
@@ -595,7 +601,18 @@ boolean AFEWebServer::generate(boolean upload) {
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_WAVE) {
+          CLED_EFFECT_WAVE configuration;
+          get(configuration);
+          Data->saveConfiguration(siteConfig.deviceID, &configuration);
+          configuration = {0};
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT) {
+          CLED_EFFECT_FADE_INOUT configuration;
+          get(configuration);
+          Data->saveConfiguration(siteConfig.deviceID, &configuration);
+          configuration = {0};
         }
+        
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
         else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561) {
@@ -2731,6 +2748,52 @@ void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
       server.arg(F("t1")).length() > 0
           ? server.arg(F("t1")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
+}
+
+void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
+  data.on.color =
+      server.arg(F("c0")).length() > 0
+          ? server.arg(F("c0")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
+
+  data.off.color =
+      server.arg(F("c1")).length() > 0
+          ? server.arg(F("c1")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
+
+  data.on.brightness =
+      server.arg(F("b")).length() > 0
+          ? server.arg(F("b")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+
+  data.timeout =
+      server.arg(F("t")).length() > 0
+          ? server.arg(F("t")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
+
+}
+
+void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
+  data.in.color =
+      server.arg(F("k")).length() > 0
+          ? server.arg(F("k")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR;
+
+  data.in.brightness =
+      server.arg(F("b0")).length() > 0
+          ? server.arg(F("b0")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_IN_BRIGHTNESS;
+
+  data.out.brightness =
+      server.arg(F("b1")).length() > 0
+          ? server.arg(F("b1")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_OUT_BRIGHTNESS;
+
+  data.timeout =
+      server.arg(F("t")).length() > 0
+          ? server.arg(F("t")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
+
 }
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT

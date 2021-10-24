@@ -225,6 +225,19 @@ private:
  */
   void get(CLED_EFFECT_BLINKING &data);
 
+/**
+ * @brief Gets RGB LED Wave effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_WAVE &data);
+
+/**
+ * @brief Gets RGB LED Fade In/Out effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_FADE_INOUT &data);
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 

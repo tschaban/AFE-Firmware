@@ -6196,7 +6196,7 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_CLED
 boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
   boolean _ret = true;
-  char fileName[18];
+  char fileName[strlen(AFE_FILE_CLED_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6269,7 +6269,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
-  char fileName[18];
+  char fileName[strlen(AFE_FILE_CLED_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6360,10 +6360,11 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   }
 }
 
+/* RGB LED Blinking Effect */
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECT_BLINKING *configuration) {
   boolean _ret = true;
-  char fileName[27];
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6430,7 +6431,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_BLINKING *configuration) {
-  char fileName[18];
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6507,6 +6508,286 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
+
+/* RGB LED Wave Effect */
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        CLED_EFFECT_WAVE *configuration) {
+  boolean _ret = true;
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION) + 1];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->on.color = root["on"]["color"].as<int>();
+      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->timeout = root["timeout"].as<int>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_EFFECT_WAVE *configuration) {
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION) + 1];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    JsonObject &on = root.createNestedObject("on");
+    JsonObject &off = root.createNestedObject("off");
+
+    on["color"] = configuration->on.color;
+    on["brightness"] = configuration->on.brightness;
+    off["color"] = configuration->off.color;
+    root["timeout"] = configuration->timeout;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDEffectWaveConfigurationFile() {
+  CLED_EFFECT_WAVE configuration;
+  configuration.on.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
+  configuration.on.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
+  configuration.off.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
+  configuration.timeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating CLED EFFECT Wave configuration file");
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    saveConfiguration(i, &configuration);
+  }
+}
+
+
+/* RGB LED Fade In/Out Effect */
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        CLED_EFFECT_FADE_INOUT *configuration) {
+  boolean _ret = true;
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION) + 1];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    createCLEDConfigurationFile();
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->in.color = root["color"].as<int>();
+      configuration->in.brightness = root["inBrightness"].as<int>();
+      configuration->out.brightness = root["outBrightness"].as<int>();
+      configuration->timeout = root["timeout"].as<int>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      CLED_EFFECT_FADE_INOUT *configuration) {
+  char fileName[strlen(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION) + 1];
+  sprintf(fileName, AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["color"] = configuration->in.color;
+    root["inBrightness"] = configuration->in.brightness;
+    root["outBrightness"] = configuration->out.brightness;
+    root["timeout"] = configuration->timeout;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT
+           << F(", actual JSON size: ") << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+
+void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
+  CLED_EFFECT_FADE_INOUT configuration;
+  configuration.in.color =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR;
+  configuration.in.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_IN_BRIGHTNESS;
+  configuration.out.brightness =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_OUT_BRIGHTNESS;
+  configuration.timeout =
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Creating CLED EFFECT FadeInOut configuration file");
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+    saveConfiguration(i, &configuration);
+  }
+}
+
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
@@ -6649,7 +6930,7 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   configuration.effect[0].color =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_COLOR; // DarkBlue
   configuration.effect[0].time =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIME;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
 
   /* Fade Out */
   configuration.effect[1].brightness =
@@ -6657,7 +6938,7 @@ void AFEDataAccess::createCLEDEffectsConfigurationFile() {
   configuration.effect[1].color =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR; // IndigoRed
   configuration.effect[1].time =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERVAL;
+      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
 #ifdef DEBUG

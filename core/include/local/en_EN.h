@@ -603,6 +603,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* CLED */
 
 #define L_CLED_STRIP "LED Strip"
+#define L_CLED_BRIGHTNESS "Brightness"
+#define L_CLED_COLOR "Color"
+
 #define L_CLED_CONFIGURATION "RGB LEDs configuration"
 #define L_CLED_ONOFF_CONFIGURATION "LEDs: ON/OFF configuration"
 #define L_CLED_ONOFF_CONFIGURATION_ON "LED's turned ON settings"
@@ -610,11 +613,18 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "How long keep this state"
+
 #define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
 #define L_CLED_EFFECT_WAVE_CONFIGURATION "Wave effect"
 
+#define L_CLED_EFFECT_WAVE_ON_LED_COLOR "Active LED's color"
+#define L_CLED_EFFECT_WAVE_OFF_LED_COLOR "Inactive LEDs' color"
+#define L_CLED_EFFECT_WAVE_SPEED "Wave speed"
 
+#define L_CLED_MAX_BRIGHTNESS "Max brightness"
+#define L_CLED_MIN_BRIGHTNESS "Min brightness"
+#define L_CLED_FADE_IN_OUT_TIMEOUT "Fade speed"
 
 #define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
 #define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
@@ -623,13 +633,12 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
 #define L_CLED_COLORS_ORDER "Colors order"
 
-#define L_CLED_EFFECT_WAVE "Wave effect"
-#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
-#define L_CLED_COLOR "Color"
-#define L_CLED_BRIGHTNESS "Brightness"
+//#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
+
+
 #define L_CLED_MAX_BRIGHTNESS "Max brightness"
-#define L_CLED_TIME_WAVE "Wave speed"
-#define L_CLED_TIME_FADE_IN_OUT "Fade speed"
+//#define L_CLED_TIME_WAVE "Wave speed"
+
 
 #define L_CLED_LIGHT_SENSOR "Light sensor"
 #define L_CLED_LIGHT_LEVEL "Light level"

@@ -28,21 +28,11 @@
 class AFECLED {
 
 private:
-  struct CLED_EFFECT_FADE_IN_OUT {
-    int8_t increment;
-    uint8_t step;
-  };
-
-    struct CLED_EFFECT_WAVE {
-    int8_t increment;
-    uint8_t ledId;
-  };
-
   struct CLED_EFFECT_CONFIG {
     uint8_t id = AFE_NONE;
     unsigned long timer;
-    CLED_EFFECT_FADE_IN_OUT fadeInOut;
-    CLED_EFFECT_WAVE wave;
+    int8_t increment;
+    uint8_t integer;
   };
 
   struct CLED_CURRENT_STATE {
@@ -57,6 +47,8 @@ private:
 
   CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
   CLED_EFFECT_BLINKING configurationEffectBlinking[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  CLED_EFFECT_WAVE configurationEffectWave[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  CLED_EFFECT_FADE_INOUT configurationEffectFadeInOut[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
   CLEDController *controllers[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 

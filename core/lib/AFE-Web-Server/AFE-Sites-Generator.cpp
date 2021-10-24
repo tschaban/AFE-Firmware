@@ -3830,6 +3830,74 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
                    L_MILISECONDS);
   closeSection(page);
 }
+
+void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
+  CLED_EFFECT_WAVE configuration;
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+  char _number[10];
+  openSection(page, F(L_CLED_EFFECT_WAVE_CONFIGURATION), F(""));
+
+  /* Item: Active Led color */
+  sprintf(_number, "%d", configuration.on.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_EFFECT_WAVE_ON_LED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: Inactive Led color */
+  sprintf(_number, "%d", configuration.off.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_EFFECT_WAVE_OFF_LED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: brightness */
+  sprintf(_number, "%d", configuration.on.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b", L_CLED_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: timeout */
+  sprintf(_number, "%d", configuration.timeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_CLED_EFFECT_WAVE_SPEED,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+}
+
+void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
+  CLED_EFFECT_FADE_INOUT configuration;
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+  char _number[10];
+  openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION), F(""));
+
+  /* Item: Led color */
+  sprintf(_number, "%d", configuration.in.color);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k", L_CLED_COLOR, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: Max brightness */
+  sprintf(_number, "%d", configuration.in.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_MAX_BRIGHTNESS, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+
+  /* Item: Min brightness */
+  sprintf(_number, "%d", configuration.out.brightness);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MIN_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  /* Item: Fade Out/In speed */
+  sprintf(_number, "%d", configuration.timeout);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_CLED_FADE_IN_OUT_TIMEOUT,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
+                   L_MILISECONDS);
+
+  closeSection(page);
+
+}
+
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT

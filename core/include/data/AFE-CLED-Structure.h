@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_HARDWARE_API == AFE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -31,7 +31,7 @@ struct CLED_LIGHT_CONTROLLED_LEVELS_CONFIG {
 struct CLED_LIGHT_CONTROLLED_CONFIG {
   uint8_t lightSensorId;
   CLED_BACKLIGHT_CONFIG
-      config[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS];
+  config[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS];
 };
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
@@ -42,23 +42,26 @@ struct CLED_EFFECT_BLINKING {
   unsigned long offTimeout;
 };
 
-struct CLED_EFFECT_STANDARD {
+struct CLED_EFFECT_WAVE {
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
-  unsigned long interval;
+  unsigned long timeout;
 };
+
+struct CLED_EFFECT_FADE_INOUT {
+  CLED_PARAMETERS in;
+  CLED_PARAMETERS out;
+  unsigned long timeout;
+};
+
 
 struct CLED {
   uint8_t gpio;
-  /*
-  uint8_t colorOrder;
-  uint8_t chipset;
-  */
   uint16_t ledNumbers;
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_HARDWARE_API == AFE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_BASIC_CONFIG mqtt;
