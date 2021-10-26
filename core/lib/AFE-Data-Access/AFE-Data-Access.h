@@ -15,7 +15,7 @@
 #else /* ESP8266 */
 #include <ESP8266WiFi.h>
 #include <FS.h>
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
 #include <LittleFS.h>
 #endif
 #endif // ESP32/ESP8266

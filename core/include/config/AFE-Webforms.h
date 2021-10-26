@@ -1,5 +1,7 @@
-#ifndef _AFE_Configuration_sites_h
-#define _AFE_Configuration_sites_h
+#ifndef _AFE_Webforms_h
+#define _AFE_Webforms_h
+
+#define AFE_MAX_PAGE_SIZE 12000
 
 #ifndef AFE_ESP32 /* ESP82xx */
 #define AFE_SITE_REBOOT 10
@@ -10,6 +12,12 @@
 #define AFE_SITE_REBOOT_POST_UPGRADE 5
 #define AFE_SITE_REBOOT_POST_WAN_UPGRADE 30
 #endif
+
+/* Form constants */
+#define AFE_FORM_ITEM_TYPE_NUMBER "number"
+#define AFE_FORM_ITEM_TYPE_TEXT "text"
+#define AFE_FORM_ITEM_TYPE_PASSWORD "password"
+#define AFE_FORM_ITEM_SKIP_PROPERTY "?"
 
 /* Config sites IDs */
 #define AFE_CONFIG_SITE_INDEX 0
@@ -61,4 +69,4 @@
 #define AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION 46
 
 
-#endif
+#endif // _AFE_Webforms_h

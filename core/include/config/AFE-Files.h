@@ -1,5 +1,17 @@
-#ifndef _AFE_Configuration_files_h
-#define _AFE_Configuration_files_h
+#ifndef _AFE_files_h
+#define _AFE_files_h
+
+/* ***************** FILESYSTEM *********************/
+#define AFE_FS_SPIFFS 0
+#define AFE_FS_LITTLEFS 1
+
+/* Filesystem per ESP type */
+#ifdef AFE_ESP32
+#define AFE_FILE_SYSTEM AFE_FS_LITTLEFS
+#else 
+#define AFE_FILE_SYSTEM AFE_FS_SPIFFS
+#endif
+
 
 /* Configuration files names */
 #ifndef AFE_ESP32 /* ESP82xx */

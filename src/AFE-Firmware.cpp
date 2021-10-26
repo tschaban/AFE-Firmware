@@ -53,7 +53,7 @@ void setup() {
 #endif // ESP32/ESP8266
 
 /* Initializing SPIFFS file system */
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   bool _fileSystemReady = LITTLEFS.begin();
 #else
   bool _fileSystemReady = SPIFFS.begin();
@@ -67,7 +67,7 @@ void setup() {
     Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
 
-#if AFE_FILE_SYSTEM_USED == AFE_FS_SPIFFS
+#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
     yield();
     SPIFFS.gc();
 #endif
