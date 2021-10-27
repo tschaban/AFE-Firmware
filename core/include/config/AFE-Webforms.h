@@ -3,6 +3,10 @@
 
 #define AFE_MAX_PAGE_SIZE 12000
 
+/* Types of URL requests */
+#define AFE_SERVER_CMD_SAVE 1
+#define AFE_SERVER_CMD_NONE 0
+
 #ifndef AFE_ESP32 /* ESP82xx */
 #define AFE_SITE_REBOOT 10
 #define AFE_SITE_REBOOT_POST_UPGRADE 15

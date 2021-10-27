@@ -13,7 +13,6 @@
 #define _AFE_Configuration_h
 
 /* Serial port speed */
-//#define AFE_CONFIG_SERIAL_SPEED 9600
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
 /* Turn On/Off debbuging of Ping class */
@@ -50,18 +49,6 @@
 /* Frequency of AFE Key validation in minutes */
 #define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
 
-/* Types of URL requests */
-#define AFE_SERVER_CMD_SAVE 1
-#define AFE_SERVER_CMD_NONE 0
-
-
-/* Set 4MB Flash for all ESP32 firmwares */
-#ifdef AFE_ESP32
-#ifndef ESP_4MB
-#define ESP_4MB
-#endif
-#endif
-
 /* Not existing hardware item. Used as a default value */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 #define AFE_NONE AFE_HARDWARE_ITEM_NOT_EXIST
@@ -72,18 +59,11 @@
 /* Default time to auto-logout from config panel: in minutes */
 #define AFE_AUTOLOGOFF_DEFAULT_TIME 10
 
-/* Number of GPIOs available in ESP8266, used in the conjunction with
- * AFE-Site-components.h table */
-#ifndef AFE_ESP32 /* ESP82xx */
-#define AFE_NUMBER_OF_GPIOS 13
-#define AFE_NUMBER_OF_ADC_GPIOS 1
-#else /* ESP32 */
-#ifdef ESP32_30_PINS
-#define AFE_NUMBER_OF_GPIOS 25
-#else // ESP32_38_PINS
-#define AFE_NUMBER_OF_GPIOS 34
-#endif // ESP32_30_PINS
-#define AFE_NUMBER_OF_ADC_GPIOS 4
+
+#ifdef AFE_ESP32 
+#include <devices/AFE-ESP32.h>
+#else /* ESP8266 */
+#include <devices/AFE-ESP8266.h>
 #endif
 
 /* The size of AFE Firmware file, used by OTA */ 
@@ -281,6 +261,9 @@
 #include <sensors/AFE-Rainmeter.h>
 #endif
 
+/* Common configuration for sensors */
+#include <sensors/AFE-Common.h>
+
 /* Regulator defaults */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #include <functionalities/AFE-Regulator.h>
@@ -290,9 +273,6 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <functionalities/AFE-Thermal-Protection.h>
 #endif 
-
-/* Common configuration for sensors */
-#include <AFE-Sensors-Common.h>
 
 
 /* ***************** APIs: Config and defaults *********************/
