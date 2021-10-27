@@ -36,26 +36,44 @@ struct CLED_LIGHT_CONTROLLED_CONFIG {
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 struct CLED_EFFECT_BLINKING {
+  char name[33];
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
   unsigned long onTimeout;
   unsigned long offTimeout;
+#if AFE_HARDWARE_API == AFE_API_DOMOTICZ
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 struct CLED_EFFECT_WAVE {
+  char name[33];
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
   unsigned long timeout;
+#if AFE_HARDWARE_API == AFE_API_DOMOTICZ
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
 struct CLED_EFFECT_FADE_INOUT {
+  char name[33];
   CLED_PARAMETERS in;
   CLED_PARAMETERS out;
   unsigned long timeout;
+#if AFE_HARDWARE_API == AFE_API_DOMOTICZ
+  DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_BASIC_CONFIG mqtt;
+#endif
 };
 
-
 struct CLED {
+  char name[33];
   uint8_t gpio;
   uint16_t ledNumbers;
   CLED_PARAMETERS on;

@@ -203,13 +203,24 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-  /**
-   * @brief Adds warning session to the configuration form is a configuration
-   * file doesn't exist
-   *
-   * @param  page             return string
-   */
-  void addFileNotFound(String &page);
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+  void addAPIsSection(String &page, const __FlashStringHelper *header,
+                      const __FlashStringHelper *info, const char *label,
+                      uint32_t *idx)
+#else
+  void addAPIsSection(String &page, const __FlashStringHelper *header,
+                      const __FlashStringHelper *info, const char *label,
+                      const char *topic);
+#endif
+
+      /**
+       * @brief Adds warning session to the configuration form is a
+       * configuration
+       * file doesn't exist
+       *
+       * @param  page             return string
+       */
+      void addFileNotFound(String &page);
 
   /**
    * @brief Adds information item in the form

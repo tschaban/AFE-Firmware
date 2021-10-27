@@ -257,10 +257,6 @@ public:
   void createCLEDEffectFadeInOutConfigurationFile();
   
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
-  void saveConfiguration(uint8_t id, CLED_EFFECTS *);
-  void createCLEDEffectsConfigurationFile();
-
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();

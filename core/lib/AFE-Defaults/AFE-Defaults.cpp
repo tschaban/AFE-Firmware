@@ -123,6 +123,8 @@ boolean AFEDefaults::set(void) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
     Data->createCLEDConfigurationFile();
     Data->createCLEDEffectBlinkingConfigurationFile();
+    Data->createCLEDEffectFadeInOutConfigurationFile();
+    Data->createCLEDEffectWaveConfigurationFile();
     // @TODO T7 add missing files
 #endif // AFE_CONFIG_HARDWARE_CLED
 

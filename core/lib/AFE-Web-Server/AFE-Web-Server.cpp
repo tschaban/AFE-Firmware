@@ -70,7 +70,8 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 
 /*
 #if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-  void AFEWebServer::addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration *HomeAssistantIntegration) {
+  void AFEWebServer::addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration
+*HomeAssistantIntegration) {
     _HomeAssistantDiscoveryAPI = HomeAssistantIntegration;
   }
 #endif
@@ -279,12 +280,12 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_CLED_EFFECT_BLINKING:
     Site.siteCLEDEffectBlinking(page, siteConfig->deviceID);
     break;
-case AFE_CONFIG_SITE_CLED_EFFECT_WAVE:
+  case AFE_CONFIG_SITE_CLED_EFFECT_WAVE:
     Site.siteCLEDEffectWave(page, siteConfig->deviceID);
     break;
-case AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT:
+  case AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT:
     Site.siteCLEDEffectFadeInOut(page, siteConfig->deviceID);
-    break;       
+    break;
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   case AFE_CONFIG_SITE_TSL2561:
@@ -409,7 +410,7 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 #if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
         else if (siteConfig.ID == AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION) {
-        //  _HomeAssistantIntegration->publishRelay(0);
+          //  _HomeAssistantIntegration->publishRelay(0);
         }
 #endif
 
@@ -612,7 +613,7 @@ boolean AFEWebServer::generate(boolean upload) {
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};
         }
-        
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
         else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561) {
@@ -1224,7 +1225,7 @@ void AFEWebServer::get(DEVICE &data) {
 
   data.api.http = server.arg(F("h")).length() > 0 ? true : false;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.api.domoticz = server.arg(F("m")).length() > 0
                           ? (server.arg(F("m")).toInt() == 1 ? true : false)
                           : false;
@@ -1490,7 +1491,7 @@ void AFEWebServer::get(MQTT &data) {
   } else {
     data.password[0] = AFE_EMPTY_STRING;
   }
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.lwt.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
@@ -1507,7 +1508,7 @@ void AFEWebServer::get(MQTT &data) {
       server.arg(F("ph")).length() > 0 ? true : false;
 }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
 void AFEWebServer::get(DOMOTICZ &data) {
 
   if (server.arg(F("t")).length() > 0) {
@@ -1611,7 +1612,7 @@ void AFEWebServer::get(SWITCH &data) {
   data.relayID = server.arg(F("r")).length() > 0 ? server.arg(F("r")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
@@ -1765,7 +1766,7 @@ void AFEWebServer::get(CONTACTRON &data) {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx = server.arg(F("x")).length() > 0
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -1804,7 +1805,7 @@ void AFEWebServer::get(GATE &data) {
                                ? server.arg(F("s" + String(i)).toInt()
                                : AFE_GATE_UNKNOWN;
   }
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx = server.arg(F("x")).length() > 0
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -1921,7 +1922,7 @@ void AFEWebServer::get(DS18B20 &data) {
                         ? server.arg(F("r")).toInt()
                         : AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx = server.arg(F("x")).length() > 0
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -1976,7 +1977,7 @@ void AFEWebServer::get(DHT &data) {
 
   data.sendOnlyChanges = server.arg(F("s")).length() > 0 ? true : false;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.temperature.idx = server.arg(F("i1")).length() > 0
                                       ? server.arg(F("i1")).toInt()
                                       : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2066,7 +2067,7 @@ void AFEWebServer::get(HPMA115S0 &data) {
                          ? server.arg(F("n2")).toFloat()
                          : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_WHO_NORM_PM25;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.pm25.idx = server.arg(F("x2")).length() > 0
                                ? server.arg(F("x2")).toInt()
                                : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2139,7 +2140,7 @@ void AFEWebServer::get(BMEX80 &data) {
   data.pressure.correction =
       server.arg(F("pc")).length() > 0 ? server.arg(F("pc")).toFloat() : 0;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.temperatureHumidityPressure.idx =
       server.arg(F("i0")).length() > 0 ? server.arg(F("i0")).toInt()
                                        : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2238,7 +2239,7 @@ void AFEWebServer::get(BH1750 &data) {
   data.mode = server.arg(F("m")).length() > 0
                   ? server.arg(F("m")).toInt()
                   : AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx = server.arg(F("d")).length() > 0
                           ? server.arg(F("d")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2303,7 +2304,7 @@ void AFEWebServer::get(AS3935 &data) {
 
   data.unit = server.arg(F("u")).length() > 0 ? server.arg(F("u")).toInt()
                                               : AFE_DISTANCE_KM;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("d")).length() > 0 ? server.arg(F("d")).toInt() : 0;
 #else
@@ -2345,7 +2346,7 @@ void AFEWebServer::get(ANEMOMETER &data) {
           ? server.arg(F("u")).toInt()
           : AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE_UNIT;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
@@ -2431,8 +2432,8 @@ void AFEWebServer::get(ADCINPUT &data) {
     data.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #else
-  data.battery.domoticz.idx = server.arg(F("bx")).length() > 0
-                                  ? server.arg(F("bx")).toInt()
+  data.battery.domoticz.idx = server.arg(F("x")).length() > 0
+                                  ? server.arg(F("x")).toInt()
                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
@@ -2465,7 +2466,7 @@ void AFEWebServer::get(RAINMETER &data) {
                         ? server.arg(F("r")).toFloat()
                         : (float)AFE_HARDWARE_RAINMETER_DEFAULT_RESOLUTION;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
@@ -2507,7 +2508,7 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
           : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
@@ -2652,7 +2653,7 @@ void AFEWebServer::get(MIFARE_CARD &data) {
   data.relayId = server.arg(F("r")).length() > 0 ? server.arg(F("r")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   char label[3];
 
   for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
@@ -2676,15 +2677,7 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 void AFEWebServer::get(CLED &data) {
   data.gpio =
       server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : AFE_NONE;
-  /*
-    data.colorOrder = server.arg(F("o")).length() > 0
-                          ? server.arg(F("o")).toInt()
-                          : AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
 
-    data.chipset = server.arg(F("m")).length() > 0
-                       ? server.arg(F("m")).toInt()
-                       : 0;
-  */
   data.ledNumbers = server.arg(F("l")).length() > 0
                         ? server.arg(F("l")).toInt()
                         : AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
@@ -2705,7 +2698,13 @@ void AFEWebServer::get(CLED &data) {
                             ? server.arg(F("b1")).toInt()
                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.idx = server.arg(F("d")).length() > 0
                           ? server.arg(F("d")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2748,18 +2747,34 @@ void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
       server.arg(F("t1")).length() > 0
           ? server.arg(F("t1")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
+
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("d")).length() > 0
+                          ? server.arg(F("d")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
 }
 
 void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
-  data.on.color =
-      server.arg(F("c0")).length() > 0
-          ? server.arg(F("c0")).toInt()
-          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
+  data.on.color = server.arg(F("c0")).length() > 0
+                      ? server.arg(F("c0")).toInt()
+                      : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
 
-  data.off.color =
-      server.arg(F("c1")).length() > 0
-          ? server.arg(F("c1")).toInt()
-          : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
+  data.off.color = server.arg(F("c1")).length() > 0
+                       ? server.arg(F("c1")).toInt()
+                       : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
 
   data.on.brightness =
       server.arg(F("b")).length() > 0
@@ -2767,10 +2782,27 @@ void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
 
   data.timeout =
-      server.arg(F("t")).length() > 0
-          ? server.arg(F("t")).toInt()
+      server.arg(F("z")).length() > 0
+          ? server.arg(F("z")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
 
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("d")).length() > 0
+                          ? server.arg(F("d")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
 }
 
 void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
@@ -2790,10 +2822,27 @@ void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_OUT_BRIGHTNESS;
 
   data.timeout =
-      server.arg(F("t")).length() > 0
-          ? server.arg(F("t")).toInt()
+      server.arg(F("z")).length() > 0
+          ? server.arg(F("z")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("d")).length() > 0
+                          ? server.arg(F("d")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
 }
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
@@ -2812,7 +2861,7 @@ void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
                            ? server.arg(F("l")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_8_LEDS;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   CLEDData.domoticz.idx = server.arg(F("d")).length() > 0
                               ? server.arg(F("d")).toInt()
                               : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2873,7 +2922,7 @@ void AFEWebServer::get(TSL2561 &data) {
                   ? server.arg(F("g")).toInt()
                   : AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   data.domoticz.ir.idx = server.arg(F("d3")).length() > 0
                              ? server.arg(F("d3")).toInt()
                              : AFE_DOMOTICZ_DEFAULT_IDX;

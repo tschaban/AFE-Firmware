@@ -624,7 +624,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   /* Section: APIs */
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   addSelectFormItemOpen(page, F("v"), F(L_DOMOTICZ_VERSION));
   addSelectOptionFormItem(page, L_DEVICE_DOMOTICZ_VERSION_410, "0",
                           Device->configuration.api.domoticzVersion ==
@@ -837,7 +837,7 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
 
   closeSection(page);
 /* Section: LWT */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   char _idx[7];
   sprintf(_idx, "%d", configuration.lwt.idx);
   openSection(page, F(L_MQTT_IDX_LWT), F(L_DOMOTICZ_NO_IF_IDX_0));
@@ -1113,25 +1113,13 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   if (!isGateRelay) {
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-      openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-      char _idx[7];
-      sprintf(_idx, "%d", configuration.domoticz.idx);
-      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
-                       AFE_FORM_ITEM_SKIP_PROPERTY,
-                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-      closeSection(page);
-    }
-#else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_RELAY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                     configuration.mqtt.topic, "64");
-    closeSection(page);
-  }
-#endif
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+    addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                   configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_RELAY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   }
@@ -1256,7 +1244,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
   addRegulatorControllerItem(page, &configuration);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -1346,7 +1334,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -1474,25 +1462,13 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   closeSection(page);
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    char _idx[7];
-    sprintf(_idx, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _idx,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
-#else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                     configuration.mqtt.topic, "64");
-    closeSection(page);
-  }
-#endif
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1578,7 +1554,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -1678,7 +1654,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
 
@@ -1927,7 +1903,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   addLEDSelectionItem(page, configuration.ledID);
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
 
@@ -2119,7 +2095,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
     }
   }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -2187,7 +2163,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.pm10.idx);
@@ -2310,7 +2286,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 
     closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
     if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
       openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
@@ -2483,7 +2459,7 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2555,7 +2531,7 @@ void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.illuminance.idx);
@@ -2676,7 +2652,7 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
@@ -2748,7 +2724,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -2795,7 +2771,7 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "9999.99", "0.01",
                    "ml/m2");
   closeSection(page);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -2868,7 +2844,7 @@ void AFESitesGenerator::siteADCInput(String &page) {
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "90000000", "1", "Om");
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   char _idx[7];
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
@@ -2894,13 +2870,9 @@ void AFESitesGenerator::siteADCInput(String &page) {
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
     closeSection(page);
   }
-#else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_ADC_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                     configuration.mqtt.topic, "64");
-    closeSection(page);
-  }
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_ADC_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY), L_MQTT_TOPIC,
+                 configuration.mqtt.topic);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -2916,23 +2888,13 @@ void AFESitesGenerator::siteADCInput(String &page) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    sprintf(_idx, "%d", configuration.battery.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "bx", "IDX", _idx,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.battery.domoticz.idx);
 #else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_BATTERY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "bt", L_MQTT_TOPIC,
-                     configuration.battery.mqtt.topic, "64");
-    closeSection(page);
-  }
+  addAPIsSection(page, F(L_BATTERY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -3285,7 +3247,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -3501,7 +3463,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 #endif
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
@@ -3709,6 +3671,10 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   openSection(page, F(L_CLED_CONFIGURATION), F(L_CLEDS_HINT));
 
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "32");
+
   /* Item: GPIO */
   sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
@@ -3753,24 +3719,13 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   closeSection(page);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-    sprintf(_number, "%d", configuration.domoticz.idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
-#else
-  if (Device->configuration.api.mqtt) {
-    openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                     configuration.mqtt.topic, "64");
-    closeSection(page);
-  }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 
   openMessageSection(page, F(L_CLED_EFFECTS_CONFIGURATION), F(""));
   addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_BLINKING, id,
@@ -3792,6 +3747,10 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
   char _number[10];
 
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_ON), F(""));
+
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "32");
 
   /* Item: On Led color */
   sprintf(_number, "%d", configuration.on.color);
@@ -3829,7 +3788,46 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
                    L_MILISECONDS);
   closeSection(page);
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 }
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+void AFESitesGenerator::addAPIsSection(String &page,
+                                       const __FlashStringHelper *header,
+                                       const __FlashStringHelper *info,
+                                       const char *label, uint32_t *idx) {
+
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    char _number[10];
+    openSection(page, header, info);
+    sprintf(_number, "%d", idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", label, _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+}
+#else  // HA and Standard API
+void AFESitesGenerator::addAPIsSection(String &page,
+                                       const __FlashStringHelper *header,
+                                       const __FlashStringHelper *info,
+                                       const char *label, const char *topic) {
+
+  if (Device->configuration.api.mqtt) {
+    openSection(page, header, info);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", label, topic, "64");
+    closeSection(page);
+  }
+}
+#endif // End if API section
 
 void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
   CLED_EFFECT_WAVE configuration;
@@ -3839,14 +3837,20 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
   char _number[10];
   openSection(page, F(L_CLED_EFFECT_WAVE_CONFIGURATION), F(""));
 
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "32");
+
   /* Item: Active Led color */
   sprintf(_number, "%d", configuration.on.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_EFFECT_WAVE_ON_LED_COLOR, _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0",
+                   L_CLED_EFFECT_WAVE_ON_LED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: Inactive Led color */
   sprintf(_number, "%d", configuration.off.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_EFFECT_WAVE_OFF_LED_COLOR, _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1",
+                   L_CLED_EFFECT_WAVE_OFF_LED_COLOR, _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: brightness */
@@ -3856,12 +3860,19 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
 
   /* Item: timeout */
   sprintf(_number, "%d", configuration.timeout);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_CLED_EFFECT_WAVE_SPEED,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
-                   L_MILISECONDS);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "z", L_CLED_EFFECT_WAVE_SPEED, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
 
   closeSection(page);
 
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 }
 
 void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
@@ -3872,6 +3883,10 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
   char _number[10];
   openSection(page, F(L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION), F(""));
 
+  /* Item: Name */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "32");
+
   /* Item: Led color */
   sprintf(_number, "%d", configuration.in.color);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k", L_CLED_COLOR, _number,
@@ -3879,8 +3894,8 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
 
   /* Item: Max brightness */
   sprintf(_number, "%d", configuration.in.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_MAX_BRIGHTNESS, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_MAX_BRIGHTNESS,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: Min brightness */
   sprintf(_number, "%d", configuration.out.brightness);
@@ -3889,14 +3904,20 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
 
   /* Item: Fade Out/In speed */
   sprintf(_number, "%d", configuration.timeout);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_CLED_FADE_IN_OUT_TIMEOUT,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
-                   L_MILISECONDS);
+  addInputFormItem(
+      page, AFE_FORM_ITEM_TYPE_NUMBER, "z", L_CLED_FADE_IN_OUT_TIMEOUT, _number,
+      AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
 
   closeSection(page);
 
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ /* API: Domoticz */
+  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
+                 configuration.domoticz.idx);
+#else  /* Home Assistant and Standard API */
+  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
+                 L_MQTT_TOPIC, configuration.mqtt.topic);
+#endif /* End of APIs section */
 }
-
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 
@@ -3996,7 +4017,7 @@ void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
 
   /*
 
-  #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+  #if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
     if (Device->configuration.api.domoticz || Device->configuration.api.mqtt)
   {
       openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
