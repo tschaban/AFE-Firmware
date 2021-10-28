@@ -86,12 +86,10 @@
 #include <AFE-Sensor-PN532.h>
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-/* Not yet implemented 
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+#ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-CLED.h>
 #endif
-*/
+
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 #include <AFE-Sensor-TSL2561.h>
@@ -189,15 +187,12 @@ public:
 #endif
   virtual void addClass(AFEMiFareCard *);
 #endif
-/* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  virtual void addClassEffectDeviceLight(AFECLED *);
+
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  virtual void addClass(AFECLED *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  virtual void addClassEffecPN532Sensor(AFECLED *);
-#endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   virtual void addClass(AFESensorTSL2561 *);
@@ -285,14 +280,10 @@ protected:
 #endif
   AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
-/* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  AFECLED *_CLEDBacklight;
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED *_CLED;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  AFECLED *_CLEDAccessControl;
-#endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];

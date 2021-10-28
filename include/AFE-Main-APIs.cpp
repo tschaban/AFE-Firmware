@@ -166,19 +166,12 @@ void initializeMQTTAPI(void) {
       MqttAPI.addClass(&MiFareCard[0]);
     }
 #endif
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-    if (Device.configuration.effectDeviceLight) {
-      MqttAPI.addClassEffectDeviceLight(&CLEDBacklight);
-    }
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    if (Device.configuration.effectPN532) {
-      MqttAPI.addClassEffecPN532Sensor(&CLEDAccessControl);
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0 ) {
+      MqttAPI.addClass(&CLEDStrip);
     }
 #endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
     if (Device.configuration.noOfTSL2561s > 0) {

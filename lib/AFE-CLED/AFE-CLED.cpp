@@ -45,12 +45,12 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
-    _currentState[i].on.color = configuration[i].on.color;
-    _currentState[i].on.brightness = configuration[i].on.brightness;
-    _currentState[i].off.color = configuration[i].off.color;
-    _currentState[i].off.brightness = configuration[i].off.brightness;
-    //_currentState[i].config.color = _off[i].color;
-    //_currentState[i].config.brightness = _off[i].brightness;
+    currentState[i].on.color = configuration[i].on.color;
+    currentState[i].on.brightness = configuration[i].on.brightness;
+    currentState[i].off.color = configuration[i].off.color;
+    currentState[i].off.brightness = configuration[i].off.brightness;
+    //currentState[i].config.color = _off[i].color;
+    //currentState[i].config.brightness = _off[i].brightness;
   }
 
   _initialized = true;
@@ -74,56 +74,56 @@ void AFECLED::off(uint8_t stripId) {
 }
 
 void AFECLED::on(uint8_t stripId, uint32_t color) {
-  on(stripId, color, _currentState[stripId].on.brightness);
+  on(stripId, color, currentState[stripId].on.brightness);
 }
 void AFECLED::off(uint8_t stripId, uint32_t color) {
-  off(stripId, color, _currentState[stripId].off.brightness);
+  off(stripId, color, currentState[stripId].off.brightness);
 }
 
 void AFECLED::on(uint8_t stripId, uint32_t color, uint8_t brightness) {
-  _currentState[stripId].on.color = color;
-  _currentState[stripId].on.brightness = brightness;
+  currentState[stripId].on.color = color;
+  currentState[stripId].on.brightness = brightness;
   _turnOnOff(stripId, true);
 }
 void AFECLED::off(uint8_t stripId, uint32_t color, uint8_t brightness) {
-  _currentState[stripId].off.color = color;
-  _currentState[stripId].off.brightness = brightness;
+  currentState[stripId].off.color = color;
+  currentState[stripId].off.brightness = brightness;
   _turnOnOff(stripId, false);
 }
 
 void AFECLED::activateEffect(uint8_t stripId, uint8_t effectId) {
-  _currentState[stripId].effect.id = effectId;
-  _currentState[stripId].effect.timer = 0;
-  switch (_currentState[stripId].effect.id) {
+  currentState[stripId].effect.id = effectId;
+  currentState[stripId].effect.timer = 0;
+  switch (currentState[stripId].effect.id) {
   case AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING:
     /* no special configuration required */
     break;
   case AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT:
-    _currentState[stripId].config.brightness =
+    currentState[stripId].config.brightness =
         configurationEffectFadeInOut[stripId].out.brightness;
-    _currentState[stripId].config.color =
+    currentState[stripId].config.color =
         configurationEffectFadeInOut[stripId].in.color;
-    _currentState[stripId].effect.increment = -1;
-    _currentState[stripId].effect.integer = round(
+    currentState[stripId].effect.increment = -1;
+    currentState[stripId].effect.integer = round(
         (configurationEffectFadeInOut[stripId].in.brightness -
          configurationEffectFadeInOut[stripId].out.brightness) /
         (configurationEffectFadeInOut[stripId].timeout / 2 /
          AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL));
 
-    _currentState[stripId].effect.integer =
-        _currentState[stripId].effect.integer < 1
+    currentState[stripId].effect.integer =
+        currentState[stripId].effect.integer < 1
             ? 1
-            : _currentState[stripId].effect.integer;
+            : currentState[stripId].effect.integer;
     break;
   case AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE:
-    _currentState[stripId].effect.integer = 0;
-    _currentState[stripId].effect.increment = -1;
+    currentState[stripId].effect.integer = 0;
+    currentState[stripId].effect.increment = -1;
     break;
   }
 }
 
 void AFECLED::deactivateEffect(uint8_t stripId, boolean setToOff) {
-  _currentState[stripId].effect.id = AFE_NONE;
+  currentState[stripId].effect.id = AFE_NONE;
   if (setToOff) {
     off(stripId, AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR,
         AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS);
@@ -132,18 +132,18 @@ void AFECLED::deactivateEffect(uint8_t stripId, boolean setToOff) {
 
 void AFECLED::effectBlinkingListener(uint8_t stripId) {
   if (_initialized) {
-    if (_currentState[stripId].effect.timer == 0) {
-      _currentState[stripId].effect.timer = millis();
+    if (currentState[stripId].effect.timer == 0) {
+      currentState[stripId].effect.timer = millis();
     }
 
-    if ((_currentState[stripId].state &&
-         millis() > _currentState[stripId].effect.timer +
+    if ((currentState[stripId].state &&
+         millis() > currentState[stripId].effect.timer +
                         configurationEffectBlinking[stripId].onTimeout) ||
-        (!_currentState[stripId].state &&
-         millis() > _currentState[stripId].effect.timer +
+        (!currentState[stripId].state &&
+         millis() > currentState[stripId].effect.timer +
                         configurationEffectBlinking[stripId].offTimeout)) {
 
-      if (_currentState[stripId].state) {
+      if (currentState[stripId].state) {
         off(stripId, configurationEffectBlinking[stripId].off.color,
             configurationEffectBlinking[stripId].off.brightness);
       } else {
@@ -151,80 +151,80 @@ void AFECLED::effectBlinkingListener(uint8_t stripId) {
            configurationEffectBlinking[stripId].on.brightness);
       }
 
-      _currentState[stripId].effect.timer = millis();
+      currentState[stripId].effect.timer = millis();
     }
   }
 }
 
 void AFECLED::effectFadeInOutListener(uint8_t stripId) {
   if (_initialized) {
-    if (millis() - _currentState[stripId].effect.timer >
+    if (millis() - currentState[stripId].effect.timer >
         AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_INTERNAL_LOOP_INTERVAL) {
 
-      if (_currentState[stripId].config.brightness >=
+      if (currentState[stripId].config.brightness >=
               configurationEffectFadeInOut[stripId].in.brightness -
-                  _currentState[stripId].effect.integer ||
-          _currentState[stripId].config.brightness -
-                  _currentState[stripId].effect.integer <
+                  currentState[stripId].effect.integer ||
+          currentState[stripId].config.brightness -
+                  currentState[stripId].effect.integer <
               configurationEffectFadeInOut[stripId].out.brightness) {
 
-        _currentState[stripId].effect.increment =
-            _currentState[stripId].effect.increment > 0
-                ? -1 * _currentState[stripId].effect.integer
-                : _currentState[stripId].effect.integer;
+        currentState[stripId].effect.increment =
+            currentState[stripId].effect.increment > 0
+                ? -1 * currentState[stripId].effect.integer
+                : currentState[stripId].effect.integer;
       }
 
-      _currentState[stripId].config.brightness +=
-          _currentState[stripId].effect.increment;
+      currentState[stripId].config.brightness +=
+          currentState[stripId].effect.increment;
 
-      _currentState[stripId]
+      currentState[stripId]
               .config
               .brightness<
                   configurationEffectFadeInOut[stripId].out.brightness
                       ? configurationEffectFadeInOut[stripId].out.brightness
-                      : _currentState[stripId].config.brightness>
+                      : currentState[stripId].config.brightness>
                   configurationEffectFadeInOut[stripId]
               .in.brightness
           ? configurationEffectFadeInOut[stripId].in.brightness
-          : _currentState[stripId].config.brightness;
+          : currentState[stripId].config.brightness;
 
       _setColor(stripId,
                 configurationEffectFadeInOut[stripId].in.color,
-                _currentState[stripId].config.brightness);
-      _currentState[stripId].effect.timer = millis();
+                currentState[stripId].config.brightness);
+      currentState[stripId].effect.timer = millis();
     }
   }
 }
 
 void AFECLED::effectWaveListener(uint8_t stripId) {
-  if (millis() - _currentState[stripId].effect.timer >
+  if (millis() - currentState[stripId].effect.timer >
       configurationEffectWave[stripId].timeout) {
 
-    if (_currentState[stripId].effect.integer == FastLED[stripId].size() - 1 ||
-        _currentState[stripId].effect.integer == 0) {
-      _currentState[stripId].effect.increment *= -1;
+    if (currentState[stripId].effect.integer == FastLED[stripId].size() - 1 ||
+        currentState[stripId].effect.integer == 0) {
+      currentState[stripId].effect.increment *= -1;
     }
 
-    leds[stripId][_currentState[stripId].effect.integer] =
+    leds[stripId][currentState[stripId].effect.integer] =
         configurationEffectWave[stripId].off.color;
 
-    _currentState[stripId].effect.integer +=
-        _currentState[stripId].effect.increment;
+    currentState[stripId].effect.integer +=
+        currentState[stripId].effect.increment;
 
-    leds[stripId][_currentState[stripId].effect.integer] =
+    leds[stripId][currentState[stripId].effect.integer] =
         configurationEffectWave[stripId].on.color;
 
     FastLED[stripId].show(leds[stripId], FastLED[stripId].size(),
                           configurationEffectWave[stripId].on.brightness);
     FastLED[stripId].showLeds(configurationEffectWave[stripId].on.brightness);
-    _currentState[stripId].effect.timer = millis();
+    currentState[stripId].effect.timer = millis();
   }
 }
 
 void AFECLED::loop() {
   if (_initialized) {
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
-      switch (_currentState[i].effect.id) {
+      switch (currentState[i].effect.id) {
       case AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING:
         effectBlinkingListener(i);
         break;
@@ -240,31 +240,31 @@ void AFECLED::loop() {
 }
 
 void AFECLED::toggle(uint8_t stripId, uint32_t color) {
-  _currentState[stripId].state ? off(stripId) : on(stripId);
+  currentState[stripId].state ? off(stripId) : on(stripId);
 }
 
 void AFECLED::_turnOnOff(uint8_t stripId, boolean state) {
   if (_initialized) {
-    _setColor(stripId, state ? _currentState[stripId].on.color
-                             : _currentState[stripId].off.color,
-              state ? _currentState[stripId].on.brightness
-                    : _currentState[stripId].off.brightness);
-    _currentState[stripId].state = state;
+    _setColor(stripId, state ? currentState[stripId].on.color
+                             : currentState[stripId].off.color,
+              state ? currentState[stripId].on.brightness
+                    : currentState[stripId].off.brightness);
+    currentState[stripId].state = state;
   }
 }
 
 void AFECLED::_setBrightness(uint8_t stripId, uint8_t brightness) {
-  _setColor(stripId, _currentState[stripId].config.color, brightness);
+  _setColor(stripId, currentState[stripId].config.color, brightness);
 }
 
 void AFECLED::_setColor(uint8_t stripId, uint32_t color) {
-  _setColor(stripId, color, _currentState[stripId].config.brightness);
+  _setColor(stripId, color, currentState[stripId].config.brightness);
 }
 void AFECLED::_setColor(uint8_t stripId, uint32_t color, uint8_t brightness) {
-  _currentState[stripId].config.color = color;
-  _currentState[stripId].config.brightness = brightness;
-  FastLED[stripId].showColor(_currentState[stripId].config.color,
-                             _currentState[stripId].config.brightness);
+  currentState[stripId].config.color = color;
+  currentState[stripId].config.brightness = brightness;
+  FastLED[stripId].showColor(currentState[stripId].config.color,
+                             currentState[stripId].config.brightness);
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED

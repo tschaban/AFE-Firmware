@@ -9,7 +9,7 @@
 
 #include <AFE-API.h>
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                      \
+#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||               \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
 #include <ArduinoJson.h>
 
@@ -30,6 +30,9 @@ class AFEAPIMQTTStandard : public AFEAPI {
 private:
   /* Classifies incomming MQTT Topics and invokes code for processing them */
   void processRequest();
+
+  void subscribeToCommand(const char *topic, afe_mqtt_standard_device_type_t topicId, uint8_t index = 0);
+
   /* Size of the cache that stories MQTT Topics AFE has subsribed to */
   uint8_t currentCacheSize = 0;
   /* Cache with MQTT Topics AFE has subsribed to */
@@ -81,6 +84,11 @@ private:
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS +
                   AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+                  + AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS +
+                  (AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS *
+                   AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS)
+#endif
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_ESP32
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS
@@ -88,24 +96,10 @@ private:
                   + 1
 #endif
 #endif
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-                  + 1
-#endif
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-                  + 1
-#endif
-*/
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561
 #endif
   ];
-  /* Not yet implemented
-  #if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
-      defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
-    void getCLEDCommand(CLED_COMMAND *);
-  #endif
-  */
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -221,15 +215,12 @@ public:
   boolean publishPN532SensorData(uint8_t id);
   boolean publishMiFareCardState(uint8_t id, uint8_t state);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  void processEffectDeviceLight();
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  void processEffectPN532Sensor();
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-*/
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void processCLED(uint8_t *id);
+  boolean publishCLEDState(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void processTSL2561(uint8_t *id);
   boolean publishTSL2561SensorData(uint8_t id);
