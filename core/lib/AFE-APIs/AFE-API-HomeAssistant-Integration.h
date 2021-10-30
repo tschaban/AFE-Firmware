@@ -18,9 +18,8 @@
 #include <AFE-API-MQTT-Standard.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <ArduinoJson.h>
 #include <AFE-Site-components.h>
-
+#include <ArduinoJson.h>
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -38,13 +37,18 @@ private:
   AFEDataAccess *_Data;
   AFEDevice *_Device;
   AFEAPIMQTTStandard *_MqttAPI;
-  
+
   char _deviceID[17];
 
-  void generateObjectId(char *objectId, const char *deviceClass, uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST);
-  void generateTopic(char *topic, const char *deviceClass, const char *objectId);
+  void generateObjectId(char *objectId, uint8_t deviceClassId,
+                        uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST, uint8_t supportingId = AFE_NONE);
+  void generateTopic(char *topic, uint8_t type, const char *objectId);
   void generateAvailability(char *availability);
   void generateDeviceRegistry(char *device);
+
+  void generateSwitch(uint8_t id, uint8_t type, const char *topic,
+                      const char *label, uint8_t supportingId = AFE_NONE);
+
 
 public:
   /**
@@ -57,11 +61,13 @@ public:
              AFEAPIMQTTStandard *MqttAPI);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void publishRelay(uint8_t id);
   void publishRelays();
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void publishCLEDs();
 
+#endif // AFE_CONFIG_HARDWARE_CLED
 };
 
 #endif // AFE_CONFIG_API_HOME_ASSISTANT_ENABLED

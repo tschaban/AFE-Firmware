@@ -2,8 +2,8 @@
 #define _AFE_Hardware_Relay_h
 
 /* Relay ON/OFF values */
-#define AFE_RELAY_ON 1
-#define AFE_RELAY_OFF 0
+#define AFE_RELAY_ON AFE_ON
+#define AFE_RELAY_OFF AFE_OFF
 
 /* Signal triggering a relay */
 #define AFE_RELAY_SIGNAL_TRIGGER_HIGH 1

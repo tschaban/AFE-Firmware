@@ -2,8 +2,8 @@
 #define _AFE_Hardware_Gate_h
 
 /* Gate's states */
-#define AFE_GATE_OPEN 0           // Open
-#define AFE_GATE_CLOSED 1         // Closed
+#define AFE_GATE_OPEN AFE_OFF           // Open
+#define AFE_GATE_CLOSED AFE_ON         // Closed
 #define AFE_GATE_PARTIALLY_OPEN 2 // Being opened
 #define AFE_GATE_UNKNOWN 9        // Unknown state
 

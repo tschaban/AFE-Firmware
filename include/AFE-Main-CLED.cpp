@@ -7,10 +7,7 @@ void CLedEventsListener(void);
 
 /* --------- Body -----------*/
 
-void initializeCLed(void) {
-  
-  Device.configuration.noOfCLEDs = 1;
-
+void initializeCLed(void) {  
   if (Device.configuration.noOfCLEDs > 0) {
     CLEDStrip.begin(&Data);
   }

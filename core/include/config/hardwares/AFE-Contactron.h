@@ -5,14 +5,10 @@
 #define AFE_CONTACTRON_NO 0 // Normally open
 #define AFE_CONTACTRON_NC 1 // Normally closed
 /* Contactron states */
-#define AFE_CONTACTRON_OPEN 0   // Open
-#define AFE_CONTACTRON_CLOSED 1 // Closed
 /* Contactron defaults */
 #define AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING 200
 #define AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE AFE_CONTACTRON_NO
-/* Contactron MQTT messages */
-#define AFE_MQTT_CONTACTRON_OPEN "open"
-#define AFE_MQTT_CONTACTRON_CLOSED "closed"
+
 
 #define AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH 200  // Not checked. used by HTTP API
 

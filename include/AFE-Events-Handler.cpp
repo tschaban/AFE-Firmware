@@ -155,13 +155,16 @@ void eventsListener(void) {
   /* Event: connected to MQTT API */
   if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
-      
+
 #if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       HomeAssistantDiscoveryAPI.publishRelays();
 #endif
-#endif      
-      
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      HomeAssistantDiscoveryAPI.publishCLEDs();
+#endif
+#endif
+
       MqttAPI.subscribe();
       MqttAPI.synchronize();
     }

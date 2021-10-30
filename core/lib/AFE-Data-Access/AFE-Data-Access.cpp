@@ -619,7 +619,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-      configuration->noOfCLEDs = root["noOfCLEDs"];
+      configuration->noOfCLEDs =
+          root["noOfCLEDs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLED_STRIPS;
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)

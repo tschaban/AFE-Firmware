@@ -19,3 +19,33 @@ https://www.home-assistant.io/docs/mqtt/discovery/
 "stat_off":"off",
 "ret":false}
 
+
+/* LIGHT 
+   Sample topic: homeassistant/switch/E86aDBf2-84e0E084-20/config
+*/
+
+
+{
+    "uniq_id": "E86aDBf2-84e0E084-20",
+    "name": "RGBLED-1",
+    "cmd_t": "development/t7/cled/1/cmd",
+    "stat_t": "development/t7/cled/1/state",
+    "pl_on": "on",
+    "pl_off": "off",
+    "stat_on": "on",
+    "stat_off": "off",
+    "ret": false,
+    "device": {
+      "ids": "E86aDBf2-84e0E084",
+      "name": "T7",
+      "mf": "Espressif Systems",
+      "mdl": "ESP8266",
+      "sw": "AFE Firmware T7-3.2.0.B0",
+      "via_device": "E86aDBf2-84e0E084"
+    },
+    "avty": {
+      "topic": "development/t7/lwt",
+      "payload_available": "connected",
+      "payload_not_available": "disconnected"
+    }
+  }

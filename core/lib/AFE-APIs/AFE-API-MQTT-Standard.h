@@ -28,14 +28,49 @@ struct CLED_COMMAND {
 class AFEAPIMQTTStandard : public AFEAPI {
 
 private:
-  /* Classifies incomming MQTT Topics and invokes code for processing them */
   void processRequest();
 
-  void subscribeToCommand(const char *topic, afe_mqtt_standard_device_type_t topicId, uint8_t index = 0);
+  /**
+   * @brief formats MQTT topic and subscribes to MQTT Broker for command
+   * messages
+   *
+   * @param  topic            device items topic (for state and command)
+   * @param  topicId          if of a topic type:
+   * afe_mqtt_standard_device_type_t
+   * @param  index            device Item Id, default 0 => If there is only one
+   * instance of an item (eg one sensor)
+   */
+  void subscribeToCommand(const char *topic,
+                          afe_mqtt_standard_device_type_t topicId,
+                          uint8_t index = 0);
 
-  /* Size of the cache that stories MQTT Topics AFE has subsribed to */
-  uint8_t currentCacheSize = 0;
-  /* Cache with MQTT Topics AFE has subsribed to */
+  /**
+   * @brief Processing common ON / OFF commands
+   *
+   * @param  command          byte array of chars that should contain a command
+   * On,Off
+   * @param  length           length of command array
+   * @return uint8_t          Returns AFE_ON, AFE_OFF, AFE_NONE
+   */
+  uint8_t processOnOffCommand(byte *command, uint16_t *length);
+
+  /**
+   * @brief Publishes MQTT item state ON/OFF message
+   *
+   * @param  topic            MQTT topic used to send state update
+   * @param  state            AFE_ON, AFE_OFF, AFE_NONE
+   * @param  sendAsOpenClosed if false sends as ON/OFF if true OPEN/CLOSED
+   * @return boolean          true if success, false: mqtt not enabled, AFE_NONE
+   * or XYZ problem with MQTT Broker
+   */
+  boolean publishOnOffState(const char *topic, uint8_t state,
+                            boolean sendAsOpenClosed = false);
+
+  /**
+   * @brief Caches all MQTT Topics AFE has subsribed to
+   *
+   */
+
   MQTT_TOPICS_CACHE
   mqttTopicsCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
@@ -101,8 +136,17 @@ private:
 #endif
   ];
 
+  /**
+   * @brief Size of the cache that stories MQTT Topics AFE has subsribed to
+   *
+   */
+  uint8_t currentCacheSize = 0;
+
 public:
-  /* Constructor: it sets all necessary parameters */
+  /**
+   * @brief Construct a new AFEAPIMQTTStandard object
+   *
+   */
   AFEAPIMQTTStandard();
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFELED *);
@@ -110,14 +154,24 @@ public:
   void begin(AFEDataAccess *, AFEDevice *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-  /* Subscribes to MQTT Topcis */
+  /**
+   * @brief Takes care of subscription to all MQTT commands controlling device
+   * items
+   *
+   */
   void subscribe();
 
-  /* Synchronize device's items values after connection to MQTT Broker is
-   * established */
+  /**
+   * @brief Synchronize device's items values after connection to MQTT Broker is
+   * established
+   *
+   */
   void synchronize();
 
-  /* Listens for MQTT Messages */
+  /**
+   * @brief Listens for MQTT Messages and dispaches them for processing
+   *
+   */
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -219,6 +273,9 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED
   void processCLED(uint8_t *id);
   boolean publishCLEDState(uint8_t id);
+  void processCLEDEffect(uint8_t *id, uint8_t effectId);
+  boolean publishCLEDEffectsState(uint8_t id);
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

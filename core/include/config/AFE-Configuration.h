@@ -53,6 +53,16 @@
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 #define AFE_NONE AFE_HARDWARE_ITEM_NOT_EXIST
 
+/* Binary states */
+#define AFE_OFF 0
+#define AFE_ON 1
+#define AFE_OPEN AFE_OFF
+#define AFE_CLOSED AFE_ON
+#define AFE_OFF_LABEL "off"
+#define AFE_ON_LABEL "on"
+#define AFE_OPEN_LABEL "open"
+#define AFE_CLOSED_LABEL "closed"
+
 /* Empty string */
 #define AFE_EMPTY_STRING '\0'
 

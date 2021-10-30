@@ -6,8 +6,8 @@
 #define AFE_SWITCH_TYPE_BI 1   // Bistable switch
 
 /* Switch ON/OFF Values */
-#define AFE_SWITCH_ON 1
-#define AFE_SWITCH_OFF 0
+#define AFE_SWITCH_ON AFE_ON
+#define AFE_SWITCH_OFF AFE_OFF
 
 /* Switches functionalities */
 #define AFE_SWITCH_FUNCTIONALITY_NONE 0  // do nothing
