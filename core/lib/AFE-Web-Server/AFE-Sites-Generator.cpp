@@ -1,5 +1,3 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
-
 #include "AFE-Sites-Generator.h"
 
 AFESitesGenerator::AFESitesGenerator() {}
@@ -3727,14 +3725,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                  L_MQTT_TOPIC, configuration.mqtt.topic);
 #endif /* End of APIs section */
 
-  openMessageSection(page, F(L_CLED_EFFECTS_CONFIGURATION), F(""));
-  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_BLINKING, id,
-             L_CLED_EFFECT_BLINKING_CONFIGURATION);
-  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_WAVE, id,
-             L_CLED_EFFECT_WAVE_CONFIGURATION);
-  addUrlItem(page, AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT, id,
-             L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION);
-  closeMessageSection(page);
+  addCLEDMenuSection(page, AFE_NONE, id);
 }
 
 void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
@@ -3796,38 +3787,9 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
   addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
                  L_MQTT_TOPIC, configuration.mqtt.topic);
 #endif /* End of APIs section */
-}
 
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
-void AFESitesGenerator::addAPIsSection(String &page,
-                                       const __FlashStringHelper *header,
-                                       const __FlashStringHelper *info,
-                                       const char *label, uint32_t *idx) {
-
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
-    char _number[10];
-    openSection(page, header, info);
-    sprintf(_number, "%d", idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", label, _number,
-                     AFE_FORM_ITEM_SKIP_PROPERTY,
-                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    closeSection(page);
-  }
+  addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING, id);
 }
-#else  // HA and Standard API
-void AFESitesGenerator::addAPIsSection(String &page,
-                                       const __FlashStringHelper *header,
-                                       const __FlashStringHelper *info,
-                                       const char *label, const char *topic) {
-
-  if (Device->configuration.api.mqtt) {
-    openSection(page, header, info);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", label, topic, "64");
-    closeSection(page);
-  }
-}
-#endif // End if API section
 
 void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
   CLED_EFFECT_WAVE configuration;
@@ -3873,6 +3835,8 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
   addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
                  L_MQTT_TOPIC, configuration.mqtt.topic);
 #endif /* End of APIs section */
+
+  addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE, id);
 }
 
 void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
@@ -3917,128 +3881,35 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
   addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
                  L_MQTT_TOPIC, configuration.mqtt.topic);
 #endif /* End of APIs section */
+
+  addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT, id);
+}
+
+void AFESitesGenerator::addCLEDMenuSection(String &section, uint8_t effectId, uint8_t id) {
+  openMessageSection(section, F(L_CLED_EFFECTS_CONFIGURATION), F(""));
+  if (effectId != AFE_NONE) {
+    addUrlItem(section, AFE_CONFIG_SITE_CLED, id, L_CLED_CONFIGURATION);
+  }
+  if (effectId != AFE_CONFIG_SITE_CLED_EFFECT_BLINKING) {
+    addUrlItem(section, AFE_CONFIG_SITE_CLED_EFFECT_BLINKING, id,
+               L_CLED_EFFECT_BLINKING_CONFIGURATION);
+  }
+  if (effectId != AFE_CONFIG_SITE_CLED_EFFECT_BLINKING) {
+    addUrlItem(section, AFE_CONFIG_SITE_CLED_EFFECT_BLINKING, id,
+               L_CLED_EFFECT_BLINKING_CONFIGURATION);
+  }
+  if (effectId != AFE_CONFIG_SITE_CLED_EFFECT_WAVE) {
+    addUrlItem(section, AFE_CONFIG_SITE_CLED_EFFECT_WAVE, id,
+               L_CLED_EFFECT_WAVE_CONFIGURATION);
+  }
+  if (effectId != AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT) {
+    addUrlItem(section, AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT, id,
+               L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION);
+  }
+  closeMessageSection(section);
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-void AFESitesGenerator::siteCLEDDeviceEffect(String &page, uint8_t id) {
-
-  CLED configuration;
-  CLED_BACKLIGHT CLEDBacklightConfiguration;
-  char _label[26];
-  char _number[10];
-  Data->getConfiguration(id, &configuration);
-
-  if (!Data->getConfiguration(id, &CLEDBacklightConfiguration)) {
-    addFileNotFound(page);
-  }
-
-  openSection(page, F(L_CLED_EFFECT_DEVICE_LIGHT), F(L_CLEDS_HINT));
-  /* Item: GPIO */
-  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_1_GPIO);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, true);
-
-  page.concat(FPSTR(HTTP_FIXED_CLED_CONFIG_PARAMS));
-  closeSection(page);
-
-  openSection(page, F(L_CLED_BACKLIGHT_CONFIG), F(L_CLED_RULE_HINT));
-
-  // uint8_t lightSensorId;
-
-  addSelectFormItemOpen(page, F("s"), F(L_CLED_LIGHT_SENSOR));
-  addSelectOptionFormItem(page, L_NONE, "255",
-                          CLEDBacklightConfiguration.lightSensorId ==
-                              AFE_HARDWARE_ITEM_NOT_EXIST);
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-  if (Device->configuration.noOfBH1750s > 0) {
-    BH1750 BH1750Configuration;
-    for (uint8_t i = 0; i < Device->configuration.noOfBH1750s; i++) {
-      Data->getConfiguration(i, &BH1750Configuration);
-      sprintf(_label, "BH1750: %s", BH1750Configuration.name);
-      sprintf(_number, "%d", i);
-      addSelectOptionFormItem(page, _label, _number,
-                              CLEDBacklightConfiguration.lightSensorId == i);
-    }
-  }
-#endif // AFE_CONFIG_HARDWARE_BH1750
-
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-  if (Device->configuration.noOfTSL2561s > 0) {
-    TSL2561 TSL2561Configuration;
-    for (uint8_t i = 0; i < Device->configuration.noOfTSL2561s; i++) {
-      Data->getConfiguration(i, &TSL2561Configuration);
-      sprintf(_label, "TSL2561: %s", TSL2561Configuration.name);
-      sprintf(_number, "%d", 50 + i);
-      addSelectOptionFormItem(page, _label, _number,
-                              CLEDBacklightConfiguration.lightSensorId ==
-                                  50 + i);
-    }
-  }
-#endif // AFE_CONFIG_HARDWARE_TSL2561
-  addSelectFormItemClose(page);
-
-  for (uint8_t index = 0;
-       index < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; index++) {
-
-    page.concat(FPSTR(HTTP_ITEM_HINT));
-    sprintf(_label, "{{L}}: %d", index + 1);
-    page.replace("{{i.h}}", _label);
-
-    /* Item: Lux level */
-    sprintf(_label, "l%u", index);
-    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].luxLevel);
-
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label,
-                     L_CLED_LIGHT_LEVEL, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                     "0", "65535", "1", "Lux");
-
-    /* Item: Led color */
-    sprintf(_label, "k%u", index);
-    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].color);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_COLOR,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999",
-                     "1");
-
-    /* Item: brightness */
-    sprintf(_label, "b%u", index);
-    sprintf(_number, "%u", CLEDBacklightConfiguration.config[index].brightness);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, _label, L_CLED_BRIGHTNESS,
-                     _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
-  }
-
-  page.replace("{{L}}", L_CLED_RULE);
-
-  closeSection(page);
-
-  /*
-
-  #if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
-    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt)
-  {
-      openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
-      sprintf(_number, "%d", configuration.domoticz.idx);
-      addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
-                       AFE_FORM_ITEM_SKIP_PROPERTY,
-                       AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-                       AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-      closeSection(page);
-    }
-  #else
-    if (Device->configuration.api.mqtt) {
-      openSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
-      addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
-                       configuration.mqtt.topic, "64");
-      closeSection(page);
-    }
-  #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-  */
-}
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {
@@ -4618,3 +4489,34 @@ void AFESitesGenerator::addUrlItem(String &item, uint8_t option, uint8_t id,
   item.replace("{{u.l}}", label);
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+void AFESitesGenerator::addAPIsSection(String &page,
+                                       const __FlashStringHelper *header,
+                                       const __FlashStringHelper *info,
+                                       const char *label, uint32_t *idx) {
+
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    char _number[10];
+    openSection(page, header, info);
+    sprintf(_number, "%d", idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", label, _number,
+                     AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    closeSection(page);
+  }
+}
+#else  // HA and Standard API
+void AFESitesGenerator::addAPIsSection(String &page,
+                                       const __FlashStringHelper *header,
+                                       const __FlashStringHelper *info,
+                                       const char *label, const char *topic) {
+
+  if (Device->configuration.api.mqtt) {
+    openSection(page, header, info);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", label, topic, "64");
+    closeSection(page);
+  }
+}
+#endif // End if API section

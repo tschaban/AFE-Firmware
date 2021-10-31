@@ -28,6 +28,10 @@
 class AFECLED {
 
 private:
+  /**
+   * @brief structure that keeps effects current state
+   *
+   */
   struct CLED_EFFECT_CONFIG {
     uint8_t id = AFE_NONE;
     boolean stateUpdated = false;
@@ -36,6 +40,11 @@ private:
     uint8_t integer;
   };
 
+  /**
+   * @brief data structure that keeps current state and other information
+   * releated to a LED strip
+   *
+   */
   struct CLED_CURRENT_STATE {
     CLED_PARAMETERS config;
     boolean state = false;
@@ -47,30 +56,77 @@ private:
 
   boolean _initialized = false;
 
-  CLEDController *controllers[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
-
   CRGB leds[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS]
            [AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED];
 
-  /* Tunes On/Off CLEDs */
+  /**
+   * @brief Turns On/Off LED based on the settings in the currentState variable
+   *
+   * @param  stripId          ID of a LED strip
+   * @param  state            On or Off: AFE_ON, AFE_OFF
+   * @param  disableEffects   Is true it runs a code of disabling effects
+   */
   void _turnOnOff(uint8_t stripId, boolean state,
                   boolean disableEffects = false);
 
-  /* Set LED brightness */
+  /**
+   * @brief Set LED brightness
+   *
+   * @param  stripId          ID of a LED strip
+   * @param  brightness       0 .. 255
+   */
   void _setBrightness(uint8_t stripId, uint8_t brightness);
 
-  /* Set Color and brightness for all leds in the string */
+  /**
+   * @brief Set Color for all leds in the strip. It uses last set brightness
+   * level
+   *
+   * @param  stripId          ID of a LED strip
+   * @param  color            a color
+   */
   void _setColor(uint8_t stripId, uint32_t color);
+
+  /**
+   * @brief Set Color and brightness for all leds in the strip
+   *
+   * @param  stripId          ID of a LED strip
+   * @param  color            color
+   * @param  brightness       0 .. 255
+   */
   void _setColor(uint8_t stripId, uint32_t color, uint8_t brightness);
 
 public:
+  /**
+   * @brief Strip LED configuration parameters
+   *
+   */
   CLED configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+
+  /**
+   * @brief Effect: flashing configuration parameters
+   *
+   */
   CLED_EFFECT_BLINKING
   configurationEffectBlinking[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+
+  /**
+   * @brief Effect: wave configuration parameters
+   *
+   */
   CLED_EFFECT_WAVE
   configurationEffectWave[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+
+  /**
+   * @brief Effect: fade in/out configuration parameters
+   *
+   */
   CLED_EFFECT_FADE_INOUT
   configurationEffectFadeInOut[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+
+  /**
+   * @brief Stores LED strip current state parameters
+   *
+   */
   CLED_CURRENT_STATE currentState[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
   /**
@@ -130,11 +186,27 @@ public:
   void effectFadeInOutListener(uint8_t stripId);
   void effectWaveListener(uint8_t stripId);
 
-  /* Events triggeres */
+  /**
+   * @brief returns true is LED strip changed from ON->OFF or from OFF->ON
+   *
+   * @param  stripId          ID of a LED Strip
+   * @return boolean          true - state changed, false - no change
+   */
   boolean isStateUpdated(uint8_t stripId);
+
+  /**
+   * @brief returns true is LED strip effect has been changed eg from ON to OFF,
+   * effect changed etc
+   *
+   * @param  stripId          ID of a LED Strip
+   * @return boolean          true - state changed, false - no change
+   */
   boolean isEffectStateUpdated(uint8_t stripId);
 
-  /* Method must be added to main loop in order to enable effects  */
+  /**
+   * @brief Method must be added to main loop in order to enable effects
+   *
+   */
   void loop();
 };
 

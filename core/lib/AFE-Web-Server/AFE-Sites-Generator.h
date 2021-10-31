@@ -240,7 +240,9 @@ private:
    * @param  id               object id -> url option "i"
    * @param  label            label of <a>label</a>
    */
+
   void addUrlItem(String &item, uint8_t option, uint8_t id, const char *label);
+  void addCLEDMenuSection(String &section, uint8_t effectId, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 public:

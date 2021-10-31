@@ -1,6 +1,3 @@
-
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
-
 #include "AFE-CLED.h"
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
