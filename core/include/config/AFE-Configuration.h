@@ -287,8 +287,8 @@
 
 /* ***************** APIs: Config and defaults *********************/
 
+#include <api/AFE-HTTP.h>
 
-/* Configs releated to Domoticz APIs */
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 #include <api/AFE-Domoticz.h>
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)

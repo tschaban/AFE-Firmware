@@ -78,6 +78,10 @@
 #include <AFE-Sensor-TSL2561.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -105,7 +109,7 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_ADC_VCC
 #ifdef AFE_ESP32
-AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
+  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 #else  // AFE_ESP8266
   AFEAnalogInput *_AnalogInput;
 #endif // AFE_ESP32
@@ -166,6 +170,10 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED *_CLED;
 #endif
 
   /* Classifies and invokes code for HTTP request processing */
@@ -239,17 +247,37 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   void processTSL2561(HTTPCOMMAND *);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void processCLED(HTTPCOMMAND *);
+  void processCLEDEffect(HTTPCOMMAND *, uint8_t effectId); 
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
+  /**
+  * @brief Method creates and sends On/Off response
+  *
+  * @param  request          HTTP Command request
+  * @param  status           Success or Failure
+  * @param  value            On, Off
+  */
+  void sendOnOffStatus(HTTPCOMMAND *request, boolean status, byte value);  
+#endif
+
+  /**
+   * @brief Method creates JSON respons after processing HTTP API request, and
+   * pushes it
+   *
+   * @param  request          HTTP Command request
+   * @param  status           success or failure
+   * @param  value            contain of data json tag
+   */
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
+
 /* @TODO Check if it's still used
   void send(HTTPCOMMAND *request, boolean status, double value,
           uint8_t width = 2, uint8_t precision = 2);
 */
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
-   * method which creates JSON respons and pushes it */
-  void sendRelayStatus(HTTPCOMMAND *request, boolean status, byte value);
-#endif
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -329,6 +357,10 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void addClass(AFESensorTSL2561 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void addClass(AFECLED *);
 #endif
 };
 

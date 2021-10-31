@@ -188,7 +188,6 @@ public:
   virtual void addClass(AFEMiFareCard *);
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_CLED
   virtual void addClass(AFECLED *);
 #endif

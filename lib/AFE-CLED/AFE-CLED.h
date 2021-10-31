@@ -120,7 +120,8 @@ public:
            boolean disableEffects = false);
 
   /* Method change the CLED to opposite state */
-  void toggle(uint8_t stripId, uint32_t color);
+  void toggle(uint8_t stripId, boolean disableEffects = false);
+  void toggle(uint8_t stripId, uint32_t color, boolean disableEffects = false);
 
   /* Effects */
   void activateEffect(uint8_t stripId, uint8_t effectId);

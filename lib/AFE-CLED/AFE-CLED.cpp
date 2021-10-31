@@ -43,7 +43,6 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
     currentState[i].on.brightness = configuration[i].on.brightness;
     currentState[i].off.color = configuration[i].off.color;
     currentState[i].off.brightness = configuration[i].off.brightness;
-
   }
 
   _initialized = true;
@@ -243,8 +242,15 @@ void AFECLED::loop() {
   }
 }
 
-void AFECLED::toggle(uint8_t stripId, uint32_t color) {
-  currentState[stripId].state ? off(stripId) : on(stripId);
+void AFECLED::toggle(uint8_t stripId, boolean disableEffects) {
+  currentState[stripId].state
+      ? off(stripId, currentState[stripId].off.color, disableEffects)
+      : on(stripId, currentState[stripId].on.color, disableEffects);
+}
+
+void AFECLED::toggle(uint8_t stripId, uint32_t color, boolean disableEffects) {
+  currentState[stripId].state ? off(stripId, color, disableEffects)
+                              : on(stripId, color, disableEffects);
 }
 
 void AFECLED::_turnOnOff(uint8_t stripId, boolean state,
@@ -257,7 +263,7 @@ void AFECLED::_turnOnOff(uint8_t stripId, boolean state,
     currentState[stripId].state = state;
     currentState[stripId].stateUpdated = true;
     if (disableEffects && currentState[stripId].effect.id != AFE_NONE) {
-      deactivateEffect(stripId,false);
+      deactivateEffect(stripId, false);
     }
   }
 }

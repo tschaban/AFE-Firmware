@@ -307,6 +307,13 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0 ) {
+      HttpAPI.addClass(&CLEDStrip);
+    }
+#endif
+
+
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: HTTP init completed");
 #endif

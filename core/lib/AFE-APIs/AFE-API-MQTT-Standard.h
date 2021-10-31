@@ -275,7 +275,6 @@ public:
   boolean publishCLEDState(uint8_t id);
   void processCLEDEffect(uint8_t *id, uint8_t effectId);
   boolean publishCLEDEffectsState(uint8_t id);
-
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
