@@ -163,6 +163,12 @@ void eventsListener(void) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
       HomeAssistantDiscoveryAPI.publishCLEDs();
 #endif
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+      HomeAssistantDiscoveryAPI.publishAnalogInputs();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+      HomeAssistantDiscoveryAPI.publishSwitches();
+#endif
 #endif
 
       MqttAPI.subscribe();

@@ -2,7 +2,7 @@
 
 #include "AFE-Analog-Input.h"
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 AFEAnalogInput::AFEAnalogInput(){};
 
@@ -132,4 +132,4 @@ void AFEAnalogInput::getBatteryMeterJSON(char *json) {
 }
 #endif
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT

@@ -128,7 +128,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif
 
 /* Subscribe: ADC */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
     subscribeToCommand(_AnalogInput[i]->configuration.mqtt.topic,
@@ -305,7 +305,7 @@ void AFEAPIMQTTStandard::listener() {
           processBinarySensor(&mqttTopicsCache[i].id);
           break;
 #endif // AFE_CONFIG_HARDWARE_SWITCH
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
         case AFE_MQTT_DEVICE_ADC: // ADC
 #ifdef AFE_ESP32
           processADC(&mqttTopicsCache[i].id);
@@ -314,7 +314,7 @@ void AFEAPIMQTTStandard::listener() {
 #endif
           break;
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         case AFE_MQTT_DEVICE_BH1750:
           processBH1750(&mqttTopicsCache[i].id);
@@ -468,7 +468,7 @@ boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
 void AFEAPIMQTTStandard::publishADCValues(uint8_t id) {
   if (enabled) {
@@ -512,7 +512,7 @@ void AFEAPIMQTTStandard::processADC() {
 #endif
 }
 #endif // AFE_ESP32
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIMQTTStandard::processBatteryMeter() {

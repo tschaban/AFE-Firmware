@@ -1,7 +1,7 @@
 #ifndef _AFE_Hardware_api_domoticz_h
 #define _AFE_Hardware_api_domoticz_h
 
-#define AFE_FIRMWARE_API AFE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
+#define AFE_FIRMWARE_API AFE_FIRMWARE_API_DOMOTICZ // Type of the firmware API: DOMOTICZ
 #define AFE_DOMOTICZ_VERSION_0 0 // 4.10x
 #define AFE_DOMOTICZ_VERSION_1 1 // 2020.x
 #define AFE_DOMOTICZ_VERSION_DEFAULT AFE_DOMOTICZ_VERSION_0

@@ -108,7 +108,7 @@ public:
   void createSystemLedIDConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, ADCINPUT *);
   void saveConfiguration(uint8_t id, ADCINPUT *);
@@ -118,7 +118,7 @@ public:
 #endif // ESP32/ESP8266
 
   void createADCInputConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void getConfiguration(uint8_t id, DS18B20 *);

@@ -129,7 +129,7 @@ boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 void AFEAPIHTTPDomoticz::addClass(AFEAnalogInput *Analog) {
   AFEAPI::addClass(Analog);
 }
@@ -185,7 +185,7 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
   }
 }
 #endif // ESP32/ESP8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues() {
@@ -737,5 +737,14 @@ boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEAPIHTTPDomoticz::addClass(AFECLED *CLed) {}
+boolean AFEAPIHTTPDomoticz::publishCLEDState(uint8_t id) { return true; }
+boolean AFEAPIHTTPDomoticz::publishCLEDEffectState(uint8_t id,
+                                                   uint8_t effectId) {
+  return true;
+}
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

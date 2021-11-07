@@ -19,7 +19,7 @@ boolean AFEUpgrader::upgraded() {
   case AFE_API_STANDARD:
     Serial << F("Standard");
     break;
-  case AFE_API_DOMOTICZ:
+  case AFE_FIRMWARE_API_DOMOTICZ:
     Serial << F("Domoticz");
     break;
   case AFE_API_HOME_ASSISTANT:
@@ -36,7 +36,7 @@ boolean AFEUpgrader::upgraded() {
       FirmwareConfiguration.type == AFE_FIRMWARE_TYPE &&
       FirmwareConfiguration.api ==
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-          AFE_API_DOMOTICZ
+          AFE_FIRMWARE_API_DOMOTICZ
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
           AFE_API_HOME_ASSISTANT
 #else
@@ -182,7 +182,7 @@ void AFEUpgrader::updateFirmwareVersion() {
 void AFEUpgrader::updateFirmwareAPIVersion() {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (AFE_FIRMWARE_API == AFE_API_DOMOTICZ) {
+  if (AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ) {
     /* Checking if there is Domoticz server configuration file */
     if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
       Data->createDomoticzConfigurationFile();
@@ -214,7 +214,7 @@ void AFEUpgrader::upgradeToT0V210() {
   newDevice.api.domoticz = oldDevice.api.domoticz;
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_ADC_VCC) && !defined(AFE_ESP32)
+#if defined(AFE_CONFIG_HARDWARE_ANALOG_INPUT) && !defined(AFE_ESP32)
   newDevice.isAnalogInput = oldDevice.isAnalogInput;
 #endif
 

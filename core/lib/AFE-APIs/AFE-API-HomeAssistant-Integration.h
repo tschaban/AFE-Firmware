@@ -41,15 +41,16 @@ private:
   char _deviceID[17];
 
   void generateObjectId(char *objectId, uint8_t deviceClassId,
-                        uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST, uint8_t supportingId = AFE_NONE);
+                        uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST,
+                        uint8_t supportingId = AFE_NONE);
   void generateTopic(char *topic, uint8_t type, const char *objectId);
   void generateAvailability(char *availability);
   void generateDeviceRegistry(char *device);
-
-  void generateSwitch(uint8_t id, uint8_t type, const char *topic,
-                      const char *label, uint8_t supportingId = AFE_NONE);
-
-
+  void publishItemToHomeAssistantMQTTDiscovery(uint8_t id, uint8_t type,
+                                               const char *topic,
+                                               const char *label,
+                                               uint8_t supportingId = AFE_NONE);
+  uint8_t getTypeOfHAEntity(uint8_t deviceClassId);
 public:
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object
@@ -61,13 +62,20 @@ public:
              AFEAPIMQTTStandard *MqttAPI);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void publishRelays();
+  void publishRelays(void);
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  void publishCLEDs();
-
+  void publishCLEDs(void);
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+  void publishSwitches(void);
+#endif // AFE_CONFIG_HARDWARE_SWITCH
+
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+  void publishAnalogInputs(void);
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 };
 
 #endif // AFE_CONFIG_API_HOME_ASSISTANT_ENABLED

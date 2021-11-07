@@ -25,9 +25,9 @@ void initializeI2CBUS(void) {
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: I2C[0]: SDA: " << I2CBUSConfiguration.SDA
-           << ", SCL: " << I2CBUSConfiguration.SCL
-           << ", Frequency: " << (I2CBUSConfiguration.frequency / 1000) << "Hz";
+           << F("INFO: I2C[0]: SDA: ") << I2CBUSConfiguration.SDA
+           << F(", SCL: ") << I2CBUSConfiguration.SCL
+           << F(", Frequency: ") << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
 #endif
 
     success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
@@ -37,8 +37,8 @@ void initializeI2CBUS(void) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: I2C: SDA: " << I2CBUSConfiguration.SDA
-         << ", SCL: " << I2CBUSConfiguration.SCL;
+         << F("INFO: I2C: SDA: ") << I2CBUSConfiguration.SDA
+         << F(", SCL: ") << I2CBUSConfiguration.SCL;
 #endif
 
   WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
@@ -48,9 +48,9 @@ void initializeI2CBUS(void) {
 #ifdef DEBUG
 // @TODO there was delay(100) here, testing without it
     if (!success) {
-      Serial << endl << "ERROR: I2C[0]: Bus doesn't work";
+      Serial << endl << F("ERROR: I2C[0]: Bus doesn't work");
     } else {
-      Serial << endl << "INFO: I2C[0]: Scannings for devices";
+      Serial << endl << F("INFO: I2C[0]: Scannings for devices");
       I2CBus.begin(&WirePort0);
       I2CBus.scanAll();
     }
@@ -64,9 +64,9 @@ void initializeI2CBUS(void) {
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: I2C[1]: SDA: " << I2CBUSConfiguration.SDA
-           << ", SCL: " << I2CBUSConfiguration.SCL
-           << ", Frequency: " << I2CBUSConfiguration.frequency / 1000 << "Hz";
+           << F("INFO: I2C[1]: SDA: ") << I2CBUSConfiguration.SDA
+           << F(", SCL: ") << I2CBUSConfiguration.SCL
+           << F(", Frequency: ") << I2CBUSConfiguration.frequency / 1000 << F("Hz");
 #endif // DEBUG
 
     success = WirePort1.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
@@ -75,9 +75,9 @@ void initializeI2CBUS(void) {
 #ifdef DEBUG
      
     if (!success) {
-      Serial << endl << "ERROR: I2C[1]: Bus doesn't work";
+      Serial << endl << F("ERROR: I2C[1]: Bus doesn't work");
     } else {
-      Serial << endl << "INFO: I2C[1]: Scannings for devices";
+      Serial << endl << F("INFO: I2C[1]: Scannings for devices");
       I2CBus.begin(&WirePort1);
       I2CBus.scanAll();
     }

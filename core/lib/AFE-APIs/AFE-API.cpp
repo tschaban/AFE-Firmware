@@ -49,7 +49,7 @@ void AFEAPI::addClass(AFESwitch *Switch) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 void AFEAPI::addClass(AFEAnalogInput *Analog) {
 #ifdef AFE_ESP32
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
@@ -64,7 +64,7 @@ void AFEAPI::addClass(AFEAnalogInput *Analog) {
   Serial << endl << F("INFO: The reference to the ADC added");
 #endif
 }
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPI::addClass(AFESensorBMEX80 *Sensor) {

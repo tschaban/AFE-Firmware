@@ -50,7 +50,7 @@ boolean AFEDefaults::set(void) {
     Data->createSwitchConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
     Data->createADCInputConfigurationFile();
 #endif
 

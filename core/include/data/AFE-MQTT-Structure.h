@@ -7,7 +7,7 @@
 #include <arduino.h>
 
 
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif // Domoticz
 
@@ -19,7 +19,7 @@ struct MQTT_MESSAGE {
   uint16_t length;
 };
 
-#if AFE_FIRMWARE_API != AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 struct MQTT_BASIC_CONFIG {
   char topic[65];
 };
@@ -29,7 +29,7 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   AFE_MQTT_DEVICE_RELAY = 0,
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   AFE_MQTT_DEVICE_ADC = 1,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -102,7 +102,7 @@ struct MQTT {
   uint16_t port;
   char user[33];
   char password[33];
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
   MQTT_BASIC_CONFIG lwt;

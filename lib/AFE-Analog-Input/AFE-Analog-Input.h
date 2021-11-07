@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #include <AFE-Data-Access.h>
 
@@ -58,5 +58,5 @@ public:
 #endif
 };
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #endif // _AFE_Sensor_ADC_VCC_h

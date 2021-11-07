@@ -3,7 +3,7 @@
 #include <AFE-API-HTTP.h>
 #include <AFE-Configuration.h>
 
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
 #else // Standards and Home Assistant API
@@ -24,7 +24,7 @@ void initializeHTTPDomoticzAPI(void);
 /* --------- Body -----------*/
 
 AFEAPIHTTP HttpAPI;
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
@@ -66,7 +66,7 @@ void initializeMQTTAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       MqttAPI.addClass(&AnalogInput[0]);
@@ -205,7 +205,7 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       HttpAPI.addClass(&AnalogInput[0]);
@@ -321,7 +321,7 @@ void initializeHTTPAPI(void) {
 }
 
 /* Initializing Domoticz HTTP API */
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 void initializeHTTPDomoticzAPI(void) {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
@@ -345,7 +345,7 @@ void initializeHTTPDomoticzAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       HttpDomoticzAPI.addClass(&AnalogInput[0]);
@@ -444,6 +444,13 @@ void initializeHTTPDomoticzAPI(void) {
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
     if (Device.configuration.noOfTSL2561s > 0) {
       HttpDomoticzAPI.addClass(&TSL2561Sensor[0]);
+    }
+#endif
+
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0) {
+      HttpDomoticzAPI.addClass(&CLEDStrip);
     }
 #endif
 

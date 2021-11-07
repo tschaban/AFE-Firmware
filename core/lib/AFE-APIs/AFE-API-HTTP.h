@@ -26,7 +26,7 @@
 #include <AFE-Relay.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-Analog-Input.h>
 #endif
 
@@ -107,7 +107,7 @@ private:
   AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 #else  // AFE_ESP8266
@@ -183,7 +183,7 @@ private:
   void processRelay(HTTPCOMMAND *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   void processAnalogInput(HTTPCOMMAND *);
 #endif
 
@@ -299,7 +299,7 @@ public:
   void addClass(AFERelay *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   void addClass(AFEAnalogInput *);
 #endif
 

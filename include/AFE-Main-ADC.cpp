@@ -1,6 +1,6 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 /* ---------Headers ---------*/
 void initializeADC(void);
@@ -78,4 +78,4 @@ void analogInputEventsListener(void) {
 
 #endif // AFE_ESP32
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT

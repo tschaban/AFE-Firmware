@@ -25,7 +25,7 @@
 #include <AFE-Switch.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-Analog-Input.h>
 #endif
 
@@ -125,7 +125,7 @@ public:
   virtual void addClass(AFESwitch *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   virtual void addClass(AFEAnalogInput *);
 #endif
 
@@ -211,7 +211,7 @@ protected:
   AFESwitch *_Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   /* Stories reference to global ADC class */
   #ifdef AFE_ESP32
   AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];

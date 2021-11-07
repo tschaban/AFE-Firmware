@@ -1,5 +1,3 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
-
 #ifndef _AFE_DEVICE_Structure_h
 #define _AFE_DEVICE_Structure_h
 
@@ -28,7 +26,7 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t noOfLEDs;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifndef AFE_ESP32
   boolean isAnalogInput;
 #else
@@ -113,7 +111,7 @@ struct DEVICE_T0_200 {
 #endif
   boolean isSwitch[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES];
   boolean isRelay[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS];
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   boolean isAnalogInput;
 #endif
 };

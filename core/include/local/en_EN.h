@@ -262,6 +262,12 @@
 #define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
 #define L_ADC_INPUT "Input"
 
+#define L_ADC_HA_VOLTAGE "Voltage on input"
+#define L_ADC_HA_VOLTAGE_CALCULATED "Voltage"
+#define L_ADC_HA_VOLTAGE_RAW "ADC Raw data"
+#define L_ADC_HA_VOLTAGE_PERCENT "ADC Range percent"
+
+
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
 #define L_BATTERY_MIN_LEVEL "Battery level: min"

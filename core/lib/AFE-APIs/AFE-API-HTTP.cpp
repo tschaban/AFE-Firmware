@@ -71,7 +71,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif
 /* Checking if Analog Input request */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_ANALOG_INPUT) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing ADC requests");
@@ -386,7 +386,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
 
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 /* Adding pointer to ADC class */
 void AFEAPIHTTP::addClass(AFEAnalogInput *Analog) {
 #ifdef AFE_ESP32
@@ -427,7 +427,7 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
   }
 #endif // AFE_ESP32
 }
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
@@ -872,7 +872,7 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
         _CLED->off(i, true);
         /* Checking if command: toggle */
       } else if (strcmp(request->command, "toggle") == 0) {
-        _CLED->toggle(i);
+        _CLED->toggle(i, true);
         /* Checking if command: get */
       } else if (strcmp(request->command, "get") == 0) {
         _stateUpdated = false;

@@ -72,14 +72,14 @@ public:
   boolean publishSwitchState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   virtual void addClass(AFEAnalogInput *);
 #ifdef AFE_ESP32
   void publishADCValues(uint8_t id);
 #else  // ESP32
   void publishADCValues();
 #endif // ESP32/8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
@@ -160,6 +160,13 @@ public:
   virtual void addClass(AFESensorTSL2561 *);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  virtual void addClass(AFECLED *);
+  boolean publishCLEDState(uint8_t id);
+  boolean publishCLEDEffectState(uint8_t id, uint8_t effectId);
+#endif // AFE_CONFIG_HARDWARE_CLED
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

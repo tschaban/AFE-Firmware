@@ -124,7 +124,7 @@ private:
                   (AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS *
                    AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS)
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS
 #else
@@ -189,7 +189,7 @@ public:
   void processBinarySensor(uint8_t *id);
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSORS
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   void publishADCValues(uint8_t id);
   void processADC(uint8_t *id);
@@ -197,7 +197,7 @@ public:
   void publishADCValues();
   void processADC();
 #endif // AFE_ESP32
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   void processBatteryMeter();

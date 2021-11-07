@@ -1,5 +1,3 @@
-/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
-
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
 
@@ -77,12 +75,31 @@ private:
 
   void generateHeader(String &page, uint16_t redirect);
 
-  /* Method addes configuration block to the site */
+  /**
+   * @brief Method addes configuration block to the site
+   * 
+   * @param  page             return string with section HTML code
+   * @param  title            Title of the section
+   * @param  description      Sub-title of the section
+   */
   void openSection(String &page, const char *title,
                    const __FlashStringHelper *description);
+  
+  /**
+   * @brief Method addes configuration block to the site
+   * 
+   * @param  page             return string with section HTML code
+   * @param  title            Title of the section
+   * @param  description      Sub-title of the section
+   */  
   void openSection(String &page, const __FlashStringHelper *title,
                    const __FlashStringHelper *description);
 
+  /**
+   * @brief Closes section 
+   * 
+   * @param  page             return string with section HTML code
+   */
   void closeSection(String &page);
 
   void openMessageSection(String &page, const char *title,
@@ -203,10 +220,10 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void addAPIsSection(String &page, const __FlashStringHelper *header,
                       const __FlashStringHelper *info, const char *label,
-                      uint32_t *idx)
+                      uint32_t *idx);
 #else
   void addAPIsSection(String &page, const __FlashStringHelper *header,
                       const __FlashStringHelper *info, const char *label,
@@ -285,18 +302,31 @@ public:
   void siteWANUpgrade(String &page, const __FlashStringHelper *title);
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-  /* Method generate restore to defaults section. Command = 0 is pre-reset site,
-   * 1 is a post reset site */
+  /**
+   * @brief Method generate restore to defaults section
+   * 
+   * @param  page             return string with the site HTML
+   */
   void siteReset(String &page);
+  
   void sitePostReset(String &page);
 
-  /* Method addes info that device is being reset */
-  void siteExit(String &page, uint8_t command);
+  /**
+   * @brief Method addes info that device is being reset
+   * 
+   * @param  page             return string with the site HTML
+   * @param  configMode       config mode: over WiFi or HotSpot
+   */
+  void siteExit(String &page, uint8_t configMode);
 
   /* Method generates section shown when device is in norma mode */
   void siteIndex(String &page, boolean authorized);
 
-  /* Site: Firmware version */
+  /**
+   * @brief Site: Firmware version
+   * 
+   * @param  page             return string with the site
+   */
   void siteFirmware(String &page);
 
   /* All following methods generates configuration sections */
@@ -304,7 +334,7 @@ public:
   void siteNetwork(String &page);
   void siteConnecting(String &page);
   void siteMQTTBroker(String &page);
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void siteDomoticzServer(String &page);
 #elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
   void siteHomeAssistantDiscoveryConfiguration(String &page);
@@ -375,13 +405,13 @@ public:
   void siteAnemometerSensor(String &page);
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   void siteADCInput(String &page, uint8_t id);
 #else  // ESP8266
   void siteADCInput(String &page);
 #endif // ESP32/ESP88266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_UART
   void siteUARTBUS(String &page);

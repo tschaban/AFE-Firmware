@@ -61,7 +61,7 @@
 #include <AFE-PIR-Sensor-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-ADC-INPUT-Structure.h>
 #endif 
 

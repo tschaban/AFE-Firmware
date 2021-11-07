@@ -190,6 +190,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif
           break;
 #endif // AFE_CONFIG_HARDWARE_RELAY
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* Processing Gate command*/
         case AFE_DOMOTICZ_DEVICE_GATE:
@@ -259,6 +260,50 @@ void AFEAPIMQTTDomoticz::processRequest() {
           break;
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        case AFE_DOMOTICZ_DEVICE_CLED:
+#ifdef DEBUG
+          Serial << endl
+                 << F("INFO: Domoticz: Found CLED ID: ") << idxCache[i].id;
+          _found = true;
+#endif
+          if (_CLED->currentState[idxCache[i].id].state !=
+              (byte)command.nvalue) {
+            if (command.nvalue == AFE_OFF) {
+              _CLED->off(idxCache[i].id, true);
+            } else {
+              _CLED->on(idxCache[i].id, true);
+            }
+            publishCLEDState(idxCache[i].id);
+
+            // @TODO T7 Update effects state
+
+          }
+#ifdef DEBUG
+          else {
+            Serial << endl << F("WARN: Domoticz: Same state. No change needed");
+          }
+#endif
+          break;
+
+        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING:
+          processCLEDEffect(idxCache[i].id,
+                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
+                            AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+          break;
+        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT:
+          processCLEDEffect(idxCache[i].id,
+                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
+                            AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
+          break;
+        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE:
+          processCLEDEffect(idxCache[i].id,
+                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
+                            AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+          break;
+
+#endif // AFE_CONFIG_HARDWARE_CLED
+
         /* Processing Unknown command*/
         default:
 #ifdef DEBUG
@@ -288,6 +333,25 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif
 }
 
+void AFEAPIMQTTDomoticz::addIdxToCache(uint8_t id,
+                                       afe_domoticz_device_type_t type,
+                                       uint32_t idx) {
+  if (idx > 0) {
+    idxCache[lastIDXChacheIndex].domoticz.idx = idx;
+    idxCache[lastIDXChacheIndex].id = id;
+    idxCache[lastIDXChacheIndex].type = type;
+#ifdef DEBUG
+    Serial << endl << F(" - added IDX[") << type << F("]: ") << idx;
+#endif
+    lastIDXChacheIndex++;
+
+#ifdef DEBUG
+  } else {
+    Serial << endl << F(" - IDX not set");
+#endif
+  }
+}
+
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
   // Returns true if Domoticz is in version 2020.x. All requests are processed
@@ -299,48 +363,13 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   return _ret;
 }
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
-  AFEAPI::addClass(Relay);
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: Caching IDXs for Relays");
-#endif
-
-  for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    if (_Relay[i]->configuration.domoticz.idx > 0) {
-      idxCache[lastIDXChacheIndex].domoticz.idx =
-          _Relay[i]->configuration.domoticz.idx;
-      idxCache[lastIDXChacheIndex].id = i;
-      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_RELAY;
-#ifdef DEBUG
-      Serial << endl
-             << F(" - added IDX: ")
-             << idxCache[lastIDXChacheIndex].domoticz.idx;
-#endif
-      lastIDXChacheIndex++;
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << F(" - IDX not set");
-    }
-#endif
-  }
-}
-
-boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
-#ifdef DEBG
-  Serial << endl
-         << F("INFO: Publishing relay: ") << id << F(", IDX: ")
-         << idxCache[id].domoticz.idx << F(" state");
-#endif
+boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
   boolean publishStatus = false;
-  if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
+  if (enabled && idx > 0) {
     char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
-    generateSwitchMessage(json, _Relay[id]->configuration.domoticz.idx,
-                          _Relay[id]->get());
+    generateSwitchMessage(json, *idx, state ? AFE_ON : AFE_OFF);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = _Relay[id]->configuration.domoticz.idx;
+    bypassProcessing.idx = *idx;
   }
 #ifdef DEBUG
   else {
@@ -348,6 +377,24 @@ boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
   }
 #endif
   return publishStatus;
+}
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
+  AFEAPI::addClass(Relay);
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Caching IDXs for Relays");
+#endif
+  for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_RELAY,
+                  _Relay[i]->configuration.domoticz.idx);
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
+  return publishSwitchMessage(&_Relay[id]->configuration.domoticz.idx,
+                              _Relay[id]->get());
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -370,13 +417,13 @@ boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 void AFEAPIMQTTDomoticz::addClass(AFEAnalogInput *Analog) {
   AFEAPI::addClass(Analog);
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
 void AFEAPIMQTTDomoticz::publishADCValues(uint8_t id) {
   if (enabled) {
@@ -441,7 +488,7 @@ void AFEAPIMQTTDomoticz::publishADCValues() {
   }
 }
 #endif // ESP32/ESP8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
@@ -750,20 +797,22 @@ boolean AFEAPIMQTTDomoticz::publishTSL2561SensorData(uint8_t id) {
     char value[6];
     if (_TSL2561Sensor[id]->configuration.domoticz.ir.idx > 0) {
       sprintf(value, "%d", _TSL2561Sensor[id]->ir);
-      generateDeviceValue(json, _TSL2561Sensor[id]->configuration.domoticz.ir.idx,
-                          value);
+      generateDeviceValue(
+          json, _TSL2561Sensor[id]->configuration.domoticz.ir.idx, value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
     if (_TSL2561Sensor[id]->configuration.domoticz.illuminance.idx > 0) {
       sprintf(value, "%d", _TSL2561Sensor[id]->illuminance);
       generateDeviceValue(
-          json, _TSL2561Sensor[id]->configuration.domoticz.illuminance.idx, value);
+          json, _TSL2561Sensor[id]->configuration.domoticz.illuminance.idx,
+          value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
     if (_TSL2561Sensor[id]->configuration.domoticz.broadband.idx > 0) {
       sprintf(value, "%d", _TSL2561Sensor[id]->broadband);
       generateDeviceValue(
-          json, _TSL2561Sensor[id]->configuration.domoticz.broadband.idx, value);
+          json, _TSL2561Sensor[id]->configuration.domoticz.broadband.idx,
+          value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
   }
@@ -838,34 +887,15 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    if (_Gate[i]->configuration.domoticzControl.idx > 0) {
-      idxCache[lastIDXChacheIndex].domoticz.idx =
-          _Gate[i]->configuration.domoticzControl.idx;
-      idxCache[lastIDXChacheIndex].id = i;
-      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_GATE;
-#ifdef DEBUG
-      Serial << endl
-             << F(" - added IDX: ")
-             << idxCache[lastIDXChacheIndex].domoticz.idx;
-#endif
-      lastIDXChacheIndex++;
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << F(" - IDX not set");
-    }
-#endif
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_GATE,
+                  _Gate[i]->configuration.domoticz.idx);
   }
 }
 
 boolean AFEAPIMQTTDomoticz::publishGateState(uint8_t id) {
-  if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
-    char json[AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH];
-    generateSwitchMessage(json, _Gate[id]->configuration.domoticz.idx,
-                          _Gate[id]->get() == AFE_GATE_CLOSED ? false : true);
-    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-  }
-  return true;
+  return publishSwitchMessage(&_Gate[id]->configuration.domoticz.idx,
+                              _Gate[id]->get() == AFE_GATE_CLOSED ? false
+                                                                  : true);
 }
 #endif
 
@@ -913,23 +943,8 @@ void AFEAPIMQTTDomoticz::addClass(AFERegulator *Regulator) {
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    if (_Regulator[i]->configuration.domoticz.idx > 0) {
-      idxCache[lastIDXChacheIndex].domoticz.idx =
-          _Regulator[i]->configuration.domoticz.idx;
-      idxCache[lastIDXChacheIndex].id = i;
-      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_REGULATOR;
-#ifdef DEBUG
-      Serial << endl
-             << F(" - added IDX: ")
-             << idxCache[lastIDXChacheIndex].domoticz.idx;
-#endif
-      lastIDXChacheIndex++;
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << F(" - IDX not set");
-    }
-#endif
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_REGULATOR,
+                  _Regulator[i]->configuration.domoticz.idx);
   }
 }
 
@@ -939,20 +954,8 @@ boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id) {
          << F("INFO: Publishing regulator: ") << id << F(", IDX: ")
          << idxCache[id].domoticz.idx << F(" state");
 #endif
-  boolean publishStatus = false;
-  if (enabled && _Regulator[id]->configuration.domoticz.idx > 0) {
-    char json[AFE_CONFIG_API_JSON_REGULATOR_COMMAND_LENGTH];
-    generateSwitchMessage(json, _Regulator[id]->configuration.domoticz.idx,
-                          _Regulator[id]->configuration.enabled);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = _Regulator[id]->configuration.domoticz.idx;
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("INFO: Not published");
-  }
-#endif
-  return publishStatus;
+  return publishSwitchMessage(&_Regulator[id]->configuration.domoticz.idx,
+                              _Regulator[id]->configuration.enabled);
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
@@ -965,23 +968,8 @@ void AFEAPIMQTTDomoticz::addClass(AFEThermalProtector *ThermalProtector) {
 #endif
 
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    if (_ThermalProtector[i]->configuration.domoticz.idx > 0) {
-      idxCache[lastIDXChacheIndex].domoticz.idx =
-          _ThermalProtector[i]->configuration.domoticz.idx;
-      idxCache[lastIDXChacheIndex].id = i;
-      idxCache[lastIDXChacheIndex].type = AFE_DOMOTICZ_DEVICE_THERMAL_PROTECTOR;
-#ifdef DEBUG
-      Serial << endl
-             << F(" - added IDX: ")
-             << idxCache[lastIDXChacheIndex].domoticz.idx;
-#endif
-      lastIDXChacheIndex++;
-    }
-#ifdef DEBUG
-    else {
-      Serial << endl << F(" - IDX not set");
-    }
-#endif
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_THERMAL_PROTECTOR,
+                  _ThermalProtector[i]->configuration.domoticz.idx);
   }
 }
 
@@ -991,21 +979,9 @@ boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
          << F("INFO: Publishing thermal protector: ") << id << F(", IDX: ")
          << idxCache[id].domoticz.idx << F(" state");
 #endif
-  boolean publishStatus = false;
-  if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
-    char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH];
-    generateSwitchMessage(json,
-                          _ThermalProtector[id]->configuration.domoticz.idx,
-                          _ThermalProtector[id]->configuration.enabled);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = _ThermalProtector[id]->configuration.domoticz.idx;
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("INFO: Not published");
-  }
-#endif
-  return publishStatus;
+  return publishSwitchMessage(
+      &_ThermalProtector[id]->configuration.domoticz.idx,
+      _ThermalProtector[id]->configuration.enabled);
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
@@ -1160,5 +1136,75 @@ boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEAPIMQTTDomoticz::addClass(AFECLED *CLed) {
+  AFEAPI::addClass(CLed);
+
+#ifdef DEBUG
+  Serial << endl << F("INFO: Caching IDXs for CLED strips");
+#endif
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED,
+                  _CLED->configuration[i].domoticz.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING,
+                  _CLED->configurationEffectBlinking[i].domoticz.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT,
+                  _CLED->configurationEffectFadeInOut[i].domoticz.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE,
+                  _CLED->configurationEffectWave[i].domoticz.idx);
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishCLEDState(uint8_t id) {
+  return publishSwitchMessage(&_CLED->configuration[id].domoticz.idx,
+                              _CLED->currentState[id].state);
+}
+
+void AFEAPIMQTTDomoticz::processCLEDEffect(uint8_t id, boolean state,
+                                           uint8_t effectId) {
+  boolean _success = true;
+  switch (state) {
+  case AFE_ON:
+    _CLED->activateEffect(id, effectId);
+    break;
+  case AFE_OFF:
+    _CLED->deactivateEffect(id, effectId);
+    break;
+  default:
+    _success = false;
+  }
+  if (_success) {
+    if (_CLED->isEffectStateUpdated(id)) {
+      publishCLEDEffectsState(id);
+    }
+    if (_CLED->isStateUpdated(id)) {
+      publishCLEDState(id);
+    }
+  }
+}
+
+boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
+
+  publishSwitchMessage(&_CLED->configurationEffectBlinking[id].domoticz.idx,
+                       _CLED->currentState[id].effect.id ==
+                               AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING
+                           ? AFE_ON
+                           : AFE_OFF);
+
+  publishSwitchMessage(&_CLED->configurationEffectFadeInOut[id].domoticz.idx,
+                       _CLED->currentState[id].effect.id ==
+                               AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT
+                           ? AFE_ON
+                           : AFE_OFF);
+
+  return publishSwitchMessage(&_CLED->configurationEffectWave[id].domoticz.idx,
+                              _CLED->currentState[id].effect.id ==
+                                      AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE
+                                  ? AFE_ON
+                                  : AFE_OFF);
+}
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

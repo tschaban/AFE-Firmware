@@ -43,7 +43,7 @@
 
 /* APIs */
 #define AFE_API_STANDARD 0
-#define AFE_API_DOMOTICZ 1
+#define AFE_FIRMWARE_API_DOMOTICZ 1
 #define AFE_API_HOME_ASSISTANT 2
 
 /* Frequency of AFE Key validation in minutes */
@@ -78,6 +78,10 @@
 
 /* The size of AFE Firmware file, used by OTA */ 
 #define AFE_FIRMARE_FILE_NAME_LENGTH 100
+
+
+/* Adds Units mainly for sensors */
+#include <AFE-Units.h>
 
 /* ***************** DEVICES *********************/
 #include <devices/AFE-Devices.h>
@@ -127,15 +131,15 @@
 
 /* Config releated to battery meter functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-#ifndef AFE_CONFIG_HARDWARE_ADC_VCC
-#define AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#define AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 /* Configs related to analog input functionality */
 #ifdef AFE_CONFIG_FUNCTIONALITY_ADC
-#ifndef AFE_CONFIG_HARDWARE_ADC_VCC
-#define AFE_CONFIG_HARDWARE_ADC_VCC
+#ifndef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#define AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_ADC
 
@@ -194,7 +198,7 @@
 #endif
 
 /* ADC Input and Battery measure functionality */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <hardwares/AFE-ADC.h>
 #endif 
 
@@ -283,6 +287,7 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <functionalities/AFE-Thermal-Protection.h>
 #endif 
+
 
 
 /* ***************** APIs: Config and defaults *********************/
