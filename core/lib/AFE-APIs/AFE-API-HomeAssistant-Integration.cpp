@@ -78,29 +78,64 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
   ADCINPUT configuration;
 
 #ifdef AFE_ESP32
+  char _label[17 + 2 + sizeof(configuration.name)]; // @TODO HA - check if
+                                                    // doesn't increase the size
+                                                    // of max label
+  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
+    _Data->getConfiguration(i, &configuration);
+#ifdef DEBUG
+    Serial << endl << F("INFO: HA: Setting/Updating Analog Input: ") << i + 1;
+#endif
 #else // ESP8266
   if (_Device->configuration.isAnalogInput) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HA: Setting/Updating Analog Input");
 #endif
+    uint8_t i = 0;   // needed to have the same code for ESP8266/32
+    char _label[17]; // @TODO HA - check if doesn't increase the size of max
+                     // label
+    _Data->getConfiguration(&configuration);
 #endif
-  _Data->getConfiguration(&configuration);
-  publishItemToHomeAssistantMQTTDiscovery(
-      0, AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE, configuration.mqtt.topic,
-      L_ADC_HA_VOLTAGE);
 
-  publishItemToHomeAssistantMQTTDiscovery(
-      0, AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED,
-      configuration.mqtt.topic, L_ADC_HA_VOLTAGE_CALCULATED);
+#ifdef AFE_ESP32
+    sprintf(_label, "%s: %s", configuration.name, L_ADC_HA_VOLTAGE);
+#else
+    sprintf(_label, "%s", L_ADC_HA_VOLTAGE);
+#endif
 
-  publishItemToHomeAssistantMQTTDiscovery(0, AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW,
-                                          configuration.mqtt.topic,
-                                          L_ADC_HA_VOLTAGE_RAW);
+    publishItemToHomeAssistantMQTTDiscovery(
+        i, AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE, configuration.mqtt.topic,
+        _label);
 
-  publishItemToHomeAssistantMQTTDiscovery(
-      0, AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT, configuration.mqtt.topic,
-      L_ADC_HA_VOLTAGE_PERCENT);
-}
+#ifdef AFE_ESP32
+    sprintf(_label, "%s: %s", configuration.name, L_ADC_HA_VOLTAGE_CALCULATED);
+#else
+    sprintf(_label, "%s", L_ADC_HA_VOLTAGE_CALCULATED);
+#endif
+
+    publishItemToHomeAssistantMQTTDiscovery(
+        i, AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED,
+        configuration.mqtt.topic, _label);
+
+#ifdef AFE_ESP32
+    sprintf(_label, "%s: %s", configuration.name,L_ADC_HA_VOLTAGE_RAW);
+#else
+    sprintf(_label, "%s", L_ADC_HA_VOLTAGE_RAW);
+#endif
+
+    publishItemToHomeAssistantMQTTDiscovery(
+        i, AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW, configuration.mqtt.topic, _label);
+
+#ifdef AFE_ESP32
+    sprintf(_label, "%s: %s",configuration.name,L_ADC_HA_VOLTAGE_PERCENT);
+#else
+    sprintf(_label, "%s", L_ADC_HA_VOLTAGE_PERCENT);
+#endif
+
+    publishItemToHomeAssistantMQTTDiscovery(
+        i, AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT, configuration.mqtt.topic,
+        _label);
+  }
 }
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 

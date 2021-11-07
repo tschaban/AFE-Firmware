@@ -264,8 +264,8 @@
 
 #define L_ADC_HA_VOLTAGE "Voltage on input"
 #define L_ADC_HA_VOLTAGE_CALCULATED "Voltage"
-#define L_ADC_HA_VOLTAGE_RAW "ADC Raw data"
-#define L_ADC_HA_VOLTAGE_PERCENT "ADC Range percent"
+#define L_ADC_HA_VOLTAGE_RAW "Raw"
+#define L_ADC_HA_VOLTAGE_PERCENT "Raw"
 
 
 #define L_BATTERY_METER "Battery level"
