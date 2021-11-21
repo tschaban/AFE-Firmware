@@ -105,6 +105,17 @@ void AFEAPIMQTTDomoticz::synchronize() {
   }
 #endif
 
+/* Synchronize: Binary sensor */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Synchronizing CLEDs: ") << i;
+#endif
+    publishCLEDState(i);
+    publishCLEDEffectsState(i);
+  }
+#endif
+
 #ifdef DEBUG
   Serial << endl << F("INFO: Sending message: device is connected ...");
 #endif
@@ -329,6 +340,10 @@ void AFEAPIMQTTDomoticz::processRequest() {
            << command.domoticz.idx;
   }
 #endif
+
+#ifdef DEBUG
+  Serial << endl << "INFO: Domoticz: Request processing finished";
+#endif
 }
 
 void AFEAPIMQTTDomoticz::addIdxToCache(uint8_t id,
@@ -339,7 +354,7 @@ void AFEAPIMQTTDomoticz::addIdxToCache(uint8_t id,
     idxCache[lastIDXChacheIndex].id = id;
     idxCache[lastIDXChacheIndex].type = type;
 #ifdef DEBUG
-    Serial << endl << F(" - added IDX[") << type << F("]: ") << idx;
+    Serial << endl << F(" - added IDX[") << id << F("]: ") << idx;
 #endif
     lastIDXChacheIndex++;
 
@@ -1184,24 +1199,17 @@ void AFEAPIMQTTDomoticz::processCLEDEffect(uint8_t id, boolean state,
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
-
   publishSwitchMessage(&_CLED->configurationEffectBlinking[id].domoticz.idx,
                        _CLED->currentState[id].effect.id ==
-                               AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING
-                           ? AFE_ON
-                           : AFE_OFF);
+                           AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
 
   publishSwitchMessage(&_CLED->configurationEffectFadeInOut[id].domoticz.idx,
                        _CLED->currentState[id].effect.id ==
-                               AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT
-                           ? AFE_ON
-                           : AFE_OFF);
+                           AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
 
   return publishSwitchMessage(&_CLED->configurationEffectWave[id].domoticz.idx,
                               _CLED->currentState[id].effect.id ==
-                                      AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE
-                                  ? AFE_ON
-                                  : AFE_OFF);
+                                  AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
 

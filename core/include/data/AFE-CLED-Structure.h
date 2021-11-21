@@ -39,8 +39,8 @@ struct CLED_EFFECT_BLINKING {
   char name[33];
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
-  unsigned long onTimeout;
-  unsigned long offTimeout;
+  uint32_t onTimeout;
+  uint32_t offTimeout;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
@@ -52,7 +52,7 @@ struct CLED_EFFECT_WAVE {
   char name[33];
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
-  unsigned long timeout;
+  uint32_t timeout;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
@@ -64,7 +64,7 @@ struct CLED_EFFECT_FADE_INOUT {
   char name[33];
   CLED_PARAMETERS in;
   CLED_PARAMETERS out;
-  unsigned long timeout;
+  uint32_t timeout;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

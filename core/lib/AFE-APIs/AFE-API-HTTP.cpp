@@ -5,7 +5,7 @@
 AFEAPIHTTP::AFEAPIHTTP() {}
 
 /* Initializing class */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
                        AFEDataAccess *Data, AFEAPIMQTTDomoticz *MqttAPI,
                        AFEAPIHTTPDomoticz *HttpDomoticzAPI) {
@@ -353,7 +353,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
           if (_relayStateUpdated) {
             _MqttAPI->publishRelayState(i);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
             if (strcmp(request->source, "domoticz") != 0) {
               _HttpAPIDomoticz->publishRelayState(i);
             }
@@ -629,7 +629,7 @@ void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
       if (strcmp(request->command, "toggle") == 0) {
         _Gate[i]->toggle();
         _MqttAPI->publishGateState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         _HttpAPIDomoticz->publishGateState(i);
 #endif
         _Gate[i]->getJSON(json);
@@ -729,7 +729,7 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
       if (sendJSON) {
         if (strcmp(request->command, "get") != 0) {
           _MqttAPI->publishRegulatorState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRegulatorState(i);
           }
@@ -776,7 +776,7 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
       if (sendJSON) {
         if (strcmp(request->command, "get") != 0) {
           _MqttAPI->publishRegulatorState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRegulatorState(i);
           }
@@ -949,13 +949,14 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
   if (_CLED->isStateUpdated(id)) {
-    _MqttAPI->publishCLEDState(id);
+    // @TODO T7 - if uncommented crashes woth Domoticz HTTP API
+    //_MqttAPI->publishCLEDState(id);
     if (!fromDomoticz) {
       _HttpAPIDomoticz->publishCLEDState(id);
     }
   }
   if (_CLED->isEffectStateUpdated(id)) {
-    _MqttAPI->publishCLEDEffectsState(id);
+    //_MqttAPI->publishCLEDEffectsState(id);
     if (!fromDomoticz) {
       _HttpAPIDomoticz->publishCLEDEffectState(id);
     }
@@ -970,7 +971,7 @@ void AFEAPIHTTP::publishCLEDStates(uint8_t id) {
     _MqttAPI->publishCLEDEffectsState(id);
   }
 }
-#endif;
+#endif
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 

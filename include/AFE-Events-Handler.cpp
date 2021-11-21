@@ -20,7 +20,7 @@ void eventsListener(void) {
     if (Device.getMode() == AFE_MODE_NORMAL) {
 
 /* ################## HTTP DOMOTICZ ################### */
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTIC
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       /* Sendings hardware values to Domoticz */
 
       if (Device.configuration.api.domoticz) {
@@ -75,6 +75,18 @@ void eventsListener(void) {
 #endif
         for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
           HttpDomoticzAPI.publishBinarySensorState(i);
+        }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef DEBUG
+        Serial << endl
+               << F("INFO: EVENTS: Sending current state of RGB LEDs "
+                    "Domoticz");
+#endif
+        for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
+          HttpDomoticzAPI.publishCLEDState(i);
+          HttpDomoticzAPI.publishCLEDEffectState(i);
         }
 #endif
 
@@ -168,7 +180,6 @@ void eventsListener(void) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
       HomeAssistantDiscoveryAPI->publishSwitches();
-
 #endif
 
       delete HomeAssistantDiscoveryAPI;

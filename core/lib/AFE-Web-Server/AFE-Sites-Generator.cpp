@@ -3773,7 +3773,7 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: On timeout */
-  sprintf(_number, "%uI", configuration.onTimeout);
+  sprintf(_number, "%d", configuration.onTimeout);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIMEOUT,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
                    L_MILISECONDS);
@@ -3793,7 +3793,7 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: Off timeout */
-  sprintf(_number, "%uI", configuration.offTimeout);
+  sprintf(_number, "%d", configuration.offTimeout);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIMEOUT,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
                    L_MILISECONDS);
@@ -3840,7 +3840,7 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: timeout */
-  sprintf(_number, "%uI", configuration.timeout);
+  sprintf(_number, "%d", configuration.timeout);
   addInputFormItem(
       page, AFE_FORM_ITEM_TYPE_NUMBER, "z", L_CLED_EFFECT_WAVE_SPEED, _number,
       AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
@@ -3886,7 +3886,7 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: Fade Out/In speed */
-  sprintf(_number, "%uI", configuration.timeout);
+  sprintf(_number, "%d", configuration.timeout);
   addInputFormItem(
       page, AFE_FORM_ITEM_TYPE_NUMBER, "z", L_CLED_FADE_IN_OUT_TIMEOUT, _number,
       AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
@@ -4515,7 +4515,7 @@ void AFESitesGenerator::addAPIsSection(String &page,
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     char _number[10];
     openSection(page, header, info);
-    sprintf(_number, "%d", idx);
+    sprintf(_number, "%d", *idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", label, _number,
                      AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,

@@ -259,11 +259,11 @@ void AFEAPI::addClass(AFEMiFareCard *Sensor) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEAPI::addClass(AFECLED *Sensor) {
-  if (_Device->configuration.noOfCLEDs>0) {
+  if (_Device->configuration.noOfCLEDs > 0) {
     _CLED = Sensor;
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: The reference to the CLED: Device Light added");
+  Serial << endl << F("INFO: The reference to the RGB LED added");
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
