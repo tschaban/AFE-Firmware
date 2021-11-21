@@ -249,7 +249,13 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   void processCLED(HTTPCOMMAND *);
-  void processCLEDEffect(HTTPCOMMAND *, uint8_t effectId); 
+  void processCLEDEffect(HTTPCOMMAND *, uint8_t effectId);
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  void publishCLEDStates(uint8_t id, boolean fromDomoticz);
+#else
+  void publishCLEDStates(uint8_t id);
+#endif;
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
@@ -260,7 +266,7 @@ private:
   * @param  status           Success or Failure
   * @param  value            On, Off
   */
-  void sendOnOffStatus(HTTPCOMMAND *request, boolean status, byte value);  
+  void sendOnOffStatus(HTTPCOMMAND *request, boolean status, byte value);
 #endif
 
   /**
@@ -273,11 +279,10 @@ private:
    */
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
 
-/* @TODO Check if it's still used
-  void send(HTTPCOMMAND *request, boolean status, double value,
-          uint8_t width = 2, uint8_t precision = 2);
-*/
-
+  /* @TODO Check if it's still used
+    void send(HTTPCOMMAND *request, boolean status, double value,
+            uint8_t width = 2, uint8_t precision = 2);
+  */
 
 public:
   /* Constructor: it sets all necessary parameters */

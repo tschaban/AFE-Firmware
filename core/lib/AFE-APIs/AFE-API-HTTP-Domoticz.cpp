@@ -710,10 +710,24 @@ boolean AFEAPIHTTPDomoticz::publishCLEDState(uint8_t id) {
 }
 
 boolean AFEAPIHTTPDomoticz::publishCLEDEffectState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-  }
-  return publishStatus;
+
+  sendSwitchCommand(_CLED->configurationEffectBlinking[id].domoticz.idx,
+                    _CLED->currentState[id].effect.id ==
+                            AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING
+                        ? AFE_ON
+                        : AFE_OFF);
+
+  sendSwitchCommand(_CLED->configurationEffectFadeInOut[id].domoticz.idx,
+                    _CLED->currentState[id].effect.id ==
+                            AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT
+                        ? AFE_ON
+                        : AFE_OFF);
+
+  return sendSwitchCommand(_CLED->configurationEffectWave[id].domoticz.idx,
+                           _CLED->currentState[id].effect.id ==
+                                   AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE
+                               ? AFE_ON
+                               : AFE_OFF);
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
 

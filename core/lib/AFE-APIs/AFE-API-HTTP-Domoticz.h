@@ -47,8 +47,8 @@ private:
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
                                   uint16_t nvalue = 0);
 
-  /* Replace space with %20 */
-  //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
+/* Replace space with %20 */
+//  void replaceSpaceinUrl(const char *inputString, const char &outputString);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -160,7 +160,6 @@ public:
   virtual void addClass(AFESensorTSL2561 *);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   virtual void addClass(AFECLED *);

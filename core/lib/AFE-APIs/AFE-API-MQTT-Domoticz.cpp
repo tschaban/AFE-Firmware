@@ -275,9 +275,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
               _CLED->on(idxCache[i].id, true);
             }
             publishCLEDState(idxCache[i].id);
-
-            // @TODO T7 Update effects state
-
+            publishCLEDEffectsState(idxCache[i].id);
           }
 #ifdef DEBUG
           else {

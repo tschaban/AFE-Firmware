@@ -884,19 +884,10 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
         sendOnOffStatus(request, true,
                         _CLED->currentState[i].state ? AFE_ON : AFE_OFF);
         if (_stateUpdated) {
-          if (_CLED->isStateUpdated(i)) {
-            _MqttAPI->publishCLEDState(i);
-          }
-          if (_CLED->isEffectStateUpdated(i)) {
-            _MqttAPI->publishCLEDEffectsState(i);
-          }
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-
-
-            // @TODO T7
-            // _HttpAPIDomoticz->publishRelayState(i);
-          }
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+          publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+#else
+          publishCLEDStates(i);
 #endif
         }
       }
@@ -940,17 +931,10 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
                         _CLED->currentState[i].effect.id == effectId ? AFE_ON
                                                                      : AFE_OFF);
         if (_stateUpdated) {
-          if (_CLED->isEffectStateUpdated(i)) {
-            _MqttAPI->publishCLEDEffectsState(i);
-          }
-          if (_CLED->isStateUpdated(i)) {
-            _MqttAPI->publishCLEDState(i);
-          }
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            // @TODO T7
-            // _HttpAPIDomoticz->publishRelayState(i);
-          }
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+          publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+#else
+          publishCLEDStates(i);
 #endif
         }
       }
@@ -961,6 +945,32 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 }
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
+  if (_CLED->isStateUpdated(id)) {
+    _MqttAPI->publishCLEDState(id);
+    if (!fromDomoticz) {
+      _HttpAPIDomoticz->publishCLEDState(id);
+    }
+  }
+  if (_CLED->isEffectStateUpdated(id)) {
+    _MqttAPI->publishCLEDEffectsState(id);
+    if (!fromDomoticz) {
+      _HttpAPIDomoticz->publishCLEDEffectState(id);
+    }
+  }
+}
+#else
+void AFEAPIHTTP::publishCLEDStates(uint8_t id) {
+  if (_CLED->isStateUpdated(id)) {
+    _MqttAPI->publishCLEDState(id);
+  }
+  if (_CLED->isEffectStateUpdated(id)) {
+    _MqttAPI->publishCLEDEffectsState(id);
+  }
+}
+#endif;
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 
