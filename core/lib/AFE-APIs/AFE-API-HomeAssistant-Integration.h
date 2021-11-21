@@ -8,8 +8,8 @@
  * @copyright AFE Firmware @2021
  *
  */
-#ifndef _AFE_API_HOME_ASSISTANT_INTEGRATION_h
-#define _AFE_API_HOME_ASSISTANT_INTEGRATION_h
+#ifndef _AFE_FIRMWARE_API_HOME_ASSISTANT_INTEGRATION_h
+#define _AFE_FIRMWARE_API_HOME_ASSISTANT_INTEGRATION_h
 
 #include <AFE-Configuration.h>
 
@@ -38,7 +38,11 @@ private:
   AFEDevice *_Device;
   AFEAPIMQTTStandard *_MqttAPI;
 
-  char _deviceID[17];
+  char _deviceID[18];
+  char _firmwareName[28];
+  MQTT _mqttConfiguration;
+
+  boolean _initialize = false;
 
   void generateObjectId(char *objectId, uint8_t deviceClassId,
                         uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST,
@@ -50,8 +54,15 @@ private:
                                                const char *topic,
                                                const char *label,
                                                uint8_t supportingId = AFE_NONE);
+
+  void removeItemRemovedFromHomeAssistantMQTTDiscovery(
+      uint8_t id, uint8_t type, uint8_t supportingId = AFE_NONE);
+
   uint8_t getTypeOfHAEntity(uint8_t deviceClassId);
+
 public:
+  HOME_ASSISTANT_CONFIG configuration;
+
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object
    *
@@ -79,4 +90,4 @@ public:
 };
 
 #endif // AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
-#endif //_AFE_API_HOME_ASSISTANT_INTEGRATION_h
+#endif //_AFE_FIRMWARE_API_HOME_ASSISTANT_INTEGRATION_h

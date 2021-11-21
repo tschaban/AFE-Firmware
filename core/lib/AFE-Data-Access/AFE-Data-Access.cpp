@@ -1521,7 +1521,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<98> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MQTT_BROKER> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -1561,7 +1561,6 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
   }
 #endif
 }
-
 void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -1580,7 +1579,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
     Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
 
-    StaticJsonBuffer<211> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MQTT_BROKER> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["protocol"] = configuration->protocol;
     root["host"] = configuration->host;
@@ -1623,7 +1622,128 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
   DomoticzConfiguration.port = 8080;
   saveConfiguration(&DomoticzConfiguration);
 }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
+  boolean _ret = true;
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION
+         << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "r");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      configuration->removeingComponents = root["removing"];
+      configuration->addingComponents = root["adding"];
+      sprintf(configuration->discovery.topic, root["topic"]);
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT
+             << F(", actual JSON size: ") << jsonBuffer.size();
+      if (AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ")
+           << AFE_FILE_HOME_ASSISTANT_CONFIGURATION << F(" not opened");
+#endif
+  }
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
+#ifdef DEBUG
+  Serial << endl
+         << endl
+         << F("INFO: Opening file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION
+         << F(" ... ");
+#endif
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
+#else
+  File configFile = SPIFFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+    root["adding"] = configuration->addingComponents;
+    root["removing"] = configuration->removeingComponents;
+    root["topic"] = configuration->discovery.topic;
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Data saved") << endl
+           << F("INFO: JSON: Buffer size: ")
+           << AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT << F(", actual JSON size: ")
+           << jsonBuffer.size();
+    if (AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT < jsonBuffer.size() + 10) {
+      Serial << endl << F("WARN: Too small buffer size");
+    }
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createHomeAssistantConfigurationFile() {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: Creating file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION;
+#endif
+  HOME_ASSISTANT_CONFIG configuration;
+  configuration.addingComponents =
+      AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
+  configuration.removeingComponents =
+      AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
+  sprintf(configuration.discovery.topic, AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
+  saveConfiguration(&configuration);
+}
+#endif // AFE_FIRMWARE_API
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
@@ -2859,7 +2979,8 @@ void AFEDataAccess::createADCInputConfigurationFile() {
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_INTERVAL;
   AnalogInputConfiguration.numberOfSamples =
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_NUMBER_OF_SAMPLES;
-  AnalogInputConfiguration.maxVCC = AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_MAX_VCC;
+  AnalogInputConfiguration.maxVCC =
+      AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_MAX_VCC;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
   AnalogInputConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #else

@@ -42,9 +42,9 @@
 #define AFE_WAN_ACCSSS_TIMEOUT 3000 // performs check if access to the network longer than this time in ms
 
 /* APIs */
-#define AFE_API_STANDARD 0
+#define AFE_FIRMWARE_API_STANDARD 0
 #define AFE_FIRMWARE_API_DOMOTICZ 1
-#define AFE_API_HOME_ASSISTANT 2
+#define AFE_FIRMWARE_API_HOME_ASSISTANT 2
 
 /* Frequency of AFE Key validation in minutes */
 #define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440

@@ -156,19 +156,23 @@ void eventsListener(void) {
   if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
 
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-      HomeAssistantDiscoveryAPI.publishRelays();
+      HomeAssistantDiscoveryAPI->publishRelays();
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED
-      HomeAssistantDiscoveryAPI.publishCLEDs();
+      HomeAssistantDiscoveryAPI->publishCLEDs();
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-      HomeAssistantDiscoveryAPI.publishAnalogInputs();
+      HomeAssistantDiscoveryAPI->publishAnalogInputs();
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-      HomeAssistantDiscoveryAPI.publishSwitches();
+      HomeAssistantDiscoveryAPI->publishSwitches();
+
 #endif
+
+      delete HomeAssistantDiscoveryAPI;
+      HomeAssistantDiscoveryAPI = NULL;
 #endif
 
       MqttAPI.subscribe();

@@ -9,8 +9,10 @@
 
 /* APIs */
 #include <AFE-MQTT-Structure.h>
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 #include <AFE-DOMOTICZ-Structure.h>
+#elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
+#include <AFE-HOME-ASSISTANT-Structure.h>
 #endif
 
 #include <AFE-NETWORK-Structure.h>

@@ -657,5 +657,10 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
 #define L_CLED_PN532_EFFECTS "PN532 sensor's light effects"
 
+#define L_HA_DISCOVERY_TOPIC "Home Assistant discovery topic"
+#define L_HA_PUBLISHING "Publish/Update configuration?"
+#define L_HA_UPDATE_REMOVE "Remove old configuration?"
+
+
 #endif // _LANG_EN_h
 

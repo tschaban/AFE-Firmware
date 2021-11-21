@@ -68,14 +68,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   FirmwarePro = _FirmwarePro;
 }
 
-/*
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-  void AFEWebServer::addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration
-*HomeAssistantIntegration) {
-    _HomeAssistantDiscoveryAPI = HomeAssistantIntegration;
-  }
-#endif
-*/
+
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
@@ -120,7 +113,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_DOMOTICZ:
     Site.siteDomoticzServer(page);
     break;
-#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   case AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION:
     Site.siteHomeAssistantDiscoveryConfiguration(page);
     break;
@@ -408,9 +401,12 @@ boolean AFEWebServer::generate(boolean upload) {
           configuration = {0};
         }
 #endif
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
         else if (siteConfig.ID == AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION) {
-          //  _HomeAssistantIntegration->publishRelay(0);
+          HOME_ASSISTANT_CONFIG configuration;
+          get(configuration);
+          Data->saveConfiguration(&configuration);
+          configuration = {0};
         }
 #endif
 
@@ -1536,7 +1532,19 @@ void AFEWebServer::get(DOMOTICZ &data) {
     data.password[0] = AFE_EMPTY_STRING;
   }
 }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+void AFEWebServer::get(HOME_ASSISTANT_CONFIG &data) {
+
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.discovery.topic,
+                                   sizeof(data.discovery.topic));
+  } else {
+    data.discovery.topic[0] = AFE_EMPTY_STRING;
+  }
+  data.addingComponents = server.arg(F("a")).length() > 0 ? true : false;
+  data.removeingComponents = server.arg(F("r")).length() > 0 ? true : false;
+}
+#endif // AFE_FIRMWARE_API
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEWebServer::get(RELAY &data) {

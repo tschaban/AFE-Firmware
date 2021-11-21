@@ -79,7 +79,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   if (Device->configuration.api.mqtt) {
     addMenuItem(page, F(L_MQTT_BROKER), AFE_CONFIG_SITE_MQTT);
 
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
     addMenuItem(page, F(L_HOME_ASSISTANT_INTEGRATION),
                 AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION);
 #endif // HomeAssistant
@@ -641,7 +641,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                          Device->configuration.api.domoticz);
   addRadioButtonFormItem(page, "m", "Domoticz MQTT API", "2",
                          Device->configuration.api.mqtt);
-#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   addCheckboxFormItem(page, "m", "Home Assistant MQTT API", "1",
                       Device->configuration.api.mqtt);
 #else
@@ -889,11 +889,30 @@ void AFESitesGenerator::siteDomoticzServer(String &page) {
 }
 #endif // Domoticz API
 
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
-  openSection(page, F("HA Discover"), F(""));
 
+  HOME_ASSISTANT_CONFIG configuration;
+
+  if (!Data->getConfiguration(&configuration)) {
+    addFileNotFound(page);
+  }
+
+  openSection(page, F(L_HOME_ASSISTANT_INTEGRATION), F(""));
+
+  addCheckboxFormItem(page, "a", L_HA_PUBLISHING, "1",
+                      configuration.addingComponents);
+
+  addCheckboxFormItem(page, "r", L_HA_UPDATE_REMOVE, "1",
+                      configuration.removeingComponents);
   closeSection(page);
+
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_HA_DISCOVERY_TOPIC), F(""));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.discovery.topic, "64");
+    closeSection(page);
+  }
 }
 #endif // Home Assistant Discovery API
 
@@ -2811,7 +2830,7 @@ void AFESitesGenerator::siteADCInput(String &page) {
 #ifdef AFE_ESP32
   /* Item: name of the ADC */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "l", L_NAME,
-                   configuration.name, "16");
+                   configuration.name, "32");
 #endif // AFE_ESP32
 
   sprintf(_number, "%d", configuration.interval);
@@ -3927,7 +3946,7 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   page.replace("{{f.a}}", F("Domoticz"));
-#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   page.replace("{{f.a}}", F("HomeAssistant"));
 #else
   page.replace("{{f.a}}", F("Standard"));

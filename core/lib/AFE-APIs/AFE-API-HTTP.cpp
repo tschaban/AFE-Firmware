@@ -892,6 +892,8 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
           }
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
           if (strcmp(request->source, "domoticz") != 0) {
+
+
             // @TODO T7
             // _HttpAPIDomoticz->publishRelayState(i);
           }

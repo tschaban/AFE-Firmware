@@ -56,7 +56,7 @@ struct ADCINPUT {
 #endif
 
 #ifdef AFE_ESP32
-  char name[17];
+  char name[33];
 #endif
 };
 

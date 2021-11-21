@@ -8,7 +8,7 @@
 #include <AFE-API-MQTT-Domoticz.h>
 #else // Standards and Home Assistant API
 #include <AFE-API-MQTT-Standard.h>
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 #include <AFE-API-HomeAssistant-Integration.h>
 #endif
 #endif
@@ -29,8 +29,8 @@ AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
 AFEAPIMQTTStandard MqttAPI;
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-AFEAPIHomeAssistantIntegration HomeAssistantDiscoveryAPI;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI = new AFEAPIHomeAssistantIntegration();
 #endif // Home Assistant
 #endif
 
@@ -50,8 +50,8 @@ void initializeMQTTAPI(void) {
 #endif
 
 /* Inititializing Home Assistant Discovery */
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-    HomeAssistantDiscoveryAPI.begin(&Data, &Device, &MqttAPI);
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+    HomeAssistantDiscoveryAPI->begin(&Data, &Device, &MqttAPI);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY

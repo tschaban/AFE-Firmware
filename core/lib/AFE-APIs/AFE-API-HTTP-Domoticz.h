@@ -41,7 +41,7 @@ private:
   boolean callURL(const String url);
 
   /* Sends to Domoticz switch update call */
-  boolean sendSwitchCommand(unsigned int idx, const char *value);
+  boolean sendSwitchCommand(unsigned int idx, boolean state);
 
   /* sends to Domoticz custome sensor call */
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
@@ -165,7 +165,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED
   virtual void addClass(AFECLED *);
   boolean publishCLEDState(uint8_t id);
-  boolean publishCLEDEffectState(uint8_t id, uint8_t effectId);
+  boolean publishCLEDEffectState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 };
 

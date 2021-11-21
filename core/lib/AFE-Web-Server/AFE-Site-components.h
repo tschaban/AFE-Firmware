@@ -114,7 +114,7 @@ const char HTTP_FIXED_CLED_CONFIG_PARAMS[] PROGMEM = "<input name=\"m\" type=\"h
 #endif
 
 
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 //const char HA_CONFIG_TOPIC[] PROGMEM = "{{ha.d}}/";
 #endif
 

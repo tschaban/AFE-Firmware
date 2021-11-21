@@ -16,13 +16,13 @@ boolean AFEUpgrader::upgraded() {
          << F("-") << FirmwareConfiguration.version << F("-");
 
   switch (FirmwareConfiguration.api) {
-  case AFE_API_STANDARD:
+  case AFE_FIRMWARE_API_STANDARD:
     Serial << F("Standard");
     break;
   case AFE_FIRMWARE_API_DOMOTICZ:
     Serial << F("Domoticz");
     break;
-  case AFE_API_HOME_ASSISTANT:
+  case AFE_FIRMWARE_API_HOME_ASSISTANT:
     Serial << F("HomeAssistant");
     break;
   default:
@@ -38,9 +38,9 @@ boolean AFEUpgrader::upgraded() {
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
           AFE_FIRMWARE_API_DOMOTICZ
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
-          AFE_API_HOME_ASSISTANT
+          AFE_FIRMWARE_API_HOME_ASSISTANT
 #else
-          AFE_API_STANDARD
+          AFE_FIRMWARE_API_STANDARD
 #endif
       ) {
     return false;

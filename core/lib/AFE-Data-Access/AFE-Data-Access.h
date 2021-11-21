@@ -67,10 +67,14 @@ public:
   void getWelcomeMessage(String &message);
   void saveWelecomeMessage(const char *);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void getConfiguration(DOMOTICZ *);
   void saveConfiguration(DOMOTICZ *);
   void createDomoticzConfigurationFile();
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+  boolean getConfiguration(HOME_ASSISTANT_CONFIG *);
+  void saveConfiguration(HOME_ASSISTANT_CONFIG *);
+  void createHomeAssistantConfigurationFile();
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   uint8_t getDeviceMode();
@@ -112,7 +116,7 @@ public:
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, ADCINPUT *);
   void saveConfiguration(uint8_t id, ADCINPUT *);
-#else // ESP8266
+#else  // ESP8266
   void getConfiguration(ADCINPUT *);
   void saveConfiguration(ADCINPUT *);
 #endif // ESP32/ESP8266
@@ -167,7 +171,7 @@ public:
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, I2CPORT *);
   void saveConfiguration(uint8_t id, I2CPORT *);
-#else // ESP8266
+#else  // ESP8266
   void getConfiguration(I2CPORT *);
   void saveConfiguration(I2CPORT *);
 #endif // ESP32/ESP8266
@@ -255,7 +259,7 @@ public:
   boolean getConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
   void saveConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
   void createCLEDEffectFadeInOutConfigurationFile();
-  
+
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);

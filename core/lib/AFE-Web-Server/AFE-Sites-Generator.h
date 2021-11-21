@@ -336,7 +336,7 @@ public:
   void siteMQTTBroker(String &page);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void siteDomoticzServer(String &page);
-#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   void siteHomeAssistantDiscoveryConfiguration(String &page);
 #endif // Domoticz or Home Assistant API
 
