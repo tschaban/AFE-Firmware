@@ -4,7 +4,7 @@
 /* Set this before run */
 
 $type = "5";
-$version = "3.1.0";
+$version = "3.1.1";
 $language = "en";
 
 /******************/
@@ -52,6 +52,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 6  : E1 ESP32-30p
 7  : E1 ESP32-38p
 8  : E1 ESP8266
+9  : Shelly-1
 
 
 */
@@ -81,25 +82,31 @@ $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 30;
 $targetHardware[$index][2] = "30pins";
 
-$index++;
+$index++; // 5
 $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 31;
 $targetHardware[$index][2] = "38pins";
 
-$index++;
+$index++; // 6
 $targetHardware[$index][0] = "custom";
 $targetHardware[$index][1] = 12; // ESP32-30p
 $targetHardware[$index][2] = "e1.30pins";
 
-$index++;
+$index++; // 7 
 $targetHardware[$index][0] = "custom";
 $targetHardware[$index][1] = 13; // ESP32-38p
 $targetHardware[$index][2] = "e1.38pins";
 
-$index++;
+$index++; // 8
 $targetHardware[$index][0] = "custom";
 $targetHardware[$index][1] = 14; // ESP8266
 $targetHardware[$index][2] = "e1";
+
+$index++; //9 
+$targetHardware[$index][0] = "shelly";
+$targetHardware[$index][1] = 20;
+$targetHardware[$index][2] = "shelly-1";
+
 
 
 $folderStructure[0] = $targetFolder;
@@ -236,6 +243,21 @@ $sourceFolder[$index]["hardware"] = 8;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_Shelly-1-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_Shelly-1-generic-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[1];
 
 // Domoticz API
 
@@ -367,7 +389,21 @@ $sourceFolder[$index]["hardware"] = 8;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_Shelly-1-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_Shelly-1-domoticz-development/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 2;
+$sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = true;
+$sourceFolder[$index]["api"] = $targetAPI[0];
 
 
 function createdIndexFile($path) {
