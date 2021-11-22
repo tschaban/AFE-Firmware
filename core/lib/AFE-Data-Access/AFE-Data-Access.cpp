@@ -3092,7 +3092,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
       sprintf(configuration->name, root["name"]);
       configuration->type = root["type"];
       configuration->bouncing = root["bouncing"];
+#ifdef AFE_CONFIG_HARDWARE_LED
       configuration->ledID = root["ledID"];
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -3151,7 +3153,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
     root["name"] = configuration->name;
     root["type"] = configuration->type;
     root["bouncing"] = configuration->bouncing;
+#ifdef AFE_CONFIG_HARDWARE_LED
     root["ledID"] = configuration->ledID;
+#endif
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -3194,8 +3198,10 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #else
   ContactronConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
-
+#ifdef AFE_CONFIG_HARDWARE_LED
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
 #if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                  \
     defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
@@ -3214,8 +3220,17 @@ void AFEDataAccess::createContractonConfigurationFile() {
   sprintf(ContactronConfiguration.name, "C4");
   saveConfiguration(2, &ContactronConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS;
-#endif
-#endif
+#endif // V3
+#endif // iECS
+
+#if defined(AFE_DEVICE_SHELLY_1)
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
+  sprintf(ContactronConfiguration.name, "C1");
+  saveConfiguration(0, &ContactronConfiguration);
+  //  so not to create additional for Shelly-1
+  index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
+#endif // Shelly-1
+
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_X_DEFAULT_GPIO;
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
        i++) {

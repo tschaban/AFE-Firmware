@@ -1922,10 +1922,12 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
                    L_MILISECONDS);
   closeSection(page);
 
+#ifdef AFE_CONFIG_HARDWARE_LED
   /* Item: LED */
   openSection(page, F(L_CONTACTRON_LED_ASSIGNED_TO_SENSOR), F(""));
   addLEDSelectionItem(page, configuration.ledID);
   closeSection(page);
+#endif
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {

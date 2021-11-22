@@ -8,6 +8,7 @@
 
 #include <AFE-CONTACTRON-Structure.h>
 #include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif

@@ -1733,8 +1733,11 @@ void AFEWebServer::get(CONTACTRON &data) {
                   ? server.arg(F("y")).toInt()
                   : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
 
-  data.ledID = server.arg(F("l")).length() > 0 ? server.arg(F("l")).toInt()
-                                               : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()
+                                            : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 
   data.bouncing = server.arg(F("b")).length() > 0
                       ? server.arg(F("b")).toInt()
