@@ -32,7 +32,7 @@ void initializeI2CBUS(void) {
 
     success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
                               I2CBUSConfiguration.frequency);
-#else
+#else /* ESP8266 */
   Data.getConfiguration(&I2CBUSConfiguration);
 
 #ifdef DEBUG
@@ -46,7 +46,7 @@ void initializeI2CBUS(void) {
 #endif // AFE_ESP32
 
 #ifdef DEBUG
-     yield();
+// @TODO there was delay(100) here, testing without it
     if (!success) {
       Serial << endl << "ERROR: I2C[0]: Bus doesn't work";
     } else {
@@ -73,6 +73,7 @@ void initializeI2CBUS(void) {
                               I2CBUSConfiguration.frequency);
 
 #ifdef DEBUG
+     
     if (!success) {
       Serial << endl << "ERROR: I2C[1]: Bus doesn't work";
     } else {

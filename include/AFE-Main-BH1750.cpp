@@ -32,16 +32,16 @@ void BH1750SensorEventsListener(void) {
         HttpDomoticzAPI.publishBH1750SensorData(i);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         if (Device.configuration.effectDeviceLight) {
           if (CLEDStrip.lightSensorType ==
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_BH1750) {
             CLEDStrip.backlightEffect(
-                AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT_ID,
+                AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID,
                 BH1750Sensor[i].data);
           }
         }
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
       }
     }
   }

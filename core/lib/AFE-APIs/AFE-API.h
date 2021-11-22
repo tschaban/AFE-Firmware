@@ -87,7 +87,7 @@
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 /* Not yet implemented 
-#if defined(AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT) ||                   \
+#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
     defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
 #include <AFE-CLED.h>
 #endif
@@ -190,7 +190,7 @@ public:
   virtual void addClass(AFEMiFareCard *);
 #endif
 /* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   virtual void addClassEffectDeviceLight(AFECLED *);
 #endif
 
@@ -286,7 +286,7 @@ protected:
   AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 /* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   AFECLED *_CLEDBacklight;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT

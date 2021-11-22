@@ -1,2 +1,0 @@
-
-INSERT INTO `afe_firmwares` (`id`, `type`, `version`, `chip`, `language`, `api`, `hardware`, `flash_size`, `release_date`, `current_version`, `downloaded`, `debug`, `path`) VALUES ('0', '0', '2.x.x', '8266', 'pl', 'S', '0', '1', CURRENT_TIMESTAMP, '0', '0', '0', '');

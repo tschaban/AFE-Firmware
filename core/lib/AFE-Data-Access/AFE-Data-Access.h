@@ -34,8 +34,7 @@ public:
   /* It formats SPIFFS */
   boolean formatFileSystem();
 
-  /* Returns true if a file exists */
-  boolean fileExist(const char *);
+  boolean fileExist(const char *path);
 
   const String getDeviceUID();
   void saveDeviceUID(const char *);
@@ -241,21 +240,27 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  void getConfiguration(uint8_t id, CLED *);
+  boolean getConfiguration(uint8_t id, CLED *);
   void saveConfiguration(uint8_t id, CLED *);
   void createCLEDConfigurationFile();
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+  boolean getConfiguration(uint8_t id, CLED_EFFECT_BLINKING *);
+  void saveConfiguration(uint8_t id, CLED_EFFECT_BLINKING *);
+  void createCLEDEffectBlinkingConfigurationFile();
+
+
+
+
+  
+#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
   void saveConfiguration(uint8_t id, CLED_EFFECTS *);
   void createCLEDEffectsConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

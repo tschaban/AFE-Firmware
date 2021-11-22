@@ -13,24 +13,32 @@ boolean AFEUpgrader::upgraded() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Firmware version (stored) T") << FirmwareConfiguration.type
-         << F("-") << FirmwareConfiguration.version << F("-")
-         << (FirmwareConfiguration.api == AFE_API_STANDARD
-                 ? F("Standard")
-                 : (FirmwareConfiguration.api == AFE_API_DOMOTICZ
-                        ? F("Domoticz")
-                        : F("Unknwon")));
-  Serial << endl
-         << F("INFO: Firmware version (booted) T") << AFE_FIRMWARE_TYPE
-         << F("-") << AFE_FIRMWARE_VERSION << F("-")
-         << (AFE_FIRMARE_API == AFE_API_STANDARD ? F("Standard")
-                                                 : F("Domoticz"));
+         << F("-") << FirmwareConfiguration.version << F("-");
+
+  switch (FirmwareConfiguration.api) {
+  case AFE_API_STANDARD:
+    Serial << F("Standard");
+    break;
+  case AFE_API_DOMOTICZ:
+    Serial << F("Domoticz");
+    break;
+  case AFE_API_HOME_ASSISTANT:
+    Serial << F("HomeAssistant");
+    break;
+  default:
+    Serial << F("Unknwon");
+    break;
+  }
+
 #endif
 
   if (strcmp(FirmwareConfiguration.version, AFE_FIRMWARE_VERSION) == 0 &&
       FirmwareConfiguration.type == AFE_FIRMWARE_TYPE &&
       FirmwareConfiguration.api ==
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
           AFE_API_DOMOTICZ
+#elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
+          AFE_API_HOME_ASSISTANT
 #else
           AFE_API_STANDARD
 #endif
@@ -63,11 +71,11 @@ void AFEUpgrader::upgrade() {
   }
 
   /* Checking if in addition there has been API version change */
-  if (FirmwareConfiguration.api != AFE_FIRMARE_API) {
+  if (FirmwareConfiguration.api != AFE_FIRMWARE_API) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Firmware API version upgraded") << F(" from version: ")
-           << FirmwareConfiguration.api << F(" to ") << AFE_FIRMARE_API;
+           << FirmwareConfiguration.api << F(" to ") << AFE_FIRMWARE_API;
 #endif
     updateFirmwareAPIVersion();
   }
@@ -174,7 +182,7 @@ void AFEUpgrader::updateFirmwareVersion() {
 void AFEUpgrader::updateFirmwareAPIVersion() {
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (AFE_FIRMARE_API == AFE_API_DOMOTICZ) {
+  if (AFE_FIRMWARE_API == AFE_API_DOMOTICZ) {
     /* Checking if there is Domoticz server configuration file */
     if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
       Data->createDomoticzConfigurationFile();
@@ -185,7 +193,6 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 
   Data->saveFirmwareAPIVersion();
 }
-
 
 #ifndef AFE_ESP32
 

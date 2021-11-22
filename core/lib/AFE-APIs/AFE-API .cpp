@@ -259,7 +259,7 @@ void AFEAPI::addClass(AFEAnalogInput *Analog) {
   }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
        /* Not yet implemented
-       #ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+       #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
        void AFEAPI::addClassEffectDeviceLight(AFECLED *Sensor) {
          if (_Device->configuration.effectDeviceLight) {
            _CLEDBacklight = Sensor;
@@ -268,7 +268,7 @@ void AFEAPI::addClass(AFEAnalogInput *Analog) {
          Serial << endl << F("INFO: The reference to the CLED: Device Light added");
        #endif
        }
-       #endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
+       #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
      
        #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
        void AFEAPI::addClassEffecPN532Sensor(AFECLED *Sensor) {

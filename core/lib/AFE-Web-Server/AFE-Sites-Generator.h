@@ -93,7 +93,21 @@ private:
 
   void closeMessageSection(String &page);
 
-  /* Item: HTML <input type=""> */
+  /**
+ * @brief Generates HTML <input> tag
+ *
+ * @param  item             return string with generated tag
+ * @param  type             type of the input
+ * @param  name             name if the input itme
+ * @param  label            desc
+ * @param  value            value of the input
+ * @param  size             size of the input
+ * @param  min              minimal value if a number
+ * @param  max              maximum value if a number
+ * @param  step             step if a number value
+ * @param  hint             hint text
+ * @param  readonly         if true then input is readonly
+ */
   void addInputFormItem(String &item, const char *type, const char *name,
                         const char *label, const char *value,
                         const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -189,8 +203,34 @@ private:
   void addLEDSelectionItem(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-  /* Adding section file not found */
+  /**
+   * @brief Adds warning session to the configuration form is a configuration
+   * file doesn't exist
+   *
+   * @param  page             return string
+   */
   void addFileNotFound(String &page);
+
+  /**
+   * @brief Adds information item in the form
+   *
+   * @param  item             return string
+   * @param  information      information text
+   */
+  void addInformationItem(String &item, const __FlashStringHelper *information);
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  /**
+   * @brief Adds url item (<a> html tag) to the list group. openMessageSection
+   * and closeMessageSection are required
+   *
+   * @param  item             return string
+   * @param  option           site ID -> url option "o"
+   * @param  id               object id -> url option "i"
+   * @param  label            label of <a>label</a>
+   */
+  void addUrlItem(String &item, uint8_t option, uint8_t id, const char *label);
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 public:
   /* Constructor*/
@@ -215,7 +255,14 @@ public:
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
 
-  /* Method generates site footer */
+  /**
+   * @brief Generates the site footer part. It also replace the site template
+   * {{parameters}} to thier values
+   *
+   * @param  page             return string
+   * @param  extended         if true addess additinal information to the site.
+   * @TODO check if still used
+   */
   void generateFooter(String &page, boolean extended = false);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
@@ -244,9 +291,12 @@ public:
   void siteNetwork(String &page);
   void siteConnecting(String &page);
   void siteMQTTBroker(String &page);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
   void siteDomoticzServer(String &page);
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#elif AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+  void siteHomeAssistantDiscoveryConfiguration(String &page);
+#endif // Domoticz or Home Assistant API
+
   void sitePassword(String &page);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -346,13 +396,11 @@ public:
   void siteMiFareCard(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-  void siteCLEDDeviceEffect(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_EFFECT
-
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void siteCLED(String &page, uint8_t id);
+  void siteCLEDEffectBlinking(String &page, uint8_t id);
   void siteCLEDPN532SensoreEffect(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void siteTSL2561Sensor(String &page, uint8_t id);
