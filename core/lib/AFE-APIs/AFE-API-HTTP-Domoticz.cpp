@@ -75,6 +75,7 @@ void AFEAPIHTTPDomoticz::replaceSpaceinUrl(const char *inputString,
 
 boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx, boolean state) {
   boolean _return = false;
+  // @TODO T7  - problem with updates in DOmoticz if changed by browser
   if (enabled && idx > 0) {
     String call = getApiCall("switchlight", idx);
     call += "&switchcmd=";
