@@ -447,13 +447,13 @@ void initializeHTTPDomoticzAPI(void) {
     }
 #endif
 
-
+/* RGB LED are not supported in HTTP Domoticz API 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     if (Device.configuration.noOfCLEDs > 0) {
       HttpDomoticzAPI.addClass(&CLEDStrip);
     }
 #endif
-
+*/
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif

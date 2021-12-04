@@ -6,6 +6,10 @@
 #include <AFE-Configuration.h>
 #include <Arduino.h>
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-COLOR-Structure.h>
+#endif
+
 struct DOMOTICZ_BASIC_CONFIG {
   uint32_t idx = AFE_DOMOTICZ_DEFAULT_IDX;
 };
@@ -13,6 +17,10 @@ struct DOMOTICZ_BASIC_CONFIG {
 struct DOMOTICZ_MQTT_COMMAND {
   DOMOTICZ_BASIC_CONFIG domoticz;
   uint8_t nvalue;
+  char svalue[20];
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  CLED_PARAMETERS led;
+#endif
 };
 
 typedef enum {
@@ -30,9 +38,7 @@ typedef enum {
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_HARDWARE_CLED
   AFE_DOMOTICZ_DEVICE_CLED = 4,
-  AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE = 5,
-  AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT = 6,
-  AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING = 7,
+  AFE_DOMOTICZ_DEVICE_CLED_EFFECT = 5,
 #endif // AFE_CONFIG_HARDWARE_CLED
 } afe_domoticz_device_type_t;
 

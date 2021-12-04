@@ -161,11 +161,13 @@ public:
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
+/* RGB LED are not supported in HTTP Domoticz API 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   virtual void addClass(AFECLED *);
   boolean publishCLEDState(uint8_t id);
   boolean publishCLEDEffectState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
+*/
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

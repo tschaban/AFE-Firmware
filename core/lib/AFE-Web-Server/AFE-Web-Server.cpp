@@ -68,7 +68,6 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   FirmwarePro = _FirmwarePro;
 }
 
-
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
@@ -2690,20 +2689,36 @@ void AFEWebServer::get(CLED &data) {
                         ? server.arg(F("l")).toInt()
                         : AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
 
-  data.on.color = server.arg(F("c0")).length() > 0
-                      ? server.arg(F("c0")).toInt()
-                      : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  data.on.color.red = server.arg(F("or")).length() > 0
+                          ? server.arg(F("or")).toInt()
+                          : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
-  data.off.color = server.arg(F("c1")).length() > 0
-                       ? server.arg(F("c1")).toInt()
-                       : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  data.on.color.green = server.arg(F("og")).length() > 0
+                            ? server.arg(F("og")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
-  data.on.brightness = server.arg(F("b0")).length() > 0
-                           ? server.arg(F("b0")).toInt()
+  data.on.color.blue = server.arg(F("ob")).length() > 0
+                           ? server.arg(F("ob")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.off.color.red = server.arg(F("fr")).length() > 0
+                           ? server.arg(F("fr")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.green = server.arg(F("fg")).length() > 0
+                             ? server.arg(F("fg")).toInt()
+                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.blue = server.arg(F("fb")).length() > 0
+                            ? server.arg(F("fb")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.on.brightness = server.arg(F("ol")).length() > 0
+                           ? server.arg(F("ol")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
 
-  data.off.brightness = server.arg(F("b1")).length() > 0
-                            ? server.arg(F("b1")).toInt()
+  data.off.brightness = server.arg(F("fl")).length() > 0
+                            ? server.arg(F("fl")).toInt()
                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
 
   if (server.arg(F("n")).length() > 0) {
@@ -2713,47 +2728,70 @@ void AFEWebServer::get(CLED &data) {
   }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  data.domoticz.idx = server.arg(F("d")).length() > 0
-                          ? server.arg(F("d")).toInt()
+  data.cled.idx = server.arg(F("cd")).length() > 0
+                          ? server.arg(F("cd")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
+    data.effect.idx = server.arg(F("ed")).length() > 0
+                          ? server.arg(F("ed")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;                        
 #else
-  if (server.arg(F("t")).length() > 0) {
-    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  if (server.arg(F("ct")).length() > 0) {
+    server.arg(F("ct")).toCharArray(data.cled.topic, sizeof(data.cled.topic));
   } else {
-    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+    data.cled.topic[0] = AFE_EMPTY_STRING;
+  }
+    if (server.arg(F("et")).length() > 0) {
+    server.arg(F("et")).toCharArray(data.effect.topic, sizeof(data.effect.topic));
+  } else {
+    data.effect.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
 
 void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
-  data.on.color =
-      server.arg(F("c0")).length() > 0
-          ? server.arg(F("c0")).toInt()
-          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
 
-  data.off.color =
-      server.arg(F("c1")).length() > 0
-          ? server.arg(F("c1")).toInt()
-          : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+  data.on.color.red = server.arg(F("or")).length() > 0
+                          ? server.arg(F("or")).toInt()
+                          : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.on.color.green = server.arg(F("og")).length() > 0
+                            ? server.arg(F("og")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.on.color.blue = server.arg(F("ob")).length() > 0
+                           ? server.arg(F("ob")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.off.color.red = server.arg(F("fr")).length() > 0
+                           ? server.arg(F("fr")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.green = server.arg(F("fg")).length() > 0
+                             ? server.arg(F("fg")).toInt()
+                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.blue = server.arg(F("fb")).length() > 0
+                            ? server.arg(F("fb")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
 
   data.on.brightness =
-      server.arg(F("b0")).length() > 0
-          ? server.arg(F("b0")).toInt()
+      server.arg(F("ol")).length() > 0
+          ? server.arg(F("ol")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
 
   data.off.brightness =
-      server.arg(F("b1")).length() > 0
-          ? server.arg(F("b1")).toInt()
+      server.arg(F("fl")).length() > 0
+          ? server.arg(F("fl")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
 
   data.onTimeout =
-      server.arg(F("t0")).length() > 0
-          ? server.arg(F("t0")).toInt()
+      server.arg(F("ot")).length() > 0
+          ? server.arg(F("ot")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_TIMER;
 
   data.offTimeout =
-      server.arg(F("t1")).length() > 0
-          ? server.arg(F("t1")).toInt()
+      server.arg(F("ft")).length() > 0
+          ? server.arg(F("ft")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
   if (server.arg(F("n")).length() > 0) {
@@ -2761,28 +2799,32 @@ void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
   } else {
     data.name[0] = AFE_EMPTY_STRING;
   }
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  data.domoticz.idx = server.arg(F("d")).length() > 0
-                          ? server.arg(F("d")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  if (server.arg(F("t")).length() > 0) {
-    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
-    data.mqtt.topic[0] = AFE_EMPTY_STRING;
-  }
-#endif
 }
 
 void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
-  data.on.color = server.arg(F("c0")).length() > 0
-                      ? server.arg(F("c0")).toInt()
-                      : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
+  data.on.color.red = server.arg(F("or")).length() > 0
+                          ? server.arg(F("or")).toInt()
+                          : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
-  data.off.color = server.arg(F("c1")).length() > 0
-                       ? server.arg(F("c1")).toInt()
-                       : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
+  data.on.color.green = server.arg(F("og")).length() > 0
+                            ? server.arg(F("og")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.on.color.blue = server.arg(F("ob")).length() > 0
+                           ? server.arg(F("ob")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.off.color.red = server.arg(F("fr")).length() > 0
+                           ? server.arg(F("fr")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.green = server.arg(F("fg")).length() > 0
+                             ? server.arg(F("fg")).toInt()
+                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+
+  data.off.color.blue = server.arg(F("fb")).length() > 0
+                            ? server.arg(F("fb")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
 
   data.on.brightness =
       server.arg(F("b")).length() > 0
@@ -2800,33 +2842,29 @@ void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  data.domoticz.idx = server.arg(F("d")).length() > 0
-                          ? server.arg(F("d")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  if (server.arg(F("t")).length() > 0) {
-    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
-    data.mqtt.topic[0] = AFE_EMPTY_STRING;
-  }
-#endif
 }
 
 void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
-  data.in.color =
-      server.arg(F("k")).length() > 0
-          ? server.arg(F("k")).toInt()
-          : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR;
+  data.in.color.red = server.arg(F("or")).length() > 0
+                          ? server.arg(F("or")).toInt()
+                          : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.in.color.green = server.arg(F("og")).length() > 0
+                            ? server.arg(F("og")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
+  data.in.color.blue = server.arg(F("ob")).length() > 0
+                           ? server.arg(F("ob")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
   data.in.brightness =
-      server.arg(F("b0")).length() > 0
-          ? server.arg(F("b0")).toInt()
+      server.arg(F("ol")).length() > 0
+          ? server.arg(F("ol")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_IN_BRIGHTNESS;
 
   data.out.brightness =
-      server.arg(F("b1")).length() > 0
-          ? server.arg(F("b1")).toInt()
+      server.arg(F("fl")).length() > 0
+          ? server.arg(F("fl")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_OUT_BRIGHTNESS;
 
   data.timeout =
@@ -2839,18 +2877,6 @@ void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
   } else {
     data.name[0] = AFE_EMPTY_STRING;
   }
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  data.domoticz.idx = server.arg(F("d")).length() > 0
-                          ? server.arg(F("d")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  if (server.arg(F("t")).length() > 0) {
-    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
-    data.mqtt.topic[0] = AFE_EMPTY_STRING;
-  }
-#endif
 }
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT

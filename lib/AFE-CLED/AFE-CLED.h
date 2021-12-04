@@ -33,7 +33,7 @@ private:
    *
    */
   struct CLED_EFFECT_CONFIG {
-    uint8_t id = AFE_NONE;
+    uint8_t id = AFE_CONFIG_HARDWARE_CLED_EFFECT_NONE;
     boolean stateUpdated = false;
     unsigned long timer;
     int8_t increment;
@@ -55,6 +55,7 @@ private:
   };
 
   boolean _initialized = false;
+  AFEDataAccess *_Data;
 
   CRGB leds[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS]
            [AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED];
@@ -82,18 +83,23 @@ private:
    * level
    *
    * @param  stripId          ID of a LED strip
-   * @param  color            a color
+   * @param  color            a color in RGB
    */
-  void _setColor(uint8_t stripId, uint32_t color);
+  void _setColor(uint8_t stripId, CLED_RGB color);
 
   /**
    * @brief Set Color and brightness for all leds in the strip
    *
    * @param  stripId          ID of a LED strip
-   * @param  color            color
-   * @param  brightness       0 .. 255
+   * @param  ledConfig        RGB + brightness
    */
-  void _setColor(uint8_t stripId, uint32_t color, uint8_t brightness);
+  void _setColor(uint8_t stripId, CLED_PARAMETERS ledConfig);
+
+  /* TODO T7 opisy */
+  void _setColor(uint8_t stripId);
+  void _setColor(uint8_t stripId, CLED_RGB color, uint8_t brightness);
+
+  void _writeColor(CLED_RGB &to, CLED_RGB *from);
 
 public:
   /**
@@ -155,29 +161,28 @@ public:
    * used
    *
    * @param  stripId          ID of the LED Strip
-   * @param  color            Color ID
+   * @param  color            Color RGB
    */
-  void on(uint8_t stripId, uint32_t color, boolean disableEffects = false);
+  void on(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
 
   /**
    * @brief Turns ON LED strip: color and brightness as parameters
    *
    * @param  stripId          ID of the LED Strip
-   * @param  color            Color ID
-   * @param  brightness       Brightness 0 .. 255
+   * @param  ledConfig        Coler RGB + Brightness 0 .. 255
    */
-  void on(uint8_t stripId, uint32_t color, uint8_t brightness,
-          boolean disableEffects = false);
+  void on(uint8_t stripId, CLED_PARAMETERS ledConfig,
+          boolean disableEffects = false, boolean saveColor = false);
 
   /* Turn off CLED */
   void off(uint8_t stripId, boolean disableEffects = false);
-  void off(uint8_t stripId, uint32_t color, boolean disableEffects = false);
-  void off(uint8_t stripId, uint32_t color, uint8_t brightness,
+  void off(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
+  void off(uint8_t stripId, CLED_PARAMETERS ledConfig,
            boolean disableEffects = false);
 
   /* Method change the CLED to opposite state */
   void toggle(uint8_t stripId, boolean disableEffects = false);
-  void toggle(uint8_t stripId, uint32_t color, boolean disableEffects = false);
+  void toggle(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
 
   /* Effects */
   void activateEffect(uint8_t stripId, uint8_t effectId);

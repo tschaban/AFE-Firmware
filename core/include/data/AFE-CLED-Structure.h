@@ -6,6 +6,8 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CLED
 
+#include <AFE-COLOR-Structure.h>
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
@@ -17,10 +19,6 @@ struct CLED_STRIP {
   uint16_t numberOfLEDs;
 };
 
-struct CLED_PARAMETERS {
-  uint32_t color;
-  uint8_t brightness;
-};
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 struct CLED_LIGHT_CONTROLLED_LEVELS_CONFIG {
@@ -41,11 +39,6 @@ struct CLED_EFFECT_BLINKING {
   CLED_PARAMETERS off;
   uint32_t onTimeout;
   uint32_t offTimeout;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  DOMOTICZ_BASIC_CONFIG domoticz;
-#else
-  MQTT_BASIC_CONFIG mqtt;
-#endif
 };
 
 struct CLED_EFFECT_WAVE {
@@ -53,11 +46,6 @@ struct CLED_EFFECT_WAVE {
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
   uint32_t timeout;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  DOMOTICZ_BASIC_CONFIG domoticz;
-#else
-  MQTT_BASIC_CONFIG mqtt;
-#endif
 };
 
 struct CLED_EFFECT_FADE_INOUT {
@@ -65,11 +53,6 @@ struct CLED_EFFECT_FADE_INOUT {
   CLED_PARAMETERS in;
   CLED_PARAMETERS out;
   uint32_t timeout;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  DOMOTICZ_BASIC_CONFIG domoticz;
-#else
-  MQTT_BASIC_CONFIG mqtt;
-#endif
 };
 
 struct CLED {
@@ -78,11 +61,12 @@ struct CLED {
   uint16_t ledNumbers;
   CLED_PARAMETERS on;
   CLED_PARAMETERS off;
-
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  DOMOTICZ_BASIC_CONFIG domoticz;
+  DOMOTICZ_BASIC_CONFIG cled;
+  DOMOTICZ_BASIC_CONFIG effect;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_BASIC_CONFIG cled;
+  MQTT_BASIC_CONFIG effect;
 #endif
 };
 

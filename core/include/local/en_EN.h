@@ -610,7 +610,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_CLED_STRIP "LED Strip"
 #define L_CLED_BRIGHTNESS "Brightness"
-#define L_CLED_COLOR "Color"
+#define L_CLED_COLOR_RGB "Color RGB"
 
 #define L_CLED_CONFIGURATION "RGB LEDs configuration"
 #define L_CLED_ONOFF_CONFIGURATION "LEDs: ON/OFF configuration"
@@ -624,21 +624,29 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
 #define L_CLED_EFFECT_WAVE_CONFIGURATION "Wave effect"
 
-#define L_CLED_EFFECT_WAVE_ON_LED_COLOR "Active LED's color"
-#define L_CLED_EFFECT_WAVE_OFF_LED_COLOR "Inactive LEDs' color"
+#define L_CLED_EFFECT_WAVE_ON_LED_COLOR "Active LED RGB color"
+#define L_CLED_EFFECT_WAVE_OFF_LED_COLOR "Inactive LED RGB color"
 #define L_CLED_EFFECT_WAVE_SPEED "Wave speed"
 
 #define L_CLED_MAX_BRIGHTNESS "Max brightness"
 #define L_CLED_MIN_BRIGHTNESS "Min brightness"
 #define L_CLED_FADE_IN_OUT_TIMEOUT "Fade speed"
 
-#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
-#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
-//#define L_CLEDS "RGB Leds"
+#define L_CLED_ON_OFF_IDX "On/Off IDX"
+#define L_CLED_EFFECTS_IDX "Effect IDX"
+#define L_CLED_MQTT_TOPIC "MQTT Topic controlling RGB LED"
+
+#define L_CLED_MQTT_ON_OFF_TOPIC "On/Off Topic"
+#define L_CLED_MQTT_EFFECTS_TOPIC "Effect's Topic"
+
 #define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
-#define L_CLED_COLORS_ORDER "Colors order"
 
+//#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
+//#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
+//#define L_CLEDS "RGB Leds"
+////
+//#define L_CLED_COLOR_RGBS_ORDER "Colors order"
 //#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
 
 
@@ -651,7 +659,6 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
 #define L_CLED_RULE "Rule"
 #define L_CLED_RULE_HINT "The backlight rule is triggered if the light level is below the sensor's reading. The first condition met stops processing following rules"
-#define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
 
 #define L_CLED_LIGHT_EFFECTS "Light effects"
 #define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
@@ -660,6 +667,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_DISCOVERY_TOPIC "Home Assistant discovery topic"
 #define L_HA_PUBLISHING "Publish/Update configuration?"
 #define L_HA_UPDATE_REMOVE "Remove old configuration?"
+
+
 
 
 #endif // _LANG_EN_h

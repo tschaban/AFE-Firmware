@@ -105,12 +105,15 @@ void AFEAPIMQTTDomoticz::synchronize() {
   }
 #endif
 
-/* Synchronize: Binary sensor */
+/* Synchronize: RGB LED */
 #ifdef AFE_CONFIG_HARDWARE_CLED
   for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Synchronizing CLEDs: ") << i;
 #endif
+
+    publishSetColorMessage(&_CLED->configuration[i].cled.idx,
+                           &_CLED->currentState[i].on);
     publishCLEDState(i);
     publishCLEDEffectsState(i);
   }
@@ -155,10 +158,20 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   if (root.success()) {
     command.domoticz.idx = root["idx"];
     command.nvalue = root["nvalue"];
+    sprintf(command.svalue, root["svalue1"] | "");
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    command.led.brightness = root["Level"];
+    command.led.color.blue = root["Color"]["b"];
+    command.led.color.red = root["Color"]["r"];
+    command.led.color.green = root["Color"]["g"];
+#endif
+
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Domoticz: Got command: ") << command.nvalue
-           << F(", IDX: ") << command.domoticz.idx;
+           << F("INFO: Domoticz: IDX: ") << command.domoticz.idx
+           << F(", NValue: ") << command.nvalue << F(", SValue: ")
+           << command.svalue;
 #endif
   }
 #ifdef DEBUG
@@ -283,10 +296,12 @@ void AFEAPIMQTTDomoticz::processRequest() {
             if (command.nvalue == AFE_OFF) {
               _CLED->off(idxCache[i].id, true);
             } else {
-              _CLED->on(idxCache[i].id, true);
+              command.led.brightness *=
+                  AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
+              _CLED->on(idxCache[i].id, command.led, true, true);
+              publishCLEDEffectsState(idxCache[i].id);
             }
-            publishCLEDState(idxCache[i].id);
-            publishCLEDEffectsState(idxCache[i].id);
+            publishCLEDColorState(idxCache[i].id);
           }
 #ifdef DEBUG
           else {
@@ -294,21 +309,12 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #endif
           break;
-
-        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING:
-          processCLEDEffect(idxCache[i].id,
-                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
-          break;
-        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT:
-          processCLEDEffect(idxCache[i].id,
-                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
-          break;
-        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE:
-          processCLEDEffect(idxCache[i].id,
-                            command.nvalue == 0 ? AFE_OFF : AFE_ON,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT:
+          _CLED->activateEffect(idxCache[i].id, atoi(command.svalue));
+          publishCLEDEffectsState(idxCache[i].id);
+          if (atoi(command.svalue) != AFE_CONFIG_HARDWARE_CLED_EFFECT_NONE) {
+            publishCLEDState(idxCache[i].id);
+          }
           break;
 
 #endif // AFE_CONFIG_HARDWARE_CLED
@@ -391,6 +397,48 @@ boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
 #endif
   return publishStatus;
 }
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+boolean AFEAPIMQTTDomoticz::publishSetLevelMessage(uint32_t *idx,
+                                                   uint8_t *level) {
+  boolean publishStatus = false;
+  if (enabled && idx > 0) {
+    char json[AFE_CONFIG_API_JSON_SET_LEVEL_COMMAND_LENGTH];
+    sprintf(json, "{\"command\":\"switchlight\",\"idx\":%d,\"switchcmd\":\"Set "
+                  "Level\",\"level\":%d}",
+            *idx, *level);
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    bypassProcessing.idx = *idx;
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("INFO: Not published");
+  }
+#endif
+  return publishStatus;
+}
+
+boolean AFEAPIMQTTDomoticz::publishSetColorMessage(uint32_t *idx,
+                                                   CLED_PARAMETERS *led) {
+  boolean publishStatus = false;
+  if (enabled && idx > 0) {
+    char json[1000]; // @TODO T7
+    sprintf(json, "{\"command\":\"setcolbrightnessvalue\",\"idx\":%d,\"color\":"
+                  "{\"m\":3,\"t\":0,\"r\":%d,\"g\":%d,\"b\":%d,\"cw\":0,\"ww\":"
+                  "0},\"brightness\":%d}",
+            *idx, led->color.red, led->color.green, led->color.blue,
+            led->brightness / (AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100));
+    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    bypassProcessing.idx = *idx;
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("INFO: Not published");
+  }
+#endif
+  return publishStatus;
+}
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
@@ -1160,57 +1208,29 @@ void AFEAPIMQTTDomoticz::addClass(AFECLED *CLed) {
 
   for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
     addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED,
-                  _CLED->configuration[i].domoticz.idx);
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING,
-                  _CLED->configurationEffectBlinking[i].domoticz.idx);
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT,
-                  _CLED->configurationEffectFadeInOut[i].domoticz.idx);
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE,
-                  _CLED->configurationEffectWave[i].domoticz.idx);
+                  _CLED->configuration[i].cled.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT,
+                  _CLED->configuration[i].effect.idx);
   }
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDState(uint8_t id) {
-  return publishSwitchMessage(&_CLED->configuration[id].domoticz.idx,
+  return publishSwitchMessage(&_CLED->configuration[id].cled.idx,
                               _CLED->currentState[id].state);
 }
 
-void AFEAPIMQTTDomoticz::processCLEDEffect(uint8_t id, boolean state,
-                                           uint8_t effectId) {
-  boolean _success = true;
-  switch (state) {
-  case AFE_ON:
-    _CLED->activateEffect(id, effectId);
-    break;
-  case AFE_OFF:
-    _CLED->deactivateEffect(id, effectId);
-    break;
-  default:
-    _success = false;
-  }
-  if (_success) {
-    if (_CLED->isEffectStateUpdated(id)) {
-      publishCLEDEffectsState(id);
-    }
-    if (_CLED->isStateUpdated(id)) {
-      publishCLEDState(id);
-    }
-  }
+boolean AFEAPIMQTTDomoticz::publishCLEDColorState(uint8_t id) {
+  return publishSetColorMessage(
+      &_CLED->configuration[id].cled.idx,
+      _CLED->currentState[id].state ? &_CLED->currentState[id].on
+                                    : &_CLED->currentState[id].off);
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
-  publishSwitchMessage(&_CLED->configurationEffectBlinking[id].domoticz.idx,
-                       _CLED->currentState[id].effect.id ==
-                           AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
-
-  publishSwitchMessage(&_CLED->configurationEffectFadeInOut[id].domoticz.idx,
-                       _CLED->currentState[id].effect.id ==
-                           AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
-
-  return publishSwitchMessage(&_CLED->configurationEffectWave[id].domoticz.idx,
-                              _CLED->currentState[id].effect.id ==
-                                  AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+  return publishSetLevelMessage(&_CLED->configuration[id].effect.idx,
+                                &_CLED->currentState[id].effect.id);
 }
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

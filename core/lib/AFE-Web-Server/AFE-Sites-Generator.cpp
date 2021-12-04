@@ -3711,13 +3711,11 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_ON), F(""));
 
   /* Item: On Led color */
-  sprintf(_number, "%d", configuration.on.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.on.color, "o", F(L_CLED_COLOR_RGB));
 
   /* Item: On brightness */
   sprintf(_number, "%d", configuration.on.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   closeSection(page);
@@ -3725,24 +3723,41 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
 
   /* Item: Off Led color */
-  sprintf(_number, "%d", configuration.off.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.off.color, "f", F(L_CLED_COLOR_RGB));
 
   /* Item: Off brightness */
   sprintf(_number, "%d", configuration.off.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   closeSection(page);
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
-  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 &configuration.domoticz.idx);
-#else  /* Home Assistant and Standard API */
-  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
-#endif /* End of APIs section */
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.cled.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "cd", L_CLED_ON_OFF_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    sprintf(_number, "%d", configuration.effect.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ed", L_CLED_EFFECTS_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+  }
+#else
+
+  if (Device->configuration.api.mqtt) {
+    openSection(page, F(L_CLED_MQTT_TOPIC), F(""));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "ct",
+                     L_CLED_MQTT_ON_OFF_TOPIC, configuration.cled.topic, "64");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "et",
+                     L_CLED_MQTT_EFFECTS_TOPIC, configuration.cled.topic, "64");
+    closeSection(page);
+  }
+#endif
 
   addCLEDMenuSection(page, AFE_NONE, id);
 }
@@ -3763,18 +3778,16 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
                    configuration.name, "32");
 
   /* Item: On Led color */
-  sprintf(_number, "%d", configuration.on.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.on.color, "o", F(L_CLED_COLOR_RGB));
 
   /* Item: On brightness */
   sprintf(_number, "%d", configuration.on.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: On timeout */
   sprintf(_number, "%d", configuration.onTimeout);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t0", L_CLED_TIMEOUT,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ot", L_CLED_TIMEOUT,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
                    L_MILISECONDS);
 
@@ -3783,29 +3796,19 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
 
   /* Item: Off Led color */
-  sprintf(_number, "%d", configuration.off.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.off.color, "f", F(L_CLED_COLOR_RGB));
 
   /* Item: Off brightness */
   sprintf(_number, "%d", configuration.off.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: Off timeout */
   sprintf(_number, "%d", configuration.offTimeout);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t1", L_CLED_TIMEOUT,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft", L_CLED_TIMEOUT,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1",
                    L_MILISECONDS);
   closeSection(page);
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
-  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 &configuration.domoticz.idx);
-#else  /* Home Assistant and Standard API */
-  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
-#endif /* End of APIs section */
 
   addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING, id);
 }
@@ -3823,16 +3826,12 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
                    configuration.name, "32");
 
   /* Item: Active Led color */
-  sprintf(_number, "%d", configuration.on.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c0",
-                   L_CLED_EFFECT_WAVE_ON_LED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.on.color, "o",
+                   F(L_CLED_EFFECT_WAVE_ON_LED_COLOR));
 
   /* Item: Inactive Led color */
-  sprintf(_number, "%d", configuration.off.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "c1",
-                   L_CLED_EFFECT_WAVE_OFF_LED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.off.color, "f",
+                   F(L_CLED_EFFECT_WAVE_OFF_LED_COLOR));
 
   /* Item: brightness */
   sprintf(_number, "%d", configuration.on.brightness);
@@ -3846,14 +3845,6 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
       AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
 
   closeSection(page);
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
-  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 &configuration.domoticz.idx);
-#else  /* Home Assistant and Standard API */
-  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
-#endif /* End of APIs section */
 
   addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE, id);
 }
@@ -3871,18 +3862,16 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
                    configuration.name, "32");
 
   /* Item: Led color */
-  sprintf(_number, "%d", configuration.in.color);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "k", L_CLED_COLOR, _number,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+  addCLEDColorItem(page, &configuration.in.color, "o", F(L_CLED_COLOR_RGB));
 
   /* Item: Max brightness */
   sprintf(_number, "%d", configuration.in.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b0", L_CLED_MAX_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol", L_CLED_MAX_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
 
   /* Item: Min brightness */
   sprintf(_number, "%d", configuration.out.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "b1", L_CLED_MIN_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_MIN_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: Fade Out/In speed */
@@ -3892,14 +3881,6 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
       AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999", "1", L_MILISECONDS);
 
   closeSection(page);
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
-  addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 &configuration.domoticz.idx);
-#else  /* Home Assistant and Standard API */
-  addAPIsSection(page, F(L_CLED_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
-#endif /* End of APIs section */
 
   addCLEDMenuSection(page, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT, id);
 }
@@ -3923,6 +3904,30 @@ void AFESitesGenerator::addCLEDMenuSection(String &section, uint8_t effectId,
                L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION);
   }
   closeMessageSection(section);
+}
+
+void AFESitesGenerator::addCLEDColorItem(String &item, CLED_RGB *color,
+                                         const char *labelPrefix,
+                                         const __FlashStringHelper *label) {
+  char _label[strlen(labelPrefix) + 1];
+  char _color[3];
+  item.concat(FPSTR(HTTP_ITEM_CLED_COLOR_RGB));
+  item.replace("{{i.l}}", label);
+  item.replace("{{i.r}}", FPSTR(HTTP_ITEM_CLED_COLOR_RGB_COLOR));
+  sprintf(_label, "%sr", labelPrefix);
+  item.replace("{{i.i}}", _label);
+  sprintf(_color, "%d", color->red);
+  item.replace("{{i.v}}", _color);
+  item.replace("{{i.g}}", FPSTR(HTTP_ITEM_CLED_COLOR_RGB_COLOR));
+  sprintf(_label, "%sg", labelPrefix);
+  item.replace("{{i.i}}", _label);
+  sprintf(_color, "%d", color->green);
+  item.replace("{{i.v}}", _color);
+  item.replace("{{i.b}}", FPSTR(HTTP_ITEM_CLED_COLOR_RGB_COLOR));
+  sprintf(_label, "%sb", labelPrefix);
+  item.replace("{{i.i}}", _label);
+  sprintf(_color, "%d", color->blue);
+  item.replace("{{i.v}}", _color);
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED

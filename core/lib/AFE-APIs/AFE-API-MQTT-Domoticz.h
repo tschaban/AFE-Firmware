@@ -52,8 +52,7 @@ private:
                               + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED
-                              + AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS +
-                              AFE_CONFIG_HARDWARE_CLED_NUMBER_OF_EFFECTS
+                              + (2 * AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS)
 #endif
   ];
 
@@ -72,6 +71,12 @@ private:
   uint8_t getRSSI();
 
   boolean publishSwitchMessage(uint32_t *idx, boolean state);
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  boolean publishSetLevelMessage(uint32_t *idx, uint8_t *level);
+  boolean publishSetColorMessage(uint32_t *idx, CLED_PARAMETERS *led);
+#endif
+
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -193,7 +198,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED
   virtual void addClass(AFECLED *);
   boolean publishCLEDState(uint8_t id);
-  void processCLEDEffect(uint8_t id, boolean state, uint8_t effectId);
+  boolean publishCLEDColorState(uint8_t id);
   boolean publishCLEDEffectsState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 };

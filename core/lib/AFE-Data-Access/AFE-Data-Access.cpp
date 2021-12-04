@@ -139,13 +139,7 @@ const String AFEDataAccess::getDeviceUID() {
 #endif
       uid = root.get<char *>("uid");
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_DEVICE_UID << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_DEVICE_UID < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_UID, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -201,14 +195,7 @@ void AFEDataAccess::saveDeviceUID(const char *uid) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_DEVICE_UID << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_DEVICE_UID < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_UID, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -267,13 +254,8 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
       configuration->valid = root["valid"];
       sprintf(configuration->serial, root["serial"]);
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_PRO_VERSION << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_PRO_VERSION < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PRO_VERSION,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -324,15 +306,7 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_PRO_VERSION << F(", actual JSON size: ")
-           << jsonBuffer.size();
-
-    if (AFE_CONFIG_FILE_BUFFER_PRO_VERSION < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PRO_VERSION, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -384,13 +358,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
       sprintf(configuration->password, root["password"]);
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_PASSWORD << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_PASSWORD < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PASSWORD, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -439,13 +407,7 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_PASSWORD
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_PASSWORD < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PASSWORD, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -629,12 +591,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -782,13 +739,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_DEVICE
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_DEVICE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -973,13 +924,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
       sprintf(configuration->version, root["version"]);
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_FIRMWARE << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_FIRMWARE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -1030,13 +975,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_FIRMWARE
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_FIRMWARE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1100,13 +1039,8 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #endif
       mode = root["mode"];
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_DEVICE_MODE << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_DEVICE_MODE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_MODE,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -1157,14 +1091,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_DEVICE_MODE << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_DEVICE_MODE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_MODE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1222,12 +1149,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
           AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_NETWORK
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_NETWORK < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -1293,13 +1215,7 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_NETWORK
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_NETWORK < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1387,13 +1303,8 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
           AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION;
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size()) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MQTT_BROKER,
+                          jsonBuffer.size());
 #endif
     }
 
@@ -1458,14 +1369,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size()) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MQTT_BROKER, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1521,7 +1425,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MQTT_BROKER> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DOMOTICZ> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success()) {
 #ifdef DEBUG
@@ -1535,13 +1439,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
       sprintf(configuration->password, root["password"]);
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DOMOTICZ, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -1579,7 +1477,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
     Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
 
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MQTT_BROKER> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DOMOTICZ> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["protocol"] = configuration->protocol;
     root["host"] = configuration->host;
@@ -1593,14 +1491,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_MQTT_BROKER < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DOMOTICZ, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1658,13 +1549,8 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
       sprintf(configuration->discovery.topic, root["topic"]);
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
+                          jsonBuffer.size());
 #endif
     } else {
       _ret = false;
@@ -1714,14 +1600,8 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1789,12 +1669,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_LED
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_LED < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_LED, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -1856,13 +1731,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_LED
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_LED < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_LED, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -1979,13 +1848,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
       id = root["id"];
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_SYSTEM_LED << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_SYSTEM_LED < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SYSTEM_LED, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -2036,14 +1899,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_SYSTEM_LED << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_SYSTEM_LED < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SYSTEM_LED, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -2130,13 +1986,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #ifdef DEBUG
-
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RELAY
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_RELAY < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -2205,13 +2055,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RELAY
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_RELAY < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -2416,13 +2260,8 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
       state = root["state"];
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_RELAY_STATE << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_RELAY_STATE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY_STATE,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -2472,14 +2311,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_RELAY_STATE << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_RELAY_STATE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY_STATE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -2539,12 +2371,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_SWITCH
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_SWITCH < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SWITCH, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -2610,13 +2438,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_SWITCH
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_SWITCH < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SWITCH, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -2857,12 +2679,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_ADC
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_ADC < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ADC, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -2953,13 +2770,7 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_ADC
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_ADC < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ADC, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3065,12 +2876,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
       }
 
 #ifdef DEBUG
-      Serial << endl
-             << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DS18B20
-             << ", actual JSON size: " << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_DS18B20 < jsonBuffer.size() + 10) {
-        Serial << endl << "WARN: Too small buffer size";
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DS18B20, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3134,13 +2940,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "INFO: Data saved" << endl
-           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DS18B20
-           << ", actual JSON size: " << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_DS18B20 < jsonBuffer.size() + 10) {
-      Serial << endl << "WARN: Too small buffer size";
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DS18B20, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3222,13 +3022,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CONTACTRON << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CONTACTRON, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3287,14 +3081,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_CONTACTRON << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CONTACTRON < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CONTACTRON, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3400,12 +3187,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_GATE
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_GATE, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3482,13 +3264,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_GATE
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_GATE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_GATE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3573,13 +3349,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
       state = root["state"];
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_GATE_STATE << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_GATE_STATE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_GATE_STATE, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3636,14 +3406,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_GATE_STATE << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_GATE_STATE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_GATE_STATE, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3712,13 +3475,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_REGULATOR << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_REGULATOR < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_REGULATOR, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3786,13 +3543,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_REGULATOR
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_REGULATOR < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_REGULATOR, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -3883,13 +3634,8 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -3949,14 +3695,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4061,13 +3801,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
       sprintf(configuration->name, root["name"]);
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_HPMA115S0 << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_HPMA115S0 < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HPMA115S0, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -4133,13 +3867,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_HPMA115S0
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_HPMA115S0 < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HPMA115S0, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4212,12 +3940,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
       configuration->TXD = root["TXD"];
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_UART
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_UART < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_UART, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -4265,13 +3988,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #endif
     configFile.close();
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_UART
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_UART < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_UART, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4338,12 +4055,7 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_I2C, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -4407,13 +4119,7 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_I2C
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_I2C < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_I2C, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4526,12 +4232,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
       configuration->altitude = root["pressure"]["altitude"];
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_BMEX80
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_BMEX80 < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BMEX80, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -4624,13 +4325,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_BMEX80
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_BMEX80 < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BMEX80, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4736,12 +4431,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_BH1750
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_BH1750 < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BH1750, jsonBuffer.size());
 #endif
     }
 
@@ -4806,13 +4496,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_BH1750
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_BH1750 < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BH1750, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -4897,12 +4581,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_AS3935
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_AS3935 < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_AS3935, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -4969,13 +4648,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_AS3935
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_AS3935 < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_AS3935, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -5094,12 +4767,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DHT
-             << ", actual JSON size: " << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_DHT < jsonBuffer.size() + 10) {
-        Serial << endl << "WARN: Too small buffer size";
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DHT, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -5175,13 +4843,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << "INFO: Data saved" << endl
-           << "INFO: JSON: Buffer size: " << AFE_CONFIG_FILE_BUFFER_DHT
-           << ", actual JSON size: " << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_DHT < jsonBuffer.size() + 10) {
-      Serial << endl << "WARN: Too small buffer size";
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DHT, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -5376,13 +5038,7 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_ANEMOMETER << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ANEMOMETER, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -5442,14 +5098,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_ANEMOMETER << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_ANEMOMETER < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ANEMOMETER, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -5529,13 +5178,7 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_RAINMETER << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_RAINMETER < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER, jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -5593,13 +5236,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_RAINMETER
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_RAINMETER < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -5680,13 +5317,8 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -5754,14 +5386,8 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -5853,13 +5479,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -5925,14 +5546,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6035,13 +5650,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PN532_SENSOR,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -6107,14 +5717,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_PN532_SENSOR << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_PN532_SENSOR < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PN532_SENSOR, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6200,13 +5803,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MIFARE_CARD,
+                          jsonBuffer.size());
 #endif
     }
 #ifdef DEBUG
@@ -6269,14 +5867,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_MIFARE_CARD << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_MIFARE_CARD < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MIFARE_CARD, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6318,7 +5909,7 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_CLED
 boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
   boolean _ret = true;
-  char fileName[strlen(AFE_FILE_CLED_CONFIGURATION) + 1];
+  char fileName[strlen(AFE_FILE_LED_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -6350,25 +5941,26 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
       configuration->gpio = root["gpio"].as<int>();
       configuration->ledNumbers = root["ledNumbers"].as<int>();
-      configuration->on.color = root["on"]["color"].as<int>();
-      configuration->on.brightness = root["on"]["brightness"].as<int>();
-      configuration->off.color = root["off"]["color"].as<int>();
-      configuration->off.brightness = root["off"]["brightness"].as<int>();
+      configuration->on.color.red = root["on"]["c"]["r"].as<int>();
+      configuration->on.color.green = root["on"]["c"]["g"].as<int>();
+      configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
+      configuration->on.brightness = root["on"]["l"].as<int>();
+      configuration->off.color.red = root["off"]["c"]["r"].as<int>();
+      configuration->off.color.green = root["off"]["c"]["g"].as<int>();
+      configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
+      configuration->off.brightness = root["off"]["l"].as<int>();
 
       sprintf(configuration->name, root["name"]);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->cled.idx = root["cIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->effect.idx = root["eIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
+      sprintf(configuration->cled.topic, root["cMqttTopic"] | "");
+      sprintf(configuration->effect.topic, root["eMqttTopic"] | "");
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CLED < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED, jsonBuffer.size());
 #endif
     } else {
       _ret = false;
@@ -6409,21 +6001,28 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &on = root.createNestedObject("on");
+    JsonObject &cOn = on.createNestedObject("c");
     JsonObject &off = root.createNestedObject("off");
+    JsonObject &cOff = off.createNestedObject("c");
     root["gpio"] = configuration->gpio;
     root["ledNumbers"] = configuration->ledNumbers;
-    on["color"] = configuration->on.color;
-    on["brightness"] = configuration->on.brightness;
-    off["color"] = configuration->off.color;
-    off["brightness"] = configuration->off.brightness;
+    cOn["r"] = configuration->on.color.red;
+    cOn["g"] = configuration->on.color.green;
+    cOn["b"] = configuration->on.color.blue;
+    on["l"] = configuration->on.brightness;
+    cOff["r"] = configuration->off.color.red;
+    cOff["g"] = configuration->off.color.green;
+    cOff["b"] = configuration->off.color.blue;
+    off["l"] = configuration->off.brightness;
 
     root["name"] = configuration->name;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
+    root["cMqttTopic"] = configuration->cled.topic;
+     root["eMqttTopic"] = configuration->effect.topic;
 #else
-    root["idx"] = configuration->domoticz.idx;
+    root["cIdx"] = configuration->cled.idx;
+    root["eIdx"] = configuration->effect.idx;
 #endif
-
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -6431,13 +6030,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_CLED
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CLED < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6453,16 +6046,23 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   configuration.colorOrder = AFE_CONFIG_HARDWARE_CLED_COLORS_ORDER;
   */
   configuration.ledNumbers = AFE_CONFIG_HARDWARE_CLED_MAX_NUMBER_OF_LED;
-  configuration.on.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+
   configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
-  configuration.off.color = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.off.brightness =
       AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.cled.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.effect.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+  configuration.cled.topic[0] = AFE_EMPTY_STRING;
+  configuration.effect.topic[0] = AFE_EMPTY_STRING;
 #endif
 
 #ifdef DEBUG
@@ -6512,28 +6112,21 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       root.printTo(Serial);
 #endif
 
-      configuration->on.color = root["on"]["color"].as<int>();
-      configuration->on.brightness = root["on"]["brightness"].as<int>();
+      configuration->on.color.red = root["on"]["c"]["r"].as<int>();
+      configuration->on.color.green = root["on"]["c"]["g"].as<int>();
+      configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
+      configuration->on.brightness = root["on"]["l"].as<int>();
       configuration->onTimeout = root["on"]["timeout"].as<int>();
-      configuration->off.color = root["off"]["color"].as<int>();
-      configuration->off.brightness = root["off"]["brightness"].as<int>();
+      configuration->off.color.red = root["off"]["c"]["r"].as<int>();
+      configuration->off.color.green = root["off"]["c"]["g"].as<int>();
+      configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
+      configuration->off.brightness = root["off"]["l"].as<int>();
       configuration->offTimeout = root["off"]["timeout"].as<int>();
       sprintf(configuration->name, root["name"]);
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
-#endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING <
-          jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING,
+                          jsonBuffer.size());
 #endif
     } else {
       _ret = false;
@@ -6576,34 +6169,29 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &on = root.createNestedObject("on");
     JsonObject &off = root.createNestedObject("off");
+    JsonObject &cOn = on.createNestedObject("c");
+    JsonObject &cOff = off.createNestedObject("c");
 
-    on["color"] = configuration->on.color;
-    on["brightness"] = configuration->on.brightness;
+    cOn["r"] = configuration->on.color.red;
+    cOn["g"] = configuration->on.color.green;
+    cOn["b"] = configuration->on.color.blue;
+    on["l"] = configuration->on.brightness;
+    cOff["r"] = configuration->off.color.red;
+    cOff["g"] = configuration->off.color.green;
+    cOff["b"] = configuration->off.color.blue;
+    off["l"] = configuration->off.brightness;
     on["timeout"] = configuration->onTimeout;
-    off["color"] = configuration->off.color;
-    off["brightness"] = configuration->off.brightness;
     off["timeout"] = configuration->offTimeout;
     root["name"] = configuration->name;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
-    root["idx"] = configuration->domoticz.idx;
-#endif
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
 #endif
     configFile.close();
-
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6615,12 +6203,14 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
 void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
   CLED_EFFECT_BLINKING configuration;
-  configuration.on.color =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_COLOR;
+  configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.brightness =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_ON_BRIGHTNESS;
-  configuration.off.color =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_COLOR;
+  configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.off.brightness =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_BRIGHTNESS;
   configuration.onTimeout =
@@ -6628,11 +6218,7 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
   configuration.offTimeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
+
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating CLED EFFECT Blinking configuration file");
@@ -6679,24 +6265,19 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       root.printTo(Serial);
 #endif
 
-      configuration->on.color = root["on"]["color"].as<int>();
-      configuration->on.brightness = root["on"]["brightness"].as<int>();
-      configuration->off.color = root["off"]["color"].as<int>();
+      configuration->on.color.red = root["on"]["c"]["r"].as<int>();
+      configuration->on.color.green = root["on"]["c"]["g"].as<int>();
+      configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
+      configuration->on.brightness = root["on"]["l"].as<int>();
+      configuration->off.color.red = root["off"]["c"]["r"].as<int>();
+      configuration->off.color.green = root["off"]["c"]["g"].as<int>();
+      configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
       configuration->timeout = root["timeout"].as<int>();
       sprintf(configuration->name, root["name"]);
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
-#endif
+
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE,
+                          jsonBuffer.size());
 #endif
     } else {
       _ret = false;
@@ -6739,17 +6320,21 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     JsonObject &root = jsonBuffer.createObject();
     JsonObject &on = root.createNestedObject("on");
     JsonObject &off = root.createNestedObject("off");
+    JsonObject &cOn = on.createNestedObject("c");
+    JsonObject &cOff = off.createNestedObject("c");
 
-    on["color"] = configuration->on.color;
-    on["brightness"] = configuration->on.brightness;
-    off["color"] = configuration->off.color;
+    cOn["r"] = configuration->on.color.red;
+    cOn["g"] = configuration->on.color.green;
+    cOn["b"] = configuration->on.color.blue;
+    on["l"] = configuration->on.brightness;
+    cOff["r"] = configuration->off.color.red;
+    cOff["g"] = configuration->off.color.green;
+    cOff["b"] = configuration->off.color.blue;
+
     root["timeout"] = configuration->timeout;
     root["name"] = configuration->name;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
-    root["idx"] = configuration->domoticz.idx;
-#endif
+
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -6757,14 +6342,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6776,20 +6355,16 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
 void AFEDataAccess::createCLEDEffectWaveConfigurationFile() {
   CLED_EFFECT_WAVE configuration;
-  configuration.on.color =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_ON_COLOR;
+  configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.brightness =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_BRIGHTNESS;
-  configuration.off.color =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_OFF_COLOR;
+  configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating CLED EFFECT Wave configuration file");
@@ -6836,25 +6411,17 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       root.printTo(Serial);
 #endif
 
-      configuration->in.color = root["color"].as<int>();
-      configuration->in.brightness = root["inBrightness"].as<int>();
-      configuration->out.brightness = root["outBrightness"].as<int>();
+      configuration->in.color.red = root["c"]["r"].as<int>();
+      configuration->in.color.green = root["c"]["g"].as<int>();
+      configuration->in.color.blue = root["c"]["b"].as<int>();
+      configuration->in.brightness = root["maxL"].as<int>();
+      configuration->out.brightness = root["minL"].as<int>();
       configuration->timeout = root["timeout"].as<int>();
       sprintf(configuration->name, root["name"]);
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
-#endif
+
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT <
-          jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT,
+                          jsonBuffer.size());
 #endif
     } else {
       _ret = false;
@@ -6895,33 +6462,28 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
+    JsonObject &cOn = root.createNestedObject("c");
 
-    root["color"] = configuration->in.color;
-    root["inBrightness"] = configuration->in.brightness;
-    root["outBrightness"] = configuration->out.brightness;
+    cOn["r"] = configuration->in.color.red;
+    cOn["g"] = configuration->in.color.green;
+    cOn["b"] = configuration->in.color.blue;
+    root["maxL"] = configuration->in.brightness;
+    root["minL"] = configuration->out.brightness;
+
     root["timeout"] = configuration->timeout;
     root["name"] = configuration->name;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
-    root["idx"] = configuration->domoticz.idx;
-#endif
+
+
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
 #endif
+
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT <
-        jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT,
+                        jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -6933,8 +6495,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
 void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
   CLED_EFFECT_FADE_INOUT configuration;
-  configuration.in.color =
-      AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_COLOR;
+  configuration.in.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.in.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
+  configuration.in.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.in.brightness =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_IN_BRIGHTNESS;
   configuration.out.brightness =
@@ -6942,11 +6505,6 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
 
 #ifdef DEBUG
   Serial << endl
@@ -7002,11 +6560,6 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
             root["configs"][i]["brightness"].as<int>();
         configuration->config[i].color = root["configs"][i]["color"].as<int>();
         sprintf(configuration->name, root["name"]);
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-        sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
-#endif
       }
 
 #ifdef DEBUG
@@ -7187,12 +6740,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TSL2561
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_TSL2561 < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
 #endif
     }
 
@@ -7263,13 +6811,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
     configFile.close();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ") << AFE_CONFIG_FILE_BUFFER_TSL2561
-           << F(", actual JSON size: ") << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_TSL2561 < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
 #endif
   }
 #ifdef DEBUG
@@ -7308,3 +6850,17 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+/* Private methods */
+
+#ifdef DEBUG
+void AFEDataAccess::printBufforSizeInfo(uint16_t bufferSize,
+                                        uint16_t jsonSize) {
+  Serial << endl
+         << F("INFO: JSON: Buffer size: ") << bufferSize
+         << F(", actual JSON size: ") << jsonSize;
+  if (bufferSize < jsonSize + 10) {
+    Serial << endl << F("WARN: BUFFER TOO SMALL");
+  }
+}
+#endif

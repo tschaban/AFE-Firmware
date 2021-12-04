@@ -260,6 +260,7 @@ private:
 
   void addUrlItem(String &item, uint8_t option, uint8_t id, const char *label);
   void addCLEDMenuSection(String &section, uint8_t effectId, uint8_t id);
+  void addCLEDColorItem(String &item, CLED_RGB *color, const char *labelPrefix,  const __FlashStringHelper *label);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 public:

@@ -28,6 +28,10 @@ class AFEDataAccess {
 private:
   IPAddress IPfromString(const char *address);
 
+#ifdef DEBUG
+ void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
+#endif
+
 public:
   AFEDataAccess();
 

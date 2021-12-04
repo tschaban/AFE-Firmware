@@ -113,6 +113,11 @@ const char HTTP_ITEM_REGULATOR[] PROGMEM =
 const char HTTP_FIXED_CLED_CONFIG_PARAMS[] PROGMEM = "<input name=\"m\" type=\"hidden\" value=\"0\"><input name=\"l\" type=\"hidden\" value=\"8\"><input name=\"o\" type=\"hidden\" value=\"39\">";
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+const char HTTP_ITEM_CLED_COLOR_RGB[] PROGMEM = "<div class=\"cf\"><label>{{i.l}}</label>{{i.r}}{{i.g}}{{i.b}}</div>";
+const char HTTP_ITEM_CLED_COLOR_RGB_COLOR[] PROGMEM = "<input name=\"{{i.i}}\" type=\"number\" min=\"0\" max=\"255\" step=\"1\" value=\"{{i.v}}\">";
+#endif
+
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 //const char HA_CONFIG_TOPIC[] PROGMEM = "{{ha.d}}/";

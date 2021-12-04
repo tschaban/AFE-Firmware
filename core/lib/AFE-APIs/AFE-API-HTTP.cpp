@@ -885,7 +885,10 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
                         _CLED->currentState[i].state ? AFE_ON : AFE_OFF);
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-          publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+          if (_CLED->isEffectStateUpdated(i)) {
+            //_MqttAPI->publishCLEDEffectsState(id);
+            //   _HttpAPIDomoticz->publishCLEDEffectState(i);
+          }
 #else
           publishCLEDStates(i);
 #endif
@@ -932,7 +935,10 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
                                                                      : AFE_OFF);
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-          publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+          // publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+          if (_CLED->isStateUpdated(i)) {
+            //    _HttpAPIDomoticz->publishCLEDState(i);
+          }
 #else
           publishCLEDStates(i);
 #endif
@@ -949,17 +955,21 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
   if (_CLED->isStateUpdated(id)) {
-    // @TODO T7 - if uncommented crashes woth Domoticz HTTP API
-    //_MqttAPI->publishCLEDState(id);
-    if (!fromDomoticz) {
-      _HttpAPIDomoticz->publishCLEDState(id);
-    }
+    _MqttAPI->publishCLEDState(id);
+
+    /* RGB LED are not supported in HTTP Domoticz API
+        if (!fromDomoticz) {
+          _HttpAPIDomoticz->publishCLEDState(id);
+        }
+    */
   }
   if (_CLED->isEffectStateUpdated(id)) {
-    //_MqttAPI->publishCLEDEffectsState(id);
+    _MqttAPI->publishCLEDEffectsState(id);
+    /* RGB LED are not supported in HTTP Domoticz API
     if (!fromDomoticz) {
       _HttpAPIDomoticz->publishCLEDEffectState(id);
     }
+    */
   }
 }
 #else

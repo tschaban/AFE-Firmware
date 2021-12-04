@@ -85,8 +85,8 @@ void eventsListener(void) {
                     "Domoticz");
 #endif
         for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
-          HttpDomoticzAPI.publishCLEDState(i);
-          HttpDomoticzAPI.publishCLEDEffectState(i);
+     //     HttpDomoticzAPI.publishCLEDState(i);
+     //     HttpDomoticzAPI.publishCLEDEffectState(i);
         }
 #endif
 

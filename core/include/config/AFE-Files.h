@@ -92,6 +92,7 @@
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ check
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 352 // AJ check
+#define AFE_CONFIG_FILE_BUFFER_DOMOTICZ 352 // @TODO T7
 #define AFE_CONFIG_FILE_BUFFER_BH1750 221      // AJ check
 #ifdef AFE_ESP32
 #define AFE_CONFIG_FILE_BUFFER_I2C 100          // AJ check

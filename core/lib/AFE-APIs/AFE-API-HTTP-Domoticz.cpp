@@ -712,6 +712,7 @@ boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
+/* RGB LED are not supported in HTTP Domoticz API 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEAPIHTTPDomoticz::addClass(AFECLED *CLed) { AFEAPI::addClass(CLed); }
 
@@ -733,6 +734,7 @@ boolean AFEAPIHTTPDomoticz::publishCLEDEffectState(uint8_t id) {
                               AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT
                           ? AFE_ON
                           : AFE_OFF);
+                          
     return sendSwitchCommand(_CLED->configurationEffectWave[id].domoticz.idx,
                              _CLED->currentState[id].effect.id ==
                                      AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE
@@ -743,5 +745,5 @@ boolean AFEAPIHTTPDomoticz::publishCLEDEffectState(uint8_t id) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
-
+*/
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
