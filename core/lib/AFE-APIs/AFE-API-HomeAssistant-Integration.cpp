@@ -80,28 +80,16 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
     if (i < _Device->configuration.noOfCLEDs) {
       _Data->getConfiguration(i, &configurationCLED);
       publishItemToHomeAssistantMQTTDiscovery(i, AFE_CONFIG_HA_ITEM_LIGHT,
-                                              configurationCLED.mqtt.topic,
+                                              configurationCLED.cled.topic,
                                               configurationCLED.name);
 
       _Data->getConfiguration(i, &configurationEffectBlinkng);
       publishItemToHomeAssistantMQTTDiscovery(
           i, AFE_CONFIG_HA_ITEM_RGB_LED_EFFECT,
-          configurationEffectBlinkng.mqtt.topic,
+          configurationCLED.effect.topic,
           configurationEffectBlinkng.name,
           AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
 
-      _Data->getConfiguration(i, &configurationEffectFadeInOut);
-      publishItemToHomeAssistantMQTTDiscovery(
-          i, AFE_CONFIG_HA_ITEM_RGB_LED_EFFECT,
-          configurationEffectFadeInOut.mqtt.topic,
-          configurationEffectFadeInOut.name,
-          AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
-
-      _Data->getConfiguration(i, &configurationEffectWave);
-      publishItemToHomeAssistantMQTTDiscovery(
-          i, AFE_CONFIG_HA_ITEM_RGB_LED_EFFECT,
-          configurationEffectWave.mqtt.topic, configurationEffectWave.name,
-          AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
     } else {
       removeItemRemovedFromHomeAssistantMQTTDiscovery(i,
                                                       AFE_CONFIG_HA_ITEM_LIGHT);

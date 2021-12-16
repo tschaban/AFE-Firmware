@@ -3754,7 +3754,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "ct",
                      L_CLED_MQTT_ON_OFF_TOPIC, configuration.cled.topic, "64");
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "et",
-                     L_CLED_MQTT_EFFECTS_TOPIC, configuration.cled.topic, "64");
+                     L_CLED_MQTT_EFFECTS_TOPIC, configuration.effect.topic, "64");
     closeSection(page);
   }
 #endif
@@ -4521,7 +4521,7 @@ void AFESitesGenerator::addAPIsSection(String &page,
     char _number[10];
     openSection(page, header, info);
     sprintf(_number, "%d", *idx);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", label, _number,
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", label, _number,
                      AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");

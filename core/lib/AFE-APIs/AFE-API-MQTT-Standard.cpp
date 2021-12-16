@@ -250,18 +250,14 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_HARDWARE_CLED
   for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
 
-    subscribeToCommand(_CLED->configuration[i].mqtt.topic, AFE_MQTT_DEVICE_CLED,
+    subscribeToCommand(_CLED->configuration[i].cled.topic, AFE_MQTT_DEVICE_CLED,
                        i);
 
-    subscribeToCommand(_CLED->configurationEffectBlinking[i].mqtt.topic,
-                       AFE_MQTT_DEVICE_CLED_EFFECT_BLINKING, i);
-
-    subscribeToCommand(_CLED->configurationEffectFadeInOut[i].mqtt.topic,
-                       AFE_MQTT_DEVICE_CLED_EFFECT_FADE_INOUT, i);
-
-    subscribeToCommand(_CLED->configurationEffectWave[i].mqtt.topic,
-                       AFE_MQTT_DEVICE_CLED_EFFECT_WAVE, i);
+    subscribeToCommand(_CLED->configuration[i].effect.topic, AFE_MQTT_DEVICE_CLED_EFFECTS,
+                       i);
   }
+
+
 #endif
 
 #ifdef DEBUG
@@ -380,17 +376,9 @@ void AFEAPIMQTTStandard::listener() {
         case AFE_MQTT_DEVICE_CLED:
           processCLED(&mqttTopicsCache[i].id);
           break;
-        case AFE_MQTT_DEVICE_CLED_EFFECT_BLINKING:
+        case AFE_MQTT_DEVICE_CLED_EFFECTS:
           processCLEDEffect(&mqttTopicsCache[i].id,
                             AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
-          break;
-        case AFE_MQTT_DEVICE_CLED_EFFECT_FADE_INOUT:
-          processCLEDEffect(&mqttTopicsCache[i].id,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
-          break;
-        case AFE_MQTT_DEVICE_CLED_EFFECT_WAVE:
-          processCLEDEffect(&mqttTopicsCache[i].id,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
           break;
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
@@ -968,7 +956,7 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
 }
 
 boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
-  return publishOnOffState(_CLED->configuration[id].mqtt.topic,
+  return publishOnOffState(_CLED->configuration[id].cled.topic,
                            _CLED->currentState[id].state ? AFE_ON : AFE_OFF);
 }
 
@@ -996,26 +984,13 @@ void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id, uint8_t effectId) {
 
 boolean AFEAPIMQTTStandard::publishCLEDEffectsState(uint8_t id) {
   boolean publishStatus =
-      publishOnOffState(_CLED->configurationEffectBlinking[id].mqtt.topic,
+      publishOnOffState(_CLED->configuration[id].effect.topic,
                         _CLED->currentState[id].effect.id ==
                                 AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
                             ? AFE_ON
                             : AFE_OFF);
 
-  publishStatus =
-      publishOnOffState(_CLED->configurationEffectFadeInOut[id].mqtt.topic,
-                        _CLED->currentState[id].effect.id ==
-                                AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
-                            ? AFE_ON
-                            : AFE_OFF);
-
-  publishStatus = publishOnOffState(
-      _CLED->configurationEffectWave[id].mqtt.topic,
-      _CLED->currentState[id].effect.id == AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE
-          ? AFE_ON
-          : AFE_OFF);
-
-  return publishStatus;
+   return publishStatus;
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED
