@@ -76,11 +76,11 @@ void AFECLED::on(uint8_t stripId, CLED_PARAMETERS ledConfig,
   currentState[stripId].on.brightness = ledConfig.brightness;
   on(stripId, disableEffects);
   if (saveColor) {
-    configuration->on.color.blue = ledConfig.color.blue;
-    configuration->on.color.green = ledConfig.color.green;
-    configuration->on.color.red = ledConfig.color.red;
-    configuration->on.brightness = ledConfig.brightness;
-    _Data->saveConfiguration(stripId, configuration);
+    configuration[stripId].on.color.blue = ledConfig.color.blue;
+    configuration[stripId].on.color.green = ledConfig.color.green;
+    configuration[stripId].on.color.red = ledConfig.color.red;
+    configuration[stripId].on.brightness = ledConfig.brightness;
+    _Data->saveConfiguration(stripId, &configuration[stripId]);
   }
 }
 void AFECLED::off(uint8_t stripId, CLED_PARAMETERS ledConfig,

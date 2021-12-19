@@ -18,8 +18,14 @@
 #include <AFE-API-MQTT-Standard.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-MQTT-Structure.h>
 #include <AFE-Site-components.h>
 #include <ArduinoJson.h>
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <hardwares/AFE-RGB-LED.h>
+#endif
+
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -44,19 +50,29 @@ private:
 
   boolean _initialize = false;
 
+  struct HA_DEVICE_CONFIG {
+    uint8_t id;
+    uint8_t type;
+    char label[AFE_CONFIG_HA_LABEL_SIZE];
+    MQTT_TOPIC mqtt;
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    MQTT_TOPIC brightnessCmd;
+    char options[AFE_CONFIG_HA_OPTIONS_SIZE];
+#endif
+  };
+
+  HA_DEVICE_CONFIG _deviceConfiguration;
+
   void generateObjectId(char *objectId, uint8_t deviceClassId,
-                        uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST,
-                        uint8_t supportingId = AFE_NONE);
+                        uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST);
+
   void generateTopic(char *topic, uint8_t type, const char *objectId);
-  void generateAvailability(char *availability);
-  void generateDeviceRegistry(char *device);
-  void publishItemToHomeAssistantMQTTDiscovery(uint8_t id, uint8_t type,
-                                               const char *topic,
-                                               const char *label,
-                                               uint8_t supportingId = AFE_NONE);
+
+  void publishItemToHomeAssistantMQTTDiscovery(
+      HA_DEVICE_CONFIG *deviceConfiguration);
 
   void removeItemRemovedFromHomeAssistantMQTTDiscovery(
-      uint8_t id, uint8_t type, uint8_t supportingId = AFE_NONE);
+      HA_DEVICE_CONFIG *deviceConfiguration);
 
   uint8_t getTypeOfHAEntity(uint8_t deviceClassId);
 

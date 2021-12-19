@@ -26,7 +26,7 @@ struct PN532_SENSOR {
   uint8_t ledID;
 #endif
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 
@@ -47,7 +47,7 @@ struct MIFARE_CARD {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   DOMOTICZ_BASIC_CONFIG domoticz[AFE_HARDWARE_PN532_TAG_SIZE];
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

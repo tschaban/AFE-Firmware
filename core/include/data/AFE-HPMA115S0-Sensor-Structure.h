@@ -26,7 +26,7 @@ struct HPMA115S0 {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   HPMA115S0_DOMOTICZ domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
   float whoPM10Norm;
   float whoPM25Norm;

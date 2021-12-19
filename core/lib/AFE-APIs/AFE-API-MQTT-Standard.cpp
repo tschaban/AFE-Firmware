@@ -248,15 +248,21 @@ void AFEAPIMQTTStandard::subscribe() {
 
 /* Subscribe: CLED */
 #ifdef AFE_CONFIG_HARDWARE_CLED
+
+  char _brightnessTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
   for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
 
     subscribeToCommand(_CLED->configuration[i].cled.topic, AFE_MQTT_DEVICE_CLED,
                        i);
 
-    subscribeToCommand(_CLED->configuration[i].effect.topic, AFE_MQTT_DEVICE_CLED_EFFECTS,
-                       i);
-  }
+    sprintf(_brightnessTopic, "%s%s", _CLED->configuration[i].cled.topic,
+            AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CMD_TOPIC_SUFIX);
 
+    subscribeToCommand(_brightnessTopic, AFE_MQTT_DEVICE_CLED_BRIGHTNESS, i);
+
+    subscribeToCommand(_CLED->configuration[i].effect.topic,
+                       AFE_MQTT_DEVICE_CLED_EFFECTS, i);
+  }
 
 #endif
 
@@ -377,8 +383,10 @@ void AFEAPIMQTTStandard::listener() {
           processCLED(&mqttTopicsCache[i].id);
           break;
         case AFE_MQTT_DEVICE_CLED_EFFECTS:
-          processCLEDEffect(&mqttTopicsCache[i].id,
-                            AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+          processCLEDEffect(&mqttTopicsCache[i].id);
+          break;
+        case AFE_MQTT_DEVICE_CLED_BRIGHTNESS:
+          processCLEDBrigtness(&mqttTopicsCache[i].id);
           break;
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
@@ -934,17 +942,64 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
 void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
   boolean _success = true;
-  switch (processOnOffCommand(Mqtt.message.content, &Mqtt.message.length)) {
-  case AFE_ON:
-    _CLED->on(*id, true);
-    break;
-  case AFE_OFF:
-    _CLED->off(*id, true);
-    break;
-  default:
-    _success = false;
-    break;
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing CLED: ") << *id << " : command: ";
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
   }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+
+  StaticJsonBuffer<AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH> jsonBuffer;
+  JsonObject &root = jsonBuffer.parseObject(_command);
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: API REST: JSON Buffer size: ")
+         << AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH
+         << F(", actual JSON size: ") << jsonBuffer.size();
+  if (AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH < jsonBuffer.size() + 10) {
+    Serial << endl << F("WARN: API REST: Too small buffer size");
+  }
+#endif
+  if (!root.success()) {
+#ifdef DEBUG
+    Serial << endl << F("ERROR: API REST: JSON Parsing error");
+#endif
+  } else {
+
+    CLED_PARAMETERS _color;
+    char _state[4];
+
+    sprintf(_state, root["command"] | "");
+
+    if (strcmp(_state, "on") == 0) {
+      _CLED->on(*id, true);
+    } else if (strcmp(_state, "off") == 0) {
+      _CLED->off(*id, false);
+    } else {
+      _color.color.blue = root["color"]["blue"];
+      _color.color.green = root["color"]["green"];
+      _color.color.red = root["color"]["red"];
+      _color.brightness =
+          root["brightness"] | _CLED->currentState[*id].on.brightness;
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: CLED: Changing color: RGB[") << _color.color.red
+             << F(",") << _color.color.green << F(",") << _color.color.blue
+             << F("], Brightness: ") << _color.brightness;
+#endif
+
+      _CLED->on(*id, _color, true, true);
+    }
+  }
+
   if (_success) {
     if (_CLED->isStateUpdated(*id)) {
       publishCLEDState(*id);
@@ -955,42 +1010,134 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
   }
 }
 
-boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
-  return publishOnOffState(_CLED->configuration[id].cled.topic,
-                           _CLED->currentState[id].state ? AFE_ON : AFE_OFF);
-}
-
-void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id, uint8_t effectId) {
+void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id) {
   boolean _success = true;
-  switch (processOnOffCommand(Mqtt.message.content, &Mqtt.message.length)) {
-  case AFE_ON:
-    _CLED->activateEffect(*id, effectId);
-    break;
-  case AFE_OFF:
-    _CLED->deactivateEffect(*id, effectId);
-    break;
-  default:
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : effect: ");
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
+  }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+
+  if (strcmp(_command, AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF) == 0) {
+    _CLED->deactivateEffect(*id);
+  } else if (strcmp(_command, _CLED->configurationEffectBlinking[*id].name) ==
+             0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+  } else if (strcmp(_command, _CLED->configurationEffectFadeInOut[*id].name) ==
+             0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
+  } else if (strcmp(_command, _CLED->configurationEffectWave[*id].name) == 0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+  } else {
     _success = false;
   }
+
   if (_success) {
     if (_CLED->isEffectStateUpdated(*id)) {
       publishCLEDEffectsState(*id);
     }
     if (_CLED->isStateUpdated(*id)) {
       publishCLEDState(*id);
+    }
+  }
+}
+
+void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
+  boolean _success = true;
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : brightness : ");
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
+  }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+
+  if (atoi(_command) >= 0 &&
+      atoi(_command) <= AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS) {
+    CLED_PARAMETERS _color;
+    _color = atoi(_command) == 0 ? _CLED->currentState[*id].off
+                                 : _CLED->currentState[*id].on;
+    _color.brightness = atoi(_command);
+    _CLED->on(*id, _color, true, true);
+  } else {
+    _success = false;
+  }
+
+  if (_success) {
+    if (_CLED->isStateUpdated(*id)) {
+      publishCLEDState(*id);
+    }
+    if (_CLED->isEffectStateUpdated(*id)) {
+      publishCLEDEffectsState(*id);
     }
   }
 }
 
 boolean AFEAPIMQTTStandard::publishCLEDEffectsState(uint8_t id) {
-  boolean publishStatus =
-      publishOnOffState(_CLED->configuration[id].effect.topic,
-                        _CLED->currentState[id].effect.id ==
-                                AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
-                            ? AFE_ON
-                            : AFE_OFF);
+  boolean publishStatus = false;
+  if (enabled) {
+    if (strlen(_CLED->configuration[id].effect.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _CLED->configuration[id].effect.topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic,
+          _CLED->currentState[id].effect.id ==
+                  AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
+              ? _CLED->configurationEffectBlinking[id].name
+              : _CLED->currentState[id].effect.id ==
+                        AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
+                    ? _CLED->configurationEffectFadeInOut[id].name
+                    : _CLED->currentState[id].effect.id ==
+                              AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE
+                          ? _CLED->configurationEffectWave[id].name
+                          : AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF);
+    }
+  }
+  return publishStatus;
+}
 
-   return publishStatus;
+boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    if (strlen(_CLED->configuration[id].cled.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      char _message[AFE_CONFIG_HARDWARE_CLED_STATE_JSON_LENGTH];
+
+      sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
+                        "\"blue\":%d},\"brightness\":%d}",
+              _CLED->currentState[id].state ? "on" : "off",
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.red
+                  : _CLED->currentState[id].off.color.red,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.green
+                  : _CLED->currentState[id].off.color.green,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.blue
+                  : _CLED->currentState[id].off.color.blue,
+              _CLED->currentState[id].config.brightness);
+      sprintf(mqttStateTopic, "%s/state", _CLED->configuration[id].cled.topic);
+      publishStatus = Mqtt.publish(mqttStateTopic, _message);
+    }
+  }
+  return publishStatus;
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED

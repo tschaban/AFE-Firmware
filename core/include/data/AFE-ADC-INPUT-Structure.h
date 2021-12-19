@@ -33,7 +33,7 @@ struct BATTERY_METER {
   float maxVoltage;
   float minVoltage;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #else
   DOMOTICZ_BASIC_CONFIG domoticz;
 #endif
@@ -46,7 +46,7 @@ struct ADCINPUT {
   uint16_t numberOfSamples;
   double maxVCC;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #else
   ADCINPUT_DOMOTICZ domoticz;
 #endif

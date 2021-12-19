@@ -28,7 +28,7 @@ struct TSL2561 {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
   TSL2561_DOMOTICZ domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

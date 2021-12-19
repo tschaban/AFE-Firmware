@@ -213,6 +213,7 @@ public:
    *
    */
   void loop();
+
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

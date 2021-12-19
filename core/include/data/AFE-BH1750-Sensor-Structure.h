@@ -19,7 +19,7 @@ struct BH1750 {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

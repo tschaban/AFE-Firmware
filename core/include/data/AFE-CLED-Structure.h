@@ -65,8 +65,8 @@ struct CLED {
   DOMOTICZ_BASIC_CONFIG cled;
   DOMOTICZ_BASIC_CONFIG effect;
 #else
-  MQTT_BASIC_CONFIG cled;
-  MQTT_BASIC_CONFIG effect;
+  MQTT_TOPIC cled;
+  MQTT_TOPIC effect;
 #endif
 };
 

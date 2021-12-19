@@ -34,7 +34,7 @@ struct GATE {
   DOMOTICZ_BASIC_CONFIG domoticz; // IDX for gate state
   DOMOTICZ_BASIC_CONFIG domoticzControl; // IDX for gate controll
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

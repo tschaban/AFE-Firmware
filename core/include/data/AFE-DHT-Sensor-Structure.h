@@ -40,7 +40,7 @@ struct DHT {
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
   DHT_DOMOTICZ domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

@@ -642,6 +642,11 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
 
+#define L_CLED_EFFECT_OFF_COMMAND "Off"
+#define L_CLED_EFFECT_LABEL "Light effects"
+
+
+
 //#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
 //#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
 //#define L_CLEDS "RGB Leds"

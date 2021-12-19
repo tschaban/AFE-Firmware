@@ -9,9 +9,9 @@
 
 #include <AFE-API.h>
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||               \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+#ifdef AFE_CONFIG_HARDWARE_CLED
 #include <ArduinoJson.h>
+#include <hardwares/AFE-RGB-LED.h>
 
 struct CLED_COMMAND {
   char command[10];
@@ -71,7 +71,7 @@ private:
    *
    */
 
-  MQTT_TOPICS_CACHE
+  MQTT_CMD_TOPICS_CACHE
   mqttTopicsCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
                   + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
@@ -120,7 +120,7 @@ private:
                   AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED
-                  + (2 * AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS)
+                  + (3 * AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS) /* 3 x topics: cled, brightness, effects */
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
@@ -271,8 +271,9 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_CLED
   void processCLED(uint8_t *id);
   boolean publishCLEDState(uint8_t id);
-  void processCLEDEffect(uint8_t *id, uint8_t effectId);
+  void processCLEDEffect(uint8_t *id);
   boolean publishCLEDEffectsState(uint8_t id);
+  void processCLEDBrigtness(uint8_t *id);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

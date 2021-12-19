@@ -7,6 +7,7 @@
 #include <arduino.h>
 
 
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif // Domoticz
@@ -20,9 +21,15 @@ struct MQTT_MESSAGE {
 };
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-struct MQTT_BASIC_CONFIG {
-  char topic[65];
+struct MQTT_TOPIC {
+  char topic[AFE_CONFIG_MQTT_TOPIC_LENGTH];
 };
+
+struct MQTT_CMD_TOPIC {
+  char topic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+};
+
+
 
 /* Types of items in MQTT Topics cache */
 typedef enum {
@@ -77,18 +84,19 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_CLED
   AFE_MQTT_DEVICE_CLED = 16,
   AFE_MQTT_DEVICE_CLED_EFFECTS = 17,
+  AFE_MQTT_DEVICE_CLED_BRIGHTNESS = 18,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 18,
+  AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 19,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  AFE_MQTT_DEVICE_TSL2561 = 19,
+  AFE_MQTT_DEVICE_TSL2561 = 20,
 #endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */
-struct MQTT_TOPICS_CACHE {
-  MQTT_BASIC_CONFIG message;
+struct MQTT_CMD_TOPICS_CACHE {
+  MQTT_CMD_TOPIC message;
   uint8_t id;
   afe_mqtt_standard_device_type_t type;
 };
@@ -103,7 +111,7 @@ struct MQTT {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
-  MQTT_BASIC_CONFIG lwt;
+  MQTT_TOPIC lwt;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   uint16_t timeout;
   boolean retainLWT;
