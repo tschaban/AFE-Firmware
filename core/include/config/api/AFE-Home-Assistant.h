@@ -3,32 +3,29 @@
 
 #include <AFE-Configuration.h>
 
-#define AFE_FIRMWARE_API                                                       \
-  AFE_FIRMWARE_API_HOME_ASSISTANT // Type of the firmware API: Home Assistant
+#define AFE_FIRMWARE_API AFE_FIRMWARE_API_HOME_ASSISTANT // Type of the firmware API: Home Assistant
 
-#define AFE_CONFIG_MQTT_TOPIC_LENGTH 65
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH                                       \
-  AFE_CONFIG_MQTT_TOPIC_LENGTH +                                               \
-      15 // Size of a Command topic: MQTT_TOPIC + /brightness/cmd (15)
+
+/**
+ * @brief Size of configuraion topic
+ * Max at this stage: 1234567890123456789012345678901234567890123456789012345678901234/binary_sensor/E86aDBf2-84e0E084-12/config
+ * 106 + 3 buffer
+ */
+#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE 110 
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 15 // Size of a Command topic: MQTT_TOPIC + /brightness/cmd (15)
 #else
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH                                       \
-  AFE_CONFIG_MQTT_TOPIC_LENGTH +                                               \
-      4 // Size of a Command topic: MQTT_TOPIC + /cmd (4)
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH +   4 // Size of a Command topic: MQTT_TOPIC + /cmd (4)
 #endif
+#define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 6 // Size of a State topic: MQTT_TOPIC + 6
 
-#define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH                                     \
-  AFE_CONFIG_MQTT_TOPIC_LENGTH + 6 // Size of a State topic: MQTT_TOPIC + 6
-
-#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE                                       \
-  117 // For device: binary_sensor @TODO HA once new devices added
 
 /**
  * @brief Length of JSON Configuraion device
  *
  */
-#define AFE_CONFIG_HA_CONFIGURATION_JSON_SIZE 2000 // @TODO T7
+#define AFE_CONFIG_HA_CONFIGURATION_JSON_SIZE 1651 // Based on light 
 
 /**
  * @brief HA Integraion defaults. For the configuration file

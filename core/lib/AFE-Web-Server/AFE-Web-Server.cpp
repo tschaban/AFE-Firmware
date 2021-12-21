@@ -2728,23 +2728,31 @@ void AFEWebServer::get(CLED &data) {
   }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  data.cled.idx = server.arg(F("cd")).length() > 0
-                          ? server.arg(F("cd")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
-    data.effect.idx = server.arg(F("ed")).length() > 0
-                          ? server.arg(F("ed")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;                        
+  data.cled.idx = server.arg(F("cd")).length() > 0 ? server.arg(F("cd")).toInt()
+                                                   : AFE_DOMOTICZ_DEFAULT_IDX;
+  data.effect.idx = server.arg(F("ed")).length() > 0
+                        ? server.arg(F("ed")).toInt()
+                        : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   if (server.arg(F("ct")).length() > 0) {
     server.arg(F("ct")).toCharArray(data.cled.topic, sizeof(data.cled.topic));
   } else {
     data.cled.topic[0] = AFE_EMPTY_STRING;
   }
-    if (server.arg(F("et")).length() > 0) {
-    server.arg(F("et")).toCharArray(data.effect.topic, sizeof(data.effect.topic));
+  if (server.arg(F("et")).length() > 0) {
+    server.arg(F("et")).toCharArray(data.effect.topic,
+                                    sizeof(data.effect.topic));
   } else {
     data.effect.topic[0] = AFE_EMPTY_STRING;
   }
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+  data.brightnessConversion =
+      server.arg(F("bc")).length() > 0
+          ? server.arg(F("bc")).toInt()
+          : AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
+#endif
+
 #endif
 }
 
@@ -2841,7 +2849,6 @@ void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
   } else {
     data.name[0] = AFE_EMPTY_STRING;
   }
-
 }
 
 void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {

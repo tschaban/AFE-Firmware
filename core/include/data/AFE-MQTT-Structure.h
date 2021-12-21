@@ -100,7 +100,7 @@ struct MQTT_CMD_TOPICS_CACHE {
   uint8_t id;
   afe_mqtt_standard_device_type_t type;
 };
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // !AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 struct MQTT {
   char host[33];

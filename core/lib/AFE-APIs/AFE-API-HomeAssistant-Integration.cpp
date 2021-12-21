@@ -1,6 +1,6 @@
 #include "AFE-API-HomeAssistant-Integration.h";
 
-#ifdef AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT 
 
 AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(void){};
 

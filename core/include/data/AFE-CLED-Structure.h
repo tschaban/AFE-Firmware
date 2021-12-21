@@ -67,6 +67,9 @@ struct CLED {
 #else
   MQTT_TOPIC cled;
   MQTT_TOPIC effect;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+  uint8_t brightnessConversion;
+#endif  
 #endif
 };
 

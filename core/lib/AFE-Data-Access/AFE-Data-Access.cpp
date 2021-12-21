@@ -5580,6 +5580,8 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BINARY_SENSORS;
@@ -5589,9 +5591,6 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
            << F("INFO: Creating file: cfg-binary-sensor-") << i << F(".json");
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
     sprintf(configuration.name, "binary-%d", i + 1);
 
     saveConfiguration(i, &configuration);
@@ -5957,6 +5956,13 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #else
       sprintf(configuration->cled.topic, root["cMqttTopic"] | "");
       sprintf(configuration->effect.topic, root["eMqttTopic"] | "");
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+      configuration->brightnessConversion =
+          root["bConversion"] |
+          AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
+#endif
+
 #endif
 
 #ifdef DEBUG
@@ -6018,7 +6024,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     root["name"] = configuration->name;
 #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
     root["cMqttTopic"] = configuration->cled.topic;
-     root["eMqttTopic"] = configuration->effect.topic;
+    root["eMqttTopic"] = configuration->effect.topic;
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+    root["bConversion"] = configuration->brightnessConversion;
+#endif
+
 #else
     root["cIdx"] = configuration->cled.idx;
     root["eIdx"] = configuration->effect.idx;
@@ -6063,7 +6074,11 @@ void AFEDataAccess::createCLEDConfigurationFile() {
 #else
   configuration.cled.topic[0] = AFE_EMPTY_STRING;
   configuration.effect.topic[0] = AFE_EMPTY_STRING;
-#endif
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+  configuration.brightnessConversion =
+      AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
+#endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+#endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: cfg-cled-X.json");
@@ -6218,8 +6233,6 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
   configuration.offTimeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
-
-
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating CLED EFFECT Blinking configuration file");
 #endif
@@ -6333,7 +6346,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
     root["timeout"] = configuration->timeout;
     root["name"] = configuration->name;
-
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -6473,7 +6485,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     root["timeout"] = configuration->timeout;
     root["name"] = configuration->name;
 
-
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -6504,7 +6515,6 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_OUT_BRIGHTNESS;
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
-
 
 #ifdef DEBUG
   Serial << endl

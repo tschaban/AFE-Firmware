@@ -12,10 +12,18 @@
 #define AFE_CONFIG_API_HTTP_TIMEOUT 200 // Time for HTTP response. If 5000 than device goes to config mode if Domoticz is Off, button is pressed and HTTP Domoticz API is on
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_IN "domoticz/in" // MQTT Topic for outgoing from AFE messages
 #define AFE_CONFIG_API_DOMOTICZ_TOPIC_OUT "domoticz/out" // MQTT Topic Domoticz uses for publishing messages
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE 1000 // @TODO T7
+/**
+ * @brief Size of the incoming JSON from Domoticz
+ * currently based on SetColort JSON
+ * Warning: if description of item in Domoticz is too large it can cause a problem here
+ * 
+ */
+#define AFE_CONFIG_API_JSON_BUFFER_SIZE 574 // AJ Checked
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 57 // Outgoing MQTT message size for switch
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 90 // Outgoing MQTT message size for custom sensor
 #define AFE_CONFIG_API_JSON_SET_LEVEL_COMMAND_LENGTH 134 // Outgoing MQTT message size for selector item
+
+#define AFE_CONFIG_
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #define AFE_CONFIG_API_JSON_GATE_COMMAND_LENGTH AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
@@ -45,10 +53,12 @@
 #define AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_COMMAND_LENGTH  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH // it's a switch
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
-
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #define AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH  AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH
 #endif
+
+
+#define AFE_CONFIG_API_JSON_SET_COLOR_COMMAND_LENGTH 291
 
 #define AFE_CONFIG_API_DOMOTICZ_URL_LENGTH 190 // Outgoing url size for statuses updates to Domoticz
 

@@ -1067,17 +1067,17 @@ void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
 #ifdef DEBUG
   Serial << _command;
 #endif
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+  uint8_t _brightness = _CLED->convertBrightnessFromAPI(*id, atof(_command));
+#else
+  uint8_t _brightness = atoi(_command);
+#endif // AFE_FIRMWARE_API_STANDARD
 
-  if (atoi(_command) >= 0 &&
-      atoi(_command) <= AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS) {
-    CLED_PARAMETERS _color;
-    _color = atoi(_command) == 0 ? _CLED->currentState[*id].off
-                                 : _CLED->currentState[*id].on;
-    _color.brightness = atoi(_command);
-    _CLED->on(*id, _color, true, true);
-  } else {
-    _success = false;
-  }
+  CLED_PARAMETERS _color;
+  _color = _brightness == 0 ? _CLED->currentState[*id].off
+                            : _CLED->currentState[*id].on;
+  _color.brightness = _brightness;
+  _CLED->on(*id, _color, true, true);
 
   if (_success) {
     if (_CLED->isStateUpdated(*id)) {
@@ -1120,6 +1120,22 @@ boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
       char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
       char _message[AFE_CONFIG_HARDWARE_CLED_STATE_JSON_LENGTH];
 
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+      sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
+                        "\"blue\":%d},\"brightness\":%.2f}",
+              _CLED->currentState[id].state ? "on" : "off",
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.red
+                  : _CLED->currentState[id].off.color.red,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.green
+                  : _CLED->currentState[id].off.color.green,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.blue
+                  : _CLED->currentState[id].off.color.blue,
+              _CLED->convertBrigtnessToAPI(
+                  id, _CLED->currentState[id].config.brightness));
+#else
       sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
                         "\"blue\":%d},\"brightness\":%d}",
               _CLED->currentState[id].state ? "on" : "off",
@@ -1133,6 +1149,7 @@ boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
                   ? _CLED->currentState[id].on.color.blue
                   : _CLED->currentState[id].off.color.blue,
               _CLED->currentState[id].config.brightness);
+#endif
       sprintf(mqttStateTopic, "%s/state", _CLED->configuration[id].cled.topic);
       publishStatus = Mqtt.publish(mqttStateTopic, _message);
     }

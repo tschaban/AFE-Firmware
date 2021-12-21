@@ -24,36 +24,59 @@
 #define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
 #define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
 
-/* Upgrade types */
+/**
+ * @brief types of firmware upgrades
+ * 
+ */
 #define AFE_UPGRADE_NONE 0
 #define AFE_UPGRADE_VERSION 1
 #define AFE_UPGRADE_VERSION_TYPE 2
 
-/* Device operating modes */
+/**
+ * @brief firmware operating modes
+ * 
+ */
 #define AFE_MODE_NORMAL 0
 #define AFE_MODE_CONFIGURATION 1
 #define AFE_MODE_ACCESS_POINT 2
 #define AFE_MODE_NETWORK_NOT_SET 4
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
-/* Host to check WAN Access */
+/**
+ * @brief params related checking if a device has an access to the Internet
+ * 
+ */
 #define AFE_WAN_ACCSSS_HOST "8.8.8.8"
 #define AFE_WAN_ACCSSS_PINGS 1
 #define AFE_WAN_ACCSSS_TIMEOUT 3000 // performs check if access to the network longer than this time in ms
 
-/* APIs */
+/**
+ * @brief types for APIs
+ * 
+ */
 #define AFE_FIRMWARE_API_STANDARD 0
 #define AFE_FIRMWARE_API_DOMOTICZ 1
 #define AFE_FIRMWARE_API_HOME_ASSISTANT 2
 
-/* Frequency of AFE Key validation in minutes */
-#define AFE_KEY_FREQUENCY_VALIDATION 60 // 1440
+/**
+ * @brief frequecny to check it the key is valid in minutes
+ * 
+ */
+#define AFE_KEY_FREQUENCY_VALIDATION 60
 
-/* Not existing hardware item. Used as a default value */
+/**
+ * @brief standard default values for not used devices and empty string
+ * 
+ */
 #define AFE_HARDWARE_ITEM_NOT_EXIST 255
 #define AFE_NONE AFE_HARDWARE_ITEM_NOT_EXIST
+#define AFE_EMPTY_STRING '\0'
 
-/* Binary states */
+
+/**
+ * @brief different binary default values
+ * 
+ */
 #define AFE_OFF 0
 #define AFE_ON 1
 #define AFE_OPEN AFE_OFF
@@ -63,33 +86,53 @@
 #define AFE_OPEN_LABEL "open"
 #define AFE_CLOSED_LABEL "closed"
 
-/* Empty string */
-#define AFE_EMPTY_STRING '\0'
 
-/* Default time to auto-logout from config panel: in minutes */
+/**
+ * @brief Default time to auto-logout from config panel. In minutes
+ * 
+ */
 #define AFE_AUTOLOGOFF_DEFAULT_TIME 10
 
 
+/**
+ * @brief include default values depending on ESP microcontroller type
+ * 
+ */
 #ifdef AFE_ESP32 
 #include <devices/AFE-ESP32.h>
 #else /* ESP8266 */
 #include <devices/AFE-ESP8266.h>
 #endif
 
-/* The size of AFE Firmware file, used by OTA */ 
+/**
+ * @brief max firmware file size. used by OTA
+ * 
+ */
 #define AFE_FIRMARE_FILE_NAME_LENGTH 100
 
 
-/* Adds Units mainly for sensors */
+/**
+ * @brief include parameters related to mainly sensor's unites
+ * 
+ */
 #include <AFE-Units.h>
 
-/* ***************** DEVICES *********************/
+/**
+ * @brief include parameters related to hardwares types
+ * 
+ */
 #include <devices/AFE-Devices.h>
 
-/* ***************** FILE SYSTEM *********************/
+/**
+ * @brief include configuration files parameters
+ * 
+ */
 #include <AFE-Files.h>
 
-/* ***************** AFE VERSIONS *********************/
+/**
+ * @brief include configuration files per each AFE version
+ * 
+ */
 #if defined(T0_CONFIG)
 #include <firmwares/AFE-T0.h>
 #elif defined(T1_CONFIG)
@@ -108,13 +151,18 @@
 #include <firmwares/AFE-T7.h>
 #endif 
 
-/* ***************** WEB FORMS *********************/
+/**
+ * @brief include parameters related to configuration panel
+ * and web server
+ * 
+ */
 #include <AFE-Webforms.h>
 
-
-/* ***************** NETWORK *********************/
-
-#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 30
+/**
+ * @brief include configuration related to network configuration
+ * 
+ */
+#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 20
 #define AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME 1
 #define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
 #define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
@@ -122,7 +170,8 @@
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
-/* Configs related to a relay functionality */
+/* Configs related to a relay functionality
+@TODO refactoring needed: remove this type of config parameter */
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
 #ifndef AFE_CONFIG_HARDWARE_RELAY
 #define AFE_CONFIG_HARDWARE_RELAY
@@ -136,7 +185,8 @@
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
-/* Configs related to analog input functionality */
+/* Configs related to analog input functionality
+@TODO refactoring needed: remove this type of config parameter */
 #ifdef AFE_CONFIG_FUNCTIONALITY_ADC
 #ifndef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #define AFE_CONFIG_HARDWARE_ANALOG_INPUT
@@ -159,49 +209,6 @@
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_GATE
 
-
-/* ***************** HARDWARE: Config and defaults *********************/
-
-/* UART Defaults */
-#ifdef AFE_CONFIG_HARDWARE_UART
-#include <bus/AFE-UART.h>
-#endif 
-
-/* I2C Defaults */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <bus/AFE-IIC.h>
-#endif
-
-/* MCP23017 GPIO extension board */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#include <hardwares/AFE-MCP23017.h>
-#endif
-
-/* LED */
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <hardwares/AFE-LED.h>
-#endif
-
-/* RGB LED: WS281x */
-#ifdef AFE_CONFIG_HARDWARE_CLED
-#include <hardwares/AFE-RGB-LED.h>
-#endif
-
-/* SWITCH */
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-#include <hardwares/AFE-Switch.h>
-#endif 
-
-/* RELAY */
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#include <hardwares/AFE-Relay.h>
-#endif
-
-/* ADC Input and Battery measure functionality */
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#include <hardwares/AFE-ADC.h>
-#endif 
-
 /* PIR Sesnor */
 #ifdef AFE_CONFIG_HARDWARE_PIR
 #ifndef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
@@ -209,104 +216,221 @@
 #endif
 #endif // AFE_CONFIG_HARDWARE_PIR
 
-/* Gate */
+
+/* ***************** HARDWARE: Config and defaults *********************/
+
+/**
+ * @brief include UART bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_UART
+#include <bus/AFE-UART.h>
+#endif 
+
+/**
+ * @brief include I2C bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <bus/AFE-IIC.h>
+#endif
+
+/**
+ * @brief include MCP23017 configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <hardwares/AFE-MCP23017.h>
+#endif
+
+/**
+ * @brief include LED configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <hardwares/AFE-LED.h>
+#endif
+
+/**
+ * @brief include RGB LED WS281x configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <hardwares/AFE-RGB-LED.h>
+#endif
+
+/**
+ * @brief include Switch configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#include <hardwares/AFE-Switch.h>
+#endif 
+
+/**
+ * @brief include Relay configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#include <hardwares/AFE-Relay.h>
+#endif
+
+/**
+ * @brief include Analog input and battery measurment configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#include <hardwares/AFE-ADC.h>
+#endif 
+
+/**
+ * @brief include Gate configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <hardwares/AFE-Gate.h>
 #endif
 
-/* Contactron */
+/**
+ * @brief include Contactron configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #include <hardwares/AFE-Contactron.h>
 #endif
 
 
-/* BINARY SENSOR (PIR, etc) */
+/**
+ * @brief include Binary sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #include <sensors/AFE-Binary.h>
 #endif 
 
-/* PN532 Sensor */
+/**
+ * @brief include PN532 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <sensors/AFE-PN532.h>
 #endif
 
-/* DS18B20 Sensor */
+/**
+ * @brief include DS18B20 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 #include <sensors/AFE-DS18B20.h>
 #endif
 
-/* DHxx sesnors like DHT21,DHT22 */
+/**
+ * @brief include DHTxx sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_DHT
 #include <sensors/AFE-DHT.h>
 #endif
 
-/* HPMA115S0 Sensor */
+/**
+ * @brief include HPMA115S0 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 #include <sensors/AFE-HPMA115S0.h>
 #endif
 
-/* BMx80 Defaults */
+/**
+ * @brief include Bosch BMx80 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 #include <sensors/AFE-Bosch-BMx80.h>
 #endif
 
-/* BH1750 Defualts */
+/**
+ * @brief include BH1759 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 #include <sensors/AFE-Bosch-BMx80.h>
 #endif
 
-/* TSL2561 Defualts */
+/**
+ * @brief include TSL2561 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 #include <sensors/AFE-TSL2561-Sensor.h>
 #endif
 
-/* AS3935 Defaults */
+/**
+ * @brief include AS3935 sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <sensors/AFE-AS3935.h>
 #endif
 
-/* Anemometer Sensor Defaults */
+/**
+ * @brief include Anememeter sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <sensors/AFE-Anememeter.h>
 #endif
 
-/* Rainmeter defaults */
+/**
+ * @brief include Rainmeter sensor configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <sensors/AFE-Rainmeter.h>
 #endif
 
-/* Common configuration for sensors */
+/**
+ * @brief common configuration parameters for sensors
+ * 
+ */
 #include <sensors/AFE-Common.h>
 
-/* Regulator defaults */
+/**
+ * @brief include regulators configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #include <functionalities/AFE-Regulator.h>
 #endif
 
-/* Relay thermal protection */
+/**
+ * @brief include thermal protection configuration parameters
+ * 
+ */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <functionalities/AFE-Thermal-Protection.h>
 #endif 
 
 
 
-/* ***************** APIs: Config and defaults *********************/
-
+/**
+ * @brief include configuration parameters for APIs
+ * 
+ */
 #include <api/AFE-HTTP.h>
-
+#include <api/AFE-MQTT.h>
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 #include <api/AFE-Domoticz.h>
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
 #include <api/AFE-Home-Assistant.h>
 #else
-#include <api/<AFE-Standard.h>
+#include <api/AFE-Standard.h>
 #endif
 
 
-/* Defaults for each MQTT Version (standard and domoticz) */
-#include <api/AFE-MQTT.h>
-
-/* JSONRPC API */
+/**
+ * @brief include JSONRPC API used to exchange data with afe infrastructure
+ * 
+ */
 #include <api/AFE-JSONRPC.h>
 
 #endif // _AFE_Configuration_h

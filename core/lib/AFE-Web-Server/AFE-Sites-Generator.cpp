@@ -3715,7 +3715,13 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 
   /* Item: On brightness */
   sprintf(_number, "%d", configuration.on.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol", L_CLED_BRIGHTNESS,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol",
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+                   L_CLED_MAX_BRIGHTNESS
+#else
+                   L_CLED_BRIGHTNESS
+#endif
+                   ,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   closeSection(page);
@@ -3754,7 +3760,24 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "ct",
                      L_CLED_MQTT_ON_OFF_TOPIC, configuration.cled.topic, "64");
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "et",
-                     L_CLED_MQTT_EFFECTS_TOPIC, configuration.effect.topic, "64");
+                     L_CLED_MQTT_EFFECTS_TOPIC, configuration.effect.topic,
+                     "64");
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+    addSelectFormItemOpen(page, F("bc"), F(L_CLED_API_BRIGHTNESS_CONVERSION));
+    addSelectOptionFormItem(
+        page, L_CLED_API_BRIGHTNESS_CONVERSION_0_255, "0",
+        configuration.brightnessConversion ==
+            AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CONVERSION_0_255);
+    addSelectOptionFormItem(
+        page, L_CLED_API_BRIGHTNESS_CONVERSION_0_100, "1",
+        configuration.brightnessConversion ==
+            AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CONVERSION_0_100);
+    addSelectOptionFormItem(
+        page, L_CLED_API_BRIGHTNESS_CONVERSION_0_1, "2",
+        configuration.brightnessConversion ==
+            AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CONVERSION_0_1);
+    addSelectFormItemClose(page);
+#endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
     closeSection(page);
   }
 #endif
@@ -3867,7 +3890,7 @@ void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
   /* Item: Max brightness */
   sprintf(_number, "%d", configuration.in.brightness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ol", L_CLED_MAX_BRIGHTNESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999999999", "1");
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
   /* Item: Min brightness */
   sprintf(_number, "%d", configuration.out.brightness);

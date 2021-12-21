@@ -642,10 +642,13 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
 
+#define L_CLED_API_BRIGHTNESS_CONVERSION "Brightness value conversion to"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "no conversion"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_100 "0..100"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_1 "0..1"
+
 #define L_CLED_EFFECT_OFF_COMMAND "Off"
 #define L_CLED_EFFECT_LABEL "Light effects"
-
-
 
 //#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
 //#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
@@ -654,11 +657,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 //#define L_CLED_COLOR_RGBS_ORDER "Colors order"
 //#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
 
-
-#define L_CLED_MAX_BRIGHTNESS "Max brightness"
 //#define L_CLED_TIME_WAVE "Wave speed"
 
-
+/*
 #define L_CLED_LIGHT_SENSOR "Light sensor"
 #define L_CLED_LIGHT_LEVEL "Light level"
 #define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
@@ -668,7 +669,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_LIGHT_EFFECTS "Light effects"
 #define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
 #define L_CLED_PN532_EFFECTS "PN532 sensor's light effects"
+*/
 
+/* Home Assistant */
 #define L_HA_DISCOVERY_TOPIC "Home Assistant discovery topic"
 #define L_HA_PUBLISHING "Publish/Update configuration?"
 #define L_HA_UPDATE_REMOVE "Remove old configuration?"

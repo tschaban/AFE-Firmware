@@ -291,6 +291,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
                  << F("INFO: Domoticz: Found CLED ID: ") << idxCache[i].id;
           _found = true;
 #endif
+
           if (_CLED->currentState[idxCache[i].id].state !=
               (byte)command.nvalue) {
             if (command.nvalue == AFE_OFF) {
@@ -310,6 +311,13 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif
           break;
         case AFE_DOMOTICZ_DEVICE_CLED_EFFECT:
+
+#ifdef DEBUG
+          Serial << endl
+                 << F("INFO: Domoticz: Found CLED Effect ID: ")
+                 << idxCache[i].id;
+          _found = true;
+#endif
           _CLED->activateEffect(idxCache[i].id, atoi(command.svalue));
           publishCLEDEffectsState(idxCache[i].id);
           if (atoi(command.svalue) != AFE_CONFIG_HARDWARE_CLED_EFFECT_NONE) {
@@ -360,7 +368,10 @@ void AFEAPIMQTTDomoticz::addIdxToCache(uint8_t id,
     idxCache[lastIDXChacheIndex].id = id;
     idxCache[lastIDXChacheIndex].type = type;
 #ifdef DEBUG
-    Serial << endl << F(" - added IDX[") << id << F("]: ") << idx;
+    Serial << endl
+           << F(" - added IDX[") << lastIDXChacheIndex << F("][")
+           << idxCache[lastIDXChacheIndex].type << F("][")
+           << idxCache[lastIDXChacheIndex].id << F(")]: ") << idx;
 #endif
     lastIDXChacheIndex++;
 
@@ -422,7 +433,7 @@ boolean AFEAPIMQTTDomoticz::publishSetColorMessage(uint32_t *idx,
                                                    CLED_PARAMETERS *led) {
   boolean publishStatus = false;
   if (enabled && idx > 0) {
-    char json[1000]; // @TODO T7
+    char json[AFE_CONFIG_API_JSON_SET_COLOR_COMMAND_LENGTH];
     sprintf(json, "{\"command\":\"setcolbrightnessvalue\",\"idx\":%d,\"color\":"
                   "{\"m\":3,\"t\":0,\"r\":%d,\"g\":%d,\"b\":%d,\"cw\":0,\"ww\":"
                   "0},\"brightness\":%d}",
@@ -1220,9 +1231,9 @@ boolean AFEAPIMQTTDomoticz::publishCLEDState(uint8_t id) {
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDColorState(uint8_t id) {
-  return publishSetColorMessage(
-      &_CLED->configuration[id].cled.idx,
-      _CLED->currentState[id].state ? &_CLED->currentState[id].on
+  return publishSetColorMessage(&_CLED->configuration[id].cled.idx,
+                                _CLED->currentState[id].state
+                                    ? &_CLED->currentState[id].on
                                     : &_CLED->currentState[id].off);
 }
 
