@@ -5,12 +5,12 @@
 
 #include <arduino.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 struct HPMA115S0_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG pm25;
   DOMOTICZ_BASIC_CONFIG pm10;
@@ -23,7 +23,7 @@ struct HPMA115S0 {
   char name[17];
   uint32_t interval;
   uint16_t timeToMeasure;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   HPMA115S0_DOMOTICZ domoticz;
 #else
   MQTT_TOPIC mqtt;

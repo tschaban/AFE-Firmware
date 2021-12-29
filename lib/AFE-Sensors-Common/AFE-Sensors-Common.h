@@ -49,7 +49,7 @@ enum PerceptionState {
   Perception_SevereUncomfy = 7
 };
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 enum DomoticzAlert {
   domoticzAlertRed = 4,
   domoticzAlertOrange = 3,
@@ -133,7 +133,7 @@ public:
   byte perception(float temperature, float humidity,
                   boolean fahrenheit = false);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   byte convertPerceptionDomoticz(byte perception);
   byte convertComfortDomoticz(byte comfort);
   byte convertHumidyStatusDomoticz(float humidity);

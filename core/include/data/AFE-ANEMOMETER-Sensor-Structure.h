@@ -11,7 +11,7 @@ struct ANEMOMETER {
   uint32_t interval;
   float impulseDistance;
   uint8_t impulseDistanceUnit;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_TOPIC mqtt;

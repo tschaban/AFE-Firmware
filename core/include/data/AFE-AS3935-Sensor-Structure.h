@@ -5,7 +5,7 @@
 
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -24,7 +24,7 @@ struct AS3935 {
   uint8_t spikesRejectionLevel;           // 0 - 11
   bool indoor;
   uint8_t unit; // Distance
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_TOPIC mqtt;

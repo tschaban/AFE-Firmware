@@ -7,7 +7,7 @@
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <arduino.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -30,7 +30,7 @@ struct GATE {
   GATE_CONTACTRONS contactron;
   GATE_STATES states;
   char name[17];
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz; // IDX for gate state
   DOMOTICZ_BASIC_CONFIG domoticzControl; // IDX for gate controll
 #else

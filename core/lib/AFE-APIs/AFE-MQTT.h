@@ -19,7 +19,7 @@
 #endif
 
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else

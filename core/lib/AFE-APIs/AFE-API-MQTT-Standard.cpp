@@ -3,7 +3,7 @@
 
 #include "AFE-API-MQTT-Standard.h"
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 
 AFEAPIMQTTStandard::AFEAPIMQTTStandard() : AFEAPI(){};
 
@@ -1208,4 +1208,4 @@ uint8_t AFEAPIMQTTStandard::processOnOffCommand(byte *command,
   return _return;
 }
 
-#endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif

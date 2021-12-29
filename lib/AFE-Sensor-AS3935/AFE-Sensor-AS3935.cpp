@@ -10,7 +10,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
   Data.getConfiguration(id, &configuration);
   I2CPORT I2C;
   Data.getConfiguration(&I2C);
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   if (strlen(configuration.mqtt.topic) > 0) {
     sprintf(mqttCommandTopic, "%s/cmd", configuration.mqtt.topic);
   } else {
@@ -32,7 +32,7 @@ boolean AFESensorAS3935::begin(uint8_t id) {
          << F("Min.strikes level : ")
          << configuration.minimumNumberOfLightningSpikes;
   Serial << endl << F("Indoor? : ") << configuration.indoor;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Serial << endl << F("IDX: ") << configuration.domoticz.idx;
 #endif
 

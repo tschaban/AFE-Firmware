@@ -2359,10 +2359,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->relayID = root["relayID"];
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -2459,10 +2460,10 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.relayID = 0;
 #endif
 #endif // AFE_CONFIG_HARDWARE_RELAY
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   /* Saving first switch. Common for all devices */
   SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
@@ -2571,38 +2572,6 @@ void AFEDataAccess::createSwitchConfigurationFile() {
     }
   }
 }
-/*
-void AFEDataAccess::createSwitchConfigurationFile(uint8_t id) {
-  SWITCH SwitchConfiguration;
-  SwitchConfiguration.sensitiveness = AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING;
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif
-
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  SwitchConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
-  SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#endif
-
-  // Saving first switch. Common for all devices
-  SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_0_DEFAULT_GPIO;
-  SwitchConfiguration.type = AFE_HARDWARE_SWITCH_0_DEFAULT_TYPE;
-  SwitchConfiguration.functionality =
-      AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  SwitchConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
-  SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: cfg-switch-") << id << F(".json");
-#endif
-  saveConfiguration(id, &SwitchConfiguration);
-}
-*/
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
@@ -2649,9 +2618,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
       configuration->interval = root["interval"];
       configuration->numberOfSamples = root["numberOfSamples"];
       configuration->maxVCC = root["maxVCC"];
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.raw =
           root["idx"]["raw"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.percent =
@@ -2660,6 +2627,8 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
           root["idx"]["voltage"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.voltageCalculated =
           root["idx"]["voltageCalculated"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
       configuration->divider.Ra = root["divider"]["Ra"];
       configuration->divider.Rb = root["divider"]["Rb"];
@@ -2669,12 +2638,12 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
           root["batteryMeter"]["maxV"].as<float>();
       configuration->battery.minVoltage =
           root["batteryMeter"]["minV"].as<float>();
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->battery.mqtt.topic,
-              root["batteryMeter"]["mqttTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->battery.domoticz.idx =
           root["batteryMeter"]["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->battery.mqtt.topic,
+              root["batteryMeter"]["mqttTopic"] | "");
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
@@ -2742,13 +2711,13 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
     root["interval"] = configuration->interval;
     root["numberOfSamples"] = configuration->numberOfSamples;
     root["maxVCC"] = configuration->maxVCC;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     idx["raw"] = configuration->domoticz.raw;
     idx["percent"] = configuration->domoticz.percent;
     idx["voltage"] = configuration->domoticz.voltage;
     idx["voltageCalculated"] = configuration->domoticz.voltageCalculated;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
     divider["Ra"] = configuration->divider.Ra;
     divider["Rb"] = configuration->divider.Rb;
@@ -2756,10 +2725,10 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
     battery["maxV"] = configuration->battery.maxVoltage;
     battery["minV"] = configuration->battery.minVoltage;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    battery["mqttTopic"] = configuration->battery.mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     battery["idx"] = configuration->battery.domoticz.idx;
+#else
+    battery["mqttTopic"] = configuration->battery.mqtt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
@@ -2792,13 +2761,13 @@ void AFEDataAccess::createADCInputConfigurationFile() {
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_NUMBER_OF_SAMPLES;
   AnalogInputConfiguration.maxVCC =
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_MAX_VCC;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  AnalogInputConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   AnalogInputConfiguration.domoticz.raw = 0;
   AnalogInputConfiguration.domoticz.voltage = 0;
   AnalogInputConfiguration.domoticz.percent = 0;
   AnalogInputConfiguration.domoticz.voltageCalculated = 0;
+#else
+  AnalogInputConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   AnalogInputConfiguration.divider.Ra = 0;
   AnalogInputConfiguration.divider.Rb = 0;
@@ -2808,10 +2777,10 @@ void AFEDataAccess::createADCInputConfigurationFile() {
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_BATTER_MIN_V;
   AnalogInputConfiguration.battery.maxVoltage =
       AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_BATTER_MAX_V;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  AnalogInputConfiguration.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   AnalogInputConfiguration.battery.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  AnalogInputConfiguration.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
@@ -2928,10 +2897,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
     root["sendOnlyChanges"] = configuration->sendOnlyChanges;
     root["resolution"] = configuration->resolution;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
     root.printTo(configFile);
 #ifdef DEBUG
@@ -2965,14 +2934,13 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
   configuration.resolution = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_RESOLUTION;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++) {
 #ifdef DEBUG
     Serial << endl << "INFO: Creating file: /cfg-ds18b20-" << i << ".json";
-#endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "DS18B20-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -3892,14 +3860,13 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
   configuration.domoticz.pm10.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.whoPM10Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.whoPM25Norm.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Creating file: cfg-hpma115s0-") << i << F(".json");
-#endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "HPMA115S0-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4286,9 +4253,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
     root["i2cAddress"] = configuration->i2cAddress;
     root["resolution"] = configuration->resolution;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     idx["temperatureHumidity"] =
         configuration->domoticz.temperatureHumidity.idx;
     idx["temperatureHumidityPressure"] =
@@ -4308,7 +4273,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
     idx["perception"] = configuration->domoticz.perception.idx;
     idx["comfort"] = configuration->domoticz.comfort.idx;
     idx["absoluteHumidity"] = configuration->domoticz.absoluteHumidity.idx;
-
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
     temperature["unit"] = configuration->temperature.unit;
     temperature["correction"] = configuration->temperature.correction;
@@ -4370,15 +4336,15 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.domoticz.perception.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.comfort.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.absoluteHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating file: cfg-BMEX80-") << i << F(".json");
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
+
     sprintf(configuration.name, "BMEX80-%d", i + 1);
     saveConfiguration(i, &configuration);
   }
@@ -4483,10 +4449,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 
     root["i2cAddress"] = configuration->i2cAddress;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
 
     root.printTo(configFile);
@@ -4517,15 +4483,15 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   configuration.mode = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating file: cfg-bh1750-") << i << F(".json");
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
+
     sprintf(configuration.name, "BH1750-%d", i + 1);
     saveConfiguration(i, &configuration);
   }
@@ -4636,10 +4602,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
     root["spikesRejectionLevel"] = configuration->spikesRejectionLevel;
     root["indoor"] = configuration->indoor;
     root["unit"] = configuration->unit;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
     root.printTo(configFile);
 #ifdef DEBUG
@@ -4672,15 +4638,14 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
   configuration.indoor = true;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   configuration.unit = AFE_DISTANCE_KM;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating file: cfg-as3935-") << i << F(".json");
-#endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    sprintf(configuration.mqtt.topic, "AS3935/%d", i + 1);
 #endif
     sprintf(configuration.name, "AS3935-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4822,9 +4787,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
     temperature["correction"] = configuration->temperature.correction;
     humidity["unit"] = configuration->humidity.unit;
     humidity["correction"] = configuration->humidity.correction;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     domoticz["temperature"] = configuration->domoticz.temperature.idx;
     domoticz["humidity"] = configuration->domoticz.humidity.idx;
     domoticz["dewPoint"] = configuration->domoticz.dewPoint.idx;
@@ -4834,7 +4797,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
     domoticz["absoluteHumidity"] = configuration->domoticz.absoluteHumidity.idx;
     domoticz["perception"] = configuration->domoticz.perception.idx;
     domoticz["comfort"] = configuration->domoticz.comfort.idx;
-
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
     root.printTo(configFile);
 #ifdef DEBUG
@@ -4877,14 +4841,13 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
   configuration.domoticz.comfort.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.perception.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.absoluteHumidity.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
 #ifdef DEBUG
     Serial << endl << "INFO: Creating file: /cfg-dht-" << i << ".json";
-#endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
     sprintf(configuration.name, "DHT-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -5031,10 +4994,10 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
           root["impulseDistanceUnit"] |
           AFE_HARDWARE_ANEMOMETER_DEFAULT_IMPULSE_DISTANCE_UNIT;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -5117,10 +5080,10 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
   ANEMOMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
   configuration.interval = AFE_HARDWARE_ANEMOMETER_DEFAULT_INTERVAL;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   /* Saving first switch. Common for all devices */
   configuration.gpio = AFE_HARDWARE_ANEMOMETER_DEFAULT_GPIO;
@@ -5171,10 +5134,10 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
           root["interval"] | AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
       configuration->resolution = root["resolution"].as<float>();
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef DEBUG
@@ -5255,10 +5218,10 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile() {
   RAINMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
   configuration.interval = AFE_HARDWARE_RAINMETER_DEFAULT_INTERVAL;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   /* Saving first switch. Common for all devices */
   configuration.gpio = AFE_HARDWARE_RAINMETER_DEFAULT_GPIO;
@@ -5359,7 +5322,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     JsonArray &last1h = jsonBuffer.createArray();
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
     JsonArray &last12h = jsonBuffer.createArray();
     JsonArray &last24h = jsonBuffer.createArray();
 #endif
@@ -5467,10 +5430,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
       configuration->bouncing =
           root["bouncing"] | AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+      sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
@@ -5559,10 +5522,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 void AFEDataAccess::createBinarySensorConfigurationFile() {
   BINARY_SENSOR configuration;
   configuration.bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   configuration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -5644,7 +5607,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
       configuration->ledID = root["ledID"].as<int>();
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
@@ -5705,7 +5668,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     root["ledID"] = configuration->ledID;
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
@@ -5745,7 +5708,7 @@ void AFEDataAccess::createPN532ConfigurationFile() {
   configuration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
@@ -6022,17 +5985,15 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     off["l"] = configuration->off.brightness;
 
     root["name"] = configuration->name;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+    root["cIdx"] = configuration->cled.idx;
+    root["eIdx"] = configuration->effect.idx;
+#else
     root["cMqttTopic"] = configuration->cled.topic;
     root["eMqttTopic"] = configuration->effect.topic;
-
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
     root["bConversion"] = configuration->brightnessConversion;
 #endif
-
-#else
-    root["cIdx"] = configuration->cled.idx;
-    root["eIdx"] = configuration->effect.idx;
 #endif
     root.printTo(configFile);
 #ifdef DEBUG
@@ -6639,10 +6600,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     l3["brightness"] = configuration->config[2].brightness;
 
     root["name"] = configuration->name;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
 
     root.printTo(configFile);
@@ -6806,12 +6767,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
 
     root["i2cAddress"] = configuration->i2cAddress;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    root["mqttTopic"] = configuration->mqtt.topic;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     domoticz["ir"] = configuration->domoticz.ir.idx;
     domoticz["illuminance"] = configuration->domoticz.illuminance.idx;
     domoticz["broadband"] = configuration->domoticz.broadband.idx;
+#else
+    root["mqttTopic"] = configuration->mqtt.topic;
 #endif
 
     root.printTo(configFile);
@@ -6846,15 +6807,15 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   configuration.domoticz.illuminance.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.broadband.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.ir.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Creating file: cfg-tls2561-") << i << F(".json");
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-    configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
-#endif
+
     sprintf(configuration.name, "TSL2561-%d", i + 1);
     saveConfiguration(i, &configuration);
   }

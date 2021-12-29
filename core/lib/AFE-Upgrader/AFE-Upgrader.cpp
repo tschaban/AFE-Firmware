@@ -90,7 +90,7 @@ void AFEUpgrader::upgrade() {
 void AFEUpgrader::upgradeFirmwarType() {
   NETWORK networkConfiguration;
   MQTT mqttConfiguration;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ domoticzCofiguration;
 #endif
   PRO_VERSION proConfiguration;
@@ -106,7 +106,7 @@ void AFEUpgrader::upgradeFirmwarType() {
   /* Reading current data */
   Data->getConfiguration(&networkConfiguration);
   Data->getConfiguration(&mqttConfiguration);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Data->getConfiguration(&domoticzCofiguration);
 #endif
   Data->getConfiguration(&proConfiguration);
@@ -128,7 +128,7 @@ void AFEUpgrader::upgradeFirmwarType() {
   /* Restoring core configuration */
   Data->saveConfiguration(&networkConfiguration);
   Data->saveConfiguration(&mqttConfiguration);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Data->saveConfiguration(&domoticzCofiguration);
 #endif
   Data->saveConfiguration(&proConfiguration);
@@ -181,13 +181,10 @@ void AFEUpgrader::updateFirmwareVersion() {
 
 void AFEUpgrader::updateFirmwareAPIVersion() {
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ) {
-    /* Checking if there is Domoticz server configuration file */
-    if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
-      Data->createDomoticzConfigurationFile();
-    }
-    Data->saveFirmwareAPIVersion();
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  /* Checking if there is Domoticz server configuration file */
+  if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
+    Data->createDomoticzConfigurationFile();
   }
 #endif
 
@@ -210,7 +207,7 @@ void AFEUpgrader::upgradeToT0V210() {
   sprintf(newDevice.name, oldDevice.name);
   newDevice.api.http = oldDevice.api.http;
   newDevice.api.mqtt = oldDevice.api.mqtt;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   newDevice.api.domoticz = oldDevice.api.domoticz;
 #endif
 

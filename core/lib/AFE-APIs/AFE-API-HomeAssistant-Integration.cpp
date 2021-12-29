@@ -1,4 +1,4 @@
-#include "AFE-API-HomeAssistant-Integration.h";
+#include "AFE-API-HomeAssistant-Integration.h"
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT 
 
@@ -153,7 +153,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
 
 #ifdef AFE_ESP32
     if (i < _Device->configuration.noOfAnalogInputs) {
-      _Data->getConfiguration(i, &configuration);
+      _Data->getConfiguration(i, &configurationADC);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Analog Input: ") << i + 1;
 #endif

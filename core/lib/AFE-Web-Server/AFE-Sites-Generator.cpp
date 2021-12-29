@@ -412,7 +412,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #endif
 
 /* CLED */
-#ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_CLED
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS,
                         Device->configuration.noOfCLEDs, F("cl"),
                         F(L_DEVICE_NUMBER_OF_CLEDS));
@@ -1062,7 +1062,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
       addSelectOptionFormItem(page, L_RELAY_OPPOSITE_TO_LAST_KNOWN_STATE, "4",
                               configuration.state.MQTTConnected == 4);
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
       addSelectOptionFormItem(page, L_RELAY_DEFAULT_GET_FROM_MQTT, "5",
                               configuration.state.MQTTConnected == 5);
 #endif
@@ -3246,7 +3246,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   addCheckboxFormItem(page, "rs", L_BINARY_SENSOR_SENT_REVERTED_STATE, "1",
                       configuration.revertSignal);
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   /* Item: send as switch*/
   addCheckboxFormItem(page, "ss", L_BINARY_SEND_AS_SWITCH, "1",
                       configuration.sendAsSwitch, L_BINARY_SEND_AS_SWITCH_HINT);
@@ -3361,7 +3361,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   closeSection(page);
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   if (Device->configuration.api.mqtt) {
     openSection(page, F(L_PN532_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
@@ -3472,7 +3472,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "h", L_MIFARE_CARD_TIME,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "100", "20000", "1",
                    L_MILISECONDS);
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   /* Item: send as switch*/
   addCheckboxFormItem(page, "s", L_MIFARE_CARD_SEND_AS_SWITCH, "1",
                       configuration.sendAsSwitch,

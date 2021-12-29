@@ -48,7 +48,7 @@ void gateEventsListener(void) {
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates.state[gateId] != _gateState) {
         MqttAPI.publishGateState(gateId);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishGateState(gateId);
 #endif
         GatesCurrentStates.state[gateId] = _gateState;

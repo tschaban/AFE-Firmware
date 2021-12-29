@@ -1,0 +1,1 @@
+php "C:\Users\Adrian\Development\AFE-Firmware\tools\T7.php"

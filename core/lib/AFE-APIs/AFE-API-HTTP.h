@@ -15,7 +15,7 @@
 #include <en_EN.h>
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
 #else
@@ -96,7 +96,7 @@ private:
   /* Ture if HTTP API is enabled */
   boolean enabled = false;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   AFEAPIMQTTDomoticz *_MqttAPI;
   AFEAPIHTTPDomoticz *_HttpAPIDomoticz;
 #else
@@ -289,7 +289,7 @@ public:
   AFEAPIHTTP();
 
 /* Depending on the API compilication different classes are referenced */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *, AFEAPIMQTTDomoticz *,
              AFEAPIHTTPDomoticz *);
 #else

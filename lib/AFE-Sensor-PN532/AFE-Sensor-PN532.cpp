@@ -51,7 +51,7 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
   Serial << endl
          << " - Listener time: " << configuration.listenerTimeout << "msec";
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #else
   Serial << endl << " - MQTT Topic: " << configuration.mqtt.topic;
 #endif

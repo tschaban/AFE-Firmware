@@ -1567,16 +1567,16 @@ void AFEWebServer::get(RELAY &data) {
   data.state.MQTTConnected =
       server.arg(F("mc")).length() > 0 ? server.arg(F("mc")).toInt() : 0;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("x")).length() > 0
+                          ? server.arg(F("x")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg(F("t")).length() > 0) {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
-#else
-  data.domoticz.idx = server.arg(F("x")).length() > 0
-                          ? server.arg(F("x")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -1704,16 +1704,16 @@ void AFEWebServer::get(REGULATOR &data) {
 
 #endif // AFE_CONFIG_HARDWARE_DHT
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("x")).length() > 0
+                          ? server.arg(F("x")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg(F("t")).length() > 0) {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
-#else
-  data.domoticz.idx = server.arg(F("x")).length() > 0
-                          ? server.arg(F("x")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -1738,16 +1738,16 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
   /* Hardcoded 0 for DS18B20 */
   data.sensorHardware =
       server.arg(F("h")).length() > 0 ? server.arg(F("h")).toInt() : 0;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  data.domoticz.idx = server.arg(F("x")).length() > 0
+                          ? server.arg(F("x")).toInt()
+                          : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg(F("t")).length() > 0) {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
-#else
-  data.domoticz.idx = server.arg(F("x")).length() > 0
-                          ? server.arg(F("x")).toInt()
-                          : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
@@ -2399,13 +2399,7 @@ void AFEWebServer::get(ADCINPUT &data) {
   data.divider.Rb =
       server.arg(F("rb")).length() > 0 ? server.arg(F("rb")).toFloat() : 0;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (server.arg(F("t")).length() > 0) {
-    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
-    data.mqtt.topic[0] = AFE_EMPTY_STRING;
-  }
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.domoticz.raw = server.arg(F("x0")).length() > 0
                           ? server.arg(F("x0")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2418,6 +2412,12 @@ void AFEWebServer::get(ADCINPUT &data) {
   data.domoticz.voltageCalculated = server.arg(F("x3")).length() > 0
                                         ? server.arg(F("x3")).toInt()
                                         : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -2431,17 +2431,17 @@ void AFEWebServer::get(ADCINPUT &data) {
           ? server.arg(F("hv")).toFloat()
           : AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_BATTER_MAX_V;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  data.battery.domoticz.idx = server.arg(F("x")).length() > 0
+                                  ? server.arg(F("x")).toInt()
+                                  : AFE_DOMOTICZ_DEFAULT_IDX;
+#else
   if (server.arg(F("bt")).length() > 0) {
     server.arg(F("bt")).toCharArray(data.battery.mqtt.topic,
                                     sizeof(data.battery.mqtt.topic));
   } else {
     data.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
-#else
-  data.battery.domoticz.idx = server.arg(F("x")).length() > 0
-                                  ? server.arg(F("x")).toInt()
-                                  : AFE_DOMOTICZ_DEFAULT_IDX;
 #endif
 
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -2579,7 +2579,7 @@ void AFEWebServer::get(PN532_SENSOR &data) {
                                                : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   if (server.arg(F("t")).length() > 0) {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
   } else {

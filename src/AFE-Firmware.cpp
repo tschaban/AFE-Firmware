@@ -267,7 +267,7 @@ void setup() {
     initializeMQTTAPI();
 
 /* Initializing Domoticz HTTP API */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     initializeHTTPDomoticzAPI();
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 

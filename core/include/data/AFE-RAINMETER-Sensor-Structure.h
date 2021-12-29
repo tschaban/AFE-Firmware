@@ -10,7 +10,7 @@ struct RAINMETER {
   uint8_t sensitiveness;
   uint32_t interval;
   float resolution; // ml/m2
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_TOPIC mqtt;
@@ -20,7 +20,7 @@ struct RAINMETER {
 struct RAINMETER_DATA {
   float last1h[60];
   uint8_t index1h;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   float counter;
 #else
   float last12h[12];

@@ -5,7 +5,7 @@
 
 #include <arduino.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -25,7 +25,7 @@ struct PN532_SENSOR {
 #ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t ledID;
 #endif
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   MQTT_TOPIC mqtt;
 #endif
 };
@@ -44,7 +44,7 @@ struct MIFARE_CARD {
   uint8_t action;
   boolean sendAsSwitch;
   uint16_t howLongKeepState;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz[AFE_HARDWARE_PN532_TAG_SIZE];
 #else
   MQTT_TOPIC mqtt;

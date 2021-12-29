@@ -39,7 +39,7 @@ void analogInputEventsListener(void) {
         MqttAPI.publishBatteryMeterValues(i);
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishADCValues(i);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -64,7 +64,7 @@ void analogInputEventsListener(void) {
       MqttAPI.publishBatteryMeterValues();
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       HttpDomoticzAPI.publishADCValues();
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER

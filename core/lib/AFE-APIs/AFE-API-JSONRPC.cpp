@@ -87,8 +87,10 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     http.addHeader("afe-hid", _text);
     http.addHeader("afe-lang", L_LANGUAGE_SHORT);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     http.addHeader("afe-api", "D");
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT    
+    http.addHeader("afe-api", "H");
 #else
     http.addHeader("afe-api", "S");
 #endif

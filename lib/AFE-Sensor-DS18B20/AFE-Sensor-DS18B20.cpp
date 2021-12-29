@@ -211,7 +211,7 @@ void AFESensorDS18B20::getJSON(char *json) {
           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
 }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZD
 unsigned long AFESensorDS18B20::getDomoticzIDX() {
   return configuration.domoticz.idx;
 }

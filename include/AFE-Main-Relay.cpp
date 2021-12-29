@@ -35,7 +35,7 @@ void relayEventsListener(void) {
 #endif
       if (Relay[i].autoTurnOff()) {
         MqttAPI.publishRelayState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishRelayState(i);
 #endif
       }

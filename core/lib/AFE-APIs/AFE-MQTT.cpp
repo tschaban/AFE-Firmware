@@ -51,7 +51,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
          << F("INFO: Host: ") << configuration.host << endl
          << F("INFO: IP: ") << configuration.ip << endl
          << F("INFO: Port: ") << configuration.port << endl
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
          << F("INFO: LWT IDX: ") << configuration.lwt.idx;
 #else
          << F("INFO: LWT Topic: ") << configuration.lwt.topic;
@@ -144,10 +144,10 @@ void AFEMQTT::connect() {
           }
         }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         char lwtMessage
             [100]; // {"command":"udevice","idx":999999,"nvalue":"0,"svalue":"disconnected","Battery":100,"RSSI":1000}
-
+// @TODO T7 assess the size of LWT
         if (configuration.lwt.idx > 0) {
           sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":"
                               "0,\"svalue\":\"%s\",\"Battery\":0,\"RSSI\":0}",

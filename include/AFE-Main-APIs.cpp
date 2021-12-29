@@ -17,7 +17,7 @@
 
 void initializeMQTTAPI(void);
 void initializeHTTPAPI(void);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void initializeHTTPDomoticzAPI(void);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
@@ -157,7 +157,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
     if (Device.configuration.noOfPN532Sensors > 0) {
       MqttAPI.addClass(&PN532Sensor[0]);
     }
@@ -193,7 +193,7 @@ void initializeHTTPAPI(void) {
     Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI, &HttpDomoticzAPI);
 #else
     HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI);

@@ -34,7 +34,7 @@ public:
   uint8_t distance;
   uint8_t eventType;
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   char mqttCommandTopic[sizeof(configuration.mqtt.topic) + 5];
 #endif
 

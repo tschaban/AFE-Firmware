@@ -8,7 +8,7 @@
 
 #include <DallasTemperature.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -24,7 +24,7 @@ struct DS18B20 {
   uint8_t unit;
   boolean sendOnlyChanges;
   uint8_t resolution;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_TOPIC mqtt;

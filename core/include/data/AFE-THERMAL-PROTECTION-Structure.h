@@ -13,7 +13,7 @@ struct THERMAL_PROTECTOR {
   uint8_t sensorHardware;
   float temperature;
   boolean enabled;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
   MQTT_TOPIC mqtt;

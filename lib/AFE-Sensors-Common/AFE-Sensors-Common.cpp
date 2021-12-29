@@ -227,7 +227,7 @@ float AFESensorsCommon::comfort(ComfortState &destComfortStatus,
   return ratio;
 }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 byte AFESensorsCommon::convertPerceptionDomoticz(byte perception) {
   if (perception == Perception_Dry) {
     return domoticzAlertYellow;
