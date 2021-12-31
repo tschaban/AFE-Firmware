@@ -310,7 +310,7 @@ boolean AFEWebServer::generate(boolean upload) {
 
   if (getOptionName()) {
 #ifdef DEBUG
-    Serial << endl << "INFO: HTTP Server: API Request";
+    Serial << endl << F("INFO: HTTP Server: API Request");
 #endif
     _ret = false;
   } else {
@@ -867,7 +867,7 @@ void AFEWebServer::publishHTML(const String &page) {
       server.sendContent(page.substring(transfered, nextChunk));
       transfered = nextChunk;
 #ifdef DEBUG
-      Serial << endl << " : " << (transfered * 100 / pageSize) << "%";
+      Serial << endl << F(" : ") << (transfered * 100 / pageSize) << F("%");
 #endif
     }
   } else {
@@ -889,10 +889,10 @@ void AFEWebServer::sendJSON(const String &json) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: HTTP Server: Pubishing reply" << endl
-         << "-----" << endl
+         << F("INFO: HTTP Server: Pubishing reply") << endl
+         << F("-----") << endl
          << json << endl
-         << "-----";
+         << F("-----");
 #endif
 
   server.sendHeader("Cache-Control", "no-cache");
@@ -1145,14 +1145,14 @@ boolean AFEWebServer::upgradOTAFile(void) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: UPGRADE: Current Firmware size: ")
-           << (ESP.getSketchSize() / 1024) << "Kb" << endl
+           << (ESP.getSketchSize() / 1024) << F("Kb") << endl
            << F("INFO: UPGRADE: Free space size: ")
-           << (ESP.getFreeSketchSpace() / 1024) << "Kb" << endl
+           << (ESP.getFreeSketchSpace() / 1024) << F("Kb") << endl
            << F("INFO: UPGRADE: Max free space size for this hardware: ")
-           << (maxSketchSpace / 1024) << "Kb" << endl
+           << (maxSketchSpace / 1024) << F("Kb") << endl
 #ifdef AFE_ESP32
            << F("INFO: UPGRADE: Max size: ")
-           << (UPDATE_SIZE_UNKNOWN / 1024 / 1024) << "KB" << endl
+           << (UPDATE_SIZE_UNKNOWN / 1024 / 1024) << F("KB") << endl
 #endif // ESP32
            << F("INFO: UPGRADE: ");
 #endif
@@ -1167,7 +1167,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
     SystemLED->toggle();
 #endif
 #ifdef DEBUG
-    // Serial << endl << (upload.totalSize / 1024) << " kB";
+    // Serial << endl << (upload.totalSize / 1024) << F(" kB");
     Serial << F(">");
 #endif
 
@@ -2617,8 +2617,8 @@ void AFEWebServer::processMiFareCard() {
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: PN532: Writing to block: "
-           << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i << " : " << tag;
+           << F("INFO: PN532: Writing to block: "
+           << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i << F(" : ") << tag;
 #endif
     PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i, tag);
   }
@@ -2634,8 +2634,8 @@ void AFEWebServer::processMiFareCard() {
 
 #ifdef DEBUG
     Serial << endl
-           << "INFO: PN532: Writing to block: "
-           << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i << " : " << tag;
+           << F("INFO: PN532: Writing to block: "
+           << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i << F(" : ") << tag;
 #endif
     PN532Sensor.writeBlock(AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i, tag);
   }

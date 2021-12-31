@@ -4,7 +4,7 @@
 /* Set this before run */
 
 $type = "7";
-$version = "3.2.0";
+$version = "3.2.0.RC1";
 $language = "en";
 
 /******************/
@@ -336,7 +336,7 @@ foreach ($sourceFolder as &$source) {
     if (file_exists($sourceToCopy)) {
         copy($sourceToCopy, $copyTo);
         echo "\nSUCCESS: " . $fileName;
-        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":"S")."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", 1, 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
+        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":$source["api"]==$targetAPI[1]?"S":"H")."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", 1, 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
         
     } else {
         echo "\nERROR: File doesn't exist:  " . $sourceToCopy;

@@ -61,7 +61,6 @@ private:
 
   String _HtmlResponse;
 
-  char deviceID[17];
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32

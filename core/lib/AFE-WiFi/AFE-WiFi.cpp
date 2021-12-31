@@ -220,22 +220,22 @@ void AFEWiFi::listener() {
                                            : configuration.ssidBackup);
 
             Serial << endl
-                   << "INFO: WIFI: Parameters: " << endl
-                   << " - getAutoConnect=" << WirelessNetwork.getAutoConnect()
+                   << F("INFO: WIFI: Parameters: ") << endl
+                   << F(" - getAutoConnect=") << WirelessNetwork.getAutoConnect()
                    << endl
-                   << " - getAutoReconnect="
+                   << F(" - getAutoReconnect=")
                    << WirelessNetwork.getAutoReconnect() << endl
-                   << " - getMode=" << WirelessNetwork.getMode();
+                   << F(" - getMode=") << WirelessNetwork.getMode();
 
 #ifndef ESP32
             Serial << endl
-                   << " - getListenInterval="
+                   << F(" - getListenInterval=")
                    << WirelessNetwork.getListenInterval() << endl
 
-                   << " - getPersistent=" << WirelessNetwork.getPersistent()
+                   << F(" - getPersistent=") << WirelessNetwork.getPersistent()
                    << endl
-                   << " - getPhyMode=" << WirelessNetwork.getPhyMode() << endl
-                   << " - getSleepMode=" << WirelessNetwork.getSleepMode();
+                   << F(" - getPhyMode=") << WirelessNetwork.getPhyMode() << endl
+                   << F(" - getSleepMode=") << WirelessNetwork.getSleepMode();
 #endif // !ESP32
 #endif
           }

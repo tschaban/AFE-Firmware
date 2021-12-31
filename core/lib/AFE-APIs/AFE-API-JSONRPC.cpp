@@ -15,7 +15,6 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
   Data = _Data;
   Device = _Device;
   Data->getConfiguration(&Pro);
-  Data->getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
   message.reserve(AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE);
 
 #ifdef DEBUG
@@ -76,7 +75,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
     http.begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL);
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("afe-did", deviceID);
+    http.addHeader("afe-did", Device->deviceId);
     if (strlen(Pro.serial) > 0) {
       http.addHeader("afe-key", Pro.serial);
     }

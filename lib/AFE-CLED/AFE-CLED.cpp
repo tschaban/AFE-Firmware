@@ -7,7 +7,7 @@ AFECLED::AFECLED() {}
 boolean AFECLED::begin(AFEDataAccess *Data) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: CLED: Initializing CLED...";
+  Serial << endl << F("INFO: CLED: Initializing CLED...");
 #endif
   _Data = Data;
 
@@ -34,8 +34,8 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: CLED: Setting controlers..." << endl
-         << "INFO: CLED: Setting default parameters....";
+         << F("INFO: CLED: Setting controlers...") << endl
+         << F("INFO: CLED: Setting default parameters....");
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
@@ -59,9 +59,19 @@ boolean AFECLED::begin(AFEDataAccess *Data) {
 }
 
 void AFECLED::on(uint8_t stripId, boolean disableEffects) {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: CLED: Turning LED: ") << stripId
+         << F(": ON; Disable effects: ") << disableEffects;
+#endif
   _turnOnOff(stripId, true, disableEffects);
 }
 void AFECLED::off(uint8_t stripId, boolean disableEffects) {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: CLED: Turning LED: ") << stripId
+         << F(": OFF; Disable effects: ") << disableEffects;
+#endif
   _turnOnOff(stripId, false, disableEffects);
 }
 
@@ -326,11 +336,11 @@ uint8_t AFECLED::convertBrightnessFromAPI(uint8_t stripId, float brightness) {
 void AFECLED::_turnOnOff(uint8_t stripId, boolean state,
                          boolean disableEffects) {
   if (_initialized) {
+    currentState[stripId].state = state;
     _setColor(stripId, state ? currentState[stripId].on.color
                              : currentState[stripId].off.color,
               state ? currentState[stripId].on.brightness
                     : currentState[stripId].off.brightness);
-    currentState[stripId].state = state;
     currentState[stripId].stateUpdated = true;
     if (disableEffects &&
         currentState[stripId].effect.id !=
@@ -341,11 +351,39 @@ void AFECLED::_turnOnOff(uint8_t stripId, boolean state,
 }
 
 void AFECLED::_setColor(uint8_t stripId) {
+
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: CLED: Setting LED: RGB[")
+         << currentState[stripId].config.color.red << F(",")
+         << currentState[stripId].config.color.green << F(",")
+         << currentState[stripId].config.color.blue << F("]")
+         << F(", Brightness: ") << currentState[stripId].config.brightness;
+#endif
+
+  /* @TODO T7 find out why I need to call it twice to turn it on/off */
   FastLED[stripId].showColor(CRGB(currentState[stripId].config.color.red,
                                   currentState[stripId].config.color.green,
                                   currentState[stripId].config.color.blue),
                              configuration[stripId].ledNumbers,
                              currentState[stripId].config.brightness);
+
+  FastLED[stripId].showColor(CRGB(currentState[stripId].config.color.red,
+                                  currentState[stripId].config.color.green,
+                                  currentState[stripId].config.color.blue),
+                             configuration[stripId].ledNumbers,
+                             currentState[stripId].config.brightness);
+
+  /**
+   * @brief setting state to OFF is RGB=0
+   *
+   */
+  if (currentState[stripId].config.color.red == 0 &&
+      currentState[stripId].config.color.green == 0 &&
+      currentState[stripId].config.color.blue == 0 &&
+      currentState[stripId].state == AFE_ON) {
+    currentState[stripId].state = AFE_OFF;
+  }
 }
 
 void AFECLED::_setColor(uint8_t stripId, CLED_RGB color, uint8_t brightness) {

@@ -2802,7 +2802,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2813,7 +2813,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << "success" << endl << "INFO: JSON: ";
+    Serial << F("success") << endl << F("INFO: JSON: ");
 #endif
 
     size_t size = configFile.size();
@@ -2850,7 +2850,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
     }
 #ifdef DEBUG
     else {
-      Serial << "ERROR: JSON not pharsed";
+      Serial << F("ERROR: JSON not pharsed");
     }
 #endif
 
@@ -2860,7 +2860,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << "ERROR: Configuration file: " << fileName << " not opened";
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
 }
@@ -2870,7 +2870,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2881,7 +2881,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << "success" << endl << "INFO: Writing JSON: ";
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DS18B20> jsonBuffer;
@@ -2914,7 +2914,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "ERROR: failed to open file for writing";
+    Serial << endl << F("ERROR: failed to open file for writing");
   }
 #endif
 }
@@ -2940,7 +2940,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Creating file: /cfg-ds18b20-" << i << ".json";
+    Serial << endl << F("INFO: Creating file: /cfg-ds18b20-") << i << F(".json");
 #endif
     sprintf(configuration.name, "DS18B20-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4675,7 +4675,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4686,7 +4686,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << "success" << endl << "INFO: JSON: ";
+    Serial << F("success") << endl << F("INFO: JSON: ");
 #endif
 
     size_t size = configFile.size();
@@ -4752,7 +4752,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
     }
 #ifdef DEBUG
     else {
-      Serial << "ERROR: JSON not pharsed";
+      Serial << F("ERROR: JSON not pharsed");
     }
 #endif
 
@@ -4762,7 +4762,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << "ERROR: Configuration file: " << fileName << " not opened";
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
 }
@@ -4772,7 +4772,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl << endl << "INFO: Opening file: " << fileName << " ... ";
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4783,7 +4783,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
 
   if (configFile) {
 #ifdef DEBUG
-    Serial << "success" << endl << "INFO: Writing JSON: ";
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
 #endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DHT> jsonBuffer;
@@ -4827,7 +4827,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
   }
 #ifdef DEBUG
   else {
-    Serial << endl << "ERROR: failed to open file for writing";
+    Serial << endl << F("ERROR: failed to open file for writing");
   }
 #endif
 }
@@ -4862,7 +4862,7 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Creating file: /cfg-dht-" << i << ".json";
+    Serial << endl << F("INFO: Creating file: /cfg-dht-") << i << F(".json");
 #endif
     sprintf(configuration.name, "DHT-%d", i + 1);
     saveConfiguration(i, &configuration);

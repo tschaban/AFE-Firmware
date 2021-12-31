@@ -642,8 +642,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
 
-#define L_CLED_API_BRIGHTNESS_CONVERSION "Brightness value conversion to"
-#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "no conversion"
+#define L_CLED_API_BRIGHTNESS_CONVERSION "Brightness values"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "0 .. 255"
 #define L_CLED_API_BRIGHTNESS_CONVERSION_0_100 "0..100"
 #define L_CLED_API_BRIGHTNESS_CONVERSION_0_1 "0..1"
 

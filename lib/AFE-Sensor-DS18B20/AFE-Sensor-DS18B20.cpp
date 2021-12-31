@@ -18,8 +18,8 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
 #ifdef DEBUG
     char addressTxt[17];
     addressToChar(configuration.address, addressTxt);
-    Serial << endl << "INFO: Sensor DS18B20[" << addressTxt << "] initialized";    
-    Serial << endl << "INFO: Sensor DS18B20[" << addressTxt << "] resolution: " << Sensor.getResolution() << " bits";
+    Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] initialized");    
+    Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] resolution: ") << Sensor.getResolution() << F(" bits");
 
 #endif
   } else {
@@ -28,8 +28,8 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
     char addressTxt[17];
     addressToChar(configuration.address, addressTxt);
     Serial << endl
-           << "WARN: Sensor DS18B20[" << addressTxt
-           << "] not found. Not initialized";
+           << F("WARN: Sensor DS18B20[") << addressTxt
+           << F("] not found. Not initialized");
 #endif
   }
 }
@@ -39,8 +39,8 @@ float AFESensorDS18B20::getCurrentTemperature() {
   if (_initialized) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Reading temperature from DS18B20[" << configuration.name
-           << "] ";
+           << F("INFO: Reading temperature from DS18B20[") << configuration.name
+           << F("] ");
 #endif
 
     if (readTimeOut == 0) {
@@ -64,10 +64,10 @@ float AFESensorDS18B20::getCurrentTemperature() {
   }
 #ifdef DEBUG
   else {
-    Serial << ": NOT CONNECTED: ";
+    Serial << F(": NOT CONNECTED: ");
   }
-  Serial << ": " << temperature
-         << ", read duration: " << (millis() - readTimeOut) << "msec.";
+  Serial << F(": ") << temperature
+         << F(", read duration: ") << (millis() - readTimeOut) << F("msec.");
 #endif
   readTimeOut = 0;
   return temperature;
@@ -99,7 +99,7 @@ boolean AFESensorDS18B20::listener() {
       else {
         Serial
             << endl
-            << "WARN: DS18B20: Sensor returned -127: means it's disconnected";
+            << F("WARN: DS18B20: Sensor returned -127: means it's disconnected");
       }
 #endif
 
@@ -114,8 +114,8 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
   uint8_t _found = 0;
   uint8_t numberOfDevicesOnBus = 0;
 #ifdef DEBUG
-  Serial << endl << "INFO: Scanning for DS18B20 sensors on GPIO: " << gpio;
-  Serial << endl << " - Wire Bus initialized";
+  Serial << endl << F("INFO: Scanning for DS18B20 sensors on GPIO: ") << gpio;
+  Serial << endl << F(" - Wire Bus initialized");
 #endif
   Sensor.setOneWire(&WireBUS);
   WireBUS.begin(gpio);
@@ -123,7 +123,7 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
   numberOfDevicesOnBus = Sensor.getDS18Count();
 #ifdef DEBUG
   Serial << endl
-         << " - Number of detected DS18B20 sensors: " << numberOfDevicesOnBus;
+         << F(" - Number of detected DS18B20 sensors: ") << numberOfDevicesOnBus;
 #endif
 
   /* @TODO This is a workaround as getDS18Count doesn't retun number of sensor
@@ -132,8 +132,8 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
     numberOfDevicesOnBus = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20;
 #ifdef DEBUG
     Serial << endl
-           << " - WARN: No sensors found. Hard scanning for "
-           << numberOfDevicesOnBus << " addresses";
+           << F(" - WARN: No sensors found. Hard scanning for "
+           << numberOfDevicesOnBus << F(" addresses");
 #endif
   }
 
@@ -157,13 +157,13 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
       }
 #ifdef DEBUG
       Serial << endl
-             << " - Found sensor: " << addresses[i][0] << ":" << addresses[i][1]
-             << ":" << addresses[i][2] << ":" << addresses[i][3] << ":"
-             << addresses[i][4] << ":" << addresses[i][5] << ":"
-             << addresses[i][6] << ":" << addresses[i][7];
+             << F(" - Found sensor: ") << addresses[i][0] << F(":") << addresses[i][1]
+             << F(":") << addresses[i][2] << F(":") << addresses[i][3] << F(":"
+             << addresses[i][4] << F(":") << addresses[i][5] << F(":"
+             << addresses[i][6] << F(":") << addresses[i][7];
 
       Sensor.requestTemperatures();
-      Serial << endl << " - Temperature : " << Sensor.getTempC(addresses[i]);
+      Serial << endl << F(" - Temperature : ") << Sensor.getTempC(addresses[i]);
 
 #endif
     }

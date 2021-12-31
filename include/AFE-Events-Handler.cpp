@@ -2,9 +2,6 @@
 
 /* ---------Headers ---------*/
 
-void eventsListener(void);
-
-/* --------- Body -----------*/
 
 void eventsListener(void) {
   /* Event: connected to WiFi*/

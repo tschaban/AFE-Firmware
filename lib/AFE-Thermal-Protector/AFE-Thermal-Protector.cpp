@@ -13,7 +13,7 @@ void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: Thermal protection initialized. Max temp: "
+         << F("INFO: Thermal protection initialized. Max temp: ")
          << configuration.temperature;
 #endif
 
@@ -23,8 +23,7 @@ void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
     configuration.enabled = false;
 #ifdef DEBUG
     Serial << endl
-           << "INFO: Thermal protection: has been disabled becuase Relay ID "
-              "and/or Sensor ID is missing ";
+           << F("INFO: Thermal protection: has been disabled becuase Relay ID and/or Sensor ID is missing ");
 #endif
   }
 };
@@ -36,8 +35,7 @@ bool AFEThermalProtector::listener(float currentTemperature) {
 
 #ifdef DEBUG
       Serial << endl
-             << "INFO: Thermal protection. Temperature has exceeded the max "
-                "value: "
+             << F("INFO: Thermal protection. Temperature has exceeded the max value: ")
              << configuration.temperature;
 #endif
 
@@ -47,7 +45,7 @@ bool AFEThermalProtector::listener(float currentTemperature) {
     return true;
   } else {
 #ifdef DEBUG
-    Serial << endl << "INFO: Thermal protection: disabled";
+    Serial << endl << F("INFO: Thermal protection: disabled");
 #endif
     return false;
   }

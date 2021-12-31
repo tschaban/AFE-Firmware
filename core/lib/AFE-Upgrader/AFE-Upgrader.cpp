@@ -99,8 +99,8 @@ void AFEUpgrader::upgradeFirmwarType() {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: upgrading firmware type." << endl
-         << "INFO: UPGRADE: Reading core configuration";
+         << F("INFO: upgrading firmware type.") << endl
+         << F("INFO: UPGRADE: Reading core configuration");
 #endif
 
   /* Reading current data */
@@ -114,7 +114,7 @@ void AFEUpgrader::upgradeFirmwarType() {
   deviceState = Data->getDeviceMode();
 
 #ifdef DEBUG
-  Serial << endl << "INFO: UPGRADE: Creating default configuration";
+  Serial << endl << F("INFO: UPGRADE: Creating default configuration");
 #endif
 
   /* Setting the device from scratch */
@@ -122,7 +122,7 @@ void AFEUpgrader::upgradeFirmwarType() {
   Defaults.set();
 
 #ifdef DEBUG
-  Serial << endl << "INFO: UPGRADE: Restoring core configuration";
+  Serial << endl << F("INFO: UPGRADE: Restoring core configuration");
 #endif
 
   /* Restoring core configuration */

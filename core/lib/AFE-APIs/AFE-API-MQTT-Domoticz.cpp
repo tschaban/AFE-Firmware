@@ -294,15 +294,82 @@ void AFEAPIMQTTDomoticz::processRequest() {
 
           if (_CLED->currentState[idxCache[i].id].state !=
               (byte)command.nvalue) {
-            if (command.nvalue == AFE_OFF) {
+
+            boolean _success = true;
+            /**
+             * @brief Processing domoticz command
+             *
+             */
+            switch (command.nvalue) {
+            /* Turn OFF */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_OFF:
               _CLED->off(idxCache[i].id, true);
-            } else {
-              command.led.brightness *=
-                  AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
+              break;
+            /* Turn ON */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_ON:
+              _CLED->on(idxCache[i].id, true);
+              break;
+            /* Turn ON: full brightness */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_FULL_LIGHT:
+              command.led.brightness =
+                  AFE_CONFIG_HARDWARE_CLED_LIGHT_LEVEL_FULL_LIGHT;
+              command.led.color = _CLED->currentState[idxCache[i].id].on.color;
               _CLED->on(idxCache[i].id, command.led, true, true);
-              publishCLEDEffectsState(idxCache[i].id);
+              break;
+            /* Turn ON: night brightness */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_NIGHT_LIGHT:
+              command.led.brightness =
+                  AFE_CONFIG_HARDWARE_CLED_LIGHT_LEVEL_NIGHT_LIGHT;
+              command.led.color = _CLED->currentState[idxCache[i].id].on.color;
+              _CLED->on(idxCache[i].id, command.led, true, true);
+              break;
+            /* Turn ON or OFF depending on new brightness level */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_BRIGHTNESS:
+              if (command.led.brightness > 0) {
+                command.led.brightness *=
+                    AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
+                command.led.color =
+                    _CLED->currentState[idxCache[i].id].on.color;
+                _CLED->on(idxCache[i].id, command.led, true, true);
+              } else {
+                _CLED->off(idxCache[i].id, false);
+              }
+              break;
+            /* Turn ON or OFF depending on brightness level and changing the
+             * color */
+            case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_COLOR:
+              if (command.led.brightness > 0) {
+                command.led.brightness *=
+                    AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
+                _CLED->on(idxCache[i].id, command.led, true, true);
+              } else {
+                _CLED->off(idxCache[i].id, false);
+              }
+              break;
+            /* Command not recognized */
+            default:
+              _success = false;
+#ifdef DEBUG
+              Serial << endl
+                     << F("INFO: WARN: CLED: Not recognized command for LEDs "
+                          "controling");
+#endif
+              break;
             }
-            publishCLEDColorState(idxCache[i].id);
+
+            /**
+             * @brief Updating states (only if authorized command recieved)
+             *
+             */
+            if (_success) {
+              if (_CLED->isStateUpdated(idxCache[i].id)) {
+                publishCLEDColorState(idxCache[i].id);
+              }
+              if (_CLED->isEffectStateUpdated(idxCache[i].id)) {
+                publishCLEDEffectsState(idxCache[i].id);
+              }
+            }
+
           }
 #ifdef DEBUG
           else {
@@ -349,14 +416,14 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #ifdef DEBUG
   else {
     Serial << endl
-           << (command.domoticz.idx > 0 ? "INFO: Domoticz: Bypassing IDX: "
-                                        : " - no IDX: ")
+           << (command.domoticz.idx > 0 ? F("INFO: Domoticz: Bypassing IDX: ")
+                                        : F(" - no IDX: "))
            << command.domoticz.idx;
   }
 #endif
 
 #ifdef DEBUG
-  Serial << endl << "INFO: Domoticz: Request processing finished";
+  Serial << endl << F("INFO: Domoticz: Request processing finished");
 #endif
 }
 

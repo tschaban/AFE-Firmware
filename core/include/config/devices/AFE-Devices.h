@@ -12,6 +12,12 @@
 #ifndef _AFE_devices_h
 #define _AFE_devices_h
 
+/**
+ * @brief Size of a Device ID + 1 for '\0
+ * 
+ */
+#define AFE_CONFIG_DEVICE_ID_SIZE 18 
+
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_DEVICE_MANUFACTURER "Itead"
 #define AFE_DEVICE_TYPE_NAME "Sonoff Basic V1"

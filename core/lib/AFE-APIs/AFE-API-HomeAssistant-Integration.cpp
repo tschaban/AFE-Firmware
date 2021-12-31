@@ -19,7 +19,6 @@ void AFEAPIHomeAssistantIntegration::begin(AFEDataAccess *Data,
     _initialize = true;
     _Device = Device;
     _MqttAPI = MqttAPI;
-    _Data->getDeviceUID().toCharArray(_deviceID, sizeof(_deviceID) + 1);
     FIRMWARE firmwareConfiguration;
     _Data->getConfiguration(&firmwareConfiguration);
     sprintf(_firmwareName, "AFE Firmware T%d-%s", AFE_FIRMWARE_TYPE,
@@ -302,7 +301,7 @@ AFEAPIHomeAssistantIntegration::getTypeOfHAEntity(uint8_t deviceClassId) {
 void AFEAPIHomeAssistantIntegration::generateObjectId(char *objectId,
                                                       uint8_t deviceClassId,
                                                       uint8_t id) {
-  sprintf(objectId, "%s-%d%d", _deviceID, deviceClassId, id);
+  sprintf(objectId, "%s-%d%d", _Device->deviceId, deviceClassId, id);
 }
 
 void AFEAPIHomeAssistantIntegration::generateTopic(char *topic,
@@ -524,7 +523,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief Adding common values
      *
      */
-    _json.replace("{{d.i}}", _deviceID);
+    _json.replace("{{d.i}}", _Device->deviceId);
     _json.replace("{{d.s}}", _firmwareName);
     _json.replace("{{d.m}}", AFE_DEVICE_MANUFACTURER);
     _json.replace("{{d.n}}", _Device->configuration.name);
@@ -551,7 +550,6 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
            << _json << endl
            << endl;
 #endif
-
     _json.toCharArray(_message, sizeof(_message));
     _MqttAPI->Mqtt.publish(_topic, _message);
   } else {

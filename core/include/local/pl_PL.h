@@ -646,8 +646,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska RGB LED: WS281x. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość diod w pasku LED"
 
-#define L_CLED_API_BRIGHTNESS_CONVERSION "Konwersja wartości jasności do"
-#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "bez konwersji"
+#define L_CLED_API_BRIGHTNESS_CONVERSION "Zakres wartości jasności"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "0 .. 255"
 #define L_CLED_API_BRIGHTNESS_CONVERSION_0_100 "0..100"
 #define L_CLED_API_BRIGHTNESS_CONVERSION_0_1 "0..1"
 

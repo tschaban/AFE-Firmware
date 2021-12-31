@@ -45,7 +45,6 @@ private:
 
   HOME_ASSISTANT_CONFIG configuration;
 
-  char _deviceID[18];
   char _firmwareName[28];
   MQTT _mqttConfiguration;
 

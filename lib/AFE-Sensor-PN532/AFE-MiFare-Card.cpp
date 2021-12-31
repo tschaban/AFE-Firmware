@@ -8,7 +8,7 @@ AFEMiFareCard::AFEMiFareCard(){};
 
 void AFEMiFareCard::begin(uint8_t id, AFEDataAccess *_Data) {
 #ifdef DEBUG
-  Serial << endl << "INFO: MiFare Card: " << id;
+  Serial << endl << F("INFO: MiFare Card: ") << id;
 #endif
   _Data->getConfiguration(id, &configuration);
 }

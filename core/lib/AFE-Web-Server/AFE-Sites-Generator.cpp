@@ -10,7 +10,6 @@ void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
   Data = _Data;
   RestAPI = _RestAPI;
   Data->getConfiguration(&Firmware);
-  Data->getDeviceUID().toCharArray(deviceID, sizeof(deviceID) + 1);
   _HtmlResponse.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
 }
 
@@ -686,7 +685,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
     if (numberOfNetworks > 0) {
       for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
-        Serial << endl << " - " << WiFi.SSID(i);
+        Serial << endl << F(" - ") << WiFi.SSID(i);
 #endif
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
         addSelectOptionFormItem(page, _ssid, _ssid,
@@ -788,12 +787,12 @@ void AFESitesGenerator::siteNetwork(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "na",
                    L_NETWORK_NUMBER_OF_CONNECTIONS, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
-
+/* Removed to simplify the configuration. Defaults to 1sec 
   sprintf(_int, "%d", configuration.waitTimeConnections);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "wc",
                    L_NETWORK_TIME_BETWEEN_CONNECTIONS, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1", L_SECONDS);
-
+*/
   sprintf(_int, "%d", configuration.waitTimeSeries);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ws", L_NETWORK_SLEEP_TIME,
                    _int, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1",
@@ -4011,7 +4010,9 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
   page.replace("{{f.t}}", String(Firmware.type));
   page.replace("{{f.d}}", F(AFE_DEVICE_TYPE_NAME));
-  page.replace("{{f.n}}", deviceID);
+
+
+  page.replace("{{f.n}}", Device->deviceId);
   page.replace("{{f.l}}", L_LANGUAGE_SHORT);
   page.replace("{{f.h}}", String(AFE_DEVICE_TYPE_ID));
 

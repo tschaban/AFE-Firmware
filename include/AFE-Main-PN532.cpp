@@ -162,8 +162,8 @@ void PN532EventsListener() {
 
 #ifdef DEBUG
           Serial << endl
-                 << "INFO: MiFare: TAG[" << (idxId + 1)
-                 << "]: MQTT publishing processed";
+                 << F("INFO: MiFare: TAG[") << (idxId + 1)
+                 << F("]: MQTT publishing processed");
 #endif
         }
 #else

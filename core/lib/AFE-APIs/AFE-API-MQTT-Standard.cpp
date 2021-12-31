@@ -943,7 +943,8 @@ boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
 void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
   boolean _success = true;
 #ifdef DEBUG
-  Serial << endl << F("INFO: MQTT: Processing CLED: ") << *id << " : command: ";
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : command: ");
 #endif
 
   char _command[Mqtt.message.length + 1];
@@ -979,8 +980,14 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
     sprintf(_state, root["command"] | "");
 
     if (strcmp(_state, "on") == 0) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: CLED: Processing ON");
+#endif
       _CLED->on(*id, true);
     } else if (strcmp(_state, "off") == 0) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: CLED: Processing OFF");
+#endif
       _CLED->off(*id, false);
     } else {
       _color.color.blue = root["color"]["blue"];
@@ -996,7 +1003,18 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
              << F("], Brightness: ") << _color.brightness;
 #endif
 
-      _CLED->on(*id, _color, true, true);
+      /**
+       * @brief if color is set to RGB=0 then turning OFF LED strip, otherwise
+       * turn it ON
+       *
+       */
+
+      if (_color.color.blue == 0 && _color.color.green == 0 &&
+          _color.color.red == 0) {
+        _CLED->off(*id, false);
+      } else {
+        _CLED->on(*id, _color, true, true);
+      }
     }
   }
 
@@ -1052,7 +1070,6 @@ void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id) {
 }
 
 void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
-  boolean _success = true;
 #ifdef DEBUG
   Serial << endl
          << F("INFO: MQTT: Processing CLED: ") << *id << F(" : brightness : ");
@@ -1077,15 +1094,14 @@ void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
   _color = _brightness == 0 ? _CLED->currentState[*id].off
                             : _CLED->currentState[*id].on;
   _color.brightness = _brightness;
-  _CLED->on(*id, _color, true, true);
+  _CLED->on(*id, _color, true,
+            true); // @TODO T7 should it be alwyas on? what if brightness is 0?
 
-  if (_success) {
-    if (_CLED->isStateUpdated(*id)) {
-      publishCLEDState(*id);
-    }
-    if (_CLED->isEffectStateUpdated(*id)) {
-      publishCLEDEffectsState(*id);
-    }
+  if (_CLED->isStateUpdated(*id)) {
+    publishCLEDState(*id);
+  }
+  if (_CLED->isEffectStateUpdated(*id)) {
+    publishCLEDEffectsState(*id);
   }
 }
 

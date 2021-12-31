@@ -69,30 +69,30 @@ boolean AFESensorAS3935::begin(uint8_t id) {
                                                         : "Unknown");
 
       Serial << endl
-             << "INFO: AS3935: Minimum Number Of Lightning: "
+             << F("INFO: AS3935: Minimum Number Of Lightning: ")
              << AS3935LightingSensor.readMinimumNumberOfLightning();
       Serial << endl
-             << "INFO: AS3935: Noise Floor Level: "
+             << F("INFO: AS3935: Noise Floor Level: ")
              << AS3935LightingSensor.readNoiseFloorLevel();
       Serial << endl
-             << "INFO: AS3935: Spike rejection: "
+             << F("INFO: AS3935: Spike rejection: ")
              << AS3935LightingSensor.readSpikeRejection();
       Serial << endl
-             << "INFO: AS3935: Watchdog threshold: "
+             << F("INFO: AS3935: Watchdog threshold: ")
              << AS3935LightingSensor.readWatchdogThreshold();
       Serial << endl
-             << "INFO: AS3935: Mask Disturber: "
+             << F("INFO: AS3935: Mask Disturber: ")
              << AS3935LightingSensor.readMaskDisturber();
       Serial << endl
-             << "INFO: AS3935: Frequency division ration for antenna tuning: "
+             << F("INFO: AS3935: Frequency division ration for antenna tuning: ")
              << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
 
-      Serial << endl << endl << "INFO: AS3935 Configuring the sensor";
+      Serial << endl << endl << F("INFO: AS3935 Configuring the sensor");
 
 #endif
 
 #ifdef DEBUG
-      Serial << endl << " - resetting to defalut values";
+      Serial << endl << F(" - resetting to defalut values");
 #endif
       AS3935LightingSensor.clearStatistics();
       AS3935LightingSensor.setDefautSettings();
@@ -120,27 +120,27 @@ boolean AFESensorAS3935::begin(uint8_t id) {
       Serial << endl
              << F("INFO: AS3935: AFE Gain: ")
              << (AS3935LightingSensor.isIndoor()
-                     ? "Indoor"
-                     : AS3935LightingSensor.isOutdoor() ? "Outdoor"
-                                                        : "Unknown");
+                     ? F("Indoor")
+                     : AS3935LightingSensor.isOutdoor() ? F("Outdoor")
+                                                        : F("Unknown"));
 
       Serial << endl
-             << "INFO: AS3935: Minimum Number Of Lightning: "
+             << F("INFO: AS3935: Minimum Number Of Lightning: ")
              << AS3935LightingSensor.readMinimumNumberOfLightning();
       Serial << endl
-             << "INFO: AS3935: Noise Floor Level: "
+             << F("INFO: AS3935: Noise Floor Level: ")
              << AS3935LightingSensor.readNoiseFloorLevel();
       Serial << endl
-             << "INFO: AS3935: Spike rejection: "
+             << F("INFO: AS3935: Spike rejection: ")
              << AS3935LightingSensor.readSpikeRejection();
       Serial << endl
-             << "INFO: AS3935: Watchdog threshold: "
+             << F("INFO: AS3935: Watchdog threshold: ")
              << AS3935LightingSensor.readWatchdogThreshold();
       Serial << endl
-             << "INFO: AS3935: Mask Disturber: "
+             << F("INFO: AS3935: Mask Disturber: ")
              << AS3935LightingSensor.readMaskDisturber();
       Serial << endl
-             << "INFO: AS3935: Frequency division ration for antenna tuning: "
+             << F("INFO: AS3935: Frequency division ration for antenna tuning: ")
              << AS3935LightingSensor.readFrequencyDivisionForAntennaTuning();
 
 #endif

@@ -54,7 +54,7 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Device: ")
-         << (_initialized ? "Found" : "Not found: check wiring");
+         << (_initialized ? F("Found") : F("Not found: check wiring"));
   Serial << endl << F("--------------------------------------") << endl;
 #endif
 }

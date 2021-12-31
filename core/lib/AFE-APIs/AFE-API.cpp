@@ -9,21 +9,29 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device, AFELED *Led) {
   _Data = Data;
   _Device = Device;
   _Led = Led;
-  if (_Device->configuration.api.mqtt) {
-    Mqtt.begin(Data, Device->configuration.name, Led);
-  }
-  enabled = true;
+  begin();
 }
 #else
 void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Data = Data;
   _Device = Device;
+  begin();
+}
+#endif // AFE_CONFIG_HARDWARE_LED
+
+void AFEAPI::begin() {
+
+  
+
   if (_Device->configuration.api.mqtt) {
-    Mqtt.begin(Data, Device->configuration.name);
+#ifdef AFE_CONFIG_HARDWARE_LED
+    Mqtt.begin(_Data, _Device, _Led);
+#else
+    Mqtt.begin(_Data, _Device);
+#endif
   }
   enabled = true;
 }
-#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPI::addClass(AFERelay *Relay) {

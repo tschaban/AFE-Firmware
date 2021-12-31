@@ -90,7 +90,6 @@
 #include <AFE-CLED.h>
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 #include <AFE-Sensor-TSL2561.h>
 #endif // AFE_CONFIG_HARDWARE_TSL2561
@@ -101,10 +100,14 @@
 
 class AFEAPI {
 private:
+  void begin();
+
 public:
   AFEMQTT Mqtt;
   AFEDevice *_Device;
   AFEDataAccess *_Data;
+
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
 #endif
@@ -192,7 +195,6 @@ public:
   virtual void addClass(AFECLED *);
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   virtual void addClass(AFESensorTSL2561 *);
 #endif
@@ -212,12 +214,12 @@ protected:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-  /* Stories reference to global ADC class */
-  #ifdef AFE_ESP32
+/* Stories reference to global ADC class */
+#ifdef AFE_ESP32
   AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
-  #else
+#else
   AFEAnalogInput *_AnalogInput;
-  #endif
+#endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -287,7 +289,6 @@ protected:
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
-
 };
 
 #endif // _AFE_API_h

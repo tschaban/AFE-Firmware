@@ -41,7 +41,6 @@ class AFEJSONRPC {
 private:
   WiFiClient WirelessClient;
   HTTPClient http;
-  char deviceID[17];
   AFEDevice *Device;
   AFEDataAccess *Data;  
   String message;
