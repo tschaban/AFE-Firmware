@@ -67,9 +67,6 @@
 #include <AFE-ADC-INPUT-Structure.h>
 #endif 
 
-/* @TODO BUG For unknown reason non T5 version can't be compiled if these are
- * excluded */
-
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-AS3935-Sensor-Structure.h>
 #endif

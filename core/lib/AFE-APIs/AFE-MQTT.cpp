@@ -150,9 +150,7 @@ void AFEMQTT::connect() {
                 _Device->deviceId);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        char lwtMessage
-            [100]; // {"command":"udevice","idx":999999,"nvalue":"0,"svalue":"disconnected","Battery":100,"RSSI":1000}
-                   // @TODO T7 assess the size of LWT
+        char lwtMessage[96];
         if (configuration.lwt.idx > 0) {
           sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":"
                               "0,\"svalue\":\"%s\",\"Battery\":0,\"RSSI\":0}",

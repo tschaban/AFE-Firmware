@@ -157,7 +157,7 @@ void AFESensorBMEX80::listener() {
 
 void AFESensorBMEX80::getJSON(char *json) {
 
-  //@TODO Estimate max size of JSON
+  //@TODO T5 T6  Estimate max size of JSON
   StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH>
       jsonBuffer; // {"temperature":{"value":25.0273,"unit":"C","correction":25.0273},"pressure":{"value":993.6063,"unit":"hPa","correction":993.6063},"relativePressure":{"value":1003.809,"unit":"hPa"},"dewPoint":{"value":5.321408,"unit":"C"},"humidity":{"value":281.10078,"unit":"%H","correction":281.10078,"rating":3},"absoluteHumidity":{"value":6.480335,"unit":"%H"},"heatIndex":{"value":24.31934,"unit":"C"},"perception":{"value":0,"description":"W
   // porządku dla większości, ale wszyscy odczuwają wilgoć przy
@@ -270,7 +270,7 @@ void AFESensorBMEX80::getJSON(char *json) {
     gasResistance["unit"] = "kOm";
   }
 
-  //@TODO Estimate max size of JSON
+  //@TODO T5 T6 Estimate max size of JSON
   root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH);
 }
 

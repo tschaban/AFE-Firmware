@@ -1090,12 +1090,13 @@ void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
   uint8_t _brightness = atoi(_command);
 #endif // AFE_FIRMWARE_API_STANDARD
 
-  CLED_PARAMETERS _color;
-  _color = _brightness == 0 ? _CLED->currentState[*id].off
-                            : _CLED->currentState[*id].on;
-  _color.brightness = _brightness;
-  _CLED->on(*id, _color, true,
-            true); // @TODO T7 should it be alwyas on? what if brightness is 0?
+  if (_brightness > 0) {
+    CLED_PARAMETERS _color = _CLED->currentState[*id].on;
+    _color.brightness = _brightness;
+    _CLED->on(*id, _color, true, true);
+  } else {
+    _CLED->off(*id, true);
+  }
 
   if (_CLED->isStateUpdated(*id)) {
     publishCLEDState(*id);

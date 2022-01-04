@@ -202,7 +202,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
 
   boolean _ret = false;
   if (enabled) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T5 T6 CHeck the max size
     if (_BMx80Sensor[id]->configuration.domoticz.temperature.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.temperature.value);
       sendCustomSensorCommand(
@@ -397,7 +397,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorBH1750 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled && _BH1750Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T5 T6  CHeck the max size
     sprintf(value, "%-.2f", _BH1750Sensor[id]->data);
     sendCustomSensorCommand(_BH1750Sensor[id]->configuration.domoticz.idx,
                             value);
@@ -446,7 +446,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorAS3935 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled && _AS3935Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T6 CHeck the max size
     sprintf(value, "%-d", _AS3935Sensor[id]->distance);
     sendCustomSensorCommand(_AS3935Sensor[id]->configuration.domoticz.idx,
                             value);
@@ -644,7 +644,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_charText, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
 
-      // @TODO is there a better one?
+      // @TODO T2 is there a better one?
       _stringText = _charText;
       _stringText.replace(" ", "%20");
       _stringText.toCharArray(_charText, sizeof(_charText));
@@ -667,7 +667,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
       strcpy_P(_charText,
                (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
 
-      // @TODO is there a better one?
+      // @TODO T2 is there a better one?
       _stringText = _charText;
       _stringText.replace(" ", "%20");
       _stringText.toCharArray(_charText, sizeof(_charText));

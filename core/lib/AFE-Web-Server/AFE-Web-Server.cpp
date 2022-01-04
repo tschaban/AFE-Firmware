@@ -452,7 +452,7 @@ boolean AFEWebServer::generate(boolean upload) {
           CONTACTRON configuration;
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
-          // @TODO why this doesn't work here? => configuration = {0};
+          // @TODO T5 why this doesn't work here? => configuration = {0};
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE

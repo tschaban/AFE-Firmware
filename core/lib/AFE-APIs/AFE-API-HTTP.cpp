@@ -90,7 +90,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif
 /* Checking if BMx80 Input request */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  // @TODO change in doc BMX80
+  // @TODO T5 T6 change in doc BMX80
   else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BMEX80) == 0 ||
            strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BMX80) == 0) {
 #ifdef DEBUG

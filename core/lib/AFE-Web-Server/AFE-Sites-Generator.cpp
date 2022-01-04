@@ -334,8 +334,13 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   addMenuItem(page, F(L_PRO_VERSION), AFE_CONFIG_SITE_PRO_VERSION);
 
   addMenuItemExternal(page, F(L_DOCUMENTATION), F(AFE_URL_DOCUMENTATION));
-
   addMenuItemExternal(page, F(L_HELP), F(AFE_URL_HELP));
+
+#if AFE_LANGUAGE == 0
+  addMenuItemExternal(page, F("YouTube"), F("https://afe.yt.pl.smartnydom.pl"));
+#else
+  addMenuItemExternal(page, F("YouTube"), F("https://afe.yt.en.smartnydom.pl"));
+#endif
 
   page.concat(F("</ul><h4></h4><ul class=\"lst\">"));
 
@@ -670,7 +675,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
   openSection(page, F(L_NETWORK_CONFIGURATION),
               F(L_NETWORK_CONFIGURATION_INFO));
 
-#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+#ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   if (WiFi.getMode() == WIFI_MODE_STA) {
 #endif // AFE_ESP32
 
@@ -703,7 +708,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
     page.concat(F("\" formaction=\"/?o="));
     page += AFE_CONFIG_SITE_NETWORK;
     page.concat(F("&c=0\"></div>"));
-#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+#ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   } else {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "s", L_NETWORK_SSID,
                      configuration.ssid, "32");
@@ -742,7 +747,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
                    L_NETWORK_SWITCH_TO_BACKUP, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
 
-#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+#ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   if (WiFi.getMode() == WIFI_MODE_STA) {
 #endif // AFE_EPS32
 
@@ -759,7 +764,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
       }
     }
     addSelectFormItemClose(page);
-#ifdef AFE_ESP32 /* @TODO problem with scanning for WiFi on ESP32 */
+#ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   } else {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "sb", L_NETWORK_SSID,
                      configuration.ssidBackup, "32");
@@ -787,12 +792,12 @@ void AFESitesGenerator::siteNetwork(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "na",
                    L_NETWORK_NUMBER_OF_CONNECTIONS, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
-/* Removed to simplify the configuration. Defaults to 1sec 
-  sprintf(_int, "%d", configuration.waitTimeConnections);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "wc",
-                   L_NETWORK_TIME_BETWEEN_CONNECTIONS, _int,
-                   AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1", L_SECONDS);
-*/
+  /* Removed to simplify the configuration. Defaults to 1sec
+    sprintf(_int, "%d", configuration.waitTimeConnections);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "wc",
+                     L_NETWORK_TIME_BETWEEN_CONNECTIONS, _int,
+                     AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1", L_SECONDS);
+  */
   sprintf(_int, "%d", configuration.waitTimeSeries);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ws", L_NETWORK_SLEEP_TIME,
                    _int, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1",
@@ -3080,7 +3085,6 @@ void AFESitesGenerator::siteConnecting(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
   page.replace("{{M}}", WiFi.macAddress());
-  page.replace("{{S}}", configuration.ssid);
   closeMessageSection(page);
 }
 
@@ -3694,7 +3698,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    configuration.name, "32");
 
   /* Item: GPIO */
-  sprintf(_number, "%d", AFE_CONFIG_HARDWARE_CLED_0_GPIO);
+  sprintf(_number, "%d", configuration.gpio);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "g", "GPIO", _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
                    AFE_FORM_ITEM_SKIP_PROPERTY, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -4010,7 +4014,6 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
   page.replace("{{f.t}}", String(Firmware.type));
   page.replace("{{f.d}}", F(AFE_DEVICE_TYPE_NAME));
-
 
   page.replace("{{f.n}}", Device->deviceId);
   page.replace("{{f.l}}", L_LANGUAGE_SHORT);

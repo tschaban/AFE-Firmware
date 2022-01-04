@@ -126,7 +126,7 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
          << F(" - Number of detected DS18B20 sensors: ") << numberOfDevicesOnBus;
 #endif
 
-  /* @TODO This is a workaround as getDS18Count doesn't retun number of sensor
+  /* @TODO T1 This is a workaround as getDS18Count doesn't retun number of sensor
    */
   if (numberOfDevicesOnBus == 0) {
     numberOfDevicesOnBus = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20;
