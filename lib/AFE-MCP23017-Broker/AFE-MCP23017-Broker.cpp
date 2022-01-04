@@ -10,7 +10,7 @@ AFEMCP23017Broker::AFEMCP23017Broker() {
     _cache[i].address = AFE_HARDWARE_ITEM_NOT_EXIST;
   }
 #ifdef DEBUG
-  Serial << endl << "INFO: MCP23017 Broker: initialized";
+  Serial << endl << F("INFO: MCP23017 Broker: initialized");
 #endif
 }
 

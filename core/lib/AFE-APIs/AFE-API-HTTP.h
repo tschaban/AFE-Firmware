@@ -15,7 +15,7 @@
 #include <en_EN.h>
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
 #else
@@ -26,7 +26,7 @@
 #include <AFE-Relay.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-Analog-Input.h>
 #endif
 
@@ -78,6 +78,10 @@
 #include <AFE-Sensor-TSL2561.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -92,7 +96,7 @@ private:
   /* Ture if HTTP API is enabled */
   boolean enabled = false;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   AFEAPIMQTTDomoticz *_MqttAPI;
   AFEAPIHTTPDomoticz *_HttpAPIDomoticz;
 #else
@@ -103,9 +107,9 @@ private:
   AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
-AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
+  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
 #else  // AFE_ESP8266
   AFEAnalogInput *_AnalogInput;
 #endif // AFE_ESP32
@@ -168,6 +172,10 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED *_CLED;
+#endif
+
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
 
@@ -175,7 +183,7 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   void processRelay(HTTPCOMMAND *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   void processAnalogInput(HTTPCOMMAND *);
 #endif
 
@@ -239,24 +247,49 @@ AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
   void processTSL2561(HTTPCOMMAND *);
 #endif
 
-  void send(HTTPCOMMAND *request, boolean status, const char *value = "");
-/* @TODO Check if it's still used
-  void send(HTTPCOMMAND *request, boolean status, double value,
-          uint8_t width = 2, uint8_t precision = 2);
-*/
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void processCLED(HTTPCOMMAND *);
+  void processCLEDEffect(HTTPCOMMAND *, uint8_t effectId);
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  void publishCLEDStates(uint8_t id, boolean fromDomoticz);
+#else
+  void publishCLEDStates(uint8_t id);
+#endif;
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Method converts Relay value to string and invokes sendHTTPAPIRequestStatus
-   * method which creates JSON respons and pushes it */
-  void sendRelayStatus(HTTPCOMMAND *request, boolean status, byte value);
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
+  /**
+  * @brief Method creates and sends On/Off response
+  *
+  * @param  request          HTTP Command request
+  * @param  status           Success or Failure
+  * @param  value            On, Off
+  */
+  void sendOnOffStatus(HTTPCOMMAND *request, boolean status, byte value);
 #endif
+
+  /**
+   * @brief Method creates JSON respons after processing HTTP API request, and
+   * pushes it
+   *
+   * @param  request          HTTP Command request
+   * @param  status           success or failure
+   * @param  value            contain of data json tag
+   */
+  void send(HTTPCOMMAND *request, boolean status, const char *value = "");
+
+  /* @TODO Check if it's still used
+    void send(HTTPCOMMAND *request, boolean status, double value,
+            uint8_t width = 2, uint8_t precision = 2);
+  */
 
 public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIHTTP();
 
 /* Depending on the API compilication different classes are referenced */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *, AFEAPIMQTTDomoticz *,
              AFEAPIHTTPDomoticz *);
 #else
@@ -271,7 +304,7 @@ public:
   void addClass(AFERelay *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   void addClass(AFEAnalogInput *);
 #endif
 
@@ -329,6 +362,10 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void addClass(AFESensorTSL2561 *);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void addClass(AFECLED *);
 #endif
 };
 

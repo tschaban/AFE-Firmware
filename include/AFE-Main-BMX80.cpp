@@ -26,7 +26,7 @@ void BMX80SensorEventsListener(void) {
       BMEX80Sensor[i].listener();
       if (BMEX80Sensor[i].isReady()) {
         MqttAPI.publishBMx80SensorData(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishBMx80SensorData(i);
 #endif
       }

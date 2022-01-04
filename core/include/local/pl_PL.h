@@ -57,6 +57,8 @@
 #define L_NETWORK_CONNECTED "Podłączony"
 #define L_DISCONNECTED "Odłączony"
 #define L_CONNECTIONS "Połączenia"
+#define L_CLEDS "LEDy RGB"
+#define L_HOME_ASSISTANT_INTEGRATION "Integracja z Home Assistant"
 
 /* Forms commons */
 #define L_NUMBER_OF_CHARS "znaków"
@@ -147,7 +149,7 @@
 #define L_NETWORK_SUBNET "Maska sieci"
 #define L_NETWORK_DEVICE_IP "IP urządzenia"
 #define L_NETWORK_DEVICE_IP_INFO "Możesz skonfigurować adres IP urządzenia ręcznie lub automatycznie za pośrednictwem DHCP"
-#define L_NETWORK_NUMBER_OF_CONNECTIONS "Ilość prób łączenia się"
+#define L_NETWORK_NUMBER_OF_CONNECTIONS "Czas oczekiwania na połączenie"
 #define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Czas między próbami łączenia się"
 #define L_NETWORK_SLEEP_TIME "Czas po jakim powtórzyć próby łączenia się"
 #define L_NETWORK_ADVANCED "Zaawansowane"
@@ -155,7 +157,7 @@
 #define L_NETWORK_DEVICE_CONNECTS "Urządzenie łaczy się z siecią"
 #define L_NETWORK_CONNECT_TO "Połącz się z siecią WiFi"
 //#define L_NETWORK_CONNECT "Połącz"
-#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Następnie w konfigurację routera WiFi, wyszukaj adres IP urządzenia o adresie MAC"
+#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Następnie w konfigurację routera WiFi, wyszukaj adres IP urządzenia o adresie MAC: {{M}} lub hostname: AFE-Device"
 #define L_NETWORK_FINISH_NETWORK_CONFIGURATION  "Dokończ konfigurację wpisując adres IP urządzenia w przeglądarce"
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
@@ -259,6 +261,11 @@
 #define L_ADC_MQTT_TOPIC "Temat MQTT dla informacji z ADC"
 #define L_ADC_INPUT "Wejście"
 
+#define L_ADC_HA_VOLTAGE "Napięcie na wejściu"
+#define L_ADC_HA_VOLTAGE_CALCULATED "Napięcie"
+#define L_ADC_HA_VOLTAGE_RAW "Wartość na wejściu"
+#define L_ADC_HA_VOLTAGE_PERCENT "Wartość na wejściu"
+
 #define L_BATTERY_METER "Pomiar naładowania baterii"
 #define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
 #define L_BATTERY_MIN_LEVEL "Minimalny poziom baterii"
@@ -301,7 +308,7 @@
   "Po 15 sekundach urządzenie zostanie zrestartowane. Proszę czekać ..."
 #define L_UPGRADE_RESTORE_DEFAULT_SETTINGS "Przywróć ustawienia początkowe"
 #define L_RESTORE_CONFIGURATION_WILL_BE_REMOVED                                        \
-  "<strong> Ostrzeżenie:</strong> przywrócenie ustawień domyślnych spowoduje usunięcie aktualnej konfiguracji, w tym konfiguracja WiFi"
+  "<strong> Ostrzeżenie:</strong> przywrócenie ustawień domyślnych spowoduje usunięcie aktualnej konfiguracji, w tym konfigurację WiFi"
 #define L_RESTORE_IN_PROGRESS "Trwa przywracanie konfiguracji początkowej"
 #define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE "Po 20 sekundach połącz się z siecią Wi-Fi o nazwie twojego urządzenia" 
 #define L_RESTORE_NETWORK_CONNECT_TO_HOTSPOT_AFTER_UPGRADE_AFE "Po 20 sekundach połącz się z siecią WiFi o nazwie <strong>AFE Device</strong>" 
@@ -603,28 +610,51 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_MIFARE_ADMIN_INFO "Informacje"
 
-#define L_CLED_EFFECT_DEVICE_LIGHT "Efekt LED: Podświetlenia urządzenia"
-#define L_CLED_EFFECT_PN532_SENSOR "Efekt LED: Status czujnika PN532/PIR"
-#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska 8xLED RGB WS2812. Pasek musi zostać podłączony jak poniżej"
-#define L_CLED_NUMBER_OF_LEDS "Ilość LED na listwie"
-#define L_CLED_COLORS_ORDER "Kolejność kolorów"
-#define L_CLED_EFFECT_WAVE "Efekt fala"
-#define L_CLED_EFFECT_FADE_IN_OUT "Efekt przygaszania"
-#define L_CLED_COLOR "Kolor"
-#define L_CLED_BRIGHTNESS "Jasność"
-#define L_CLED_MAX_BRIGHTNESS "Maksymalna jasność"
-#define L_CLED_TIME_WAVE "Szybkość fali"
-#define L_CLED_TIME_FADE_IN_OUT "Szybkość przygaszania"
-#define L_CLED_LIGHT_SENSOR "Czujnik natężenia oświetlenia"
-#define L_CLED_LIGHT_LEVEL "Poziom natężenia oświetlenia"
-#define L_CLED_BACKLIGHT_CONFIG "Konfiguracja podświetlenia"
-#define L_CLED_RULE "Reguła"
-#define L_CLED_RULE_HINT "Reguła podświetlenia jest uruchamiana, jeśli poziom światła jest poniżej odczytu czujnika. Pierwszy spełniony warunek zatrzymuje przetwarzanie kolejnych reguł"
-#define L_CLED_MQTT_TOPIC "Temat MQTT sterujący LED'em"
 
-#define L_CLED_LIGHT_EFFECTS "Efekty świetlne"
-#define L_CLED_DEVICE_BACKLIGHT "Podświetlenie urządzenia"
-#define L_CLED_PN532_EFFECTS "Efekty czujnika PN532"
+#define L_CLED_STRIP "Pasek RGB LED"
+#define L_CLED_BRIGHTNESS "Jasność"
+#define L_CLED_COLOR_RGB "Kolor"
+#define L_CLED_CONFIGURATION "Konfiguracja RGB LED"
+#define L_CLED_ONOFF_CONFIGURATION "Konfiguracja wł/wył"
+#define L_CLED_ONOFF_CONFIGURATION_ON "RGB LED włączony"
+#define L_CLED_ONOFF_CONFIGURATION_OFF "RGB LED wyłączony"
+#define L_CLED_EFFECTS_CONFIGURATION "Konfiguracja efektów świetlnych"
+#define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
+#define L_CLED_TIMEOUT "Jak długo utrzymywać stan"
+
+#define L_CLED_EFFECT_LABEL "Efekty świetlne"
+#define L_CLED_EFFECT_OFF_COMMAND "Wyłącz"
+#define L_CLED_EFFECT_BLINKING_CONFIGURATION "Efekt: migania"
+#define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Efekt: zanikanie"
+#define L_CLED_EFFECT_WAVE_CONFIGURATION "Efekt: fali"
+
+#define L_CLED_EFFECT_WAVE_ON_LED_COLOR "Kolor aktywnej diody"
+#define L_CLED_EFFECT_WAVE_OFF_LED_COLOR "Kolor nieaktywnych diod"
+#define L_CLED_EFFECT_WAVE_SPEED "Szybkość fali"
+
+#define L_CLED_MAX_BRIGHTNESS "Max jasność"
+#define L_CLED_MIN_BRIGHTNESS "Min jasność"
+#define L_CLED_FADE_IN_OUT_TIMEOUT "Szybkość zanikania"
+
+#define L_CLED_ON_OFF_IDX "IDX Wł/Wył"
+#define L_CLED_EFFECTS_IDX "IDX Efekty"
+#define L_CLED_MQTT_TOPIC "Temat MQTT kontrolujący RGB LED"
+
+#define L_CLED_MQTT_ON_OFF_TOPIC "Temat Wł/Wył"
+#define L_CLED_MQTT_EFFECTS_TOPIC "Temat efektów"
+
+#define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska RGB LED: WS281x. Pasek musi zostać podłączony jak poniżej"
+#define L_CLED_NUMBER_OF_LEDS "Ilość diod w pasku LED"
+
+#define L_CLED_API_BRIGHTNESS_CONVERSION "Zakres wartości jasności"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "0 .. 255"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_100 "0..100"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_1 "0..1"
+
+/* Home Assistant */
+#define L_HA_DISCOVERY_TOPIC "Temat nasłuchu konfiguracji urządzeń"
+#define L_HA_PUBLISHING "Publikować/aktualizować konfiguracje urządzenia?"
+#define L_HA_UPDATE_REMOVE "Usuwać nieaktualne konfiguracje?"
 
 
 #endif // _LANG_PL_h

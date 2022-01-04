@@ -18,25 +18,25 @@ void setup() {
 
 #ifndef AFE_ESP32 /* ESP82xx */
 
-  Serial << endl << "INFO: ESP: ID " << ESP.getFlashChipId();
-  Serial << endl << "INFO: ESP: Real flash size: ";
+  Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
+  Serial << endl << F("INFO: ESP: Real flash size: ");
   if (ESP.getFlashChipRealSize() >= 1048576) {
-    Serial << (ESP.getFlashChipRealSize() / 1048576) << " Mbits";
+    Serial << (ESP.getFlashChipRealSize() / 1048576) << F(" Mbits");
   } else {
-    Serial << (ESP.getFlashChipRealSize() / 1024) << " Kbits";
+    Serial << (ESP.getFlashChipRealSize() / 1024) << F(" Kbits");
   }
 
-  Serial << endl << "INFO: ESP: Flesh size: ";
+  Serial << endl << F("INFO: ESP: Flesh size: ");
   if (ESP.getFlashChipSize() >= 1048576) {
-    Serial << (ESP.getFlashChipSize() / 1048576) << " Mbits";
+    Serial << (ESP.getFlashChipSize() / 1048576) << F(" Mbits");
   } else {
-    Serial << (ESP.getFlashChipSize() / 1024) << " Kbits";
+    Serial << (ESP.getFlashChipSize() / 1024) << F(" Kbits");
   }
 
   Serial << endl
-         << "INFO: ESP: Speed " << (ESP.getFlashChipSpeed() / 1000000)
-         << " MHz";
-  Serial << endl << "INFO: ESP: Mode " << ESP.getFlashChipMode() << endl;
+         << F("INFO: ESP: Speed ") << (ESP.getFlashChipSpeed() / 1000000)
+         << F(" MHz");
+  Serial << endl <<F( "INFO: ESP: Mode " )<< ESP.getFlashChipMode() << endl;
 
 #else  /* ESP32 */
 // @TODO ESP32
@@ -53,7 +53,7 @@ void setup() {
 #endif // ESP32/ESP8266
 
 /* Initializing SPIFFS file system */
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   bool _fileSystemReady = LITTLEFS.begin();
 #else
   bool _fileSystemReady = SPIFFS.begin();
@@ -67,7 +67,7 @@ void setup() {
     Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
 
-#if AFE_FILE_SYSTEM_USED == AFE_FS_SPIFFS
+#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
     yield();
     SPIFFS.gc();
 #endif
@@ -255,9 +255,9 @@ void setup() {
     initializeRainmeter();
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
     initializeADC();
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();
@@ -267,20 +267,13 @@ void setup() {
     initializeMQTTAPI();
 
 /* Initializing Domoticz HTTP API */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     initializeHTTPDomoticzAPI();
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
     /* Initializing HTTP API */
     initializeHTTPAPI();
   }
-
-/* Enabling MQTT API in configuration mode for Home Assistant Discovery */
-#ifdef AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
-  if (Device.getMode() == AFE_MODE_CONFIGURATION) {
-    initializeMQTTAPI();
-  }
-#endif // Home Assistant
 
 /* End of initialization for operating mode. Initialization for all devices
  * modes */
@@ -320,8 +313,8 @@ void setup() {
               "########");
 #ifndef AFE_ESP32
   Serial << endl
-         << "INFO: MEMORY: Free: [Boot end] : "
-         << String(system_get_free_heap_size() / 1024) << "kB";
+         << F("INFO: MEMORY: Free: [Boot end] : ")
+         << String(system_get_free_heap_size() / 1024) << F("kB");
 #endif
 #endif
 }
@@ -371,7 +364,7 @@ void loop() {
         AS3935SensorEventsListener();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
         analogInputEventsListener();
 #endif
 
@@ -401,14 +394,6 @@ void loop() {
           Led.blinkingOn(100);
         }
 #endif
-
-/* MQTT works in the configuration mode in order to enable to Home Assistant
- * Discovery */
-#ifdef AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
-        if (Device.configuration.api.mqtt) {
-          MqttAPI.listener();
-        }
-#endif // AFE_CONFIG_API_HOME_ASSISTANT_ENABLED
 
         HTTPServer.listener();
       }

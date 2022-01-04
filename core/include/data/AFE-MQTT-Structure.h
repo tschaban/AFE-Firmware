@@ -4,12 +4,15 @@
 #define _AFE_MQTT_Structure_h
 
 #include <AFE-Configuration.h>
-
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-#include <AFE-DOMOTICZ-Structure.h>
-#endif
-
 #include <arduino.h>
+
+
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-DOMOTICZ-Structure.h>
+#endif // Domoticz
+
+
 
 struct MQTT_MESSAGE {
   char *topic;
@@ -17,17 +20,23 @@ struct MQTT_MESSAGE {
   uint16_t length;
 };
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-struct MQTT_BASIC_CONFIG {
-  char topic[65];
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
+struct MQTT_TOPIC {
+  char topic[AFE_CONFIG_MQTT_TOPIC_LENGTH];
 };
+
+struct MQTT_CMD_TOPIC {
+  char topic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+};
+
+
 
 /* Types of items in MQTT Topics cache */
 typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   AFE_MQTT_DEVICE_RELAY = 0,
 #endif
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   AFE_MQTT_DEVICE_ADC = 1,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -72,24 +81,26 @@ typedef enum {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   AFE_MQTT_DEVICE_BINARY_SENSOR = 15,
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT = 16,
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFE_MQTT_DEVICE_CLED = 16,
+  AFE_MQTT_DEVICE_CLED_EFFECTS = 17,
+  AFE_MQTT_DEVICE_CLED_BRIGHTNESS = 18,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 17,
+  AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR = 19,
 #endif
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  AFE_MQTT_DEVICE_TSL2561 = 18,
+  AFE_MQTT_DEVICE_TSL2561 = 20,
 #endif
 } afe_mqtt_standard_device_type_t;
 
 /* MQTT Topics cache structure */
-struct MQTT_TOPICS_CACHE {
-  MQTT_BASIC_CONFIG message;
+struct MQTT_CMD_TOPICS_CACHE {
+  MQTT_CMD_TOPIC message;
   uint8_t id;
   afe_mqtt_standard_device_type_t type;
 };
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // !AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 struct MQTT {
   char host[33];
@@ -97,10 +108,10 @@ struct MQTT {
   uint16_t port;
   char user[33];
   char password[33];
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
-  MQTT_BASIC_CONFIG lwt;
+  MQTT_TOPIC lwt;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
   uint16_t timeout;
   boolean retainLWT;

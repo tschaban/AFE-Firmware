@@ -3,12 +3,12 @@
 #ifndef _AFE_TSL2561_Structure_h
 #define _AFE_TSL2561_Structure_h
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 struct TSL2561_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG ir;
   DOMOTICZ_BASIC_CONFIG illuminance;
@@ -25,10 +25,10 @@ struct TSL2561 {
   uint8_t i2cAddress;
   uint8_t sensitiveness;
   uint8_t gain;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   TSL2561_DOMOTICZ domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

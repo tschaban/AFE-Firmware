@@ -28,32 +28,33 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
                            AFEDevice *_Device) {
 
 #ifdef DEBUG
-  Serial << endl << "INFO: PN532: Initializing PN532";
+  Serial << endl << F("INFO: PN532: Initializing PN532");
 #endif
 
   Data = _Data;
   Data->getConfiguration(_id, &configuration);
 
 #ifdef DEBUG
-  Serial << endl << "INFO: PN532: Configuration";
+  Serial << endl << F("INFO: PN532: Configuration");
   Serial << endl
-         << " - Interface: "
+         << F(" - Interface: ")
          << (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_IIC
-                 ? "I2C"
-                 : "UART");
+                 ? F("I2C")
+                 : F("UART"));
   if (configuration.interface == AFE_HARDWARE_PN532_INTERFACE_UART) {
-    Serial << endl << " - UART RX: " << configuration.rx;
-    Serial << endl << " - UART TX: " << configuration.tx;
+    Serial << endl << F(" - UART RX: ") << configuration.rx;
+    Serial << endl << F(" - UART TX: ") << configuration.tx;
   }
   Serial << endl
-         << " - Processing time: " << configuration.requestProcessingTime
-         << "msec";
+         << F(" - Processing time: ") << configuration.requestProcessingTime
+         << F("msec");
   Serial << endl
-         << " - Listener time: " << configuration.listenerTimeout << "msec";
+         << F(" - Listener time: ") << configuration.listenerTimeout
+         << F("msec");
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #else
-  Serial << endl << " - MQTT Topic: " << configuration.mqtt.topic;
+  Serial << endl << F(" - MQTT Topic: ") << configuration.mqtt.topic;
 #endif
 #endif // DEBUG
 
@@ -88,7 +89,7 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
   if (_initialized) {
 
 #ifdef DEBUG
-    Serial << endl << "INFO: PN532: Looking for PN532...";
+    Serial << endl << F("INFO: PN532: Looking for PN532...");
 #endif
 
     NFCReader.begin();
@@ -96,7 +97,7 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
     uint32_t versiondata = NFCReader.getFirmwareVersion();
     if (!versiondata) {
 #ifdef DEBUG
-      Serial << endl << "INFO: PN532: Didn't find PN53x board";
+      Serial << endl << F("INFO: PN532: Didn't find PN53x board");
 #endif
       _initialized = false;
       return;
@@ -106,9 +107,9 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
 
 // Got ok data, print it out!
 #ifdef DEBUG
-    Serial << endl << "Found chip PN5" << _HEX((versiondata >> 24) & 0xFF);
+    Serial << endl << F("Found chip PN5") << _HEX((versiondata >> 24) & 0xFF);
     Serial << endl
-           << "Firmware ver. " << _DEC((versiondata >> 16) & 0xFF) << "."
+           << F("Firmware ver. ") << _DEC((versiondata >> 16) & 0xFF) << F("."
            << _DEC((versiondata >> 8) & 0xFF) << endl;
 #endif
 
@@ -122,15 +123,14 @@ void AFESensorPN532::begin(uint8_t _id, AFEDataAccess *_Data,
     }
 #endif
   }
-  
 }
 
 boolean AFESensorPN532::authenticatedBlock(uint32_t blockId) {
 #ifdef DEBUG
   Serial << endl
-         << "INFO: PN532: Autenticating : " << blockId << endl
-         << " - with keyId: " << AFE_HARDWARE_PN532_SENSOR_KEY_B
-         << ", status: ";
+         << F("INFO: PN532: Autenticating : ") << blockId << endl
+         << F(" - with keyId: ") << AFE_HARDWARE_PN532_SENSOR_KEY_B
+         << F(", status: ");
 #endif
   boolean authenticated = NFCReader.mifareclassic_AuthenticateBlock(
       cardUID, cardUIDLength, blockId, AFE_HARDWARE_PN532_SENSOR_KEY_B,
@@ -139,9 +139,9 @@ boolean AFESensorPN532::authenticatedBlock(uint32_t blockId) {
   if (!authenticated) {
 
 #ifdef DEBUG
-    Serial << "access denied" << endl
-           << " - with keyId: " << AFE_HARDWARE_PN532_SENSOR_KEY_A
-           << ", status: ";
+    Serial << F("access denied") << endl
+           << F(" - with keyId: ") << AFE_HARDWARE_PN532_SENSOR_KEY_A
+           << F(", status: ");
 #endif
     authenticated = NFCReader.mifareclassic_AuthenticateBlock(
         cardUID, cardUIDLength, blockId, AFE_HARDWARE_PN532_SENSOR_KEY_A,
@@ -149,7 +149,7 @@ boolean AFESensorPN532::authenticatedBlock(uint32_t blockId) {
   }
 
 #ifdef DEBUG
-  Serial << (authenticated ? "access granted" : "access denied");
+  Serial << (authenticated ? F("access granted") : F("access denied"));
 #endif
 
   return authenticated;
@@ -159,15 +159,17 @@ boolean AFESensorPN532::foundCard() {
   boolean _ret = false;
   uint8_t found = NFCReader.readPassiveTargetID(
       PN532_MIFARE_ISO14443A, cardUID, &cardUIDLength, configuration.timeout);
-  yield();
+  
+  //yield(); @TODO T5 is it needed?
+
   if (found) {
 #ifdef DEBUG
     Serial << endl
-           << "INFO: PN532: Found an ISO14443A card:  UID Length: "
-           << _DEC(cardUIDLength) << " bytes,  UID Value: ";
+           << F("INFO: PN532: Found an ISO14443A card:  UID Length: "
+           << _DEC(cardUIDLength) << F(" bytes,  UID Value: ");
     NFCReader.PrintHex(cardUID, cardUIDLength);
     for (uint8_t i = 0; i < cardUIDLength; i++) {
-      Serial << _HEX(cardUID[i]) << " ";
+      Serial << _HEX(cardUID[i]) << F(" ");
     }
 #endif
     if (cardUIDLength == 4) {
@@ -175,13 +177,14 @@ boolean AFESensorPN532::foundCard() {
     }
 #ifdef DEBUG
     else {
-      Serial << endl
-             << "WARN: PN532: Card doesn't seem to be a Mifare Classic card!";
+      Serial
+          << endl
+          << F("WARN: PN532: Card doesn't seem to be a Mifare Classic card!");
     }
 #endif
   }
 #ifdef DEBUG
-  Serial << ".";
+  Serial << F(".");
 #endif
   return _ret;
 }
@@ -223,44 +226,45 @@ void AFESensorPN532::getJSON(char *json) {
 }
 
 void AFESensorPN532::formattingNFC() {
-  const char *url = "smartnydom.pl";
+  const char *url = "smartnydom.pl");
   uint8_t ndefprefix = NDEF_URIPREFIX_HTTP_WWWDOT;
   Led.on();
   if (foundCard()) {
     if (authenticatedBlock(0)) {
       if (NFCReader.mifareclassic_FormatNDEF()) {
 #ifdef DEBUG
-        Serial
-            << endl
-            << "INFO: PN532: Card has been formatted for NDEF data using MAD1";
+        Serial << endl
+               << F("INFO: PN532: Card has been formatted for NDEF data using "
+                    "MAD1");
 #endif
         if (authenticatedBlock(4)) {
           if (strlen(url) <= 38) {
             if (NFCReader.mifareclassic_WriteNDEFURI(1, ndefprefix, url)) {
 #ifdef DEBUG
               Serial << endl
-                     << "INFO: PN532: NDEF URI Record written to sector 1";
+                     << F("INFO: PN532: NDEF URI Record written to sector 1");
             } else {
-              Serial << endl << "ERROR: PN532: NDEF Record creation failed! :(";
+              Serial << endl
+                     << F("ERROR: PN532: NDEF Record creation failed! :(");
 #endif
             }
           }
 #ifdef DEBUG
           else {
-            Serial << endl << "ERROR: PN532: Tag text is too long";
+            Serial << endl << F("ERROR: PN532: Tag text is too long");
           }
 #endif
         }
       }
 #ifdef DEBUG
       else {
-        Serial << endl << "ERROR: PN532: Unable to format the card for NDEF";
+        Serial << endl << F("ERROR: PN532: Unable to format the card for NDEF");
       }
 #endif
     }
 #ifdef DEBUG
     else {
-      Serial << endl << "WARN: PN532: Card couldn't be formatted";
+      Serial << endl << F("WARN: PN532: Card couldn't be formatted");
     }
 #endif
   }
@@ -275,13 +279,14 @@ void AFESensorPN532::formattingClassic() {
   Led.on();
   if (foundCard()) {
 #ifdef DEBUG
-    Serial << endl << "INFO: PN532: Reformatting card for Mifare Classic... ";
+    Serial << endl
+           << F("INFO: PN532: Reformatting card for Mifare Classic... ");
 #endif
     // Now run through the card sector by sector
     for (idx = 0; idx < AFE_HARDWARE_PN532_NUMBER_OF_SECTORS; idx++) {
 
 #ifdef DEBUG
-      Serial << endl << endl << "INFO: PN532: Formatting sector: " << idx;
+      Serial << endl << endl << F("INFO: PN532: Formatting sector: ") << idx;
 #endif
 
       if (authenticatedBlock(BLOCK_NUMBER_OF_SECTOR_TRAILER(idx))) {
@@ -293,8 +298,9 @@ void AFESensorPN532::formattingClassic() {
                   (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3, blockBuffer))) {
 #ifdef DEBUG
             Serial << endl
-                   << "ERROR: PN532: Unable to write to sector: " << idx
-                   << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3;
+                   << F("ERROR: PN532: Unable to write to sector: ") << idx
+                   << F(", block: ")
+                   << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3;
 #endif
             return;
           }
@@ -306,8 +312,9 @@ void AFESensorPN532::formattingClassic() {
                   (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2, blockBuffer))) {
 #ifdef DEBUG
             Serial << endl
-                   << "ERROR: PN532: Unable to write to sector: " << idx
-                   << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2;
+                   << F("ERROR: PN532: Unable to write to sector: ") << idx
+                   << F(", block: ")
+                   << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2;
 #endif
             return;
           }
@@ -319,8 +326,9 @@ void AFESensorPN532::formattingClassic() {
                   (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3, blockBuffer))) {
 #ifdef DEBUG
             Serial << endl
-                   << "ERROR: PN532: Unable to write to sector: " << idx
-                   << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3;
+                   << F("ERROR: PN532: Unable to write to sector: ") << idx
+                   << F(", block: ")
+                   << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 3;
 #endif
             return;
           }
@@ -328,8 +336,9 @@ void AFESensorPN532::formattingClassic() {
                   (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2, blockBuffer))) {
 #ifdef DEBUG
             Serial << endl
-                   << "ERROR: PN532: Unable to write to sector: " << idx
-                   << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2;
+                   << F("ERROR: PN532: Unable to write to sector: ") << idx
+                   << F(", block: ")
+                   << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 2;
 #endif
             return;
           }
@@ -341,8 +350,8 @@ void AFESensorPN532::formattingClassic() {
                 (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1, blockBuffer))) {
 #ifdef DEBUG
           Serial << endl
-                 << "ERROR: PN532: Unable to write to sector: " << idx
-                 << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1;
+                 << F("ERROR: PN532: Unable to write to sector: ") << idx
+                 << F(", block: ") << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)) - 1;
 #endif
           return;
         }
@@ -358,13 +367,13 @@ void AFESensorPN532::formattingClassic() {
                 (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx)), blockBuffer))) {
 #ifdef DEBUG
           Serial << endl
-                 << "ERROR: PN532: Unable to write trailer block of sector: "
-                 << idx << ", block: " << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx));
+                 << F("ERROR: PN532: Unable to write trailer block of sector: "
+                 << idx << F(", block: ") << (BLOCK_NUMBER_OF_SECTOR_TRAILER(idx));
 #endif
           return;
         }
 #ifdef DEBUG
-        Serial << endl << "INFO: PN532: Sector: " << idx << " formatted";
+        Serial << endl << F("INFO: PN532: Sector: ") << idx << F(" formatted");
 #endif
       }
     }
@@ -388,10 +397,10 @@ void AFESensorPN532::readNFC() {
       if (!authenticated) {
 #ifdef DEBUG
         Serial << endl
-               << "------------------------Sector "
+               << F("------------------------Sector ")
                << _DEC(currentblock /
                        AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR)
-               << "-------------------------";
+               << F("-------------------------");
 #endif
         authenticated = authenticatedBlock(currentblock);
 #ifdef DEBUG
@@ -402,15 +411,15 @@ void AFESensorPN532::readNFC() {
       if (authenticated) {
         if (NFCReader.mifareclassic_ReadDataBlock(currentblock, data)) {
 #ifdef DEBUG
-          Serial << "Block " << _DEC(currentblock)
-                 << (currentblock < 10 ? "  " : " ");
+          Serial << F("Block ") << _DEC(currentblock)
+                 << (currentblock < 10 ? F("  ") : F(" "));
           NFCReader.PrintHexChar(data, AFE_HARDWARE_PN532_BLOCK_SIZE);
 #endif
         }
 #ifdef DEBUG
         else {
-          Serial << "ERROR: PN532: Block " << currentblock
-                 << " unable to read this block" << endl;
+          Serial << F("ERROR: PN532: Block ") << currentblock
+                 << F(" unable to read this block") << endl;
         }
 #endif
       }
@@ -436,7 +445,7 @@ boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
   if (authenticatedBlock(blockId)) {
 
 #ifdef DEBUG
-    Serial << endl << "INFO: PN532: Reading block: " << blockId << endl;
+    Serial << endl << F("INFO: PN532: Reading block: ") << blockId << endl;
 #endif
     if (NFCReader.mifareclassic_ReadDataBlock(blockId, _data)) {
 
@@ -448,7 +457,8 @@ boolean AFESensorPN532::readBlock(uint8_t blockId, char *data,
 #ifdef DEBUG
       NFCReader.PrintHexChar(_data, AFE_HARDWARE_PN532_BLOCK_SIZE);
     } else {
-      Serial << endl << "WARN: PN532: Something went wrong with card reading";
+      Serial << endl
+             << F("WARN: PN532: Something went wrong with card reading");
 #endif
     }
   }
@@ -459,7 +469,7 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
   Led.on();
   if (strlen(data) > AFE_HARDWARE_PN532_BLOCK_SIZE) {
 #ifdef DEBUG
-    Serial << endl << "ERROR: PN532: Too long string to save in the block";
+    Serial << endl << F("ERROR: PN532: Too long string to save in the block");
 #endif
     return;
   }
@@ -474,14 +484,14 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
     if (authenticatedBlock(blockId)) {
 #ifdef DEBUG
       Serial << endl
-             << "INFO: PN532: Writing to primary block: " << blockId
-             << ", text: " << data;
+             << F("INFO: PN532: Writing to primary block: ") << blockId
+             << F(", text: ") << data;
 #endif
 
       if (!NFCReader.mifareclassic_WriteDataBlock(blockId, _data)) {
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: PN532: Problem with saving data primary block";
+               << F("ERROR: PN532: Problem with saving data primary block");
 #endif
       }
       delay(10);
@@ -493,9 +503,9 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
                            AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR)) {
 #ifdef DEBUG
       Serial << endl
-             << "INFO: PN532: Writing to backup block: "
+             << F("INFO: PN532: Writing to backup block: ")
              << blockId + AFE_HARDWARE_PN532_NUMBER_OF_BLOCKS_PER_SECTOR
-             << ", text: " << data;
+             << F(", text: ") << data;
 #endif
 
       if (!NFCReader.mifareclassic_WriteDataBlock(
@@ -503,7 +513,7 @@ void AFESensorPN532::writeBlock(uint8_t blockId, const char *data) {
               _data)) {
 #ifdef DEBUG
         Serial << endl
-               << "ERROR: PN532: Problem with saving data to backup block";
+               << F("ERROR: PN532: Problem with saving data to backup block");
 #endif
       }
       delay(10);
@@ -517,7 +527,7 @@ boolean AFESensorPN532::readTag() {
   if (foundCard()) {
 
 #ifdef DEBUG
-    Serial << "INFO: PN532: Reading Tag" << endl;
+    Serial << F("INFO: PN532: Reading Tag") << endl;
 #endif
 
     for (uint8_t i = 0;
@@ -533,8 +543,8 @@ boolean AFESensorPN532::readTag() {
       }
 #ifdef DEBUG
       if (_success) {
-        Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i
-               << "] : " << tag.block[i].value;
+        Serial << F(" :[") << AFE_HARDWARE_PN532_FIRST_TAG_FIRST_BLOCK + i
+               << F("] : ") << tag.block[i].value;
       }
 #endif
     }
@@ -557,8 +567,8 @@ boolean AFESensorPN532::readTag() {
 
         if (_success) {
 #ifdef DEBUG
-          Serial << " :[" << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i
-                 << "] : " << tag.block[i + 3].value;
+          Serial << F(" :[") << AFE_HARDWARE_PN532_FIRST_TAG_SECOND_BLOCK + i
+                 << F("] : ") << tag.block[i + 3].value;
 #endif
           if (i ==
               AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR - 1) {

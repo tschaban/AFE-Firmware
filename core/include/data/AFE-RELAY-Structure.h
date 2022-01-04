@@ -21,10 +21,10 @@ struct RELAY {
   uint8_t ledID;
 #endif
   uint8_t triggerSignal;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
   RELAY_DEFAULTS state;
 #ifdef AFE_CONFIG_HARDWARE_MCP23017

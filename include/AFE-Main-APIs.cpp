@@ -3,12 +3,12 @@
 #include <AFE-API-HTTP.h>
 #include <AFE-Configuration.h>
 
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
 #include <AFE-API-MQTT-Domoticz.h>
 #else // Standards and Home Assistant API
 #include <AFE-API-MQTT-Standard.h>
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 #include <AFE-API-HomeAssistant-Integration.h>
 #endif
 #endif
@@ -17,20 +17,20 @@
 
 void initializeMQTTAPI(void);
 void initializeHTTPAPI(void);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void initializeHTTPDomoticzAPI(void);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 /* --------- Body -----------*/
 
 AFEAPIHTTP HttpAPI;
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
 AFEAPIMQTTStandard MqttAPI;
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-AFEAPIHomeAssistantIntegration HomeAssistantDiscoveryAPI;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI = new AFEAPIHomeAssistantIntegration();
 #endif // Home Assistant
 #endif
 
@@ -50,8 +50,8 @@ void initializeMQTTAPI(void) {
 #endif
 
 /* Inititializing Home Assistant Discovery */
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-    HomeAssistantDiscoveryAPI.begin(&Data, &Device, &MqttAPI);
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+    HomeAssistantDiscoveryAPI->begin(&Data, &Device, &MqttAPI);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -66,7 +66,7 @@ void initializeMQTTAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       MqttAPI.addClass(&AnalogInput[0]);
@@ -157,7 +157,7 @@ void initializeMQTTAPI(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
     if (Device.configuration.noOfPN532Sensors > 0) {
       MqttAPI.addClass(&PN532Sensor[0]);
     }
@@ -166,19 +166,12 @@ void initializeMQTTAPI(void) {
       MqttAPI.addClass(&MiFareCard[0]);
     }
 #endif
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-    if (Device.configuration.effectDeviceLight) {
-      MqttAPI.addClassEffectDeviceLight(&CLEDBacklight);
-    }
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    if (Device.configuration.effectPN532) {
-      MqttAPI.addClassEffecPN532Sensor(&CLEDAccessControl);
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0 ) {
+      MqttAPI.addClass(&CLEDStrip);
     }
 #endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
     if (Device.configuration.noOfTSL2561s > 0) {
@@ -200,7 +193,7 @@ void initializeHTTPAPI(void) {
     Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI, &HttpDomoticzAPI);
 #else
     HttpAPI.begin(&Device, &HTTPServer, &Data, &MqttAPI);
@@ -212,7 +205,7 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       HttpAPI.addClass(&AnalogInput[0]);
@@ -314,6 +307,13 @@ void initializeHTTPAPI(void) {
     }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0 ) {
+      HttpAPI.addClass(&CLEDStrip);
+    }
+#endif
+
+
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: HTTP init completed");
 #endif
@@ -321,7 +321,7 @@ void initializeHTTPAPI(void) {
 }
 
 /* Initializing Domoticz HTTP API */
-#if AFE_FIRMWARE_API == AFE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 void initializeHTTPDomoticzAPI(void) {
   if (Device.getMode() != AFE_MODE_ACCESS_POINT &&
@@ -345,7 +345,7 @@ void initializeHTTPDomoticzAPI(void) {
     }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
     if (Device.configuration.noOfAnalogInputs > 0) {
       HttpDomoticzAPI.addClass(&AnalogInput[0]);
@@ -447,6 +447,13 @@ void initializeHTTPDomoticzAPI(void) {
     }
 #endif
 
+/* RGB LED are not supported in HTTP Domoticz API 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    if (Device.configuration.noOfCLEDs > 0) {
+      HttpDomoticzAPI.addClass(&CLEDStrip);
+    }
+#endif
+*/
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: API: MQTT init completed");
 #endif

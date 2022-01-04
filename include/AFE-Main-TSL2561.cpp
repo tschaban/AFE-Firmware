@@ -27,7 +27,7 @@ void TSL2561SensorEventsListener(void) {
     for (uint8_t i = 0; i < Device.configuration.noOfTSL2561s; i++) {
       if (TSL2561Sensor[i].listener()) {
         MqttAPI.publishTSL2561SensorData(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishTSL2561SensorData(i);
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT

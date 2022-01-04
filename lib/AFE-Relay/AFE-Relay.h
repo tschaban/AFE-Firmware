@@ -70,7 +70,7 @@ public:
    * after device has been crash */
   void setRelayAfterRestoringPower();
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   /* Method sets relay state after device is connected / reconnected to MQTT
    * Broker. It returns TRUE if relay state has been set, false it relay state
    * should be manged through MQTT Broker*/

@@ -24,7 +24,7 @@ void HPMA115S0SensorEventsListener(void) {
     for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
       if (HPMA115S0Sensor[i].listener()) {
         MqttAPI.publishHPMA115S0SensorData(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishHPMA115S0SensorData(i);
 #endif
       }

@@ -226,7 +226,7 @@ void AFERelay::setRelayAfterRestoringPower() {
   setRelayAfterRestore(configuration.state.powerOn);
 }
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
   if (configuration.state.MQTTConnected ==
       5) { // request state from MQTT Broker

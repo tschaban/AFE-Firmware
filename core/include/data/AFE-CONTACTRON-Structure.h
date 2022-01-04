@@ -7,7 +7,7 @@
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #include <arduino.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
@@ -20,10 +20,10 @@ struct CONTACTRON {
 #endif
   uint16_t bouncing = AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
   char name[17];
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

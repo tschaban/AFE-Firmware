@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 #include <AFE-API.h>
 #include <ArduinoJson.h>
@@ -30,7 +30,13 @@ private:
   void generateDeviceValue(char *json, uint32_t idx, const char *svalue,
                            uint16_t nvalue = 0);
 
-  /* Cache that stories IDXs for devices that are controlled by Domoticz */
+  /* It stories IDX of a device that should be excluded from processing */
+  DOMOTICZ_BASIC_CONFIG bypassProcessing;
+
+  /**
+   * @brief Cache that stories IDXs for devices that are controlled by Domoticz
+   *
+   */
   uint8_t lastIDXChacheIndex = 0;
   DOMOTICZ_IDX_CACHE idxCache[1
 #ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
@@ -45,14 +51,16 @@ private:
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
                               + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
 #endif
-
+#ifdef AFE_CONFIG_HARDWARE_CLED
+                              + (2 * AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS)
+#endif
   ];
 
-  /* It stories IDX of a device that should be excluded from processing */
-  DOMOTICZ_BASIC_CONFIG bypassProcessing;
+  void addIdxToCache(uint8_t id, afe_domoticz_device_type_t type, uint32_t idx);
 
   /* Get domoticz request/update command in formated form */
   DOMOTICZ_MQTT_COMMAND getCommand();
+
   /* Classfies and invokes code for processing the request */
   void processRequest();
 
@@ -61,6 +69,14 @@ private:
 
   /* Returns RSSI level in DOmoticz Range */
   uint8_t getRSSI();
+
+  boolean publishSwitchMessage(uint32_t *idx, boolean state);
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  boolean publishSetLevelMessage(uint32_t *idx, uint8_t *level);
+  boolean publishSetColorMessage(uint32_t *idx, CLED_PARAMETERS *led);
+#endif
+
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -90,14 +106,14 @@ public:
   boolean publishSwitchState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   virtual void addClass(AFEAnalogInput *);
 #ifdef AFE_ESP32
   void publishADCValues(uint8_t id);
 #else  // ESP32
   void publishADCValues();
 #endif // ESP32/8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   void publishBatteryMeterValues();
@@ -178,6 +194,13 @@ public:
   virtual void addClass(AFESensorTSL2561 *);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif //  AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  virtual void addClass(AFECLED *);
+  boolean publishCLEDState(uint8_t id);
+  boolean publishCLEDColorState(uint8_t id);
+  boolean publishCLEDEffectsState(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_CLED
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

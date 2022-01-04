@@ -38,8 +38,10 @@ boolean AFEDefaults::set(void) {
     /* Setting device mode to Access Point */
     Data->saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     Data->createDomoticzConfigurationFile();
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+    Data->createHomeAssistantConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -50,7 +52,7 @@ boolean AFEDefaults::set(void) {
     Data->createSwitchConfigurationFile();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
     Data->createADCInputConfigurationFile();
 #endif
 
@@ -123,7 +125,8 @@ boolean AFEDefaults::set(void) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
     Data->createCLEDConfigurationFile();
     Data->createCLEDEffectBlinkingConfigurationFile();
-    // @TODO T7 add missing files
+    Data->createCLEDEffectFadeInOutConfigurationFile();
+    Data->createCLEDEffectWaveConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

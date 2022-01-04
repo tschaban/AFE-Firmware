@@ -43,12 +43,6 @@
 #include <Streaming.h>
 #endif
 
-/*
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-#include <AFE-API-HomeAssistant-Integration.h>
-AFEAPIHomeAssistantIntegration _HomeAssistantDiscoveryAPI;
-#endif
-*/
 
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
@@ -119,9 +113,11 @@ private:
   void get(PASSWORD &data);
   void get(PRO_VERSION &data);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void get(DOMOTICZ &data);
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+  void get(HOME_ASSISTANT_CONFIG &data);
+#endif // AFE_FIRMWARE_API
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   void get(RELAY &data);
@@ -196,9 +192,9 @@ private:
   void get(RAINMETER &data);
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   void get(ADCINPUT &data);
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   void get(BINARY_SENSOR &data);
@@ -225,6 +221,19 @@ private:
  */
   void get(CLED_EFFECT_BLINKING &data);
 
+/**
+ * @brief Gets RGB LED Wave effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_WAVE &data);
+
+/**
+ * @brief Gets RGB LED Fade In/Out effect configuration parameters from HTML form
+ * 
+ * @param  data Configuration data
+ */
+  void get(CLED_EFFECT_FADE_INOUT &data);
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 
@@ -274,11 +283,7 @@ public:
 #else
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
-/*
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-  void addHomeAssistantDiscoveryAPI(AFEAPIHomeAssistantIntegration *HomeAssistantIntegration)
-#endif
-*/
+
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /* Method inherits global system LED */

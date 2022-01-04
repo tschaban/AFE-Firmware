@@ -25,7 +25,7 @@
 #include <AFE-Switch.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-Analog-Input.h>
 #endif
 
@@ -86,12 +86,9 @@
 #include <AFE-Sensor-PN532.h>
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-/* Not yet implemented 
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+#ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-CLED.h>
 #endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 #include <AFE-Sensor-TSL2561.h>
@@ -103,10 +100,14 @@
 
 class AFEAPI {
 private:
+  void begin();
+
 public:
   AFEMQTT Mqtt;
   AFEDevice *_Device;
   AFEDataAccess *_Data;
+
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
 #endif
@@ -127,7 +128,7 @@ public:
   virtual void addClass(AFESwitch *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   virtual void addClass(AFEAnalogInput *);
 #endif
 
@@ -184,20 +185,15 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   virtual void addClass(AFESensorPN532 *);
 #endif
   virtual void addClass(AFEMiFareCard *);
 #endif
-/* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  virtual void addClassEffectDeviceLight(AFECLED *);
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  virtual void addClassEffecPN532Sensor(AFECLED *);
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  virtual void addClass(AFECLED *);
 #endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   virtual void addClass(AFESensorTSL2561 *);
@@ -217,13 +213,13 @@ protected:
   AFESwitch *_Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  /* Stories reference to global ADC class */
-  #ifdef AFE_ESP32
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+/* Stories reference to global ADC class */
+#ifdef AFE_ESP32
   AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
-  #else
+#else
   AFEAnalogInput *_AnalogInput;
-  #endif
+#endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -280,24 +276,19 @@ protected:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   AFESensorPN532 *_PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 #endif
   AFEMiFareCard *_MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
-/* Not yet implemented 
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  AFECLED *_CLEDBacklight;
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED *_CLED;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  AFECLED *_CLEDAccessControl;
-#endif
-*/
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
 #endif
-
 };
 
 #endif // _AFE_API_h

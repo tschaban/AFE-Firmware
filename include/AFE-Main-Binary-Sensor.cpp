@@ -28,7 +28,7 @@ void binarySensorEventsListener(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
     if (BinarySensor[i].listener()) {
       MqttAPI.publishBinarySensorState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       HttpDomoticzAPI.publishBinarySensorState(i);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 

@@ -9,8 +9,10 @@
 
 /* APIs */
 #include <AFE-MQTT-Structure.h>
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
 #include <AFE-DOMOTICZ-Structure.h>
+#elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
+#include <AFE-HOME-ASSISTANT-Structure.h>
 #endif
 
 #include <AFE-NETWORK-Structure.h>
@@ -61,12 +63,9 @@
 #include <AFE-PIR-Sensor-Structure.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-ADC-INPUT-Structure.h>
 #endif 
-
-/* @TODO BUG For unknown reason non T5 version can't be compiled if these are
- * excluded */
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-AS3935-Sensor-Structure.h>

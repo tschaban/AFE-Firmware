@@ -7,6 +7,7 @@ AFEDevice::AFEDevice() {}
 void AFEDevice::begin() {
   deviceMode = Data.getDeviceMode();
   Data.getConfiguration(&configuration);
+  Data.getDeviceUID().toCharArray(deviceId, AFE_CONFIG_DEVICE_ID_SIZE);
 }
 
 void AFEDevice::reboot(uint8_t mode) {
@@ -15,9 +16,9 @@ void AFEDevice::reboot(uint8_t mode) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << "##################################################" << endl
-         << "####      INFO: Rebooting device in 1sec      ####" << endl
-         << "##################################################" << endl
+         << F("##################################################") << endl
+         << F("####      INFO: Rebooting device in 1sec      ####") << endl
+         << F("##################################################") << endl
          << endl;
 #endif
   delay(1000);

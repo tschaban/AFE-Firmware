@@ -16,14 +16,14 @@ void AFERegulator::addRelayReference(AFERelay *Relay) {
   _Relay = Relay;
   initialized = true;
 #ifdef DEBUG
-    Serial << endl << "INFO: Regulator initialized";
+    Serial << endl << F("INFO: Regulator initialized");
 #endif  
 }
 
 boolean AFERegulator::listener(float value) {
   if (configuration.enabled && initialized) {
 #ifdef DEBUG
-    Serial << endl << "INFO: Executing regulator check ...";
+    Serial << endl << F("INFO: Executing regulator check ...");
 #endif
     deviceState = _Relay->get();
     if (configuration.turnOnAbove && value > configuration.turnOn) {
@@ -38,7 +38,7 @@ boolean AFERegulator::listener(float value) {
     return true;
   } else {
 #ifdef DEBUG
-    Serial << endl << "INFO: Regulator: disabled";
+    Serial << endl << F("INFO: Regulator: disabled");
 #endif
     return false;
   }

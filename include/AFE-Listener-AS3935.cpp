@@ -48,7 +48,7 @@ void AS3935SensorEventsListener() {
 
   if (AS3935Sensor[0].strikeDetected()) {
     MqttAPI.publishAS3935SensorData(0);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     HttpDomoticzAPI.publishAS3935SensorData(0);
 #endif
   }

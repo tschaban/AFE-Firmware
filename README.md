@@ -7,5 +7,5 @@ The module with AFE Firmware installed can be wirelessly controlled by automatio
 
 [AFE Firmware docs](https://afe.smartnydom.pl/)
 
-# More information on the YouTune channel
+# More information on the YouTube channel
 [English version](https://www.youtube.com/channel/UCYgYJJq8hGizu6CxVUMR5CA) | [Polska wersja](https://www.youtube.com/c/smartnydom)

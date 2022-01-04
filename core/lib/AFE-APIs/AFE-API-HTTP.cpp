@@ -5,7 +5,7 @@
 AFEAPIHTTP::AFEAPIHTTP() {}
 
 /* Initializing class */
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
                        AFEDataAccess *Data, AFEAPIMQTTDomoticz *MqttAPI,
                        AFEAPIHTTPDomoticz *HttpDomoticzAPI) {
@@ -63,7 +63,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 
 /* Checking if Relay request */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  if (strcmp(request->device, "relay") == 0) {
+  if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_RELAY) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Relay HTTP requests");
 #endif
@@ -71,8 +71,8 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif
 /* Checking if Analog Input request */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-  else if (strcmp(request->device, "ADC") == 0) {
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_ANALOG_INPUT) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing ADC requests");
 #endif
@@ -81,7 +81,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif
 /* Checking if Battery Meter request */
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-  else if (strcmp(request->device, "batterymeter") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BATTERY_METER) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing ADC requests");
 #endif
@@ -90,9 +90,9 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif
 /* Checking if BMx80 Input request */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  // @TODO change in doc BMX80
-  else if (strcmp(request->device, "BMEX80") == 0 ||
-           strcmp(request->device, "BMX80") == 0) {
+  // @TODO T5 T6 change in doc BMX80
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BMEX80) == 0 ||
+           strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BMX80) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing BMX80 requests");
 #endif
@@ -100,7 +100,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  else if (strcmp(request->device, "BH1750") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BH1750) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing BH1750 requests");
 #endif
@@ -108,7 +108,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  else if (strcmp(request->device, "AS3935") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_AS3935) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing AS3935 requests");
 #endif
@@ -116,7 +116,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_AS3935
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  else if (strcmp(request->device, "HPMA115S0") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_HPMA115S0) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing HPMA115S0 requests");
 #endif
@@ -125,7 +125,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 /* Checking if Anemometer request */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  else if (strcmp(request->device, "anemometer") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_ANEMOMETER) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Anemometer requests");
 #endif
@@ -134,7 +134,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 /* Checking if Rain request */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  else if (strcmp(request->device, "rainmeter") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_RAINMETER) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Rainmeter requests");
 #endif
@@ -142,7 +142,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  else if (strcmp(request->device, "gate") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_GATE) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing GATE requests");
 #endif
@@ -150,7 +150,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_GATE
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  else if (strcmp(request->device, "contactron") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_CONTACTRON) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing CONTACTRON requests");
 #endif
@@ -159,7 +159,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  else if (strcmp(request->device, "ds18b20") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_DS18B20) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing DS18B20 sensor requests");
 #endif
@@ -168,7 +168,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  else if (strcmp(request->device, "regulator") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_REGULATOR) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Regulator requests");
 #endif
@@ -177,7 +177,8 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  else if (strcmp(request->device, "thermalProtector") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_THERMAL_PROTECTOR) ==
+           0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Thermal Protector requests");
 #endif
@@ -186,7 +187,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  else if (strcmp(request->device, "dht") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_DHT) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing DHT sensor requests");
 #endif
@@ -195,7 +196,7 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  else if (strcmp(request->device, "binary") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_BINARY_SENSOR) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing Binary sensor requests");
 #endif
@@ -203,19 +204,48 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
   }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  else if (strcmp(request->device, "tls2561") == 0) {
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_TSL2561) == 0) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Processing TSL2561 requests");
 #endif
     processTSL2561(request);
   }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_CLED) == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing CLED requests");
+#endif
+    processCLED(request);
+  } else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_CLED_EFFECT_WAVE) ==
+             0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing CLED Effect Wave requests");
+#endif
+    processCLEDEffect(request, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+  } else if (strcmp(request->device,
+                    AFE_CONFIG_HTTP_DEVICE_CLED_EFFECT_FADE_IN_OUT) == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing CLED Effect FadeInOut requests");
+#endif
+    processCLEDEffect(request, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
+  } else if (strcmp(request->device,
+                    AFE_CONFIG_HTTP_DEVICE_CLED_EFFECT_BLINKING) == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing CLED Blinking requests");
+#endif
+    processCLEDEffect(request, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED
+
   /* Checking if reboot command */
-  else if (strcmp(request->command, "reboot") == 0) {
+  else if (strcmp(request->command, AFE_CONFIG_HTTP_COMMAND_REBOOT) == 0) {
     send(request, true);
     _Device->reboot(_Device->getMode());
     /* Checking if configurationMode commad */
-  } else if (strcmp(request->command, "configurationMode") == 0) {
+  } else if (strcmp(request->command,
+                    AFE_CONFIG_HTTP_COMMAND_CONFIGURATION_MODE) == 0) {
     PASSWORD password;
     _Data->getConfiguration(&password);
     if (!password.protect) {
@@ -244,7 +274,7 @@ void AFEAPIHTTP::addClass(AFERelay *Relay) {
 /* Processing relay requests */
 void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-
+  boolean _relayStateUpdated = false;
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
     /* For the Relay assigned to a gate code below is not needed for execution
@@ -256,41 +286,28 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
         /* Checking if command: on */
         if (strcmp(request->command, "on") == 0) {
           _Relay[i]->on();
-          sendRelayStatus(request, _Relay[i]->get() == AFE_RELAY_ON,
-                          _Relay[i]->get());
-          _MqttAPI->publishRelayState(i);
+          sendOnOffStatus(request, _Relay[i]->get() == AFE_RELAY_ON,
+                          _Relay[i]->get() == AFE_RELAY_ON ? AFE_ON : AFE_OFF);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            _HttpAPIDomoticz->publishRelayState(i);
-          }
-#endif
+          _relayStateUpdated = true;
           /* Checking if command: off */
         } else if (strcmp(request->command, "off") == 0) {
           _Relay[i]->off();
-          sendRelayStatus(request, _Relay[i]->get() == AFE_RELAY_OFF,
+          sendOnOffStatus(request, _Relay[i]->get() == AFE_RELAY_OFF,
                           _Relay[i]->get());
-          _MqttAPI->publishRelayState(i);
+          _relayStateUpdated = true;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            _HttpAPIDomoticz->publishRelayState(i);
-          }
-#endif
           /* Checking if command: toggle */
         } else if (strcmp(request->command, "toggle") == 0) {
           uint8_t state = _Relay[i]->get();
           _Relay[i]->toggle();
-          sendRelayStatus(request, state != _Relay[i]->get(), _Relay[i]->get());
-          _MqttAPI->publishRelayState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-          if (strcmp(request->source, "domoticz") != 0) {
-            _HttpAPIDomoticz->publishRelayState(i);
-          }
-#endif
+          sendOnOffStatus(request, state != _Relay[i]->get(), _Relay[i]->get());
+          _relayStateUpdated = true;
+
           /* Checking if command: get */
         } else if (strcmp(request->command, "get") == 0) {
-          sendRelayStatus(request, true, _Relay[i]->get());
+          sendOnOffStatus(request, true, _Relay[i]->get());
+          _relayStateUpdated = false;
 
 /* Command not implemented.Info */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMOSTAT
@@ -333,6 +350,16 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
 
 #endif
 
+          if (_relayStateUpdated) {
+            _MqttAPI->publishRelayState(i);
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+            if (strcmp(request->source, "domoticz") != 0) {
+              _HttpAPIDomoticz->publishRelayState(i);
+            }
+#endif
+          }
+
         } else {
           send(request, false, L_COMMAND_NOT_IMPLEMENTED);
         }
@@ -351,21 +378,15 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
 #endif
 #endif
   }
+
   if (deviceNotExist) {
     send(request, false, L_DEVICE_NOT_EXIST);
   }
 }
 
-/* Formating call for send for Relay and send it */
-void AFEAPIHTTP::sendRelayStatus(HTTPCOMMAND *request, boolean status,
-                                 byte value) {
-  send(request, status,
-       value == AFE_RELAY_ON ? "{\"state\":\"on\"}" : "{\"state\":\"off\"}");
-}
-
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 /* Adding pointer to ADC class */
 void AFEAPIHTTP::addClass(AFEAnalogInput *Analog) {
 #ifdef AFE_ESP32
@@ -406,7 +427,7 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
   }
 #endif // AFE_ESP32
 }
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
@@ -608,7 +629,7 @@ void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
       if (strcmp(request->command, "toggle") == 0) {
         _Gate[i]->toggle();
         _MqttAPI->publishGateState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         _HttpAPIDomoticz->publishGateState(i);
 #endif
         _Gate[i]->getJSON(json);
@@ -708,7 +729,7 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
       if (sendJSON) {
         if (strcmp(request->command, "get") != 0) {
           _MqttAPI->publishRegulatorState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRegulatorState(i);
           }
@@ -755,7 +776,7 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
       if (sendJSON) {
         if (strcmp(request->command, "get") != 0) {
           _MqttAPI->publishRegulatorState(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           if (strcmp(request->source, "domoticz") != 0) {
             _HttpAPIDomoticz->publishRegulatorState(i);
           }
@@ -829,10 +850,149 @@ void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
-/* Method creates JSON respons after processing HTTP API request, and pushes
- * it.
- * The second one method converts float to charString before pushing response
- */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+/* Adding pointer to the Relay class */
+void AFEAPIHTTP::addClass(AFECLED *CLED) { _CLED = CLED; }
+
+/* Processing CLED requests */
+void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+  boolean _stateUpdated = true;
+  boolean _sendStatus = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+    if (strcmp(request->name, _CLED->configuration[i].name) == 0) {
+      deviceNotExist = false;
+      _stateUpdated = true;
+      /* Checking if command: on */
+      if (strcmp(request->command, "on") == 0) {
+        _CLED->on(i, true);
+        /* Checking if command: off */
+      } else if (strcmp(request->command, "off") == 0) {
+        _CLED->off(i, true);
+        /* Checking if command: toggle */
+      } else if (strcmp(request->command, "toggle") == 0) {
+        _CLED->toggle(i, true);
+        /* Checking if command: get */
+      } else if (strcmp(request->command, "get") == 0) {
+        _stateUpdated = false;
+      } else {
+        _sendStatus = false;
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+      if (_sendStatus) {
+        sendOnOffStatus(request, true,
+                        _CLED->currentState[i].state ? AFE_ON : AFE_OFF);
+        if (_stateUpdated) {
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+          if (_CLED->isEffectStateUpdated(i)) {
+            //_MqttAPI->publishCLEDEffectsState(id);
+            //   _HttpAPIDomoticz->publishCLEDEffectState(i);
+          }
+#else
+          publishCLEDStates(i);
+#endif
+        }
+      }
+      break;
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+
+void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
+  boolean deviceNotExist = true;
+  boolean _stateUpdated = true;
+  boolean _sendStatus = true;
+
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+    if (strcmp(request->name,
+               effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
+                   ? _CLED->configurationEffectBlinking[i].name
+                   : effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
+                         ? _CLED->configurationEffectFadeInOut[i].name
+                         : _CLED->configurationEffectWave[i].name) == 0) {
+      deviceNotExist = false;
+      _stateUpdated = true;
+      /* Checking if command: on */
+      if (strcmp(request->command, "on") == 0) {
+        _CLED->activateEffect(i, effectId);
+        /* Checking if command: off */
+      } else if (strcmp(request->command, "off") == 0) {
+        _CLED->deactivateEffect(i, effectId);
+        /* Checking if command: get */
+      } else if (strcmp(request->command, "get") == 0) {
+        _stateUpdated = false;
+      } else {
+        _sendStatus = false;
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+      if (_sendStatus) {
+        sendOnOffStatus(request, true,
+                        _CLED->currentState[i].effect.id == effectId ? AFE_ON
+                                                                     : AFE_OFF);
+        if (_stateUpdated) {
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+          // publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
+          if (_CLED->isStateUpdated(i)) {
+            //    _HttpAPIDomoticz->publishCLEDState(i);
+          }
+#else
+          publishCLEDStates(i);
+#endif
+        }
+      }
+      break;
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
+  if (_CLED->isStateUpdated(id)) {
+    _MqttAPI->publishCLEDState(id);
+
+    /* RGB LED are not supported in HTTP Domoticz API
+        if (!fromDomoticz) {
+          _HttpAPIDomoticz->publishCLEDState(id);
+        }
+    */
+  }
+  if (_CLED->isEffectStateUpdated(id)) {
+    _MqttAPI->publishCLEDEffectsState(id);
+    /* RGB LED are not supported in HTTP Domoticz API
+    if (!fromDomoticz) {
+      _HttpAPIDomoticz->publishCLEDEffectState(id);
+    }
+    */
+  }
+}
+#else
+void AFEAPIHTTP::publishCLEDStates(uint8_t id) {
+  if (_CLED->isStateUpdated(id)) {
+    _MqttAPI->publishCLEDState(id);
+  }
+  if (_CLED->isEffectStateUpdated(id)) {
+    _MqttAPI->publishCLEDEffectsState(id);
+  }
+}
+#endif
+
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
+void AFEAPIHTTP::sendOnOffStatus(HTTPCOMMAND *request, boolean status,
+                                 byte value) {
+  send(request, status,
+       value == AFE_ON ? "{\"state\":\"on\"}" : "{\"state\":\"off\"}");
+}
+#endif
+
 void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   String respond;
   respond.concat(FPSTR(JSON_RESPONSE));

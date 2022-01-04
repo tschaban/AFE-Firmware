@@ -154,8 +154,8 @@
 #define L_NETWORK_SUBNET "Subnet"
 #define L_NETWORK_DEVICE_IP "Device IP address"
 #define L_NETWORK_DEVICE_IP_INFO "You can set up device's IP address manually or automatically by DHCP"
-#define L_NETWORK_NUMBER_OF_CONNECTIONS "Number of connection attempts"
-#define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Time between connections' attempts"
+#define L_NETWORK_NUMBER_OF_CONNECTIONS "Connection timeout"
+#define L_NETWORK_TIME_BETWEEN_CONNECTIONS "Connections' attempts timeout"
 #define L_NETWORK_SLEEP_TIME "Sleep time before next connection attempts"
 #define L_NETWORK_ADVANCED "Advanced"
 #define L_NETWORK_ALMOST "We're almost there!"
@@ -261,6 +261,12 @@
 #define L_ADC_VOLTAGE_DIVIDER "Voltage Divider"
 #define L_ADC_MQTT_TOPIC "MQTT Topic: ADC"
 #define L_ADC_INPUT "Input"
+
+#define L_ADC_HA_VOLTAGE "Voltage on input"
+#define L_ADC_HA_VOLTAGE_CALCULATED "Voltage"
+#define L_ADC_HA_VOLTAGE_RAW "Raw"
+#define L_ADC_HA_VOLTAGE_PERCENT "Raw"
+
 
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
@@ -603,6 +609,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* CLED */
 
 #define L_CLED_STRIP "LED Strip"
+#define L_CLED_BRIGHTNESS "Brightness"
+#define L_CLED_COLOR_RGB "Color RGB"
+
 #define L_CLED_CONFIGURATION "RGB LEDs configuration"
 #define L_CLED_ONOFF_CONFIGURATION "LEDs: ON/OFF configuration"
 #define L_CLED_ONOFF_CONFIGURATION_ON "LED's turned ON settings"
@@ -610,37 +619,65 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "How long keep this state"
+
 #define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
 #define L_CLED_EFFECT_WAVE_CONFIGURATION "Wave effect"
 
+#define L_CLED_EFFECT_WAVE_ON_LED_COLOR "Active LED RGB color"
+#define L_CLED_EFFECT_WAVE_OFF_LED_COLOR "Inactive LED RGB color"
+#define L_CLED_EFFECT_WAVE_SPEED "Wave speed"
 
+#define L_CLED_MAX_BRIGHTNESS "Max brightness"
+#define L_CLED_MIN_BRIGHTNESS "Min brightness"
+#define L_CLED_FADE_IN_OUT_TIMEOUT "Fade speed"
 
-#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
-#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
-//#define L_CLEDS "RGB Leds"
+#define L_CLED_ON_OFF_IDX "On/Off IDX"
+#define L_CLED_EFFECTS_IDX "Effect IDX"
+#define L_CLED_MQTT_TOPIC "MQTT Topic controlling RGB LED"
+
+#define L_CLED_MQTT_ON_OFF_TOPIC "On/Off Topic"
+#define L_CLED_MQTT_EFFECTS_TOPIC "Effect's Topic"
+
 #define L_CLEDS_HINT "This firmware version doesn't enable to change the GPIO parameter of the WS281x RGB LED strip. It must be connected as described below"
 #define L_CLED_NUMBER_OF_LEDS "Number of leds in the strip"
-#define L_CLED_COLORS_ORDER "Colors order"
 
-#define L_CLED_EFFECT_WAVE "Wave effect"
-#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
-#define L_CLED_COLOR "Color"
-#define L_CLED_BRIGHTNESS "Brightness"
-#define L_CLED_MAX_BRIGHTNESS "Max brightness"
-#define L_CLED_TIME_WAVE "Wave speed"
-#define L_CLED_TIME_FADE_IN_OUT "Fade speed"
+#define L_CLED_API_BRIGHTNESS_CONVERSION "Brightness values"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_255 "0 .. 255"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_100 "0..100"
+#define L_CLED_API_BRIGHTNESS_CONVERSION_0_1 "0..1"
 
+#define L_CLED_EFFECT_OFF_COMMAND "Off"
+#define L_CLED_EFFECT_LABEL "Light effects"
+
+//#define L_CLED_EFFECT_DEVICE_LIGHT "LED Effect: Device backlight"
+//#define L_CLED_EFFECT_PN532_SENSOR "LED Effect: PN532 sensor state"
+//#define L_CLEDS "RGB Leds"
+////
+//#define L_CLED_COLOR_RGBS_ORDER "Colors order"
+//#define L_CLED_EFFECT_FADE_IN_OUT "Fade In/Out effect"
+
+//#define L_CLED_TIME_WAVE "Wave speed"
+
+/*
 #define L_CLED_LIGHT_SENSOR "Light sensor"
 #define L_CLED_LIGHT_LEVEL "Light level"
 #define L_CLED_BACKLIGHT_CONFIG "Backlight configuration"
 #define L_CLED_RULE "Rule"
 #define L_CLED_RULE_HINT "The backlight rule is triggered if the light level is below the sensor's reading. The first condition met stops processing following rules"
-#define L_CLED_MQTT_TOPIC "MQTT Topic controlling the LED"
 
 #define L_CLED_LIGHT_EFFECTS "Light effects"
 #define L_CLED_DEVICE_BACKLIGHT "Device's backlight"
 #define L_CLED_PN532_EFFECTS "PN532 sensor's light effects"
+*/
+
+/* Home Assistant */
+#define L_HA_DISCOVERY_TOPIC "Home Assistant discovery topic"
+#define L_HA_PUBLISHING "Publish/Update configuration?"
+#define L_HA_UPDATE_REMOVE "Remove old configuration?"
+
+
+
 
 #endif // _LANG_EN_h
 

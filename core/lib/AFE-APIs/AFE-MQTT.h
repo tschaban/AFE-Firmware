@@ -4,6 +4,7 @@
 #define _AFE_MQTT_h
 
 #include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-NETWORK-Structure.h>
 #include <PubSubClient.h>
@@ -19,7 +20,7 @@
 #endif
 
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
@@ -40,7 +41,7 @@ class AFEMQTT {
 private:
   PubSubClient _Broker;
   AFEDataAccess *_Data;
-  char *_DeviceName;
+  AFEDevice *_Device;
   NETWORK _NetworkConfiguration;
   PingClass Ping;
 
@@ -84,9 +85,9 @@ public:
 
 /* Initialization of the class */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, char *, AFELED *);
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #endif
-  void begin(AFEDataAccess *, char *);
+  void begin(AFEDataAccess *, AFEDevice *);
 
   /* Methods establishes connection from MQTT Broker, subscribed and set relay
  * default values */

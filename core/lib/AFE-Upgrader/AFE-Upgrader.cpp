@@ -16,13 +16,13 @@ boolean AFEUpgrader::upgraded() {
          << F("-") << FirmwareConfiguration.version << F("-");
 
   switch (FirmwareConfiguration.api) {
-  case AFE_API_STANDARD:
+  case AFE_FIRMWARE_API_STANDARD:
     Serial << F("Standard");
     break;
-  case AFE_API_DOMOTICZ:
+  case AFE_FIRMWARE_API_DOMOTICZ:
     Serial << F("Domoticz");
     break;
-  case AFE_API_HOME_ASSISTANT:
+  case AFE_FIRMWARE_API_HOME_ASSISTANT:
     Serial << F("HomeAssistant");
     break;
   default:
@@ -36,11 +36,11 @@ boolean AFEUpgrader::upgraded() {
       FirmwareConfiguration.type == AFE_FIRMWARE_TYPE &&
       FirmwareConfiguration.api ==
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
-          AFE_API_DOMOTICZ
+          AFE_FIRMWARE_API_DOMOTICZ
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
-          AFE_API_HOME_ASSISTANT
+          AFE_FIRMWARE_API_HOME_ASSISTANT
 #else
-          AFE_API_STANDARD
+          AFE_FIRMWARE_API_STANDARD
 #endif
       ) {
     return false;
@@ -90,7 +90,7 @@ void AFEUpgrader::upgrade() {
 void AFEUpgrader::upgradeFirmwarType() {
   NETWORK networkConfiguration;
   MQTT mqttConfiguration;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ domoticzCofiguration;
 #endif
   PRO_VERSION proConfiguration;
@@ -99,14 +99,14 @@ void AFEUpgrader::upgradeFirmwarType() {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: upgrading firmware type." << endl
-         << "INFO: UPGRADE: Reading core configuration";
+         << F("INFO: upgrading firmware type.") << endl
+         << F("INFO: UPGRADE: Reading core configuration");
 #endif
 
   /* Reading current data */
   Data->getConfiguration(&networkConfiguration);
   Data->getConfiguration(&mqttConfiguration);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Data->getConfiguration(&domoticzCofiguration);
 #endif
   Data->getConfiguration(&proConfiguration);
@@ -114,7 +114,7 @@ void AFEUpgrader::upgradeFirmwarType() {
   deviceState = Data->getDeviceMode();
 
 #ifdef DEBUG
-  Serial << endl << "INFO: UPGRADE: Creating default configuration";
+  Serial << endl << F("INFO: UPGRADE: Creating default configuration");
 #endif
 
   /* Setting the device from scratch */
@@ -122,13 +122,13 @@ void AFEUpgrader::upgradeFirmwarType() {
   Defaults.set();
 
 #ifdef DEBUG
-  Serial << endl << "INFO: UPGRADE: Restoring core configuration";
+  Serial << endl << F("INFO: UPGRADE: Restoring core configuration");
 #endif
 
   /* Restoring core configuration */
   Data->saveConfiguration(&networkConfiguration);
   Data->saveConfiguration(&mqttConfiguration);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Data->saveConfiguration(&domoticzCofiguration);
 #endif
   Data->saveConfiguration(&proConfiguration);
@@ -181,13 +181,10 @@ void AFEUpgrader::updateFirmwareVersion() {
 
 void AFEUpgrader::updateFirmwareAPIVersion() {
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  if (AFE_FIRMWARE_API == AFE_API_DOMOTICZ) {
-    /* Checking if there is Domoticz server configuration file */
-    if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
-      Data->createDomoticzConfigurationFile();
-    }
-    Data->saveFirmwareAPIVersion();
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  /* Checking if there is Domoticz server configuration file */
+  if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
+    Data->createDomoticzConfigurationFile();
   }
 #endif
 
@@ -210,11 +207,11 @@ void AFEUpgrader::upgradeToT0V210() {
   sprintf(newDevice.name, oldDevice.name);
   newDevice.api.http = oldDevice.api.http;
   newDevice.api.mqtt = oldDevice.api.mqtt;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   newDevice.api.domoticz = oldDevice.api.domoticz;
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_ADC_VCC) && !defined(AFE_ESP32)
+#if defined(AFE_CONFIG_HARDWARE_ANALOG_INPUT) && !defined(AFE_ESP32)
   newDevice.isAnalogInput = oldDevice.isAnalogInput;
 #endif
 

@@ -2,7 +2,7 @@
 
 #include "AFE-API-HTTP-Domoticz.h"
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 AFEAPIHTTPDomoticz::AFEAPIHTTPDomoticz() : AFEAPI(){};
 
@@ -73,13 +73,13 @@ void AFEAPIHTTPDomoticz::replaceSpaceinUrl(const char *inputString,
                                            const char &outputString); {}
 */
 
-boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx,
-                                              const char *value) {
+boolean AFEAPIHTTPDomoticz::sendSwitchCommand(unsigned int idx, boolean state) {
   boolean _return = false;
-  if (enabled) {
+  // @TODO T7  - problem with updates in DOmoticz if changed by browser
+  if (enabled && idx > 0) {
     String call = getApiCall("switchlight", idx);
     call += "&switchcmd=";
-    call += value;
+    call += state ? "On" : "Off";
     _return = callURL(call);
   }
   return _return;
@@ -104,13 +104,9 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) { AFEAPI::addClass(Relay); }
 boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled && _Relay[id]->configuration.domoticz.idx > 0) {
-    publishStatus =
-        sendSwitchCommand(_Relay[id]->configuration.domoticz.idx,
-                          _Relay[id]->get() == AFE_RELAY_ON ? "On" : "Off");
-  }
-  return publishStatus;
+  return enabled ? sendSwitchCommand(_Relay[id]->configuration.domoticz.idx,
+                                     _Relay[id]->get() == AFE_RELAY_ON)
+                 : false;
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -119,17 +115,13 @@ void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
   AFEAPI::addClass(Switch);
 }
 boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled && _Switch[id]->configuration.domoticz.idx) {
-    publishStatus =
-        sendSwitchCommand(_Switch[id]->configuration.domoticz.idx,
-                          _Switch[id]->getPhisicalState() ? "Off" : "On");
-  }
-  return publishStatus;
+  return enabled ? sendSwitchCommand(_Switch[id]->configuration.domoticz.idx,
+                                     !_Switch[id]->getPhisicalState())
+                 : false;
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 void AFEAPIHTTPDomoticz::addClass(AFEAnalogInput *Analog) {
   AFEAPI::addClass(Analog);
 }
@@ -185,7 +177,7 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
   }
 }
 #endif // ESP32/ESP8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues() {
@@ -210,7 +202,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
 
   boolean _ret = false;
   if (enabled) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T5 T6 CHeck the max size
     if (_BMx80Sensor[id]->configuration.domoticz.temperature.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.temperature.value);
       sendCustomSensorCommand(
@@ -405,7 +397,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorBH1750 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled && _BH1750Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T5 T6  CHeck the max size
     sprintf(value, "%-.2f", _BH1750Sensor[id]->data);
     sendCustomSensorCommand(_BH1750Sensor[id]->configuration.domoticz.idx,
                             value);
@@ -454,7 +446,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorAS3935 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishAS3935SensorData(uint8_t id) {
   boolean _ret = false;
   if (enabled && _AS3935Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[20]; // @TODO CHeck the max size
+    char value[20]; // @TODO T6 CHeck the max size
     sprintf(value, "%-d", _AS3935Sensor[id]->distance);
     sendCustomSensorCommand(_AS3935Sensor[id]->configuration.domoticz.idx,
                             value);
@@ -503,13 +495,9 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
 
 boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
-  boolean _ret = false;
-  if (enabled && _Gate[id]->configuration.domoticz.idx > 0) {
-    _ret =
-        sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
-                          _Gate[id]->get() == AFE_GATE_CLOSED ? "Off" : "On");
-  }
-  return _ret;
+  return enabled ? sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
+                                     _Gate[id]->get() == AFE_GATE_OPEN)
+                 : false;
 }
 #endif // AFE_CONFIG_HARDWARE_GATE
 
@@ -519,13 +507,10 @@ void AFEAPIHTTPDomoticz::addClass(AFEContactron *Item) {
 }
 
 boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
-  boolean _ret = false;
-  if (enabled && _Contactron[id]->configuration.domoticz.idx > 0) {
-    _ret = sendSwitchCommand(
-        _Contactron[id]->configuration.domoticz.idx,
-        _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? "On" : "Off");
-  }
-  return _ret;
+  return enabled
+             ? sendSwitchCommand(_Contactron[id]->configuration.domoticz.idx,
+                                 _Contactron[id]->get() == AFE_CONTACTRON_OPEN)
+             : false;
 }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
@@ -551,13 +536,9 @@ void AFEAPIHTTPDomoticz::addClass(AFERegulator *Regulator) {
   AFEAPI::addClass(Regulator);
 }
 boolean AFEAPIHTTPDomoticz::publishRegulatorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled && _Regulator[id]->configuration.domoticz.idx > 0) {
-    publishStatus =
-        sendSwitchCommand(_Regulator[id]->configuration.domoticz.idx,
-                          _Regulator[id]->configuration.enabled ? "On" : "Off");
-  }
-  return publishStatus;
+  return enabled ? sendSwitchCommand(_Regulator[id]->configuration.domoticz.idx,
+                                     _Regulator[id]->configuration.enabled)
+                 : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
@@ -566,13 +547,10 @@ void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
   AFEAPI::addClass(Protector);
 }
 boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled && _ThermalProtector[id]->configuration.domoticz.idx > 0) {
-    publishStatus = sendSwitchCommand(
-        _ThermalProtector[id]->configuration.domoticz.idx,
-        _ThermalProtector[id]->configuration.enabled ? "On" : "Off");
-  }
-  return publishStatus;
+  return enabled ? sendSwitchCommand(
+                       _ThermalProtector[id]->configuration.domoticz.idx,
+                       _ThermalProtector[id]->configuration.enable)
+                 : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
@@ -666,7 +644,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_charText, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
 
-      // @TODO is there a better one?
+      // @TODO T2 is there a better one?
       _stringText = _charText;
       _stringText.replace(" ", "%20");
       _stringText.toCharArray(_charText, sizeof(_charText));
@@ -689,7 +667,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
       strcpy_P(_charText,
                (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
 
-      // @TODO is there a better one?
+      // @TODO T2 is there a better one?
       _stringText = _charText;
       _stringText.replace(" ", "%20");
       _stringText.toCharArray(_charText, sizeof(_charText));
@@ -710,15 +688,11 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorBinary *Sensor) {
   AFEAPI::addClass(Sensor);
 }
 boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
-    publishStatus =
-        sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
-                          _BinarySensor[id]->get() == 1 ? "Off" : "On");
-  }
-  return publishStatus;
+  return enabled
+             ? sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
+                                 _BinarySensor[id]->get() == 0)
+             : false;
 }
-
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -738,4 +712,38 @@ boolean AFEAPIHTTPDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
 }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
+/* RGB LED are not supported in HTTP Domoticz API 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEAPIHTTPDomoticz::addClass(AFECLED *CLed) { AFEAPI::addClass(CLed); }
+
+boolean AFEAPIHTTPDomoticz::publishCLEDState(uint8_t id) {
+  return enabled ? sendSwitchCommand(_CLED->configuration[id].domoticz.idx,
+                                     _CLED->currentState[id].state == AFE_ON)
+                 : false;
+}
+
+boolean AFEAPIHTTPDomoticz::publishCLEDEffectState(uint8_t id) {
+  if (enabled) {
+    sendSwitchCommand(_CLED->configurationEffectBlinking[id].domoticz.idx,
+                      _CLED->currentState[id].effect.id ==
+                              AFE_DOMOTICZ_DEVICE_CLED_EFFECT_BLINKING
+                          ? AFE_ON
+                          : AFE_OFF);
+    sendSwitchCommand(_CLED->configurationEffectFadeInOut[id].domoticz.idx,
+                      _CLED->currentState[id].effect.id ==
+                              AFE_DOMOTICZ_DEVICE_CLED_EFFECT_FADE_IN_OUT
+                          ? AFE_ON
+                          : AFE_OFF);
+                          
+    return sendSwitchCommand(_CLED->configurationEffectWave[id].domoticz.idx,
+                             _CLED->currentState[id].effect.id ==
+                                     AFE_DOMOTICZ_DEVICE_CLED_EFFECT_WAVE
+                                 ? AFE_ON
+                                 : AFE_OFF);
+  } else {
+    return false;
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_CLED
+*/
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

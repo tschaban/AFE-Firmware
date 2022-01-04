@@ -5,9 +5,9 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 struct ADCINPUT_DOMOTICZ {
   uint32_t raw;
   uint32_t percent;
@@ -32,10 +32,10 @@ struct VOLTAGE_DIVIDER {
 struct BATTERY_METER {
   float maxVoltage;
   float minVoltage;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTT_BASIC_CONFIG mqtt;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
+#else
+  MQTT_TOPIC mqtt;
 #endif
 };
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -45,10 +45,10 @@ struct ADCINPUT {
   uint32_t interval;
   uint16_t numberOfSamples;
   double maxVCC;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-  MQTT_BASIC_CONFIG mqtt;
-#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   ADCINPUT_DOMOTICZ domoticz;
+#else
+  MQTT_TOPIC mqtt;
 #endif
   VOLTAGE_DIVIDER divider;
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -56,9 +56,9 @@ struct ADCINPUT {
 #endif
 
 #ifdef AFE_ESP32
-  char name[17];
+  char name[33];
 #endif
 };
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #endif // _AFE_ADC_INPUT_Structure_h

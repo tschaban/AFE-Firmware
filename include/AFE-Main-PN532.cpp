@@ -115,7 +115,7 @@ void PN532EventsListener() {
                 break;
               }
               MqttAPI.publishRelayState(MiFareCard[j].configuration.relayId);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
               HttpDomoticzAPI.publishRelayState(
                   MiFareCard[j].configuration.relayId);
 #endif
@@ -130,7 +130,7 @@ void PN532EventsListener() {
           }
         }
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
         MqttAPI.publishPN532SensorData(i);
 #endif
       }
@@ -150,7 +150,7 @@ void PN532EventsListener() {
     for (uint8_t j = 0; j < Device.configuration.noOfMiFareCards; j++) {
       if (MiFareCard[j].listener()) {
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         for (uint8_t idxId = 0; idxId < AFE_HARDWARE_PN532_TAG_SIZE; idxId++) {
 
           MqttAPI.publishMiFareCardState(j, idxId, MiFareCard[j].state,
@@ -162,8 +162,8 @@ void PN532EventsListener() {
 
 #ifdef DEBUG
           Serial << endl
-                 << "INFO: MiFare: TAG[" << (idxId + 1)
-                 << "]: MQTT publishing processed";
+                 << F("INFO: MiFare: TAG[") << (idxId + 1)
+                 << F("]: MQTT publishing processed");
 #endif
         }
 #else

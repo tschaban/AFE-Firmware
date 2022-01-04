@@ -6,8 +6,7 @@
 
 AFERainmeter::AFERainmeter(){};
 
-boolean AFERainmeter::begin(AFEDataAccess *Data,
-                                  AFEImpulseCatcher *Sensor) {
+boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor) {
   _Data = Data;
   _Sensor = Sensor;
   Data->getConfiguration(&configuration);
@@ -29,7 +28,7 @@ boolean AFERainmeter::begin(AFEDataAccess *Data,
   memcpy(current.last1h, _previous.last1h, sizeof(_previous.last1h[0]) * 60);
   current.index1h = _previous.index1h;
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   current.counter = _previous.counter;
 #else
   for (uint8_t i = 0; i < 12; i++) {
@@ -60,7 +59,7 @@ boolean AFERainmeter::listener(void) {
 
       /* Level during last 1 minute */
       rainLevelLast1Minute = noOfImpulses * configuration.resolution / 1000;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       current.counter += rainLevelLast1Minute;
 #endif
       /* Storing water level for passed 1 minute */
@@ -72,7 +71,7 @@ boolean AFERainmeter::listener(void) {
         rainLevelLastHour = rainLevelLastHour + current.last1h[i];
       }
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED // Not required for Domoticz
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ // Not required for Domoticz
       /* Storing water level for passed hour */
 
       current.last12h[current.index12h] = rainLevelLastHour;
@@ -108,15 +107,15 @@ boolean AFERainmeter::listener(void) {
              << endl
              << F(" - last hour: ") << rainLevelLastHour << F(" mm/hour")
              << endl
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
-             << F(" - last 12 hours: ") << rainLevelLast12Hours << F(" mm/12-hours")
-             << endl
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
+             << F(" - last 12 hours: ") << rainLevelLast12Hours
+             << F(" mm/12-hours") << endl
              << F(" - last 24 hours: ") << rainLevelLast24Hours
              << F(" mm/24-hours") << endl
 #endif
              << F(" - INDEX: ") << endl
              << F("  : Hour Index= ") << current.index1h << endl
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
              << F("  : 12 Hours Index = ") << current.index12h << endl
              << F("  : 24 Hours index = ") << current.index24h
 #endif
@@ -138,18 +137,18 @@ boolean AFERainmeter::listener(void) {
 }
 
 void AFERainmeter::getJSON(char *json) {
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
+                "min\"},{\"value\":%.3f,\"unit\":\"mm/"
+                "h\"}]}",
+          rainLevelLast1Minute, rainLevelLastHour);
+#else
   sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
                 "min\"},{\"value\":%.3f,\"unit\":\"mm/"
                 "h\"},{\"value\":%.3f,\"unit\":\"mm/"
                 "12h\"},{\"value\":%.3f,\"unit\":\"mm/24h\"}]}",
           rainLevelLast1Minute, rainLevelLastHour, rainLevelLast12Hours,
           rainLevelLast24Hours);
-#else
-  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
-                "min\"},{\"value\":%.3f,\"unit\":\"mm/"
-                "h\"}]}",
-          rainLevelLast1Minute, rainLevelLastHour);
 #endif
 }
 

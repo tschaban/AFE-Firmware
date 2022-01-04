@@ -2,9 +2,6 @@
 
 /* ---------Headers ---------*/
 
-void eventsListener(void);
-
-/* --------- Body -----------*/
 
 void eventsListener(void) {
   /* Event: connected to WiFi*/
@@ -20,7 +17,7 @@ void eventsListener(void) {
     if (Device.getMode() == AFE_MODE_NORMAL) {
 
 /* ################## HTTP DOMOTICZ ################### */
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTIC
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       /* Sendings hardware values to Domoticz */
 
       if (Device.configuration.api.domoticz) {
@@ -75,6 +72,18 @@ void eventsListener(void) {
 #endif
         for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
           HttpDomoticzAPI.publishBinarySensorState(i);
+        }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef DEBUG
+        Serial << endl
+               << F("INFO: EVENTS: Sending current state of RGB LEDs "
+                    "Domoticz");
+#endif
+        for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
+     //     HttpDomoticzAPI.publishCLEDState(i);
+     //     HttpDomoticzAPI.publishCLEDEffectState(i);
         }
 #endif
 
@@ -155,12 +164,27 @@ void eventsListener(void) {
   /* Event: connected to MQTT API */
   if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.eventConnected()) {
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+      HomeAssistantDiscoveryAPI->publishRelays();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      HomeAssistantDiscoveryAPI->publishCLEDs();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+      HomeAssistantDiscoveryAPI->publishAnalogInputs();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+      HomeAssistantDiscoveryAPI->publishSwitches();
+#endif
+
+      delete HomeAssistantDiscoveryAPI;
+      HomeAssistantDiscoveryAPI = NULL;
+#endif
+
       MqttAPI.subscribe();
       MqttAPI.synchronize();
-
-#if AFE_FIRMWARE_API == AFE_API_HOME_ASSISTANT
-      HomeAssistantDiscoveryAPI.publishRelay(0);
-#endif
     }
   }
 }

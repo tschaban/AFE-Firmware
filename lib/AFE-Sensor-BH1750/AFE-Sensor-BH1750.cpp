@@ -91,7 +91,7 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F("Name: ") << configuration.name;
     Serial << endl << F("Mode: ") << configuration.mode;
     Serial << endl << F("Interval: ") << configuration.interval;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     Serial << endl << F("IDX: ") << configuration.domoticz.idx;
 #endif
   }

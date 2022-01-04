@@ -5,18 +5,25 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED // Code excluded for not Standard API
-                                       // version of Firmware
+/**
+ * @brief code excluded for none-Domoticz API
+ * 
+ */
+// #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ @TODO No clue why it doesn't work
 
+#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+
+#include <rBase64.h>
 #include <AFE-API.h>
 #include <WiFiClient.h>
+
 #ifdef AFE_ESP32
 #include <HTTPClient.h>
 #else // ESP8266
 #include <ESP8266HTTPClient.h>
-#endif // ESPESP8266
+#endif // ESP32 / 8266
 
-#include <rBase64.h>
+
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -41,14 +48,14 @@ private:
   boolean callURL(const String url);
 
   /* Sends to Domoticz switch update call */
-  boolean sendSwitchCommand(unsigned int idx, const char *value);
+  boolean sendSwitchCommand(unsigned int idx, boolean state);
 
   /* sends to Domoticz custome sensor call */
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
                                   uint16_t nvalue = 0);
 
-  /* Replace space with %20 */
-  //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
+/* Replace space with %20 */
+//  void replaceSpaceinUrl(const char *inputString, const char &outputString);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -72,14 +79,14 @@ public:
   boolean publishSwitchState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   virtual void addClass(AFEAnalogInput *);
 #ifdef AFE_ESP32
   void publishADCValues(uint8_t id);
 #else  // ESP32
   void publishADCValues();
 #endif // ESP32/8266
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   virtual void addClass(AFESensorBMEX80 *);
@@ -160,6 +167,14 @@ public:
   virtual void addClass(AFESensorTSL2561 *);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+/* RGB LED are not supported in HTTP Domoticz API 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  virtual void addClass(AFECLED *);
+  boolean publishCLEDState(uint8_t id);
+  boolean publishCLEDEffectState(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_CLED
+*/
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

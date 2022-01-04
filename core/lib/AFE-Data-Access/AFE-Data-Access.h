@@ -15,7 +15,7 @@
 #else /* ESP8266 */
 #include <ESP8266WiFi.h>
 #include <FS.h>
-#if AFE_FILE_SYSTEM_USED == AFE_FS_LITTLEFS
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
 #include <LittleFS.h>
 #endif
 #endif // ESP32/ESP8266
@@ -27,6 +27,10 @@
 class AFEDataAccess {
 private:
   IPAddress IPfromString(const char *address);
+
+#ifdef DEBUG
+ void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
+#endif
 
 public:
   AFEDataAccess();
@@ -67,10 +71,14 @@ public:
   void getWelcomeMessage(String &message);
   void saveWelecomeMessage(const char *);
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   void getConfiguration(DOMOTICZ *);
   void saveConfiguration(DOMOTICZ *);
   void createDomoticzConfigurationFile();
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+  boolean getConfiguration(HOME_ASSISTANT_CONFIG *);
+  void saveConfiguration(HOME_ASSISTANT_CONFIG *);
+  void createHomeAssistantConfigurationFile();
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   uint8_t getDeviceMode();
@@ -108,17 +116,17 @@ public:
   void createSystemLedIDConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, ADCINPUT *);
   void saveConfiguration(uint8_t id, ADCINPUT *);
-#else // ESP8266
+#else  // ESP8266
   void getConfiguration(ADCINPUT *);
   void saveConfiguration(ADCINPUT *);
 #endif // ESP32/ESP8266
 
   void createADCInputConfigurationFile();
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   void getConfiguration(uint8_t id, DS18B20 *);
@@ -167,7 +175,7 @@ public:
 #ifdef AFE_ESP32
   void getConfiguration(uint8_t id, I2CPORT *);
   void saveConfiguration(uint8_t id, I2CPORT *);
-#else // ESP8266
+#else  // ESP8266
   void getConfiguration(I2CPORT *);
   void saveConfiguration(I2CPORT *);
 #endif // ESP32/ESP8266
@@ -248,15 +256,15 @@ public:
   void saveConfiguration(uint8_t id, CLED_EFFECT_BLINKING *);
   void createCLEDEffectBlinkingConfigurationFile();
 
+  boolean getConfiguration(uint8_t id, CLED_EFFECT_WAVE *);
+  void saveConfiguration(uint8_t id, CLED_EFFECT_WAVE *);
+  void createCLEDEffectWaveConfigurationFile();
 
+  boolean getConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
+  void saveConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
+  void createCLEDEffectFadeInOutConfigurationFile();
 
-
-  
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  boolean getConfiguration(uint8_t id, CLED_EFFECTS *);
-  void saveConfiguration(uint8_t id, CLED_EFFECTS *);
-  void createCLEDEffectsConfigurationFile();
-
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();

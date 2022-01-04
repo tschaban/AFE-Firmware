@@ -8,13 +8,13 @@
 
 #include <AFE-Air-Item-Structure.h>
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
 #endif
 #include <AFE-MQTT-Structure.h>
 
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 struct DHT_DOMOTICZ {
   DOMOTICZ_BASIC_CONFIG temperature;
   DOMOTICZ_BASIC_CONFIG humidity;
@@ -37,10 +37,10 @@ struct DHT {
   boolean sendOnlyChanges;
   AIR_ITEM_SETTING temperature;
   AIR_ITEM_SETTING humidity;
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DHT_DOMOTICZ domoticz;
 #else
-  MQTT_BASIC_CONFIG mqtt;
+  MQTT_TOPIC mqtt;
 #endif
 };
 

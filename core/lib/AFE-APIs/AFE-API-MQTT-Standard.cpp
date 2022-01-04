@@ -3,7 +3,7 @@
 
 #include "AFE-API-MQTT-Standard.h"
 
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 
 AFEAPIMQTTStandard::AFEAPIMQTTStandard() : AFEAPI(){};
 
@@ -17,12 +17,6 @@ void AFEAPIMQTTStandard::begin(AFEDataAccess *Data, AFEDevice *Device) {
   AFEAPI::begin(Data, Device);
 }
 #endif
-
-void AFEAPIMQTTStandard::listener() {
-  if (Mqtt.listener()) {
-    processRequest();
-  }
-}
 
 void AFEAPIMQTTStandard::synchronize() {
 
@@ -41,9 +35,7 @@ void AFEAPIMQTTStandard::synchronize() {
   char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     if (strlen(_Relay[i]->configuration.mqtt.topic) > 0) {
-
       sprintf(mqttStateTopic, "%s/state", _Relay[i]->configuration.mqtt.topic);
-
       if (!_Relay[i]->setRelayAfterRestoringMQTTConnection()) {
         /* Requesting state from MQTT Broker / service */
         Mqtt.publish(mqttStateTopic, "get");
@@ -95,6 +87,13 @@ void AFEAPIMQTTStandard::synchronize() {
     publishThermalProtectorState(i);
   }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+    publishCLEDState(i);
+    publishCLEDEffectsState(i);
+  }
+#endif // AFE_CONFIG_HARDWARE_CLED
 }
 
 void AFEAPIMQTTStandard::subscribe() {
@@ -103,81 +102,42 @@ void AFEAPIMQTTStandard::subscribe() {
   Serial << endl << F("INFO: Subscribing to MQTT Topics ...");
 #endif
 
-  char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
-
 /* Subscribe: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    if (strlen(_Relay[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd", _Relay[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RELAY;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_Relay[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_RELAY, i);
   }
 #endif
 
 /* Subscribe: Switch */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
-    if (strlen(_Switch[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd", _Switch[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_SWITCH;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_Switch[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_SWITCH, i);
   }
 #endif
 
 /* Subscribe: Binary sensors */
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    if (strlen(_BinarySensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _BinarySensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BINARY_SENSOR;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_BinarySensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_BINARY_SENSOR, i);
   }
 #endif
 
 /* Subscribe: ADC */
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strlen(_AnalogInput[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _AnalogInput[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ADC;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_AnalogInput[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_ADC, i);
   }
 #else
   if (_Device->configuration.isAnalogInput) {
-    if (strlen(_AnalogInput->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _AnalogInput->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ADC;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_AnalogInput->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_ADC);
   }
 #endif // AFE_ESP32
 #endif
@@ -185,206 +145,125 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: BMx80 */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    if (strlen(_BMx80Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _BMx80Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BMX80;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_BMx80Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_BMX80, i);
   }
 #endif
 
 /* Subscribe: BH1750 */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    if (strlen(_BH1750Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _BH1750Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_BH1750;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_BH1750Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_BH1750, i);
   }
 #endif
 
 /* Subscribe: TSL2561 */
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
-    if (strlen(_TSL2561Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _TSL2561Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_TSL2561;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_TSL2561Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_TSL2561, i);
   }
 #endif
 
 /* Subscribe: AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    if (strlen(_AS3935Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _AS3935Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_AS3935;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_AS3935Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_AS3935, i);
   }
 #endif
 
 /* Subscribe: HPMA115S0 */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    if (strlen(_HPMA115S0Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _HPMA115S0Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_HPMA115S0;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_HPMA115S0Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_HPMA115S0, i);
   }
 #endif
 
 /* Subscribe: ANEMOMETER */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (_Device->configuration.noOfAnemometerSensors > 0) {
-    if (strlen(_AnemometerSensor->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _AnemometerSensor->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_ANEMOMETER;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_AnemometerSensor->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_HPMA115S0);
   }
 #endif
 
 /* Subscribe: RAIN */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   if (_Device->configuration.noOfRainmeterSensors > 0) {
-
-    if (strlen(_RainmeterSensor->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _RainmeterSensor->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_RAINMETER;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_RainmeterSensor->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_RAINMETER);
   }
 #endif
 
 /* Subscribe: Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    if (strlen(_Contactron[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _Contactron[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_CONTACTRON;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_Contactron[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_CONTACTRON, i);
   }
 #endif
 
 /* Subscribe: Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    if (strlen(_Gate[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd", _Gate[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_GATE;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_Gate[i]->configuration.mqtt.topic, AFE_MQTT_DEVICE_GATE,
+                       i);
   }
 #endif
 
 /* Subscribe: DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    if (strlen(_DS18B20Sensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _DS18B20Sensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DS18B20;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_DS18B20Sensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_DS18B20, i);
   }
 #endif
 
+/* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    if (strlen(_Regulator[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _Regulator[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_REGULATOR;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_Regulator[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_REGULATOR, i);
   }
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#endif
 
+/* Thermal protector */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    if (strlen(_ThermalProtector[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _ThermalProtector[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type =
-          AFE_MQTT_DEVICE_THERMAL_PROTECTOR;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_ThermalProtector[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_THERMAL_PROTECTOR, i);
   }
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#endif
 
 /* Subscribe: DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    if (strlen(_DHTSensor[i]->configuration.mqtt.topic) > 0) {
-      sprintf(mqttCommandTopic, "%s/cmd",
-              _DHTSensor[i]->configuration.mqtt.topic);
-      Mqtt.subscribe(mqttCommandTopic);
-      sprintf(mqttTopicsCache[currentCacheSize].message.topic,
-              mqttCommandTopic);
-      mqttTopicsCache[currentCacheSize].id = i;
-      mqttTopicsCache[currentCacheSize].type = AFE_MQTT_DEVICE_DHT;
-      currentCacheSize++;
-    }
+    subscribeToCommand(_DHTSensor[i]->configuration.mqtt.topic,
+                       AFE_MQTT_DEVICE_DHT, i);
   }
+#endif
+
+/* Subscribe: CLED */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+
+  char _brightnessTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+
+    subscribeToCommand(_CLED->configuration[i].cled.topic, AFE_MQTT_DEVICE_CLED,
+                       i);
+
+    sprintf(_brightnessTopic, "%s%s", _CLED->configuration[i].cled.topic,
+            AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CMD_TOPIC_SUFIX);
+
+    subscribeToCommand(_brightnessTopic, AFE_MQTT_DEVICE_CLED_BRIGHTNESS, i);
+
+    subscribeToCommand(_CLED->configuration[i].effect.topic,
+                       AFE_MQTT_DEVICE_CLED_EFFECTS, i);
+  }
+
 #endif
 
 #ifdef DEBUG
@@ -396,151 +275,145 @@ void AFEAPIMQTTStandard::subscribe() {
 #endif
 }
 
-void AFEAPIMQTTStandard::processRequest() {
+void AFEAPIMQTTStandard::listener() {
+  if (Mqtt.listener()) {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: MQTT: Got message: ") << Mqtt.message.topic << F(" | ");
-  for (uint8_t i = 0; i < Mqtt.message.length; i++) {
-    Serial << (char)Mqtt.message.content[i];
-  }
+    Serial << endl
+           << F("INFO: MQTT: Got message: ") << Mqtt.message.topic << F(" | ");
+    for (uint8_t i = 0; i < Mqtt.message.length; i++) {
+      Serial << (char)Mqtt.message.content[i];
+    }
 #endif
-  for (uint8_t i = 0; i < currentCacheSize; i++) {
-    if (strcmp(Mqtt.message.topic, mqttTopicsCache[i].message.topic) == 0) {
+    for (uint8_t i = 0; i < currentCacheSize; i++) {
+      if (strcmp(Mqtt.message.topic, mqttTopicsCache[i].message.topic) == 0) {
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: MQTT: Found topic in cache: Device Type=")
-             << mqttTopicsCache[i].type;
+        Serial << endl
+               << F("INFO: MQTT: Found topic in cache: Device Type=")
+               << mqttTopicsCache[i].type;
 #endif
-      switch (mqttTopicsCache[i].type) {
+        switch (mqttTopicsCache[i].type) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-      case AFE_MQTT_DEVICE_RELAY: // RELAY
-        processRelay(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_RELAY: // RELAY
+          processRelay(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_RELAY
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-      case AFE_MQTT_DEVICE_SWITCH:
-        processSwitch(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_SWITCH:
+          processSwitch(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-      case AFE_MQTT_DEVICE_BINARY_SENSOR:
-        processBinarySensor(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_BINARY_SENSOR:
+          processBinarySensor(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_SWITCH
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
-      case AFE_MQTT_DEVICE_ADC: // ADC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+        case AFE_MQTT_DEVICE_ADC: // ADC
 #ifdef AFE_ESP32
-        processADC(&mqttTopicsCache[i].id);
+          processADC(&mqttTopicsCache[i].id);
 #else
-        processADC();
+          processADC();
 #endif
-        break;
+          break;
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-      case AFE_MQTT_DEVICE_BH1750:
-        processBH1750(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_BH1750:
+          processBH1750(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_BH1750
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-      case AFE_MQTT_DEVICE_BMX80:
-        processBMEX80(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_BMX80:
+          processBMEX80(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-      case AFE_MQTT_DEVICE_AS3935:
-        processAS3935(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_AS3935:
+          processAS3935(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_AS3935
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-      case AFE_MQTT_DEVICE_ANEMOMETER:
-        processAnemometerSensor();
-        break;
+        case AFE_MQTT_DEVICE_ANEMOMETER:
+          processAnemometerSensor();
+          break;
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-      case AFE_MQTT_DEVICE_RAINMETER:
-        processRainSensor();
-        break;
+        case AFE_MQTT_DEVICE_RAINMETER:
+          processRainSensor();
+          break;
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-      case AFE_MQTT_DEVICE_HPMA115S0:
-        processHPMA115S0(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_HPMA115S0:
+          processHPMA115S0(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #ifdef AFE_CONFIG_HARDWARE_GATE
-      case AFE_MQTT_DEVICE_GATE:
-        processGate(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_GATE:
+          processGate(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_GATE
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-      case AFE_MQTT_DEVICE_CONTACTRON:
-        processContactron(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_CONTACTRON:
+          processContactron(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-      case AFE_MQTT_DEVICE_DS18B20:
-        processDS18B20(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_DS18B20:
+          processDS18B20(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-      case AFE_MQTT_DEVICE_REGULATOR:
-        processRegulator(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_REGULATOR:
+          processRegulator(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-      case AFE_MQTT_DEVICE_THERMAL_PROTECTOR:
-        processThermalProtector(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_THERMAL_PROTECTOR:
+          processThermalProtector(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef AFE_CONFIG_HARDWARE_DHT
-      case AFE_MQTT_DEVICE_DHT:
-        processDHT(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_DHT:
+          processDHT(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_DHT
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-      case AFE_MQTT_DEVICE_CLED_EFFECT_DEVICE_LIGHT:
-        processEffectDeviceLight();
-        break;
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-      case AFE_MQTT_DEVICE_CLED_EFFECT_PN532_SENSOR:
-        processEffectPN532Sensor();
-        break;
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-*/
+#ifdef AFE_CONFIG_HARDWARE_CLED
+        case AFE_MQTT_DEVICE_CLED:
+          processCLED(&mqttTopicsCache[i].id);
+          break;
+        case AFE_MQTT_DEVICE_CLED_EFFECTS:
+          processCLEDEffect(&mqttTopicsCache[i].id);
+          break;
+        case AFE_MQTT_DEVICE_CLED_BRIGHTNESS:
+          processCLEDBrigtness(&mqttTopicsCache[i].id);
+          break;
+#endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-      case AFE_MQTT_DEVICE_TSL2561:
-        processTSL2561(&mqttTopicsCache[i].id);
-        break;
+        case AFE_MQTT_DEVICE_TSL2561:
+          processTSL2561(&mqttTopicsCache[i].id);
+          break;
 #endif // AFE_CONFIG_HARDWARE_TSL2561
-      default:
+        default:
 #ifdef DEBUG
-        Serial << endl
-               << F("ERROR: Device type ") << mqttTopicsCache[i].type
-               << F(" not found");
+          Serial << endl
+                 << F("ERROR: Device type ") << mqttTopicsCache[i].type
+                 << F(" not found");
 #endif
+          break;
+        }
+
         break;
       }
-
-      break;
     }
   }
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-    if (strlen(_Relay[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state", _Relay[id]->configuration.mqtt.topic);
-      publishStatus = Mqtt.publish(
-          mqttStateTopic, _Relay[id]->get() == AFE_RELAY_ON ? "on" : "off");
-    }
-  }
-  return publishStatus;
+  return publishOnOffState(_Relay[id]->configuration.mqtt.topic,
+                           _Relay[id]->get() == AFE_RELAY_ON ? AFE_ON
+                                                             : AFE_OFF);
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -585,21 +458,13 @@ void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
 #endif
 }
 boolean AFEAPIMQTTStandard::publishSwitchState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-    if (strlen(_Switch[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state",
-              _Switch[id]->configuration.mqtt.topic);
-      publishStatus = Mqtt.publish(
-          mqttStateTopic, _Switch[id]->getPhisicalState() ? "open" : "closed");
-    }
-  }
-  return publishStatus;
+  return publishOnOffState(
+      _Switch[id]->configuration.mqtt.topic,
+      _Switch[id]->getPhisicalState() ? AFE_OPEN : AFE_CLOSED, true);
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
 void AFEAPIMQTTStandard::publishADCValues(uint8_t id) {
   if (enabled) {
@@ -643,7 +508,7 @@ void AFEAPIMQTTStandard::processADC() {
 #endif
 }
 #endif // AFE_ESP32
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIMQTTStandard::processBatteryMeter() {
@@ -905,19 +770,9 @@ void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 }
 
 boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-    if (strlen(_Contactron[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state",
-              _Contactron[id]->configuration.mqtt.topic);
-      publishStatus = Mqtt.publish(mqttStateTopic,
-                                   _Contactron[id]->get() == AFE_CONTACTRON_OPEN
-                                       ? AFE_MQTT_CONTACTRON_OPEN
-                                       : AFE_MQTT_CONTACTRON_CLOSED);
-    }
-  }
-  return publishStatus;
+  // TODO T5 - check if works as in previous version
+  return publishOnOffState(_Contactron[id]->configuration.mqtt.topic,
+                           _Contactron[id]->get(), true);
 }
 #endif //  AFE_CONFIG_HARDWARE_CONTACTRON
 
@@ -950,17 +805,9 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-    if (strlen(_Regulator[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state",
-              _Regulator[id]->configuration.mqtt.topic);
-      publishStatus = Mqtt.publish(
-          mqttStateTopic, _Regulator[id]->configuration.enabled ? "on" : "off");
-    }
-  }
-  return publishStatus;
+  return publishOnOffState(_Regulator[id]->configuration.mqtt.topic,
+                           _Regulator[id]->configuration.enabled ? AFE_ON
+                                                                 : AFE_OFF);
 }
 
 void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
@@ -990,19 +837,9 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-
-    if (strlen(_ThermalProtector[id]->configuration.mqtt.topic) > 0) {
-      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state",
-              _ThermalProtector[id]->configuration.mqtt.topic);
-      publishStatus = Mqtt.publish(
-          mqttStateTopic,
-          _ThermalProtector[id]->configuration.enabled ? "on" : "off");
-    }
-  }
-  return publishStatus;
+  return publishOnOffState(
+      _ThermalProtector[id]->configuration.mqtt.topic,
+      _ThermalProtector[id]->configuration.enabled ? AFE_ON : AFE_OFF);
 }
 
 void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
@@ -1073,18 +910,11 @@ void AFEAPIMQTTStandard::processBinarySensor(uint8_t *id) {
 }
 
 boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
-  boolean publishStatus = false;
-  if (enabled) {
-    if (strlen(_BinarySensor[id]->configuration.mqtt.topic) > 0) {
-      publishStatus = Mqtt.publish(
-          _BinarySensor[id]->configuration.mqtt.topic,
-          _BinarySensor[id]->get() == 1
-              ? _BinarySensor[id]->configuration.sendAsSwitch ? "off" : "open"
-              : _BinarySensor[id]->configuration.sendAsSwitch ? "on"
-                                                              : "closed");
-    }
-  }
-  return publishStatus;
+  return publishOnOffState(_BinarySensor[id]->configuration.mqtt.topic,
+                           _BinarySensor[id]->get() == AFE_BINARY_SENSOR_OPEN
+                               ? AFE_OPEN
+                               : AFE_CLOSED,
+                           !_MiFareCard[id]->configuration.sendAsSwitch);
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
@@ -1102,66 +932,297 @@ boolean AFEAPIMQTTStandard::publishPN532SensorData(uint8_t id) {
   return publishStatus;
 }
 boolean AFEAPIMQTTStandard::publishMiFareCardState(uint8_t id, uint8_t state) {
+  return publishOnOffState(
+      _MiFareCard[id]->configuration.mqtt.topic,
+      state == AFE_HARDWARE_MIFARE_CARD_ACTION_ON ? AFE_ON : AFE_OFF,
+      !_MiFareCard[id]->configuration.sendAsSwitch);
+}
+#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
+  boolean _success = true;
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : command: ");
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
+  }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+
+  StaticJsonBuffer<AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH> jsonBuffer;
+  JsonObject &root = jsonBuffer.parseObject(_command);
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: API REST: JSON Buffer size: ")
+         << AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH
+         << F(", actual JSON size: ") << jsonBuffer.size();
+  if (AFE_CONFIG_HARDWARE_CLED_CMD_JSON_LENGTH < jsonBuffer.size() + 10) {
+    Serial << endl << F("WARN: API REST: Too small buffer size");
+  }
+#endif
+  if (!root.success()) {
+#ifdef DEBUG
+    Serial << endl << F("ERROR: API REST: JSON Parsing error");
+#endif
+  } else {
+
+    CLED_PARAMETERS _color;
+    char _state[4];
+
+    sprintf(_state, root["command"] | "");
+
+    if (strcmp(_state, "on") == 0) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: CLED: Processing ON");
+#endif
+      _CLED->on(*id, true);
+    } else if (strcmp(_state, "off") == 0) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: CLED: Processing OFF");
+#endif
+      _CLED->off(*id, false);
+    } else {
+      _color.color.blue = root["color"]["blue"];
+      _color.color.green = root["color"]["green"];
+      _color.color.red = root["color"]["red"];
+      _color.brightness =
+          root["brightness"] | _CLED->currentState[*id].on.brightness;
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: CLED: Changing color: RGB[") << _color.color.red
+             << F(",") << _color.color.green << F(",") << _color.color.blue
+             << F("], Brightness: ") << _color.brightness;
+#endif
+
+      /**
+       * @brief if color is set to RGB=0 then turning OFF LED strip, otherwise
+       * turn it ON
+       *
+       */
+
+      if (_color.color.blue == 0 && _color.color.green == 0 &&
+          _color.color.red == 0) {
+        _CLED->off(*id, false);
+      } else {
+        _CLED->on(*id, _color, true, true);
+      }
+    }
+  }
+
+  if (_success) {
+    if (_CLED->isStateUpdated(*id)) {
+      publishCLEDState(*id);
+    }
+    if (_CLED->isEffectStateUpdated(*id)) {
+      publishCLEDEffectsState(*id);
+    }
+  }
+}
+
+void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id) {
+  boolean _success = true;
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : effect: ");
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
+  }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+
+  if (strcmp(_command, AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF) == 0) {
+    _CLED->deactivateEffect(*id);
+  } else if (strcmp(_command, _CLED->configurationEffectBlinking[*id].name) ==
+             0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+  } else if (strcmp(_command, _CLED->configurationEffectFadeInOut[*id].name) ==
+             0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
+  } else if (strcmp(_command, _CLED->configurationEffectWave[*id].name) == 0) {
+    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+  } else {
+    _success = false;
+  }
+
+  if (_success) {
+    if (_CLED->isEffectStateUpdated(*id)) {
+      publishCLEDEffectsState(*id);
+    }
+    if (_CLED->isStateUpdated(*id)) {
+      publishCLEDState(*id);
+    }
+  }
+}
+
+void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: MQTT: Processing CLED: ") << *id << F(" : brightness : ");
+#endif
+
+  char _command[Mqtt.message.length + 1];
+  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
+    _command[i] = (char)Mqtt.message.content[i];
+  }
+  _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << _command;
+#endif
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+  uint8_t _brightness = _CLED->convertBrightnessFromAPI(*id, atof(_command));
+#else
+  uint8_t _brightness = atoi(_command);
+#endif // AFE_FIRMWARE_API_STANDARD
+
+  if (_brightness > 0) {
+    CLED_PARAMETERS _color = _CLED->currentState[*id].on;
+    _color.brightness = _brightness;
+    _CLED->on(*id, _color, true, true);
+  } else {
+    _CLED->off(*id, true);
+  }
+
+  if (_CLED->isStateUpdated(*id)) {
+    publishCLEDState(*id);
+  }
+  if (_CLED->isEffectStateUpdated(*id)) {
+    publishCLEDEffectsState(*id);
+  }
+}
+
+boolean AFEAPIMQTTStandard::publishCLEDEffectsState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    if (strlen(_MiFareCard[id]->configuration.mqtt.topic) > 0) {
+    if (strlen(_CLED->configuration[id].effect.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state",
+              _CLED->configuration[id].effect.topic);
       publishStatus = Mqtt.publish(
-          _MiFareCard[id]->configuration.mqtt.topic,
-          state == AFE_HARDWARE_MIFARE_CARD_ACTION_OFF
-              ? _MiFareCard[id]->configuration.sendAsSwitch ? "off" : "open"
-              : _MiFareCard[id]->configuration.sendAsSwitch ? "on" : "closed");
-      _MiFareCard[id]->state = state;
+          mqttStateTopic,
+          _CLED->currentState[id].effect.id ==
+                  AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
+              ? _CLED->configurationEffectBlinking[id].name
+              : _CLED->currentState[id].effect.id ==
+                        AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
+                    ? _CLED->configurationEffectFadeInOut[id].name
+                    : _CLED->currentState[id].effect.id ==
+                              AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE
+                          ? _CLED->configurationEffectWave[id].name
+                          : AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF);
     }
   }
   return publishStatus;
 }
-#endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-/* Not yet implemented
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-void AFEAPIMQTTStandard::processEffectDeviceLight() {
-#ifdef DEBUG
-  Serial << endl << F("INFO: MQTT: Processing CLED: Device Effect");
+boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
+  boolean publishStatus = false;
+  if (enabled) {
+    if (strlen(_CLED->configuration[id].cled.topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      char _message[AFE_CONFIG_HARDWARE_CLED_STATE_JSON_LENGTH];
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+      sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
+                        "\"blue\":%d},\"brightness\":%.2f}",
+              _CLED->currentState[id].state ? "on" : "off",
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.red
+                  : _CLED->currentState[id].off.color.red,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.green
+                  : _CLED->currentState[id].off.color.green,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.blue
+                  : _CLED->currentState[id].off.color.blue,
+              _CLED->convertBrigtnessToAPI(
+                  id, _CLED->currentState[id].config.brightness));
+#else
+      sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
+                        "\"blue\":%d},\"brightness\":%d}",
+              _CLED->currentState[id].state ? "on" : "off",
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.red
+                  : _CLED->currentState[id].off.color.red,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.green
+                  : _CLED->currentState[id].off.color.green,
+              _CLED->currentState[id].state
+                  ? _CLED->currentState[id].on.color.blue
+                  : _CLED->currentState[id].off.color.blue,
+              _CLED->currentState[id].config.brightness);
 #endif
-  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
-
-  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
-// Off
-
+      sprintf(mqttStateTopic, "%s/state", _CLED->configuration[id].cled.topic);
+      publishStatus = Mqtt.publish(mqttStateTopic, _message);
+    }
   }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("WARN: MQTT: Command not implemented");
-  }
-#endif
+  return publishStatus;
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-void AFEAPIMQTTStandard::processEffectPN532Sensor() {
-#ifdef DEBUG
-  Serial << endl << F("INFO: MQTT: Processing CLED: PN532 Sensor Effect");
-#endif
-  if ((char)Mqtt.message.content[1] == 'n' && Mqtt.message.length == 2) { // On
-    _CLEDBacklight->on();
-  } else if ((char)Mqtt.message.content[1] == 'f' && Mqtt.message.length == 3) {
-// Off
+#endif // AFE_CONFIG_HARDWARE_CLED
 
+/**** Private methods ****/
+
+void AFEAPIMQTTStandard::subscribeToCommand(
+    const char *topic, afe_mqtt_standard_device_type_t topicId, uint8_t index) {
+  if (strlen(topic) > 0) {
+    char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+    sprintf(mqttCommandTopic, "%s/cmd", topic);
+    Mqtt.subscribe(mqttCommandTopic);
+    sprintf(mqttTopicsCache[currentCacheSize].message.topic, mqttCommandTopic);
+    mqttTopicsCache[currentCacheSize].id = index;
+    mqttTopicsCache[currentCacheSize].type = topicId;
+    currentCacheSize++;
   }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("WARN: MQTT: Command not implemented");
-  }
-#endif
 }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||                   \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
-  void AFEAPIMQTTStandard::getCLEDCommand(CLED_COMMAND *command) {}
+boolean AFEAPIMQTTStandard::publishOnOffState(const char *topic, uint8_t state,
+                                              boolean sendAsOpenClosed) {
+  boolean publishStatus = false;
+  if (enabled && (state == AFE_ON || state == AFE_OFF)) {
+    if (strlen(topic) > 0) {
+      char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
+      sprintf(mqttStateTopic, "%s/state", topic);
+      publishStatus = Mqtt.publish(
+          mqttStateTopic,
+          state == AFE_ON ? sendAsOpenClosed ? AFE_CLOSED_LABEL : AFE_ON_LABEL
+                          : sendAsOpenClosed ? AFE_OPEN_LABEL : AFE_OFF_LABEL);
+    }
+  }
+  return publishStatus;
+}
 
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT ||
-AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-*/
+uint8_t AFEAPIMQTTStandard::processOnOffCommand(byte *command,
+                                                uint16_t *length) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing ON/OFF command: ");
+#endif
+  uint8_t _return = AFE_NONE;
+  if ((char)command[1] == 'n' && *length == 2) { /* ON */
+    _return = AFE_ON;
+  } else if ((char)command[1] == 'f' && *length == 3) { /* OFF */
+    _return = AFE_OFF;
+#ifdef DEBUG
+  } else {
+    Serial << endl << F("WARN: MQTT: Command: not implemented");
+#endif
+  }
+  return _return;
+}
 
-#endif // #ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif

@@ -1,6 +1,6 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifdef AFE_CONFIG_HARDWARE_ADC_VCC
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 /* ---------Headers ---------*/
 void initializeADC(void);
@@ -39,7 +39,7 @@ void analogInputEventsListener(void) {
         MqttAPI.publishBatteryMeterValues(i);
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishADCValues(i);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -64,7 +64,7 @@ void analogInputEventsListener(void) {
       MqttAPI.publishBatteryMeterValues();
 #endif
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       HttpDomoticzAPI.publishADCValues();
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
@@ -78,4 +78,4 @@ void analogInputEventsListener(void) {
 
 #endif // AFE_ESP32
 
-#endif // AFE_CONFIG_HARDWARE_ADC_VCC
+#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT

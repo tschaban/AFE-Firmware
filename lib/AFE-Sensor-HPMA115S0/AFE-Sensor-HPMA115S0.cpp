@@ -238,7 +238,7 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
 
 #ifdef DEBUG
   Serial << endl
-         << (_ret ? "UART: No need to retry" : "UART: Command not accepted");
+         << (_ret ? F("UART: No need to retry") : F("UART: Command not accepted"));
 #endif
 
   if (!_ret) {

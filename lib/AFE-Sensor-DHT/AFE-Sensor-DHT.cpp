@@ -12,8 +12,8 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
 
 #ifdef DEBUG
   Serial << endl
-         << "INFO: DHT: Initializing...GPIO: " << configuration.gpio
-         << ", Type: DHT" << configuration.type;
+         << F("INFO: DHT: Initializing...GPIO: ") << configuration.gpio
+         << F(", Type: DHT") << configuration.type;
 #endif
 
   dht.setup(configuration.gpio,
@@ -31,7 +31,7 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
                                         ? DHTesp::RHT03
                                         : DHTesp::AUTO_DETECT);
 #ifdef DEBUG
-  Serial << "DONE";
+  Serial << F("DONE");
 #endif
 
   _initialized = true;
@@ -51,7 +51,7 @@ boolean AFESensorDHT::listener() {
     if (time - startTime >= configuration.interval * 1000) {
 
 #ifdef DEBUG
-      Serial << endl << "INFO: DHT: Reading data from the sensor...";
+      Serial << endl << F("INFO: DHT: Reading data from the sensor...");
 #endif
 
       float _humidity = dht.getHumidity();

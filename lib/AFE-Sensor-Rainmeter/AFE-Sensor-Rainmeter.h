@@ -21,7 +21,7 @@ public:
   RAINMETER_DATA current;
   float rainLevelLast1Minute = 0;
   float rainLevelLastHour = 0;
-#ifndef AFE_CONFIG_API_DOMOTICZ_ENABLED  
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   float rainLevelLast12Hours = 0;
   float rainLevelLast24Hours = 0;
 #endif

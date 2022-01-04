@@ -36,24 +36,24 @@ boolean AFEContactron::get() {
 #ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.on();
 #endif
-      _return = AFE_CONTACTRON_OPEN;
+      _return = AFE_OPEN;
     } else {
 #ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.off();
 #endif
-      _return = AFE_CONTACTRON_CLOSED;
+      _return = AFE_CLOSED;
     }
   } else {
     if (currentState) {
 #ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.off();
 #endif
-      _return = AFE_CONTACTRON_CLOSED;
+      _return = AFE_CLOSED;
     } else {
 #ifdef AFE_CONFIG_HARDWARE_LED
       ContactronLed.on();
 #endif
-      _return = AFE_CONTACTRON_OPEN;
+      _return = AFE_OPEN;
     }
   }
 
@@ -93,7 +93,7 @@ void AFEContactron::listener() {
 
 void AFEContactron::getJSON(char *json) {
   sprintf(json, "{\"state\":\":%s\"}",
-          (get() == AFE_CONTACTRON_OPEN ? "open" : "closed"));
+          (get() == AFE_OPEN ? F(AFE_OPEN_LABEL) : F(AFE_CLOSED_LABEL)));
 }
 
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON

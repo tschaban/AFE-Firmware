@@ -28,7 +28,7 @@ void BH1750SensorEventsListener(void) {
       BH1750Sensor[i].listener();
       if (BH1750Sensor[i].isReady()) {
         MqttAPI.publishBH1750SensorData(i);
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI.publishBH1750SensorData(i);
 #endif
 

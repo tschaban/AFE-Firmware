@@ -5,15 +5,15 @@
 AFEMQTT::AFEMQTT(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName, AFELED *Led) {
+void AFEMQTT::begin(AFEDataAccess *Data, AFEDevice *Device, AFELED *Led) {
   _Led = Led;
-  begin(Data, DeviceName);
+  begin(Data, Device);
 }
 #endif
 
-void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
+void AFEMQTT::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Data = Data;
-  _DeviceName = DeviceName;
+  _Device = Device;
   _Data->getConfiguration(&configuration);
   _Data->getConfiguration(&_NetworkConfiguration);
   esp.setTimeout(configuration.timeout);
@@ -51,7 +51,7 @@ void AFEMQTT::begin(AFEDataAccess *Data, char *DeviceName) {
          << F("INFO: Host: ") << configuration.host << endl
          << F("INFO: IP: ") << configuration.ip << endl
          << F("INFO: Port: ") << configuration.port << endl
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
          << F("INFO: LWT IDX: ") << configuration.lwt.idx;
 #else
          << F("INFO: LWT Topic: ") << configuration.lwt.topic;
@@ -144,10 +144,13 @@ void AFEMQTT::connect() {
           }
         }
 
-#ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
-        char lwtMessage
-            [100]; // {"command":"udevice","idx":999999,"nvalue":"0,"svalue":"disconnected","Battery":100,"RSSI":1000}
+        char _DeviceName[sizeof(_Device->configuration.name) +
+                         AFE_CONFIG_DEVICE_ID_SIZE + 1];
+        sprintf(_DeviceName, "%s-%s", _Device->configuration.name,
+                _Device->deviceId);
 
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+        char lwtMessage[96];
         if (configuration.lwt.idx > 0) {
           sprintf(lwtMessage, "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":"
                               "0,\"svalue\":\"%s\",\"Battery\":0,\"RSSI\":0}",
@@ -196,7 +199,7 @@ void AFEMQTT::connect() {
                          (_NetworkConfiguration.waitTimeConnections * 1000)) {
 
         _connections++;
-        //yield(); // @TODO removed with T7
+// yield(); // @TODO removed with T7
 #ifdef DEBUG
         Serial << endl
                << F("INFO: MQTT Connection attempt: ") << _connections
@@ -277,7 +280,7 @@ boolean AFEMQTT::eventConnected() {
 
 boolean AFEMQTT::publish(const char *topic, const char *message) {
 
-  boolean pubslishingStatus = false;
+  boolean _status = false;
 
   if (_Broker.state() == MQTT_CONNECTED) {
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -287,11 +290,11 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
     Serial << endl << F("----------- Publish MQTT -----------");
     Serial << endl << F("Topic: ") << topic;
     Serial << endl << F("Message: ") << message;
-    Serial << endl << F("Retain: ") << (configuration.retainAll ? "YES" : "NO");
+    Serial << endl
+           << F("Retain: ") << (configuration.retainAll ? F("YES") : F("NO"));
 #endif
     if (strlen(topic) > 0) {
-      pubslishingStatus =
-          _Broker.publish(topic, message, configuration.retainAll);
+      _status = _Broker.publish(topic, message, configuration.retainAll);
     }
 #ifdef DEBUG
     else {
@@ -303,11 +306,10 @@ boolean AFEMQTT::publish(const char *topic, const char *message) {
 #endif
 #ifdef DEBUG
     Serial << endl
-           << F("Status: ")
-           << (pubslishingStatus ? F("published") : F("NOT pubslished"));
+           << F("Status: ") << (_status ? F("published") : F("NOT pubslished"));
     Serial << endl << F("------------------------------------");
 #endif
   }
 
-  return pubslishingStatus;
+  return _status;
 }
