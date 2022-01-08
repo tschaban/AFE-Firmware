@@ -3173,6 +3173,7 @@ void AFESitesGenerator::siteProKey(String &page) {
 }
 
 void AFESitesGenerator::siteFirmware(String &page) {
+  char _numberToText[12];
   openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_TYPE));
@@ -3183,20 +3184,20 @@ void AFESitesGenerator::siteFirmware(String &page) {
 #ifndef AFE_ESP32
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
-  char _flashSize[12];
+
   if (ESP.getFlashChipRealSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1024);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipRealSize() / 1024);
   }
-  page.replace("{{f.s}}", _flashSize);
+  page.replace("{{f.s}}", _numberToText);
 
   if (ESP.getFlashChipSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipSize() / 1048576);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%d Kb", ESP.getFlashChipSize() / 1024);
+    sprintf(_numberToText, "%d Kb", ESP.getFlashChipSize() / 1024);
   }
-  page.replace("{{f.f}}", _flashSize);
+  page.replace("{{f.f}}", _numberToText);
 #endif // ESP8266
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
@@ -3207,6 +3208,10 @@ void AFESitesGenerator::siteFirmware(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", FirmwarePro->Pro.valid ? F(L_UPGRADE_FIRMWARE_PRO_YES)
                                                : F(L_UPGRADE_FIRMWARE_PRO_NO));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_REBOOTS_NUMBER));
+  sprintf(_numberToText, "%d", Data->getRebootCounter(false));
+  page.replace("{{x}}", _numberToText);
   closeMessageSection(page);
 }
 
@@ -3985,9 +3990,9 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.replace("{{f.a}}", F("Standard"));
 #endif
 
-#if defined(ESP_4MB)
+#if defined(AFE_ESP_FLASH_4MB)
   page.replace("{{f.s}}", F("4Mb"));
-#elif defined(ESP_2MB)
+#elif defined(AFE_ESP_FLASH_2MBB)
   page.replace("{{f.s}}", F("2Mb"));
 #else
   page.replace("{{f.s}}", F("1Mb"));

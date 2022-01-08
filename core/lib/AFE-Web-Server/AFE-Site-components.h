@@ -52,11 +52,11 @@ const char HTTP_MENU_SUBITEM[] PROGMEM =
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};
 const uint8_t GPIOS_ADC[] PROGMEM = {17};
 #else
-#ifdef ESP32_30_PINS
+#ifdef AFE_ESP32_30_PINS
 const uint8_t GPIOS[] PROGMEM = {1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33, 34, 35, 36, 39};
-#else // ESP32_38_PINS
+#else // AFE_ESP32_38_PINS
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
-#endif // ESP32_30_PINS
+#endif // AFE_ESP32_30_PINS
 const uint8_t GPIOS_ADC[] PROGMEM = {32, 33, 34, 35};
 #endif // !AFE_ESP32
 
@@ -119,8 +119,5 @@ const char HTTP_ITEM_CLED_COLOR_RGB_COLOR[] PROGMEM = "<input name=\"{{i.i}}\" t
 #endif
 
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-//const char HA_CONFIG_TOPIC[] PROGMEM = "{{ha.d}}/";
-#endif
 
 #endif // _AFE_CSS_h

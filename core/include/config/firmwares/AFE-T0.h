@@ -1,7 +1,7 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.1.0"
+#define AFE_FIRMWARE_VERSION "3.2.0.B0"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */
@@ -17,6 +17,7 @@
 #ifdef AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 5
 #endif
+
 
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -97,9 +98,15 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_ADC
 #ifdef AFE_ESP32
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS AFE_NUMBER_OF_ADC_GPIOS
+#else // ESP8266
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS 1
+#endif // ESP32/ESP8266
+
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_ADCS 0
-#endif
+
 #endif // AFE_CONFIG_FUNCTIONALITY_ADC
+
+
 
 #endif // _AFE_Configuration_T_h

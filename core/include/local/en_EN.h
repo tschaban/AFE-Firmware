@@ -676,7 +676,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_PUBLISHING "Publish/Update configuration?"
 #define L_HA_UPDATE_REMOVE "Remove old configuration?"
 
-
+/* Reboots */
+#define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
 
 
 #endif // _LANG_EN_h

@@ -1,1 +1,0 @@
-php "C:\Users\Adrian\Development\AFE-Firmware\tools\T5.php"

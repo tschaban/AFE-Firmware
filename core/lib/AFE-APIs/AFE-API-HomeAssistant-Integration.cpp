@@ -1,6 +1,6 @@
 #include "AFE-API-HomeAssistant-Integration.h"
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT 
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 
 AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(void){};
 
@@ -402,17 +402,22 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     /* Adds state_on, state_off or state_value_template*/
     if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH) {
       _json.replace("{{bsp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_ON_OFF));
+#ifdef AFE_CONFIG_HARDWARE_CLED
     } else if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bsp}}",
                     FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_VALUE_TEMPLATE));
+#endif
     }
-
+    
     /* Adds payload_on=on, payload_off=off or payload command */
     if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
         _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF) {
       _json.replace("{{bcp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_ON_OFF));
+#ifdef AFE_CONFIG_HARDWARE_CLED
     } else if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bcp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_TEMPLATE));
+
+#endif
     }
 
     /* Adds payload_on=closed, payload_off=open */
@@ -469,7 +474,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
 
     /**
      * @brief tag: device_class
-     * 
+     *
      */
     _json.replace(
         "{{s.dc}}",

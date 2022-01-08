@@ -76,10 +76,10 @@
 #define AFE_DEVICE_TYPE_ID 11
 #elif defined(AFE_T5_CUSTOM_E1)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
-#ifdef ESP32_30_PINS /* T5 E1 ESP32-30p */
+#ifdef AFE_ESP32_30_PINS /* T5 E1 ESP32-30p */
 #define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 12
-#elif defined(ESP32_38_PINS) /* T5 E1 ESP32-38p */
+#elif defined(AFE_ESP32_38_PINS) /* T5 E1 ESP32-38p */
 #define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 13
 #else /* T5 E1 ESP82663 */
@@ -90,11 +90,11 @@
 #define AFE_DEVICE_MANUFACTURER "iECS"
 #define AFE_DEVICE_TYPE_NAME "iECS Gate Driver v3"
 #define AFE_DEVICE_TYPE_ID 24
-#elif defined(ESP32_30_PINS)
+#elif defined(AFE_ESP32_30_PINS)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "ESP32 30Pins"
 #define AFE_DEVICE_TYPE_ID 30
-#elif defined(ESP32_38_PINS)
+#elif defined(AFE_ESP32_38_PINS)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "ESP32 38Pins"
 #define AFE_DEVICE_TYPE_ID 31

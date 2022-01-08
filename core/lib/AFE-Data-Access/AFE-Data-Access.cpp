@@ -2940,7 +2940,8 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Creating file: /cfg-ds18b20-") << i << F(".json");
+    Serial << endl
+           << F("INFO: Creating file: /cfg-ds18b20-") << i << F(".json");
 #endif
     sprintf(configuration.name, "DS18B20-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -6836,6 +6837,115 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+unsigned long AFEDataAccess::getRebootCounter(boolean increase) {
+  unsigned long _ret = 1;
+  char fileName[strlen(AFE_FILE_REBOOTS_COUNTER) + 1];
+  sprintf(fileName, AFE_FILE_REBOOTS_COUNTER);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  if (!LITTLEFS.exists(fileName)) {
+    saveRebootCounter(0);
+  }
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  if (!SPIFFS.exists(fileName)) {
+    saveRebootCounter(0);
+  }
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_FILE_BUFFER_REBOOTS_COUNTER> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      _ret = root["reboots"].as<unsigned long>();
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: JSON: Buffer size: ")
+             << AFE_FILE_BUFFER_REBOOTS_COUNTER << F(", actual JSON size: ")
+             << jsonBuffer.size();
+      if (AFE_FILE_BUFFER_REBOOTS_COUNTER < jsonBuffer.size() + 10) {
+        Serial << endl << F("WARN: Too small buffer size");
+      }
+#endif
+    } else {
+      _ret = 0;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = 0;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+  if (increase) {
+    saveRebootCounter(_ret + 1);
+  }
+  return _ret;
+}
+
+void AFEDataAccess::saveRebootCounter(unsigned long counter) {
+  char fileName[strlen(AFE_FILE_REBOOTS_COUNTER) + 1];
+  sprintf(fileName, AFE_FILE_REBOOTS_COUNTER);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_FILE_BUFFER_REBOOTS_COUNTER> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["reboots"] = counter;
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_FILE_BUFFER_REBOOTS_COUNTER, jsonBuffer.size());
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
 
 /* Private methods */
 

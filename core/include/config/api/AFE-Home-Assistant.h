@@ -5,8 +5,17 @@
 
 #define AFE_FIRMWARE_API AFE_FIRMWARE_API_HOME_ASSISTANT // Type of the firmware API: Home Assistant
 
+#include <Arduino.h>
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 15 // Size of a Command topic: MQTT_TOPIC + /brightness/cmd (15)
+#else
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH +   4 // Size of a Command topic: MQTT_TOPIC + /cmd (4)
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+
+#define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 6 // Size of a State topic: MQTT_TOPIC + 6
+
 
 /**
  * @brief Size of configuraion topic
@@ -14,12 +23,6 @@
  * 106 + 3 buffer
  */
 #define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE 110 
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 15 // Size of a Command topic: MQTT_TOPIC + /brightness/cmd (15)
-#else
-#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH +   4 // Size of a Command topic: MQTT_TOPIC + /cmd (4)
-#endif
-#define AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 6 // Size of a State topic: MQTT_TOPIC + 6
-
 
 /**
  * @brief Length of JSON Configuraion device

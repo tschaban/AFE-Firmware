@@ -256,7 +256,7 @@ void AFEWiFi::listener() {
             delayStartTime + (configuration.waitTimeConnections * 1000)) {
           connections++;
 
-//          yield();
+          yield();
           delay(10);
 #ifdef DEBUG
           Serial << endl
@@ -319,10 +319,10 @@ void AFEWiFi::listener() {
                << Device->configuration.name;
 #endif
 
-    //    yield();
+        yield();
 
         if (WirelessNetwork.hostname(Device->configuration.name)) {
-   //       yield();
+          yield();
 #ifdef DEBUG
           Serial << F(" ... Success");
         } else {
@@ -350,7 +350,7 @@ boolean AFEWiFi::connected() {
       (((isPrimaryConfiguration && !configuration.isDHCP) ||
         (!isPrimaryConfiguration && !configuration.isDHCPBackup)) &&
        WirelessNetwork.status() == WL_CONNECTED)) {
- //   yield();
+    yield();
     delay(10);
 #else /* ESP32 */
   if (WiFi.status() == WL_CONNECTED) {

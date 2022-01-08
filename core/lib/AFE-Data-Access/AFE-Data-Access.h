@@ -84,6 +84,9 @@ public:
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
+  unsigned long getRebootCounter(boolean increase = true);
+  void saveRebootCounter(unsigned long counter);
+
   void getConfiguration(PRO_VERSION *);
   void saveConfiguration(PRO_VERSION *);
   void createProVersionConfigurationFile();

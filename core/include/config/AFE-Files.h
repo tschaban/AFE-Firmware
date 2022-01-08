@@ -68,6 +68,7 @@
 #define AFE_FILE_BMX680_CONFIGURATION "/cfg-BMEX80-%d.json"
 #define AFE_FILE_BH1750_CONFIGURATION "/cfg-bh1750-%d.json"
 #define AFE_FILE_AS3935_CONFIGURATION "/cfg-as3935-%d.json"
+
 #endif /* ESP8266/ESP32 */
 
 #define AFE_FILE_HOME_ASSISTANT_CONFIGURATION "/cfg-home-assistant.json"
@@ -88,6 +89,7 @@
 #define AFE_FILE_CLED_EFFECTS_CONFIGURATION "/cfg-cled-effects-%d.json"
 #define AFE_FILE_CLED_BACKLIGHT_CONFIGURATION "/cfg-cled-backlight-%d.json"
 #define AFE_FILE_TSL2561_CONFIGURATION "/cfg-tls2561-%d.json"
+#define AFE_FILE_REBOOTS_COUNTER "/cfg-reboots_counter.json"
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ checked
@@ -147,5 +149,6 @@
 
 #define AFE_CONFIG_FILE_BUFFER_TSL2561 290 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT 153 // AJ Checked
+#define AFE_FILE_BUFFER_REBOOTS_COUNTER 43 // AJ Checked
 
 #endif

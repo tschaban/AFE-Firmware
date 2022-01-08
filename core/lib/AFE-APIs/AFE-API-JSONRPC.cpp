@@ -102,9 +102,9 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     http.addHeader("afe-chip", "32");
 #endif
 
-#if defined(ESP_4MB)
+#if defined(AFE_ESP_FLASH_4MB)
     http.addHeader("afe-size", "4");
-#elif defined(ESP_2MB)
+#elif defined(AFE_ESP_FLASH_2MBB)
     http.addHeader("afe-size", "2");
 #else
     http.addHeader("afe-size", "1");
