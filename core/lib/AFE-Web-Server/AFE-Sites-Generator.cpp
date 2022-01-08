@@ -826,6 +826,9 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
                    configuration.password, "32");
 
   closeSection(page);
+ /**
+  * @brief Removed for version with ASyncMQTTClient
+  * 
 
   openSection(page, F(L_MQTT_CONNECTION), F(L_MQTT_CONNECTION_HINT));
   addCheckboxFormItem(page, "ph", L_MQTT_USE_PING, "1",
@@ -838,6 +841,9 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
                    L_MILISECONDS);
 
   closeSection(page);
+
+  */
+
 /* Section: LWT */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   char _idx[7];

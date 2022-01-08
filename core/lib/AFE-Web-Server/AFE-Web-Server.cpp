@@ -1467,13 +1467,8 @@ void AFEWebServer::get(MQTT &data) {
     data.ip[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("p")).length() > 0) {
-    data.port = server.arg(F("p")).toInt();
-  }
-
-  if (server.arg(F("t")).length() > 0) {
-    data.timeout = server.arg(F("t")).toInt();
-  }
+  data.port = server.arg(F("p")).length() > 0 ? server.arg(F("p")).toInt()
+                                              : AFE_CONFIG_MQTT_DEFAULT_PORT;
 
   if (server.arg(F("u")).length() > 0) {
     server.arg(F("u")).toCharArray(data.user, sizeof(data.user));
@@ -1499,8 +1494,14 @@ void AFEWebServer::get(MQTT &data) {
 
   data.retainLWT = server.arg(F("rl")).length() > 0 ? true : false;
   data.retainAll = server.arg(F("ra")).length() > 0 ? true : false;
+
+   // @TODO T0 if asyncMqtt works well both below could be removed
   data.pingHostBeforeConnection =
       server.arg(F("ph")).length() > 0 ? true : false;
+
+  data.timeout = server.arg(F("t")).length() > 0
+                     ? server.arg(F("t")).toInt()
+                     : AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -1757,7 +1758,6 @@ void AFEWebServer::get(CONTACTRON &data) {
   data.type = server.arg(F("y")).length() > 0
                   ? server.arg(F("y")).toInt()
                   : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
-
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()

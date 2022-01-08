@@ -11,7 +11,6 @@
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
 #include <AFE-MQTT-Structure.h>
-// TESTMQTT #include <AFE-MQTT.h>
 #include <AFE-ASYNC-MQTT.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -104,7 +103,6 @@ private:
   void begin();
 
 public:
-  // TESTMQTT AFEMQTT Mqtt;
   AFEAsyncMQTTClient Mqtt;
   AFEDevice *_Device;
   AFEDataAccess *_Data;

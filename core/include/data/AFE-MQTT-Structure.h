@@ -13,10 +13,9 @@
 #endif // Domoticz
 
 
-
 struct MQTT_MESSAGE {
   char *topic;
-  byte *content;
+  char *content;
   uint16_t length;
 };
 
@@ -117,6 +116,7 @@ struct MQTT {
   boolean retainLWT;
   boolean retainAll;
   boolean pingHostBeforeConnection;
+  uint8_t qos; // @TODO T0 define QOS in the UI
 };
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.2.0.B0"
+#define AFE_FIRMWARE_VERSION "3.3.0.RC1"
 #define AFE_FIRMWARE_TYPE 0
 
 /* Define Hardware */

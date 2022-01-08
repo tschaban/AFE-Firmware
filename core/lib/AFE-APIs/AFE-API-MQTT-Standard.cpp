@@ -24,12 +24,6 @@ void AFEAPIMQTTStandard::synchronize() {
   Serial << endl << F("INFO: Sending current device state to MQTT Broker  ...");
 #endif
 
-  // workaround for LWT retain flag
-  boolean _retainAll = Mqtt.configuration.retainAll;
-  Mqtt.configuration.retainAll = Mqtt.configuration.retainLWT;
-  Mqtt.publish(Mqtt.configuration.lwt.topic, "connected");
-  Mqtt.configuration.retainAll = _retainAll;
-
 /* Synchronize: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];

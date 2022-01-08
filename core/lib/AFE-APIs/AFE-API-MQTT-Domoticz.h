@@ -67,9 +67,6 @@ private:
   /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
   boolean idxForProcessing(uint32_t idx);
 
-  /* Returns RSSI level in DOmoticz Range */
-  uint8_t getRSSI();
-
   boolean publishSwitchMessage(uint32_t *idx, boolean state);
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
