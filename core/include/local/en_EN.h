@@ -107,6 +107,7 @@
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Configuration panel"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
+#define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
@@ -288,16 +289,7 @@
 #define L_UPGRADE_FROM_FILE "Upload *.bin file"
 #define L_UPGRADE "Upgrade with binary file"
 
-#define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
-#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_UPGRADE_FIRMWARE_VERSION "Version {{f.v}}"
-#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
-#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
-#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
-#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Device type: {{f.d}}"
-#define L_UPGRADE_FIRMWARE_DEVICE_ID "Device ID: {{f.n}}"
-#define L_UPGRADE_FIRMWARE_PRO_YES "Pro version: Yes"
-#define L_UPGRADE_FIRMWARE_PRO_NO "Pro version: No"
+
 
 #define L_UPGRADE_IN_PROGRESS "Upgrade in progress"
 
@@ -676,9 +668,25 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_PUBLISHING "Publish/Update configuration?"
 #define L_HA_UPDATE_REMOVE "Remove old configuration?"
 
-/* Reboots */
+/* Firmware version and details */
+#define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
+#define L_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_UPGRADE_FIRMWARE_VERSION "Version {{f.v}}"
+#define L_ESP_CHIP "Chip: ESP{{f.e}}"
+#define L_ESP_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
+#define L_FIRMWARE_API "API: {{f.a}}"
+#define L_FIRMWARE_DEVICE_NAME "Device type: {{f.d}}"
+#define L_FIRMWARE_DEVICE_ID "Device ID: {{f.n}}"
+#define L_FIRMWARE_PRO_YES "Pro version: Yes"
+#define L_FIRMWARE_PRO_NO "Pro version: No"
 #define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
-
-
+#define L_ADDITIONAL_INFORMATION "Additional information"
+#define L_WIFI_RSSI "WiFi Received Signal Strength Indicator {{x}} dBm ({{t}})"
+#define L_WIFI_SIGNAL "Signal"
+#define L_WIFI_RSSI_30 "Amazing"
+#define L_WIFI_RSSI_67 "Very Good"
+#define L_WIFI_RSSI_70 "Okay"
+#define L_WIFI_RSSI_80 "Not Good"
+#define L_WIFI_RSSI_90 "Unusable"
 #endif // _LANG_EN_h
 

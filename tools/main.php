@@ -4,8 +4,9 @@
 /* Set this before run */
 
 $type = "0";
-$version = "3.2.0.B0";
+$version = "3.3.0.RC2";
 $language = "pl";
+$development = true;
 
 
 /**
@@ -81,8 +82,13 @@ foreach ($targetLanguage as &$targetLanguageFolder) {
 
 
 $handle = fopen($targetFolder."/script-".$language.".sql", "a");
-fwrite($handle, "UPDATE afe_firmwares set current_version = 0 WHERE type = ".$type." AND language = '".$language."';\n");
 
+/**
+ * Does not generate update for development version
+ */
+if (!$development) {
+  fwrite($handle, "UPDATE afe_firmwares set current_version != 1 WHERE type = ".$type." AND language = '".$language."';\n");
+}
 echo "\nCoping firmwares";
 
 foreach ($sourceFolder as &$source) {
@@ -93,7 +99,7 @@ foreach ($sourceFolder as &$source) {
     if (file_exists($sourceToCopy)) {
         copy($sourceToCopy, $copyTo);
         echo "\nSUCCESS: " . $fileName;
-        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", 1, 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
+        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
         
     } else {
         echo "\nERROR: File doesn't exist:  " . $sourceToCopy;

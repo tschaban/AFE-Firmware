@@ -93,6 +93,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_INDEX:
     Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
+  case AFE_CONFIG_SITE_INDEX_MONITOR:
+    Site.siteFirmware(page,true);
+    break;
   case AFE_CONFIG_SITE_FIRST_TIME:
     Site.siteNetwork(page);
     break;
@@ -641,6 +644,9 @@ boolean AFEWebServer::generate(boolean upload) {
               siteConfig.rebootTime = AFE_SITE_REBOOT;
             }
           }
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_INDEX_MONITOR) {
+          siteConfig.form = false;
+          siteConfig.twoColumns = false;
         } else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT) {
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_NORMAL;
@@ -764,14 +770,13 @@ uint8_t AFEWebServer::getSiteID() {
 
   if (Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
     return AFE_CONFIG_SITE_FIRST_TIME;
-  } else if (Device->getMode() == AFE_MODE_NORMAL) {
-    return AFE_CONFIG_SITE_INDEX;
   } else {
-    if (server.hasArg(F("o"))) {
-      return server.arg(F("o")).toInt();
-    } else {
-      return AFE_CONFIG_SITE_DEVICE;
-    }
+    return Device->getMode() == AFE_MODE_NORMAL
+               ? server.arg(F("o")).toInt() == AFE_CONFIG_SITE_INDEX_MONITOR
+                     ? AFE_CONFIG_SITE_INDEX_MONITOR
+                     : AFE_CONFIG_SITE_INDEX
+               : server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
+                                                : AFE_CONFIG_SITE_DEVICE;
   }
 }
 
@@ -1495,7 +1500,7 @@ void AFEWebServer::get(MQTT &data) {
   data.retainLWT = server.arg(F("rl")).length() > 0 ? true : false;
   data.retainAll = server.arg(F("ra")).length() > 0 ? true : false;
 
-   // @TODO T0 if asyncMqtt works well both below could be removed
+  // @TODO T0 if asyncMqtt works well both below could be removed
   data.pingHostBeforeConnection =
       server.arg(F("ph")).length() > 0 ? true : false;
 

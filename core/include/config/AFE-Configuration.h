@@ -168,6 +168,7 @@
 #define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
 #define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
 #define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
+#define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.ssid) + 23 // _(Sygnał: Bardzo dobry)
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
