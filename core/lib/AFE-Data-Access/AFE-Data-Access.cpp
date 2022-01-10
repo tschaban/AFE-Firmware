@@ -1292,15 +1292,18 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #else
       sprintf(configuration->lwt.topic, root["lwt"] | "");
 #endif
-      configuration->timeout =
-          root["timeout"] | AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
+
       configuration->retainLWT =
           root["retainLWT"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
       configuration->retainAll =
           root["retainAll"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
+      configuration->qos = root["qos"] | AFE_CONFIG_MQTT_DEFAULT_QOS;
+      // @TODO 2 below will not be required if 3.3.0 confirmed working well
       configuration->pingHostBeforeConnection =
           root["pingHostBeforeConnection"] |
           AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION;
+      configuration->timeout =
+          root["timeout"] | AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MQTT_BROKER,
@@ -1357,10 +1360,12 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     root["lwt"] = configuration->lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-    root["timeout"] = configuration->timeout;
     root["retainAll"] = configuration->retainAll;
     root["retainLWT"] = configuration->retainLWT;
+    root["qos"] = configuration->qos;
+    // @TODO 2 below will not be required if 3.3.0 confirmed working well
     root["pingHostBeforeConnection"] = configuration->pingHostBeforeConnection;
+    root["timeout"] = configuration->timeout;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1395,11 +1400,14 @@ void AFEDataAccess::createMQTTConfigurationFile() {
 #else
   configuration.lwt.topic[0] = AFE_EMPTY_STRING;
 #endif
-  configuration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
+
   configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
   configuration.retainLWT = AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
+  configuration.qos = AFE_CONFIG_MQTT_DEFAULT_QOS;
+  // @TODO 2 below will not be required if 3.3.0 confirmed working well
   configuration.pingHostBeforeConnection =
       AFE_CONFIG_MQTT_DEFAULT_HOST_PING_BEFORE_CONNECTION;
+  configuration.timeout = AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
   saveConfiguration(&configuration);
 }
 

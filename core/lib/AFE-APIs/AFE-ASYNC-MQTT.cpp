@@ -21,8 +21,6 @@ void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device,
 void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   Data->getConfiguration(&configuration);
 
-  configuration.qos = 1; // @TODO T0 to define in UI, for now hardcoded
-
   _Broker.onConnect(AFEAsyncMQTTClient::onMqttConnect);
   _Broker.onDisconnect(AFEAsyncMQTTClient::onMqttDisconnect);
   _Broker.onMessage(AFEAsyncMQTTClient::onMqttMessage);

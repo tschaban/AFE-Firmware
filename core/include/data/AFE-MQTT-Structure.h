@@ -116,7 +116,7 @@ struct MQTT {
   boolean retainLWT;
   boolean retainAll;
   boolean pingHostBeforeConnection;
-  uint8_t qos; // @TODO T0 define QOS in the UI
+  uint8_t qos;
 };
 
 #endif

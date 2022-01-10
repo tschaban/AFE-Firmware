@@ -846,6 +846,12 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "s", L_PASSWORD,
                    configuration.password, "32");
 
+  addSelectFormItemOpen(page, F("q"), F("QOS"));
+  addSelectOptionFormItem(page, "0", "0", configuration.qos == 0);
+  addSelectOptionFormItem(page, "1", "1", configuration.qos == 1);
+  addSelectOptionFormItem(page, "2", "2", configuration.qos == 2);
+  addSelectFormItemClose(page);
+
   closeSection(page);
 /**
  * @brief Removed for version with ASyncMQTTClient

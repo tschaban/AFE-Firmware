@@ -94,7 +94,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
   case AFE_CONFIG_SITE_INDEX_MONITOR:
-    Site.siteFirmware(page,true);
+    Site.siteFirmware(page, true);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
     Site.siteNetwork(page);
@@ -1499,6 +1499,9 @@ void AFEWebServer::get(MQTT &data) {
 
   data.retainLWT = server.arg(F("rl")).length() > 0 ? true : false;
   data.retainAll = server.arg(F("ra")).length() > 0 ? true : false;
+
+  data.qos = server.arg(F("q")).length() > 0 ? server.arg(F("q")).toInt()
+                                             : AFE_CONFIG_MQTT_DEFAULT_QOS;
 
   // @TODO T0 if asyncMqtt works well both below could be removed
   data.pingHostBeforeConnection =
