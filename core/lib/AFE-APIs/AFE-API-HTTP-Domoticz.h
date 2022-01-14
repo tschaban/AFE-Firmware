@@ -9,7 +9,7 @@
  * @brief code excluded for none-Domoticz API
  * 
  */
-// #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ @TODO No clue why it doesn't work
+
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 

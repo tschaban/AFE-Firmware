@@ -669,6 +669,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
   char _int[4];
   int numberOfNetworks = 0;
   char _ssid[sizeof(configuration.ssid)];
+  char _ssidLabel[AFE_CONFIG_NETWORK_SSID_LABEL_SIZE];
   Data->getConfiguration(&configuration);
 
   /* Section: WiFi selection, user and password */
@@ -691,9 +692,28 @@ void AFESitesGenerator::siteNetwork(String &page) {
       for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
         Serial << endl << F(" - ") << WiFi.SSID(i);
-#endif
+#endif 
+
+
+
+
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-        addSelectOptionFormItem(page, _ssid, _ssid,
+        _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
+
+
+//Serial << endl << "sizeof(_ssid) " << sizeof(_ssid);
+//Serial << endl << "strlen(_ssid) " << strlen(_ssid) + 1;
+
+        sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
+                WiFi.RSSI(i) >= -30
+                    ? L_WIFI_RSSI_30
+                    : WiFi.RSSI(i) >= -67
+                          ? L_WIFI_RSSI_67
+                          : WiFi.RSSI(i) >= -70
+                                ? L_WIFI_RSSI_70
+                                : WiFi.RSSI(i) >= -80 ? L_WIFI_RSSI_80
+                                                      : L_WIFI_RSSI_90);
+        addSelectOptionFormItem(page, _ssidLabel, _ssid,
                                 strcmp(_ssid, configuration.ssid) == 0);
       }
     } else {
@@ -759,7 +779,17 @@ void AFESitesGenerator::siteNetwork(String &page) {
     if (numberOfNetworks > 0) {
       for (int i = 0; i < numberOfNetworks; i++) {
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
-        addSelectOptionFormItem(page, _ssid, _ssid,
+        _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
+        sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
+                WiFi.RSSI(i) >= -30
+                    ? L_WIFI_RSSI_30
+                    : WiFi.RSSI(i) >= -67
+                          ? L_WIFI_RSSI_67
+                          : WiFi.RSSI(i) >= -70
+                                ? L_WIFI_RSSI_70
+                                : WiFi.RSSI(i) >= -80 ? L_WIFI_RSSI_80
+                                                      : L_WIFI_RSSI_90);
+        addSelectOptionFormItem(page, _ssidLabel, _ssid,
                                 strcmp(_ssid, configuration.ssidBackup) == 0);
       }
     }
@@ -823,21 +853,33 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "u", L_USERNAME,
                    configuration.user, "32");
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "s", L_PASSWORD,
-                   configuration.password, "32");
+                   configuration.password, "64");
+
+  addSelectFormItemOpen(page, F("q"), F("QOS"));
+  addSelectOptionFormItem(page, "0", "0", configuration.qos == 0);
+  addSelectOptionFormItem(page, "1", "1", configuration.qos == 1);
+  addSelectOptionFormItem(page, "2", "2", configuration.qos == 2);
+  addSelectFormItemClose(page);
 
   closeSection(page);
+/**
+ * @brief Removed for version with ASyncMQTTClient
+ *
 
-  openSection(page, F(L_MQTT_CONNECTION), F(L_MQTT_CONNECTION_HINT));
-  addCheckboxFormItem(page, "ph", L_MQTT_USE_PING, "1",
-                      configuration.pingHostBeforeConnection,
-                      L_MQTT_USE_PING_HINT);
+ openSection(page, F(L_MQTT_CONNECTION), F(L_MQTT_CONNECTION_HINT));
+ addCheckboxFormItem(page, "ph", L_MQTT_USE_PING, "1",
+                     configuration.pingHostBeforeConnection,
+                     L_MQTT_USE_PING_HINT);
 
-  sprintf(_number, "%d", configuration.timeout);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_MQTT_TIMEOUT,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "30000", "1",
-                   L_MILISECONDS);
+ sprintf(_number, "%d", configuration.timeout);
+ addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "t", L_MQTT_TIMEOUT,
+                  _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "30000", "1",
+                  L_MILISECONDS);
 
-  closeSection(page);
+ closeSection(page);
+
+ */
+
 /* Section: LWT */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   char _idx[7];
@@ -3089,11 +3131,9 @@ void AFESitesGenerator::siteConnecting(String &page) {
 }
 
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
-  DEVICE configuration;
-  configuration = Device->configuration;
 
   char _text[42];
-  sprintf(_text, "%s: %s", L_DEVICE, configuration.name);
+  sprintf(_text, "%s: %s", L_DEVICE, Device->configuration.name);
   openMessageSection(page, _text, F(""));
 
   if (RestAPI->accessToWAN()) {
@@ -3115,6 +3155,9 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace("{{I}}", _HtmlResponse);
     }
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace("{{I}}", F(L_INDX_INFORMATION_ABOUT_YOUR_VERSION));
 
     page.concat(F("</ul>"));
   }
@@ -3172,42 +3215,69 @@ void AFESitesGenerator::siteProKey(String &page) {
   closeSection(page);
 }
 
-void AFESitesGenerator::siteFirmware(String &page) {
-  openMessageSection(page, F(L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
+void AFESitesGenerator::siteFirmware(String &page, boolean details) {
+  char _numberToText[12];
+  openMessageSection(page, F(L_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_TYPE));
+  page.replace("{{I}}", F(L_FIRMWARE_TYPE));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_VERSION));
+  page.replace("{{I}}", F(L_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_CHIP));
+  page.replace("{{I}}", F(L_ESP_CHIP));
 #ifndef AFE_ESP32
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_FLASH_SIZE));
-  char _flashSize[12];
+  page.replace("{{I}}", F(L_ESP_FLASH_SIZE));
+
   if (ESP.getFlashChipRealSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipRealSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipRealSize() / 1024);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipRealSize() / 1024);
   }
-  page.replace("{{f.s}}", _flashSize);
+  page.replace("{{f.s}}", _numberToText);
 
   if (ESP.getFlashChipSize() >= 1048576) {
-    sprintf(_flashSize, "%d Mb", ESP.getFlashChipSize() / 1048576);
+    sprintf(_numberToText, "%d Mb", ESP.getFlashChipSize() / 1048576);
   } else {
-    sprintf(_flashSize, "%d Kb", ESP.getFlashChipSize() / 1024);
+    sprintf(_numberToText, "%d Kb", ESP.getFlashChipSize() / 1024);
   }
-  page.replace("{{f.f}}", _flashSize);
+  page.replace("{{f.f}}", _numberToText);
 #endif // ESP8266
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_NAME));
+  page.replace("{{I}}", F(L_FIRMWARE_DEVICE_NAME));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_API));
+  page.replace("{{I}}", F(L_FIRMWARE_API));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", F(L_UPGRADE_FIRMWARE_DEVICE_ID));
+  page.replace("{{I}}", F(L_FIRMWARE_DEVICE_ID));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace("{{I}}", FirmwarePro->Pro.valid ? F(L_UPGRADE_FIRMWARE_PRO_YES)
-                                               : F(L_UPGRADE_FIRMWARE_PRO_NO));
+  page.replace("{{I}}", FirmwarePro->Pro.valid ? F(L_FIRMWARE_PRO_YES)
+                                               : F(L_FIRMWARE_PRO_NO));
+
   closeMessageSection(page);
+
+  if (details) {
+    openMessageSection(page, F(L_ADDITIONAL_INFORMATION), F(""));
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace("{{I}}", F(L_REBOOTS_NUMBER));
+    sprintf(_numberToText, "%lu", Data->getRebootCounter(false));
+    page.replace("{{x}}", _numberToText);
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    int32_t _rssi = WiFi.RSSI();
+    page.replace("{{I}}", F(L_WIFI_RSSI));
+    sprintf(_numberToText, "%d", _rssi);
+    page.replace("{{x}}", _numberToText);
+#define L_WIFI_RSSI_70 "Dobry"
+    page.replace("{{t}}", _rssi >= -30
+                              ? F(L_WIFI_RSSI_30)
+                              : _rssi >= -67
+                                    ? F(L_WIFI_RSSI_67)
+                                    : _rssi >= -70
+                                          ? F(L_WIFI_RSSI_70)
+                                          : _rssi >= -80 ? F(L_WIFI_RSSI_80)
+                                                         : F(L_WIFI_RSSI_90));
+
+    closeMessageSection(page);
+  }
 }
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
@@ -3985,9 +4055,9 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.replace("{{f.a}}", F("Standard"));
 #endif
 
-#if defined(ESP_4MB)
+#if defined(AFE_ESP_FLASH_4MB)
   page.replace("{{f.s}}", F("4Mb"));
-#elif defined(ESP_2MB)
+#elif defined(AFE_ESP_FLASH_2MBB)
   page.replace("{{f.s}}", F("2Mb"));
 #else
   page.replace("{{f.s}}", F("1Mb"));

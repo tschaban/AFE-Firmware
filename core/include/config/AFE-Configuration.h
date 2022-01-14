@@ -1,9 +1,9 @@
 /**
  * @file AFE-Configuration.h
  * @author Tschaban-A (github@adrian.czabanowski.com)
- * @brief files contains firmware configuration parameters
- * @version 3.1.0
- * @date 2021-10-17
+ * @brief files contain firmware configuration parameters
+ * @version 3.3.0
+ * @date 2022-01-13
  * 
  * @copyright Copyright (c) 2021
  * 
@@ -11,6 +11,7 @@
 
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
+
 
 /* Serial port speed */
 #define AFE_CONFIG_SERIAL_SPEED 115200
@@ -167,6 +168,7 @@
 #define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
 #define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
 #define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
+#define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.ssid) + 30 // _(Sygnał: Bardzo dobry)
 
 /* ***************** HARDWARE: Config and defaults *********************/
 

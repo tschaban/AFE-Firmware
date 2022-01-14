@@ -36,7 +36,7 @@ void setup() {
   Serial << endl
          << F("INFO: ESP: Speed ") << (ESP.getFlashChipSpeed() / 1000000)
          << F(" MHz");
-  Serial << endl <<F( "INFO: ESP: Mode " )<< ESP.getFlashChipMode() << endl;
+  Serial << endl << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
 
 #else  /* ESP32 */
 // @TODO ESP32
@@ -63,15 +63,32 @@ void setup() {
 #ifdef DEBUG
     Serial << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
                 "collection operation on SPIFFS");
-  } else {
-    Serial << F("ERROR:  FILES SYSTEM: NOT mounted");
 #endif
+  } else {
+#ifdef DEBUG
+    Serial << endl << F("ERROR: FILES SYSTEM NOT MOUNTED !!!") << endl;
+#endif
+/**
+ * @brief firmare cannot continue if files system is not mounted
+ * 
+ */
+    return;
+  }
 
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
-    yield();
-    SPIFFS.gc();
+  yield();
+  SPIFFS.gc();
 #endif
-  }
+
+  /**
+   * @brief saving information how many times firmare has been rebooted. For
+   * debug purpose
+   *
+   */
+  unsigned long _reboots = Data.getRebootCounter();
+#ifdef DEBUG
+  Serial << endl << F("INFO: Firmware rebooted: ") << _reboots << F(" times");
+#endif
 
   Device.begin();
 

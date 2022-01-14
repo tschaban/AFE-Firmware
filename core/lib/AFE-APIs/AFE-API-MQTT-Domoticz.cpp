@@ -119,23 +119,6 @@ void AFEAPIMQTTDomoticz::synchronize() {
   }
 #endif
 
-#ifdef DEBUG
-  Serial << endl << F("INFO: Sending message: device is connected ...");
-#endif
-  if (Mqtt.configuration.lwt.idx > 0) {
-    char lwtMessage[100];
-    sprintf(
-        lwtMessage,
-        "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":1,\"svalue\":\"%s\","
-        "\"Battery\":100,\"RSSI\":%d}",
-        Mqtt.configuration.lwt.idx, L_NETWORK_CONNECTED, getRSSI());
-
-    // Workaround for retainLWT
-    boolean _retainAll = Mqtt.configuration.retainAll;
-    Mqtt.configuration.retainAll = Mqtt.configuration.retainLWT;
-    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, lwtMessage);
-    Mqtt.configuration.retainAll = _retainAll;
-  }
 }
 
 void AFEAPIMQTTDomoticz::subscribe() {
@@ -462,7 +445,7 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
 
 boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
   boolean publishStatus = false;
-  if (enabled && idx > 0) {
+  if (enabled && *idx > 0) {
     char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
     generateSwitchMessage(json, *idx, state ? AFE_ON : AFE_OFF);
     publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
@@ -660,19 +643,6 @@ void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
       idx, nvalue, svalue);
 }
 
-uint8_t AFEAPIMQTTDomoticz::getRSSI() {
-  uint8_t _ret;
-  long current = WiFi.RSSI();
-  if (current > -50) {
-    _ret = 10;
-  } else if (current < -98) {
-    _ret = 0;
-  } else {
-    _ret = ((current + 97) / 5) + 1;
-  }
-
-  return _ret;
-}
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIMQTTDomoticz::addClass(AFESensorBMEX80 *Sensor) {

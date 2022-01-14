@@ -102,7 +102,7 @@
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Urządzenie jest w trybie operacyjnym"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
 #define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
-
+#define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
@@ -286,19 +286,6 @@
 
 #define L_UPGRADE_FROM_FILE "Załaduj plik *.bin"
 #define L_UPGRADE "Aktualizuj"
-
-#define L_UPGRADE_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
-#define L_UPGRADE_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
-#define L_UPGRADE_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
-#define L_UPGRADE_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_UPGRADE_FIRMWARE_VERSION "Wersja {{f.v}}"
-#define L_UPGRADE_FIRMWARE_CHIP "Chip: ESP{{f.e}}"
-#define L_UPGRADE_FIRMWARE_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
-#define L_UPGRADE_FIRMWARE_API "API: {{f.a}}"
-#define L_UPGRADE_FIRMWARE_PRO_YES "Wersja Pro: Tak"
-#define L_UPGRADE_FIRMWARE_PRO_NO "Wersja Pro: Nie"
-
-
 
 #define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
 
@@ -656,6 +643,27 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_PUBLISHING "Publikować/aktualizować konfiguracje urządzenia?"
 #define L_HA_UPDATE_REMOVE "Usuwać nieaktualne konfiguracje?"
 
+ 
+/* Firmware version and details */
+#define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
+#define L_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
+#define L_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
+#define L_FIRMWARE_TYPE "AFE T{{f.t}}"
+#define L_FIRMWARE_VERSION "Wersja {{f.v}}"
+#define L_ESP_CHIP "Chip: ESP{{f.e}}"
+#define L_ESP_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
+#define L_FIRMWARE_API "API: {{f.a}}"
+#define L_FIRMWARE_PRO_YES "Wersja Pro: Tak"
+#define L_FIRMWARE_PRO_NO "Wersja Pro: Nie"
+#define L_ADDITIONAL_INFORMATION "Informacje dodatkowe"
+#define L_REBOOTS_NUMBER "Firmware restartowany {{x}} razy"
+#define L_WIFI_RSSI "Wskaźnik siły odbieranego sygnału WiFi {{x}} dBm ({{t}})"
+#define L_WIFI_SIGNAL "Sygnał"
+#define L_WIFI_RSSI_30 "Super"
+#define L_WIFI_RSSI_67 "Bardzo dobry"
+#define L_WIFI_RSSI_70 "Dobry"
+#define L_WIFI_RSSI_80 "Słaby"
+#define L_WIFI_RSSI_90 "Niestabilny"
 
 #endif // _LANG_PL_h
 

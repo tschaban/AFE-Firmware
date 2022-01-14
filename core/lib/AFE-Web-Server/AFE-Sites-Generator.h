@@ -61,7 +61,6 @@ private:
 
   String _HtmlResponse;
 
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
   TwoWire *WirePort0;
@@ -76,27 +75,27 @@ private:
 
   /**
    * @brief Method addes configuration block to the site
-   * 
+   *
    * @param  page             return string with section HTML code
    * @param  title            Title of the section
    * @param  description      Sub-title of the section
    */
   void openSection(String &page, const char *title,
                    const __FlashStringHelper *description);
-  
+
   /**
    * @brief Method addes configuration block to the site
-   * 
+   *
    * @param  page             return string with section HTML code
    * @param  title            Title of the section
    * @param  description      Sub-title of the section
-   */  
+   */
   void openSection(String &page, const __FlashStringHelper *title,
                    const __FlashStringHelper *description);
 
   /**
-   * @brief Closes section 
-   * 
+   * @brief Closes section
+   *
    * @param  page             return string with section HTML code
    */
   void closeSection(String &page);
@@ -229,14 +228,14 @@ private:
                       const char *topic);
 #endif
 
-      /**
-       * @brief Adds warning session to the configuration form is a
-       * configuration
-       * file doesn't exist
-       *
-       * @param  page             return string
-       */
-      void addFileNotFound(String &page);
+  /**
+   * @brief Adds warning session to the configuration form is a
+   * configuration
+   * file doesn't exist
+   *
+   * @param  page             return string
+   */
+  void addFileNotFound(String &page);
 
   /**
    * @brief Adds information item in the form
@@ -259,7 +258,8 @@ private:
 
   void addUrlItem(String &item, uint8_t option, uint8_t id, const char *label);
   void addCLEDMenuSection(String &section, uint8_t effectId, uint8_t id);
-  void addCLEDColorItem(String &item, CLED_RGB *color, const char *labelPrefix,  const __FlashStringHelper *label);
+  void addCLEDColorItem(String &item, CLED_RGB *color, const char *labelPrefix,
+                        const __FlashStringHelper *label);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 public:
@@ -291,7 +291,7 @@ public:
    *
    * @param  page             return string
    * @param  extended         if true addess additinal information to the site.
-   * @TODO check if still used
+   *
    */
   void generateFooter(String &page, boolean extended = false);
 
@@ -304,16 +304,16 @@ public:
 
   /**
    * @brief Method generate restore to defaults section
-   * 
+   *
    * @param  page             return string with the site HTML
    */
   void siteReset(String &page);
-  
+
   void sitePostReset(String &page);
 
   /**
    * @brief Method addes info that device is being reset
-   * 
+   *
    * @param  page             return string with the site HTML
    * @param  configMode       config mode: over WiFi or HotSpot
    */
@@ -324,10 +324,19 @@ public:
 
   /**
    * @brief Site: Firmware version
-   * 
-   * @param  page             return string with the site
+   *
+   * @param  page             
    */
-  void siteFirmware(String &page);
+
+/**
+ * @brief Site: Firmware version
+ * 
+ * @param  page             return string with the site
+ * @param  details          add additional information to the site
+ */
+  void siteFirmware(String &page, boolean details = false);
+
+
 
   /* All following methods generates configuration sections */
   void siteDevice(String &page);

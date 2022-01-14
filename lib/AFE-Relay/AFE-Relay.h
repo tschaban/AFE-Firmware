@@ -7,7 +7,6 @@
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-//#include <arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
 
@@ -27,7 +26,7 @@ class AFERelay {
 
 private:
   uint8_t _id;
-  AFEDataAccess *_Data; // @TODO nie jest konsekwentnie jak np. w switch
+  AFEDataAccess *_Data;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED Led;
@@ -56,58 +55,103 @@ public:
 #endif
   RELAY configuration;
 
-  /* Constructors */
+  /**
+   * @brief Construct a new AFERelay object
+   *
+   */
   AFERelay();
 
-  /* Method: initiates relay */
+  /**
+   * @brief Method: initiates relay
+   *
+   * @param  id               desc
+   */
   void begin(AFEDataAccess *, uint8_t id);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 
-  /* Method sets relay state after device is turned on / power is restored / or
-   * after device has been crash */
+  /**
+   * @brief Method sets relay state after device is turned on / power is
+   * restored / or
+     * after device has been crash
+   *
+   */
   void setRelayAfterRestoringPower();
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-  /* Method sets relay state after device is connected / reconnected to MQTT
+  /**
+   * @brief Method sets relay state after device is connected / reconnected to
+   * MQTT
    * Broker. It returns TRUE if relay state has been set, false it relay state
-   * should be manged through MQTT Broker*/
+   * should be manged through MQTT Broker
+   *
+   * @return boolean
+   */
   boolean setRelayAfterRestoringMQTTConnection();
 #endif
 
-  /* Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay is ON
+  /**
+   * @brief Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay
+   * is ON
+   *
+   * @return byte
    */
   byte get();
 
-  /* Turns on relay */
+  /**
+   * @brief Turns on relay
+   *
+   */
   void on();
 
-  /* Turns off relay */
+  /**
+   * @brief Turns off relay
+   *
+   */
   void off();
 
-  /* Toggles relay state from ON to OFF or from OFF to ON */
+  /**
+   * @brief Toggles relay state from ON to OFF or from OFF to ON
+   *
+   */
   void toggle();
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
-  /* Methods automatically turns off/on relay */
+  /**
+   * @brief Methods automatically turns off/on relay
+   *
+   * @return boolean
+   */
   boolean autoTurnOff();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
-  /* It sets timer to auto-switch of the relay */
+  /**
+   * @brief It sets timer to auto-switch of the relay
+   *
+   * @param  timer            desc
+   */
   void setTimer(float timer);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PIR
-  /* It removed timer for auto-switch of the relay */
+  /**
+   * @brief It removed timer for auto-switch of the relay
+   *
+   */
   void clearTimer();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  /* It sets unit of relay to auto turn off timer. Possible options: true -
-   * secods, false - miliseconds */
+  /**
+   * @brief It sets unit of relay to auto turn off timer. Possible options: true
+   * -
+   * secods, false - miliseconds
+   *
+   * @param  value            desc
+   */
   void setTimerUnitToSeconds(boolean value);
 #endif
 };

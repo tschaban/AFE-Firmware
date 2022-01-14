@@ -93,6 +93,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_INDEX:
     Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
+  case AFE_CONFIG_SITE_INDEX_MONITOR:
+    Site.siteFirmware(page, true);
+    break;
   case AFE_CONFIG_SITE_FIRST_TIME:
     Site.siteNetwork(page);
     break;
@@ -641,6 +644,9 @@ boolean AFEWebServer::generate(boolean upload) {
               siteConfig.rebootTime = AFE_SITE_REBOOT;
             }
           }
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_INDEX_MONITOR) {
+          siteConfig.form = false;
+          siteConfig.twoColumns = false;
         } else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT) {
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_NORMAL;
@@ -764,14 +770,13 @@ uint8_t AFEWebServer::getSiteID() {
 
   if (Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
     return AFE_CONFIG_SITE_FIRST_TIME;
-  } else if (Device->getMode() == AFE_MODE_NORMAL) {
-    return AFE_CONFIG_SITE_INDEX;
   } else {
-    if (server.hasArg(F("o"))) {
-      return server.arg(F("o")).toInt();
-    } else {
-      return AFE_CONFIG_SITE_DEVICE;
-    }
+    return Device->getMode() == AFE_MODE_NORMAL
+               ? server.arg(F("o")).toInt() == AFE_CONFIG_SITE_INDEX_MONITOR
+                     ? AFE_CONFIG_SITE_INDEX_MONITOR
+                     : AFE_CONFIG_SITE_INDEX
+               : server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
+                                                : AFE_CONFIG_SITE_DEVICE;
   }
 }
 
@@ -1467,13 +1472,8 @@ void AFEWebServer::get(MQTT &data) {
     data.ip[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("p")).length() > 0) {
-    data.port = server.arg(F("p")).toInt();
-  }
-
-  if (server.arg(F("t")).length() > 0) {
-    data.timeout = server.arg(F("t")).toInt();
-  }
+  data.port = server.arg(F("p")).length() > 0 ? server.arg(F("p")).toInt()
+                                              : AFE_CONFIG_MQTT_DEFAULT_PORT;
 
   if (server.arg(F("u")).length() > 0) {
     server.arg(F("u")).toCharArray(data.user, sizeof(data.user));
@@ -1499,8 +1499,17 @@ void AFEWebServer::get(MQTT &data) {
 
   data.retainLWT = server.arg(F("rl")).length() > 0 ? true : false;
   data.retainAll = server.arg(F("ra")).length() > 0 ? true : false;
+
+  data.qos = server.arg(F("q")).length() > 0 ? server.arg(F("q")).toInt()
+                                             : AFE_CONFIG_MQTT_DEFAULT_QOS;
+
+  // @TODO T0 if asyncMqtt works well both below could be removed
   data.pingHostBeforeConnection =
       server.arg(F("ph")).length() > 0 ? true : false;
+
+  data.timeout = server.arg(F("t")).length() > 0
+                     ? server.arg(F("t")).toInt()
+                     : AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -1757,7 +1766,6 @@ void AFEWebServer::get(CONTACTRON &data) {
   data.type = server.arg(F("y")).length() > 0
                   ? server.arg(F("y")).toInt()
                   : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
-
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   data.ledID = server.arg("l").length() > 0 ? server.arg("l").toInt()

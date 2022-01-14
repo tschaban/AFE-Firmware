@@ -13,10 +13,9 @@
 #endif // Domoticz
 
 
-
 struct MQTT_MESSAGE {
   char *topic;
-  byte *content;
+  char *content;
   uint16_t length;
 };
 
@@ -107,7 +106,7 @@ struct MQTT {
   char ip[16];
   uint16_t port;
   char user[33];
-  char password[33];
+  char password[65];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
@@ -117,6 +116,7 @@ struct MQTT {
   boolean retainLWT;
   boolean retainAll;
   boolean pingHostBeforeConnection;
+  uint8_t qos;
 };
 
 #endif
