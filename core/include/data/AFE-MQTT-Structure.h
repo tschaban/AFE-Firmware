@@ -106,7 +106,7 @@ struct MQTT {
   char ip[16];
   uint16_t port;
   char user[33];
-  char password[33];
+  char password[65];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else

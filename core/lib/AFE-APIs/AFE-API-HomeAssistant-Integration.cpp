@@ -555,7 +555,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
            << _json << endl
            << endl;
 #endif
-    _json.toCharArray(_message, sizeof(_message));
+    _json.toCharArray(_message, sizeof(_message)+1);
     _MqttAPI->Mqtt.publish(_topic, _message);
   } else {
 

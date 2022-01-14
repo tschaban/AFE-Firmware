@@ -90,7 +90,7 @@ const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
     "{\"device\":{\"ids\":\"{{d.i}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
     "\"name\":\"{{d.n}}\",\"via_device\":\"{{d.i}}\",\"mdl\":\"{{d.h}}\"},"
     "\"uniq_id\":\"{{i.i}}\",\"name\":\"{{i.n}}\"{{ret}}{{b.a}}{{bst}}{{"
-    "bsp}}{{bct}}{{bcp}}{{sen}}{{bdo}}{{rgb}}{{opt}}}";
+    "bsp}}{{bct}}{{bcp}}{{sen}}{{bdo}}{{rgb}}{{opt}}{{bdc}}}";
 
 const char HA_MQTT_DISCOVERY_JSON_AVAILABILITY[] PROGMEM =
     ",\"avty\":{\"topic\":\"{{a.t}}\",\"payload_available\":\"connected\","

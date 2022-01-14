@@ -2,6 +2,11 @@
 
 #include "AFE-Wifi.h"
 
+boolean AFEWiFi::eventConnectionEstablished = false;
+boolean AFEWiFi::isConnected = false;
+boolean AFEWiFi::eventConnectionLost = true;
+
+
 AFEWiFi::AFEWiFi() {}
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -15,6 +20,15 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data,
 void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Device = _Device;
   WiFiMode = mode;
+
+#ifdef AFE_ESP32
+  WirelessNetwork.onEvent(AFEWiFi::onWiFiEvent);
+#else
+  wifiConnectHandler =
+      WirelessNetwork.onStationModeGotIP(AFEWiFi::onWifiConnect);
+  wifiDisconnectHandler =
+      WirelessNetwork.onStationModeDisconnected(AFEWiFi::onWifiDisconnect);
+#endif
 
   if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
     _Data->getConfiguration(&configuration);
@@ -94,9 +108,9 @@ void AFEWiFi::switchConfiguration() {
   if (isPrimaryConfiguration && !configuration.isDHCP) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: WIFI: Setting fixed IP (")
-                << configuration.ip << F(")  address for primary WiFi "
-                                       "configuration");
+           << F("INFO: WIFI: Setting fixed IP (") << configuration.ip
+           << F(")  address for primary WiFi "
+                "configuration");
 #endif
     IPAddress ip;
     if (!ip.fromString(configuration.ip)) {
@@ -135,8 +149,8 @@ void AFEWiFi::switchConfiguration() {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: WIFI: Setting fixed IP (") << configuration.ipBackup
-                                                 << F(") address for backup WiFi "
-                                                    "configuration");
+           << F(") address for backup WiFi "
+                "configuration");
 #endif
 
     IPAddress ip;
@@ -221,8 +235,8 @@ void AFEWiFi::listener() {
 
             Serial << endl
                    << F("INFO: WIFI: Parameters: ") << endl
-                   << F(" - getAutoConnect=") << WirelessNetwork.getAutoConnect()
-                   << endl
+                   << F(" - getAutoConnect=")
+                   << WirelessNetwork.getAutoConnect() << endl
                    << F(" - getAutoReconnect=")
                    << WirelessNetwork.getAutoReconnect() << endl
                    << F(" - getMode=") << WirelessNetwork.getMode();
@@ -234,7 +248,8 @@ void AFEWiFi::listener() {
 
                    << F(" - getPersistent=") << WirelessNetwork.getPersistent()
                    << endl
-                   << F(" - getPhyMode=") << WirelessNetwork.getPhyMode() << endl
+                   << F(" - getPhyMode=") << WirelessNetwork.getPhyMode()
+                   << endl
                    << F(" - getSleepMode=") << WirelessNetwork.getSleepMode();
 #endif // !ESP32
 #endif
@@ -256,8 +271,8 @@ void AFEWiFi::listener() {
             delayStartTime + (configuration.waitTimeConnections * 1000)) {
           connections++;
 
-          yield();
-          delay(10);
+          // yield();
+         // delay(10);
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: WIFI: Connection to ")
@@ -319,10 +334,10 @@ void AFEWiFi::listener() {
                << Device->configuration.name;
 #endif
 
-        yield();
+        // yield();
 
         if (WirelessNetwork.hostname(Device->configuration.name)) {
-          yield();
+// yield();
 #ifdef DEBUG
           Serial << F(" ... Success");
         } else {
@@ -342,44 +357,60 @@ void AFEWiFi::listener() {
 }
 
 boolean AFEWiFi::connected() {
-
-#ifndef AFE_ESP32 /* ESP82xx */
-  if ((((isPrimaryConfiguration && configuration.isDHCP) ||
-        (!isPrimaryConfiguration && configuration.isDHCPBackup)) &&
-       WirelessNetwork.localIP().toString() != "(IP unset)") ||
-      (((isPrimaryConfiguration && !configuration.isDHCP) ||
-        (!isPrimaryConfiguration && !configuration.isDHCPBackup)) &&
-       WirelessNetwork.status() == WL_CONNECTED)) {
-    yield();
-    delay(10);
-#else /* ESP32 */
-  if (WiFi.status() == WL_CONNECTED) {
-#endif
-
-    if (disconnected) {
-      eventConnectionEstablished = true;
-      eventConnectionLost = false;
-      disconnected = false;
-    }
-    return true;
-  } else {
-    if (!disconnected) {
-      eventConnectionLost = true;
-      eventConnectionEstablished = false;
-    }
-    disconnected = true;
-    return false;
-  }
+   return AFEWiFi::isConnected;
 }
 
 boolean AFEWiFi::eventConnected() {
-  boolean returnValue = eventConnectionEstablished;
-  eventConnectionEstablished = false;
+  boolean returnValue = AFEWiFi::eventConnectionEstablished;
+  AFEWiFi::eventConnectionEstablished = false;
   return returnValue;
 }
 
 boolean AFEWiFi::eventDisconnected() {
-  boolean returnValue = eventConnectionLost;
-  eventConnectionLost = false;
+  boolean returnValue = AFEWiFi::eventConnectionLost;
+  AFEWiFi::eventConnectionLost = false;
   return returnValue;
 }
+
+
+#ifdef AFE_ESP32
+void AFEWiFi::onWiFiEvent(WiFiEvent_t event) {
+  switch (event) {
+  case SYSTEM_EVENT_STA_GOT_IP:
+#ifdef DEBUG
+    Serial << endl << F("INFO: WiFi: Disconnected from Wi-Fi");
+#endif
+    AFEWiFi::eventConnectionEstablished = true;
+    AFEWiFi::isConnected = true;
+    break;
+  case SYSTEM_EVENT_STA_DISCONNECTED:
+#ifdef DEBUG
+    Serial << endl << F("INFO: WiFi: Disconnected from Wi-Fi");
+#endif
+    AFEWiFi::eventConnectionLost = true;
+    AFEWiFi::isConnected = false;
+    break;
+  }
+}
+
+
+
+#else // ESP8266
+void AFEWiFi::onWifiConnect(const WiFiEventStationModeGotIP &event) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: WiFi: Connected to Wi-Fi");
+#endif
+  AFEWiFi::eventConnectionEstablished = true;
+  AFEWiFi::isConnected = true;
+}
+
+void AFEWiFi::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: WiFi: Disconnected from Wi-Fi");
+#endif
+  AFEWiFi::eventConnectionLost = true;
+  AFEWiFi::isConnected = false;
+}
+
+#endif
+

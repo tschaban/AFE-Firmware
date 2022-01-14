@@ -291,7 +291,7 @@ public:
    *
    * @param  page             return string
    * @param  extended         if true addess additinal information to the site.
-   * @TODO check if still used
+   *
    */
   void generateFooter(String &page, boolean extended = false);
 

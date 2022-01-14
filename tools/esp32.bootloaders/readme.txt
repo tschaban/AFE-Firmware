@@ -1,5 +1,3 @@
-# Manual EN:
-
 To upload the firmware to ESP32 you need to upload following files to ESP32 to specyfic addresses:
 - bootloader_dout_40m.bin: 0x1000
 - boot_app0.bin: 0xe00
@@ -7,7 +5,7 @@ To upload the firmware to ESP32 you need to upload following files to ESP32 to s
 - AFE ESP32 firmware file: 0x10000
 
 Upload using SPI_MODE = DOUT
-Update the the latest version or another AFE Firmwre version can be made via web broser from AFE Configuration panel
+Update the latest version or another AFE Firmware version can be made via web browser from AFE Configuration panel
 
 ------------------------------------------------
 

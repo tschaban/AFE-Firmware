@@ -692,8 +692,17 @@ void AFESitesGenerator::siteNetwork(String &page) {
       for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
         Serial << endl << F(" - ") << WiFi.SSID(i);
-#endif
+#endif 
+
+
+
+
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
+
+
+//Serial << endl << "sizeof(_ssid) " << sizeof(_ssid);
+//Serial << endl << "strlen(_ssid) " << strlen(_ssid) + 1;
 
         sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
                 WiFi.RSSI(i) >= -30
@@ -704,7 +713,6 @@ void AFESitesGenerator::siteNetwork(String &page) {
                                 ? L_WIFI_RSSI_70
                                 : WiFi.RSSI(i) >= -80 ? L_WIFI_RSSI_80
                                                       : L_WIFI_RSSI_90);
-
         addSelectOptionFormItem(page, _ssidLabel, _ssid,
                                 strcmp(_ssid, configuration.ssid) == 0);
       }
@@ -771,6 +779,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
     if (numberOfNetworks > 0) {
       for (int i = 0; i < numberOfNetworks; i++) {
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
+        _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
         sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
                 WiFi.RSSI(i) >= -30
                     ? L_WIFI_RSSI_30
@@ -844,7 +853,7 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "u", L_USERNAME,
                    configuration.user, "32");
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "s", L_PASSWORD,
-                   configuration.password, "32");
+                   configuration.password, "64");
 
   addSelectFormItemOpen(page, F("q"), F("QOS"));
   addSelectOptionFormItem(page, "0", "0", configuration.qos == 0);
