@@ -3,9 +3,9 @@
 
 /* Set this before run */
 
-$type = "0";
+$type = "7";
 $version = "3.3.0";
-$language = "en";
+$language = "pl";
 $development = false;
 
 
@@ -87,7 +87,7 @@ $handle = fopen($targetFolder."/script-".$language.".sql", "a");
  * Does not generate update for development version
  */
 if (!$development) {
-  fwrite($handle, "UPDATE afe_firmwares set current_version != 1 WHERE type = ".$type." AND language = '".$language."';\n");
+  fwrite($handle, "UPDATE afe_firmwares set current_version = 0 WHERE type = ".$type." AND language = '".$language."';\n");
 }
 echo "\nCoping firmwares";
 
