@@ -2,7 +2,6 @@
 
 /* ---------Headers ---------*/
 
-
 void eventsListener(void) {
   /* Event: connected to WiFi*/
   if (Network.eventConnected()) {
@@ -82,8 +81,8 @@ void eventsListener(void) {
                     "Domoticz");
 #endif
         for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
-     //     HttpDomoticzAPI.publishCLEDState(i);
-     //     HttpDomoticzAPI.publishCLEDEffectState(i);
+          //     HttpDomoticzAPI.publishCLEDState(i);
+          //     HttpDomoticzAPI.publishCLEDEffectState(i);
         }
 #endif
 
@@ -166,19 +165,13 @@ void eventsListener(void) {
     if (MqttAPI.Mqtt.connected()) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-      HomeAssistantDiscoveryAPI->publishRelays();
-#endif
-#ifdef AFE_CONFIG_HARDWARE_CLED
-      HomeAssistantDiscoveryAPI->publishCLEDs();
-#endif
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-      HomeAssistantDiscoveryAPI->publishAnalogInputs();
-#endif
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-      HomeAssistantDiscoveryAPI->publishSwitches();
-#endif
-
+/**
+ * @brief Publishing device configuration to Home Assistant
+ * 
+ */
+      AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI =
+          new AFEAPIHomeAssistantIntegration(&Data, &Device, &MqttAPI);
+      HomeAssistantDiscoveryAPI->publish();
       delete HomeAssistantDiscoveryAPI;
       HomeAssistantDiscoveryAPI = NULL;
 #endif

@@ -29,9 +29,7 @@ AFEAPIMQTTDomoticz MqttAPI;
 AFEAPIHTTPDomoticz HttpDomoticzAPI;
 #else
 AFEAPIMQTTStandard MqttAPI;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI = new AFEAPIHomeAssistantIntegration();
-#endif // Home Assistant
+
 #endif
 
 /* Initializing MQTT API */
@@ -49,10 +47,6 @@ void initializeMQTTAPI(void) {
     MqttAPI.begin(&Data, &Device);
 #endif
 
-/* Inititializing Home Assistant Discovery */
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-    HomeAssistantDiscoveryAPI->begin(&Data, &Device, &MqttAPI);
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     if (Device.configuration.noOfRelays > 0) {

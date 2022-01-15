@@ -132,7 +132,7 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
     numberOfDevicesOnBus = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20;
 #ifdef DEBUG
     Serial << endl
-           << F(" - WARN: No sensors found. Hard scanning for "
+           << F(" - WARN: No sensors found. Hard scanning for ")
            << numberOfDevicesOnBus << F(" addresses");
 #endif
   }
@@ -158,8 +158,8 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
 #ifdef DEBUG
       Serial << endl
              << F(" - Found sensor: ") << addresses[i][0] << F(":") << addresses[i][1]
-             << F(":") << addresses[i][2] << F(":") << addresses[i][3] << F(":"
-             << addresses[i][4] << F(":") << addresses[i][5] << F(":"
+             << F(":") << addresses[i][2] << F(":") << addresses[i][3] << F(":")
+             << addresses[i][4] << F(":") << addresses[i][5] << F(":")
              << addresses[i][6] << F(":") << addresses[i][7];
 
       Sensor.requestTemperatures();
@@ -211,7 +211,7 @@ void AFESensorDS18B20::getJSON(char *json) {
           configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
 }
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZD
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 unsigned long AFESensorDS18B20::getDomoticzIDX() {
   return configuration.domoticz.idx;
 }

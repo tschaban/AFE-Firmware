@@ -66,7 +66,7 @@
 #define AFE_DEVICE_MANUFACTURER "iECS"
 #define AFE_DEVICE_TYPE_NAME "iECS Weather Station v2.1"
 #define AFE_DEVICE_TYPE_ID 23
-#elif defined(AFE_CONFIG_T1_USE_MAX_HARDWARE)
+#elif defined(AFE_T1_CUSTOM_E2)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "T1 Mega pack"
 #define AFE_DEVICE_TYPE_ID 10

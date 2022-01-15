@@ -47,7 +47,9 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE 6
 #define AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED 7
 #define AFE_CONFIG_HA_ITEM_BINARY_SENSOR 8
-
+#define AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE 9
+#define AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR 10
+#define AFE_CONFIG_HA_ITEM_REGULATOR 11
 /**
  * @brief Sizes of variables
  *
@@ -55,6 +57,7 @@
 #define AFE_CONFIG_HA_OBJECT_ID_SIZE 25
 #define AFE_CONFIG_HA_LABEL_SIZE 33
 #define AFE_CONFIG_HA_OPTIONS_SIZE 144 // Currently only from RGB effect options
+#define AFE_CONFIG_HA_UNIT_SIZE 5
 
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH 0
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH_NAME "switch"
@@ -68,6 +71,7 @@
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT 5
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT_NAME "light"
 
+
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_UNKNOWN "unknown"
 
 /**
@@ -78,6 +82,7 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE "voltage"
 #define AFE_CONFIG_HA_DEVICE_CLASS_OPENING "opening"
 #define AFE_CONFIG_HA_DEVICE_CLASS_MOVING "moving"
+#define AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE "temperature"
 /**
  * @brief Home Assistant State Classes
  * https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes

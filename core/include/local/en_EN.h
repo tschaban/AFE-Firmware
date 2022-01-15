@@ -671,7 +671,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Version {{f.v}}"
+#define L_FIRMWARE_VERSION "Version {{f.v}}.{{f.b}}"
+#define L_FIRMWARE_VERSION_DATE "Compilation date: {{f.k}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
 #define L_FIRMWARE_API "API: {{f.a}}"
