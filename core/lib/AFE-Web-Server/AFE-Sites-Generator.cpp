@@ -51,7 +51,7 @@ void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}.{{f.b}}-ESP{{f.e}}</small>"));
+  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})</small>"));
 }
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {

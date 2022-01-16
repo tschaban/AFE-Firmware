@@ -649,7 +649,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
 #define L_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Wersja {{f.v}}.{{f.b}}"
+#define L_FIRMWARE_VERSION "Wersja {{f.v}} (Build:{{f.b}})"
 #define L_FIRMWARE_VERSION_DATE "Kompilacja z dnia: {{f.k}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"

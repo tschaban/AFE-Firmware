@@ -549,7 +549,7 @@ void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
 boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
   return enabled ? sendSwitchCommand(
                        _ThermalProtector[id]->configuration.domoticz.idx,
-                       _ThermalProtector[id]->configuration.enable)
+                       _ThermalProtector[id]->configuration.enabled)
                  : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR

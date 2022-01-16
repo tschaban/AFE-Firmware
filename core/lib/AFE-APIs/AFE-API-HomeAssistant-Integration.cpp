@@ -189,6 +189,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       _Data->getConfiguration(&_configuration);
 #endif // ESP32/ESP8266
 
+/* Voltage on input */
 #ifdef AFE_ESP32
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_ADC_HA_VOLTAGE);
@@ -201,6 +202,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       sprintf(_deviceConfiguration.unit, AFE_UNIT_VOLTAGE);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
+/* Voltage calulcated */
 #ifdef AFE_ESP32
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_ADC_HA_VOLTAGE_CALCULATED);
@@ -212,6 +214,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
           AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED;
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
+/* Raw value on input */
 #ifdef AFE_ESP32
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_ADC_HA_VOLTAGE_RAW);
@@ -222,6 +225,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       sprintf(_deviceConfiguration.unit, "");
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
+/* Percent value on input using input range */
 #ifdef AFE_ESP32
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_ADC_HA_VOLTAGE_PERCENT);
@@ -232,6 +236,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT;
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      
     } else {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE;
       removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
@@ -313,9 +318,11 @@ void AFEAPIHomeAssistantIntegration::publishThermalProtector(void) {
     return;
   }
   THERMAL_PROTECTOR _configuration;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS;
+       i++) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: HA: Setting/Updating Thermal protector: ") << i + 1;
+    Serial << endl
+           << F("INFO: HA: Setting/Updating Thermal protector: ") << i + 1;
 #endif
 
     _deviceConfiguration.id = i;
@@ -506,7 +513,10 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       _json.replace("{{b.a}}", "");
     }
 
-    /* Adds command_topic, retain */
+    /**
+     * @brief Adds command_topic, retain
+     *
+     */
     if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
         _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
         _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
