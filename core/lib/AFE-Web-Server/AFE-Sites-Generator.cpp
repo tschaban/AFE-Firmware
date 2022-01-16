@@ -51,7 +51,7 @@ void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}}-ESP{{f.e}}</small>"));
+  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})</small>"));
 }
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
@@ -3223,6 +3223,8 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_FIRMWARE_VERSION_DATE));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace("{{I}}", F(L_ESP_CHIP));
 #ifndef AFE_ESP32
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
@@ -4074,7 +4076,7 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   FirmwarePro->Pro.valid ? page.replace("{{f.p}}", F(L_YES))
                          : page.replace("{{f.p}}", F(L_NO));
 
-#ifdef AFE_CONFIG_T1_USE_MAX_HARDWARE
+#ifdef AFE_T1_CUSTOM_E2
   char _version[sizeof(Firmware.version) + 6];
   sprintf(_version, "%s %s", Firmware.version, "MEGA");
   page.replace("{{f.v}}", _version);
@@ -4088,6 +4090,8 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
   page.replace("{{f.n}}", Device->deviceId);
   page.replace("{{f.l}}", L_LANGUAGE_SHORT);
   page.replace("{{f.h}}", String(AFE_DEVICE_TYPE_ID));
+  page.replace("{{f.b}}", String(AFE_VERSION_BUILD_NUMBER));
+  page.replace("{{f.k}}", AFE_VERSION_BUILD_DATE);
 
   page.concat(F("</body></html>"));
 }

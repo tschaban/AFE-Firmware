@@ -136,20 +136,28 @@
  */
 #if defined(T0_CONFIG)
 #include <firmwares/AFE-T0.h>
+#include <builds/AFE-T0-Build.h>
 #elif defined(T1_CONFIG)
 #include <firmwares/AFE-T1.h>
+#include <builds/AFE-T1-Build.h>
 #elif defined(T2_CONFIG)
 #include <firmwares/AFE-T2.h>
+#include <builds/AFE-T2-Build.h>
 #elif defined(T3_CONFIG)
 #include <firmwares/AFE-T3.h>
+#include <builds/AFE-T3-Build.h>
 #elif defined(T4_CONFIG)
 #include <firmwares/AFE-T4.h>
+#include <builds/AFE-T4-Build.h>
 #elif defined(T5_CONFIG)
 #include <firmwares/AFE-T5.h>
+#include <builds/AFE-T5-Build.h>
 #elif defined(T6_CONFIG)
 #include <firmwares/AFE-T6.h>
+#include <builds/AFE-T6-Build.h>
 #elif defined(T7_CONFIG)
 #include <firmwares/AFE-T7.h>
+#include <builds/AFE-T7-Build.h>
 #endif 
 
 /**
