@@ -6,7 +6,9 @@ boolean AFEAsyncMQTTClient::eventConnected = false;
 boolean AFEAsyncMQTTClient::eventGotMessage = false;
 boolean AFEAsyncMQTTClient::isConnected = false;
 
-MQTT_MESSAGE AFEAsyncMQTTClient::message;
+MQTT_MESSAGE
+AFEAsyncMQTTClient::messagesBuffer[AFE_CONFIG_MQTT_MESSAGES_BUFFER];
+uint8_t AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
 
 AFEAsyncMQTTClient::AFEAsyncMQTTClient(){};
 
@@ -107,10 +109,21 @@ void AFEAsyncMQTTClient::subscribe(const char *topic) {
 boolean AFEAsyncMQTTClient::listener() {
   boolean _ret = false;
   if (_Broker.connected()) {
-    if (AFEAsyncMQTTClient::eventGotMessage) {
+    // if (AFEAsyncMQTTClient::eventGotMessage) {
+    if (messageProcessed != AFEAsyncMQTTClient::numberOfMessagesInBuffer) {
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: MQTT: Processing message: ") << messageProcessed;
+#endif
+      message = AFEAsyncMQTTClient::messagesBuffer[messageProcessed];
+      messageProcessed++;
+      if (messageProcessed == AFE_CONFIG_MQTT_MESSAGES_BUFFER) {
+        messageProcessed = 0;
+      }
       _ret = true;
-      AFEAsyncMQTTClient::eventGotMessage = false;
     }
+    // AFEAsyncMQTTClient::eventGotMessage = false;
+    //}
   } else {
     _Broker.connect();
   }
@@ -268,11 +281,53 @@ void AFEAsyncMQTTClient::onMqttMessage(
   Serial << endl << F(" : Total   ") << total;
 #endif
 
-  AFEAsyncMQTTClient::message.topic = topic;
-  AFEAsyncMQTTClient::message.content = payload;
-  AFEAsyncMQTTClient::message.length = len;
+  if (strlen(topic) > AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH) {
+#ifdef DEBUG
+    Serial << endl
+           << F("WARN: MQTT: Topic legnth: ") << strlen(topic)
+           << F("too long. Max size: ") << AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH;
+#endif
+    return;
+  }
+
+  if (strlen(payload) > AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH) {
+#ifdef DEBUG
+    Serial << endl
+           << F("WARN: MQTT: Message legnth: ") << strlen(topic)
+           << F("too long. Max size: ") << AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH;
+#endif
+    return;
+  }
+
+  sprintf(AFEAsyncMQTTClient::messagesBuffer
+              [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                  .topic,
+          topic);
+
+  sprintf(AFEAsyncMQTTClient::messagesBuffer
+              [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                  .content,
+          payload);
+  /*
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .length = len;
+            */
   AFEAsyncMQTTClient::eventGotMessage = true;
+
+  AFEAsyncMQTTClient::numberOfMessagesInBuffer++;
+  if (AFEAsyncMQTTClient::numberOfMessagesInBuffer ==
+      AFE_CONFIG_MQTT_MESSAGES_BUFFER) {
+    AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
+  }
+
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: MQTT: New message to a buffer: ") << messageProcessed;
+#endif
+
 }
+
 #ifdef DEBUG
 void AFEAsyncMQTTClient::onMqttPublish(uint16_t packetId) {
   Serial << endl

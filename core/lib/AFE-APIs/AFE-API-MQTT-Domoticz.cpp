@@ -130,12 +130,16 @@ void AFEAPIMQTTDomoticz::subscribe() {
 
 DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   DOMOTICZ_MQTT_COMMAND command;
-  char json[Mqtt.message.length];
+  char json[strlen(Mqtt.message.content)];
 
+/* @TODO T0 remove
   for (uint16_t i = 0; i < Mqtt.message.length; i++) {
     json[i] = Mqtt.message.content[i];
   }
-  StaticJsonBuffer<AFE_CONFIG_API_JSON_BUFFER_SIZE> jsonBuffer;
+*/
+  sprintf(json,Mqtt.message.content);
+
+  StaticJsonBuffer<AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(json);
 
   if (root.success()) {

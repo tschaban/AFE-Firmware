@@ -222,7 +222,8 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       sprintf(_deviceConfiguration.label, "%s", L_ADC_HA_VOLTAGE_RAW);
 #endif
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW;
-      sprintf(_deviceConfiguration.unit, "");
+      // sprintf(_deviceConfiguration.unit, "");
+      _deviceConfiguration.unit[0] = AFE_EMPTY_STRING; // @TODO T0 test it
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
 /* Percent value on input using input range */
@@ -236,7 +237,7 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT;
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
-      
+
     } else {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE;
       removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);

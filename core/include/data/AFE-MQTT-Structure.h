@@ -14,10 +14,18 @@
 
 
 struct MQTT_MESSAGE {
+  char topic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
+  char content[AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH];
+};
+
+/*
+struct MQTT_MESSAGE {
   char *topic;
   char *content;
   uint16_t length;
 };
+*/
+
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 struct MQTT_TOPIC {
