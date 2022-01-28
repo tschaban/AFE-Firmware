@@ -17,7 +17,7 @@ struct DOMOTICZ_BASIC_CONFIG {
 struct DOMOTICZ_MQTT_COMMAND {
   DOMOTICZ_BASIC_CONFIG domoticz;
   uint8_t nvalue;
-  char svalue[20];
+  char svalue[AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH];
 #ifdef AFE_CONFIG_HARDWARE_CLED
   CLED_PARAMETERS led;
 #endif

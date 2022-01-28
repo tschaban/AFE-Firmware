@@ -2,6 +2,8 @@
 
 void setup() {
 
+  boolean _success = false;
+
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
@@ -46,48 +48,36 @@ void setup() {
 #ifdef AFE_ESP32
 #else // ESP8266
   // Erase all config
-  ESP.eraseConfig();
+  _success = ESP.eraseConfig();
 #ifdef DEBUG
-  Serial << F("INFO: ESP: Erasing internally stored configuration") << endl;
+
+  if (_success) {
+    Serial << F("INFO: ESP: Internally stored configuration: erased") << endl;
+  } else {
+    Serial << F("ERROR: ESP: Internally stored configuration NOT erased")
+           << endl;
+  }
 #endif
 #endif // ESP32/ESP8266
 
 /* Initializing SPIFFS file system */
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  bool _fileSystemReady = LITTLEFS.begin();
+  _success = LITTLEFS.begin();
 #else
-  bool _fileSystemReady = SPIFFS.begin();
+  _success = SPIFFS.begin();
 #endif
-
-  if (_fileSystemReady) {
 #ifdef DEBUG
+  if (_success) {
     Serial << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
                 "collection operation on SPIFFS");
-#endif
   } else {
-#ifdef DEBUG
-    Serial << endl << F("ERROR: FILES SYSTEM NOT MOUNTED !!!") << endl;
-#endif
-/**
- * @brief firmare cannot continue if files system is not mounted
- * 
- */
-    return;
+    Serial << endl << F("WARN: FILES SYSTEM: Not mounted") << endl;
   }
+#endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
   yield();
   SPIFFS.gc();
-#endif
-
-  /**
-   * @brief saving information how many times firmare has been rebooted. For
-   * debug purpose
-   *
-   */
-  unsigned long _reboots = Data.getRebootCounter();
-#ifdef DEBUG
-  Serial << endl << F("INFO: Firmware rebooted: ") << _reboots << F(" times");
 #endif
 
   Device.begin();
@@ -112,6 +102,16 @@ void setup() {
   else {
     Serial << F("NO");
   }
+#endif
+
+  /**
+   * @brief saving information how many times firmare has been rebooted. For
+   * debug purpose
+   *
+   */
+  unsigned long _reboots = Data.getRebootCounter();
+#ifdef DEBUG
+  Serial << endl << F("INFO: Firmware rebooted: ") << _reboots << F(" times");
 #endif
 
 /* Initializing MCP23017 expanders */

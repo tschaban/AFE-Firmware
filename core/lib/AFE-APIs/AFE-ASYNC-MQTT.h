@@ -67,12 +67,6 @@ public:
   static boolean eventConnected;
 
   /**
-   * @brief set to true after receiving MQTT Message
-   *
-   */
-  static boolean eventGotMessage;
-
-  /**
    * @brief is true when device is connected to MQTT broker
    *
    */

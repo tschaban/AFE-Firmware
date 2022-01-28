@@ -20,7 +20,7 @@
  * 
  */
 #define AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH 574 // AJ Checked
-
+#define AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH 20 
 
 /**
  * @brief Domoticz 3.1.8 uses MQTT dicovery so the command topics are same as in standard API

@@ -118,7 +118,6 @@ void AFEAPIMQTTDomoticz::synchronize() {
     publishCLEDEffectsState(i);
   }
 #endif
-
 }
 
 void AFEAPIMQTTDomoticz::subscribe() {
@@ -132,12 +131,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   DOMOTICZ_MQTT_COMMAND command;
   char json[strlen(Mqtt.message.content)];
 
-/* @TODO T0 remove
-  for (uint16_t i = 0; i < Mqtt.message.length; i++) {
-    json[i] = Mqtt.message.content[i];
-  }
-*/
-  sprintf(json,Mqtt.message.content);
+  sprintf(json, Mqtt.message.content);
 
   StaticJsonBuffer<AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(json);
@@ -145,7 +139,17 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   if (root.success()) {
     command.domoticz.idx = root["idx"];
     command.nvalue = root["nvalue"];
-    sprintf(command.svalue, root["svalue1"] | "");
+    if (strlen(root["svalue1"]) < AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH) {
+      sprintf(command.svalue, root["svalue1"] | "");
+#ifdef DEBUG
+    } else {
+      Serial << endl
+             << F("WARN: Domoticz: Incoming SVALUE is: ")
+             << strlen(root["svalue1"]) << F(" and it's too long. Max size: ")
+             << AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH
+             << F(". Request not processed");
+#endif
+    }
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     command.led.brightness = root["Level"];
@@ -646,7 +650,6 @@ void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
       "{\"command\":\"udevice\",\"idx\":%d,\"nvalue\":%d,\"svalue\":\"%s\"}",
       idx, nvalue, svalue);
 }
-
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEAPIMQTTDomoticz::addClass(AFESensorBMEX80 *Sensor) {

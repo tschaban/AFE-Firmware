@@ -3,7 +3,6 @@
 #include "AFE-ASYNC-MQTT.h"
 
 boolean AFEAsyncMQTTClient::eventConnected = false;
-boolean AFEAsyncMQTTClient::eventGotMessage = false;
 boolean AFEAsyncMQTTClient::isConnected = false;
 
 MQTT_MESSAGE
@@ -36,10 +35,7 @@ void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   sprintf(_DeviceName, "%s-%s", Device->configuration.name, Device->deviceId);
 
   _Broker.setClientId(_DeviceName);
-  _Broker.setMaxTopicLength(AFE_CONFIG_MQTT_DEFAULT_BUFFER_SIZE +
-                            AFE_CONFIG_MQTT_TOPIC_LENGTH); // @TODO T0 check if
-                                                           // this is topic +
-                                                           // payload
+  _Broker.setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
   if (strlen(configuration.user) > 0 && strlen(configuration.password) > 0) {
     _Broker.setCredentials(configuration.user, configuration.password);
   }
@@ -109,7 +105,6 @@ void AFEAsyncMQTTClient::subscribe(const char *topic) {
 boolean AFEAsyncMQTTClient::listener() {
   boolean _ret = false;
   if (_Broker.connected()) {
-    // if (AFEAsyncMQTTClient::eventGotMessage) {
     if (messageProcessed != AFEAsyncMQTTClient::numberOfMessagesInBuffer) {
 #ifdef DEBUG
       Serial << endl
@@ -122,8 +117,6 @@ boolean AFEAsyncMQTTClient::listener() {
       }
       _ret = true;
     }
-    // AFEAsyncMQTTClient::eventGotMessage = false;
-    //}
   } else {
     _Broker.connect();
   }
@@ -269,18 +262,20 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 void AFEAsyncMQTTClient::onMqttMessage(
     char *topic, char *payload, AsyncMqttClientMessageProperties properties,
     size_t len, size_t index, size_t total) {
+
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Got message:");
-  Serial << endl << F(" : Topic   ") << topic;
-  Serial << endl << F(" : Message ") << payload;
-  Serial << endl << F(" : QOS     ") << properties.qos;
-  Serial << endl << F(" : Retain  ") << properties.retain;
-  Serial << endl << F(" : Dup     ") << properties.dup;
-  Serial << endl << F(" : Index   ") << index;
-  Serial << endl << F(" : Length  ") << len;
-  Serial << endl << F(" : Total   ") << total;
+  Serial << endl
+         << F(" : Topic   ") << topic << F(" | length: ") << strlen(topic);
+  //Serial << endl << F(" : Message ") << payload;
+  Serial << endl << F(" : QOS           ") << properties.qos;
+  Serial << endl << F(" : Retain        ") << properties.retain;
+  Serial << endl << F(" : Dup           ") << properties.dup;
+  Serial << endl << F(" : Index         ") << index;
+  Serial << endl << F(" : Length        ") << len;
+  Serial << endl << F(" : Total         ") << total;
+                    
 #endif
-
   if (strlen(topic) > AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH) {
 #ifdef DEBUG
     Serial << endl
@@ -290,7 +285,7 @@ void AFEAsyncMQTTClient::onMqttMessage(
     return;
   }
 
-  if (strlen(payload) > AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH) {
+  if (len > AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH) {
 #ifdef DEBUG
     Serial << endl
            << F("WARN: MQTT: Message legnth: ") << strlen(topic)
@@ -304,28 +299,27 @@ void AFEAsyncMQTTClient::onMqttMessage(
                   .topic,
           topic);
 
-  sprintf(AFEAsyncMQTTClient::messagesBuffer
-              [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-                  .content,
-          payload);
-  /*
+  for (uint16_t i = 0; i < len; i++) {
     AFEAsyncMQTTClient::messagesBuffer
         [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-            .length = len;
-            */
-  AFEAsyncMQTTClient::eventGotMessage = true;
+            .content[i] = payload[i];
+  }
+
+  AFEAsyncMQTTClient::messagesBuffer
+      [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+          .content[len] = AFE_EMPTY_STRING;
+
+#ifdef DEBUG
+  Serial << endl
+         << F(" : Idx in buffer ")
+         << AFEAsyncMQTTClient::numberOfMessagesInBuffer;
+#endif
 
   AFEAsyncMQTTClient::numberOfMessagesInBuffer++;
   if (AFEAsyncMQTTClient::numberOfMessagesInBuffer ==
       AFE_CONFIG_MQTT_MESSAGES_BUFFER) {
     AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
   }
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: MQTT: New message to a buffer: ") << messageProcessed;
-#endif
-
 }
 
 #ifdef DEBUG
