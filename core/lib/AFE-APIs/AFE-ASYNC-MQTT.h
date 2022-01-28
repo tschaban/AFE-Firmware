@@ -67,12 +67,6 @@ public:
   static boolean eventConnected;
 
   /**
-   * @brief set to true after receiving MQTT Message
-   *
-   */
-  static boolean eventGotMessage;
-
-  /**
    * @brief is true when device is connected to MQTT broker
    *
    */
@@ -82,7 +76,10 @@ public:
    * @brief storeis latest received MQTT Message
    *
    */
-  static MQTT_MESSAGE message;
+  static MQTT_MESSAGE messagesBuffer[AFE_CONFIG_MQTT_MESSAGES_BUFFER];
+  static uint8_t numberOfMessagesInBuffer;
+  uint8_t messageProcessed = 0;
+  MQTT_MESSAGE message;
 
   MQTT configuration;
 

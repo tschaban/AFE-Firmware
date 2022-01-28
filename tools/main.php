@@ -3,8 +3,8 @@
 
 /* Set this before run */
 
-$type = "1";
-$version = "3.3.0";
+$type = "0";
+$version = "3.3.1";
 $language = "en";
 $development = false;
 

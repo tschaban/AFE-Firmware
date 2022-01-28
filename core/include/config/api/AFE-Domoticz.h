@@ -16,9 +16,22 @@
  * @brief Size of the incoming JSON from Domoticz
  * currently based on SetColort JSON
  * Warning: if description of item in Domoticz is too large it can cause a problem here
+ * It represents the size of incomming command
  * 
  */
-#define AFE_CONFIG_API_JSON_BUFFER_SIZE 574 // AJ Checked
+#define AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH 574 // AJ Checked
+#define AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH 20 
+
+/**
+ * @brief Domoticz 3.1.8 uses MQTT dicovery so the command topics are same as in standard API
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH + 15 // Size of a Command topic: MQTT_TOPIC + /brightness/cmd (15)
+#else
+#define AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH AFE_CONFIG_MQTT_TOPIC_LENGTH +   4 // Size of a Command topic: MQTT_TOPIC + /cmd (4)
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #define AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH 57 // Outgoing MQTT message size for switch
 #define AFE_CONFIG_API_JSON_DEVICE_COMMAND_LENGTH 90 // Outgoing MQTT message size for custom sensor
 #define AFE_CONFIG_API_JSON_SET_LEVEL_COMMAND_LENGTH 134 // Outgoing MQTT message size for selector item

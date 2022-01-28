@@ -1503,13 +1503,6 @@ void AFEWebServer::get(MQTT &data) {
   data.qos = server.arg(F("q")).length() > 0 ? server.arg(F("q")).toInt()
                                              : AFE_CONFIG_MQTT_DEFAULT_QOS;
 
-  // @TODO T0 if asyncMqtt works well both below could be removed
-  data.pingHostBeforeConnection =
-      server.arg(F("ph")).length() > 0 ? true : false;
-
-  data.timeout = server.arg(F("t")).length() > 0
-                     ? server.arg(F("t")).toInt()
-                     : AFE_CONFIG_MQTT_DEFAULT_TIMEOUT;
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
