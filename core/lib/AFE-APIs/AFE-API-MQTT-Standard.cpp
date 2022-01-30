@@ -446,7 +446,7 @@ void AFEAPIMQTTStandard::processSwitch(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Switch ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishSwitchState(*id);
   }
 #ifdef DEBUG
@@ -475,7 +475,7 @@ void AFEAPIMQTTStandard::processADC(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing ADC: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishADCValues(*id);
   }
 #ifdef DEBUG
@@ -496,7 +496,7 @@ void AFEAPIMQTTStandard::processADC() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing ADC: ");
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishADCValues();
   }
 #ifdef DEBUG
@@ -513,7 +513,7 @@ void AFEAPIMQTTStandard::processBatteryMeter() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BatteryMeter: ");
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishBatteryMeterValues();
   }
 #ifdef DEBUG
@@ -540,7 +540,7 @@ void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BMX80 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishBMx80SensorData(*id);
   }
 #ifdef DEBUG
@@ -567,7 +567,7 @@ void AFEAPIMQTTStandard::processHPMA115S0(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing HPMA115S0 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishHPMA115S0SensorData(*id);
   }
 #ifdef DEBUG
@@ -593,7 +593,7 @@ void AFEAPIMQTTStandard::processBH1750(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BH1750 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishBH1750SensorData(*id);
   }
 #ifdef DEBUG
@@ -619,7 +619,7 @@ void AFEAPIMQTTStandard::processTSL2561(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing TSL2561 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishTSL2561SensorData(*id);
   }
 #ifdef DEBUG
@@ -645,7 +645,7 @@ void AFEAPIMQTTStandard::processAS3935(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing AS3935 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishAS3935SensorData(*id);
   }
 #ifdef DEBUG
@@ -679,7 +679,7 @@ void AFEAPIMQTTStandard::processAnemometerSensor() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Anemometer: ");
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishAnemometerSensorData();
   }
 #ifdef DEBUG
@@ -703,7 +703,7 @@ void AFEAPIMQTTStandard::processRainSensor() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Rain: ");
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishRainSensorData();
   }
 #ifdef DEBUG
@@ -721,7 +721,7 @@ void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 #endif
   if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
     _Gate[*id]->toggle();
-  } else if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishGateState(*id);
   }
 #ifdef DEBUG
@@ -757,7 +757,7 @@ void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Contactron ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishContactronState(*id);
   }
 #ifdef DEBUG
@@ -779,7 +779,7 @@ void AFEAPIMQTTStandard::processDS18B20(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing DS18B20 ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishDS18B20SensorData(*id);
   }
 #ifdef DEBUG
@@ -814,13 +814,14 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Regulator ID: ") << *id;
 #endif
-  if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 2) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_ON) == 0) {
     _Regulator[*id]->on();
-  } else if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 3) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_OFF) == 0) {
     _Regulator[*id]->off();
-  } else if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_TOGGLE) ==
+             0) {
     _Regulator[*id]->toggle();
-  } else if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
   } else {
     publishState = false;
 #ifdef DEBUG
@@ -846,13 +847,14 @@ void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Themrnal Protector ID: ") << *id;
 #endif
-  if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 2) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_ON) == 0) {
     _ThermalProtector[*id]->on();
-  } else if ((char)Mqtt.message.content[0] == 'o' && Mqtt.message.length == 3) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_OFF) == 0) {
     _ThermalProtector[*id]->off();
-  } else if ((char)Mqtt.message.content[0] == 't' && Mqtt.message.length == 6) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_TOGGLE) ==
+             0) {
     _ThermalProtector[*id]->toggle();
-  } else if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  } else if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
   } else {
     publishState = false;
 #ifdef DEBUG
@@ -870,7 +872,7 @@ void AFEAPIMQTTStandard::processDHT(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing DHT ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishDHTSensorData(*id);
   }
 #ifdef DEBUG
@@ -897,7 +899,7 @@ void AFEAPIMQTTStandard::processBinarySensor(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Binary Sensor ID: ") << *id;
 #endif
-  if (strcmp(Mqtt.message.content,AFE_CONFIG_MQTT_COMMAND_GET)==0) {
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishBinarySensorState(*id);
   }
 #ifdef DEBUG
