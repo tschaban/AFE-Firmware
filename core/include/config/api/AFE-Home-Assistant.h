@@ -63,6 +63,13 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE 9
 #define AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR 10
 #define AFE_CONFIG_HA_ITEM_REGULATOR 11
+#define AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY 12
+#define AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY 13
+#define AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX 14
+#define AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT 15
+#define AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION 16
+#define AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL 17
+
 /**
  * @brief Sizes of variables
  *
@@ -96,6 +103,10 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_OPENING "opening"
 #define AFE_CONFIG_HA_DEVICE_CLASS_MOVING "moving"
 #define AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE "temperature"
+#define AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY "humidity"
+
+
+
 /**
  * @brief Home Assistant State Classes
  * https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes

@@ -45,8 +45,13 @@ void AFEAPIHomeAssistantIntegration::publish() {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   publishSwitches();
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   publishSensorDS18B20();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  publishSensorDHT();
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
@@ -313,6 +318,97 @@ void AFEAPIHomeAssistantIntegration::publishSensorDS18B20(void) {
 }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_HARDWARE_DHT
+/**
+ * @brief publishes configuration of all DHT sensors
+ *
+ */
+void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
+  if (!_initialize) {
+    return;
+  }
+  DHT _configuration;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_DHT; i++) {
+
+    _deviceConfiguration.id = i;
+
+    if (i < _Device->configuration.noOfDHTs) {
+      _Data->getConfiguration(i, &_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating DHT: ") << i + 1;
+#endif
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit,
+              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                  ? AFE_UNIT_TEMPERATURE_C
+                  : AFE_UNIT_TEMPERATURE_F);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit,
+              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                  ? AFE_UNIT_TEMPERATURE_C
+                  : AFE_UNIT_TEMPERATURE_F);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit,
+              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                  ? AFE_UNIT_TEMPERATURE_C
+                  : AFE_UNIT_TEMPERATURE_F);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit, AFE_EMPTY_STRING);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.unit, AFE_EMPTY_STRING);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_DHT
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 void AFEAPIHomeAssistantIntegration::publishThermalProtector(void) {
   if (!_initialize) {
@@ -406,11 +502,18 @@ AFEAPIHomeAssistantIntegration::getTypeOfHAEntity(uint8_t deviceClassId) {
     _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
     break;
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
   case AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE:
     _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
     break;
-#endif // AFE_CONFIG_HARDWARE_DS18B20
+#endif // AFE_CONFIG_HARDWARE_DS18B20 || AFE_CONFIG_HARDWARE_DHT
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  case AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY:
+    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+    break;
+#endif // AFE_CONFIG_HARDWARE_DHT
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   case AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR:
     _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
@@ -599,14 +702,53 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
         _json.replace("{{s.vt}}", "{{value_json.percent}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
-#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#endif // Analog Input
 
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
       if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE) {
         _json.replace("{{s.vt}}", "{{value_json.temperature.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
-#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#endif // Temperature
+
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY) {
+        _json.replace("{{s.vt}}", "{{value_json.humidity.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Humidity
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT) {
+        _json.replace("{{s.vt}}", "{{value_json.dewPoint.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Dew Point
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX) {
+        _json.replace("{{s.vt}}", "{{value_json.heatIndex.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Heat Index
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type ==
+          AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY) {
+        _json.replace("{{s.vt}}", "{{value_json.absoluteHumidity.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Absolute Humidity
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION) {
+        _json.replace("{{s.vt}}", "{{value_json.perception.description}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Perception
+#if defined(AFE_CONFIG_HARDWARE_DHT)
+      if (deviceConfiguration->type ==
+          AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL) {
+        _json.replace("{{s.vt}}", "{{value_json.comfort.description}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Comfort level
 
       /* Removed unused tags */
       _json.replace("{{s.u}}", "");
@@ -624,23 +766,31 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      */
     _json.replace(
         "{{s.dc}}",
-        deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
-                deviceConfiguration->type ==
-                    AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED ||
-                deviceConfiguration->type ==
-                    AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW ||
-                deviceConfiguration->type ==
-                    AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT
+        (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
+         deviceConfiguration->type ==
+             AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED ||
+         deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW ||
+         deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT)
             ? AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE
-            : deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE
+            : (deviceConfiguration->type ==
+                   AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE ||
+               deviceConfiguration->type ==
+                   AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT ||
+               deviceConfiguration->type ==
+                   AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX)
                   ? AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE
-                  : _entityType ==
-                            AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF
-                        ? AFE_CONFIG_HA_DEVICE_CLASS_MOVING
+                  : (deviceConfiguration->type ==
+                         AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY ||
+                     deviceConfiguration->type ==
+                         AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY)
+                        ? AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY
                         : _entityType ==
-                                  AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED
-                              ? AFE_CONFIG_HA_DEVICE_CLASS_OPENING
-                              : "");
+                                  AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF
+                              ? AFE_CONFIG_HA_DEVICE_CLASS_MOVING
+                              : _entityType ==
+                                        AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED
+                                    ? AFE_CONFIG_HA_DEVICE_CLASS_OPENING
+                                    : "");
 
 /**
  * @brief RGB LED specyfic
