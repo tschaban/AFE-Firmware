@@ -130,17 +130,17 @@ void AFEAPIMQTTDomoticz::subscribe() {
 DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   DOMOTICZ_MQTT_COMMAND command;
   char json[strlen(Mqtt.message.content)];
-
   sprintf(json, Mqtt.message.content);
 
   StaticJsonBuffer<AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.parseObject(json);
 
   if (root.success()) {
-    command.domoticz.idx = root["idx"];
-    command.nvalue = root["nvalue"];
-    if (strlen(root["svalue1"]) < AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH) {
+    command.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+    command.nvalue = root["nvalue"] | AFE_NONE;
+    if (strlen(root["svalue1"] | "") < AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH) {
       sprintf(command.svalue, root["svalue1"] | "");
+
 #ifdef DEBUG
     } else {
       Serial << endl
@@ -170,6 +170,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
     Serial << endl << F("ERROR: Domoticz: Problem with JSON pharsing");
   }
 #endif
+
   return command;
 }
 

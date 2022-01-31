@@ -947,11 +947,15 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
          << F("INFO: MQTT: Processing CLED: ") << *id << F(" : command: ");
 #endif
 
-  char _command[Mqtt.message.length + 1];
+  char _command[strlen(Mqtt.message.content) + 1];
+
+  sprintf(_command,"%s",Mqtt.message.content);
+/*
   for (uint16_t i = 0; i < Mqtt.message.length; i++) {
     _command[i] = (char)Mqtt.message.content[i];
   }
   _command[Mqtt.message.length] = AFE_EMPTY_STRING;
+*/
 
 #ifdef DEBUG
   Serial << _command;
@@ -1035,12 +1039,14 @@ void AFEAPIMQTTStandard::processCLEDEffect(uint8_t *id) {
          << F("INFO: MQTT: Processing CLED: ") << *id << F(" : effect: ");
 #endif
 
-  char _command[Mqtt.message.length + 1];
+  char _command[strlen(Mqtt.message.content) + 1];
+   sprintf(_command,"%s",Mqtt.message.content);
+  /*
   for (uint16_t i = 0; i < Mqtt.message.length; i++) {
     _command[i] = (char)Mqtt.message.content[i];
   }
   _command[Mqtt.message.length] = AFE_EMPTY_STRING;
-
+*/
 #ifdef DEBUG
   Serial << _command;
 #endif
@@ -1075,12 +1081,15 @@ void AFEAPIMQTTStandard::processCLEDBrigtness(uint8_t *id) {
          << F("INFO: MQTT: Processing CLED: ") << *id << F(" : brightness : ");
 #endif
 
-  char _command[Mqtt.message.length + 1];
+  char _command[strlen(Mqtt.message.content) + 1];
+   sprintf(_command,"%s",Mqtt.message.content);
+   
+   /*
   for (uint16_t i = 0; i < Mqtt.message.length; i++) {
     _command[i] = (char)Mqtt.message.content[i];
   }
   _command[Mqtt.message.length] = AFE_EMPTY_STRING;
-
+*/
 #ifdef DEBUG
   Serial << _command;
 #endif
