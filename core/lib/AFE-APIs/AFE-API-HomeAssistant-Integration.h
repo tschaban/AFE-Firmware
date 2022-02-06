@@ -148,6 +148,15 @@ private:
   void publishSensorDS18B20(void);
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+  /**
+   * @brief publishes configuration of all DHT sensors
+   *
+   */
+  void publishSensorDHT(void);
+#endif // AFE_CONFIG_HARDWARE_DHT
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void publishThermalProtector(void);
 #endif

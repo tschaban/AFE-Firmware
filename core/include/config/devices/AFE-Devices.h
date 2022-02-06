@@ -69,10 +69,14 @@
 #elif defined(AFE_T1_CUSTOM_E2)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "T1 Mega pack"
-#define AFE_DEVICE_TYPE_ID 10
+#define AFE_DEVICE_TYPE_ID 15
 #elif defined(AFE_T1_CUSTOM_E1)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "T1 E1 Custom"
+#define AFE_DEVICE_TYPE_ID 11
+#elif defined(AFE_T2_CUSTOM_E1)
+#define AFE_DEVICE_MANUFACTURER "Espressif Systems"
+#define AFE_DEVICE_TYPE_NAME "T2 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 11
 #elif defined(AFE_T5_CUSTOM_E1)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
@@ -86,6 +90,10 @@
 #define AFE_DEVICE_TYPE_NAME "T5 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 14
 #endif
+/**
+ * @brief WARN: 15th is the last one - above
+ * 
+ */
 #elif defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
 #define AFE_DEVICE_MANUFACTURER "iECS"
 #define AFE_DEVICE_TYPE_NAME "iECS Gate Driver v3"

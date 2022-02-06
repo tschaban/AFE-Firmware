@@ -1203,7 +1203,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                   configuration.name, "16");
+                   configuration.name, "32");
 
   /* Item: relay */
   addSelectFormItemOpen(page, F("r"), F(L_RELAY));
@@ -1260,21 +1260,21 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
                               : false);
 
   sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE);
-  addSelectOptionFormItem(page, L_REGULATOR_CP_TEMPERATURE, value,
+  addSelectOptionFormItem(page, L_TEMPERATURE, value,
                           configuration.controllingParameter ==
                                   AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE
                               ? true
                               : false);
 
   sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX);
-  addSelectOptionFormItem(page, L_REGULATOR_CP_HEAT_INDEX, value,
+  addSelectOptionFormItem(page, L_HEAT_INDEX, value,
                           configuration.controllingParameter ==
                                   AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX
                               ? true
                               : false);
 
   sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY);
-  addSelectOptionFormItem(page, L_REGULATOR_CP_HUMIDITY, value,
+  addSelectOptionFormItem(page, L_HUMIDITY, value,
                           configuration.controllingParameter ==
                                   AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY
                               ? true
@@ -1282,14 +1282,14 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
   sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY);
   addSelectOptionFormItem(
-      page, L_REGULATOR_CP_ABSOLOUTE_HUMIDITY, value,
+      page, L_ABSOLOUTE_HUMIDITY, value,
       configuration.controllingParameter ==
               AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY
           ? true
           : false);
 
   sprintf(value, "%d", AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT);
-  addSelectOptionFormItem(page, L_REGULATOR_CP_DEW_POINT, value,
+  addSelectOptionFormItem(page, L_DEW_POINT, value,
                           configuration.controllingParameter ==
                                   AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT
                               ? true
@@ -1341,7 +1341,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
               F(L_THERMAL_PROTECTOR_AUTOMATIC_SWITCHING_OFF));
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                   configuration.name, "16");
+                   configuration.name, "32");
 
   addSelectFormItemOpen(page, F("r"), F(L_RELAY));
   sprintf(value, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
@@ -1657,7 +1657,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
   /* Item: Name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                   configuration.name, "16");
+                   configuration.name, "32");
 
   /* Item: type of the sensor */
   addSelectFormItemOpen(page, F("t"), F(L_DHT_SENSOR_TYPE));
@@ -1741,19 +1741,19 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
     sprintf(_number, "%d", configuration.domoticz.absoluteHumidity.idx);
     addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i8", L_HUMIDITY_IDX_ABSOLUTE, _number,
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i8", L_ABSOLUTE_HUMIDITY_IDX, _number,
         AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
     addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_HUMIDITY_IDX_DEW_POINT,
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_DEW_POINT_IDX,
         _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
     addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i4", L_HUMIDITY_IDX_HEAT_INDEX,
+        page, AFE_FORM_ITEM_TYPE_NUMBER, "i4", L_HEAT_INDEX_IDX,
         _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
@@ -2369,21 +2369,21 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 
         sprintf(_number, "%d", configuration.domoticz.absoluteHumidity.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i15",
-                         L_HUMIDITY_IDX_ABSOLUTE, _number,
+                         L_ABSOLUTE_HUMIDITY_IDX, _number,
                          AFE_FORM_ITEM_SKIP_PROPERTY,
                          AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
         sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i3",
-                         L_HUMIDITY_IDX_DEW_POINT, _number,
+                         L_DEW_POINT_IDX, _number,
                          AFE_FORM_ITEM_SKIP_PROPERTY,
                          AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
         sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i4",
-                         L_HUMIDITY_IDX_HEAT_INDEX, _number,
+                         L_HEAT_INDEX_IDX, _number,
                          AFE_FORM_ITEM_SKIP_PROPERTY,
                          AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");

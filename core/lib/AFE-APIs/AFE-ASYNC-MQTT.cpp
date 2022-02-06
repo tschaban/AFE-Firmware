@@ -12,14 +12,15 @@ uint8_t AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
 AFEAsyncMQTTClient::AFEAsyncMQTTClient(){};
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device,
-                               AFELED *Led) {
+boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device,
+                                  AFELED *Led) {
   _Led = Led;
-  begin(Data, Device);
+  return begin(Data, Device);
 }
 #endif
 
-void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
+boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
+  boolean _isConfigured = true;
   Data->getConfiguration(&configuration);
 
   _Broker.onConnect(AFEAsyncMQTTClient::onMqttConnect);
@@ -69,7 +70,8 @@ void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif
   } else if (strlen(configuration.host) > 0) {
     _Broker.setServer(configuration.host, configuration.port);
-  } else {
+  } 
+  else {
     _isConfigured = false;
   }
 
@@ -85,6 +87,7 @@ void AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
          << F("INFO: LWT Topic: ") << configuration.lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif
+return _isConfigured;
 }
 
 void AFEAsyncMQTTClient::subscribe(const char *topic) {
@@ -267,14 +270,14 @@ void AFEAsyncMQTTClient::onMqttMessage(
   Serial << endl << F("INFO: MQTT: Got message:");
   Serial << endl
          << F(" : Topic   ") << topic << F(" | length: ") << strlen(topic);
-  //Serial << endl << F(" : Message ") << payload;
+  // Serial << endl << F(" : Message ") << payload;
   Serial << endl << F(" : QOS           ") << properties.qos;
   Serial << endl << F(" : Retain        ") << properties.retain;
   Serial << endl << F(" : Dup           ") << properties.dup;
   Serial << endl << F(" : Index         ") << index;
   Serial << endl << F(" : Length        ") << len;
   Serial << endl << F(" : Total         ") << total;
-                    
+
 #endif
   if (strlen(topic) > AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH) {
 #ifdef DEBUG

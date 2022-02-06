@@ -19,7 +19,7 @@ enum SENSOR_HARDWARE {
 */
 
 struct REGULATOR {
-  char name[17];
+  char name[33];
   uint8_t relayId;
   uint8_t sensorId;
   uint8_t sensorHardware;
