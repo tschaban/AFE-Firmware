@@ -9,7 +9,7 @@ $targetAPI[2] = "homeassistant.api";
 
 $rootPath = "C:/Users/Adrian/Cloud/Pulpit/";
 $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
-
+ 
 
 /* 
 ### AFE_DEVICE_ID ###
@@ -58,7 +58,7 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 
 // Standard API ESP8266 4MB
 
-$index;
+$index=0;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T2_8266_4m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;

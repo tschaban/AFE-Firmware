@@ -75,7 +75,7 @@
  *
  */
 #define AFE_CONFIG_HA_OBJECT_ID_SIZE 25
-#define AFE_CONFIG_HA_LABEL_SIZE 33
+#define AFE_CONFIG_HA_LABEL_SIZE 55 //33 + "Temperatura odczuwalna"
 #define AFE_CONFIG_HA_OPTIONS_SIZE 144 // Currently only from RGB effect options
 #define AFE_CONFIG_HA_UNIT_SIZE 5
 

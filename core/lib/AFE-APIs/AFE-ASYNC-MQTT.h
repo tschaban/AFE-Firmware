@@ -41,12 +41,7 @@ private:
   AFELED *_Led;
   unsigned long _ledStartTime = 0;
 #endif
-
-  /**
-   * @brief if it's falsed it does not connect to MQTT Broker
-   *
-   */
-  boolean _isConfigured = true;
+  
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 /**
@@ -90,9 +85,9 @@ public:
   AFEAsyncMQTTClient();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
+  boolean begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #endif
-  void begin(AFEDataAccess *, AFEDevice *);
+  boolean begin(AFEDataAccess *, AFEDevice *);
 
   /**
    * @brief establishes connection to MQTT Broker and listens for messages

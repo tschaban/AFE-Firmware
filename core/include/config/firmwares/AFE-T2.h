@@ -1,7 +1,7 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.3.2.RC1"
+#define AFE_FIRMWARE_VERSION "3.3.3"
 #define AFE_FIRMWARE_TYPE 2
 
 /* Functionalities */

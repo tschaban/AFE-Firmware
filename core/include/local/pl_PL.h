@@ -504,28 +504,37 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_REGULATOR_ENABLED "Włączony po uruchomieniu"
 #define L_REGULATOR_MQTT_TOPIC "Temat MQTT sterujący regulatorem"
 
-#define L_REGULATOR_CP_TEMPERATURE "Temperatura"
-#define L_REGULATOR_CP_HEAT_INDEX "Temperatura odczuwalna"
-#define L_REGULATOR_CP_HUMIDITY "Wilgotność"
-#define L_REGULATOR_CP_ABSOLOUTE_HUMIDITY "Wilgotność absolutna"
-#define L_REGULATOR_CP_DEW_POINT "Punkt rosy"
+
 
 
 /* Generic Sensor: Temperature */
 #define L_TEMPERATURE "Temperatura"
 #define L_TEMPERATURE_IDX "IDX Temperatura"
 
+/* Generic Sensor: Heat Index */
+#define L_HEAT_INDEX "Temperatura odczuwalna"
+#define L_HEAT_INDEX_IDX "IDX Temp.odczuwalna"
+
+/* Generic Sensor: Dew Point */
+#define L_DEW_POINT "Punkt rosy"
+#define L_DEW_POINT_IDX "IDX Punkt rosy"
 
 /* Generic Sensor: Humidity */
 #define L_HUMIDITY "Wilgotność"
 #define L_HUMIDITY_IDX "IDX Wilgotność"
 #define L_HUMIDITY_IDX_TEMP_HUM "IDX Temp/Wilgotność"
 #define L_HUMIDITY_IDX_TEMP_HUM_BAR "IDX Temp/Wilg/Bar"
-#define L_HUMIDITY_IDX_ABSOLUTE "IDX Wilgotność absolutna"
-#define L_HUMIDITY_IDX_DEW_POINT "IDX Punkt rosy"
-#define L_HUMIDITY_IDX_HEAT_INDEX "IDX Temp.odczuwalna"
 
+/* Generic Sensor: Absolute Humidity */
+#define L_ABSOLOUTE_HUMIDITY "Wilgotność absolutna"
+#define L_ABSOLUTE_HUMIDITY_IDX "IDX Wilgotność absolutna"
+
+/* Generic Sensor: Comfort level */
+#define L_COMFORT_LEVEL "Poziom komfortu"
 #define L_COMFORT_IDX "IDX Komfort"
+
+/* Generic Sensor: Perception */
+#define L_PERCEPTION "Percepcja"
 #define L_PERCEPTION_IDX "IDX Percepcja"
 
 /* Generic Sensor: Pressure */

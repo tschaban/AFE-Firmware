@@ -454,17 +454,15 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
 
 boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
   boolean publishStatus = false;
-  if (enabled && *idx > 0) {
-    char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
-    generateSwitchMessage(json, *idx, state ? AFE_ON : AFE_OFF);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = *idx;
+  if (enabled) {
+
+    if (*idx > 0) {
+      char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
+      generateSwitchMessage(json, *idx, state ? AFE_ON : AFE_OFF);
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      bypassProcessing.idx = *idx;
+    }
   }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("INFO: Not published");
-  }
-#endif
   return publishStatus;
 }
 
@@ -472,40 +470,36 @@ boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
 boolean AFEAPIMQTTDomoticz::publishSetLevelMessage(uint32_t *idx,
                                                    uint8_t *level) {
   boolean publishStatus = false;
-  if (enabled && idx > 0) {
-    char json[AFE_CONFIG_API_JSON_SET_LEVEL_COMMAND_LENGTH];
-    sprintf(json, "{\"command\":\"switchlight\",\"idx\":%d,\"switchcmd\":\"Set "
-                  "Level\",\"level\":%d}",
-            *idx, *level);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = *idx;
+  if (enabled) {
+    if (*idx > 0) {
+      char json[AFE_CONFIG_API_JSON_SET_LEVEL_COMMAND_LENGTH];
+      sprintf(json,
+              "{\"command\":\"switchlight\",\"idx\":%d,\"switchcmd\":\"Set "
+              "Level\",\"level\":%d}",
+              *idx, *level);
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      bypassProcessing.idx = *idx;
+    }
   }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("INFO: Not published");
-  }
-#endif
   return publishStatus;
 }
 
 boolean AFEAPIMQTTDomoticz::publishSetColorMessage(uint32_t *idx,
                                                    CLED_PARAMETERS *led) {
   boolean publishStatus = false;
-  if (enabled && idx > 0) {
-    char json[AFE_CONFIG_API_JSON_SET_COLOR_COMMAND_LENGTH];
-    sprintf(json, "{\"command\":\"setcolbrightnessvalue\",\"idx\":%d,\"color\":"
-                  "{\"m\":3,\"t\":0,\"r\":%d,\"g\":%d,\"b\":%d,\"cw\":0,\"ww\":"
-                  "0},\"brightness\":%d}",
-            *idx, led->color.red, led->color.green, led->color.blue,
-            led->brightness / (AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100));
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-    bypassProcessing.idx = *idx;
+  if (enabled) {
+    if (*idx > 0) {
+      char json[AFE_CONFIG_API_JSON_SET_COLOR_COMMAND_LENGTH];
+      sprintf(
+          json, "{\"command\":\"setcolbrightnessvalue\",\"idx\":%d,\"color\":"
+                "{\"m\":3,\"t\":0,\"r\":%d,\"g\":%d,\"b\":%d,\"cw\":0,\"ww\":"
+                "0},\"brightness\":%d}",
+          *idx, led->color.red, led->color.green, led->color.blue,
+          led->brightness / (AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100));
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      bypassProcessing.idx = *idx;
+    }
   }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("INFO: Not published");
-  }
-#endif
   return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_CLED
@@ -524,8 +518,9 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 }
 
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
-  return publishSwitchMessage(&_Relay[id]->configuration.domoticz.idx,
-                              _Relay[id]->get());
+  return enabled ? publishSwitchMessage(&_Relay[id]->configuration.domoticz.idx,
+                                        _Relay[id]->get())
+                 : false;
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -536,13 +531,16 @@ void AFEAPIMQTTDomoticz::addClass(AFESwitch *Switch) {
 
 boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
-  if (enabled && _Switch[id]->configuration.domoticz.idx) {
-    char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
+  if (enabled) {
+    if (_Switch[id]->configuration.domoticz.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
 
-    generateSwitchMessage(json, _Switch[id]->configuration.domoticz.idx,
-                          _Switch[id]->getPhisicalState() == 1 ? AFE_SWITCH_OFF
-                                                               : AFE_SWITCH_ON);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      generateSwitchMessage(json, _Switch[id]->configuration.domoticz.idx,
+                            _Switch[id]->getPhisicalState() == 1
+                                ? AFE_SWITCH_OFF
+                                : AFE_SWITCH_ON);
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
   }
   return publishStatus;
 }
@@ -1010,9 +1008,10 @@ void AFEAPIMQTTDomoticz::addClass(AFEGate *Item) {
 }
 
 boolean AFEAPIMQTTDomoticz::publishGateState(uint8_t id) {
-  return publishSwitchMessage(&_Gate[id]->configuration.domoticz.idx,
-                              _Gate[id]->get() == AFE_GATE_CLOSED ? false
-                                                                  : true);
+  return enabled ? publishSwitchMessage(
+                       &_Gate[id]->configuration.domoticz.idx,
+                       _Gate[id]->get() == AFE_GATE_CLOSED ? false : true)
+                 : false;
 }
 #endif
 
@@ -1021,12 +1020,14 @@ void AFEAPIMQTTDomoticz::addClass(AFEContactron *Item) {
   AFEAPI::addClass(Item);
 }
 boolean AFEAPIMQTTDomoticz::publishContactronState(uint8_t id) {
-  if (enabled && _Contactron[id]->configuration.domoticz.idx > 0) {
-    char json[AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH];
-    generateSwitchMessage(
-        json, _Contactron[id]->configuration.domoticz.idx,
-        _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? true : false);
-    Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+  if (enabled) {
+    if (_Contactron[id]->configuration.domoticz.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_CONTACTRON_COMMAND_LENGTH];
+      generateSwitchMessage(
+          json, _Contactron[id]->configuration.domoticz.idx,
+          _Contactron[id]->get() == AFE_CONTACTRON_OPEN ? true : false);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
   }
   return true;
 }
@@ -1071,8 +1072,10 @@ boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id) {
          << F("INFO: Publishing regulator: ") << id << F(", IDX: ")
          << idxCache[id].domoticz.idx << F(" state");
 #endif
-  return publishSwitchMessage(&_Regulator[id]->configuration.domoticz.idx,
-                              _Regulator[id]->configuration.enabled);
+  return enabled
+             ? publishSwitchMessage(&_Regulator[id]->configuration.domoticz.idx,
+                                    _Regulator[id]->configuration.enabled)
+             : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
@@ -1222,15 +1225,17 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
 
 boolean AFEAPIMQTTDomoticz::publishBinarySensorState(uint8_t id) {
   boolean publishStatus = false;
-  if (enabled && _BinarySensor[id]->configuration.domoticz.idx) {
-    char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH];
+  if (enabled)
+    if (_BinarySensor[id]->configuration.domoticz.idx > 0) {
+      char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH];
 
-    generateSwitchMessage(json, _BinarySensor[id]->configuration.domoticz.idx,
-                          _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF
-                                                        : AFE_SWITCH_ON);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
-  }
-  return publishStatus;
+      generateSwitchMessage(json, _BinarySensor[id]->configuration.domoticz.idx,
+                            _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF
+                                                          : AFE_SWITCH_ON);
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+}
+return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
@@ -1243,12 +1248,15 @@ boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
                                                    uint8_t state,
                                                    const char *user) {
   boolean publishStatus = false;
-  if (enabled && _MiFareCard[id]->configuration.domoticz[tagId].idx) {
-    char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
+  if (enabled) {
+    if (_MiFareCard[id]->configuration.domoticz[tagId].idx > 0) {
+      char json[AFE_CONFIG_API_JSON_MIFARE_CARD_COMMAND_LENGTH];
 
-    generateDeviceValue(
-        json, _MiFareCard[id]->configuration.domoticz[tagId].idx, user, state);
-    publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+      generateDeviceValue(json,
+                          _MiFareCard[id]->configuration.domoticz[tagId].idx,
+                          user, state);
+      publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
   }
   return publishStatus;
 }
@@ -1271,20 +1279,23 @@ void AFEAPIMQTTDomoticz::addClass(AFECLED *CLed) {
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDState(uint8_t id) {
-  return publishSwitchMessage(&_CLED->configuration[id].cled.idx,
-                              _CLED->currentState[id].state);
+  return enabled ? publishSwitchMessage(&_CLED->configuration[id].cled.idx,
+                                        _CLED->currentState[id].state)
+                 : false;
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDColorState(uint8_t id) {
-  return publishSetColorMessage(&_CLED->configuration[id].cled.idx,
-                                _CLED->currentState[id].state
-                                    ? &_CLED->currentState[id].on
-                                    : &_CLED->currentState[id].off);
+  return enabled ? publishSetColorMessage(&_CLED->configuration[id].cled.idx,
+                                          _CLED->currentState[id].state
+                                              ? &_CLED->currentState[id].on
+                                              : &_CLED->currentState[id].off)
+                 : false;
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
-  return publishSetLevelMessage(&_CLED->configuration[id].effect.idx,
-                                &_CLED->currentState[id].effect.id);
+  return enabled ? publishSetLevelMessage(&_CLED->configuration[id].effect.idx,
+                                          &_CLED->currentState[id].effect.id)
+                 : false;
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED

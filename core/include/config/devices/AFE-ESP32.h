@@ -2,7 +2,7 @@
 #define _AFE_devices_ESP32_h
 
 #ifdef AFE_ESP32_30_PINS
-#define AFE_NUMBER_OF_GPIOS 25
+#define AFE_NUMBER_OF_GPIOS 26
 #else // AFE_ESP32_38_PINS
 #define AFE_NUMBER_OF_GPIOS 34
 #endif // AFE_ESP32_30_PINS

@@ -68,6 +68,7 @@ void processSwitchEvents(void) {
 
           Relay[Switch[i].configuration.relayID].toggle();
           MqttAPI.publishRelayState(Switch[i].configuration.relayID);
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           HttpDomoticzAPI.publishRelayState(Switch[i].configuration.relayID);
 #endif

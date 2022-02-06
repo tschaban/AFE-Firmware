@@ -20,17 +20,13 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEAPI::begin() {
-
-  
-
   if (_Device->configuration.api.mqtt) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Mqtt.begin(_Data, _Device, _Led);
+    enabled = Mqtt.begin(_Data, _Device, _Led);
 #else
-    Mqtt.begin(_Data, _Device);
+    enabled = Mqtt.begin(_Data, _Device);
 #endif
   }
-  enabled = true;
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY

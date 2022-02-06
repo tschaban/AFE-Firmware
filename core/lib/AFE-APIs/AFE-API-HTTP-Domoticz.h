@@ -35,6 +35,7 @@ private:
   HTTPClient http;
   WiFiClient client;
   DOMOTICZ configuration;
+  boolean _initialized = false;
 
   char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];
 

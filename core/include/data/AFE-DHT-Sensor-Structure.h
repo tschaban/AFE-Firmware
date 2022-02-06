@@ -30,7 +30,7 @@ struct DHT_DOMOTICZ {
 
 
 struct DHT {
-  char name[17];
+  char name[33];
   uint8_t gpio;
   uint8_t type;
   uint32_t interval;
