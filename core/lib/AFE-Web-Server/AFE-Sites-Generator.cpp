@@ -951,6 +951,10 @@ void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
 
   addCheckboxFormItem(page, "r", L_HA_UPDATE_REMOVE, "1",
                       configuration.removeingComponents);
+
+  addCheckboxFormItem(page, "m", L_HA_RETAIN_CONFIGURATION, "1",
+                      configuration.retainConfiguration);
+
   closeSection(page);
 
   if (Device->configuration.api.mqtt) {

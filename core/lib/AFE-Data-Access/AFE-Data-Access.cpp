@@ -1358,7 +1358,6 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     root["retainLWT"] = configuration->retainLWT;
     root["qos"] = configuration->qos;
 
-
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -1540,9 +1539,10 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->removeingComponents = root["removing"];
-      configuration->addingComponents = root["adding"];
-      sprintf(configuration->discovery.topic, root["topic"]);
+      configuration->removeingComponents = root["removing"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
+      configuration->addingComponents = root["adding"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
+      configuration->retainConfiguration = root["retain"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
+      sprintf(configuration->discovery.topic, root["topic"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
@@ -1588,6 +1588,7 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     root["adding"] = configuration->addingComponents;
     root["removing"] = configuration->removeingComponents;
+    root["retain"] = configuration->retainConfiguration;
     root["topic"] = configuration->discovery.topic;
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1616,6 +1617,8 @@ void AFEDataAccess::createHomeAssistantConfigurationFile() {
       AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
   configuration.removeingComponents =
       AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
+  configuration.retainConfiguration =
+      AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
   sprintf(configuration.discovery.topic, AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
   saveConfiguration(&configuration);
 }

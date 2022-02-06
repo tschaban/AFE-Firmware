@@ -651,7 +651,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_DISCOVERY_TOPIC "Temat nasłuchu konfiguracji urządzeń"
 #define L_HA_PUBLISHING "Publikować/aktualizować konfiguracje urządzenia?"
 #define L_HA_UPDATE_REMOVE "Usuwać nieaktualne konfiguracje?"
-
+#define L_HA_RETAIN_CONFIGURATION "Pamiętać konfigurację przez MQTT Broker"
  
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
