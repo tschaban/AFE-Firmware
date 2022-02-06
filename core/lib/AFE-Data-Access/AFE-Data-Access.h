@@ -204,8 +204,8 @@ public:
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  void getConfiguration(uint8_t id, BH1750 *);
-  void saveConfiguration(uint8_t id, BH1750 *);
+  void getConfiguration(uint8_t id, BH1750_CONFIG *);
+  void saveConfiguration(uint8_t id, BH1750_CONFIG *);
   void createBH1750SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_BH1750
 

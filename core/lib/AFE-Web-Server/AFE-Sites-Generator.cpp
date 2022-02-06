@@ -2485,7 +2485,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 
-  BH1750 configuration;
+  BH1750_CONFIG configuration;
   Data->getConfiguration(id, &configuration);
   openSection(page, F(L_BH1750_SENSOR), F(""));
 

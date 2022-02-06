@@ -20,7 +20,7 @@
 class AFESensorBH1750 {
 
 private:
-  BH1750LightSensor bh1750;
+  BH1750 bh1750;
 
   boolean ready = false;
   boolean _initialized = false;
@@ -34,7 +34,7 @@ private:
 #endif
 
 public:
-  BH1750 configuration;
+  BH1750_CONFIG configuration;
   float data = -1; // stories lux value
 
   /* Constructor */

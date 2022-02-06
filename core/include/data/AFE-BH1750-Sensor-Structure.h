@@ -8,7 +8,7 @@
 #endif
 #include <AFE-MQTT-Structure.h>
 
-struct BH1750 {
+struct BH1750_CONFIG {
   char name[17];
   uint32_t interval;
 #ifdef AFE_ESP32

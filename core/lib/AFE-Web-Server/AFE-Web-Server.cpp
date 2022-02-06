@@ -2232,7 +2232,7 @@ void AFEWebServer::get(BMEX80 &data) {
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEWebServer::get(BH1750 &data) {
+void AFEWebServer::get(BH1750_CONFIG &data) {
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0

@@ -4367,7 +4367,7 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, BH1750_CONFIG *configuration) {
   char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
@@ -4432,7 +4432,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
   }
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, BH1750_CONFIG *configuration) {
   char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
@@ -4488,7 +4488,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 }
 
 void AFEDataAccess::createBH1750SensorConfigurationFile() {
-  BH1750 configuration;
+  BH1750_CONFIG configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 

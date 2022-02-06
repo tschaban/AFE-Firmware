@@ -230,30 +230,6 @@
 /* ***************** HARDWARE: Config and defaults *********************/
 
 /**
- * @brief include UART bus configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_UART
-#include <bus/AFE-UART.h>
-#endif 
-
-/**
- * @brief include I2C bus configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <bus/AFE-IIC.h>
-#endif
-
-/**
- * @brief include MCP23017 configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#include <hardwares/AFE-MCP23017.h>
-#endif
-
-/**
  * @brief include LED configuration parameters
  * 
  */
@@ -363,7 +339,7 @@
  * 
  */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-#include <sensors/AFE-Bosch-BMx80.h>
+#include <sensors/AFE-BH1750.h>
 #endif
 
 /**
@@ -419,6 +395,30 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <functionalities/AFE-Thermal-Protection.h>
 #endif 
+
+/**
+ * @brief include UART bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_UART
+#include <bus/AFE-UART.h>
+#endif 
+
+/**
+ * @brief include I2C bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <bus/AFE-IIC.h>
+#endif
+
+/**
+ * @brief include MCP23017 configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <hardwares/AFE-MCP23017.h>
+#endif
 
 
 
