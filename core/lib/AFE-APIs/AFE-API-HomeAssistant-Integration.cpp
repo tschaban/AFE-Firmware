@@ -339,7 +339,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       Serial << endl << F("INFO: HA: Setting/Updating DHT: ") << i + 1;
 #endif
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_TEMPERATURE);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_TEMPERATURE);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit,
               _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
@@ -348,7 +349,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_HEAT_INDEX);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_HEAT_INDEX);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit,
               _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
@@ -357,7 +359,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_DEW_POINT);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_DEW_POINT);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit,
               _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
@@ -366,13 +369,15 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_HUMIDITY);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_HUMIDITY);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_ABSOLOUTE_HUMIDITY);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_ABSOLOUTE_HUMIDITY);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
@@ -380,12 +385,14 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       _deviceConfiguration.unit[0] = AFE_EMPTY_STRING;
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_PERCEPTION);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_PERCEPTION);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
-      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,L_COMFORT_LEVEL);
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_COMFORT_LEVEL);
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
@@ -651,7 +658,11 @@ void AFEAPIHomeAssistantIntegration::
     generateObjectId(_objectId, deviceConfiguration->type,
                      deviceConfiguration->id);
     generateTopic(_topic, deviceConfiguration->type, _objectId);
+
+    boolean _retain = _MqttAPI->Mqtt.configuration.retainAll;
+    _MqttAPI->Mqtt.configuration.retainAll = configuration.retainConfiguration;
     _MqttAPI->Mqtt.publish(_topic, "");
+    _MqttAPI->Mqtt.configuration.retainAll = _retain;
   }
 }
 
@@ -944,7 +955,11 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
            << endl;
 #endif
     _json.toCharArray(_message, sizeof(_message) + 1);
+
+    boolean _retain = _MqttAPI->Mqtt.configuration.retainAll;
+    _MqttAPI->Mqtt.configuration.retainAll = configuration.retainConfiguration;
     _MqttAPI->Mqtt.publish(_topic, _message);
+    _MqttAPI->Mqtt.configuration.retainAll = _retain;
   } else {
 
     removeItemRemovedFromHomeAssistantMQTTDiscovery(deviceConfiguration);

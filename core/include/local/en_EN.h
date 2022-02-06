@@ -675,6 +675,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_DISCOVERY_TOPIC "Home Assistant discovery topic"
 #define L_HA_PUBLISHING "Publish/Update configuration?"
 #define L_HA_UPDATE_REMOVE "Remove old configuration?"
+#define L_HA_RETAIN_CONFIGURATION "Retain configuraion in MQTT Broker"
 
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"

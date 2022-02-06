@@ -11,6 +11,7 @@
 struct HOME_ASSISTANT_CONFIG {
     boolean addingComponents;
     boolean removeingComponents;  
+    boolean retainConfiguration; 
     MQTT_TOPIC discovery;
 };
 

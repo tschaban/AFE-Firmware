@@ -1502,7 +1502,6 @@ void AFEWebServer::get(MQTT &data) {
 
   data.qos = server.arg(F("q")).length() > 0 ? server.arg(F("q")).toInt()
                                              : AFE_CONFIG_MQTT_DEFAULT_QOS;
-
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -1544,6 +1543,7 @@ void AFEWebServer::get(HOME_ASSISTANT_CONFIG &data) {
   }
   data.addingComponents = server.arg(F("a")).length() > 0 ? true : false;
   data.removeingComponents = server.arg(F("r")).length() > 0 ? true : false;
+  data.retainConfiguration = server.arg(F("m")).length() > 0 ? true : false;
 }
 #endif // AFE_FIRMWARE_API
 
