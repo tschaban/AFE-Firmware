@@ -14,12 +14,12 @@
 #include <WiFiClient.h>
 //#include <AsyncPing.h>
 
-#ifndef AFE_ESP32 /* ESP82xx */
-#include <ESP8266HTTPClient.h>
-#include <ESP8266Ping.h>
-#else /* ESP32 */
+#ifdef AFE_ESP32 /* ESP32 */
 #include <HTTPClient.h>
 #include <ESP32Ping.h>
+#else /* ESP82x */
+#include <ESP8266HTTPClient.h>
+#include <ESP8266Ping.h>
 #endif
 
 
