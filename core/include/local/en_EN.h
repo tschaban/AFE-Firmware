@@ -391,6 +391,11 @@
 #define L_BMEX80_REFRESH_SETTINGS "Show/Refresh configuration settings after sensor type change"
 #define L_BMEX80_ALTITIDE "Above sea level"
 #define L_BMEX80_METERS "Meters"
+#define L_BMEX80_IAQ "IAQ"
+#define L_BMEX80_STATIC_IAQ "Static IAQ"
+#define L_BMEX80_BVOC "BVOC Equivalent"
+#define L_BMEX80_CO2 "CO2 Equivalent"
+#define L_BMEX80_GAS "Gas Resistance"
 
 /* BH1750 */
 #define L_BH1750_SENSOR "BH1750 Sensor"
@@ -540,6 +545,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* Generic Sensors: pressure */
 #define L_PRESSURE "Pressure"
+#define L_PRESSURE_RELATIVE "Relative Pressure"
 #define L_PRESSURE_IDX "IDX Pressure"
 #define L_PRESSURE_IDX_ALT "Sensor: altitude"
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Relative pressure"
@@ -691,7 +697,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_PRO_NO "Pro version: No"
 #define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
 #define L_ADDITIONAL_INFORMATION "Additional information"
-#define L_WIFI_RSSI "WiFi Received Signal Strength Indicator {{x}} dBm ({{t}})"
+#define L_WIFI_RSSI "WiFi Signal Strength Indicator {{x}} dBm ({{t}})"
 #define L_WIFI_SIGNAL "Signal"
 #define L_WIFI_RSSI_30 "Amazing"
 #define L_WIFI_RSSI_67 "Very Good"

@@ -3272,7 +3272,6 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
     page.replace("{{I}}", F(L_WIFI_RSSI));
     sprintf(_numberToText, "%d", _rssi);
     page.replace("{{x}}", _numberToText);
-#define L_WIFI_RSSI_70 "Dobry"
     page.replace("{{t}}", _rssi >= -30
                               ? F(L_WIFI_RSSI_30)
                               : _rssi >= -67

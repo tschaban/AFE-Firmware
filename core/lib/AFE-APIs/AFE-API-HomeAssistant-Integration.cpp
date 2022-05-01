@@ -36,12 +36,15 @@ void AFEAPIHomeAssistantIntegration::publish() {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   publishRelays();
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_CLED
   publishCLEDs();
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   publishAnalogInputs();
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   publishSwitches();
 #endif
@@ -61,6 +64,10 @@ void AFEAPIHomeAssistantIntegration::publish() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   publishRegulator();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+  publishBMX80();
+#endif
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -71,13 +78,16 @@ void AFEAPIHomeAssistantIntegration::publishRelays(void) {
   }
 
   RELAY _configuration;
+  _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_RELAY;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_RELAY);
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HA: Setting/Updating Relay: ") << i + 1;
 #endif
 
     _deviceConfiguration.id = i;
-    _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_RELAY;
 
     if (i < _Device->configuration.noOfRelays) {
       _Data->getConfiguration(i, &_configuration);
@@ -103,6 +113,8 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
   CLED_EFFECT_FADE_INOUT configurationEffectFadeInOut;
   CLED_EFFECT_WAVE configurationEffectWave;
 
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_SWITCH);
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS; i++) {
 
 #ifdef DEBUG
@@ -127,6 +139,7 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
               configurationCLED.cled.topic,
               AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CMD_TOPIC_SUFIX);
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_LIGHT;
+      _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT;
 
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
@@ -145,7 +158,7 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
       sprintf(_deviceConfiguration.mqtt.topic, configurationCLED.effect.topic);
       sprintf(_deviceConfiguration.label, L_CLED_EFFECT_LABEL);
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_RGB_LED_EFFECT;
-
+      _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT;
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
     } else {
@@ -174,6 +187,9 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
 #ifdef AFE_ESP32
   char _label[17 + 2 + sizeof(_configuration.name)];
 #endif
+
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE);
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS; i++) {
 
@@ -266,13 +282,17 @@ void AFEAPIHomeAssistantIntegration::publishSwitches(void) {
   }
 
   SWITCH _configuration;
+  _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SWITCH;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_SWITCH);
+  _deviceConfiguration.entityId =
+      AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HA: Setting/Updating Switch: ") << i + 1;
 #endif
 
     _deviceConfiguration.id = i;
-    _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SWITCH;
 
     if (i < _Device->configuration.noOfSwitches) {
       _Data->getConfiguration(i, &_configuration);
@@ -293,6 +313,9 @@ void AFEAPIHomeAssistantIntegration::publishSensorDS18B20(void) {
   }
   DS18B20 _configuration;
   _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
+  sprintf(_deviceConfiguration.deviceClass,
+          AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE);
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20; i++) {
 
@@ -329,6 +352,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
   }
   DHT _configuration;
 
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_DHT; i++) {
 
     _deviceConfiguration.id = i;
@@ -346,40 +371,31 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
               _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
                   ? AFE_UNIT_TEMPERATURE_C
                   : AFE_UNIT_TEMPERATURE_F);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_HEAT_INDEX);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
-      sprintf(_deviceConfiguration.unit,
-              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                  ? AFE_UNIT_TEMPERATURE_C
-                  : AFE_UNIT_TEMPERATURE_F);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_DEW_POINT);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
-      sprintf(_deviceConfiguration.unit,
-              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                  ? AFE_UNIT_TEMPERATURE_C
-                  : AFE_UNIT_TEMPERATURE_F);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_HUMIDITY);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_ABSOLOUTE_HUMIDITY);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
-      sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.unit[0] = AFE_EMPTY_STRING;
@@ -387,13 +403,13 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_PERCEPTION);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_NONE);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
       sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
               L_COMFORT_LEVEL);
-      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
     } else {
@@ -422,6 +438,11 @@ void AFEAPIHomeAssistantIntegration::publishThermalProtector(void) {
     return;
   }
   THERMAL_PROTECTOR _configuration;
+
+  _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_SWITCH);
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS;
        i++) {
 #ifdef DEBUG
@@ -430,7 +451,6 @@ void AFEAPIHomeAssistantIntegration::publishThermalProtector(void) {
 #endif
 
     _deviceConfiguration.id = i;
-    _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR;
 
     if (i < _Device->configuration.noOfThermalProtectors) {
       _Data->getConfiguration(i, &_configuration);
@@ -450,13 +470,16 @@ void AFEAPIHomeAssistantIntegration::publishRegulator(void) {
     return;
   }
   REGULATOR _configuration;
+  _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_REGULATOR;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_SWITCH);
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
+
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS; i++) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HA: Setting/Updating Regulator: ") << i + 1;
 #endif
 
     _deviceConfiguration.id = i;
-    _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_REGULATOR;
 
     if (i < _Device->configuration.noOfRegulators) {
       _Data->getConfiguration(i, &_configuration);
@@ -470,151 +493,152 @@ void AFEAPIHomeAssistantIntegration::publishRegulator(void) {
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
+  if (!_initialize) {
+    return;
+  }
+  BMEX80 _configuration;
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80; i++) {
+
+    _deviceConfiguration.id = i;
+
+    if (i < _Device->configuration.noOfBMEX80s) {
+      _Data->getConfiguration(i, &_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating Bosch sesnor: ") << i + 1;
+#endif
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_TEMPERATURE);
+      sprintf(_deviceConfiguration.unit,
+              _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                  ? AFE_UNIT_TEMPERATURE_C
+                  : AFE_UNIT_TEMPERATURE_F);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_HEAT_INDEX);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_DEW_POINT);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_HUMIDITY);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_ABSOLOUTE_HUMIDITY);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_PRESSURE_RELATIVE);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_PRESSURE);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_PRESSURE);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_PRESSURE;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_PRESSURE);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_BMEX80_CO2);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_CO2);
+      sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_CO2);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.unit[0] = AFE_EMPTY_STRING;
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_BMEX80_GAS);
+      sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_GAS);
+
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_IAQ;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_BMEX80_IAQ);
+      sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_AQI);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_STATIC_IAQ;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_BMEX80_STATIC_IAQ);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_BVOC_EQUIVALENT;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_BMEX80_BVOC);
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_PERCEPTION);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_COMFORT_LEVEL);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_PRESSURE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_IAQ;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_STATIC_IAQ;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_BVOC_EQUIVALENT;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+
 /******* Private Methods *******/
 
-uint8_t
-AFEAPIHomeAssistantIntegration::getTypeOfHAEntity(uint8_t deviceClassId) {
-  uint8_t _entityId;
-
-  switch (deviceClassId) {
-
-/**
- * @brief Relay
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  case AFE_CONFIG_HA_ITEM_RELAY:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
-    break;
-#endif
-/**
- * @brief Switch
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-  case AFE_CONFIG_HA_ITEM_SWITCH:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED;
-    break;
-#endif // AFE_CONFIG_HARDWARE_SWITCH
-/**
- * @brief RGB LED
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  case AFE_CONFIG_HA_ITEM_LIGHT:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT;
-    break;
-  case AFE_CONFIG_HA_ITEM_RGB_LED_EFFECT:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT;
-    break;
-#endif // AFE_CONFIG_HARDWARE_CLED
-/**
- * @brief Analog input
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-  case AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-  case AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-  case AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-  case AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
-
-/**
- * @brief Temperature sensor
- *
- */
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
-  case AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-/**
- * @brief Humidity sensor
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-/**
- * @brief Humidity sensor
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-/**
- * @brief Heat Index
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-/**
- * @brief Dew Point
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-/**
- * @brief Air condition perception
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-
-/**
- * @brief Air condition comfort
- */
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  case AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
-    break;
-#endif
-
-/**
- * @brief Thermal protector
- *
- */
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  case AFE_CONFIG_HA_ITEM_THERMAL_PROTECTOR:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
-    break;
-#endif
-/**
- * @brief Regulator
- *
- */
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  case AFE_CONFIG_HA_ITEM_REGULATOR:
-    _entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH;
-    break;
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  default:
-    _entityId = AFE_NONE;
-    break;
-  }
-
-  return _entityId;
-}
 
 void AFEAPIHomeAssistantIntegration::generateObjectId(char *objectId,
                                                       uint8_t deviceClassId,
@@ -623,23 +647,22 @@ void AFEAPIHomeAssistantIntegration::generateObjectId(char *objectId,
 }
 
 void AFEAPIHomeAssistantIntegration::generateTopic(char *topic,
-                                                   uint8_t deviceClassId,
+                                                   uint8_t entityId,
                                                    const char *objectId) {
-  uint8_t _entityType = getTypeOfHAEntity(deviceClassId);
   sprintf(
       topic, "%s/%s/%s/config", configuration.discovery.topic,
-      _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH
+      entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH
           ? AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH_NAME
-          : _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR
+          : entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR
                 ? AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR_NAME
-                : _entityType ==
+                : entityId ==
                               AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF ||
-                          _entityType ==
+                          entityId ==
                               AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED
                       ? AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_NAME
-                      : _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT
+                      : entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT
                             ? AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT_NAME
-                            : _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT
+                            : entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT
                                   ? AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT_NAME
                                   : AFE_CONFIG_HA_TYPE_OF_ENTITY_UNKNOWN,
       objectId);
@@ -657,7 +680,7 @@ void AFEAPIHomeAssistantIntegration::
     char _objectId[AFE_CONFIG_HA_OBJECT_ID_SIZE];
     generateObjectId(_objectId, deviceConfiguration->type,
                      deviceConfiguration->id);
-    generateTopic(_topic, deviceConfiguration->type, _objectId);
+    generateTopic(_topic, deviceConfiguration->entityId, _objectId);
 
     boolean _retain = _MqttAPI->Mqtt.configuration.retainAll;
     _MqttAPI->Mqtt.configuration.retainAll = configuration.retainConfiguration;
@@ -680,15 +703,13 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
 
     String _json = "";
 
-    uint8_t _entityType = getTypeOfHAEntity(deviceConfiguration->type);
-
     char _topic[AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE];
     char _message[AFE_CONFIG_HA_CONFIGURATION_JSON_SIZE];
     char _objectId[AFE_CONFIG_HA_OBJECT_ID_SIZE];
 
     generateObjectId(_objectId, deviceConfiguration->type,
                      deviceConfiguration->id);
-    generateTopic(_topic, deviceConfiguration->type, _objectId);
+    generateTopic(_topic, deviceConfiguration->entityId, _objectId);
 
     _json.concat(FPSTR(HA_MQTT_DISCOVERY_JSON_BODY));
 
@@ -709,44 +730,44 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief Adds command_topic, retain
      *
      */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bct}}", FPSTR(HA_MQTT_DISCOVERY_JSON_COMMAND_TOPIC));
     }
 
     /* adds state_topic */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bst}}", FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_TOPIC));
     }
 
     /* Adds state_on, state_off or state_value_template*/
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH) {
       _json.replace("{{bsp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_ON_OFF));
 #ifdef AFE_CONFIG_HARDWARE_CLED
-    } else if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    } else if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bsp}}",
                     FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_VALUE_TEMPLATE));
 #endif
     }
 
     /* Adds payload_on=on, payload_off=off or payload command */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF) {
       _json.replace("{{bcp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_ON_OFF));
 #ifdef AFE_CONFIG_HARDWARE_CLED
-    } else if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    } else if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{bcp}}", FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_TEMPLATE));
 
 #endif
     }
 
     /* Adds payload_on=closed, payload_off=open */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED) {
       _json.replace("{{bcp}}",
                     FPSTR(HA_MQTT_DISCOVERY_JSON_COMMAND_OPEN_CLOSED));
     }
@@ -755,70 +776,26 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief tag: device_class
      *
      */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF ||
-        _entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED ||
-        deviceConfiguration->type ==
-            AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED ||
-        deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
-        deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW ||
-        deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
-        || deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE
-#endif
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-        || deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX
-#endif
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-        || deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT
-#endif
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-        || deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY
-#endif
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-        ||
-        deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY
-#endif
-        ) {
+    if (strcmp(_deviceConfiguration.deviceClass,
+               AFE_CONFIG_HA_DEVICE_CLASS_NONE) == 0) {
+      _json.replace("{{bdc}}", "");
+    } else {
       _json.replace("{{bdc}}", FPSTR(HA_MQTT_DISCOVERY_JSON_DEVICE_CLASS));
-
-      _json.replace(
-          "{{s.dc}}",
-          (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
-           deviceConfiguration->type ==
-               AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED ||
-           deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_RAW ||
-           deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT)
-              ? AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE
-              : (deviceConfiguration->type ==
-                     AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE ||
-                 deviceConfiguration->type ==
-                     AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT ||
-                 deviceConfiguration->type ==
-                     AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX)
-                    ? AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE
-                    : (deviceConfiguration->type ==
-                           AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY ||
-                       deviceConfiguration->type ==
-                           AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY)
-                          ? AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY
-                          : _entityType ==
-                                    AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF
-                                ? AFE_CONFIG_HA_DEVICE_CLASS_MOVING
-                                : _entityType ==
-                                          AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED
-                                      ? AFE_CONFIG_HA_DEVICE_CLASS_OPENING
-                                      : "");
+      _json.replace("{{s.dc}}", _deviceConfiguration.deviceClass);
     }
 
     /* Sensor section */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR) {
       _json.replace("{{sen}}", FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_COMMON));
 
+      if (false) {
+      }
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
       /* Sensor ADC: voltage and calculated voltage */
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
-          deviceConfiguration->type ==
-              AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED) {
+      else if (deviceConfiguration->type ==
+                   AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE ||
+               deviceConfiguration->type ==
+                   AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE_CALCULATED) {
         _json.replace("{{s.vt}}", deviceConfiguration->type ==
                                           AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE
                                       ? "{{value_json.voltage}}"
@@ -836,51 +813,121 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       }
 #endif // Analog Input
 
-#if defined(AFE_CONFIG_HARDWARE_DS18B20) || defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE) {
+#if defined(AFE_CONFIG_HARDWARE_DS18B20) ||                                    \
+    defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE) {
         _json.replace("{{s.vt}}", "{{value_json.temperature.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Temperature
 
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY) {
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY) {
         _json.replace("{{s.vt}}", "{{value_json.humidity.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Humidity
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type ==
-          AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY) {
+
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY) {
         _json.replace("{{s.vt}}", "{{value_json.absoluteHumidity.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Absolute Humidity
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT) {
+
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT) {
         _json.replace("{{s.vt}}", "{{value_json.dewPoint.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Dew Point
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX) {
+
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX) {
         _json.replace("{{s.vt}}", "{{value_json.heatIndex.value}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Heat Index
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION) {
+
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION) {
         _json.replace("{{s.vt}}", "{{value_json.perception.description}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Perception
-#if defined(AFE_CONFIG_HARDWARE_DHT)
-      if (deviceConfiguration->type ==
-          AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL) {
+
+#if defined(AFE_CONFIG_HARDWARE_DHT) || defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL) {
         _json.replace("{{s.vt}}", "{{value_json.comfort.description}}");
         _json.replace("{{s.u}}", deviceConfiguration->unit);
       }
 #endif // Comfort level
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE) {
+        _json.replace("{{s.vt}}", "{{value_json.relativePressure.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Relative pressure
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE) {
+        _json.replace("{{s.vt}}", "{{value_json.relativePressure.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Relative pressure
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_PRESSURE) {
+        _json.replace("{{s.vt}}", "{{value_json.pressure.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // Absolute pressure
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_IAQ) {
+        _json.replace("{{s.vt}}", "{{value_json.iaq.value}}");
+      }
+#endif // IAQ
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_STATIC_IAQ) {
+        _json.replace("{{s.vt}}", "{{value_json.staticIaq.value}}");
+      }
+#endif // Static IAQ
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT) {
+        _json.replace("{{s.vt}}", "{{value_json.co2Equivalent.value}}");
+        _json.replace("{{s.u}}", deviceConfiguration->unit);
+      }
+#endif // CO2 Equivalent
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_BVOC_EQUIVALENT) {
+        _json.replace("{{s.vt}}", "{{value_json.breathVocEquivalent.value}}");
+      }
+#endif // BVOC Equivalent
+
+#if defined(AFE_CONFIG_HARDWARE_BMEX80)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE) {
+        _json.replace("{{s.vt}}", "{{value_json.gasResistance.value}}");
+      }
+#endif // Gas resistance
 
       /* Removed unused tags */
       _json.replace("{{s.u}}", "");
@@ -903,7 +950,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief tag: options
      *
      */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT) {
       _json.replace("{{bdo}}", FPSTR(HA_MQTT_DISCOVERY_JSON_OPTIONS));
       _json.replace("{{o.o}}", deviceConfiguration->options);
     }
@@ -912,7 +959,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief RGB LED config
      *
      */
-    if (_entityType == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace("{{rgb}}", FPSTR(HA_MQTT_DISCOVERY_JSON_RGB_LIGHT));
       _json.replace("{{bsc}}", String(AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS));
       _json.replace("{{i.ts}}",
@@ -942,7 +989,6 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     _json.replace("{{bcp}}", "");
     _json.replace("{{bst}}", "");
     _json.replace("{{bsp}}", "");
-    _json.replace("{{bdc}}", "");
     _json.replace("{{sen}}", "");
     _json.replace("{{bdo}}", "");
     _json.replace("{{rgb}}", "");

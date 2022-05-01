@@ -179,7 +179,7 @@ void AFESensorBMEX80::getJSON(char *json) {
 
   pressure["value"] = data.pressure.value;
   pressure["unit"] =
-      configuration.pressure.unit == AFE_PRESSURE_UNIT_HPA ? "hPa" : "?";
+      configuration.pressure.unit == AFE_PRESSURE_UNIT_HPA ? AFE_UNIT_PRESSURE : "?";
   pressure["correction"] = configuration.pressure.correction;
 
   relativePressure["value"] = data.relativePressure.value;
@@ -258,7 +258,7 @@ void AFESensorBMEX80::getJSON(char *json) {
     staticIaq["accuracy"] = data.staticIaq.accuracy;
 
     co2Equivalent["value"] = data.co2Equivalent.value;
-    co2Equivalent["unit"] = "ppm";
+    co2Equivalent["unit"] = AFE_UNIT_CO2;
     co2Equivalent["rating"] = data.co2Equivalent.rating;
     co2Equivalent["accuracy"] = data.co2Equivalent.accuracy;
 
