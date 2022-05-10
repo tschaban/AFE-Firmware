@@ -8,5 +8,7 @@
 #define AFE_UNIT_HUMIDITY "%%H"
 #define AFE_UNIT_PRESSURE "hPa"
 #define AFE_UNIT_CO2 "ppm"
-
+#define AFE_UNIT_KOM "kOm"
+#define AFE_UNIT_LUX "lux"
+#define AFE_UNIT_PARTICLE "µg/m3"
 #endif

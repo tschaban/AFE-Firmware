@@ -9,12 +9,6 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
   Data.getConfiguration(id, &configuration);
 
-  // SerialBus.init(13, 14, false, 64);
-  // SerialBus.begin(9600);
-  // SerialBus.println();
-
-  // SerialBus.println("----- HPMA115S0: Initializing -----");
-
   /* Opening Serial port */
   UART.begin();
 

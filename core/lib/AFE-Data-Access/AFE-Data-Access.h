@@ -216,13 +216,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  void getConfiguration(ANEMOMETER *);
+  boolean getConfiguration(ANEMOMETER *);
   void saveConfiguration(ANEMOMETER *);
   void createAnemometerSensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  void getConfiguration(RAINMETER *);
+  boolean getConfiguration(RAINMETER *);
   void saveConfiguration(RAINMETER *);
   void createRainmeterSensorConfigurationFile();
   void get(RAINMETER_DATA *);

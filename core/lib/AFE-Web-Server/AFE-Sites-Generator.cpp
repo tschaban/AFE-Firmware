@@ -478,7 +478,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DEVICE_NUMBER_OF_HPMA115S0_SENSORS));
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BH1750
+#if defined(AFE_CONFIG_HARDWARE_BH1750) || defined(AFE_CONFIG_HARDWARE_TLS2561)
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
   _itemDisabled = !FirmwarePro->Pro.valid;
@@ -486,14 +486,19 @@ void AFESitesGenerator::siteDevice(String &page) {
   _itemDisabled = false;
 #endif
 
+#if defined(AFE_CONFIG_HARDWARE_BH1750)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                         Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
+#endif 
 
+#if defined(AFE_CONFIG_HARDWARE_TLS2561)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561,
                         Device->configuration.noOfTSL2561s, F("tl"),
                         F(L_DEVICE_NUMBER_OF_TSL2561_SENSORS), _itemDisabled);
 #endif
+#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
@@ -692,17 +697,13 @@ void AFESitesGenerator::siteNetwork(String &page) {
       for (int i = 0; i < numberOfNetworks; i++) {
 #ifdef DEBUG
         Serial << endl << F(" - ") << WiFi.SSID(i);
-#endif 
-
-
-
+#endif
 
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
         _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
 
-
-//Serial << endl << "sizeof(_ssid) " << sizeof(_ssid);
-//Serial << endl << "strlen(_ssid) " << strlen(_ssid) + 1;
+        // Serial << endl << "sizeof(_ssid) " << sizeof(_ssid);
+        // Serial << endl << "strlen(_ssid) " << strlen(_ssid) + 1;
 
         sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
                 WiFi.RSSI(i) >= -30
@@ -1750,16 +1751,16 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
         AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
-    addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_DEW_POINT_IDX,
-        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_DEW_POINT_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
-    addInputFormItem(
-        page, AFE_FORM_ITEM_TYPE_NUMBER, "i4", L_HEAT_INDEX_IDX,
-        _number, AFE_FORM_ITEM_SKIP_PROPERTY, AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
-        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i4", L_HEAT_INDEX_IDX,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
     sprintf(_number, "%d", configuration.domoticz.perception.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i6", L_PERCEPTION_IDX,
@@ -2379,16 +2380,14 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
         sprintf(_number, "%d", configuration.domoticz.dewPoint.idx);
-        addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i3",
-                         L_DEW_POINT_IDX, _number,
-                         AFE_FORM_ITEM_SKIP_PROPERTY,
+        addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i3", L_DEW_POINT_IDX,
+                         _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                          AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
         sprintf(_number, "%d", configuration.domoticz.heatIndex.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i4",
-                         L_HEAT_INDEX_IDX, _number,
-                         AFE_FORM_ITEM_SKIP_PROPERTY,
+                         L_HEAT_INDEX_IDX, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                          AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                          AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
@@ -2745,9 +2744,12 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
-  openSection(page, F(L_ANEMOMETER_SENSOR), F(""));
   ANEMOMETER configuration;
-  Data->getConfiguration(&configuration);
+  if (!Data->getConfiguration(&configuration)) {
+    addFileNotFound(page);
+  }
+
+  openSection(page, F(L_ANEMOMETER_SENSOR), F(""));
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -2817,10 +2819,12 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFESitesGenerator::siteRainmeterSensor(String &page) {
+  RAINMETER configuration;
+  if (!Data->getConfiguration(&configuration)) {
+    addFileNotFound(page);
+  }
 
   openSection(page, F(L_RAINMETER), F(""));
-  RAINMETER configuration;
-  Data->getConfiguration(&configuration);
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
@@ -2961,8 +2965,10 @@ void AFESitesGenerator::siteADCInput(String &page) {
   addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
                  configuration.battery.domoticz.idx);
 #else
-  addAPIsSection(page, F(L_BATTERY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
+  openSection(page, F(L_BATTERY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "bt", L_MQTT_TOPIC,
+                   configuration.battery.mqtt.topic, "64");
+  closeSection(page);
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 

@@ -36,7 +36,7 @@ void analogInputEventsListener(void) {
         MqttAPI.publishADCValues(i);
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-     //  MqttAPI.publishBatteryMeterValues(i); // @TODO T6
+       MqttAPI.publishBatteryMeterValues(i); 
 #endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ

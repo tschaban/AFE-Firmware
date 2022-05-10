@@ -128,7 +128,7 @@ void AFEAnalogInput::getBatteryMeterJSON(char *json) {
   sprintf(json,
           "{\"batterymeter\":[{\"value\":%.3f,\"unit\":\"%%\"},{\"value\":"
           "%.3f,\"unit\":\"volt\"}]}",
-          batteryPercentage, (float)data.voltageCalculated);
+          batteryPercentage, data.voltageCalculated);
 }
 #endif
 

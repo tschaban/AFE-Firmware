@@ -77,7 +77,12 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT 22
 #define AFE_CONFIG_HA_ITEM_SENSOR_BVOC_EQUIVALENT 23
 #define AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE 24
-
+#define AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE 25
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM10 26
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM10_WHO 27
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM25 28
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO 28
+ 
 /**
  * @brief Sizes of variables
  *
@@ -125,9 +130,9 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_AQI "aqi"
 #define AFE_CONFIG_HA_DEVICE_CLASS_CO2 "carbon_dioxide"
 #define AFE_CONFIG_HA_DEVICE_CLASS_GAS "gas"
-
-
-
+#define AFE_CONFIG_HA_DEVICE_CLASS_ILLUMINANCE "illuminance"
+#define AFE_CONFIG_HA_DEVICE_CLASS_PM10 "pm10"
+#define AFE_CONFIG_HA_DEVICE_CLASS_PM25 "pm25"
 
 /**
  * @brief Home Assistant State Classes
@@ -136,6 +141,25 @@
 #define AFE_CONFIG_HA_STATE_CLASS_MEASUREMENT "measurement"
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL "total"
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL_INCREASING "total_increasing"
+
+
+/**
+ * @brief HA Configuratio JSON items
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_TAG_SET_RETAIN_FLAG "{{ret}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_AVAILABILITY "{{b.a}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_COMMAND_TOPIC "{{bct}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_TOPIC "{{bst}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_ON_OFF_TPL "{{bsp}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_PAYLOAD_ON_OFF_CMD "{{bcp}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_DEVICE_CLASS "{{bdc}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_OPTIONS "{{bdo}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_SENSOR "{{sen}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB "{{rgb}}"
+
+
 
 const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
     "{\"device\":{\"ids\":\"{{d.i}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
@@ -196,5 +220,57 @@ const char HA_MQTT_DISCOVERY_JSON_RGB_LIGHT[] PROGMEM =
 
 const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #endif
+
+
+
+
+/**
+ * @brief Tags
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_ID "{{d.i}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_SOFTWARE "{{d.s}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_MANUFACTURER "{{d.m}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_NAME "{{d.n}}" 
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_HARDWARE "{{d.h}}"
+#define HA_MQTT_DISCOVERY_TAG_UNIQUE_ID "{{i.i}}"
+#define HA_MQTT_DISCOVERY_TAG_NAME "{{i.n}}" 
+#define HA_MQTT_DISCOVERY_TAG_STATE_TEMPLATE "{{i.t}}"
+#define HA_MQTT_DISCOVERY_TAG_RETAIN_FLAG "{{r.f}}"
+#define HA_MQTT_DISCOVERY_TAG_AVAILABILITY_TOPIC "{{a.t}}"
+#define HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE "{{s.vt}}"
+#define HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE "{{s.u}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_CLASS "{{s.dc}}"
+#define HA_MQTT_DISCOVERY_TAG_OPTIONS "{{o.o}}"
+#define HA_MQTT_DISCOVERY_TAG_OPTIMISTIC "{{opt}}"
+#define HA_MQTT_DISCOVERY_TAG_LIGHT_BRIGHTNESS "{{bsc}}"
+#define HA_MQTT_DISCOVERY_TAG_LIGHT_TOPIC_SUFIX "{{i.ts}}"
+
+
+/**
+ * @brief JSON Value templates
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_TEMPERATURE "{{value_json.temperature.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HUMIDITY "{{value_json.humidity.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_HUMIDITY "{{value_json.absoluteHumidity.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_DEW_POINT "{{value_json.dewPoint.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HEAT_INDEX "{{value_json.heatIndex.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCEPTION "{{value_json.perception.description}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_COMFORT "{{value_json.comfort.description}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RELATIVE_PRESSURE "{{value_json.relativePressure.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_PRESSURE "{{value_json.pressure.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_IAQ "{{value_json.iaq.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_STATIC_IAQ "{{value_json.staticIaq.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_CO2_EQUIVALENT "{{value_json.co2Equivalent.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BVOC_EQUIVALENT "{{value_json.breathVocEquivalent.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_GAS_RESISTANCE "{{value_json.gasResistance.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE "{{value_json.voltage}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE_CALCULATED "{{value_json.voltageCalculated}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAW "{{value_json.raw}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCENT "{{value_json.percent}}"
+
 
 #endif // _AFE_Hardware_api_home_assistant_h

@@ -100,9 +100,9 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F(": Sensor: ") << sensor.name;
     Serial << endl << F(": Driver Ver: ") << sensor.version;
     Serial << endl << F(": Unique ID: ") << sensor.sensor_id;
-    Serial << endl << F(": Max Value: ") << sensor.max_value << F("lux");
-    Serial << endl << F(": Min Value: ") << sensor.min_value << F("lux");
-    Serial << endl << F(": Resolution: ") << sensor.resolution << F("lux");
+    Serial << endl << F(": Max Value: ") << sensor.max_value << F(AFE_UNIT_LUX);
+    Serial << endl << F(": Min Value: ") << sensor.min_value << F(AFE_UNIT_LUX);
+    Serial << endl << F(": Resolution: ") << sensor.resolution << F(AFE_UNIT_LUX);
     Serial << endl << F(": Name: ") << configuration.name;
     Serial << endl << F(": Sensitiveness: ") << configuration.sensitiveness;
     Serial << endl << F(": Gain: ") << configuration.gain;
@@ -130,7 +130,7 @@ boolean AFESensorTSL2561::listener() {
         illuminance = tls2561.calculateLux(broadband, ir);
 #ifdef DEBUG
         Serial << endl
-               << F("Lux: ") << illuminance << F(" lux") << endl
+               << F("Lux: ") << illuminance << F(AFE_UNIT_LUX) << endl
                << F("Broadband: ") << broadband << endl
                << F("IR: ") << ir;
 #endif
@@ -153,10 +153,10 @@ boolean AFESensorTSL2561::listener() {
 }
 
 void AFESensorTSL2561::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"},"
+  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"%s\"},"
                 "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
                 "%d,\"unit\":\"?\"}}",
-          illuminance, broadband, ir);
+          illuminance, AFE_UNIT_LUX, broadband, ir);
 }
 
 #endif // AFE_CONFIG_HARDWARE_TSL2561

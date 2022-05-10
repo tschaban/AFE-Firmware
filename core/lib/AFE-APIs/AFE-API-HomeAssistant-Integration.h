@@ -164,6 +164,22 @@ private:
   void publishBMX80(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  void publishBH1750(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  void publishHPMA115S0(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  void publishAnemometer(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  void publishRainmeter(void);
+#endif
+
 public:
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object

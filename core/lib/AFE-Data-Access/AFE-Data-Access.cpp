@@ -1539,10 +1539,14 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->removeingComponents = root["removing"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
-      configuration->addingComponents = root["adding"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
-      configuration->retainConfiguration = root["retain"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
-      sprintf(configuration->discovery.topic, root["topic"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
+      configuration->removeingComponents =
+          root["removing"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
+      configuration->addingComponents =
+          root["adding"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
+      configuration->retainConfiguration =
+          root["retain"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
+      sprintf(configuration->discovery.topic,
+              root["topic"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
@@ -4432,7 +4436,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750_CONFIG *configuration) {
   }
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BH1750_CONFIG *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      BH1750_CONFIG *configuration) {
   char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
@@ -4969,7 +4974,8 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
+  boolean _ret = true;
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -5018,23 +5024,24 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ANEMOMETER, jsonBuffer.size());
 #endif
-    }
+    } else {
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
-
+      _ret = false;
+    }
     configFile.close();
   }
 
-#ifdef DEBUG
   else {
+    _ret = false;
+#ifdef DEBUG
     Serial << endl
            << F("ERROR: Configuration file: ")
            << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << F(" not opened");
-  }
 #endif
+  }
+  return _ret;
 }
 
 void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
@@ -5114,7 +5121,8 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
+  boolean _ret = true;
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -5158,23 +5166,24 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER, jsonBuffer.size());
 #endif
-    }
+    } else {
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
-
+      _ret = false;
+    }
     configFile.close();
-  }
 
+  } else {
+    _ret = false;
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: Configuration file: ")
            << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION << F(" not opened");
-  }
 #endif
+  }
+
+  return _ret;
 }
 
 void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {

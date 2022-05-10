@@ -484,7 +484,7 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         else if (siteConfig.ID == AFE_CONFIG_SITE_BH1750) {
-          BH1750 configuration;
+          BH1750_CONFIG configuration;
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};

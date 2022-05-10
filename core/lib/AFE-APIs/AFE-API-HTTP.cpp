@@ -431,6 +431,24 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
+#ifdef AFE_ESP32
+  boolean deviceNotExist = true;
+  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
+    if (strcmp(request->name, _AnalogInput[i]->configuration.name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
+        _AnalogInput[i]->getBatteryMeterJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+#else // ESP8266
   if (strcmp(request->command, "get") == 0) {
     char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
     _AnalogInput->getBatteryMeterJSON(json);
@@ -438,6 +456,7 @@ void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
   } else {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
   }
+#endif
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
