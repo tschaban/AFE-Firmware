@@ -106,7 +106,7 @@
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145    // AJ checked
-#define AFE_CONFIG_FILE_BUFFER_NETWORK 708     // AJ checked
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 708     // AJ checked @TODO T6 check size after adding two additiona params
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #define AFE_CONFIG_FILE_BUFFER_LED 124 //  AJ checked
 #else

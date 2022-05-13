@@ -729,7 +729,46 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {}
+void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
+  if (!_initialize) {
+    return;
+  }
+  ANEMOMETER _configuration;
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS; i++) {
+
+    _deviceConfiguration.id = i;
+
+    if (i < _Device->configuration.noOfAnemometerSensors) {
+      _Data->getConfiguration(i, &_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating Anemometer: ") << i + 1;
+#endif
+
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+
+      /* Wind speed km/h */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH;
+      sprintf(_deviceConfiguration.deviceClass,
+              AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_KMH);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      /* Wind speed m/s */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS;
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_MS);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+    }
+  }
+}
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER

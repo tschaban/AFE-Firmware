@@ -168,6 +168,9 @@
 #define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
+#define L_NETWORK_RADIO_MODE "Radio Mode: 802.11"
+#define L_NETWORK_OUTPUT_POWER "Transmit power (dBm)"
+
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"

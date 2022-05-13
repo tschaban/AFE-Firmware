@@ -1456,6 +1456,15 @@ void AFEWebServer::get(NETWORK &data) {
 
   data.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
   data.isDHCPBackup = server.arg(F("db")).length() > 0 ? true : false;
+
+#if !defined(ESP32)
+  data.radioMode = server.arg(F("r")).length() > 0
+                       ? server.arg(F("r")).toInt()
+                       : AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+  data.outputPower = server.arg(F("d")).length() > 0
+                         ? server.arg(F("d")).toFloat()
+                         : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
 }
 
 void AFEWebServer::get(MQTT &data) {

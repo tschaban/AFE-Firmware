@@ -490,7 +490,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
                         Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
-#endif 
+#endif
 
 #if defined(AFE_CONFIG_HARDWARE_TLS2561)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561,
@@ -498,7 +498,6 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DEVICE_NUMBER_OF_TSL2561_SENSORS), _itemDisabled);
 #endif
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
@@ -702,9 +701,6 @@ void AFESitesGenerator::siteNetwork(String &page) {
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
         _ssid[strlen(_ssid) + 1] = AFE_EMPTY_STRING;
 
-        // Serial << endl << "sizeof(_ssid) " << sizeof(_ssid);
-        // Serial << endl << "strlen(_ssid) " << strlen(_ssid) + 1;
-
         sprintf(_ssidLabel, "%s (%s: %s)", _ssid, L_WIFI_SIGNAL,
                 WiFi.RSSI(i) >= -30
                     ? L_WIFI_RSSI_30
@@ -818,17 +814,38 @@ void AFESitesGenerator::siteNetwork(String &page) {
   /* Section: Advanced settings */
   openSection(page, F(L_NETWORK_ADVANCED), F(""));
 
+#if !defined(ESP32)
+
+  addSelectFormItemOpen(page, F("r"), F(L_NETWORK_RADIO_MODE));
+  addSelectOptionFormItem(page, "Auto", "255",
+                          configuration.radioMode == AFE_NONE);
+  addSelectOptionFormItem(page, "B", "1", configuration.radioMode == 1);
+  addSelectOptionFormItem(page, "G", "2", configuration.radioMode == 2);
+  addSelectOptionFormItem(page, "N", "3", configuration.radioMode == 3);
+
+  addSelectFormItemClose(page);
+
+  addSelectFormItemOpen(page, F("d"), F(L_NETWORK_OUTPUT_POWER));
+  addSelectOptionFormItem(page, "Auto", "255",
+                          configuration.outputPower == AFE_NONE);
+  float _outputPower = 0;
+  while (_outputPower != 20.5) {
+    sprintf(_ip, "%.1f", _outputPower);
+    addSelectOptionFormItem(page, _ip, _ip,
+                            configuration.outputPower == _outputPower);
+    _outputPower += 0.25;
+  }
+
+  addSelectFormItemClose(page);
+
+#endif
+
   sprintf(_int, "%d", configuration.noConnectionAttempts);
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "na",
                    L_NETWORK_NUMBER_OF_CONNECTIONS, _int,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1");
-  /* Removed to simplify the configuration. Defaults to 1sec
-    sprintf(_int, "%d", configuration.waitTimeConnections);
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "wc",
-                     L_NETWORK_TIME_BETWEEN_CONNECTIONS, _int,
-                     AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1", L_SECONDS);
-  */
+
   sprintf(_int, "%d", configuration.waitTimeSeries);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ws", L_NETWORK_SLEEP_TIME,
                    _int, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "255", "1",

@@ -1148,6 +1148,13 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
           root["noFailuresToSwitchNetwork"] |
           AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
+#if !defined(ESP32)
+      configuration->radioMode =
+          root["radioMode"] | AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+      configuration->outputPower =
+          root["outputPower"] | AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
+
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
@@ -1207,6 +1214,10 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["waitTimeSeries"] = configuration->waitTimeSeries;
     root["noFailuresToSwitchNetwork"] =
         configuration->noFailuresToSwitchNetwork;
+#if !defined(ESP32)
+    root["radioMode"] = configuration->radioMode;
+    root["outputPower"] = configuration->outputPower;
+#endif
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1250,6 +1261,10 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   configuration.waitTimeSeries = AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
   configuration.noFailuresToSwitchNetwork =
       AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
+#if !defined(ESP32)
+  configuration.radioMode = AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+  configuration.outputPower = AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
   saveConfiguration(&configuration);
 }
 
