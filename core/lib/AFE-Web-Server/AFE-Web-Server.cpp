@@ -1821,8 +1821,8 @@ void AFEWebServer::get(GATE &data) {
                               : AFE_HARDWARE_ITEM_NOT_EXIST;
 
   for (uint8_t i = 0; i < sizeof(data.states.state); i++) {
-    data.states.state[i] = server.arg(F("s" + String(i)).length() > 0
-                               ? server.arg(F("s" + String(i)).toInt()
+    data.states.state[i] = server.arg("s" + String(i)).length() > 0
+                               ? server.arg("s" + String(i)).toInt()
                                : AFE_GATE_UNKNOWN;
   }
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
