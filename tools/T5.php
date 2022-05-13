@@ -254,7 +254,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Domoticz API
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_8266_1m-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_8266_1m-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 0;
