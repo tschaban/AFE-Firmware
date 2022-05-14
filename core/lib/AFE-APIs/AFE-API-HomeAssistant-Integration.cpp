@@ -33,6 +33,11 @@ AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(
 
 void AFEAPIHomeAssistantIntegration::publish() {
 
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: HA: Updating configuration to in MQTT Auto-discovery");
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   publishRelays();
 #endif
@@ -67,6 +72,22 @@ void AFEAPIHomeAssistantIntegration::publish() {
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   publishBMX80();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+  publishBH1750();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+  publishHPMA115S0();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+  publishRainmeter();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+  publishAnemometer();
 #endif
 }
 
@@ -687,11 +708,11 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating HPMA115S0: ") << i + 1;
 #endif
-
-      sprintf(_deviceConfiguration.label, _configuration.name);
+      
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
 
       /* PM10 */
+      sprintf(_deviceConfiguration.label, "PM10");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM10;
       sprintf(_deviceConfiguration.deviceClass,
               AFE_CONFIG_HA_DEVICE_CLASS_PM10);
@@ -699,17 +720,20 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       /* PM10 WHO Norm */
+      sprintf(_deviceConfiguration.label, "PM10 WHO");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM10_WHO;
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PERCENT);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       /* PM25 WHO Norm */
+      sprintf(_deviceConfiguration.label, "PM2.5");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO;
       sprintf(_deviceConfiguration.deviceClass,
               AFE_CONFIG_HA_DEVICE_CLASS_PM25);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       /* PM25 */
+      sprintf(_deviceConfiguration.label, "PM2.5 WHO");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM25;
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PARTICLE);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
@@ -735,13 +759,15 @@ void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
   }
   ANEMOMETER _configuration;
   _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_NONE);
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS;
+       i++) {
 
     _deviceConfiguration.id = i;
 
     if (i < _Device->configuration.noOfAnemometerSensors) {
-      _Data->getConfiguration(i, &_configuration);
+      _Data->getConfiguration(&_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Anemometer: ") << i + 1;
 #endif
@@ -751,8 +777,7 @@ void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
 
       /* Wind speed km/h */
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH;
-      sprintf(_deviceConfiguration.deviceClass,
-              AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+
       sprintf(_deviceConfiguration.unit, AFE_UNIT_KMH);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
@@ -772,7 +797,61 @@ void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-void AFEAPIHomeAssistantIntegration::publishRainmeter(void) {}
+void AFEAPIHomeAssistantIntegration::publishRainmeter(void) {
+  if (!_initialize) {
+    return;
+  }
+  RAINMETER _configuration;
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+  sprintf(_deviceConfiguration.deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS;
+       i++) {
+
+    _deviceConfiguration.id = i;
+
+    if (i < _Device->configuration.noOfRainmeterSensors) {
+      _Data->getConfiguration(&_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating Rainmeter: ") << i + 1;
+#endif
+
+      sprintf(_deviceConfiguration.label, _configuration.name);
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+
+      /* Rainmeter mm/min */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM;
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_MMM);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      /* Rainmeter mm/h */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH;
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_MMH);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      /* Rainmeter mm/12h */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H;
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_MM12H);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      /* Rainmeter mm/24h */
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H;
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_MM24H);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+    }
+  }
+}
+
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 /******* Private Methods *******/
@@ -868,31 +947,31 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief Adds command_topic, retain
      *
      */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
-        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
+        deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_COMMAND_TOPIC),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_COMMAND_TOPIC));
     }
 
     /* adds state_topic */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _deviceConfiguration.entityId ==
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        deviceConfiguration->entityId ==
             AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF ||
-        _deviceConfiguration.entityId ==
+        deviceConfiguration->entityId ==
             AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED ||
-        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
-        _deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+        deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT ||
+        deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_TOPIC),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_TOPIC));
     }
 
     /* Adds state_on, state_off or state_value_template*/
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH) {
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_ON_OFF_TPL),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_ON_OFF));
 #ifdef AFE_CONFIG_HARDWARE_CLED
-    } else if (_deviceConfiguration.entityId ==
+    } else if (deviceConfiguration->entityId ==
                AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_ON_OFF_TPL),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_STATE_VALUE_TEMPLATE));
@@ -900,13 +979,13 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     }
 
     /* Adds payload_on=on, payload_off=off or payload command */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
-        _deviceConfiguration.entityId ==
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH ||
+        deviceConfiguration->entityId ==
             AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_ON_OFF) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_PAYLOAD_ON_OFF_CMD),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_ON_OFF));
 #ifdef AFE_CONFIG_HARDWARE_CLED
-    } else if (_deviceConfiguration.entityId ==
+    } else if (deviceConfiguration->entityId ==
                AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_PAYLOAD_ON_OFF_CMD),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_PAYLOAD_TEMPLATE));
@@ -915,7 +994,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     }
 
     /* Adds payload_on=closed, payload_off=open */
-    if (_deviceConfiguration.entityId ==
+    if (deviceConfiguration->entityId ==
         AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_PAYLOAD_ON_OFF_CMD),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_COMMAND_OPEN_CLOSED));
@@ -925,18 +1004,20 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief tag: device_class
      *
      */
-    if (strcmp(_deviceConfiguration.deviceClass,
+
+
+    if (strcmp(deviceConfiguration->deviceClass,
                AFE_CONFIG_HA_DEVICE_CLASS_NONE) == 0) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_DEVICE_CLASS), "");
     } else {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_DEVICE_CLASS),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_DEVICE_CLASS));
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_CLASS),
-                    _deviceConfiguration.deviceClass);
+                    deviceConfiguration->deviceClass);
     }
 
     /* Sensor section */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR) {
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_COMMON));
 
@@ -1102,6 +1183,110 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       }
 #endif // Gas resistance
 
+#if defined(AFE_CONFIG_HARDWARE_BH1750)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Illuminance
+
+#if defined(AFE_CONFIG_HARDWARE_HPMA115S0)
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PM10) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // PM10
+
+#if defined(AFE_CONFIG_HARDWARE_HPMA115S0)
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PM25) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25));
+      }
+#endif // PM25
+
+#if defined(AFE_CONFIG_HARDWARE_HPMA115S0)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_PM10_WHO) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10_WHO));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // PM10 WHO Norm
+
+#if defined(AFE_CONFIG_HARDWARE_HPMA115S0)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25_WHO));
+      }
+#endif // PM25 WHO Norm
+
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Anemometer km/h
+
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Anemometer m/s
+
+#if defined(AFE_CONFIG_HARDWARE_RAINMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Rainmeter mm/min
+
+#if defined(AFE_CONFIG_HARDWARE_RAINMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Rainmeter mm/h
+
+#if defined(AFE_CONFIG_HARDWARE_RAINMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Rainmeter mm/12h
+
+#if defined(AFE_CONFIG_HARDWARE_RAINMETER)
+      else if (deviceConfiguration->type ==
+               AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // Rainmeter mm/24h
+
       /* Removed unused tags */
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE), "");
     }
@@ -1124,7 +1309,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief tag: options
      *
      */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT) {
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_BODY_OPTIONS),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_OPTIONS));
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_OPTIONS),
@@ -1135,7 +1320,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief RGB LED config
      *
      */
-    if (_deviceConfiguration.entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
+    if (deviceConfiguration->entityId == AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT) {
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB),
                     FPSTR(HA_MQTT_DISCOVERY_JSON_RGB_LIGHT));
       _json.replace(F(HA_MQTT_DISCOVERY_TAG_LIGHT_BRIGHTNESS),

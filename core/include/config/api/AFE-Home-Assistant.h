@@ -84,6 +84,10 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO 29
 #define AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH 30
 #define AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS 31
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM 32
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH 33
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H 34
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H 35
  
 /**
  * @brief Sizes of variables
@@ -92,7 +96,6 @@
 #define AFE_CONFIG_HA_OBJECT_ID_SIZE 25
 #define AFE_CONFIG_HA_LABEL_SIZE 55 //33 + "Temperatura odczuwalna"
 #define AFE_CONFIG_HA_OPTIONS_SIZE 144 // Currently only from RGB effect options
-#define AFE_CONFIG_HA_UNIT_SIZE 5
 #define AFE_CONFIG_HA_DEVICE_TYPE_SIZE sizeof(AFE_CONFIG_HA_DEVICE_CLASS_CO2) // max of DeviceType
 
 
@@ -273,6 +276,26 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE_CALCULATED "{{value_json.voltageCalculated}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAW "{{value_json.raw}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCENT "{{value_json.percent}}"
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE "{{value_json.illuminance.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10 "{{value_json.PM10.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10_WHO "{{value_json.WHO.PM10.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25 "{{value_json.PM25.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25_WHO "{{value_json.WHO.PM25.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH "{{value_json.anemometer[1].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH "{{value_json.anemometer[?(@.unit=='km/h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS "{{value_json.anemometer[0].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS "{{value_json.anemometer[?(@.unit=='m/s')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM "{{value_json.rainmeter[0].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM "{{value_json.rainmeter[?(@.unit=='mm/min')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH "{{value_json.rainmeter[1].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH "{{value_json.rainmeter[?(@.unit=='mm/h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[2].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[?(@.unit=='mm/12h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[3].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[?(@.unit=='mm/24h')].value}}"
+
+
 
 
 #endif // _AFE_Hardware_api_home_assistant_h

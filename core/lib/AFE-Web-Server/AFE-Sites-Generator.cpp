@@ -478,7 +478,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DEVICE_NUMBER_OF_HPMA115S0_SENSORS));
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_BH1750) || defined(AFE_CONFIG_HARDWARE_TLS2561)
+#if defined(AFE_CONFIG_HARDWARE_BH1750) || defined(AFE_CONFIG_HARDWARE_TSL2561)
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
   _itemDisabled = !FirmwarePro->Pro.valid;
@@ -492,7 +492,7 @@ void AFESitesGenerator::siteDevice(String &page) {
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_TLS2561)
+#if defined(AFE_CONFIG_HARDWARE_TSL2561)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561,
                         Device->configuration.noOfTSL2561s, F("tl"),
                         F(L_DEVICE_NUMBER_OF_TSL2561_SENSORS), _itemDisabled);
@@ -816,21 +816,23 @@ void AFESitesGenerator::siteNetwork(String &page) {
 
 #if !defined(ESP32)
 
+  /* Item: Radio type */
   addSelectFormItemOpen(page, F("r"), F(L_NETWORK_RADIO_MODE));
   addSelectOptionFormItem(page, "Auto", "255",
                           configuration.radioMode == AFE_NONE);
   addSelectOptionFormItem(page, "B", "1", configuration.radioMode == 1);
   addSelectOptionFormItem(page, "G", "2", configuration.radioMode == 2);
   addSelectOptionFormItem(page, "N", "3", configuration.radioMode == 3);
-
   addSelectFormItemClose(page);
 
-  addSelectFormItemOpen(page, F("d"), F(L_NETWORK_OUTPUT_POWER));
+  /* Item: TX output power */
+  addSelectFormItemOpen(page, F("y"), F(L_NETWORK_OUTPUT_POWER));
   addSelectOptionFormItem(page, "Auto", "255",
                           configuration.outputPower == AFE_NONE);
   float _outputPower = 0;
-  while (_outputPower != 20.5) {
-    sprintf(_ip, "%.1f", _outputPower);
+  while (_outputPower <= 20.5) {
+    sprintf(_ip, "%.2f", _outputPower);
+
     addSelectOptionFormItem(page, _ip, _ip,
                             configuration.outputPower == _outputPower);
     _outputPower += 0.25;
@@ -2244,7 +2246,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
                    L_HPMA115S0_WHO_NORM_UNIT);
 
   sprintf(_number, "%-.2f", configuration.whoPM25Norm);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "n2", "PM25", _number,
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "n2", "PM2.5", _number,
                    AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999.99", "0.01",
                    L_HPMA115S0_WHO_NORM_UNIT);
 

@@ -179,6 +179,8 @@
 #define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.ssid) + 30 // _(Sygnał: Bardzo dobry)
 #define AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE AFE_NONE
 #define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER AFE_NONE
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN 0
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
@@ -349,7 +351,7 @@
  * 
  */
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-#include <sensors/AFE-TSL2561-Sensor.h>
+#include <sensors/AFE-TSL2561.h>
 #endif
 
 /**

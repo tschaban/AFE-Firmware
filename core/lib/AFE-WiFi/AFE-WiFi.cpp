@@ -68,7 +68,11 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
   }
 
-  if (configuration.outputPower != AFE_NONE) {
+  if (configuration.outputPower != AFE_NONE &&
+      configuration.outputPower >=
+          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
+      configuration.outputPower <=
+          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX) {
     WirelessNetwork.setOutputPower(configuration.outputPower);
 
 #ifdef DEBUG

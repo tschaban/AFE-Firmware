@@ -6,7 +6,7 @@ void eventsListener(void) {
   /* Event: connected to WiFi*/
   if (Network.eventConnected()) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: EVENTS: Connected to WiFi");
+    Serial << endl << F("INFO: EVENT: Connected to WiFi triggered");
 #endif
 
     /* Checking Access to WAN */
@@ -163,6 +163,12 @@ void eventsListener(void) {
   /* Event: connected to MQTT API */
   if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
     if (MqttAPI.Mqtt.connected()) {
+
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: EVENT: MQTT Connected: truggered");
+  #endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 /**

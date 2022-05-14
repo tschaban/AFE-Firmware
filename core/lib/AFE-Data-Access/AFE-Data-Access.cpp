@@ -1151,8 +1151,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #if !defined(ESP32)
       configuration->radioMode =
           root["radioMode"] | AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
-      configuration->outputPower =
-          root["outputPower"] | AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+      configuration->outputPower = root["outputPower"].as<float>();
 #endif
 
 #ifdef DEBUG
@@ -1164,7 +1163,6 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
   }
 

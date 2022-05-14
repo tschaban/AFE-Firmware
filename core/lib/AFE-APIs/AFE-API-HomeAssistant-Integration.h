@@ -59,7 +59,7 @@ private:
     MQTT_TOPIC brightnessCmd;
     char options[AFE_CONFIG_HA_OPTIONS_SIZE];
 #endif
-    char unit[AFE_CONFIG_HA_UNIT_SIZE];
+    char unit[AFE_CONFIG_ATTRIBUTE_SIZE_UNIT];
     char deviceClass[AFE_CONFIG_HA_DEVICE_TYPE_SIZE];
     uint8_t entityId;
   };
