@@ -1137,7 +1137,11 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       sprintf(configuration->ip, root["ip"]);
       sprintf(configuration->gateway, root["gateway"]);
       sprintf(configuration->subnet, root["subnet"]);
-      configuration->isDHCPBackup = root["isDHCPBackup"];
+
+      JsonVariant exists = root["isDHCPBackup"];
+      configuration->isDHCPBackup =
+          exists.success() ? root["isDHCPBackup"] : true;
+
       sprintf(configuration->ipBackup, root["ipBackup"] | "");
       sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
       sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
@@ -1151,7 +1155,10 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #if !defined(ESP32)
       configuration->radioMode =
           root["radioMode"] | AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
-      configuration->outputPower = root["outputPower"].as<float>();
+      exists = root["outputPower"];
+      configuration->outputPower =
+          exists.success() ? root["outputPower"].as<float>()
+                           : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
 #endif
 
 #ifdef DEBUG

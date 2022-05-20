@@ -187,6 +187,23 @@ void AFEAPIHTTPDomoticz::publishADCValues() {
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+
+#ifdef AFE_ESP32
+boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues(uint8_t id) {
+  boolean _ret = false;
+  if (_initialized) {
+    char value[8];
+    if (_AnalogInput[id]->configuration.battery.domoticz.idx > 0) {
+      sprintf(value, "%-.3f", _AnalogInput[id]->batteryPercentage);
+      _ret = sendCustomSensorCommand(
+          _AnalogInput[id]->configuration.battery.domoticz.idx, value);
+    }
+  }
+  return _ret;
+}
+
+#else
+
 boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues() {
   boolean _ret = false;
   if (_initialized) {
@@ -199,6 +216,7 @@ boolean AFEAPIHTTPDomoticz::publishBatteryMeterValues() {
   }
   return _ret;
 }
+#endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -401,19 +419,19 @@ boolean AFEAPIHTTPDomoticz::publishHPMA115S0SensorData(uint8_t id) {
 void AFEAPIHTTPDomoticz::addClass(AFESensorBH1750 *Sensor) {
   AFEAPI::addClass(Sensor);
 }
+
 boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
   boolean _ret = false;
   if (_initialized) {
+    if (_BH1750Sensor[id]->configuration.domoticz.idx > 0) {
+      char value[20]; // @TODO T5 T6  CHeck the max size
+      sprintf(value, "%-.2f", _BH1750Sensor[id]->data);
+      sendCustomSensorCommand(_BH1750Sensor[id]->configuration.domoticz.idx,
+                              value);
+      _ret = true;
+    }
   }
-  if (_BH1750Sensor[id]->configuration.domoticz.idx > 0) {
-    char value[20]; // @TODO T5 T6  CHeck the max size
-    sprintf(value, "%-.2f", _BH1750Sensor[id]->data);
-    sendCustomSensorCommand(_BH1750Sensor[id]->configuration.domoticz.idx,
-                            value);
-    _ret = true;
-  }
-}
-return _ret;
+  return _ret;
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 

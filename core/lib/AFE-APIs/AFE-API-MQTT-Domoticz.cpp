@@ -620,6 +620,20 @@ void AFEAPIMQTTDomoticz::publishADCValues() {
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+void AFEAPIMQTTDomoticz::publishBatteryMeterValues(uint8_t id) {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
+    char value[8];
+    if (_AnalogInput[id]->configuration.battery.domoticz.idx > 0) {
+      sprintf(value, "%-.3f", _AnalogInput[id]->batteryPercentage);
+      generateDeviceValue(
+          json, _AnalogInput[id]->configuration.battery.domoticz.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#else
 void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
@@ -632,6 +646,7 @@ void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
     }
   }
 }
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,

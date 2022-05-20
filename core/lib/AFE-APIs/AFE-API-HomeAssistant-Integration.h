@@ -122,7 +122,7 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /**
-   * @brief phublishes configuration for all switches
+   * @brief publishes configuration for all switches
    *
    */
   void publishSwitches(void);
@@ -153,31 +153,67 @@ private:
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+/**
+ * @brief publishes thermal protector
+ * 
+ */
   void publishThermalProtector(void);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+/**
+ * @brief publishes regulator 
+ * 
+ */
   void publishRegulator(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
+/**
+ * @brief publishes Bosch sensor
+ * 
+ */
   void publishBMX80(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
+/**
+ * @brief publishes BH1750 sensor
+ * 
+ */
   void publishBH1750(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+/**
+ * @brief publishes HPMA115S0 sensor
+ * 
+ */
   void publishHPMA115S0(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+/**
+ * @brief publishes Anemometer sensor
+ * 
+ */
   void publishAnemometer(void);
 #endif
-
+/**
+ * @brief publishes rainmeter sensor
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
+
   void publishRainmeter(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+/**
+ * @brief publishes TSL2561 sensor
+ * 
+ */
+  void publishTSL2561(void);
 #endif
 
 public:

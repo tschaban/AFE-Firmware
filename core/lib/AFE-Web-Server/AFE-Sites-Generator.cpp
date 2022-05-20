@@ -2982,7 +2982,7 @@ void AFESitesGenerator::siteADCInput(String &page) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 configuration.battery.domoticz.idx);
+                 &configuration.battery.domoticz.idx);
 #else
   openSection(page, F(L_BATTERY_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "bt", L_MQTT_TOPIC,

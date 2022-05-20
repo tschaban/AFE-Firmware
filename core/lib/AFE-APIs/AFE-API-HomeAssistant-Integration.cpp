@@ -89,6 +89,10 @@ void AFEAPIHomeAssistantIntegration::publish() {
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   publishAnemometer();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+  publishTSL2561();
+#endif
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -668,7 +672,6 @@ void AFEAPIHomeAssistantIntegration::publishBH1750(void) {
   _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE;
   sprintf(_deviceConfiguration.deviceClass,
           AFE_CONFIG_HA_DEVICE_CLASS_ILLUMINANCE);
-  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750; i++) {
 
@@ -708,7 +711,7 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating HPMA115S0: ") << i + 1;
 #endif
-      
+
       sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
 
       /* PM10 */
@@ -726,14 +729,14 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       /* PM25 WHO Norm */
-      sprintf(_deviceConfiguration.label, "PM2.5");
+      sprintf(_deviceConfiguration.label, "PM2.5 WHO");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO;
       sprintf(_deviceConfiguration.deviceClass,
               AFE_CONFIG_HA_DEVICE_CLASS_PM25);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
       /* PM25 */
-      sprintf(_deviceConfiguration.label, "PM2.5 WHO");
+      sprintf(_deviceConfiguration.label, "PM2.5");
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_PM25;
       sprintf(_deviceConfiguration.unit, AFE_UNIT_PARTICLE);
       publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
@@ -853,6 +856,45 @@ void AFEAPIHomeAssistantIntegration::publishRainmeter(void) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+void AFEAPIHomeAssistantIntegration::publishTSL2561(void) {
+  if (!_initialize) {
+    return;
+  }
+  TSL2561 _configuration;
+  _deviceConfiguration.entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561; i++) {
+    _deviceConfiguration.id = i;
+    if (i < _Device->configuration.noOfTSL2561s) {
+      _Data->getConfiguration(i, &_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating TSL2561: ") << i + 1;
+#endif
+
+      sprintf(_deviceConfiguration.mqtt.topic, _configuration.mqtt.topic);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
+              L_ILUMINANCE);
+      sprintf(_deviceConfiguration.unit, AFE_UNIT_LUX);
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_IR;
+      sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name, "IR");
+      _deviceConfiguration.unit[0] = AFE_EMPTY_STRING;
+      publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_IR;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
 /******* Private Methods *******/
 
@@ -1004,7 +1046,6 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
      * @brief tag: device_class
      *
      */
-
 
     if (strcmp(deviceConfiguration->deviceClass,
                AFE_CONFIG_HA_DEVICE_CLASS_NONE) == 0) {
@@ -1206,6 +1247,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PM25) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
       }
 #endif // PM25
 
@@ -1224,6 +1267,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25_WHO));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
       }
 #endif // PM25 WHO Norm
 

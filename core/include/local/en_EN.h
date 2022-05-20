@@ -425,6 +425,7 @@
 #define L_TSL2561_GAIN_ILUMINANCE "IDX Illumination"
 #define L_TSL2561_GAIN_BROADBAND "IDX Broadband"
 #define L_TSL2561_GAIN_IR "IDX Infrared"
+#define L_ILUMINANCE "Illuminance"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"

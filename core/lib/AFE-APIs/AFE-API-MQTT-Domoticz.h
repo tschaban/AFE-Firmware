@@ -74,7 +74,6 @@ private:
   boolean publishSetColorMessage(uint32_t *idx, CLED_PARAMETERS *led);
 #endif
 
-
 public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIMQTTDomoticz();
@@ -113,7 +112,11 @@ public:
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+  void publishBatteryMeterValues(uint8_t id);
+#else
   void publishBatteryMeterValues();
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

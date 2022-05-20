@@ -162,7 +162,8 @@
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
-
+#define L_NETWORK_RADIO_MODE "Tryb Radio 802.11"
+#define L_NETWORK_OUTPUT_POWER "Moc nadawania (dBm)"
 
 
 /* Form: MQTT Broker */
@@ -383,12 +384,18 @@
 #define L_BMEX80_IDX_IQA "IDX IQA"
 #define L_BMEX80_IDX_STATIC_IAQ "IDX Statyczny IQA"
 #define L_BMEX80_IDX_CO2_EQUVALENT "IDX CO2"
+#define L_BMEX80_CO2 "Ekwiwalent CO2"
 #define L_BMEX80_IDX_BVOC_EQUIVALENT "IDX BVOC"
 #define L_BMEX80_MQTT_TOPIC "Temat MQTT czujnika BMEx80"
 #define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
 #define L_BMEX80_REFRESH_SETTINGS "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu czujnika"
 #define L_BMEX80_ALTITIDE "Wysokość nad poziomem morza"
 #define L_BMEX80_METERS "Metrów"
+#define L_BMEX80_GAS "Opór gazu"
+#define L_BMEX80_STATIC_IAQ "Statyczny IAQ"
+#define L_BMEX80_BVOC "Ekwiwalent BVOC"
+#define L_BMEX80_IAQ "IAQ"
+
 
 /* BH1750 */
 #define L_BH1750_SENSOR "Czujnik BH1750"
@@ -414,6 +421,7 @@
 #define L_TSL2561_GAIN_ILUMINANCE "IDX Natężenie światła"
 #define L_TSL2561_GAIN_BROADBAND "IDX Światło widzialne"
 #define L_TSL2561_GAIN_IR "IDX Podczerwień"
+#define L_ILUMINANCE "Natężenie światła"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"
@@ -539,6 +547,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* Generic Sensor: Pressure */
 #define L_PRESSURE "Ciśnienie"
+#define L_PRESSURE_RELATIVE "Ciśnienie względne"
 #define L_PRESSURE_IDX "IDX Ciśnienie"
 #define L_PRESSURE_IDX_ALT "Czujnik: wysokość n.p.m"
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Ciśnienie względne"

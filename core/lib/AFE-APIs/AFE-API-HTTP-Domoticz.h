@@ -7,23 +7,21 @@
 
 /**
  * @brief code excluded for none-Domoticz API
- * 
+ *
  */
-
 
 #ifdef AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-#include <rBase64.h>
 #include <AFE-API.h>
 #include <WiFiClient.h>
+#include <rBase64.h>
+
 
 #ifdef AFE_ESP32
 #include <HTTPClient.h>
 #else // ESP8266
 #include <ESP8266HTTPClient.h>
 #endif // ESP32 / 8266
-
-
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -55,8 +53,8 @@ private:
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
                                   uint16_t nvalue = 0);
 
-/* Replace space with %20 */
-//  void replaceSpaceinUrl(const char *inputString, const char &outputString);
+  /* Replace space with %20 */
+  //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -130,7 +128,11 @@ public:
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+  boolean publishBatteryMeterValues(uint8_t id);
+#else
   boolean publishBatteryMeterValues();
+#endif
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
@@ -169,13 +171,13 @@ public:
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
-/* RGB LED are not supported in HTTP Domoticz API 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  virtual void addClass(AFECLED *);
-  boolean publishCLEDState(uint8_t id);
-  boolean publishCLEDEffectState(uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_CLED
-*/
+  /* RGB LED are not supported in HTTP Domoticz API
+  #ifdef AFE_CONFIG_HARDWARE_CLED
+    virtual void addClass(AFECLED *);
+    boolean publishCLEDState(uint8_t id);
+    boolean publishCLEDEffectState(uint8_t id);
+  #endif // AFE_CONFIG_HARDWARE_CLED
+  */
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
