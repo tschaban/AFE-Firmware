@@ -64,9 +64,6 @@ private:
   /* Classfies and invokes code for processing the request */
   void processRequest();
 
-  /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
-  boolean idxForProcessing(uint32_t idx);
-
   boolean publishSwitchMessage(uint32_t *idx, boolean state);
 
 #ifdef AFE_CONFIG_HARDWARE_CLED

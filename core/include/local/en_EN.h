@@ -108,6 +108,7 @@
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
+#define L_INDEX_DONATION "Donation"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
@@ -271,7 +272,7 @@
 #define L_ADC_HA_VOLTAGE_RAW "Raw"
 #define L_ADC_HA_VOLTAGE_PERCENT "Raw"
 
-
+#define L_BATTERY "Battery"
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
 #define L_BATTERY_MIN_LEVEL "Battery level: min"
@@ -409,7 +410,7 @@
 #define L_BH1750_CONTINUES_4_LUX "Continuous reading: 4 lux 16ms"
 #define L_BH1750_ONE_READ_1_LUX "One read: 1 lux 120ms"
 #define L_BH1750_ONE_READ_05_LUX "One read: 0.5 lux 120ms"
-#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16mss"
+#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16ms"
 
 
 /* TSL2561 */

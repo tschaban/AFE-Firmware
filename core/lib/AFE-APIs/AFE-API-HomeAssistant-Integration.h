@@ -53,6 +53,7 @@ private:
   struct HA_DEVICE_CONFIG {
     uint8_t id;
     uint8_t type;
+    uint8_t hardwareId;
     char label[AFE_CONFIG_HA_LABEL_SIZE];
     MQTT_TOPIC mqtt;
 #ifdef AFE_CONFIG_HARDWARE_CLED
@@ -74,6 +75,7 @@ private:
    * @param  id               hardware item Id
    */
   void generateObjectId(char *objectId, uint8_t deviceClassId,
+                        uint8_t hardwareId,
                         uint8_t id = AFE_HARDWARE_ITEM_NOT_EXIST);
 
   /**
@@ -102,7 +104,6 @@ private:
    */
   void removeItemRemovedFromHomeAssistantMQTTDiscovery(
       HA_DEVICE_CONFIG *deviceConfiguration);
-
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /**
@@ -136,6 +137,7 @@ private:
   void publishAnalogInputs(void);
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   /**
    * @brief publishes configuration of all DS18B20 sensors
@@ -153,55 +155,55 @@ private:
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-/**
- * @brief publishes thermal protector
- * 
- */
+  /**
+   * @brief publishes thermal protector
+   *
+   */
   void publishThermalProtector(void);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-/**
- * @brief publishes regulator 
- * 
- */
+  /**
+   * @brief publishes regulator
+   *
+   */
   void publishRegulator(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-/**
- * @brief publishes Bosch sensor
- * 
- */
+  /**
+   * @brief publishes Bosch sensor
+   *
+   */
   void publishBMX80(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-/**
- * @brief publishes BH1750 sensor
- * 
- */
+  /**
+   * @brief publishes BH1750 sensor
+   *
+   */
   void publishBH1750(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-/**
- * @brief publishes HPMA115S0 sensor
- * 
- */
+  /**
+   * @brief publishes HPMA115S0 sensor
+   *
+   */
   void publishHPMA115S0(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-/**
- * @brief publishes Anemometer sensor
- * 
- */
+  /**
+   * @brief publishes Anemometer sensor
+   *
+   */
   void publishAnemometer(void);
 #endif
 /**
  * @brief publishes rainmeter sensor
- * 
+ *
  */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 
@@ -209,10 +211,10 @@ private:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-/**
- * @brief publishes TSL2561 sensor
- * 
- */
+  /**
+   * @brief publishes TSL2561 sensor
+   *
+   */
   void publishTSL2561(void);
 #endif
 

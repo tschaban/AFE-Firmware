@@ -204,7 +204,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  void getConfiguration(uint8_t id, BH1750_CONFIG *);
+  boolean getConfiguration(uint8_t id, BH1750_CONFIG *);
   void saveConfiguration(uint8_t id, BH1750_CONFIG *);
   void createBH1750SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_BH1750
@@ -275,7 +275,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  void getConfiguration(uint8_t id, TSL2561 *);
+  boolean getConfiguration(uint8_t id, TSL2561 *);
   void saveConfiguration(uint8_t id, TSL2561 *);
   void createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561

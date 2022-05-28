@@ -630,17 +630,6 @@ void AFESitesGenerator::siteDevice(String &page) {
   /* Section: APIs */
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  addSelectFormItemOpen(page, F("v"), F(L_DOMOTICZ_VERSION));
-  addSelectOptionFormItem(page, L_DEVICE_DOMOTICZ_VERSION_410, "0",
-                          Device->configuration.api.domoticzVersion ==
-                              AFE_DOMOTICZ_VERSION_0);
-  addSelectOptionFormItem(page, L_DEVICE_DOMOTICZ_VERSION_2020, "1",
-                          Device->configuration.api.domoticzVersion ==
-                              AFE_DOMOTICZ_VERSION_1);
-  addSelectFormItemClose(page);
-#endif
-
   addCheckboxFormItem(page, "h", "HTTP API", "1",
                       Device->configuration.api.http);
 
@@ -2309,12 +2298,14 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   addSelectOptionFormItem(page, L_NONE, "255",
                           configuration.type == AFE_BMX_UNKNOWN_SENSOR);
 #ifndef AFE_ESP32
-  addSelectOptionFormItem(page, "BMx085/BMx180", "1",
+  addSelectOptionFormItem(page, "BMx085/BMP180", "1",
                           configuration.type == AFE_BMP180_SENSOR);
 #endif // AFE_ESP32
-  addSelectOptionFormItem(page, "BMx280", "2",
+  addSelectOptionFormItem(page, "BME280", "2",
                           configuration.type == AFE_BME280_SENSOR);
-  addSelectOptionFormItem(page, "BMx680", "6",
+  addSelectOptionFormItem(page, "BMP280", "3",
+                          configuration.type == AFE_BMP280_SENSOR);
+  addSelectOptionFormItem(page, "BME680", "6",
                           configuration.type == AFE_BME680_SENSOR);
   addSelectFormItemClose(page);
 
@@ -2353,7 +2344,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999",
                      "0.001");
 
-    if (configuration.type != AFE_BMP180_SENSOR) {
+    if (configuration.type != AFE_BMP180_SENSOR && configuration.type != AFE_BMP280_SENSOR) {
       /* Item: humidity correction */
       sprintf(_number, "%-.3f", configuration.humidity.correction);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "hc", L_HUMIDITY,
@@ -2384,7 +2375,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                        AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
-      if (configuration.type != AFE_BMP180_SENSOR) {
+      if (configuration.type != AFE_BMP180_SENSOR  && configuration.type != AFE_BMP280_SENSOR) {
         sprintf(_number, "%d", configuration.domoticz.humidity.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i2", L_HUMIDITY_IDX,
                          _number, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -2504,7 +2495,11 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 
   BH1750_CONFIG configuration;
-  Data->getConfiguration(id, &configuration);
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
   openSection(page, F(L_BH1750_SENSOR), F(""));
 
 /* Item: I2C Address selection */
@@ -2571,7 +2566,10 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
 
   TSL2561 configuration;
-  Data->getConfiguration(id, &configuration);
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
   openSection(page, F(L_TSL2561_SENSOR), F(""));
 
 /* Item: I2C Address selection */

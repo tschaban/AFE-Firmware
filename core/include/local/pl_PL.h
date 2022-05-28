@@ -103,6 +103,7 @@
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
 #define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
+#define L_INDEX_DONATION "Wsparcie"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
@@ -267,6 +268,7 @@
 #define L_ADC_HA_VOLTAGE_RAW "Wartość na wejściu"
 #define L_ADC_HA_VOLTAGE_PERCENT "Wartość na wejściu"
 
+#define L_BATTERY "Bateria"
 #define L_BATTERY_METER "Pomiar naładowania baterii"
 #define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
 #define L_BATTERY_MIN_LEVEL "Minimalny poziom baterii"
@@ -406,7 +408,7 @@
 #define L_BH1750_CONTINUES_4_LUX "Ciągły odczyt: 4 lux 16ms"
 #define L_BH1750_ONE_READ_1_LUX "Jeden odczyt: 1 lux 120ms"
 #define L_BH1750_ONE_READ_05_LUX "Jeden odczyt: 0.5 lux 120ms"
-#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16mss"
+#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16ms"
 
 /* TSL2561 */
 #define L_TSL2561_SENSOR "Czujnik TSL2561"

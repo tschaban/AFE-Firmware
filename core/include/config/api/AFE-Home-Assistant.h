@@ -30,12 +30,7 @@
 #define AFE_CONFIG_MQTT_COMMAND_GET "get"
 
 
-/**
- * @brief Size of configuraion topic
- * Max at this stage: 1234567890123456789012345678901234567890123456789012345678901234/binary_sensor/E86aDBf2-84e0E084-12/config
- * 106 + 3 buffer
- */
-#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE 110 
+
 
 /**
  * @brief Length of JSON Configuraion device
@@ -51,6 +46,11 @@
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS true
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS true
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION true
+
+/**
+ * @brief Item types. required to generated ObjectId
+ * 
+ */
 
 #define AFE_CONFIG_HA_ITEM_RELAY 0
 #define AFE_CONFIG_HA_ITEM_SWITCH 1
@@ -89,15 +89,42 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH 34
 #define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H 35
 #define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H 36
- 
+#define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_PERCENT 37
+#define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_VOLT 38
+
+/**
+ * @brief Hardware Ids required to generated ObjectId
+ * 
+ */
+
+#define AFE_CONFIG_HA_HARDWARE_RELAY 0
+#define AFE_CONFIG_HA_HARDWARE_SWITCH 1
+#define AFE_CONFIG_HA_HARDWARE_CLED 2
+#define AFE_CONFIG_HA_HARDWARE_ADC 3
+#define AFE_CONFIG_HA_HARDWARE_REGULATOR 4
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_DS18B20 5
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_DHTXX 6
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_BMX60 7
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_BH1750 8
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_HPMA115S0 9
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_ANEMOMETER 10
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_RAINMETER 11
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_TSL2561 12
+
+
 /**
  * @brief Sizes of variables
  *
  */
-#define AFE_CONFIG_HA_OBJECT_ID_SIZE 25
+#define AFE_CONFIG_HA_OBJECT_ID_SIZE 28
 #define AFE_CONFIG_HA_LABEL_SIZE 55 //33 + "Temperatura odczuwalna"
 #define AFE_CONFIG_HA_OPTIONS_SIZE 144 // Currently only from RGB effect options
 #define AFE_CONFIG_HA_DEVICE_TYPE_SIZE sizeof(AFE_CONFIG_HA_DEVICE_CLASS_CO2) // max of DeviceType
+/**
+ * @brief Size of configuraion topic
+ * Max at this stage: MQTT_TOPIC_LENGTH_64/binary_sensor/AFE_CONFIG_HA_OBJECT_ID_SIZE/config
+  */
+#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE AFE_CONFIG_HA_OBJECT_ID_SIZE+64+22
 
 
 /**
@@ -139,6 +166,9 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_ILLUMINANCE "illuminance"
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM10 "pm10"
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM25 "pm25"
+#define AFE_CONFIG_HA_DEVICE_CLASS_BATTERY "battery"
+
+
 
 /**
  * @brief Home Assistant State Classes
@@ -277,8 +307,8 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE_CALCULATED "{{value_json.voltageCalculated}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAW "{{value_json.raw}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCENT "{{value_json.percent}}"
-
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE "{{value_json.illuminance.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_IR "{{value_json.IR.value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10 "{{value_json.PM10.value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10_WHO "{{value_json.WHO.PM10.value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25 "{{value_json.PM25.value}}"
@@ -295,6 +325,10 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 //#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[?(@.unit=='mm/12h')].value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[3].value}}"
 //#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[?(@.unit=='mm/24h')].value}}"
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_PERCENT "{{value_json.batterymeter[0].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_VOLT "{{value_json.batterymeter[1].value}}"
+
 
 
 

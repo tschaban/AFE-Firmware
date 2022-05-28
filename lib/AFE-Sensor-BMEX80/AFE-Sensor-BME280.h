@@ -24,13 +24,12 @@ private:
 public:
   BMEX80 *configuration;
   BMEX80_DATA data;
-
+  
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME280();
-
-  boolean begin(BMEX80 *, TwoWire *);
-
+  boolean begin(BMEX80 *_configuration, TwoWire *_wirePort);
   boolean read();
+
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80

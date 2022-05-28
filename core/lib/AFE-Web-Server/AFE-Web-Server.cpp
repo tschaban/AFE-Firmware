@@ -1232,9 +1232,6 @@ void AFEWebServer::get(DEVICE &data) {
   data.api.mqtt = server.arg(F("m")).length() > 0
                       ? (server.arg(F("m")).toInt() == 2 ? true : false)
                       : false;
-  data.api.domoticzVersion = server.arg(F("v")).length() > 0
-                                 ? server.arg(F("v")).toInt()
-                                 : AFE_DOMOTICZ_VERSION_DEFAULT;
 #else
   data.api.mqtt = server.arg(F("m")).length() > 0 ? true : false;
 #endif

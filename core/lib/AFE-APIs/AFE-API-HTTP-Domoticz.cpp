@@ -508,7 +508,7 @@ void AFEAPIHTTPDomoticz::addClass(AFERainmeter *Sensor) {
 
 void AFEAPIHTTPDomoticz::publishRainSensorData() {
   if (_initialized) {
-    char value[20];
+    char value[20]; // 999999.00;999999.00
     if (_RainmeterSensor->configuration.domoticz.idx > 0) {
       sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour * 100,
               _RainmeterSensor->current.counter);

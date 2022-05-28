@@ -23,6 +23,7 @@
 #define AFE_BMX_UNKNOWN_SENSOR 255
 #define AFE_BMP180_SENSOR 1
 #define AFE_BME280_SENSOR 2
+#define AFE_BMP280_SENSOR 3
 #define AFE_BME680_SENSOR 6
 
 #endif // _AFE_Hardware_Bosch_BMx80_h
