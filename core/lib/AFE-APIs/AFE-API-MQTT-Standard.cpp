@@ -180,7 +180,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (_Device->configuration.noOfAnemometerSensors > 0) {
     subscribeToCommand(_AnemometerSensor->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_HPMA115S0);
+                       AFE_MQTT_DEVICE_ANEMOMETER);
   }
 #endif
 
@@ -512,6 +512,32 @@ void AFEAPIMQTTStandard::processADC() {
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+void AFEAPIMQTTStandard::processBatteryMeter(uint8_t *id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: MQTT: Processing BatteryMeter: ");
+#endif
+  if (strcmp(Mqtt.message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
+    publishBatteryMeterValues(*id);
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("WARN: MQTT: Command not implemented");
+  }
+#endif
+}
+boolean AFEAPIMQTTStandard::publishBatteryMeterValues(uint8_t id) {
+  boolean _ret = false;
+  if (enabled) {
+    char message[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
+    _AnalogInput[id]->getBatteryMeterJSON(message);
+    _ret =
+        Mqtt.publish(_AnalogInput[id]->configuration.battery.mqtt.topic, message);
+  }
+  return _ret;
+}
+
+#else  // AFE_ESP8266
 void AFEAPIMQTTStandard::processBatteryMeter() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BatteryMeter: ");
@@ -525,7 +551,6 @@ void AFEAPIMQTTStandard::processBatteryMeter() {
   }
 #endif
 }
-
 boolean AFEAPIMQTTStandard::publishBatteryMeterValues() {
   boolean _ret = false;
   if (enabled) {
@@ -536,6 +561,7 @@ boolean AFEAPIMQTTStandard::publishBatteryMeterValues() {
   }
   return _ret;
 }
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

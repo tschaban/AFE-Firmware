@@ -233,28 +233,28 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 
     switch ((uint8_t)reason) {
     case 0:
-      Serial << "TCP Disconnected";
+      Serial << F("TCP Disconnected");
       break;
     case 1:
-      Serial << "Unacceptable protocol version";
+      Serial << F("Unacceptable protocol version");
       break;
     case 2:
-      Serial << "Device identifier rejected";
+      Serial << F("Device identifier rejected");
       break;
     case 3:
-      Serial << "MQTT Server unavailable";
+      Serial << F("MQTT Server unavailable");
       break;
     case 4:
-      Serial << "Malformed credentials";
+      Serial << F("Malformed credentials");
       break;
     case 5:
-      Serial << "Not authorized";
+      Serial << F("Not authorized");
       break;
     case 6:
-      Serial << "ESP8266 Not enought memory";
+      Serial << F("ESP8266 Not enought memory");
       break;
     case 7:
-      Serial << "LS Bad fingerprint";
+      Serial << F("LS Bad fingerprint");
       break;
     }
 #endif
@@ -265,6 +265,7 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 void AFEAsyncMQTTClient::onMqttMessage(
     char *topic, char *payload, AsyncMqttClientMessageProperties properties,
     size_t len, size_t index, size_t total) {
+      
 
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Got message:");

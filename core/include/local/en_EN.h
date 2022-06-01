@@ -6,6 +6,8 @@
 #define L_LANGUAGE "en-EN"
 #define L_LANGUAGE_SHORT "en"
 
+#define L_AFE_FIRMWARE "AFE Firmware"
+
 /* Firmware names */
 #if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "for Shelly-1"
@@ -106,8 +108,9 @@
 #define L_INDEX_HOTSPOT_MODE "Direct via HotSpot"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Configuration panel"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
-#define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
+#define L_INDEX_OPENING_CONFIG_PANEL "Opening {{n}} configuration panel"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
+#define L_INDEX_DONATION "Donation"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
@@ -168,6 +171,9 @@
 #define L_NETWOK_NONE_BACKUP_SSID "--- None ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Backup WiFi Configuration"
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
+#define L_NETWORK_RADIO_MODE "Radio Mode: 802.11"
+#define L_NETWORK_OUTPUT_POWER "Transmit power (dBm)"
+
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
@@ -268,7 +274,7 @@
 #define L_ADC_HA_VOLTAGE_RAW "Raw"
 #define L_ADC_HA_VOLTAGE_PERCENT "Raw"
 
-
+#define L_BATTERY "Battery"
 #define L_BATTERY_METER "Battery level"
 #define L_BATTERY_MQTT_TOPIC "MQTT Topic: battery level"
 #define L_BATTERY_MIN_LEVEL "Battery level: min"
@@ -281,9 +287,9 @@
 #define L_UPGRADE_INTERUPTED "Don't refresh the browser while upgrading the device"
 #define L_UPGRADE_DONT_PLUG_OFF "Don't plug off the device from the power source"
 #define L_UPGRADE_TIME "The upgrade process will take up to a minute"
-#define L_UPGRADE_AUTO_REBOOT "Device will be automatically rebooted after upgrade process is finished"
+#define L_UPGRADE_AUTO_REBOOT "Device will be rebooted after upgrade process is finished"
 
-#define L_UPGRADE_VIA_WAN "Download and Upgrade"
+#define L_UPGRADE_VIA_WAN "Upgrade over the Internet"
 #define L_UPGRADE_VIA_WAN_HINT "Firmware will be automatically downloaded and uploaded to the device"
 
 #define L_UPGRADE_FROM_FILE "Upload *.bin file"
@@ -309,6 +315,8 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
+#define L_UPGRADE_UPGRADE_SERVER_NOT_AVAILABLE "<strong>No access to {{n}} upgrade server</strong>"
+#define L_UPGRADE_UPGRADE_FIRMWARE_NOT_AVAILABLE "<strong>No {{n}} version available for an upgrade</strong>"
 
 #define L_UPGRADE_TIMEOUT "Upgrade failed. Problem with connecting to the firmware's server (timeout)"
 #define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Upgrade failed. Problem with connecting to the firmware's server"
@@ -320,6 +328,8 @@
 #define L_UPGRADE_SOMETHING_WRONG "Upgrade failed. Something went wrong [Error code: %d]"
 #define L_UPGRADE_NO_SPACE "Upgrade failed. Not enough space to begin upgrade"
 #define L_UPGRADE_NO_CONTENT "Upgrade failed. Problem with firmware server [Error: No response]"
+
+
 
 
 /* Form: password */
@@ -391,6 +401,11 @@
 #define L_BMEX80_REFRESH_SETTINGS "Show/Refresh configuration settings after sensor type change"
 #define L_BMEX80_ALTITIDE "Above sea level"
 #define L_BMEX80_METERS "Meters"
+#define L_BMEX80_IAQ "IAQ"
+#define L_BMEX80_STATIC_IAQ "Static IAQ"
+#define L_BMEX80_BVOC "BVOC Equivalent"
+#define L_BMEX80_CO2 "CO2 Equivalent"
+#define L_BMEX80_GAS "Gas Resistance"
 
 /* BH1750 */
 #define L_BH1750_SENSOR "BH1750 Sensor"
@@ -401,7 +416,7 @@
 #define L_BH1750_CONTINUES_4_LUX "Continuous reading: 4 lux 16ms"
 #define L_BH1750_ONE_READ_1_LUX "One read: 1 lux 120ms"
 #define L_BH1750_ONE_READ_05_LUX "One read: 0.5 lux 120ms"
-#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16mss"
+#define L_BH1750_ONE_READ_4_LUX "One read: 4 lux 16ms"
 
 
 /* TSL2561 */
@@ -417,6 +432,7 @@
 #define L_TSL2561_GAIN_ILUMINANCE "IDX Illumination"
 #define L_TSL2561_GAIN_BROADBAND "IDX Broadband"
 #define L_TSL2561_GAIN_IR "IDX Infrared"
+#define L_ILUMINANCE "Illuminance"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"
@@ -540,6 +556,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* Generic Sensors: pressure */
 #define L_PRESSURE "Pressure"
+#define L_PRESSURE_RELATIVE "Relative Pressure"
 #define L_PRESSURE_IDX "IDX Pressure"
 #define L_PRESSURE_IDX_ALT "Sensor: altitude"
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Relative pressure"
@@ -599,7 +616,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_MQTT_TOPIC "MQTT Topic to monitor authorizations of MiFare card"
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long CLOSED (ON) state should be kept after detecting a card"
 #define L_MIFARE_CARD_TIME "Time"
-#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
+#define L_MIFARE_CARD_NONE_PRO "The standard version of {{n}} supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Backup copy of the TAG stored on the card"
 
 
@@ -691,7 +708,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_PRO_NO "Pro version: No"
 #define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
 #define L_ADDITIONAL_INFORMATION "Additional information"
-#define L_WIFI_RSSI "WiFi Received Signal Strength Indicator {{x}} dBm ({{t}})"
+#define L_WIFI_RSSI "WiFi Signal Strength Indicator {{x}} dBm ({{t}})"
 #define L_WIFI_SIGNAL "Signal"
 #define L_WIFI_RSSI_30 "Amazing"
 #define L_WIFI_RSSI_67 "Very Good"

@@ -22,10 +22,17 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
 #ifdef AFE_ESP32
   /* Setting the WirePort used by the sensor to WirePort0 */
   _WirePort0 = configuration.wirePortId == 0 ? WirePort0 : _WirePort1;
+#else
+  _WirePort0 = WirePort0;
 #endif
 
 #ifdef DEBUG
   Serial << endl << endl << F("----- TSL2561: Initializing -----");
+  Serial << endl << F(": Name: ") << configuration.name;
+  Serial << endl << F(": Sensitiveness: ") << configuration.sensitiveness;
+  Serial << endl << F(": Gain: ") << configuration.gain;
+  Serial << endl << F(": Interval: ") << configuration.interval;
+  Serial << endl << F(": I2C Address: ") << _HEX(configuration.i2cAddress);
 #endif
   if (
 #ifdef AFE_ESP32
@@ -45,6 +52,7 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
       Serial << endl
              << F(": Sensor address: 0x") << _HEX(configuration.i2cAddress);
 #endif
+      _initialized = tls2561.begin(configuration.i2cAddress, _WirePort0);
 
       /* Configuring the sensor: setting gain */
       switch (configuration.gain) {
@@ -77,8 +85,6 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
             TSL2561_INTEGRATIONTIME_13MS); /* fast but low resolution */
       }
 
-      _initialized = tls2561.begin(configuration.i2cAddress, _WirePort0);
-
 #ifdef DEBUG
     } else {
       Serial << endl
@@ -92,6 +98,7 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F("Error: Address not set");
 #endif
   }
+
 #ifdef DEBUG
   if (_initialized) {
 
@@ -100,13 +107,10 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *WirePort0) {
     Serial << endl << F(": Sensor: ") << sensor.name;
     Serial << endl << F(": Driver Ver: ") << sensor.version;
     Serial << endl << F(": Unique ID: ") << sensor.sensor_id;
-    Serial << endl << F(": Max Value: ") << sensor.max_value << F("lux");
-    Serial << endl << F(": Min Value: ") << sensor.min_value << F("lux");
-    Serial << endl << F(": Resolution: ") << sensor.resolution << F("lux");
-    Serial << endl << F(": Name: ") << configuration.name;
-    Serial << endl << F(": Sensitiveness: ") << configuration.sensitiveness;
-    Serial << endl << F(": Gain: ") << configuration.gain;
-    Serial << endl << F(": Interval: ") << configuration.interval;
+    Serial << endl << F(": Max Value: ") << sensor.max_value << F(AFE_UNIT_LUX);
+    Serial << endl << F(": Min Value: ") << sensor.min_value << F(AFE_UNIT_LUX);
+    Serial << endl
+           << F(": Resolution: ") << sensor.resolution << F(AFE_UNIT_LUX);
   }
   Serial << endl
          << F(": Device: ")
@@ -130,7 +134,7 @@ boolean AFESensorTSL2561::listener() {
         illuminance = tls2561.calculateLux(broadband, ir);
 #ifdef DEBUG
         Serial << endl
-               << F("Lux: ") << illuminance << F(" lux") << endl
+               << F("Lux: ") << illuminance << endl
                << F("Broadband: ") << broadband << endl
                << F("IR: ") << ir;
 #endif
@@ -143,7 +147,7 @@ boolean AFESensorTSL2561::listener() {
       }
 
 #ifdef DEBUG
-      Serial << Serial << endl << F("---------------------------");
+      Serial << endl << F("---------------------------");
 #endif
 
       startTime = millis();
@@ -153,10 +157,10 @@ boolean AFESensorTSL2561::listener() {
 }
 
 void AFESensorTSL2561::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"lux\"},"
+  sprintf(json, "{\"illuminance\":{\"value\":%d,\"unit\":\"%s\"},"
                 "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
                 "%d,\"unit\":\"?\"}}",
-          illuminance, broadband, ir);
+          illuminance, AFE_UNIT_LUX, broadband, ir);
 }
 
 #endif // AFE_CONFIG_HARDWARE_TSL2561

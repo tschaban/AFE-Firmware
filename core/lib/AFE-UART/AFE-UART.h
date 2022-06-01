@@ -10,7 +10,7 @@
 
 
 #include <AFE-Data-Access.h>
-#include <AFE-SoftwareSerial.h>
+#include <SoftwareSerial.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -22,7 +22,7 @@ private:
   AFEDataAccess Data;
 
 public:
-  AFESoftwareSerial SerialBus;
+  SoftwareSerial SerialBus;
 
   /* Constructor */
   AFEUART();

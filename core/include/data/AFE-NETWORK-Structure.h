@@ -22,6 +22,10 @@ struct NETWORK {
   char gatewayBackup[16];
   char subnetBackup[16];
   uint8_t noFailuresToSwitchNetwork;
+#if !defined(ESP32)
+  uint8_t radioMode;
+  float outputPower;
+#endif
 };
 
 #endif

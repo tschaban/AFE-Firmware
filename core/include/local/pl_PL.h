@@ -6,6 +6,8 @@
 #define L_LANGUAGE "pl-PL"
 #define L_LANGUAGE_SHORT "pl"
 
+#define L_AFE_FIRMWARE "AFE Firmware"
+
 /* Firmware names */
 #if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "dla Shelly-1"
@@ -101,8 +103,9 @@
 #define L_INDEX_HOTSPOT_MODE "Tryb HotSpot"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Urządzenie jest w trybie operacyjnym"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
-#define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
+#define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny {{n}}"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
+#define L_INDEX_DONATION "Wsparcie"
 
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
@@ -162,7 +165,8 @@
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
-
+#define L_NETWORK_RADIO_MODE "Tryb Radio 802.11"
+#define L_NETWORK_OUTPUT_POWER "Moc nadawania (dBm)"
 
 
 /* Form: MQTT Broker */
@@ -266,6 +270,7 @@
 #define L_ADC_HA_VOLTAGE_RAW "Wartość na wejściu"
 #define L_ADC_HA_VOLTAGE_PERCENT "Wartość na wejściu"
 
+#define L_BATTERY "Bateria"
 #define L_BATTERY_METER "Pomiar naładowania baterii"
 #define L_BATTERY_MQTT_TOPIC "Temat MQTT Stanu baterii"
 #define L_BATTERY_MIN_LEVEL "Minimalny poziom baterii"
@@ -279,12 +284,12 @@
 #define L_UPGRADE_INTERUPTED "Nie odświeżaj przeglądarki podczas aktualizacji"
 #define L_UPGRADE_DONT_PLUG_OFF "Nie odłączaj urządzenia od źródła zasilania"
 #define L_UPGRADE_TIME "Proces aktualizacji potrwa do minuty"
-#define L_UPGRADE_AUTO_REBOOT "Urządzenie zostanie automatycznie uruchomione po ukończeniu aktualizacji"
+#define L_UPGRADE_AUTO_REBOOT "Urządzenie zostanie ponownie uruchomione po ukończeniu aktualizacji"
 
-#define L_UPGRADE_VIA_WAN "Pobierz i uaktualnij"
-#define L_UPGRADE_VIA_WAN_HINT "Firmware zostanie automatycznie pobrane i wgrane do urządzenia"
+#define L_UPGRADE_VIA_WAN "Uaktualnij przez Internet"
+#define L_UPGRADE_VIA_WAN_HINT "Firmware zostanie pobrany i załadowany do urządzenia"
 
-#define L_UPGRADE_FROM_FILE "Załaduj plik *.bin"
+#define L_UPGRADE_FROM_FILE "Załaduj firmware z pliku *.bin"
 #define L_UPGRADE "Aktualizuj"
 
 #define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
@@ -304,6 +309,8 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Trwa ponowne uruchamianie"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie automatycznie przeładowana ... czekaj"
 #define L_UPGRADE_REBOOT "Ponowne uruchamianie"
+#define L_UPGRADE_UPGRADE_SERVER_NOT_AVAILABLE "<strong>Brak dostępu do serwera aktualizacji {{n}}</strong>"
+#define L_UPGRADE_UPGRADE_FIRMWARE_NOT_AVAILABLE "<strong>Brak dostępnej wersji {{n}} do aktualizacji</strong>"
 
 #define L_UPGRADE_TIMEOUT "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania (timeout)"
 #define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania"
@@ -383,12 +390,18 @@
 #define L_BMEX80_IDX_IQA "IDX IQA"
 #define L_BMEX80_IDX_STATIC_IAQ "IDX Statyczny IQA"
 #define L_BMEX80_IDX_CO2_EQUVALENT "IDX CO2"
+#define L_BMEX80_CO2 "Ekwiwalent CO2"
 #define L_BMEX80_IDX_BVOC_EQUIVALENT "IDX BVOC"
 #define L_BMEX80_MQTT_TOPIC "Temat MQTT czujnika BMEx80"
 #define L_BMEX80_SENSOR_TYPE "Typ czujnika BMEx80"
 #define L_BMEX80_REFRESH_SETTINGS "Pokaż/Odśwież parametery konfiguracyjne po ustawieniu/zmianie typu czujnika"
 #define L_BMEX80_ALTITIDE "Wysokość nad poziomem morza"
 #define L_BMEX80_METERS "Metrów"
+#define L_BMEX80_GAS "Opór gazu"
+#define L_BMEX80_STATIC_IAQ "Statyczny IAQ"
+#define L_BMEX80_BVOC "Ekwiwalent BVOC"
+#define L_BMEX80_IAQ "IAQ"
+
 
 /* BH1750 */
 #define L_BH1750_SENSOR "Czujnik BH1750"
@@ -399,7 +412,7 @@
 #define L_BH1750_CONTINUES_4_LUX "Ciągły odczyt: 4 lux 16ms"
 #define L_BH1750_ONE_READ_1_LUX "Jeden odczyt: 1 lux 120ms"
 #define L_BH1750_ONE_READ_05_LUX "Jeden odczyt: 0.5 lux 120ms"
-#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16mss"
+#define L_BH1750_ONE_READ_4_LUX "Jeden odczyt: 4 lux 16ms"
 
 /* TSL2561 */
 #define L_TSL2561_SENSOR "Czujnik TSL2561"
@@ -414,6 +427,7 @@
 #define L_TSL2561_GAIN_ILUMINANCE "IDX Natężenie światła"
 #define L_TSL2561_GAIN_BROADBAND "IDX Światło widzialne"
 #define L_TSL2561_GAIN_IR "IDX Podczerwień"
+#define L_ILUMINANCE "Natężenie światła"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"
@@ -539,6 +553,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* Generic Sensor: Pressure */
 #define L_PRESSURE "Ciśnienie"
+#define L_PRESSURE_RELATIVE "Ciśnienie względne"
 #define L_PRESSURE_IDX "IDX Ciśnienie"
 #define L_PRESSURE_IDX_ALT "Czujnik: wysokość n.p.m"
 #define L_PRESSURE_IDX_RELATIVE_PRESSURE "IDX Ciśnienie względne"
@@ -600,7 +615,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytów karty MiFare"
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
-#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa {{n}} obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
 
 

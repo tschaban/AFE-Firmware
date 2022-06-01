@@ -204,8 +204,8 @@ public:
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  void getConfiguration(uint8_t id, BH1750 *);
-  void saveConfiguration(uint8_t id, BH1750 *);
+  boolean getConfiguration(uint8_t id, BH1750_CONFIG *);
+  void saveConfiguration(uint8_t id, BH1750_CONFIG *);
   void createBH1750SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
@@ -216,13 +216,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  void getConfiguration(ANEMOMETER *);
+  boolean getConfiguration(ANEMOMETER *);
   void saveConfiguration(ANEMOMETER *);
   void createAnemometerSensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  void getConfiguration(RAINMETER *);
+  boolean getConfiguration(RAINMETER *);
   void saveConfiguration(RAINMETER *);
   void createRainmeterSensorConfigurationFile();
   void get(RAINMETER_DATA *);
@@ -275,7 +275,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  void getConfiguration(uint8_t id, TSL2561 *);
+  boolean getConfiguration(uint8_t id, TSL2561 *);
   void saveConfiguration(uint8_t id, TSL2561 *);
   void createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561

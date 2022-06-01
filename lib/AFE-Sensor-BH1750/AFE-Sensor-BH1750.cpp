@@ -46,29 +46,24 @@ void AFESensorBH1750::begin(uint8_t _id, TwoWire *WirePort0) {
 #endif
 
       _initialized = bh1750.begin(
-          configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
-              ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
-              : configuration.mode ==
-                        BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
-                    ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
-                    : configuration.mode ==
-                              BH1750LightSensor::ONE_TIME_LOW_RES_MODE
-                          ? BH1750LightSensor::ONE_TIME_LOW_RES_MODE
+          configuration.mode == BH1750::ONE_TIME_HIGH_RES_MODE
+              ? BH1750::ONE_TIME_HIGH_RES_MODE
+              : configuration.mode == BH1750::ONE_TIME_HIGH_RES_MODE_2
+                    ? BH1750::ONE_TIME_HIGH_RES_MODE_2
+                    : configuration.mode == BH1750::ONE_TIME_LOW_RES_MODE
+                          ? BH1750::ONE_TIME_LOW_RES_MODE
                           : configuration.mode ==
-                                    BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
-                                ? BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE
+                                    BH1750::CONTINUOUS_HIGH_RES_MODE
+                                ? BH1750::CONTINUOUS_HIGH_RES_MODE
                                 : configuration.mode ==
-                                          BH1750LightSensor::
-                                              CONTINUOUS_HIGH_RES_MODE_2
-                                      ? BH1750LightSensor::
-                                            CONTINUOUS_HIGH_RES_MODE_2
-                                      : BH1750LightSensor::
-                                            CONTINUOUS_LOW_RES_MODE,
+                                          BH1750::CONTINUOUS_HIGH_RES_MODE_2
+                                      ? BH1750::CONTINUOUS_HIGH_RES_MODE_2
+                                      : BH1750::CONTINUOUS_LOW_RES_MODE,
 
           configuration.i2cAddress, _WirePort0);
       /*
             _initialized =
-         bh1750.begin(BH1750LightSensor::CONTINUOUS_HIGH_RES_MODE,
+         bh1750.begin(BH1750::CONTINUOUS_HIGH_RES_MODE,
                                         configuration.i2cAddress, WirePort0);
       */
     }
@@ -135,22 +130,22 @@ void AFESensorBH1750::listener() {
 #endif
 
       startTime = millis();
-      if (configuration.mode >= BH1750LightSensor::ONE_TIME_HIGH_RES_MODE) {
+      if (configuration.mode >= BH1750::ONE_TIME_HIGH_RES_MODE) {
 
-        bh1750.configure(
-            configuration.mode == BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
-                ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE
-                : configuration.mode ==
-                          BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
-                      ? BH1750LightSensor::ONE_TIME_HIGH_RES_MODE_2
-                      : BH1750LightSensor::ONE_TIME_LOW_RES_MODE);
+        bh1750.configure(configuration.mode == BH1750::ONE_TIME_HIGH_RES_MODE
+                             ? BH1750::ONE_TIME_HIGH_RES_MODE
+                             : configuration.mode ==
+                                       BH1750::ONE_TIME_HIGH_RES_MODE_2
+                                   ? BH1750::ONE_TIME_HIGH_RES_MODE_2
+                                   : BH1750::ONE_TIME_LOW_RES_MODE);
       }
     }
   }
 }
 
 void AFESensorBH1750::getJSON(char *json) {
-  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"lux\"}}", data);
+  sprintf(json, "{\"illuminance\":{\"value\":%.2f,\"unit\":\"%s\"}}", data,
+          AFE_UNIT_LUX);
 }
 
 #endif // AFE_CONFIG_HARDWARE_BH1750

@@ -24,6 +24,7 @@
 /* Urls */
 #define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
 #define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
+#define AFE_API_URL "http://api.smartnydom.pl"
 
 /**
  * @brief types of firmware upgrades
@@ -177,6 +178,10 @@
 #define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
 #define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
 #define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.ssid) + 30 // _(Sygnał: Bardzo dobry)
+#define AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE AFE_NONE
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER AFE_NONE
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN 0
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
@@ -228,30 +233,6 @@
 
 
 /* ***************** HARDWARE: Config and defaults *********************/
-
-/**
- * @brief include UART bus configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_UART
-#include <bus/AFE-UART.h>
-#endif 
-
-/**
- * @brief include I2C bus configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <bus/AFE-IIC.h>
-#endif
-
-/**
- * @brief include MCP23017 configuration parameters
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#include <hardwares/AFE-MCP23017.h>
-#endif
 
 /**
  * @brief include LED configuration parameters
@@ -363,7 +344,7 @@
  * 
  */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-#include <sensors/AFE-Bosch-BMx80.h>
+#include <sensors/AFE-BH1750.h>
 #endif
 
 /**
@@ -371,7 +352,7 @@
  * 
  */
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-#include <sensors/AFE-TSL2561-Sensor.h>
+#include <sensors/AFE-TSL2561.h>
 #endif
 
 /**
@@ -419,6 +400,30 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #include <functionalities/AFE-Thermal-Protection.h>
 #endif 
+
+/**
+ * @brief include UART bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_UART
+#include <bus/AFE-UART.h>
+#endif 
+
+/**
+ * @brief include I2C bus configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <bus/AFE-IIC.h>
+#endif
+
+/**
+ * @brief include MCP23017 configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#include <hardwares/AFE-MCP23017.h>
+#endif
 
 
 

@@ -30,12 +30,7 @@
 #define AFE_CONFIG_MQTT_COMMAND_GET "get"
 
 
-/**
- * @brief Size of configuraion topic
- * Max at this stage: 1234567890123456789012345678901234567890123456789012345678901234/binary_sensor/E86aDBf2-84e0E084-12/config
- * 106 + 3 buffer
- */
-#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE 110 
+
 
 /**
  * @brief Length of JSON Configuraion device
@@ -51,6 +46,11 @@
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS true
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS true
 #define AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION true
+
+/**
+ * @brief Item types. required to generated ObjectId
+ * 
+ */
 
 #define AFE_CONFIG_HA_ITEM_RELAY 0
 #define AFE_CONFIG_HA_ITEM_SWITCH 1
@@ -70,16 +70,67 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT 15
 #define AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION 16
 #define AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL 17
+#define AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE 18
+#define AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_PRESSURE 19
+#define AFE_CONFIG_HA_ITEM_SENSOR_IAQ 20
+#define AFE_CONFIG_HA_ITEM_SENSOR_STATIC_IAQ 21
+#define AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT 22
+#define AFE_CONFIG_HA_ITEM_SENSOR_BVOC_EQUIVALENT 23
+#define AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE 24
+#define AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE 25
+#define AFE_CONFIG_HA_ITEM_SENSOR_IR 26
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM10 27
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM10_WHO 28
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM25 29
+#define AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO 30
+#define AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH 31
+#define AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS 32
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM 33
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH 34
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H 35
+#define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H 36
+#define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_PERCENT 37
+#define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_VOLT 38
+
+/**
+ * @brief Hardware Ids required to generated ObjectId
+ * 
+ */
+
+#define AFE_CONFIG_HA_HARDWARE_RELAY 0
+#define AFE_CONFIG_HA_HARDWARE_SWITCH 1
+#define AFE_CONFIG_HA_HARDWARE_CLED 2
+#define AFE_CONFIG_HA_HARDWARE_ADC 3
+#define AFE_CONFIG_HA_HARDWARE_REGULATOR 4
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_DS18B20 5
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_DHTXX 6
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_BMX60 7
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_BH1750 8
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_HPMA115S0 9
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_ANEMOMETER 10
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_RAINMETER 11
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_TSL2561 12
+
 
 /**
  * @brief Sizes of variables
  *
  */
-#define AFE_CONFIG_HA_OBJECT_ID_SIZE 25
+#define AFE_CONFIG_HA_OBJECT_ID_SIZE 28
 #define AFE_CONFIG_HA_LABEL_SIZE 55 //33 + "Temperatura odczuwalna"
 #define AFE_CONFIG_HA_OPTIONS_SIZE 144 // Currently only from RGB effect options
-#define AFE_CONFIG_HA_UNIT_SIZE 5
+#define AFE_CONFIG_HA_DEVICE_TYPE_SIZE sizeof(AFE_CONFIG_HA_DEVICE_CLASS_CO2) // max of DeviceType
+/**
+ * @brief Size of configuraion topic
+ * Max at this stage: MQTT_TOPIC_LENGTH_64/binary_sensor/AFE_CONFIG_HA_OBJECT_ID_SIZE/config
+  */
+#define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE AFE_CONFIG_HA_OBJECT_ID_SIZE+64+22
 
+
+/**
+ * @brief Device types 
+ * 
+ */
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH 0
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH_NAME "switch"
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR 1
@@ -99,12 +150,23 @@
  * @brief Home assistant Device Classes
  * https://www.home-assistant.io/integrations/sensor/#device-class
  */
+
 #define AFE_CONFIG_HA_DEVICE_CLASS_NONE "None"
+#define AFE_CONFIG_HA_DEVICE_CLASS_RELAY "switch"
+#define AFE_CONFIG_HA_DEVICE_CLASS_SWITCH AFE_CONFIG_HA_DEVICE_CLASS_RELAY
 #define AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE "voltage"
 #define AFE_CONFIG_HA_DEVICE_CLASS_OPENING "opening"
 #define AFE_CONFIG_HA_DEVICE_CLASS_MOVING "moving"
 #define AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE "temperature"
 #define AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY "humidity"
+#define AFE_CONFIG_HA_DEVICE_CLASS_PRESSURE "pressure"
+#define AFE_CONFIG_HA_DEVICE_CLASS_AQI "aqi"
+#define AFE_CONFIG_HA_DEVICE_CLASS_CO2 "carbon_dioxide"
+#define AFE_CONFIG_HA_DEVICE_CLASS_GAS "gas"
+#define AFE_CONFIG_HA_DEVICE_CLASS_ILLUMINANCE "illuminance"
+#define AFE_CONFIG_HA_DEVICE_CLASS_PM10 "pm10"
+#define AFE_CONFIG_HA_DEVICE_CLASS_PM25 "pm25"
+#define AFE_CONFIG_HA_DEVICE_CLASS_BATTERY "battery"
 
 
 
@@ -115,6 +177,25 @@
 #define AFE_CONFIG_HA_STATE_CLASS_MEASUREMENT "measurement"
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL "total"
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL_INCREASING "total_increasing"
+
+
+/**
+ * @brief HA Configuratio JSON items
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_TAG_SET_RETAIN_FLAG "{{ret}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_AVAILABILITY "{{b.a}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_COMMAND_TOPIC "{{bct}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_TOPIC "{{bst}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_STATE_ON_OFF_TPL "{{bsp}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_PAYLOAD_ON_OFF_CMD "{{bcp}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_DEVICE_CLASS "{{bdc}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_BODY_OPTIONS "{{bdo}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_SENSOR "{{sen}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB "{{rgb}}"
+
+
 
 const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
     "{\"device\":{\"ids\":\"{{d.i}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
@@ -175,5 +256,81 @@ const char HA_MQTT_DISCOVERY_JSON_RGB_LIGHT[] PROGMEM =
 
 const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #endif
+
+
+
+
+/**
+ * @brief Tags
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_ID "{{d.i}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_SOFTWARE "{{d.s}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_MANUFACTURER "{{d.m}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_NAME "{{d.n}}" 
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_HARDWARE "{{d.h}}"
+#define HA_MQTT_DISCOVERY_TAG_UNIQUE_ID "{{i.i}}"
+#define HA_MQTT_DISCOVERY_TAG_NAME "{{i.n}}" 
+#define HA_MQTT_DISCOVERY_TAG_STATE_TEMPLATE "{{i.t}}"
+#define HA_MQTT_DISCOVERY_TAG_RETAIN_FLAG "{{r.f}}"
+#define HA_MQTT_DISCOVERY_TAG_AVAILABILITY_TOPIC "{{a.t}}"
+#define HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE "{{s.vt}}"
+#define HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE "{{s.u}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_CLASS "{{s.dc}}"
+#define HA_MQTT_DISCOVERY_TAG_OPTIONS "{{o.o}}"
+#define HA_MQTT_DISCOVERY_TAG_OPTIMISTIC "{{opt}}"
+#define HA_MQTT_DISCOVERY_TAG_LIGHT_BRIGHTNESS "{{bsc}}"
+#define HA_MQTT_DISCOVERY_TAG_LIGHT_TOPIC_SUFIX "{{i.ts}}"
+
+
+/**
+ * @brief JSON Value templates
+ * 
+ */
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_TEMPERATURE "{{value_json.temperature.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HUMIDITY "{{value_json.humidity.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_HUMIDITY "{{value_json.absoluteHumidity.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_DEW_POINT "{{value_json.dewPoint.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HEAT_INDEX "{{value_json.heatIndex.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCEPTION "{{value_json.perception.description}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_COMFORT "{{value_json.comfort.description}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RELATIVE_PRESSURE "{{value_json.relativePressure.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_PRESSURE "{{value_json.pressure.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_IAQ "{{value_json.iaq.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_STATIC_IAQ "{{value_json.staticIaq.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_CO2_EQUIVALENT "{{value_json.co2Equivalent.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BVOC_EQUIVALENT "{{value_json.breathVocEquivalent.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_GAS_RESISTANCE "{{value_json.gasResistance.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE "{{value_json.voltage}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE_CALCULATED "{{value_json.voltageCalculated}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAW "{{value_json.raw}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCENT "{{value_json.percent}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE "{{value_json.illuminance.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_IR "{{value_json.IR.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10 "{{value_json.PM10.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10_WHO "{{value_json.WHO.PM10.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25 "{{value_json.PM25.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25_WHO "{{value_json.WHO.PM25.value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH "{{value_json.anemometer[1].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH "{{value_json.anemometer[?(@.unit=='km/h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS "{{value_json.anemometer[0].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS "{{value_json.anemometer[?(@.unit=='m/s')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM "{{value_json.rainmeter[0].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM "{{value_json.rainmeter[?(@.unit=='mm/min')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH "{{value_json.rainmeter[1].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH "{{value_json.rainmeter[?(@.unit=='mm/h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[2].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[?(@.unit=='mm/12h')].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[3].value}}"
+//#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[?(@.unit=='mm/24h')].value}}"
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_PERCENT "{{value_json.batterymeter[0].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_VOLT "{{value_json.batterymeter[1].value}}"
+
+
+
+
 
 #endif // _AFE_Hardware_api_home_assistant_h

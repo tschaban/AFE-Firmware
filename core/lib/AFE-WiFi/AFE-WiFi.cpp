@@ -6,7 +6,6 @@ boolean AFEWiFi::eventConnectionEstablished = false;
 boolean AFEWiFi::isConnected = false;
 boolean AFEWiFi::eventConnectionLost = true;
 
-
 AFEWiFi::AFEWiFi() {}
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -53,12 +52,42 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
 #endif
 
+/* Setting WiFi Radio mode for ESP32 and the TX output power */
+#if !defined(ESP32)
+  if (configuration.radioMode != AFE_NONE) {
+    // wifi_set_phy_mode(configuration.radioMode);
+    WirelessNetwork.setPhyMode(configuration.radioMode == 1
+                                   ? WIFI_PHY_MODE_11B
+                                   : configuration.radioMode == 2
+                                         ? WIFI_PHY_MODE_11G
+                                         : WIFI_PHY_MODE_11N);
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting Radio mode (1:B 2:G 3:N) to: ")
+           << configuration.radioMode;
+#endif
+  }
+
+  if (configuration.outputPower != AFE_NONE &&
+      configuration.outputPower >=
+          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
+      configuration.outputPower <=
+          AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX) {
+    WirelessNetwork.setOutputPower(configuration.outputPower);
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: WIFI: Setting TX Output power to : ")
+           << configuration.outputPower << F("dBm");
+#endif
+  }
+#endif
+
 #if defined(DEBUG) && !defined(ESP32)
   Serial << endl
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
          << WirelessNetwork.getPhyMode();
 #endif
-
   if (WiFiMode == AFE_MODE_ACCESS_POINT ||
       WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
@@ -271,8 +300,8 @@ void AFEWiFi::listener() {
             delayStartTime + (configuration.waitTimeConnections * 1000)) {
           connections++;
 
-          // yield();
-         // delay(10);
+// yield();
+// delay(10);
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: WIFI: Connection to ")
@@ -356,9 +385,7 @@ void AFEWiFi::listener() {
   }
 }
 
-boolean AFEWiFi::connected() {
-   return AFEWiFi::isConnected;
-}
+boolean AFEWiFi::connected() { return AFEWiFi::isConnected; }
 
 boolean AFEWiFi::eventConnected() {
   boolean returnValue = AFEWiFi::eventConnectionEstablished;
@@ -371,7 +398,6 @@ boolean AFEWiFi::eventDisconnected() {
   AFEWiFi::eventConnectionLost = false;
   return returnValue;
 }
-
 
 #ifdef AFE_ESP32
 void AFEWiFi::onWiFiEvent(WiFiEvent_t event) {
@@ -393,8 +419,6 @@ void AFEWiFi::onWiFiEvent(WiFiEvent_t event) {
   }
 }
 
-
-
 #else // ESP8266
 void AFEWiFi::onWifiConnect(const WiFiEventStationModeGotIP &event) {
 #ifdef DEBUG
@@ -413,4 +437,3 @@ void AFEWiFi::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
 }
 
 #endif
-

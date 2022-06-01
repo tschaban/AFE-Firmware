@@ -38,6 +38,7 @@ private:
   void applyCorrections();
 
   TwoWire *_WirePort;
+  
 #ifdef AFE_ESP32
   void begin(uint8_t id, TwoWire *WirePort);
 #endif

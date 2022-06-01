@@ -10,13 +10,6 @@ AFEAPIMQTTDomoticz::AFEAPIMQTTDomoticz() : AFEAPI(){};
 void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device,
                                AFELED *Led) {
   AFEAPI::begin(Data, Device, Led);
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Domoticz version: ")
-         << (Device->configuration.api.domoticzVersion == AFE_DOMOTICZ_VERSION_0
-                 ? L_DEVICE_DOMOTICZ_VERSION_410
-                 : L_DEVICE_DOMOTICZ_VERSION_2020);
-#endif
 }
 #else
 void AFEAPIMQTTDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
@@ -176,7 +169,7 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
 
 void AFEAPIMQTTDomoticz::processRequest() {
   DOMOTICZ_MQTT_COMMAND command = getCommand();
-  if (command.domoticz.idx > 0 && idxForProcessing(command.domoticz.idx)) {
+  if (command.domoticz.idx > 0) {
 #ifdef DEBUG
     uint8_t _found = false;
 #endif
@@ -441,6 +434,7 @@ void AFEAPIMQTTDomoticz::addIdxToCache(uint8_t id,
   }
 }
 
+/*
 boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   boolean _ret = true;
   // Returns true if Domoticz is in version 2020.x. All requests are processed
@@ -451,6 +445,7 @@ boolean AFEAPIMQTTDomoticz::idxForProcessing(uint32_t idx) {
   }
   return _ret;
 }
+*/
 
 boolean AFEAPIMQTTDomoticz::publishSwitchMessage(uint32_t *idx, boolean state) {
   boolean publishStatus = false;
@@ -620,6 +615,20 @@ void AFEAPIMQTTDomoticz::publishADCValues() {
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+void AFEAPIMQTTDomoticz::publishBatteryMeterValues(uint8_t id) {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
+    char value[8];
+    if (_AnalogInput[id]->configuration.battery.domoticz.idx > 0) {
+      sprintf(value, "%-.3f", _AnalogInput[id]->batteryPercentage);
+      generateDeviceValue(
+          json, _AnalogInput[id]->configuration.battery.domoticz.idx, value);
+      Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#else
 void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
@@ -632,6 +641,7 @@ void AFEAPIMQTTDomoticz::publishBatteryMeterValues() {
     }
   }
 }
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
@@ -643,6 +653,11 @@ void AFEAPIMQTTDomoticz::generateSwitchMessage(char *json, uint32_t idx,
 void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
                                              const char *svalue,
                                              uint16_t nvalue) {
+
+/**
+ * @brief {"command":"udevice","idx":999999,"nvalue":,"svalue":""}
+ * 
+ */
 
   sprintf(
       json,
@@ -962,7 +977,7 @@ void AFEAPIMQTTDomoticz::addClass(AFEAnemometer *Sensor) {
 void AFEAPIMQTTDomoticz::publishAnemometerSensorData() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_ANEMOMETER_COMMAND_LENGTH];
-    char value[20];
+    char value[20]; // 0;N;999999.99;0;?;?
     if (_AnemometerSensor->configuration.domoticz.idx > 0) {
       sprintf(value, "0;N;%-.2f;0;?;?", 10 * _AnemometerSensor->lastSpeedMS);
       generateDeviceValue(json, _AnemometerSensor->configuration.domoticz.idx,
@@ -981,7 +996,7 @@ void AFEAPIMQTTDomoticz::addClass(AFERainmeter *Sensor) {
 void AFEAPIMQTTDomoticz::publishRainSensorData() {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_RAINMETER_COMMAND_LENGTH];
-    char value[20];
+    char value[20]; // 999999.00;999999.00
     if (_RainmeterSensor->configuration.domoticz.idx > 0) {
       sprintf(value, "%-.2f;%-.2f", _RainmeterSensor->rainLevelLastHour * 100,
               _RainmeterSensor->current.counter);

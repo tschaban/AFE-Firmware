@@ -484,7 +484,7 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         else if (siteConfig.ID == AFE_CONFIG_SITE_BH1750) {
-          BH1750 configuration;
+          BH1750_CONFIG configuration;
           get(configuration);
           Data->saveConfiguration(siteConfig.deviceID, &configuration);
           configuration = {0};
@@ -1232,9 +1232,6 @@ void AFEWebServer::get(DEVICE &data) {
   data.api.mqtt = server.arg(F("m")).length() > 0
                       ? (server.arg(F("m")).toInt() == 2 ? true : false)
                       : false;
-  data.api.domoticzVersion = server.arg(F("v")).length() > 0
-                                 ? server.arg(F("v")).toInt()
-                                 : AFE_DOMOTICZ_VERSION_DEFAULT;
 #else
   data.api.mqtt = server.arg(F("m")).length() > 0 ? true : false;
 #endif
@@ -1456,6 +1453,15 @@ void AFEWebServer::get(NETWORK &data) {
 
   data.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
   data.isDHCPBackup = server.arg(F("db")).length() > 0 ? true : false;
+
+#if !defined(ESP32)
+  data.radioMode = server.arg(F("r")).length() > 0
+                       ? server.arg(F("r")).toInt()
+                       : AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+  data.outputPower = server.arg(F("y")).length() > 0
+                         ? server.arg(F("y")).toFloat()
+                         : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
 }
 
 void AFEWebServer::get(MQTT &data) {
@@ -2232,7 +2238,7 @@ void AFEWebServer::get(BMEX80 &data) {
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEWebServer::get(BH1750 &data) {
+void AFEWebServer::get(BH1750_CONFIG &data) {
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0

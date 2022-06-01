@@ -7,7 +7,6 @@
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 
 #include <AFE-Data-Access.h>
-#include <AFE-SoftwareSerial.h>
 #include <AFE-UART.h>
 
 #ifdef DEBUG
@@ -40,8 +39,6 @@ private:
 
   /* Method reads the data from the sensor */
   boolean read(boolean expectingACK = false);
-
-  AFESoftwareSerial SerialBus;
 
 public:
   HPMA115S0 configuration;

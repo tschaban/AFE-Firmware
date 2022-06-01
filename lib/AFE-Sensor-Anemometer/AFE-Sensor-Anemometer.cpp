@@ -108,9 +108,8 @@ void AFEAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
 }
 void AFEAnemometer::getJSON(char *json) {
   sprintf(json,
-          "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"m/"
-          "s\"},{\"value\":%.2f,\"unit\":\"km/h\"}]}",
-          lastSpeedMS, lastSpeedKMH);
+          "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"%s\"},{\"value\":%.2f,\"unit\":\"%s\"}]}",
+          lastSpeedMS, AFE_UNIT_MS, lastSpeedKMH, AFE_UNIT_KMH);
 }
 
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER

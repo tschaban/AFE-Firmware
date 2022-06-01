@@ -9,7 +9,6 @@ struct AFE_DEVICE_API {
   boolean mqtt;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   boolean domoticz;
-  uint8_t domoticzVersion;
 #endif
 };
 

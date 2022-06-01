@@ -24,7 +24,7 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort) {
     Serial << endl
            << F("INFO: Sensor address: 0x") << _HEX(configuration->i2cAddress);
 #endif
-    Bme.begin(configuration->i2cAddress, WirePort);
+    Bme.begin(configuration->i2cAddress, *WirePort);
 
 #ifdef DEBUG
     Serial << endl

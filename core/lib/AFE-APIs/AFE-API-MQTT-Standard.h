@@ -198,8 +198,13 @@ public:
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+  void processBatteryMeter(uint8_t *id);
+  boolean publishBatteryMeterValues(uint8_t id);
+#else
   void processBatteryMeter();
   boolean publishBatteryMeterValues();
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80

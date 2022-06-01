@@ -461,8 +461,6 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->api.mqtt = root["api"]["mqtt"];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->api.domoticz = root["api"]["domoticz"] | false;
-      configuration->api.domoticzVersion =
-          root["api"]["domoticzVersion"] | AFE_DOMOTICZ_VERSION_DEFAULT;
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration->api.domoticz && !configuration->api.http) {
         configuration->api.http = true;
@@ -640,7 +638,6 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     jsonAPI["mqtt"] = configuration->api.mqtt;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     jsonAPI["domoticz"] = configuration->api.domoticz;
-    jsonAPI["domoticzVersion"] = configuration->api.domoticzVersion;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
     root["noOfLEDs"] = configuration->noOfLEDs;
@@ -785,7 +782,6 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   configuration.api.mqtt = false;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.api.domoticz = false;
-  configuration.api.domoticzVersion = AFE_DOMOTICZ_VERSION_DEFAULT;
 #endif
   configuration.api.http = true;
 
@@ -1137,7 +1133,11 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       sprintf(configuration->ip, root["ip"]);
       sprintf(configuration->gateway, root["gateway"]);
       sprintf(configuration->subnet, root["subnet"]);
-      configuration->isDHCPBackup = root["isDHCPBackup"];
+
+      JsonVariant exists = root["isDHCPBackup"];
+      configuration->isDHCPBackup =
+          exists.success() ? root["isDHCPBackup"] : true;
+
       sprintf(configuration->ipBackup, root["ipBackup"] | "");
       sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
       sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
@@ -1148,6 +1148,15 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
           root["noFailuresToSwitchNetwork"] |
           AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
+#if !defined(ESP32)
+      configuration->radioMode =
+          root["radioMode"] | AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+      exists = root["outputPower"];
+      configuration->outputPower =
+          exists.success() ? root["outputPower"].as<float>()
+                           : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
+
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
@@ -1157,7 +1166,6 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
   }
 
@@ -1207,6 +1215,10 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["waitTimeSeries"] = configuration->waitTimeSeries;
     root["noFailuresToSwitchNetwork"] =
         configuration->noFailuresToSwitchNetwork;
+#if !defined(ESP32)
+    root["radioMode"] = configuration->radioMode;
+    root["outputPower"] = configuration->outputPower;
+#endif
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1250,6 +1262,10 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   configuration.waitTimeSeries = AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
   configuration.noFailuresToSwitchNetwork =
       AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
+#if !defined(ESP32)
+  configuration.radioMode = AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+  configuration.outputPower = AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+#endif
   saveConfiguration(&configuration);
 }
 
@@ -1539,10 +1555,14 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->removeingComponents = root["removing"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
-      configuration->addingComponents = root["adding"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
-      configuration->retainConfiguration = root["retain"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
-      sprintf(configuration->discovery.topic, root["topic"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
+      configuration->removeingComponents =
+          root["removing"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_ADDING_COMPONENTS;
+      configuration->addingComponents =
+          root["adding"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_REMOVING_COMPONENTS;
+      configuration->retainConfiguration =
+          root["retain"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_RETAIN_CONFIGURATION;
+      sprintf(configuration->discovery.topic,
+              root["topic"] | AFE_CONFIG_HA_DEFAULT_DISCOVERY_TOPIC);
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
@@ -3918,8 +3938,8 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->RXD = root["RXD"];
-      configuration->TXD = root["TXD"];
+      configuration->RXD = root[F("RXD")];
+      configuration->TXD = root[F("TXD")];
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_UART, jsonBuffer.size());
@@ -3962,8 +3982,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["RXD"] = configuration->RXD;
-    root["TXD"] = configuration->TXD;
+    root[F("RXD")] = configuration->RXD;
+    root[F("TXD")] = configuration->TXD;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -4367,7 +4387,9 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        BH1750_CONFIG *configuration) {
+  boolean _ret = true;
   char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
@@ -4396,15 +4418,20 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration->name, root["name"]);
-      configuration->mode = root["mode"];
-      configuration->interval = root["interval"];
+      sprintf(configuration->name, root["name"] | "");
+      configuration->mode =
+          root["mode"] | AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
+      configuration->interval =
+          root["interval"] | AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
 
 #ifdef AFE_ESP32
-      configuration->wirePortId = root["wirePortId"];
+      configuration->wirePortId =
+          root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-      configuration->i2cAddress = root["i2cAddress"];
+      configuration->i2cAddress =
+          root["i2cAddress"] |
+          AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -4414,25 +4441,26 @@ void AFEDataAccess::getConfiguration(uint8_t id, BH1750 *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BH1750, jsonBuffer.size());
 #endif
-    }
-
+    } else {
+      _ret = false;
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
+    }
 
     configFile.close();
-  }
-
+  } else {
+    _ret = false;
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
-  }
 #endif
+  }
+
+  return _ret;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      BH1750_CONFIG *configuration) {
   char fileName[20];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
@@ -4488,7 +4516,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BH1750 *configuration) {
 }
 
 void AFEDataAccess::createBH1750SensorConfigurationFile() {
-  BH1750 configuration;
+  BH1750_CONFIG configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 
@@ -4969,7 +4997,8 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
+  boolean _ret = true;
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -5018,23 +5047,24 @@ void AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ANEMOMETER, jsonBuffer.size());
 #endif
-    }
+    } else {
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
-
+      _ret = false;
+    }
     configFile.close();
   }
 
-#ifdef DEBUG
   else {
+    _ret = false;
+#ifdef DEBUG
     Serial << endl
            << F("ERROR: Configuration file: ")
            << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << F(" not opened");
-  }
 #endif
+  }
+  return _ret;
 }
 
 void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
@@ -5114,7 +5144,8 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
+  boolean _ret = true;
 #ifdef DEBUG
   Serial << endl
          << endl
@@ -5158,23 +5189,24 @@ void AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER, jsonBuffer.size());
 #endif
-    }
+    } else {
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
-
+      _ret = false;
+    }
     configFile.close();
-  }
 
+  } else {
+    _ret = false;
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: Configuration file: ")
            << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION << F(" not opened");
-  }
 #endif
+  }
+
+  return _ret;
 }
 
 void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
@@ -6675,7 +6707,8 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-void AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
+  boolean _ret = true;
   char fileName[22];
   sprintf(fileName, AFE_FILE_TSL2561_CONFIGURATION, id);
 
@@ -6704,16 +6737,16 @@ void AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration->name, root["name"]);
-      configuration->sensitiveness = root["sensitiveness"];
-      configuration->interval = root["interval"];
-      configuration->gain = root["gain"];
+      sprintf(configuration->name, root["name"] | "");
+      configuration->sensitiveness = root["sensitiveness"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
+      configuration->interval = root["interval"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
+      configuration->gain = root["gain"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
 
 #ifdef AFE_ESP32
-      configuration->wirePortId = root["wirePortId"];
+      configuration->wirePortId = root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-      configuration->i2cAddress = root["i2cAddress"];
+      configuration->i2cAddress = root["i2cAddress"] | AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.ir.idx =
           root["domoticz"]["ir"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6728,23 +6761,22 @@ void AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
 #endif
-    }
-
+    } else {
+      _ret = false;
 #ifdef DEBUG
-    else {
       Serial << F("ERROR: JSON not pharsed");
-    }
 #endif
-
+    }
     configFile.close();
-  }
-
+  } else {
+    _ret = false;
 #ifdef DEBUG
-  else {
     Serial << endl
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
-  }
 #endif
+  }
+
+  return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
   char fileName[22];

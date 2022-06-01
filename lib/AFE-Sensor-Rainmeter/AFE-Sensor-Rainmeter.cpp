@@ -143,12 +143,12 @@ void AFERainmeter::getJSON(char *json) {
                 "h\"}]}",
           rainLevelLast1Minute, rainLevelLastHour);
 #else
-  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
-                "min\"},{\"value\":%.3f,\"unit\":\"mm/"
-                "h\"},{\"value\":%.3f,\"unit\":\"mm/"
-                "12h\"},{\"value\":%.3f,\"unit\":\"mm/24h\"}]}",
-          rainLevelLast1Minute, rainLevelLastHour, rainLevelLast12Hours,
-          rainLevelLast24Hours);
+  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"%s\"},{\"value\":%."
+                "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
+                "\"value\":%.3f,\"unit\":\"%s\"}]}",
+          rainLevelLast1Minute, AFE_UNIT_MMM, rainLevelLastHour, AFE_UNIT_MMH,
+          rainLevelLast12Hours, AFE_UNIT_MM12H, rainLevelLast24Hours,
+          AFE_UNIT_MM24H);
 #endif
 }
 

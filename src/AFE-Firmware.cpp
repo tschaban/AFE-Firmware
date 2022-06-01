@@ -19,7 +19,6 @@ void setup() {
          << F("INFO: Initializing device") << endl;
 
 #ifndef AFE_ESP32 /* ESP82xx */
-
   Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
   Serial << endl << F("INFO: ESP: Real flash size: ");
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -41,7 +40,21 @@ void setup() {
   Serial << endl << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
 
 #else  /* ESP32 */
-// @TODO ESP32
+  Serial << endl << F("INFO: ESP: Chip Model ") << ESP.getChipModel();
+  Serial << endl << F("INFO: ESP: Cores: ") << ESP.getChipCores();
+  Serial << endl << F("INFO: ESP: CPU Frequency: ") << ESP.getCpuFreqMHz() << F("Mhz");
+  Serial << endl << F("INFO: ESP: Flesh size: ");
+  if (ESP.getFlashChipSize() >= 1048576) {
+    Serial << (ESP.getFlashChipSize() / 1048576) << F(" Mbits");
+  } else {
+    Serial << (ESP.getFlashChipSize() / 1024) << F(" Kbits");
+  }
+  Serial << endl
+         << F("INFO: ESP: Speed ") << (ESP.getFlashChipSpeed() / 1000000)
+         << F(" MHz");
+  Serial << endl << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
+  Serial << endl << F("INFO: ESP: Firmware size: ") << ESP.getSketchSize();
+  Serial << endl << F("INFO: ESP: Firmware free space size: ") << ESP.getFreeSketchSpace();
 #endif // ESP32
 #endif // DEBUG
 

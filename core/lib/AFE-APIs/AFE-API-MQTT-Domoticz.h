@@ -64,16 +64,12 @@ private:
   /* Classfies and invokes code for processing the request */
   void processRequest();
 
-  /* Checks if IDX can be proccesed. It's checked against bypassing IDX */
-  boolean idxForProcessing(uint32_t idx);
-
   boolean publishSwitchMessage(uint32_t *idx, boolean state);
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   boolean publishSetLevelMessage(uint32_t *idx, uint8_t *level);
   boolean publishSetColorMessage(uint32_t *idx, CLED_PARAMETERS *led);
 #endif
-
 
 public:
   /* Constructor: it sets all necessary parameters */
@@ -113,7 +109,11 @@ public:
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_ESP32
+  void publishBatteryMeterValues(uint8_t id);
+#else
   void publishBatteryMeterValues();
+#endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
