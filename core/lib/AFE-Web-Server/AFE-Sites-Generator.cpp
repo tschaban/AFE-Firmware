@@ -387,7 +387,7 @@ void AFESitesGenerator::siteDevice(String &page) {
       }
       // yield(); // @TODO removed with T7
 
-      closeSection(page);
+      closeMessageSection(page);
     }
   }
 
@@ -2344,7 +2344,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY, "-99.999", "99.999",
                      "0.001");
 
-    if (configuration.type != AFE_BMP180_SENSOR && configuration.type != AFE_BMP280_SENSOR) {
+    if (configuration.type != AFE_BMP180_SENSOR &&
+        configuration.type != AFE_BMP280_SENSOR) {
       /* Item: humidity correction */
       sprintf(_number, "%-.3f", configuration.humidity.correction);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "hc", L_HUMIDITY,
@@ -2375,7 +2376,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
                        AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                        AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
 
-      if (configuration.type != AFE_BMP180_SENSOR  && configuration.type != AFE_BMP280_SENSOR) {
+      if (configuration.type != AFE_BMP180_SENSOR &&
+          configuration.type != AFE_BMP280_SENSOR) {
         sprintf(_number, "%d", configuration.domoticz.humidity.idx);
         addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i2", L_HUMIDITY_IDX,
                          _number, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -3052,22 +3054,57 @@ void AFESitesGenerator::siteUpgrade(String &page) {
   page.replace("{{L2}}", F(L_UPGRADE));
   closeSection(page);
 
+  openMessageSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
+
   if (RestAPI->accessToWAN()) {
 
+    /**
+     * @brief Get info if there is available firmware to upgrade
+     *
+     */
+    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+    if (_HtmlResponse.length() > 0) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", _HtmlResponse);
+    }
+
+    /**
+     * @brief Get a message before upgrading to available firmware version
+     *
+     */
+    RestAPI->sent(_HtmlResponse,
+                  AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE);
+    if (_HtmlResponse.length() > 0) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", _HtmlResponse);
+    }
+
+    /**
+     * @brief Generate upgrade button if firmware available
+     *
+     */
     RestAPI->sent(_HtmlResponse,
                   AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID);
 
     if (_HtmlResponse.length() > 0) {
-      openSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
-
-      page.concat(
-          F("<form method=\"post\" action=\"/?o=35\"><input type=\"hidden\" "
-            "name=\"f\" value=\"{{V}}\"><input type=\"submit\" "
-            "class=\"b bw\" value=\"{{L}}\"></form>"));
+      page.concat(F("<br><br><form method=\"post\" action=\"/?o=35\"><input "
+                    "type=\"hidden\" "
+                    "name=\"f\" value=\"{{V}}\"><input type=\"submit\" "
+                    "class=\"b bw\" value=\"{{L}}\"></form>"));
       page.replace("{{L}}", F(L_UPGRADE_VIA_WAN));
       page.replace("{{V}}", _HtmlResponse);
-      closeSection(page);
+
+      closeMessageSection(page);
+
+    } else {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", F(L_UPGRADE_UPGRADE_FIRMWARE_NOT_AVAILABLE));
+      closeMessageSection(page);
     }
+  } else {
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace("{{I}}", F(L_UPGRADE_UPGRADE_SERVER_NOT_AVAILABLE));
+    closeMessageSection(page);
   }
 }
 
@@ -3182,12 +3219,10 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace("{{I}}", _HtmlResponse);
     }
-
-    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-    page.replace("{{I}}", F(L_INDX_INFORMATION_ABOUT_YOUR_VERSION));
-
-    page.concat(F("</ul>"));
   }
+
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace("{{I}}", F(L_INDX_INFORMATION_ABOUT_YOUR_VERSION));
 
   closeMessageSection(page);
 
@@ -3214,31 +3249,44 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page += AFE_MODE_ACCESS_POINT;
   page.concat(F("\" /></div></form>"));
   closeSection(page);
+
+  if (RestAPI->accessToWAN()) {
+    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
+    if (_HtmlResponse.length() > 0) {
+      page.concat(_HtmlResponse);
+    }
+  }
 }
 
 void AFESitesGenerator::siteProKey(String &page) {
   PRO_VERSION configuration;
   Data->getConfiguration(&configuration);
-  openSection(page, F(L_PRO_VERSION), F(""));
+  openMessageSection(page, F(L_PRO_VERSION), F(""));
 
   if (RestAPI->accessToWAN()) {
-    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "k", L_PRO_KEY,
-                     configuration.serial, "18");
-
-    page.concat(F("<ul class=\"lst\">"));
 
     RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace("{{I}}", _HtmlResponse);
     }
-    page.concat(F("</ul>"));
+
+    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_PRO_OWNER);
+    if (_HtmlResponse.length() > 0) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", _HtmlResponse);
+    }
+
 
   } else {
-    page.concat(F("<h3>"));
-    page.concat(F(L_PRO_CANNOT_BE_CONFIGURED));
-    page.concat(F("</h3>"));
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace("{{I}}", L_PRO_CANNOT_BE_CONFIGURED);
   }
+  page.concat(F("</ul><br><br>"));
+
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "k", L_PRO_KEY,
+                   configuration.serial, "18");
+
   closeSection(page);
 }
 
@@ -4059,65 +4107,69 @@ void AFESitesGenerator::addCLEDColorItem(String &item, CLED_RGB *color,
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
-  if (Device->getMode() == AFE_MODE_NORMAL && RestAPI->accessToWAN()) {
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
+
+  page.concat(F("</div></div>"));
+
+  if (RestAPI->accessToWAN()) {
+
+    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_FOOTER_SECTION);
     if (_HtmlResponse.length() > 0) {
       page.concat(_HtmlResponse);
     }
   }
 
-  page.concat(F("</div></div>"));
-
-  page.replace("{{A}}",
-               RestAPI->accessToWAN()
-                   ? F("<img style=\"opacity:.4\" "
-                       "src=\"http://api.smartnydom.pl/images/"
-                       "afe-logo.png\"><br>")
-                   : F("<h1 style=\"margin-bottom:0\">AFE Firmware</h1>"));
+  page.replace(F("{{A}}"), RestAPI->accessToWAN()
+                               ? F("<img style=\"opacity:.4\" "
+                                   "src=\"{{u}}/images/"
+                                   "afe-logo.png\"><br>")
+                               : F("<h1 style=\"margin-bottom:0\">{{n}}</h1>"));
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  page.replace("{{f.a}}", F("Domoticz"));
+  page.replace(F("{{f.a}}"), F("Domoticz"));
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-  page.replace("{{f.a}}", F("HomeAssistant"));
+  page.replace(F("{{f.a}}"), F("HomeAssistant"));
 #else
-  page.replace("{{f.a}}", F("Standard"));
+  page.replace(F("{{f.a}}"), F("Standard"));
 #endif
 
 #if defined(AFE_ESP_FLASH_4MB)
-  page.replace("{{f.s}}", F("4Mb"));
+  page.replace(F("{{f.s}}"), F("4Mb"));
 #elif defined(AFE_ESP_FLASH_2MBB)
-  page.replace("{{f.s}}", F("2Mb"));
+  page.replace(F("{{f.s}}"), F("2Mb"));
 #else
-  page.replace("{{f.s}}", F("1Mb"));
+  page.replace(F("{{f.s}}"), F("1Mb"));
 #endif
 
 #if defined(ESP8285)
-  page.replace("{{f.e}}", F("8285"));
+  page.replace(F("{{f.e}}"), F("8285"));
 #elif defined(ESP32)
-  page.replace("{{f.e}}", F("32"));
+  page.replace(F("{{f.e}}"), F("32"));
 #else
-  page.replace("{{f.e}}", F("8266"));
+  page.replace(F("{{f.e}}"), F("8266"));
 #endif
 
-  FirmwarePro->Pro.valid ? page.replace("{{f.p}}", F(L_YES))
-                         : page.replace("{{f.p}}", F(L_NO));
+  FirmwarePro->Pro.valid ? page.replace(F("{{f.p}}"), F(L_YES))
+                         : page.replace(F("{{f.p}}"), F(L_NO));
 
 #ifdef AFE_T1_CUSTOM_E2
   char _version[sizeof(Firmware.version) + 6];
   sprintf(_version, "%s %s", Firmware.version, "MEGA");
-  page.replace("{{f.v}}", _version);
+  page.replace(F("{{f.v}}"), _version);
 #else
-  page.replace("{{f.v}}", Firmware.version);
+  page.replace(F("{{f.v}}"), Firmware.version);
 #endif
 
-  page.replace("{{f.t}}", String(Firmware.type));
-  page.replace("{{f.d}}", F(AFE_DEVICE_TYPE_NAME));
+  page.replace(F("{{f.t}}"), String(Firmware.type));
+  page.replace(F("{{f.d}}"), F(AFE_DEVICE_TYPE_NAME));
 
-  page.replace("{{f.n}}", Device->deviceId);
-  page.replace("{{f.l}}", L_LANGUAGE_SHORT);
-  page.replace("{{f.h}}", String(AFE_DEVICE_TYPE_ID));
-  page.replace("{{f.b}}", String(AFE_VERSION_BUILD_NUMBER));
-  page.replace("{{f.k}}", AFE_VERSION_BUILD_DATE);
+  page.replace(F("{{f.n}}"), Device->deviceId);
+  page.replace(F("{{f.l}}"), L_LANGUAGE_SHORT);
+  page.replace(F("{{f.h}}"), String(AFE_DEVICE_TYPE_ID));
+  page.replace(F("{{f.b}}"), String(AFE_VERSION_BUILD_NUMBER));
+  page.replace(F("{{f.k}}"), AFE_VERSION_BUILD_DATE);
+
+  page.replace(F("{{n}}"), F(L_AFE_FIRMWARE));
+  page.replace(F("{{u}}"), F(AFE_API_URL));
 
   page.concat(F("</body></html>"));
 }

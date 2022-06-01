@@ -227,7 +227,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
 
   boolean _ret = false;
   if (_initialized) {
-    char value[20]; // @TODO T5 T6 CHeck the max size
+    char value[20]; 
     if (_BMx80Sensor[id]->configuration.domoticz.temperature.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.temperature.value);
       sendCustomSensorCommand(
@@ -424,7 +424,7 @@ boolean AFEAPIHTTPDomoticz::publishBH1750SensorData(uint8_t id) {
   boolean _ret = false;
   if (_initialized) {
     if (_BH1750Sensor[id]->configuration.domoticz.idx > 0) {
-      char value[20]; // @TODO T5 T6  CHeck the max size
+      char value[10];
       sprintf(value, "%-.2f", _BH1750Sensor[id]->data);
       sendCustomSensorCommand(_BH1750Sensor[id]->configuration.domoticz.idx,
                               value);

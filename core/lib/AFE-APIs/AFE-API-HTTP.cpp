@@ -1025,11 +1025,3 @@ void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   _HTTP->sendJSON(respond);
 }
 
-/* Not used - checked in T1
-void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, double value,
-                      uint8_t width, uint8_t precision) {
-  char valueString[10];
-  dtostrf(value, width, precision, valueString);
-  send(request, status, valueString);
-}
-*/

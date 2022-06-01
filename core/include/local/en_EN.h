@@ -6,6 +6,8 @@
 #define L_LANGUAGE "en-EN"
 #define L_LANGUAGE_SHORT "en"
 
+#define L_AFE_FIRMWARE "AFE Firmware"
+
 /* Firmware names */
 #if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "for Shelly-1"
@@ -106,7 +108,7 @@
 #define L_INDEX_HOTSPOT_MODE "Direct via HotSpot"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Configuration panel"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
-#define L_INDEX_OPENING_CONFIG_PANEL "Opening AFE Firmware configuration panel"
+#define L_INDEX_OPENING_CONFIG_PANEL "Opening {{n}} configuration panel"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
 #define L_INDEX_DONATION "Donation"
 
@@ -285,9 +287,9 @@
 #define L_UPGRADE_INTERUPTED "Don't refresh the browser while upgrading the device"
 #define L_UPGRADE_DONT_PLUG_OFF "Don't plug off the device from the power source"
 #define L_UPGRADE_TIME "The upgrade process will take up to a minute"
-#define L_UPGRADE_AUTO_REBOOT "Device will be automatically rebooted after upgrade process is finished"
+#define L_UPGRADE_AUTO_REBOOT "Device will be rebooted after upgrade process is finished"
 
-#define L_UPGRADE_VIA_WAN "Download and Upgrade"
+#define L_UPGRADE_VIA_WAN "Upgrade over the Internet"
 #define L_UPGRADE_VIA_WAN_HINT "Firmware will be automatically downloaded and uploaded to the device"
 
 #define L_UPGRADE_FROM_FILE "Upload *.bin file"
@@ -313,6 +315,8 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Reboot in progress"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Site will be automatically reloaded... wait"
 #define L_UPGRADE_REBOOT "Rebooting"
+#define L_UPGRADE_UPGRADE_SERVER_NOT_AVAILABLE "<strong>No access to {{n}} upgrade server</strong>"
+#define L_UPGRADE_UPGRADE_FIRMWARE_NOT_AVAILABLE "<strong>No {{n}} version available for an upgrade</strong>"
 
 #define L_UPGRADE_TIMEOUT "Upgrade failed. Problem with connecting to the firmware's server (timeout)"
 #define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Upgrade failed. Problem with connecting to the firmware's server"
@@ -324,6 +328,8 @@
 #define L_UPGRADE_SOMETHING_WRONG "Upgrade failed. Something went wrong [Error code: %d]"
 #define L_UPGRADE_NO_SPACE "Upgrade failed. Not enough space to begin upgrade"
 #define L_UPGRADE_NO_CONTENT "Upgrade failed. Problem with firmware server [Error: No response]"
+
+
 
 
 /* Form: password */
@@ -610,7 +616,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_MQTT_TOPIC "MQTT Topic to monitor authorizations of MiFare card"
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "How long CLOSED (ON) state should be kept after detecting a card"
 #define L_MIFARE_CARD_TIME "Time"
-#define L_MIFARE_CARD_NONE_PRO "The standard version of AFE Firmware supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
+#define L_MIFARE_CARD_NONE_PRO "The standard version of {{n}} supports up to 4 MiFare Classic cards.<br>The AFE Pro version supports up to 10 cards.<br>More information about <a href=\"https://afe.smartnydom.pl/en/postawowe-informacje/wersja-pro\"> AFE Pro </a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Backup copy of the TAG stored on the card"
 
 

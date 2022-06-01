@@ -279,11 +279,6 @@ private:
    */
   void send(HTTPCOMMAND *request, boolean status, const char *value = "");
 
-  /* @TODO Check if it's still used
-    void send(HTTPCOMMAND *request, boolean status, double value,
-            uint8_t width = 2, uint8_t precision = 2);
-  */
-
 public:
   /* Constructor: it sets all necessary parameters */
   AFEAPIHTTP();

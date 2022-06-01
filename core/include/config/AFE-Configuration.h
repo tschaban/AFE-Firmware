@@ -24,6 +24,7 @@
 /* Urls */
 #define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"
 #define AFE_URL_HELP "https://www.smartnydom.pl/forum/afe-firmware/"
+#define AFE_API_URL "http://api.smartnydom.pl"
 
 /**
  * @brief types of firmware upgrades

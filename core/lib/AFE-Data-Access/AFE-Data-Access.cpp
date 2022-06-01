@@ -3938,8 +3938,8 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
       root.printTo(Serial);
 #endif
 
-      configuration->RXD = root["RXD"];
-      configuration->TXD = root["TXD"];
+      configuration->RXD = root[F("RXD")];
+      configuration->TXD = root[F("TXD")];
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_UART, jsonBuffer.size());
@@ -3982,8 +3982,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["RXD"] = configuration->RXD;
-    root["TXD"] = configuration->TXD;
+    root[F("RXD")] = configuration->RXD;
+    root[F("TXD")] = configuration->TXD;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);

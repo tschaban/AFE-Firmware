@@ -6,6 +6,8 @@
 #define L_LANGUAGE "pl-PL"
 #define L_LANGUAGE_SHORT "pl"
 
+#define L_AFE_FIRMWARE "AFE Firmware"
+
 /* Firmware names */
 #if defined(AFE_DEVICE_SHELLY_1)
 #define L_FIRMWARE_NAME "dla Shelly-1"
@@ -101,7 +103,7 @@
 #define L_INDEX_HOTSPOT_MODE "Tryb HotSpot"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Urządzenie jest w trybie operacyjnym"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
-#define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny AFE Firmware"
+#define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny {{n}}"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
 #define L_INDEX_DONATION "Wsparcie"
 
@@ -282,12 +284,12 @@
 #define L_UPGRADE_INTERUPTED "Nie odświeżaj przeglądarki podczas aktualizacji"
 #define L_UPGRADE_DONT_PLUG_OFF "Nie odłączaj urządzenia od źródła zasilania"
 #define L_UPGRADE_TIME "Proces aktualizacji potrwa do minuty"
-#define L_UPGRADE_AUTO_REBOOT "Urządzenie zostanie automatycznie uruchomione po ukończeniu aktualizacji"
+#define L_UPGRADE_AUTO_REBOOT "Urządzenie zostanie ponownie uruchomione po ukończeniu aktualizacji"
 
-#define L_UPGRADE_VIA_WAN "Pobierz i uaktualnij"
-#define L_UPGRADE_VIA_WAN_HINT "Firmware zostanie automatycznie pobrane i wgrane do urządzenia"
+#define L_UPGRADE_VIA_WAN "Uaktualnij przez Internet"
+#define L_UPGRADE_VIA_WAN_HINT "Firmware zostanie pobrany i załadowany do urządzenia"
 
-#define L_UPGRADE_FROM_FILE "Załaduj plik *.bin"
+#define L_UPGRADE_FROM_FILE "Załaduj firmware z pliku *.bin"
 #define L_UPGRADE "Aktualizuj"
 
 #define L_UPGRADE_IN_PROGRESS "Aktualizacja w toku"
@@ -307,6 +309,8 @@
 #define L_UPGRADE_REBOOT_IN_PROGRESS "Trwa ponowne uruchamianie"
 #define L_UPGRADE_SITE_WILL_BE_RELOADED "Strona zostanie automatycznie przeładowana ... czekaj"
 #define L_UPGRADE_REBOOT "Ponowne uruchamianie"
+#define L_UPGRADE_UPGRADE_SERVER_NOT_AVAILABLE "<strong>Brak dostępu do serwera aktualizacji {{n}}</strong>"
+#define L_UPGRADE_UPGRADE_FIRMWARE_NOT_AVAILABLE "<strong>Brak dostępnej wersji {{n}} do aktualizacji</strong>"
 
 #define L_UPGRADE_TIMEOUT "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania (timeout)"
 #define L_UPGRADE_CANNOT_CONNECT_TO_SERVER "Aktualizacja nie powiodła się. Problem z połączeniem z serwerem oprogramowania"
@@ -611,7 +615,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MIFARE_CARD_MQTT_TOPIC "Temat do monitorowania odczytów karty MiFare"
 #define L_MIFARE_CARD_HOW_LONG_KEEP_STATE "Jak długo utrzymywać stan CLOSED (ON) po wykryciu karty"
 #define L_MIFARE_CARD_TIME "Czas"
-#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa AFE Firmware obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
+#define L_MIFARE_CARD_NONE_PRO "Wersja standardowa {{n}} obsługuje do 4 kart MiFare Classic.<br>W wersji AFE Pro dostępna jest obsługa do 10 kart.<br>Więcej informacji o <a href=\"https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro\">AFE Pro</a>"
 #define L_MIFARE_CARD_BACKUP_TAG "Zapasowa kopia informacji zapisana na karcie"
 
 

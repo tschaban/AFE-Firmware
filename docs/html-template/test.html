@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pl">
 
 <head>
   <meta charset="utf-8">
-  <title>AFE Firmware 3.0.0.B1 [T0]</title>
+  <title>AFE Firmware 3.3.4.RC5 [T6]</title>
   <link href="https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap" rel="stylesheet">
   <style>
     html {
@@ -40,7 +40,14 @@
     .c {
       display: table;
       width: 100%;
-      margin-bottom: 3em
+      margin-bottom: 0.5em;
+    }
+
+    .m {
+      text-decoration: none;
+      padding-left: 1.5em;
+      color: #777;
+      font-size: 0.9em
     }
 
     .l {
@@ -49,14 +56,14 @@
       color: #fff;
       border-top-left-radius: .8em;
       border-bottom-left-radius: .8em;
-      opacity: .92;
+      opacity: .93
     }
 
     .r {
       background: #eee;
       border-top-right-radius: .8em;
       border-bottom-right-radius: .8em;
-      opacity: .93;
+      opacity: .93
     }
 
     a,
@@ -68,7 +75,8 @@
     label,
     li,
     p,
-    span {
+    span,
+    small {
       font-family: 'Titillium Web', sans-serif
     }
 
@@ -224,115 +232,95 @@
 
 <body>
   <div class="c">
-    <div class="l"><img style="opacity:.4" src="http://test.api.smartnydom.pl/images/afe-logo.png">
-      <ul class="lst">
-        <li class="itm"><a href="/?o=1">Device</a></li>
-        <li class="itm"><a href="/?o=2">Network</a></li>
-        <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
-      </ul>
-      <h4>&#10150; Hardware</h4>
-      <ul class="lst">
-        <li class="itm"><i>LEDs</i></li>
-        <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
-        <li class="itm"><i>Button / Switches</i></li>
-        <li class="itm"><a href="/?o=9&i=0">&#8227; Switch: 1</a></li>
-      </ul>
-      <h4>&#10150; Interfaces</h4>
+    <div class="l"><img style="opacity:.4" src="http://api.smartnydom.pl/images/afe-logo.png"><br><small
+        style="opacity:.3">Wersja T6-3.3.4.RC5 ESP8266 (Build:751)</small>
       <ul class="lst"></ul>
-      <h4>&#10150; Functionalities</h4>
+      <h4>&#10150; Menu</h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=7">System LED</a></li>
+        <li class="itm"><a href="/?o=1">Urządzenie</a></li>
+      </ul>
+      <h4>&#10150; Połączenia</h4>
+      <ul class="lst">
+        <li class="itm"><a href="/?o=2">Sieć WiFi</a></li>
+        <li class="itm"><a href="/?o=3">MQTT Broker</a></li>
+        <li class="itm"><a href="/?o=27">I2C</a></li>
+        <li class="itm"><a href="/?o=22">UART</a></li>
+      </ul>
+      <h4>&#10150; Sprzęt</h4>
+      <ul class="lst">
+        <li class="itm"><i>LEDy</i></li>
+        <li class="itm"><a href="/?o=6&i=0">&#8227; LED: 1</a></li>
+        <li class="itm"><i>Czujniki BMEx80</i></li>
+        <li class="itm"><a href="/?o=24&i=0">&#8227; Czujnik: 1</a></li>
+        <li class="itm"><i>Czujniki BH1750</i></li>
+        <li class="itm"><a href="/?o=25&i=0">&#8227; Czujnik: 1</a></li>
+        <li class="itm"><i>Czujniki pyłów</i></li>
+        <li class="itm"><a href="/?o=23&i=0">&#8227; HPMA115S0: 1</a></li>
+      </ul>
+      <h4>&#10150; Funkcje</h4>
+      <ul class="lst">
+        <li class="itm"><a href="/?o=7">LED systemowy</a></li>
       </ul>
       <h4>&#10150; Firmware</h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=10">Set password</a></li>
-        <li class="itm"><a href="/?o=20">Firmware upgrade</a></li>
-        <li class="itm"><a href="/?o=16">Reset to orginal state</a></li>
-        <li class="itm"><a href="/?o=11">PRO Version</a></li>
-        <li class="itm"><a href="https://afe.smartnydom.pl">Documentation</a></li>
-        <li class="itm"><a href="https://www.smartnydom.pl/forum/afe-firmware/">Help</a></li>
+        <li class="itm"><a href="/?o=45">Wersja</a></li>
+        <li class="itm"><a href="/?o=10">Ustaw hasło</a></li>
+        <li class="itm"><a href="/?o=20">Aktualizacja oprogramowania</a></li>
+        <li class="itm"><a href="/?o=16">Ustawienia początkowe</a></li>
+        <li class="itm"><a href="/?o=11">Wersja PRO</a></li>
+        <li class="itm"><a href="https://afe.smartnydom.pl">Dokumentacja</a></li>
+        <li class="itm"><a href="https://www.smartnydom.pl/forum/afe-firmware/">Pomoc</a></li>
+        <li class="itm"><a href="https://afe.yt.pl.smartnydom.pl">YouTube</a></li>
       </ul>
       <h4></h4>
       <ul class="lst">
-        <li class="itm"><a href="/?o=15">&#10004; Finish configuration</a></li>
+        <li class="itm"><a href="/?o=15">&#10004; Zakończ konfigurację</a></li>
       </ul>
     </div>
     <div class="r">
-      <form method="post" action="/?c=1&o=1">
+      <form method="post" action="/?c=1&o=3">
         <div class="ci">
-          <h1>Firmware</h1>
-          <p class="cd"></p>
+          <h1>MQTT Broker</h1>
+          <p class="cd">Wprowadź adres hosta np. localhost lub adres IP</p>
           <fieldset>
-            <ul class="lst">
-              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em"><strong>Hi</strong>, I hope
-                firmware meets your expectations. If you experienced problems, report them <a
-                  href="https://www.smartnydom.pl/forum/english-support/">here</a> please.</li>
-              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em">Firmware has been upgraded
-                to: <strong>AFE T0.3.0.0.B1.EN.ESP8266.1Mb.H0</strong> version</li>
-              <li style="text-decoration:none;padding-left:1.5em;color:#777;font-size:0.9em">AFE Pro: is not active. <a
-                  href="https://afe.smartnydom.pl/pl/postawowe-informacje/wersja-pro">More</a> information about AFE
-                Pro.</li>
-          </fieldset>
-        </div>
-        <div class="ci">
-          <h1>Device</h1>
-          <p class="cd">Name is used for device identification within your LAN and a device's hotspot name used for
-            configuration mode</p>
-          <fieldset>
-            <div class="cf"><label>Device name</label><input name="n" type="text" maxlength="16" value="T0"><span
-                class="hint">Max 16 chars</span></div>
-          </fieldset>
-        </div>
-        <div class="ci">
-          <h1>Hardware configuration</h1>
-          <p class="cd">Select connected items to your device</p>
-          <fieldset>
-            <div class="cf"><label>Number of LEDs</label><select name="l">
-                <option value="0">None</option>
+            <div class="cf"><label>Hostname</label><input name="h" type="text" maxlength="32" value=""><span
+                class="hint">Max 32 znaków</span></div>
+            <div class="cf"><label>Adres IP</label><input name="a" type="text" value="192.168.2.146"></div>
+            <div class="cf"><label>Port</label><input name="p" type="number" min="0" max="65535" step="1"
+                value="1883"><span class="hint">Zakres 0 - 65535</span></div>
+            <div class="cf"><label>Nazwa użytkownika</label><input name="u" type="text" maxlength="32"
+                value="device"><span class="hint">Max 32 znaków</span></div>
+            <div class="cf"><label>Hasło</label><input name="s" type="password" maxlength="64"
+                value="Device#221!2021"><span class="hint">Max 64 znaków</span></div>
+            <div class="cf"><label>QOS</label><select name="q">
+                <option value="0">0</option>
                 <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
               </select></div>
-            <div class="cf"><label>Number of relays</label><select name="r">
-                <option value="0" selected="selected">None</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select></div>
-            <div class="cf"><label>Number of switches</label><select name="s">
-                <option value="0">None</option>
-                <option value="1" selected="selected">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select></div>
-            <div class="cc"><label><input name="ad" type="checkbox" value="1" disabled="disabled">Measurements from
-                Analog Input</label><span class="hint">(PRO Version)</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Device controlling mechanism</h1>
-          <p class="cd">Enable / Disable APIs</p>
+          <h1>Temat wiadomości LWT</h1>
+          <p class="cd">Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera</p>
           <fieldset>
-            <div class="cc"><label><input name="h" type="checkbox" value="1" checked="checked">HTTP API</label></div>
-            <div class="cc"><label><input name="m" type="checkbox" value="1" checked="checked">MQTT API</label></div>
+            <div class="cf"><label>Temat</label><input name="t0" type="text" maxlength="64"
+                value="parter/salon/sensor/lwt"><span class="hint">Max 64 znaków</span></div>
           </fieldset>
         </div>
         <div class="ci">
-          <h1>Automatic logout form the configuration panel</h1>
-          <p class="cd">Device configuration will be automatically closed after 10min. of idle time in the configuration
-            panel</p>
+          <h1>Zapamiętywanie wiadomości w MQTT Broker</h1>
+          <p class="cd">Wysłane wiadomości zostaną zapamiętana przez serwer i będą automatycznie wysłana do każdego kto
+            zasubskrybuje dany temat.</p>
           <fieldset>
-            <div class="cc"><label><input name="al" type="checkbox" value="1">enabled</label></div>
+            <div class="cc"><label><input name="rl" type="checkbox" value="1" checked="checked">Pamiętaj LWT</label>
+            </div>
+            <div class="cc"><label><input name="ra" type="checkbox" value="1">Pamiętaj wszystkie wiadomości</label>
+            </div>
           </fieldset>
-        </div><input type="submit" class="b bs" value="Save">
+        </div><input type="submit" class="b bs" value="Zapisz">
       </form>
     </div>
-  </div>
+  </div><img style="opacity:.6;" src="http://api.smartnydom.pl/images/smartnydom.png" />
 </body>
 
 </html>

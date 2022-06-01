@@ -153,15 +153,7 @@ void AFESensorBMEX80::listener() {
 }
 
 void AFESensorBMEX80::getJSON(char *json) {
-
-  //@TODO T5 T6  Estimate max size of JSON
-  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH>
-      jsonBuffer; // {"temperature":{"value":25.0273,"unit":"C","correction":25.0273},"pressure":{"value":993.6063,"unit":"hPa","correction":993.6063},"relativePressure":{"value":1003.809,"unit":"hPa"},"dewPoint":{"value":5.321408,"unit":"C"},"humidity":{"value":281.10078,"unit":"%H","correction":281.10078,"rating":3},"absoluteHumidity":{"value":6.480335,"unit":"%H"},"heatIndex":{"value":24.31934,"unit":"C"},"perception":{"value":0,"description":"W
-  // porządku dla większości, ale wszyscy odczuwają wilgoć przy
-  // górnej
-  // krawędzi"},"comfort":{"value":4,"ratio":84.7268,"unit":"%","description":"Gorąco
-  // i
-  // wilgotno"},"iaq":{"value":1110,"rating":1,"accuracy":0},"staticIaq":{"value":1110,"rating":1,"accuracy":0},"co2Equivalent":{"value":1400,"unit":"ppm","rating":1,"accuracy":0},"breathVocEquivalent":{"value":0.342646,"unit":"?","accuracy":0},"gasResistance":{"value":2324.371,"unit":"kOm"}}
+  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH> jsonBuffer; //
   JsonObject &root = jsonBuffer.createObject();
 
   JsonObject &temperature = root.createNestedObject("temperature");
@@ -264,8 +256,6 @@ void AFESensorBMEX80::getJSON(char *json) {
     gasResistance["value"] = data.gasResistance.value;
     gasResistance["unit"] = "kOm";
   }
-
-  //@TODO T5 T6 Estimate max size of JSON
   root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH);
 }
 
