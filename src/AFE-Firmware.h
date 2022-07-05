@@ -14,6 +14,14 @@
  * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 **************************************************************************/
 
+/**
+ * Work LOG T4
+ * - zmiana formularzy binary, relay, led, switch z MCP address na ID
+ * - dodac formularz konfiguracyjny MCP
+ * - dodać zapisywanie MCP konfiguracji
+ * - dodać odczyt MCP konfiguracji w MCP brokerze 
+ */
+
 #include <AFE-Configuration.h>
 
 /* Includes libraries for debugging in development compilation only */
@@ -38,7 +46,7 @@ AFEJSONRPC RestAPI;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #include <AFE-MCP23017-Broker.h>
-AFEMCP23017Broker MCP23017Broker[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+AFEMCP23017Broker MCP23017Broker;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED

@@ -12,57 +12,26 @@ void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        configuration.mcp23017.id !=
-            AFE_HARDWARE_ITEM_NOT_EXIST) {
-
-      if (_MCP23017ReferenceAdded) {
-
-        // @TODO T4 _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
-        if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+        configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 #ifdef DEBUG
-          Serial << endl
-                 << F("INFO: BINARY Sensor: Initializing with MCP23017");
+      Serial << endl << F("INFO: BINARY Sensor: Initializing with MCP23017");
 #endif
 
-          _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
-                                                   configuration.internalPullUp ? INPUT_PULLUP : INPUT);
-/*
-          _MCP23017Broker->MCP[_MCP23017Id].pullUp(
-              configuration.mcp23017.gpio,
-              configuration.internalPullUp ? HIGH : LOW);
-*/
+      _MCP23017Broker->MCP[_MCP23017Id].pinMode(
+          configuration.mcp23017.gpio,
+          configuration.internalPullUp ? INPUT_PULLUP : INPUT);
 
-
-          state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-              configuration.mcp23017.gpio);
+      state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+          configuration.mcp23017.gpio);
 
 #ifdef DEBUG
-          Serial
-              << endl
-              << F("INFO: BINARY Sensor: initial state of MCP23017 connected "
-                   "sensor: ")
-              << state;
+      Serial << endl
+             << F("INFO: BINARY Sensor: initial state of MCP23017 connected "
+                  "sensor: ")
+             << state;
 #endif
 
-          _expanderUsed = true;
-
-        }
-#ifdef DEBUG
-        else {
-          Serial << endl
-                 << F("WARN: BINARY Sensor: MCP23017[0x")
-                 << _HEX(configuration.mcp23017.id)
-                 << F("] not found in cache");
-        }
-#endif
-      }
-#ifdef DEBUG
-      else {
-        Serial << endl
-               << F("WARN: BINARY Sensor: Reference to MCP23017 has not been "
-                    "added");
-      }
-#endif
+      _expanderUsed = true;
 
     }
 #ifdef DEBUG
@@ -88,7 +57,6 @@ void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 void AFESensorBinary::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
-  _MCP23017ReferenceAdded = true;
 }
 #endif
 

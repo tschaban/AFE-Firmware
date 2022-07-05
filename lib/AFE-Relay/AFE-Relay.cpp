@@ -16,37 +16,15 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
     // If MCP23017 available in the HW, checking if LED connected using MCP23017
     if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
       if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-          configuration.mcp23017.id !=
-              AFE_HARDWARE_ITEM_NOT_EXIST) {
+          configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
-        if (_MCP23017ReferenceAdded) {
-
-          // @TODO T4 _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
-          if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 #ifdef DEBUG
-            Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
+        Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
 #endif
 
-            _MCP23017Broker->MCP[_MCP23017Id].pinMode(
-                configuration.mcp23017.gpio, OUTPUT);
-            _expanderUsed = true;
-          }
-#ifdef DEBUG
-          else {
-            Serial << endl
-                   << F("WARN: RELAY: MCP23017[0x")
-                   << _HEX(configuration.mcp23017.id)
-                   << F("] not found in cache");
-          }
-#endif
-        }
-#ifdef DEBUG
-        else {
-          Serial << endl
-                 << F("WARN: RELAY: Reference to MCP23017 has not been added");
-        }
-#endif
-
+        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
+                                                  OUTPUT);
+        _expanderUsed = true;
       }
 #ifdef DEBUG
       else {
@@ -61,7 +39,6 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     }
 #endif // AFE_CONFIG_HARDWARE_MCP23017
-
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -83,7 +60,6 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 void AFERelay::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
-  _MCP23017ReferenceAdded = true;
 }
 #endif
 

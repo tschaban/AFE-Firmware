@@ -20,59 +20,25 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
   // If MCP23017 available in the HW, checking if LED connected using MCP23017
   if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        configuration.mcp23017.id !=
-            AFE_HARDWARE_ITEM_NOT_EXIST) {
-
-      if (_MCP23017ReferenceAdded) {
-
-        // @TODO T4 _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
-        if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-#ifdef DEBUG
-          Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
-#endif
-
-/*
-          _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
-                                                    INPUT);
-
-          _MCP23017Broker->MCP[_MCP23017Id].pullUp(configuration.mcp23017.gpio,
-                                                   HIGH);
-
-*/
-        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
-                                                    INPUT_PULLUP);
-
-
-
-          state =
-              _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.mcp23017.gpio);
+        configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
 #ifdef DEBUG
-          Serial
-              << endl
-              << F("INFO: SWITCH: initial state of MCP23017 connecte switch: ")
-              << state;
+      Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
 #endif
 
-          _expanderUsed = true;
+      _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
+                                                INPUT_PULLUP);
 
-        }
+      state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+          configuration.mcp23017.gpio);
+
 #ifdef DEBUG
-        else {
-          Serial << endl
-                 << F("WARN: SWITCH: MCP23017[0x")
-                 << _HEX(configuration.mcp23017.id)
-                 << F("] not found in cache");
-        }
-#endif
-      }
-#ifdef DEBUG
-      else {
-        Serial << endl
-               << F("WARN: SWITCH: Reference to MCP23017 has not been added");
-      }
+      Serial << endl
+             << F("INFO: SWITCH: initial state of MCP23017 connecte switch: ")
+             << state;
 #endif
 
+      _expanderUsed = true;
     }
 #ifdef DEBUG
     else {
@@ -83,13 +49,11 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
-  pinMode(configuration.gpio, INPUT);
+    pinMode(configuration.gpio, INPUT);
 #else
   pinMode(configuration.gpio, INPUT_PULLUP);
 #endif
-  state = digitalRead(configuration.gpio);
-
-
+    state = digitalRead(configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   }
@@ -104,7 +68,6 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 void AFESwitch::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
-  _MCP23017ReferenceAdded = true;
 }
 #endif
 
