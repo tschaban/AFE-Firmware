@@ -1,13 +1,14 @@
 /************************************************************************
  * AFE Firmware for devices based on ESP8266/ESP8285/ESP32 chips
  * This code combains AFE Firmware versions:
- *  - T0 and T0 for Shelly-1
+ *  - T0 (Basic version: relay)
  *  - T1 (DS18B20)
  *  - T2 (DHTxx)
- *  - T3 (PIRs)
+ *  - T3 (PIRs) 
  *  - T4 (With expander MCP23017)
  *  - T5 Gate
  *  - T6 Wheater station
+ *  - T7 RGB LED Controller
  *
  * More info: https://afe.smartnydom.pl
  * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
@@ -37,7 +38,7 @@ AFEJSONRPC RestAPI;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 #include <AFE-MCP23017-Broker.h>
-AFEMCP23017Broker MCP23017Broker;
+AFEMCP23017Broker MCP23017Broker[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED

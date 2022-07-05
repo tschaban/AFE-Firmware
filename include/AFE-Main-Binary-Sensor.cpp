@@ -14,7 +14,7 @@ void initializeBinarySensor(void) {
   for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-    BinarySensor[i].addMCP23017Reference(&MCP23017Broker);
+    // @TODO T4  BinarySensor[i].addMCP23017Reference(&MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23017
     BinarySensor[i].begin(i, &Data);
   }

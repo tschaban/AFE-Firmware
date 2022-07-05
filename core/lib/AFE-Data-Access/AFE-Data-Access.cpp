@@ -1683,7 +1683,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
       configuration->gpio = root["gpio"];
       configuration->changeToOppositeValue = root["changeToOppositeValue"];
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -1739,7 +1739,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -1806,8 +1806,7 @@ void AFEDataAccess::createLEDConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  LEDConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  LEDConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -2000,7 +1999,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -2063,7 +2062,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -2111,8 +2110,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  RelayConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  RelayConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -2386,7 +2384,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -2447,7 +2445,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -2491,8 +2489,7 @@ void AFEDataAccess::createSwitchConfigurationFile() {
       AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  SwitchConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  SwitchConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -5484,7 +5481,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -5545,7 +5542,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -5583,8 +5580,7 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
       AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR;
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
-  configuration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  configuration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -6738,15 +6734,22 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 
       sprintf(configuration->name, root["name"] | "");
-      configuration->sensitiveness = root["sensitiveness"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
-      configuration->interval = root["interval"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
-      configuration->gain = root["gain"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
+      configuration->sensitiveness =
+          root["sensitiveness"] |
+          AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
+      configuration->interval =
+          root["interval"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
+      configuration->gain =
+          root["gain"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
 
 #ifdef AFE_ESP32
-      configuration->wirePortId = root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->wirePortId =
+          root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-      configuration->i2cAddress = root["i2cAddress"] | AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+      configuration->i2cAddress =
+          root["i2cAddress"] |
+          AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.ir.idx =
           root["domoticz"]["ir"] | AFE_DOMOTICZ_DEFAULT_IDX;

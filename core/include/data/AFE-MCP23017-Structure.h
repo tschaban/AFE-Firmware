@@ -6,13 +6,17 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
 
-struct MCP23017_CACHE {
+
+struct MCP23XXX_ITEM_CONFIG {
   uint8_t id;
-  uint8_t address;
+  uint8_t gpio;
 };
 
-struct MCP23017 {
-  uint8_t gpio;
+struct MCP23XXX_CONFIG {
+  char name[33];
+#ifdef AFE_ESP32
+  uint8_t wirePortId;
+#endif
   uint8_t address;
 };
 

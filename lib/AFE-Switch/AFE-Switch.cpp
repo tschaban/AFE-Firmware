@@ -20,21 +20,29 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
   // If MCP23017 available in the HW, checking if LED connected using MCP23017
   if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        configuration.mcp23017.address !=
-            AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+        configuration.mcp23017.id !=
+            AFE_HARDWARE_ITEM_NOT_EXIST) {
 
       if (_MCP23017ReferenceAdded) {
 
-        _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
+        // @TODO T4 _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
         if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 #ifdef DEBUG
           Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
 #endif
 
+/*
           _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
                                                     INPUT);
+
           _MCP23017Broker->MCP[_MCP23017Id].pullUp(configuration.mcp23017.gpio,
                                                    HIGH);
+
+*/
+        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
+                                                    INPUT_PULLUP);
+
+
 
           state =
               _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.mcp23017.gpio);
@@ -53,7 +61,7 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
         else {
           Serial << endl
                  << F("WARN: SWITCH: MCP23017[0x")
-                 << _HEX(configuration.mcp23017.address)
+                 << _HEX(configuration.mcp23017.id)
                  << F("] not found in cache");
         }
 #endif

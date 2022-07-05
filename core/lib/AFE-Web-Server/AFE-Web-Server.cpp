@@ -1601,10 +1601,9 @@ void AFEWebServer::get(RELAY &data) {
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address =
-      server.arg(F("a")).length() > 0
-          ? server.arg(F("a")).toInt()
-          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.id = server.arg(F("a")).length() > 0
+                         ? server.arg(F("a")).toInt()
+                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
@@ -1643,10 +1642,9 @@ void AFEWebServer::get(SWITCH &data) {
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address =
-      server.arg(F("a")).length() > 0
-          ? server.arg(F("a")).toInt()
-          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.id = server.arg(F("a")).length() > 0
+                         ? server.arg(F("a")).toInt()
+                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
@@ -1888,10 +1886,9 @@ void AFEWebServer::get(LED &data) {
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address =
-      server.arg(F("a")).length() > 0
-          ? server.arg(F("a")).toInt()
-          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.id = server.arg(F("a")).length() > 0
+                         ? server.arg(F("a")).toInt()
+                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 }
 
@@ -2519,10 +2516,9 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  data.mcp23017.address =
-      server.arg(F("a")).length() > 0
-          ? server.arg(F("a")).toInt()
-          : AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  data.mcp23017.id = server.arg(F("a")).length() > 0
+                         ? server.arg(F("a")).toInt()
+                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ

@@ -948,7 +948,7 @@ boolean AFEAPIMQTTStandard::publishBinarySensorState(uint8_t id) {
                        _BinarySensor[id]->get() == AFE_BINARY_SENSOR_OPEN
                            ? AFE_OPEN
                            : AFE_CLOSED,
-                       !_MiFareCard[id]->configuration.sendAsSwitch)
+                       !_BinarySensor[id]->configuration.sendAsSwitch)
                  : false;
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
