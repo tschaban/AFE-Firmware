@@ -92,6 +92,7 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 
     configFile.print(message);
     configFile.close();
+    configFile.write
 
   }
 #ifdef DEBUG
