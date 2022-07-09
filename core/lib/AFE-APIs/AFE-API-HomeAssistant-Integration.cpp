@@ -331,7 +331,8 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_ADC_PERCENT;
       removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-      _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_PERCENT;
+      _deviceConfiguration.type =
+          AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_PERCENT;
       removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
       _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_VOLT;
       removeItemRemovedFromHomeAssistantMQTTDiscovery(&_deviceConfiguration);
@@ -626,6 +627,12 @@ void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
         _deviceConfiguration.type = AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX;
         sprintf(_deviceConfiguration.label, "%s: %s", _configuration.name,
                 L_HEAT_INDEX);
+        sprintf(_deviceConfiguration.unit,
+                _configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                    ? AFE_UNIT_TEMPERATURE_C
+                    : AFE_UNIT_TEMPERATURE_F);
+        sprintf(_deviceConfiguration.deviceClass,
+                AFE_CONFIG_HA_DEVICE_CLASS_TEMPERATURE);
         publishItemToHomeAssistantMQTTDiscovery(&_deviceConfiguration);
 
         /* Dew point */
@@ -1335,6 +1342,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_GAS_RESISTANCE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);                      
       }
 #endif // Gas resistance
 
