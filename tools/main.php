@@ -4,7 +4,7 @@
 /* Set this before run */
 
 $type = "6";
-$version = "3.4.0";
+$version = "3.4.1";
 $language = "en";
 $development = false;
 
