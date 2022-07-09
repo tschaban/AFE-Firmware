@@ -70,8 +70,7 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif
   } else if (strlen(configuration.host) > 0) {
     _Broker.setServer(configuration.host, configuration.port);
-  } 
-  else {
+  } else {
     _isConfigured = false;
   }
 
@@ -87,7 +86,7 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
          << F("INFO: LWT Topic: ") << configuration.lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif
-return _isConfigured;
+  return _isConfigured;
 }
 
 void AFEAsyncMQTTClient::subscribe(const char *topic) {
@@ -121,6 +120,10 @@ boolean AFEAsyncMQTTClient::listener() {
       _ret = true;
     }
   } else {
+    #ifdef DEBUG
+      Serial << endl
+             << F("INFO: MQTT: Connecting to MQTT Broker");
+#endif
     _Broker.connect();
   }
 
@@ -149,6 +152,10 @@ boolean AFEAsyncMQTTClient::publish(const char *topic, const char *message) {
     Serial << endl << F("Message: ") << message;
     Serial << endl
            << F("Retain: ") << (configuration.retainAll ? F("YES") : F("NO"));
+Serial << endl << "Message size: " << strlen(message);
+    Serial << endl
+           << F("Free memory: ") << system_get_free_heap_size() / 1024
+           << F("kB");
 #endif
     if (strlen(topic) > 0) {
       _publishedId = _Broker.publish(topic, configuration.qos,
@@ -166,6 +173,7 @@ boolean AFEAsyncMQTTClient::publish(const char *topic, const char *message) {
     Serial << endl << F("Message sent. Id: ") << _publishedId;
     Serial << endl << F("------------------------------------");
 #endif
+    
   }
 
   return _ret;
@@ -265,7 +273,6 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 void AFEAsyncMQTTClient::onMqttMessage(
     char *topic, char *payload, AsyncMqttClientMessageProperties properties,
     size_t len, size_t index, size_t total) {
-      
 
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Got message:");

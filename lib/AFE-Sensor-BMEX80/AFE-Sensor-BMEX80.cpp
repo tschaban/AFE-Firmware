@@ -153,7 +153,7 @@ void AFESensorBMEX80::listener() {
 }
 
 void AFESensorBMEX80::getJSON(char *json) {
-  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH> jsonBuffer; //
+  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.createObject();
 
   JsonObject &temperature = root.createNestedObject("temperature");
@@ -256,7 +256,12 @@ void AFESensorBMEX80::getJSON(char *json) {
     gasResistance["value"] = data.gasResistance.value;
     gasResistance["unit"] = "kOm";
   }
-  root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH);
+  /**
+   * @brief There is a conversion to the real JSON string size. Workaround as
+   * ASyncMQTTCrashes with larger strings crashes @TODO T6 investigate the problem furhter
+   *
+   */
+  root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH);
 }
 
 void AFESensorBMEX80::applyCorrections() {

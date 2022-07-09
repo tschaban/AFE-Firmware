@@ -531,13 +531,13 @@ boolean AFEAPIMQTTStandard::publishBatteryMeterValues(uint8_t id) {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
     _AnalogInput[id]->getBatteryMeterJSON(message);
-    _ret =
-        Mqtt.publish(_AnalogInput[id]->configuration.battery.mqtt.topic, message);
+    _ret = Mqtt.publish(_AnalogInput[id]->configuration.battery.mqtt.topic,
+                        message);
   }
   return _ret;
 }
 
-#else  // AFE_ESP8266
+#else // AFE_ESP8266
 void AFEAPIMQTTStandard::processBatteryMeter() {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing BatteryMeter: ");
@@ -582,7 +582,12 @@ void AFEAPIMQTTStandard::processBMEX80(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishBMx80SensorData(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    char message[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH];
+    /**
+ * @brief Real JSON string size used. Workaround as ASyncMQTTCrashes with
+ * larger string crashes @TODO T6 investigate the problem furhter
+ *
+ */
+    char message[AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH];
     _BMx80Sensor[id]->getJSON(message);
     publishStatus =
         Mqtt.publish(_BMx80Sensor[id]->configuration.mqtt.topic, message);
