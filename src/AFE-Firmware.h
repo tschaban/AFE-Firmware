@@ -17,8 +17,9 @@
 /**
  * Work LOG T4
  * - zmiana formularzy binary, relay, led, switch z MCP address na ID
- * - dodac formularz konfiguracyjny MCP
- * - dodać zapisywanie MCP konfiguracji
+ * - zmodyfikowac web-server czesc poczatkowa genertcza otwieranie, zapistwanie
+ * - menu konfiguracyjne do MCP23
+ * - lokalizacje
  * - dodać odczyt MCP konfiguracji w MCP brokerze 
  */
 

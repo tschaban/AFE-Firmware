@@ -459,5 +459,13 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void siteTSL2561Sensor(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void siteMCP23XXX(String &page, uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+
+
 };
 #endif // _AFE_Sites_Generator_h

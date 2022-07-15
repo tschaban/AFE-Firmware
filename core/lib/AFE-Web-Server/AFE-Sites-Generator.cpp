@@ -134,6 +134,15 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_CLED
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  if (Device->configuration.noOfMCP23xxx > 0) {
+    addMenuHeaderItem(page, F("MCP23XXX"));
+    addMenuSubItem(page, "MCP23XXX", Device->configuration.noOfMCP23xxx,
+                   AFE_CONFIG_SITE_LED);
+  }
+#endif // AFE_CONFIG_HARDWARE_MCP23017
+
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -1004,7 +1013,8 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  // @TODO T4addDeviceI2CAddressSelectionItem(page,
+  // configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
   closeSection(page);
   openSection(page, F(L_MCP23107_LED_ADDITIONAL_SETTINGS), F(""));
@@ -1068,7 +1078,8 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
+  // configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
   closeSection(page);
@@ -1532,7 +1543,8 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
   addListOfGPIOs(page, F("g"), configuration.gpio);
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
+  // configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 
   closeSection(page);
@@ -3277,7 +3289,6 @@ void AFESitesGenerator::siteProKey(String &page) {
       page.replace("{{I}}", _HtmlResponse);
     }
 
-
   } else {
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
     page.replace("{{I}}", L_PRO_CANNOT_BE_CONFIGURED);
@@ -3381,7 +3392,8 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23017
   /* Item: GPIO from expander */
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page, configuration.mcp23017.address);
+  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
+  // configuration.mcp23017.address);
   addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
 #endif // AFE_CONFIG_HARDWARE_MCP23017
 
@@ -4660,6 +4672,32 @@ void AFESitesGenerator::addLEDSelectionItem(String &item, uint8_t id) {
   addSelectFormItemClose(item);
 }
 #endif // AFE_CONFIG_HARDWARE_LED
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+void AFESitesGenerator::siteMCP23XXX(String &page, uint8_t id) {
+
+  MCP23XXX configuration;
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
+  openSection(page, F(L_TSL2561_SENSOR), F(""));
+
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.address);
+#else
+  addDeviceI2CAddressSelectionItem(page, configuration.address);
+#endif
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "32");
+
+  closeSection(page);
+}
+#endif // AFE_CONFIG_HARDWARE_MCP23017
 
 void AFESitesGenerator::addFileNotFound(String &page) {
   openSection(page, F(L_ATTENTION), F(""));

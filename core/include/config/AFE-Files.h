@@ -90,6 +90,7 @@
 #define AFE_FILE_CLED_BACKLIGHT_CONFIGURATION "/cfg-cled-backlight-%d.json"
 #define AFE_FILE_TSL2561_CONFIGURATION "/cfg-tls2561-%d.json"
 #define AFE_FILE_REBOOTS_COUNTER "/cfg-reboots_counter.json"
+#define AFE_FILE_MCP23XXX_CONFIGURATION "/cfg-mcp23xxx-%d.json"
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ checked
@@ -154,5 +155,6 @@
 #define AFE_CONFIG_FILE_BUFFER_TSL2561 290 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT 190 // AJ Checked
 #define AFE_FILE_BUFFER_REBOOTS_COUNTER 43 // AJ Checked
+#define AFE_CONFIG_FILE_BUFFER_MCP23XXX 200 // @TODO T4
 
 #endif

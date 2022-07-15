@@ -279,5 +279,12 @@ public:
   void saveConfiguration(uint8_t id, TSL2561 *);
   void createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  boolean getConfiguration(uint8_t id, MCP23XXX *);
+  void saveConfiguration(uint8_t id, MCP23XXX *);
+  void createMCP23XXXConfigurationFile();
+#endif 
+
 };
 #endif // _AFE_Data_Access_h

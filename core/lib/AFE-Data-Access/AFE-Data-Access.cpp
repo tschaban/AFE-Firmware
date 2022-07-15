@@ -93,7 +93,6 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
     configFile.print(message);
     configFile.close();
 
-
   }
 #ifdef DEBUG
   else {
@@ -6872,6 +6871,132 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
+  boolean _ret = true;
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MCP23XXX> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["name"] | "");
+      configuration->address =
+          root["address"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_ESP32
+      configuration->wirePortId =
+          root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifdef DEBUG
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MCP23XXX, jsonBuffer.size());
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+
+  return _ret;
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MCP23XXX> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["name"] = configuration->name;
+    root["address"] = configuration->address;
+
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createMCP23XXXConfigurationFile() {
+  MCP23XXX configuration;
+  configuration.address = AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-mcp23xxx-") << i << F(".json");
+#endif
+
+    sprintf(configuration.name, "MCP23XXX-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif
 
 unsigned long AFEDataAccess::getRebootCounter(boolean increase) {
   unsigned long _ret = 1;

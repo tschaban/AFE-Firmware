@@ -241,6 +241,14 @@ private:
   void get(TSL2561 &data);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
+/**
+ * @brief Gets MCP23XXX onfiguration parameters from HTML form
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  void get(MCP23XXX &data);
+#endif
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
   boolean upgradeOTAWAN(uint16_t firmwareId);

@@ -12,7 +12,7 @@ struct MCP23XXX_ITEM_CONFIG {
   uint8_t gpio;
 };
 
-struct MCP23XXX_CONFIG {
+struct MCP23XXX {
   char name[33];
 #ifdef AFE_ESP32
   uint8_t wirePortId;

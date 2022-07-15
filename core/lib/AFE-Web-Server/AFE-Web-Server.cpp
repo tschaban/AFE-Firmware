@@ -287,6 +287,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteTSL2561Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+  case AFE_CONFIG_SITE_MCP23XXX:
+    Site.siteMCP23XXX(page, siteConfig->deviceID);
+    break;
+#endif // AFE_CONFIG_HARDWARE_MCP23017
   }
 
   if (siteConfig->form) {
@@ -2996,3 +3001,25 @@ void AFEWebServer::get(TSL2561 &data) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23017
+void AFEWebServer::get(MCP23XXX &data) {
+
+#if defined(AFE_ESP32)
+  data.wirePortId = server.arg(F("wr")).length() > 0
+                        ? server.arg(F("wr")).toInt()
+                        : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+  data.address = server.arg(F("a")).length() > 0
+                      ? server.arg(F("a")).toInt()
+                      : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+ 
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+}
+#endif
