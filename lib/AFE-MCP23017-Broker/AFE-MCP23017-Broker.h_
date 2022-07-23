@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -19,7 +19,7 @@
 class AFEMCP23017Broker {
 
 private:
-  MCP23017_CACHE _cache[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+  MCP23017_CACHE _cache[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
   uint8_t _currentCacheIndex = 0;
   I2CPORT _I2C;
   AFEI2CScanner _I2CScanner;
@@ -28,7 +28,7 @@ private:
   void add(uint8_t address);
 
 public:
-  Adafruit_MCP23017 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+  Adafruit_MCP23017 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
   /* Constructors */
   AFEMCP23017Broker();
@@ -41,5 +41,5 @@ public:
   /* Gets ID of the MCP based on it's address. Used for caching */
   uint8_t getId(uint8_t address);
 };
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #endif // _AFE_MCP23107_Broker_h

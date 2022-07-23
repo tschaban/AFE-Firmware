@@ -15,9 +15,9 @@ void relayEventsListener(void);
 void initializeRelay(void) {
 
   for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   Relay[i].addMCP23017Reference(&MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
     Relay[i].begin(&Data, i);
     // @TODO T5  does not have to be set for Relay controlling a Gate
     Relay[i].setRelayAfterRestoringPower();

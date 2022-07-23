@@ -4,7 +4,7 @@
 #define _AFE_MCP23017_Structure_h
 
 #include <AFE-Configuration.h>
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 
 struct MCP23XXX_ITEM_CONFIG {
@@ -20,5 +20,5 @@ struct MCP23XXX {
   uint8_t address;
 };
 
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #endif // _AFE_LED_Structure_h

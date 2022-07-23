@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
@@ -28,10 +28,10 @@ private:
   TwoWire _WirePort0;
 #endif
 
-  MCP23XXX configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+  MCP23XXX configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
 public:
-  Adafruit_MCP23X17 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+  Adafruit_MCP23X17 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
   /**
    * @brief Construct a new AFEMCP23017Broker object
@@ -63,5 +63,5 @@ public:
 
 
 };
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #endif // _AFE_MCP23107_Broker_h

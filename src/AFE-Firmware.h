@@ -17,7 +17,6 @@
 /**
  * Work LOG T4
  * - zmiana formularzy binary, relay, led, switch z MCP address na ID
- * - zmodyfikowac web-server czesc poczatkowa genertcza otwieranie, zapistwanie
  * - menu konfiguracyjne do MCP23
  * - lokalizacje
  * - dodać odczyt MCP konfiguracji w MCP brokerze 
@@ -45,7 +44,7 @@ AFEWiFi Network;
 AFEWebServer HTTPServer;
 AFEJSONRPC RestAPI;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 AFEMCP23017Broker MCP23017Broker;
 #endif
@@ -172,7 +171,7 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #include <AFE-Main-I2C.cpp>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-Main-MCP23017.cpp>
 #endif
 

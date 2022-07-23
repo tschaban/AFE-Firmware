@@ -2,7 +2,7 @@
 
 #include "AFE-MCP23017-Broker.h"
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 AFEMCP23017Broker::AFEMCP23017Broker(){};
 
@@ -20,7 +20,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, TwoWire *WirePort0) {
   AFEI2CScanner I2CScanner;
   _WirePort0 = WirePort0;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX; i++) {
 
 #ifdef AFE_ESP32
     if (configuration[i].wirePortId == AFE_CONFIG_HARDWARE_I2C_0) {
@@ -61,4 +61,4 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, TwoWire *WirePort0) {
   }
 }
 
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX

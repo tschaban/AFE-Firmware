@@ -60,7 +60,7 @@ const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 17, 18, 1
 const uint8_t GPIOS_ADC[] PROGMEM = {32, 33, 34, 35};
 #endif // !AFE_ESP32
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 const uint8_t MCP23017_GPIOS_ID[] PROGMEM = {0, 1, 2,  3,  4,  5,  6,  7,
                                              8, 9, 10, 11, 12, 13, 14, 15};
 #endif

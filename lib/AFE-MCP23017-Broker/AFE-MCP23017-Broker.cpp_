@@ -2,10 +2,10 @@
 
 #include "AFE-MCP23017-Broker.h"
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 AFEMCP23017Broker::AFEMCP23017Broker() {
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX; i++) {
     _cache[i].id = i;
     _cache[i].address = AFE_HARDWARE_ITEM_NOT_EXIST;
   }
@@ -126,7 +126,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device) {
 
 uint8_t AFEMCP23017Broker::getId(uint8_t address) {
   uint8_t _ret = AFE_HARDWARE_ITEM_NOT_EXIST;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX; i++) {
     if (_cache[i].address == address) {
       _ret = _cache[i].id;
       break;
@@ -162,4 +162,4 @@ void AFEMCP23017Broker::add(uint8_t address) {
 #endif
 }
 
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX

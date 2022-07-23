@@ -287,11 +287,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteTSL2561Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_TSL2561
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   case AFE_CONFIG_SITE_MCP23XXX:
     Site.siteMCP23XXX(page, siteConfig->deviceID);
     break;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
   }
 
   if (siteConfig->form) {
@@ -626,6 +626,14 @@ boolean AFEWebServer::generate(boolean upload) {
           configuration = {0};
         }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+        else if (siteConfig.ID == AFE_CONFIG_SITE_MCP23XXX) {
+          MCP23XXX configuration;
+          get(configuration);
+          Data->saveConfiguration(siteConfig.deviceID, &configuration);
+          configuration = {0};
+        }
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
       } else if (command == AFE_SERVER_CMD_NONE) {
         if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
@@ -700,7 +708,7 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 
       String page;
-// page.reserve(AFE_MAX_PAGE_SIZE);
+//page.reserve(AFE_MAX_PAGE_SIZE);
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
@@ -860,6 +868,17 @@ void AFEWebServer::publishHTML(const String &page) {
   server.setContentLength(pageSize);
   server.send(200, "text/html", page);
 /*
+
+String webPageChunk = "some html";
+server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+server.send ( 200, "text/html", webPageChunk);
+while (<page is being generated>) {
+  webPageChunk = "some more html";
+  server.sendContent(webPageChunk);
+}
+server.sendContent("");
+
+
   if (pageSize > size) {
 #ifdef DEBUG
 #ifndef AFE_ESP32
@@ -1369,6 +1388,11 @@ void AFEWebServer::get(DEVICE &data) {
       server.arg(F("tl")).length() > 0 ? server.arg(F("tl")).toInt() : 0;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  data.noOfMCP23xxx =
+      server.arg(F("e")).length() > 0 ? server.arg(F("e")).toInt() : 0;
+#endif
+
   data.timeToAutoLogOff =
       server.arg(F("al")).length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 }
@@ -1601,7 +1625,7 @@ void AFEWebServer::get(RELAY &data) {
                            ? server.arg(F("ts")).toInt()
                            : AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   data.mcp23017.gpio = server.arg(F("mg")).length() > 0
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -1609,7 +1633,7 @@ void AFEWebServer::get(RELAY &data) {
   data.mcp23017.id = server.arg(F("a")).length() > 0
                          ? server.arg(F("a")).toInt()
                          : AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -1642,7 +1666,7 @@ void AFEWebServer::get(SWITCH &data) {
   }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   data.mcp23017.gpio = server.arg(F("mg")).length() > 0
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -1650,7 +1674,7 @@ void AFEWebServer::get(SWITCH &data) {
   data.mcp23017.id = server.arg(F("a")).length() > 0
                          ? server.arg(F("a")).toInt()
                          : AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
@@ -1886,7 +1910,7 @@ void AFEWebServer::get(LED &data) {
 
   data.changeToOppositeValue = server.arg(F("w")).length() > 0 ? true : false;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   data.mcp23017.gpio = server.arg(F("mg")).length() > 0
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -1894,7 +1918,7 @@ void AFEWebServer::get(LED &data) {
   data.mcp23017.id = server.arg(F("a")).length() > 0
                          ? server.arg(F("a")).toInt()
                          : AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 }
 
 uint8_t AFEWebServer::getSystemLEDData() {
@@ -2516,7 +2540,7 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
 
   data.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : 0;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   data.mcp23017.gpio = server.arg(F("mg")).length() > 0
                            ? server.arg(F("mg")).toInt()
                            : AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -2524,7 +2548,7 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
   data.mcp23017.id = server.arg(F("a")).length() > 0
                          ? server.arg(F("a")).toInt()
                          : AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.domoticz.idx =
@@ -3002,7 +3026,7 @@ void AFEWebServer::get(TSL2561 &data) {
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFEWebServer::get(MCP23XXX &data) {
 
 #if defined(AFE_ESP32)
@@ -3011,11 +3035,9 @@ void AFEWebServer::get(MCP23XXX &data) {
                         : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-  data.address = server.arg(F("a")).length() > 0
-                      ? server.arg(F("a")).toInt()
-                      : AFE_HARDWARE_ITEM_NOT_EXIST;
+  data.address = server.arg(F("a")).length() > 0 ? server.arg(F("a")).toInt()
+                                                 : AFE_HARDWARE_ITEM_NOT_EXIST;
 
- 
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
   } else {

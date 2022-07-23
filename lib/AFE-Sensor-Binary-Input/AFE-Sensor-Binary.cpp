@@ -9,7 +9,7 @@ AFESensorBinary::AFESensorBinary(){};
 void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
   _Data->getConfiguration(id, &configuration);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
         configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -40,21 +40,21 @@ void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
     }
 #endif
   } else {
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     pinMode(configuration.gpio,
             configuration.internalPullUp ? INPUT_PULLUP : INPUT);
 
     state = digitalRead(configuration.gpio);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   _initialized = true;
 }
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFESensorBinary::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
 }
@@ -68,7 +68,7 @@ boolean AFESensorBinary::listener() {
   _detected = false;
   if (_initialized) {
     byte _currentState;
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
       _currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
           configuration.mcp23017.gpio);
@@ -77,7 +77,7 @@ boolean AFESensorBinary::listener() {
 
       _currentState = digitalRead(configuration.gpio);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }
 #endif
 

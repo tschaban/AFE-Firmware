@@ -187,6 +187,14 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     Serial << endl << F("ERROR: API REST: No access to WAN");
 #endif
   }
+
+
+#if defined(DEBUG) && !defined(AFE_ESP32)
+      Serial << endl
+             << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
+             << F("kB");
+#endif
+
   return _httpCode;
 }
 

@@ -112,11 +112,11 @@
  * {"ssid":"123456789012345678901234567890123","password":"123456789012345678901234567890123","ssidBackup":"123456789012345678901234567890123","passwordBackup":"12345678901234567890123","isDHCP":1,"ip":"111.111.111.111","gateway":"111.111.111.111","subnet":"111.111.111.111","isDHCPBackup":1,"ipBackup":"111.111.111.111","gatewayBackup":"111.111.111.111","subnetBackup":"111.111.111.111","noConnectionAttempts":110,"waitTimeConnections":111,"waitTimeSeries":115,"noFailuresToSwitchNetwork":112,"radioMode":255,"outputPower":255}
  */
 #define AFE_CONFIG_FILE_BUFFER_NETWORK 764     // AJ checked 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_LED 124 //  AJ checked
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+#define AFE_CONFIG_FILE_BUFFER_LED 156 //  AJ checked
 #else
-#define AFE_CONFIG_FILE_BUFFER_LED 76         // AJ checked
-#endif                                        // AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_FILE_BUFFER_LED 156         // AJ checked
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 35  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_RELAY 287      // AJ checked for T6 only
 #define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 46 // AJ checked

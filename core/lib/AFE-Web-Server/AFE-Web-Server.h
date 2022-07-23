@@ -245,7 +245,7 @@ private:
  * @brief Gets MCP23XXX onfiguration parameters from HTML form
  * 
  */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void get(MCP23XXX &data);
 #endif
 

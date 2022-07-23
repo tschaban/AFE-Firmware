@@ -588,6 +588,12 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfI2Cs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->noOfMCP23xxx =
+          root["noOfMCP23xxx"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif 
+
+
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE, jsonBuffer.size());
 #endif
@@ -728,6 +734,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfCLEDs"] = configuration->noOfCLEDs;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+    root["noOfMCP23xxx"] = configuration->noOfMCP23xxx;
+#endif
+
     root.printTo(configFile);
 
 #ifdef DEBUG
@@ -745,8 +755,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
   }
 #endif
 
-// Removing connection between relay and a gate, if exists reseting changing the
-// number of gates
+/**
+ * @brief Removing connection between relay and a gate, if exists reseting changing the number of gates
+ * 
+ */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (configuration->noOfGates < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES) {
     GATE _Gate;
@@ -884,6 +896,11 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   configuration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  configuration.noOfMCP23xxx = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif
+
 
   saveConfiguration(&configuration);
 }
@@ -1682,7 +1699,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 
       configuration->gpio = root["gpio"];
       configuration->changeToOppositeValue = root["changeToOppositeValue"];
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
@@ -1737,11 +1754,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
     root["gpio"] = configuration->gpio;
     root["changeToOppositeValue"] = configuration->changeToOppositeValue;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
     mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1805,10 +1822,10 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   LEDConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
 #ifdef DEBUG
@@ -1824,11 +1841,11 @@ void AFEDataAccess::createLEDConfigurationFile(uint8_t id) {
   LEDConfiguration.changeToOppositeValue = false;
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   LEDConfiguration.mcp23017.address =
       AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: cfg-led-") << id << F(".json");
@@ -1998,7 +2015,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       configuration->ledID = root["ledID"];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
@@ -2060,11 +2077,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
     mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -2109,10 +2126,10 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.triggerSignal =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   RelayConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 /* SONOFF Basic v1 */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -2383,7 +2400,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
@@ -2443,11 +2460,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
     mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -2488,10 +2505,10 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.functionality =
       AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   SwitchConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   saveConfiguration(0, &SwitchConfiguration);
 
@@ -5480,7 +5497,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
@@ -5540,11 +5557,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
     mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -5579,10 +5596,10 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
   configuration.internalPullUp =
       AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   configuration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6872,7 +6889,7 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
   boolean _ret = true;
   char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];

@@ -280,7 +280,7 @@ public:
   void createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   boolean getConfiguration(uint8_t id, MCP23XXX *);
   void saveConfiguration(uint8_t id, MCP23XXX *);
   void createMCP23XXXConfigurationFile();

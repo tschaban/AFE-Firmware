@@ -136,6 +136,7 @@
 #define L_DEVICE_NUMBER_OF_I2CS "Number of I2C port"
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Number of TSL2561's sensors"  
 #define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
+#define L_DEVICE_NUMBER_OF_MCP23XXX "Number of MCP23xxx extensions"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"

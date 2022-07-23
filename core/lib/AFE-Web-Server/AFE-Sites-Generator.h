@@ -182,10 +182,10 @@ private:
                              const __FlashStringHelper *label,
                              boolean disabled = false);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
                               const char *title = "MCP23017 GPIO");
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   void addRegulatorControllerItem(String &item, REGULATOR *configuration);
@@ -461,9 +461,9 @@ public:
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void siteMCP23XXX(String &page, uint8_t id);
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 
 

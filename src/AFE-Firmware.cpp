@@ -128,9 +128,9 @@ void setup() {
 #endif
 
 /* Initializing MCP23017 expanders */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   initializeMCP23017();
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 /* Initializing system LED (if exists) and turning it on */
 #ifdef AFE_CONFIG_HARDWARE_LED

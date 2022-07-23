@@ -21,7 +21,7 @@ struct SWITCH {
 #else
   MQTT_TOPIC mqtt;
 #endif
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   MCP23XXX_ITEM_CONFIG mcp23017;
 #endif  
 };

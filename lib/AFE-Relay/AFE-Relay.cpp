@@ -12,7 +12,7 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 
     _Data = Data;
     _Data->getConfiguration(_id, &configuration);
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     // If MCP23017 available in the HW, checking if LED connected using MCP23017
     if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
       if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
@@ -32,13 +32,13 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
       }
 #endif
     } else {
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
       pinMode(configuration.gpio, OUTPUT);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -46,9 +46,9 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 // config
 // https://github.com/tschaban/AFE-Firmware/issues/606
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       Led.addMCP23017Reference(_MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
       Led.begin(_Data, configuration.ledID);
     }
@@ -57,7 +57,7 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
   }
 }
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFERelay::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
 }
@@ -66,7 +66,7 @@ void AFERelay::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
 byte AFERelay::get() {
   byte state;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
     state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
         configuration.mcp23017.gpio);
@@ -75,7 +75,7 @@ byte AFERelay::get() {
 
     state = digitalRead(configuration.gpio);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 
@@ -101,7 +101,7 @@ void AFERelay::on() {
 
 // if (get() == AFE_RELAY_OFF) {
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
     _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
         configuration.mcp23017.gpio,
@@ -115,7 +115,7 @@ void AFERelay::on() {
                      ? HIGH
                      : LOW);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 
@@ -152,7 +152,7 @@ void AFERelay::off() {
 
 // if (get() == AFE_RELAY_ON) {
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
     _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
         configuration.mcp23017.gpio,
@@ -166,7 +166,7 @@ void AFERelay::off() {
                      ? LOW
                      : HIGH);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 

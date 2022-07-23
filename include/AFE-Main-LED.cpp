@@ -13,9 +13,9 @@ void initializeLED(void) {
 #endif
   if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (Device.configuration.noOfLEDs - 1 >= id) {
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     Led.addMCP23017Reference(&MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
       if (Led.begin(&Data, id)) {
         Led.on();
 #ifdef DEBUG

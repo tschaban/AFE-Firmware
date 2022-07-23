@@ -421,7 +421,7 @@
  * @brief include MCP23017 configuration parameters
  * 
  */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <hardwares/AFE-MCP23017.h>
 #endif
 
