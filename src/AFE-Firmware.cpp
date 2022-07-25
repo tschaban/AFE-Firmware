@@ -19,6 +19,9 @@ void setup() {
          << F("INFO: Initializing device") << endl;
 
 #ifndef AFE_ESP32 /* ESP82xx */
+  Serial << endl
+             << F("INFO: RAM:`") << system_get_free_heap_size() / 1024
+             << F("kB: Booting completed");
   Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
   Serial << endl << F("INFO: ESP: Real flash size: ");
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -91,6 +94,13 @@ void setup() {
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
   yield();
   SPIFFS.gc();
+#endif
+
+
+#if defined(DEBUG) && !defined(AFE_ESP32)
+      Serial << endl
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: File system mounted");
 #endif
 
   Device.begin();
@@ -342,9 +352,9 @@ void setup() {
               "####"
               "########");
 #ifndef AFE_ESP32
-  Serial << endl
-         << F("INFO: MEMORY: Free: [Boot end] : ")
-         << String(system_get_free_heap_size() / 1024) << F("kB");
+      Serial << endl
+             << F("INFO: RAM:`") << system_get_free_heap_size() / 1024
+             << F("kB: Booting completed");
 #endif
 #endif
 }

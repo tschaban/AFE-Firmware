@@ -142,7 +142,6 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
@@ -361,45 +360,45 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 void AFESitesGenerator::siteDevice(String &page) {
   boolean _itemDisabled = false;
-/*
-  Data->getWelcomeMessage(_HtmlResponse);
+  
+    Data->getWelcomeMessage(_HtmlResponse);
 
-  if (_HtmlResponse.length() > 0 || RestAPI->accessToWAN()) {
-    openMessageSection(page, F("Firmware"), F(""));
+    if (_HtmlResponse.length() > 0 || RestAPI->accessToWAN()) {
+      openMessageSection(page, F("Firmware"), F(""));
 
-    if (_HtmlResponse.length() > 0) {
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace("{{I}}", _HtmlResponse);
+      if (_HtmlResponse.length() > 0) {
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", _HtmlResponse);
+      }
+
+      if (RestAPI->accessToWAN()) {
+
+        RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+        if (_HtmlResponse.length() > 0) {
+          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+          page.replace("{{I}}", _HtmlResponse);
+        }
+        // yield(); // @TODO removed with T7
+
+        RestAPI->sent(_HtmlResponse,
+                      AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+        if (_HtmlResponse.length() > 0) {
+          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+          page.replace("{{I}}", _HtmlResponse);
+        }
+        // yield(); // @TODO removed with T7
+
+        RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+        if (_HtmlResponse.length() > 0) {
+          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+          page.replace("{{I}}", _HtmlResponse);
+        }
+        // yield(); // @TODO removed with T7
+
+        closeMessageSection(page);
+      }
     }
-
-    if (RestAPI->accessToWAN()) {
-
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
-      if (_HtmlResponse.length() > 0) {
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", _HtmlResponse);
-      }
-      // yield(); // @TODO removed with T7
-
-      RestAPI->sent(_HtmlResponse,
-                    AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
-      if (_HtmlResponse.length() > 0) {
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", _HtmlResponse);
-      }
-      // yield(); // @TODO removed with T7
-
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
-      if (_HtmlResponse.length() > 0) {
-        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-        page.replace("{{I}}", _HtmlResponse);
-      }
-      // yield(); // @TODO removed with T7
-
-      closeMessageSection(page);
-    }
-  }
-*/
+  
   /* Section: Device name */
   openSection(page, F(L_DEVICE), F(L_DEVICE_SECTION_INFO));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_DEVICE_NAME,
@@ -423,8 +422,6 @@ void AFESitesGenerator::siteDevice(String &page) {
                         Device->configuration.noOfMCP23xxx, F("e"),
                         F(L_DEVICE_NUMBER_OF_MCP23XXX));
 #endif
-
-
 
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -4130,7 +4127,7 @@ void AFESitesGenerator::addCLEDColorItem(String &item, CLED_RGB *color,
 void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
   page.concat(F("</div></div>"));
-/*
+
   if (RestAPI->accessToWAN()) {
 
     RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_FOOTER_SECTION);
@@ -4138,61 +4135,66 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
       page.concat(_HtmlResponse);
     }
   }
-*/
-  page.replace(F("{{A}}"), RestAPI->accessToWAN()
+
+  page.concat(F("</body></html>"));
+}
+
+void AFESitesGenerator::setAttributes(String *page) {
+
+  page->replace(F("{{A}}"), RestAPI->accessToWAN()
                                ? F("<img style=\"opacity:.4\" "
                                    "src=\"{{u}}/images/"
                                    "afe-logo.png\"><br>")
                                : F("<h1 style=\"margin-bottom:0\">{{n}}</h1>"));
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  page.replace(F("{{f.a}}"), F("Domoticz"));
+  page->replace(F("{{f.a}}"), F("Domoticz"));
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-  page.replace(F("{{f.a}}"), F("HomeAssistant"));
+  page->replace(F("{{f.a}}"), F("HomeAssistant"));
 #else
-  page.replace(F("{{f.a}}"), F("Standard"));
+  page->replace(F("{{f.a}}"), F("Standard"));
 #endif
 
 #if defined(AFE_ESP_FLASH_4MB)
-  page.replace(F("{{f.s}}"), F("4Mb"));
+  page->replace(F("{{f.s}}"), F("4Mb"));
 #elif defined(AFE_ESP_FLASH_2MBB)
-  page.replace(F("{{f.s}}"), F("2Mb"));
+  page->replace(F("{{f.s}}"), F("2Mb"));
 #else
-  page.replace(F("{{f.s}}"), F("1Mb"));
+  page->replace(F("{{f.s}}"), F("1Mb"));
 #endif
 
 #if defined(ESP8285)
-  page.replace(F("{{f.e}}"), F("8285"));
+  page->replace(F("{{f.e}}"), F("8285"));
 #elif defined(ESP32)
-  page.replace(F("{{f.e}}"), F("32"));
+  page->replace(F("{{f.e}}"), F("32"));
 #else
-  page.replace(F("{{f.e}}"), F("8266"));
+  page->replace(F("{{f.e}}"), F("8266"));
 #endif
 
-  FirmwarePro->Pro.valid ? page.replace(F("{{f.p}}"), F(L_YES))
-                         : page.replace(F("{{f.p}}"), F(L_NO));
+  FirmwarePro->Pro.valid ? page->replace(F("{{f.p}}"), F(L_YES))
+                         : page->replace(F("{{f.p}}"), F(L_NO));
 
 #ifdef AFE_T1_CUSTOM_E2
   char _version[sizeof(Firmware.version) + 6];
   sprintf(_version, "%s %s", Firmware.version, "MEGA");
-  page.replace(F("{{f.v}}"), _version);
+  page->replace(F("{{f.v}}"), _version);
 #else
-  page.replace(F("{{f.v}}"), Firmware.version);
+  page->replace(F("{{f.v}}"), Firmware.version);
 #endif
 
-  page.replace(F("{{f.t}}"), String(Firmware.type));
-  page.replace(F("{{f.d}}"), F(AFE_DEVICE_TYPE_NAME));
+  page->replace(F("{{f.t}}"), String(Firmware.type));
+  page->replace(F("{{f.d}}"), F(AFE_DEVICE_TYPE_NAME));
 
-  page.replace(F("{{f.n}}"), Device->deviceId);
-  page.replace(F("{{f.l}}"), L_LANGUAGE_SHORT);
-  page.replace(F("{{f.h}}"), String(AFE_DEVICE_TYPE_ID));
-  page.replace(F("{{f.b}}"), String(AFE_VERSION_BUILD_NUMBER));
-  page.replace(F("{{f.k}}"), AFE_VERSION_BUILD_DATE);
+  page->replace(F("{{f.n}}"), Device->deviceId);
+  page->replace(F("{{f.l}}"), L_LANGUAGE_SHORT);
+  page->replace(F("{{f.h}}"), String(AFE_DEVICE_TYPE_ID));
+  page->replace(F("{{f.b}}"), String(AFE_VERSION_BUILD_NUMBER));
+  page->replace(F("{{f.k}}"), AFE_VERSION_BUILD_DATE);
 
-  page.replace(F("{{n}}"), F(L_AFE_FIRMWARE));
-  page.replace(F("{{u}}"), F(AFE_API_URL));
+  page->replace(F("{{n}}"), F(L_AFE_FIRMWARE));
+  page->replace(F("{{u}}"), F(AFE_API_URL));
 
-  page.concat(F("</body></html>"));
+  page->replace("{{s.lang}}", L_LANGUAGE_SHORT);
 }
 
 void AFESitesGenerator::openSection(String &page, const char *title,

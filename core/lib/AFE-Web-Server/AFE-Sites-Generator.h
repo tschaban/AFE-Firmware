@@ -245,6 +245,7 @@ private:
    */
   void addInformationItem(String &item, const __FlashStringHelper *information);
 
+
 #ifdef AFE_CONFIG_HARDWARE_CLED
   /**
    * @brief Adds url item (<a> html tag) to the list group. openMessageSection
@@ -294,6 +295,15 @@ public:
    *
    */
   void generateFooter(String &page, boolean extended = false);
+
+
+  /**
+ * @brief replace all {{attributes}}
+ * 
+ * @param  page             site with replaced attributes
+ */
+  void setAttributes(String *page);
+
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   /* These methods generates firmware upgrade sections */

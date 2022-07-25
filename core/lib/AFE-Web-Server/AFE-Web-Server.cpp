@@ -71,12 +71,13 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 
-  if (siteConfig->twoColumns) {
-    Site.generateMenu(page, siteConfig->rebootTime);
-  } else {
-    Site.generateEmptyMenu(page, siteConfig->rebootTime);
-  }
-
+  /*
+    if (siteConfig->twoColumns) {
+      Site.generateMenu(page, siteConfig->rebootTime);
+    } else {
+      Site.generateEmptyMenu(page, siteConfig->rebootTime);
+    }
+  */
   if (siteConfig->form) {
     page.concat("<form  method=\"post\" action=\"/?c=");
     page.concat(AFE_SERVER_CMD_SAVE);
@@ -302,13 +303,6 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     }
     page.concat("</form>");
   }
-
-  Site.generateFooter(page, (Device->getMode() == AFE_MODE_NORMAL ||
-                             Device->getMode() == AFE_MODE_CONFIGURATION)
-                                ? true
-                                : false);
-
-  page.replace("{{s.lang}}", L_LANGUAGE_SHORT);
 
   return page;
 }
@@ -699,31 +693,79 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef DEBUG
-      Serial << endl << F("INFO: SITE: Starting generating. ");
+      Serial << endl << F("INFO: Building HTTP site response ");
 #ifndef AFE_ESP32
       Serial << endl
-             << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
-             << F("kB");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB to build the site");
 #endif // !ESP32
 #endif
 
       String page;
-//page.reserve(AFE_MAX_PAGE_SIZE);
+/* page.reserve(AFE_MAX_PAGE_SIZE);
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: MEMORY: Free after allocation for HTTP response : ")
-             << system_get_free_heap_size() / 1024 << F("kB");
+             << F("INFO: RAM: ")
+             << system_get_free_heap_size() / 1024 << F("kB after allocating memory to generate site");
 #endif
+*/
+      server.sendHeader("Cache-Control", "no-cache");
+      server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+
+      if (siteConfig.twoColumns) {
+        Site.generateMenu(page, siteConfig.rebootTime);
+      } else {
+        Site.generateEmptyMenu(page, siteConfig.rebootTime);
+      }
+      Site.setAttributes(&page);
+      server.send(200, "text/html", page);
+
+#if defined(DEBUG) && !defined(ESP32)
+      Serial << endl
+             << F("INFO: RAM: ")
+             << system_get_free_heap_size() / 1024 << F("kB: header + menu generated");
+#endif
+
+      page = "";
+
       generateSite(&siteConfig, page);
+      Site.setAttributes(&page);
+      server.sendContent(page);
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: MEMORY: Free after site generated : ")
-             << system_get_free_heap_size() / 1024 << F("kB");
+             << F("INFO: RAM: ")
+             << system_get_free_heap_size() / 1024 << F("kB: content generated");
 #endif
 
-      publishHTML(page);
+
+      page = "";
+      Site.generateFooter(page, (Device->getMode() == AFE_MODE_NORMAL ||
+                                 Device->getMode() == AFE_MODE_CONFIGURATION)
+                                    ? true
+                                    : false);
+      Site.setAttributes(&page);
+      server.sendContent(page);
+
+#if defined(DEBUG) && !defined(ESP32)
+      Serial << endl
+             << F("INFO: RAM: ")
+             << system_get_free_heap_size() / 1024 << F("kB: footer generated");
+#endif
+
+
+      // publishHTML(page);
+
+      server.sendContent("");
+      page = "";
+
+#if defined(DEBUG) && !defined(ESP32)
+      Serial << endl
+             << F("INFO: RAM: ")
+             << system_get_free_heap_size() / 1024 << F("kB: site generated and published");
+#endif
+
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
       if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
@@ -744,6 +786,74 @@ boolean AFEWebServer::generate(boolean upload) {
     }
   }
   return _ret;
+}
+
+void AFEWebServer::publishHTML(const String &page) {
+  uint16_t pageSize = page.length();
+// uint16_t size = 2048;
+
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: SITE: Streaming started. To transfer: ")
+         << (pageSize < 1024 ? pageSize : (pageSize / 1024))
+         << (pageSize < 1024 ? F("B") : F("kB"));
+
+  if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
+    Serial << endl
+           << F("ERROR: SITE: Buffor ") << AFE_MAX_PAGE_SIZE
+           << F("B too small : ") << pageSize << F(" ... ");
+  }
+#endif
+
+  server.sendHeader("Cache-Control", "no-cache");
+  server.sendHeader("Content-Length", String(page.length()));
+  server.setContentLength(pageSize);
+  server.send(200, "text/html", page);
+/*
+
+String webPageChunk = "some html";
+server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+server.send ( 200, "text/html", webPageChunk);
+while (<page is being generated>) {
+  webPageChunk = "some more html";
+  server.sendContent(webPageChunk);
+}
+server.sendContent("");
+
+
+  if (pageSize > size) {
+#ifdef DEBUG
+#ifndef AFE_ESP32
+    Serial << endl
+           << F("INFO: MEMORY: Free :  size after sending Header: ")
+           << system_get_free_heap_size() / 1024 << F("kB");
+#endif
+    Serial << endl << F("INFO: Transfering site over TCP: ");
+#endif
+    server.send(200, "text/html", page.substring(0, size));
+    uint16_t transfered = size;
+    uint16_t nextChunk;
+    while (transfered < pageSize) {
+      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
+      server.sendContent(page.substring(transfered, nextChunk));
+      transfered = nextChunk;
+#ifdef DEBUG
+      Serial << endl << F(" : ") << (transfered * 100 / pageSize) << F("%");
+#endif
+    }
+  } else {
+    server.send(200, "text/html", page);
+  }
+*/
+#ifdef DEBUG
+  Serial << endl << F("INFO: SITE: Published");
+#endif
+
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    howLongInConfigMode = millis();
+  }
 }
 
 /* Methods related to the url request */
@@ -845,74 +955,6 @@ void AFEWebServer::listener() {
 }
 
 boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
-
-void AFEWebServer::publishHTML(const String &page) {
-  uint16_t pageSize = page.length();
-// uint16_t size = 2048;
-
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: SITE: Streaming started. To transfer: ")
-         << (pageSize < 1024 ? pageSize : (pageSize / 1024))
-         << (pageSize < 1024 ? F("B") : F("kB"));
-
-  if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
-    Serial << endl
-           << F("ERROR: SITE: Buffor ") << AFE_MAX_PAGE_SIZE
-           << F("B too small : ") << pageSize << F(" ... ");
-  }
-#endif
-
-  server.sendHeader("Cache-Control", "no-cache");
-  server.sendHeader("Content-Length", String(page.length()));
-  server.setContentLength(pageSize);
-  server.send(200, "text/html", page);
-/*
-
-String webPageChunk = "some html";
-server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-server.send ( 200, "text/html", webPageChunk);
-while (<page is being generated>) {
-  webPageChunk = "some more html";
-  server.sendContent(webPageChunk);
-}
-server.sendContent("");
-
-
-  if (pageSize > size) {
-#ifdef DEBUG
-#ifndef AFE_ESP32
-    Serial << endl
-           << F("INFO: MEMORY: Free :  size after sending Header: ")
-           << system_get_free_heap_size() / 1024 << F("kB");
-#endif
-    Serial << endl << F("INFO: Transfering site over TCP: ");
-#endif
-    server.send(200, "text/html", page.substring(0, size));
-    uint16_t transfered = size;
-    uint16_t nextChunk;
-    while (transfered < pageSize) {
-      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-      server.sendContent(page.substring(transfered, nextChunk));
-      transfered = nextChunk;
-#ifdef DEBUG
-      Serial << endl << F(" : ") << (transfered * 100 / pageSize) << F("%");
-#endif
-    }
-  } else {
-    server.send(200, "text/html", page);
-  }
-*/
-#ifdef DEBUG
-  Serial << endl << F("INFO: SITE: Published");
-#endif
-
-  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
-       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-      Device->configuration.timeToAutoLogOff > 0) {
-    howLongInConfigMode = millis();
-  }
-}
 
 void AFEWebServer::sendJSON(const String &json) {
 

@@ -191,8 +191,8 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
 #if defined(DEBUG) && !defined(AFE_ESP32)
       Serial << endl
-             << F("INFO: MEMORY: Free: ") << system_get_free_heap_size() / 1024
-             << F("kB");
+             << F("INFO: RAM:`") << system_get_free_heap_size() / 1024
+             << F("kB: JSON returned");
 #endif
 
   return _httpCode;
