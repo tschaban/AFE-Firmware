@@ -7,22 +7,22 @@
 AFESensorBinary::AFESensorBinary(){};
 
 void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
-  _Data->getConfiguration(id, &configuration);
+  _Data->getConfiguration(id, configuration);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+  if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+        configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 #ifdef DEBUG
       Serial << endl << F("INFO: BINARY Sensor: Initializing with MCP23017");
 #endif
 
       _MCP23017Broker->MCP[_MCP23017Id].pinMode(
-          configuration.mcp23017.gpio,
-          configuration.internalPullUp ? INPUT_PULLUP : INPUT);
+          configuration->mcp23017.gpio,
+          configuration->internalPullUp ? INPUT_PULLUP : INPUT);
 
       state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-          configuration.mcp23017.gpio);
+          configuration->mcp23017.gpio);
 
 #ifdef DEBUG
       Serial << endl
@@ -42,10 +42,10 @@ void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
   } else {
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-    pinMode(configuration.gpio,
-            configuration.internalPullUp ? INPUT_PULLUP : INPUT);
+    pinMode(configuration->gpio,
+            configuration->internalPullUp ? INPUT_PULLUP : INPUT);
 
-    state = digitalRead(configuration.gpio);
+    state = digitalRead(configuration->gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
@@ -61,7 +61,7 @@ void AFESensorBinary::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
 #endif
 
 byte AFESensorBinary::get() {
-  return configuration.revertSignal ? (state == 0 ? 1 : 0) : state;
+  return configuration->revertSignal ? (state == 0 ? 1 : 0) : state;
 }
 
 boolean AFESensorBinary::listener() {
@@ -71,11 +71,11 @@ boolean AFESensorBinary::listener() {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
       _currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-          configuration.mcp23017.gpio);
+          configuration->mcp23017.gpio);
     } else {
 #endif
 
-      _currentState = digitalRead(configuration.gpio);
+      _currentState = digitalRead(configuration->gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }
@@ -89,7 +89,7 @@ boolean AFESensorBinary::listener() {
         startTime = time;
       }
 
-      if (time - startTime >= configuration.bouncing) {
+      if (time - startTime >= configuration->bouncing) {
         _detected = true;
         state = _currentState;
 #ifdef DEBUG
@@ -103,8 +103,8 @@ boolean AFESensorBinary::listener() {
 
 void AFESensorBinary::getJSON(char *json) {
   sprintf(json, "{\"state\":\"%s\"}",
-          get() == 1 ? configuration.sendAsSwitch ? "off" : "open"
-                     : configuration.sendAsSwitch ? "on" : "closed");
+          get() == 1 ? configuration->sendAsSwitch ? "off" : "open"
+                     : configuration->sendAsSwitch ? "on" : "closed");
 }
 
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR

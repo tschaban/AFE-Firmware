@@ -8,17 +8,17 @@ AFELED::AFELED() {}
 
 boolean AFELED::begin(AFEDataAccess *Data, uint8_t id) {
   if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Data->getConfiguration(id, &configuration);
+    Data->getConfiguration(id, configuration);
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     // If MCP23017 available in the HW, checking if LED connected using MCP23017
-    if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
-      if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-          configuration.mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
 #ifdef DEBUG
         Serial << endl << F("INFO: LED: Initializing with MCP23017");
 #endif
-        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
+        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration->mcp23017.gpio,
                                                   OUTPUT);
         _expanderUsed = true;
         _initialized = true;
@@ -31,10 +31,10 @@ boolean AFELED::begin(AFEDataAccess *Data, uint8_t id) {
     } else {
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      pinMode(configuration.gpio, OUTPUT);
-      configuration.changeToOppositeValue
-          ? digitalWrite(configuration.gpio, LOW)
-          : digitalWrite(configuration.gpio, HIGH);
+      pinMode(configuration->gpio, OUTPUT);
+      configuration->changeToOppositeValue
+          ? digitalWrite(configuration->gpio, LOW)
+          : digitalWrite(configuration->gpio, HIGH);
 
       _initialized = true;
 
@@ -52,7 +52,7 @@ void AFELED::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
 #endif
 
 void AFELED::on() {
-  if (configuration.changeToOppositeValue) {
+  if (configuration->changeToOppositeValue) {
     set(HIGH);
   } else {
     set(LOW);
@@ -60,7 +60,7 @@ void AFELED::on() {
 }
 
 void AFELED::off() {
-  if (configuration.changeToOppositeValue) {
+  if (configuration->changeToOppositeValue) {
     set(LOW);
   } else {
     set(HIGH);
@@ -98,15 +98,15 @@ void AFELED::set(uint8_t state) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
       if (_MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-              configuration.mcp23017.gpio) != state) {
+              configuration->mcp23017.gpio) != state) {
         _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
-            configuration.mcp23017.gpio, state);
+            configuration->mcp23017.gpio, state);
       }
     } else {
 #endif
 
-      if (digitalRead(configuration.gpio) != state) {
-        digitalWrite(configuration.gpio, state);
+      if (digitalRead(configuration->gpio) != state) {
+        digitalWrite(configuration->gpio, state);
       }
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
@@ -121,17 +121,17 @@ void AFELED::toggle() {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
       _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-          configuration.mcp23017.gpio) == HIGH
+          configuration->mcp23017.gpio) == HIGH
           ? _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
-                configuration.mcp23017.gpio, LOW)
+                configuration->mcp23017.gpio, LOW)
           : _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
-                configuration.mcp23017.gpio, HIGH);
+                configuration->mcp23017.gpio, HIGH);
     } else {
 #endif
 
-      digitalRead(configuration.gpio) == HIGH
-          ? digitalWrite(configuration.gpio, LOW)
-          : digitalWrite(configuration.gpio, HIGH);
+      digitalRead(configuration->gpio) == HIGH
+          ? digitalWrite(configuration->gpio, LOW)
+          : digitalWrite(configuration->gpio, HIGH);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }

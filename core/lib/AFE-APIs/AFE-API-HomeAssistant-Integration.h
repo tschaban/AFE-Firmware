@@ -43,7 +43,7 @@ private:
   AFEDevice *_Device;
   AFEAPIMQTTStandard *_MqttAPI;
 
-  HOME_ASSISTANT_CONFIG configuration;
+  HOME_ASSISTANT_CONFIG *configuration = new HOME_ASSISTANT_CONFIG;
 
   char _firmwareName[28];
   MQTT _mqttConfiguration;
@@ -65,7 +65,7 @@ private:
     uint8_t entityId;
   };
 
-  HA_DEVICE_CONFIG _deviceConfiguration;
+  HA_DEVICE_CONFIG *_deviceConfiguration = new HA_DEVICE_CONFIG;
 
   /**
    * @brief generates HA object ID

@@ -11,11 +11,11 @@ void analogInputEventsListener(void);
 void initializeADC(void) {
   if (FirmwarePro.Pro.valid) {
 #ifdef AFE_ESP32
-    for (uint8_t i = 0; i < Device.configuration.noOfAnalogInputs; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfAnalogInputs; i++) {
       AnalogInput[i].begin(i);
     }
 #else
-    if (Device.configuration.isAnalogInput) {
+    if (Device->configuration.isAnalogInput) {
       AnalogInput.begin();
     }
 #endif
@@ -28,8 +28,8 @@ void initializeADC(void) {
 
 /* Here is version for ESP32.. */
 void analogInputEventsListener(void) {
-  if (Device.configuration.noOfAnalogInputs > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfAnalogInputs; i++) {
+  if (Device->configuration.noOfAnalogInputs > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfAnalogInputs; i++) {
 
       AnalogInput[i].listener();
       if (AnalogInput[i].isReady()) {
@@ -55,7 +55,7 @@ void analogInputEventsListener(void) {
 #else
 /* Here is version for ESP82.. */
 void analogInputEventsListener(void) {
-  if (Device.configuration.isAnalogInput) {
+  if (Device->configuration.isAnalogInput) {
     AnalogInput.listener();
     if (AnalogInput.isReady()) {
       MqttAPI.publishADCValues();

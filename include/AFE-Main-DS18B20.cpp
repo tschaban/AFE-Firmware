@@ -10,8 +10,8 @@ void DS18B20SensorEventsListener(void);
 
 /* Initializing sensor */
 void initializeDS18B20Sensor(void) {
-  if (Device.configuration.noOfDS18B20s > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfDS18B20s; i++) {
+  if (Device->configuration.noOfDS18B20s > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
       DS18B20Sensor[i].begin(&Data, i);
     }
   }
@@ -26,7 +26,7 @@ void DS18B20SensorEventsListener(void) {
   boolean relayStateChanged;
 #endif
 
-  for (uint8_t i = 0; i < Device.configuration.noOfDS18B20s; i++) {
+  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
 
     if (DS18B20Sensor[i].listener()) {
 
@@ -38,7 +38,7 @@ void DS18B20SensorEventsListener(void) {
 /* Thermostat */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       relayStateChanged = false;
-      for (uint8_t j = 0; j < Device.configuration.noOfRegulators; j++) {
+      for (uint8_t j = 0; j < Device->configuration.noOfRegulators; j++) {
         if (Regulator[j].configuration.sensorId == i) {
           if (Regulator[j].listener(temperature)) {
             if (Regulator[j].deviceState &&
@@ -67,7 +67,7 @@ void DS18B20SensorEventsListener(void) {
 
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-      for (uint8_t j = 0; j < Device.configuration.noOfThermalProtectors; j++) {
+      for (uint8_t j = 0; j < Device->configuration.noOfThermalProtectors; j++) {
         if (ThermalProtector[j].configuration.sensorId == i) {
           if (ThermalProtector[j].listener(temperature)) {
             if (ThermalProtector[j].turnOff &&

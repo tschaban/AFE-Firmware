@@ -20,8 +20,8 @@ void setup() {
 
 #ifndef AFE_ESP32 /* ESP82xx */
   Serial << endl
-             << F("INFO: RAM:`") << system_get_free_heap_size() / 1024
-             << F("kB: Booting completed");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: at start");
   Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
   Serial << endl << F("INFO: ESP: Real flash size: ");
   if (ESP.getFlashChipRealSize() >= 1048576) {
@@ -103,7 +103,7 @@ void setup() {
              << F("kB: File system mounted");
 #endif
 
-  Device.begin();
+  Device->begin();
 
 /* Checking if the device is launched for a first time. If so it loades
  * default configuration */
@@ -111,14 +111,14 @@ void setup() {
   Serial << endl << F("INFO: FIRMWARE: Checking if first time launch ... ");
 #endif
 
-  if (Device.getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
+  if (Device->getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
 #ifdef DEBUG
     Serial << F("YES");
 #endif
-    if (Device.setDevice()) {
-      Device.begin();
+    if (Device->setDevice()) {
+      Device->begin();
     } else {
-      Device.reboot();
+      Device->reboot();
     }
   }
 #ifdef DEBUG
@@ -154,7 +154,7 @@ void setup() {
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
-  if (Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
+  if (Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << F("YES");
 #endif
@@ -164,7 +164,7 @@ void setup() {
     Serial << F("NO") << endl
            << F("INFO: FIRMWARE: Checking if firmware should be upgraded?");
 #endif
-    AFEUpgrader *Upgrader = new AFEUpgrader(&Data, &Device);
+    AFEUpgrader *Upgrader = new AFEUpgrader(&Data, Device);
 
     if (Upgrader->upgraded()) {
 #ifdef DEBUG
@@ -184,7 +184,7 @@ void setup() {
     Upgrader = NULL;
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-    if (Device.getMode() == AFE_MODE_NORMAL) {
+    if (Device->getMode() == AFE_MODE_NORMAL) {
       /* Initializing relay */
       initializeRelay();
 #ifdef DEBUG
@@ -196,9 +196,9 @@ void setup() {
 
 /* Initialzing network */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Network.begin(Device.getMode(), &Device, &Data, &Led);
+  Network.begin(Device->getMode(), Device, &Data, &Led);
 #else
-  Network.begin(Device.getMode(), &Device, &Data);
+  Network.begin(Device->getMode(), Device, &Data);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
@@ -217,9 +217,9 @@ void setup() {
 
 /* Initializating REST API */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  RestAPI.begin(&Data, &Device, &Led);
+  RestAPI.begin(&Data, Device, &Led);
 #else
-  RestAPI.begin(&Data, &Device);
+  RestAPI.begin(&Data, Device);
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /* Initializing FirmwarePro */
@@ -233,7 +233,7 @@ void setup() {
   initializeSwitch();
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-  if (Device.getMode() == AFE_MODE_NORMAL) {
+  if (Device->getMode() == AFE_MODE_NORMAL) {
 
 /* Initializing Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -321,8 +321,8 @@ void setup() {
 #ifdef AFE_CONFIG_HARDWARE_LED
   Led.off();
   /* If device in configuration mode then it starts LED blinking */
-  if (Device.getMode() == AFE_MODE_ACCESS_POINT ||
-      Device.getMode() == AFE_MODE_NETWORK_NOT_SET) {
+  if (Device->getMode() == AFE_MODE_ACCESS_POINT ||
+      Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
     Led.blinkingOn(100);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
@@ -340,7 +340,7 @@ void setup() {
          << F("#                            STARTING DEVICE                "
               "    "
               "       #");
-  if (Device.getMode() != AFE_MODE_NORMAL) {
+  if (Device->getMode() != AFE_MODE_NORMAL) {
     Serial << endl
            << F("#                           CONFIGURATION MODE            "
                 "    "
@@ -353,7 +353,7 @@ void setup() {
               "########");
 #ifndef AFE_ESP32
       Serial << endl
-             << F("INFO: RAM:`") << system_get_free_heap_size() / 1024
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
              << F("kB: Booting completed");
 #endif
 #endif
@@ -361,14 +361,14 @@ void setup() {
 
 void loop() {
 
-  if (Device.getMode() == AFE_MODE_NORMAL ||
-      Device.getMode() == AFE_MODE_CONFIGURATION) {
+  if (Device->getMode() == AFE_MODE_NORMAL ||
+      Device->getMode() == AFE_MODE_CONFIGURATION) {
     if (Network.connected()) {
-      if (Device.getMode() == AFE_MODE_NORMAL) {
+      if (Device->getMode() == AFE_MODE_NORMAL) {
 
         /* If MQTT API is on it listens for MQTT messages. If the device is
          * not connected to MQTT Broker, it connects the device to it */
-        if (Device.configuration.api.mqtt) {
+        if (Device->configuration.api.mqtt) {
           MqttAPI.listener();
         }
 
@@ -441,7 +441,7 @@ void loop() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     else {
-      if (Device.getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
+      if (Device->getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
         Led.blinkingOff();
       }
     }
@@ -455,7 +455,7 @@ void loop() {
      * Works for device in Normal or Configuration mode: (excluding: HotSpot
      * mode) */
 
-    if (Device.getMode() == AFE_MODE_NORMAL) {
+    if (Device->getMode() == AFE_MODE_NORMAL) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();
 #endif
@@ -494,7 +494,7 @@ void loop() {
 
 /* Debug information */
 #ifdef DEBUG
-  if (Device.getMode() == AFE_MODE_NORMAL) {
+  if (Device->getMode() == AFE_MODE_NORMAL) {
     //  debugListener();
   }
 #endif // DEBUG

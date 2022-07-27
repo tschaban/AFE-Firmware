@@ -37,7 +37,7 @@ private:
   void set(uint8_t state);
 
 public:
-  LED configuration;
+  LED *configuration = new LED;
   /* Constructor */
   AFELED();
   boolean begin(AFEDataAccess *, uint8_t id);

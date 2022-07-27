@@ -39,7 +39,7 @@
 
 AFEDataAccess Data;
 AFEFirmwarePro FirmwarePro;
-AFEDevice Device;
+AFEDevice *Device = new AFEDevice();
 AFEWiFi Network;
 AFEWebServer HTTPServer;
 AFEJSONRPC RestAPI;
@@ -261,9 +261,6 @@ AFEI2CScanner I2CScanner;
 AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#include <AFE-Sensor-Binary.h>
-#endif
 
 #include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>

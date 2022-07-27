@@ -52,7 +52,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
-  RELAY configuration;
+  RELAY *configuration;
 
   /**
    * @brief Construct a new AFERelay object

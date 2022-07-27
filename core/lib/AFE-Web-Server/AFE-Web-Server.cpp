@@ -703,12 +703,6 @@ boolean AFEWebServer::generate(boolean upload) {
 
       String page;
 /* page.reserve(AFE_MAX_PAGE_SIZE);
-
-#if defined(DEBUG) && !defined(ESP32)
-      Serial << endl
-             << F("INFO: RAM: ")
-             << system_get_free_heap_size() / 1024 << F("kB after allocating memory to generate site");
-#endif
 */
       server.sendHeader("Cache-Control", "no-cache");
       server.setContentLength(CONTENT_LENGTH_UNKNOWN);
@@ -755,8 +749,6 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 
 
-      // publishHTML(page);
-
       server.sendContent("");
       page = "";
 
@@ -765,6 +757,12 @@ boolean AFEWebServer::generate(boolean upload) {
              << F("INFO: RAM: ")
              << system_get_free_heap_size() / 1024 << F("kB: site generated and published");
 #endif
+
+  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+      Device->configuration.timeToAutoLogOff > 0) {
+    howLongInConfigMode = millis();
+  }
 
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
@@ -786,74 +784,6 @@ boolean AFEWebServer::generate(boolean upload) {
     }
   }
   return _ret;
-}
-
-void AFEWebServer::publishHTML(const String &page) {
-  uint16_t pageSize = page.length();
-// uint16_t size = 2048;
-
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: SITE: Streaming started. To transfer: ")
-         << (pageSize < 1024 ? pageSize : (pageSize / 1024))
-         << (pageSize < 1024 ? F("B") : F("kB"));
-
-  if (pageSize + 100 > AFE_MAX_PAGE_SIZE) {
-    Serial << endl
-           << F("ERROR: SITE: Buffor ") << AFE_MAX_PAGE_SIZE
-           << F("B too small : ") << pageSize << F(" ... ");
-  }
-#endif
-
-  server.sendHeader("Cache-Control", "no-cache");
-  server.sendHeader("Content-Length", String(page.length()));
-  server.setContentLength(pageSize);
-  server.send(200, "text/html", page);
-/*
-
-String webPageChunk = "some html";
-server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-server.send ( 200, "text/html", webPageChunk);
-while (<page is being generated>) {
-  webPageChunk = "some more html";
-  server.sendContent(webPageChunk);
-}
-server.sendContent("");
-
-
-  if (pageSize > size) {
-#ifdef DEBUG
-#ifndef AFE_ESP32
-    Serial << endl
-           << F("INFO: MEMORY: Free :  size after sending Header: ")
-           << system_get_free_heap_size() / 1024 << F("kB");
-#endif
-    Serial << endl << F("INFO: Transfering site over TCP: ");
-#endif
-    server.send(200, "text/html", page.substring(0, size));
-    uint16_t transfered = size;
-    uint16_t nextChunk;
-    while (transfered < pageSize) {
-      nextChunk = transfered + size < pageSize ? transfered + size : pageSize;
-      server.sendContent(page.substring(transfered, nextChunk));
-      transfered = nextChunk;
-#ifdef DEBUG
-      Serial << endl << F(" : ") << (transfered * 100 / pageSize) << F("%");
-#endif
-    }
-  } else {
-    server.send(200, "text/html", page);
-  }
-*/
-#ifdef DEBUG
-  Serial << endl << F("INFO: SITE: Published");
-#endif
-
-  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
-       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-      Device->configuration.timeToAutoLogOff > 0) {
-    howLongInConfigMode = millis();
-  }
 }
 
 /* Methods related to the url request */

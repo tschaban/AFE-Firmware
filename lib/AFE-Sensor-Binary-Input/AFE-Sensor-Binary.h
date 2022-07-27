@@ -32,7 +32,8 @@ private:
 #endif
 
 public:
-  BINARY_SENSOR configuration;
+  //BINARY_SENSOR *configuration = new BINARY_SENSOR;
+  BINARY_SENSOR *configuration = new BINARY_SENSOR;
 
   /* Constructors */
   AFESensorBinary();

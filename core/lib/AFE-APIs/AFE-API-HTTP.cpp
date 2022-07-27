@@ -281,7 +281,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
      */
     if (_Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-      if (strcmp(request->name, _Relay[i]->configuration.name) == 0) {
+      if (strcmp(request->name, _Relay[i]->configuration->name) == 0) {
         deviceNotExist = false;
         /* Checking if command: on */
         if (strcmp(request->command, "on") == 0) {
@@ -851,7 +851,7 @@ void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    if (strcmp(request->name, _BinarySensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _BinarySensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];

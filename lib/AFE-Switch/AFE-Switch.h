@@ -54,7 +54,8 @@ private:
 #endif
 
 public:
-  SWITCH configuration;
+  SWITCH *configuration = new SWITCH;
+
 
   /* Constructors */
   AFESwitch();

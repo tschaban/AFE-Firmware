@@ -13,13 +13,13 @@ void eventsListener(void) {
     RestAPI.checkAccessToWAN();
 
     /* Actions to run only on Normal mode */
-    if (Device.getMode() == AFE_MODE_NORMAL) {
+    if (Device->getMode() == AFE_MODE_NORMAL) {
 
 /* ################## HTTP DOMOTICZ ################### */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       /* Sendings hardware values to Domoticz */
 
-      if (Device.configuration.api.domoticz) {
+      if (Device->configuration.api.domoticz) {
 
 #ifdef DEBUG
         Serial << endl
@@ -35,7 +35,7 @@ void eventsListener(void) {
         Serial << endl
                << F("INFO: EVENTS: Sending current gate state to Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfGates; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
           HttpDomoticzAPI.publishGateState(i);
         }
 #endif
@@ -46,7 +46,7 @@ void eventsListener(void) {
                << F("INFO: EVENTS: Sending current state of contactrons to "
                     "Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfContactrons; i++) {
           HttpDomoticzAPI.publishContactronState(i);
           lastPublishedContactronState[i] = Contactron[i].get();
         }
@@ -58,7 +58,7 @@ void eventsListener(void) {
             << endl
             << F("INFO: EVENTS: Sending current state of switches to Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfSwitches; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
           HttpDomoticzAPI.publishSwitchState(i);
         }
 #endif
@@ -69,7 +69,7 @@ void eventsListener(void) {
                << F("INFO: EVENTS: Sending current state of binary sensors to "
                     "Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfBinarySensors; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfBinarySensors; i++) {
           HttpDomoticzAPI.publishBinarySensorState(i);
         }
 #endif
@@ -80,7 +80,7 @@ void eventsListener(void) {
                << F("INFO: EVENTS: Sending current state of RGB LEDs "
                     "Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfCLEDs; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfCLEDs; i++) {
           //     HttpDomoticzAPI.publishCLEDState(i);
           //     HttpDomoticzAPI.publishCLEDEffectState(i);
         }
@@ -92,7 +92,7 @@ void eventsListener(void) {
                << F("INFO: EVENTS: Sending current state of regulator to "
                     "Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfRegulators; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfRegulators; i++) {
           HttpDomoticzAPI.publishRegulatorState(i);
         }
 #endif
@@ -103,7 +103,7 @@ void eventsListener(void) {
                << F("INFO: EVENTS: Sending current state of regulator to "
                     "Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfThermalProtectors;
+        for (uint8_t i = 0; i < Device->configuration.noOfThermalProtectors;
              i++) {
           HttpDomoticzAPI.publishThermalProtectorState(i);
         }
@@ -115,7 +115,7 @@ void eventsListener(void) {
             << endl
             << F("INFO: EVENTS: Sending current state of relays to Domoticz");
 #endif
-        for (uint8_t i = 0; i < Device.configuration.noOfRelays; i++) {
+        for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
           /* For the Relay assigned to a gate code below is not needed for
            * execution
@@ -148,7 +148,7 @@ void eventsListener(void) {
              << F("INFO: EVENTS: Post WiFi Connection actions completed");
 #endif
 
-    } // if (Device.getMode() == AFE_MODE_NORMAL) {
+    } // if (Device->getMode() == AFE_MODE_NORMAL) {
 
   } /* End of Network.eventConnected() */
 
@@ -161,7 +161,7 @@ void eventsListener(void) {
   }
 
   /* Event: connected to MQTT API */
-  if (Device.getMode() == AFE_MODE_NORMAL && Device.configuration.api.mqtt) {
+  if (Device->getMode() == AFE_MODE_NORMAL && Device->configuration.api.mqtt) {
     if (MqttAPI.Mqtt.connected()) {
 
 
@@ -176,7 +176,7 @@ void eventsListener(void) {
  * 
  */
       AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI =
-          new AFEAPIHomeAssistantIntegration(&Data, &Device, &MqttAPI);
+          new AFEAPIHomeAssistantIntegration(&Data, Device, &MqttAPI);
       HomeAssistantDiscoveryAPI->publish();
       delete HomeAssistantDiscoveryAPI;
       HomeAssistantDiscoveryAPI = NULL;
