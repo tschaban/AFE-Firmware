@@ -133,6 +133,10 @@ boolean AFEDefaults::set(void) {
     Data->createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+    Data->createMCP23XXXConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
     _ret = true;
   }
 #ifdef DEBUG

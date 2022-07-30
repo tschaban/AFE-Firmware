@@ -118,6 +118,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   page.concat(FPSTR(HTTP_MENU_HEADER));
   page.replace("{{m.h}}", F(L_HARDWARE));
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  if (Device->configuration.noOfMCP23xxx > 0) {
+    addMenuHeaderItem(page, F("MCP23XXX"));
+    addMenuSubItem(page, "MCP23XXX", Device->configuration.noOfMCP23xxx,
+                   AFE_CONFIG_SITE_MCP23XXX);
+  }
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (Device->configuration.noOfLEDs > 0) {
     addMenuHeaderItem(page, F(L_LEDS));
@@ -133,14 +141,6 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
                    AFE_CONFIG_SITE_CLED);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  if (Device->configuration.noOfMCP23xxx > 0) {
-    addMenuHeaderItem(page, F("MCP23XXX"));
-    addMenuSubItem(page, "MCP23XXX", Device->configuration.noOfMCP23xxx,
-                   AFE_CONFIG_SITE_LED);
-  }
-#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (Device->configuration.noOfGates > 0) {
@@ -360,45 +360,45 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 void AFESitesGenerator::siteDevice(String &page) {
   boolean _itemDisabled = false;
-  
-    Data->getWelcomeMessage(_HtmlResponse);
 
-    if (_HtmlResponse.length() > 0 || RestAPI->accessToWAN()) {
-      openMessageSection(page, F("Firmware"), F(""));
+  Data->getWelcomeMessage(_HtmlResponse);
 
+  if (_HtmlResponse.length() > 0 || RestAPI->accessToWAN()) {
+    openMessageSection(page, F("Firmware"), F(""));
+
+    if (_HtmlResponse.length() > 0) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace("{{I}}", _HtmlResponse);
+    }
+
+    if (RestAPI->accessToWAN()) {
+
+      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace("{{I}}", _HtmlResponse);
       }
+      // yield(); // @TODO removed with T7
 
-      if (RestAPI->accessToWAN()) {
-
-        RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
-        if (_HtmlResponse.length() > 0) {
-          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-          page.replace("{{I}}", _HtmlResponse);
-        }
-        // yield(); // @TODO removed with T7
-
-        RestAPI->sent(_HtmlResponse,
-                      AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
-        if (_HtmlResponse.length() > 0) {
-          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-          page.replace("{{I}}", _HtmlResponse);
-        }
-        // yield(); // @TODO removed with T7
-
-        RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
-        if (_HtmlResponse.length() > 0) {
-          page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-          page.replace("{{I}}", _HtmlResponse);
-        }
-        // yield(); // @TODO removed with T7
-
-        closeMessageSection(page);
+      RestAPI->sent(_HtmlResponse,
+                    AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+      if (_HtmlResponse.length() > 0) {
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", _HtmlResponse);
       }
+      // yield(); // @TODO removed with T7
+
+      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+      if (_HtmlResponse.length() > 0) {
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace("{{I}}", _HtmlResponse);
+      }
+      // yield(); // @TODO removed with T7
+
+      closeMessageSection(page);
     }
-  
+  }
+
   /* Section: Device name */
   openSection(page, F(L_DEVICE), F(L_DEVICE_SECTION_INFO));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_DEVICE_NAME,
@@ -1018,12 +1018,13 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   addListOfGPIOs(page, F("g"), configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4addDeviceI2CAddressSelectionItem(page,
-  // configuration.mcp23017.address);
-  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
-  closeSection(page);
-  openSection(page, F(L_MCP23107_LED_ADDITIONAL_SETTINGS), F(""));
+  if (Device->configuration.noOfMCP23xxx > 0) {
+    addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
+    addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
+    addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
+    closeSection(page);
+    openSection(page, F(L_MCP23107_LED_ADDITIONAL_SETTINGS), F(""));
+  }
 #endif
 
   addCheckboxFormItem(page, "w", L_LED_CHANGE_INDICATION, "1",
@@ -1084,10 +1085,8 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
-  // configuration.mcp23017.address);
-  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
-
+  addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
+  addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
   closeSection(page);
   openSection(page, F(L_MCP23017_RELAY_TRIGGERED), F(""));
 
@@ -1549,9 +1548,9 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
   addListOfGPIOs(page, F("g"), configuration.gpio);
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
-  // configuration.mcp23017.address);
-  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+  addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
+
+  addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
 
   closeSection(page);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
@@ -3398,9 +3397,8 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   /* Item: GPIO from expander */
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  // @TODO T4 addDeviceI2CAddressSelectionItem(page,
-  // configuration.mcp23017.address);
-  addListOfMCP23017GPIOs(page, "mg", configuration.mcp23017.gpio);
+  addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
+  addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   closeSection(page);
@@ -4141,11 +4139,12 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
 void AFESitesGenerator::setAttributes(String *page) {
 
-  page->replace(F("{{A}}"), RestAPI->accessToWAN()
-                               ? F("<img style=\"opacity:.4\" "
-                                   "src=\"{{u}}/images/"
-                                   "afe-logo.png\"><br>")
-                               : F("<h1 style=\"margin-bottom:0\">{{n}}</h1>"));
+  page->replace(F("{{A}}"),
+                RestAPI->accessToWAN()
+                    ? F("<img style=\"opacity:.4\" "
+                        "src=\"{{u}}/images/"
+                        "afe-logo.png\"><br>")
+                    : F("<h1 style=\"margin-bottom:0\">{{n}}</h1>"));
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   page->replace(F("{{f.a}}"), F("Domoticz"));
@@ -4382,13 +4381,12 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
 }
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-void AFESitesGenerator::addListOfMCP23017GPIOs(String &item, const char *field,
-                                               uint8_t selected,
-                                               const char *title) {
+void AFESitesGenerator::addListOfMCP23XXXGPIOs(String &item, const char *field,
+                                               uint8_t selected) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
   item.replace("{{i.n}}", field);
-  item.replace("{{i.l}}", title);
+  item.replace("{{i.l}}", F("MCP23XXX GPIO"));
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
   item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
   item.replace("{{i.l}}", F(L_NONE));
@@ -4410,6 +4408,40 @@ void AFESitesGenerator::addListOfMCP23017GPIOs(String &item, const char *field,
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
+
+void AFESitesGenerator::addMCP23XXXSelection(String &item, const char *field,
+                                             uint8_t selected) {
+
+  MCP23XXX *_mcp = new MCP23XXX;
+
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
+  item.replace("{{i.n}}", field);
+  item.replace("{{i.l}}", F(L_MCP23017_EXTENSION));
+  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
+  item.replace("{{i.l}}", F(L_NONE));
+  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+                              ? F(" selected=\"selected\"")
+                              : F(""));
+
+  for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
+
+    char _mcpId[2];
+
+    if (Data->getConfiguration(i, _mcp)) {
+      if (_mcp->address != 0) {
+        sprintf(_mcpId, "%d", i);
+        item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
+        item.replace("{{i.v}}", _mcpId);
+        item.replace("{{i.l}}", _mcp->name);
+        item.replace("{{i.s}}",
+                     selected == i ? F(" selected=\"selected\"") : F(""));
+      }
+    }
+  }
+  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
+}
+
 #endif
 
 void AFESitesGenerator::addInputFormItem(String &item, const char *type,
@@ -4692,7 +4724,7 @@ void AFESitesGenerator::siteMCP23XXX(String &page, uint8_t id) {
     addFileNotFound(page);
   }
 
-  openSection(page, F(L_TSL2561_SENSOR), F(""));
+  openSection(page, F(L_MCP23017_EXTENSION), F(""));
 
 /* Item: I2C Address selection */
 #ifdef AFE_ESP32
@@ -4702,7 +4734,7 @@ void AFESitesGenerator::siteMCP23XXX(String &page, uint8_t id) {
   addDeviceI2CAddressSelectionItem(page, configuration.address);
 #endif
 
-  /* Item: name of the sensor */
+  /* Item: name of the MCP23XXX */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "32");
 

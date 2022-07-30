@@ -183,8 +183,9 @@ private:
                              boolean disabled = false);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  void addListOfMCP23017GPIOs(String &item, const char *field, uint8_t selected,
-                              const char *title = "MCP23017 GPIO");
+  void addListOfMCP23XXXGPIOs(String &item, const char *field, uint8_t selected);
+
+  void addMCP23XXXSelection(String &item, const char *field, uint8_t selected);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -264,7 +265,10 @@ private:
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 public:
-  /* Constructor*/
+  /**
+   * @brief Construct a new AFESitesGenerator object
+   * 
+   */
   AFESitesGenerator();
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
@@ -279,9 +283,13 @@ public:
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
-  /* Method generates site header with menu. When redirect param is diff than 0
+/**
+ * @brief Method generates site header with menu. When redirect param is diff than 0
     then it will redirect page to main page after redirect param time (in sec)
-   */
+ * 
+ * @param  page             desc
+ * @param  redirect         desc
+ */
   void generateMenuHeader(String &page, uint16_t redirect = 0);
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
@@ -306,7 +314,11 @@ public:
 
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-  /* These methods generates firmware upgrade sections */
+  /**
+   * @brief These methods generates firmware upgrade sections
+   * 
+   * @param  page             desc
+   */
   void siteUpgrade(String &page);
   void sitePostUpgrade(String &page, boolean status);
   void siteWANUpgrade(String &page, const __FlashStringHelper *title);
@@ -348,7 +360,11 @@ public:
 
 
 
-  /* All following methods generates configuration sections */
+  /**
+   * @brief All following methods generates configuration sections
+   * 
+   * @param  page             desc
+   */
   void siteDevice(String &page);
   void siteNetwork(String &page);
   void siteConnecting(String &page);

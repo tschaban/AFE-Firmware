@@ -32,7 +32,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, TwoWire *WirePort0) {
     I2CScanner.begin(_WirePort0);
 #endif
 
-    // @TODO T4 add reading configuraton
+    _Data->getConfiguration(i, &configuration[i]);
 
     if (I2CScanner.scan(configuration[i].address)) {
 

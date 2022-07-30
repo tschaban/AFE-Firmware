@@ -562,13 +562,14 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* MCP32017 */
 #define L_MCP23017_CONNECTION "Podłączenie"
-#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23107_LED_ADDITIONAL_SETTINGS "Dodatkowe ustawienia"
-#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
-#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
 
+#define L_MCP23017_EXTENSION "Rozszerzenie GPIO MCP23XXX"
 
 /* PN532 */
 

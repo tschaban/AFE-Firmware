@@ -16,10 +16,9 @@
 
 /**
  * Work LOG T4
- * - zmiana formularzy binary, relay, led, switch z MCP address na ID
- * - menu konfiguracyjne do MCP23
  * - lokalizacje
  * - dodać odczyt MCP konfiguracji w MCP brokerze 
+ * - ESP32
  */
 
 #include <AFE-Configuration.h>

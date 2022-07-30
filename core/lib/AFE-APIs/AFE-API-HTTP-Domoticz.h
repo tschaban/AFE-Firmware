@@ -16,7 +16,6 @@
 #include <WiFiClient.h>
 #include <rBase64.h>
 
-
 #ifdef AFE_ESP32
 #include <HTTPClient.h>
 #else // ESP8266
@@ -40,24 +39,49 @@ private:
   /* Invokes API setup */
   void init();
 
-  /* It creates Domoticz url with all required params */
+  /**
+   * @brief It creates Domoticz url with all required params
+   *
+   * @param  param            desc
+   * @param  idx              desc
+   * @return const String
+   */
   const String getApiCall(const char *param, unsigned int idx);
 
-  /* Calls url. Publishes to Domoticz */
+  /**
+   * @brief Calls url. Publishes to Domoticz
+   *
+   * @param  url              desc
+   * @return boolean
+   */
   boolean callURL(const String url);
 
-  /* Sends to Domoticz switch update call */
+  /**
+   * @brief Sends to Domoticz switch update call
+   *
+   * @param  idx              desc
+   * @param  state            desc
+   * @return boolean
+   */
   boolean sendSwitchCommand(unsigned int idx, boolean state);
 
-  /* sends to Domoticz custome sensor call */
+  /**
+   * @brief sends to Domoticz custome sensor call
+   *
+   * @param  idx              desc
+   * @param  value            desc
+   * @param  nvalue           desc
+   * @return boolean
+   */
   boolean sendCustomSensorCommand(unsigned int idx, const char *value,
                                   uint16_t nvalue = 0);
 
-  /* Replace space with %20 */
-  //  void replaceSpaceinUrl(const char *inputString, const char &outputString);
-
 public:
-  /* Constructor: it sets all necessary parameters */
+  /**
+   * @brief Construct a new AFEAPIHTTPDomoticz object. it sets all necessary
+   * parameters
+   *
+   */
   AFEAPIHTTPDomoticz();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -67,9 +91,18 @@ public:
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  /* Add reference to global class and adds IDX to cache */
+  /**
+   * @brief Add reference to global class and adds IDX to cache
+   *
+   */
   virtual void addClass(AFERelay *);
-  /* Publishes current relay state to Domoticz */
+
+  /**
+   * @brief Publishes current relay state to Domoticz
+   *
+   * @param  id               desc
+   * @return boolean
+   */
   boolean publishRelayState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_RELAY
 

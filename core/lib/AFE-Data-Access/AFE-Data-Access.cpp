@@ -6921,6 +6921,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
 #endif
 
       sprintf(configuration->name, root["name"] | "");
+      
       configuration->address =
           root["address"] | AFE_HARDWARE_ITEM_NOT_EXIST;
 
