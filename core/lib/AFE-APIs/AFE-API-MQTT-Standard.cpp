@@ -100,24 +100,21 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    subscribeToCommand(_Relay[i]->configuration->mqtt.topic,
-                       AFE_MQTT_DEVICE_RELAY, i);
+    subscribeToCommand(_Relay[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Subscribe: Switch */
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
-    subscribeToCommand(_Switch[i]->configuration->mqtt.topic,
-                       AFE_MQTT_DEVICE_SWITCH, i);
+    subscribeToCommand(_Switch[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Subscribe: Binary sensors */
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    subscribeToCommand(_BinarySensor[i]->configuration->mqtt.topic,
-                       AFE_MQTT_DEVICE_BINARY_SENSOR, i);
+    subscribeToCommand(_BinarySensor[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -125,13 +122,11 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    subscribeToCommand(_AnalogInput[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_ADC, i);
+    subscribeToCommand(_AnalogInput[i]->configuration.mqtt.topic);
   }
 #else
   if (_Device->configuration.isAnalogInput) {
-    subscribeToCommand(_AnalogInput->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_ADC);
+    subscribeToCommand(_AnalogInput->configuration.mqtt.topic);
   }
 #endif // AFE_ESP32
 #endif
@@ -139,104 +134,91 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: BMx80 */
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    subscribeToCommand(_BMx80Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_BMX80, i);
+    subscribeToCommand(_BMx80Sensor[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: BH1750 */
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    subscribeToCommand(_BH1750Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_BH1750, i);
+    subscribeToCommand(_BH1750Sensor[i]->configuration.mqtt.topi);
   }
 #endif
 
 /* Subscribe: TSL2561 */
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
-    subscribeToCommand(_TSL2561Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_TSL2561, i);
+    subscribeToCommand(_TSL2561Sensor[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: AS3935 */
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    subscribeToCommand(_AS3935Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_AS3935, i);
+    subscribeToCommand(_AS3935Sensor[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: HPMA115S0 */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    subscribeToCommand(_HPMA115S0Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_HPMA115S0, i);
+    subscribeToCommand(_HPMA115S0Sensor[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: ANEMOMETER */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   if (_Device->configuration.noOfAnemometerSensors > 0) {
-    subscribeToCommand(_AnemometerSensor->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_ANEMOMETER);
+    subscribeToCommand(_AnemometerSensor->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: RAIN */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   if (_Device->configuration.noOfRainmeterSensors > 0) {
-    subscribeToCommand(_RainmeterSensor->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_RAINMETER);
+    subscribeToCommand(_RainmeterSensor->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    subscribeToCommand(_Contactron[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_CONTACTRON, i);
+    subscribeToCommand(_Contactron[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    subscribeToCommand(_Gate[i]->configuration.mqtt.topic, AFE_MQTT_DEVICE_GATE,
-                       i);
+    subscribeToCommand(_Gate[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    subscribeToCommand(_DS18B20Sensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_DS18B20, i);
+    subscribeToCommand(_DS18B20Sensor[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    subscribeToCommand(_Regulator[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_REGULATOR, i);
+    subscribeToCommand(_Regulator[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Thermal protector */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    subscribeToCommand(_ThermalProtector[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_THERMAL_PROTECTOR, i);
+    subscribeToCommand(_ThermalProtector[i]->configuration.mqtt.topic);
   }
 #endif
 
 /* Subscribe: DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    subscribeToCommand(_DHTSensor[i]->configuration.mqtt.topic,
-                       AFE_MQTT_DEVICE_DHT, i);
+    subscribeToCommand(_DHTSensor[i]->configuration.mqtt.topic);
   }
 #endif
 
@@ -246,26 +228,16 @@ void AFEAPIMQTTStandard::subscribe() {
   char _brightnessTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
   for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
 
-    subscribeToCommand(_CLED->configuration[i].cled.topic, AFE_MQTT_DEVICE_CLED,
-                       i);
+    subscribeToCommand(_CLED->configuration[i].cled.topic);
 
     sprintf(_brightnessTopic, "%s%s", _CLED->configuration[i].cled.topic,
             AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CMD_TOPIC_SUFIX);
 
-    subscribeToCommand(_brightnessTopic, AFE_MQTT_DEVICE_CLED_BRIGHTNESS, i);
+    subscribeToCommand(_brightnessTopic);
 
-    subscribeToCommand(_CLED->configuration[i].effect.topic,
-                       AFE_MQTT_DEVICE_CLED_EFFECTS, i);
+    subscribeToCommand(_CLED->configuration[i].effect.topic);
   }
 
-#endif
-
-#ifdef DEBUG
-  if (currentCacheSize > 0 && sizeof(mqttTopicsCache) < currentCacheSize - 1) {
-    Serial << endl
-           << F("ERROR: MQTT Topics cache[") << sizeof(mqttTopicsCache)
-           << F("] is too small : ") << currentCacheSize - 1;
-  }
 #endif
 }
 
@@ -274,46 +246,142 @@ void AFEAPIMQTTStandard::listener() {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: MQTT: Got message: ") << Mqtt.message.topic << F(" | ")
-           << Mqtt.message.content;
-/*
-    for (uint8_t i = 0; i < Mqtt.message.length; i++) {
-      Serial << (char)Mqtt.message.content[i];
-    }
-*/
+           << Mqtt.message.content << endl
+           << F("INFO: MQTT: Checking incoming message:");
 #endif
-    for (uint8_t i = 0; i < currentCacheSize; i++) {
-      if (strcmp(Mqtt.message.topic, mqttTopicsCache[i].message.topic) == 0) {
-#ifdef DEBUG
-        Serial << endl
-               << F("INFO: MQTT: Found topic in cache: Device Type=")
-               << mqttTopicsCache[i].type;
-#endif
-        switch (mqttTopicsCache[i].type) {
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-        case AFE_MQTT_DEVICE_RELAY: // RELAY
-          processRelay(&mqttTopicsCache[i].id);
-          break;
+#ifdef DEBUG
+    Serial << endl << F(" - is relay? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+      if (strlen(_Relay[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Relay[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt.message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processRelay(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
 #endif // AFE_CONFIG_HARDWARE_RELAY
+
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-        case AFE_MQTT_DEVICE_SWITCH:
-          processSwitch(&mqttTopicsCache[i].id);
-          break;
+#ifdef DEBUG
+    Serial << endl << F(" - is switch? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfSwitches; i++) {
+      if (strlen(_Switch[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Switch[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt.message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processSwitch(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
 #endif // AFE_CONFIG_HARDWARE_SWITCH
+
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-        case AFE_MQTT_DEVICE_BINARY_SENSOR:
-          processBinarySensor(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_SWITCH
+#ifdef DEBUG
+    Serial << endl << F(" - is binary sensor? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
+      if (strlen(_BinarySensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _BinarySensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt.message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processBinarySensor(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-        case AFE_MQTT_DEVICE_ADC: // ADC
+#ifdef DEBUG
+    Serial << endl << F(" - is ADC? : ");
+#endif
+
 #ifdef AFE_ESP32
-          processADC(&mqttTopicsCache[i].id);
-#else
+    for (uint8_t i = 0; i < _Device->configuration.noOfADCs; i++) {
+      if (strlen(_AnalogInput[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _AnalogInput[i]->configuration->mqtt.topic);
+#else // ESP82xx
+    if (_Device->configuration.isAnalogInput) {
+      if (strlen(_AnalogInput->configuration.mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _AnalogInput->configuration.mqtt.topic);
+#endif
+
+        if (strcmp(Mqtt.message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+#ifdef AFE_ESP32
+          processADC(&i);
+#else // ESP82xx
           processADC();
 #endif
-          break;
-
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#ifdef DEBUG
+    Serial << endl << F(" - is DS18B20 sensor? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
+      if (strlen(_DS18B20Sensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _DS18B20Sensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt.message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processDS18B20(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_DS18B20
+
+#ifdef DEBUG
+    Serial << F(" - Topic NOT defined in this device");
+#endif
+  }
+}
+
+/*
+void AFEAPIMQTTStandard::listener() {
+
 #ifdef AFE_CONFIG_HARDWARE_BH1750
         case AFE_MQTT_DEVICE_BH1750:
           processBH1750(&mqttTopicsCache[i].id);
@@ -354,11 +422,7 @@ void AFEAPIMQTTStandard::listener() {
           processContactron(&mqttTopicsCache[i].id);
           break;
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-        case AFE_MQTT_DEVICE_DS18B20:
-          processDS18B20(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_DS18B20
+
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
         case AFE_MQTT_DEVICE_REGULATOR:
           processRegulator(&mqttTopicsCache[i].id);
@@ -405,7 +469,7 @@ void AFEAPIMQTTStandard::listener() {
     }
   }
 }
-
+*/
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   return enabled ? publishOnOffState(
@@ -413,9 +477,7 @@ boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
                        _Relay[id]->get() == AFE_RELAY_ON ? AFE_ON : AFE_OFF)
                  : false;
 }
-#endif // AFE_CONFIG_HARDWARE_RELAY
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFEAPIMQTTStandard::processRelay(uint8_t *id) {
   boolean publishState = true;
 
@@ -830,7 +892,7 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
     char message[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
     _DS18B20Sensor[id]->getJSON(message);
     publishStatus =
-        Mqtt.publish(_DS18B20Sensor[id]->configuration.mqtt.topic, message);
+        Mqtt.publish(_DS18B20Sensor[id]->configuration->mqtt.topic, message);
   }
   return publishStatus;
 }
@@ -1231,15 +1293,11 @@ boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
 /**** Private methods ****/
 
 void AFEAPIMQTTStandard::subscribeToCommand(
-    const char *topic, afe_mqtt_standard_device_type_t topicId, uint8_t index) {
+    const char *topic) {
   if (strlen(topic) > 0) {
     char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
     sprintf(mqttCommandTopic, "%s/cmd", topic);
     Mqtt.subscribe(mqttCommandTopic);
-    sprintf(mqttTopicsCache[currentCacheSize].message.topic, mqttCommandTopic);
-    mqttTopicsCache[currentCacheSize].id = index;
-    mqttTopicsCache[currentCacheSize].type = topicId;
-    currentCacheSize++;
   }
 }
 

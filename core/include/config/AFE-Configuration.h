@@ -12,7 +12,6 @@
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
 
-
 /* Serial port speed */
 #define AFE_CONFIG_SERIAL_SPEED 115200
 

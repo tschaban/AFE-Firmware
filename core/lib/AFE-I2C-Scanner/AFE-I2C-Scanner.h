@@ -53,7 +53,7 @@ public:
    * @param  deviceAddress    device address
    * @return name of a device
    */
-  const char *getName(byte deviceAddress);
+  const __FlashStringHelper *getName(byte deviceAddress);
 };
 
 #endif // AFE_CONFIG_HARDWARE_I2C

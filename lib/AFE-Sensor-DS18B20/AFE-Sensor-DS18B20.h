@@ -27,7 +27,7 @@ private:
   float currentTemperature = DEVICE_DISCONNECTED_C;
 
 public:
-  DS18B20 configuration;
+  DS18B20 *configuration = new DS18B20;
 
   AFESensorDS18B20();
 

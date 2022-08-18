@@ -1,6 +1,8 @@
 #ifndef _AFE_files_h
 #define _AFE_files_h
 
+#include <arduino.h>
+
 /* ***************** FILESYSTEM *********************/
 #define AFE_FS_SPIFFS 0
 #define AFE_FS_LITTLEFS 1
@@ -92,6 +94,8 @@
 #define AFE_FILE_REBOOTS_COUNTER "/cfg-reboots_counter.json"
 #define AFE_FILE_MCP23XXX_CONFIGURATION "/cfg-mcp23xxx-%d.json"
 
+//const char AFE_FILE_MCP23XXX_CONFIGURATION[] PROGMEM = "/cfg-mcp23xxx-%d.json";
+
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 385 // AJ checked
@@ -156,5 +160,9 @@
 #define AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT 190 // AJ Checked
 #define AFE_FILE_BUFFER_REBOOTS_COUNTER 43 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_MCP23XXX 200 // @TODO T4
+
+
+const char AFE_CONFIG_BODY_NETWORK[] PROGMEM = "{\"ssid\":\"%s\",\"password\":\"%s\",\"ssidBackup\":\"%s\",\"passwordBackup\":\"%s\",\"isDHCP\":%d,\"ip\":\"%s\",\"gateway\":\"%s\",\"subnet\":\"%s\",\"isDHCPBackup\":%d,\"ipBackup\":\"%s\",\"gatewayBackup\":\"%s\",\"subnetBackup\":\"%s\",\"noConnectionAttempts\":%d,\"waitTimeConnections\":%d,\"waitTimeSeries\":%d,\"noFailuresToSwitchNetwork\":%d,\"radioMode\":%d,\"outputPower\":255}";
+
 
 #endif

@@ -322,9 +322,9 @@ void initializeHTTPDomoticzAPI(void) {
       Device->configuration.api.domoticz) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    HttpDomoticzAPI.begin(&Data, &Device, &Led);
+    HttpDomoticzAPI.begin(&Data, Device, &Led);
 #else
-    HttpDomoticzAPI.begin(&Data, &Device);
+    HttpDomoticzAPI.begin(&Data, Device);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY

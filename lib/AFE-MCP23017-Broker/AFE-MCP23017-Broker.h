@@ -19,10 +19,6 @@
 class AFEMCP23017Broker {
 
 private:
-  I2CPORT _I2C;
-  AFEI2CScanner _I2CScanner;
-  AFEDataAccess *_Data;
-  AFEDevice *_Device;
   TwoWire *_WirePort0;
 #ifdef AFE_ESP32
   TwoWire _WirePort0;
@@ -48,7 +44,7 @@ public:
    * @param  WirePort0        reference to WirePort0
    * @param  WirePort1        reference to WirePort1
    */
-  void begin(AFEDataAccess *Data, TwoWire *WirePort0,
+  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0,
              TwoWire *WirePort1);
 #else
   /**
@@ -58,7 +54,7 @@ public:
    * @param  Data             reference to database
    * @param  WirePort0        reference to WirePort0
    */
-  void begin(AFEDataAccess *Data,  TwoWire *WirePort0);
+  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0);
 #endif
 
 

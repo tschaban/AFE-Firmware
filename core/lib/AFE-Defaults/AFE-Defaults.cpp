@@ -18,8 +18,8 @@ boolean AFEDefaults::set(void) {
 #endif
 
   if (Data->formatFileSystem()) {
-    Data->createDeviceUIDFile();
 
+    Data->saveWelecomeMessage("");
 #ifdef AFE_CONFIG_HARDWARE_GATE
     Data->createGateConfigurationFile();
 #endif

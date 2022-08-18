@@ -7,17 +7,17 @@
 AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
-  _Data->getConfiguration(id, &configuration);
-  WireBUS.begin(configuration.gpio);
+  _Data->getConfiguration(id, configuration);
+  WireBUS.begin(configuration->gpio);
   Sensor.setOneWire(&WireBUS);
   Sensor.begin();
 
-  if (Sensor.isConnected(configuration.address)) {
+  if (Sensor.isConnected(configuration->address)) {
     _initialized = true;
-     Sensor.setResolution(configuration.resolution);
+     Sensor.setResolution(configuration->resolution);
 #ifdef DEBUG
     char addressTxt[17];
-    addressToChar(configuration.address, addressTxt);
+    addressToChar(configuration->address, addressTxt);
     Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] initialized");    
     Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] resolution: ") << Sensor.getResolution() << F(" bits");
 
@@ -26,7 +26,7 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
     _initialized = false;
 #ifdef DEBUG
     char addressTxt[17];
-    addressToChar(configuration.address, addressTxt);
+    addressToChar(configuration->address, addressTxt);
     Serial << endl
            << F("WARN: Sensor DS18B20[") << addressTxt
            << F("] not found. Not initialized");
@@ -39,7 +39,7 @@ float AFESensorDS18B20::getCurrentTemperature() {
   if (_initialized) {
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Reading temperature from DS18B20[") << configuration.name
+           << F("INFO: Reading temperature from DS18B20[") << configuration->name
            << F("] ");
 #endif
 
@@ -47,19 +47,19 @@ float AFESensorDS18B20::getCurrentTemperature() {
       readTimeOut = millis();
     }
 
-    if (Sensor.isConnected(configuration.address)) {
+    if (Sensor.isConnected(configuration->address)) {
 
-      Sensor.requestTemperaturesByAddress(configuration.address);
+      Sensor.requestTemperaturesByAddress(configuration->address);
 
       do {
-        temperature = configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                          ? Sensor.getTempC(configuration.address)
-                          : Sensor.getTempF(configuration.address);
+        temperature = configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                          ? Sensor.getTempC(configuration->address)
+                          : Sensor.getTempF(configuration->address);
         if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT) {
           break;
         }
       } while (temperature == 85.0 || temperature == (-127.0));
-      temperature = temperature + configuration.correction;
+      temperature = temperature + configuration->correction;
     }
   }
 #ifdef DEBUG
@@ -84,13 +84,13 @@ boolean AFESensorDS18B20::listener() {
       startTime = time;
     }
 
-    if (time - startTime >= configuration.interval * 1000) {
+    if (time - startTime >= configuration->interval * 1000) {
       float newTemperature = getCurrentTemperature();
 
       if (newTemperature != DEVICE_DISCONNECTED_C) {
-        if ((configuration.sendOnlyChanges &&
+        if ((configuration->sendOnlyChanges &&
              newTemperature != currentTemperature) ||
-            !configuration.sendOnlyChanges) {
+            !configuration->sendOnlyChanges) {
           currentTemperature = newTemperature;
           ready = true;
         }
@@ -208,12 +208,12 @@ void AFESensorDS18B20::addressNULL(DeviceAddress &address) {
 void AFESensorDS18B20::getJSON(char *json) {
   sprintf(json, "{\"temperature\":{\"value\":%.3f,\"unit\":\"%s\"}}",
           currentTemperature,
-          configuration.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
+          configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 unsigned long AFESensorDS18B20::getDomoticzIDX() {
-  return configuration.domoticz.idx;
+  return configuration->domoticz.idx;
 }
 #endif
 

@@ -17,11 +17,11 @@ void AFESensorBinary::begin(uint8_t id, AFEDataAccess *_Data) {
       Serial << endl << F("INFO: BINARY Sensor: Initializing with MCP23017");
 #endif
 
-      _MCP23017Broker->MCP[_MCP23017Id].pinMode(
+      _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(
           configuration->mcp23017.gpio,
           configuration->internalPullUp ? INPUT_PULLUP : INPUT);
 
-      state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+      state = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
           configuration->mcp23017.gpio);
 
 #ifdef DEBUG
@@ -70,7 +70,7 @@ boolean AFESensorBinary::listener() {
     byte _currentState;
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
-      _currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+      _currentState = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
           configuration->mcp23017.gpio);
     } else {
 #endif

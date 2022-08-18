@@ -29,7 +29,7 @@ private:
   IPAddress IPfromString(const char *address);
 
 #ifdef DEBUG
- void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
+  void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
 #endif
 
 public:
@@ -39,10 +39,6 @@ public:
   boolean formatFileSystem();
 
   boolean fileExist(const char *path);
-
-  const String getDeviceUID();
-  void saveDeviceUID(const char *);
-  void createDeviceUIDFile();
 
   void getConfiguration(DEVICE *);
 #if defined(T0_CONFIG) &&                                                      \
@@ -284,7 +280,6 @@ public:
   boolean getConfiguration(uint8_t id, MCP23XXX *);
   void saveConfiguration(uint8_t id, MCP23XXX *);
   void createMCP23XXXConfigurationFile();
-#endif 
-
+#endif
 };
 #endif // _AFE_Data_Access_h

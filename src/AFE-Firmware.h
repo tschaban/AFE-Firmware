@@ -17,10 +17,11 @@
 /**
  * Work LOG T4
  * - lokalizacje
- * - dodać odczyt MCP konfiguracji w MCP brokerze 
+ * - to set fr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual JSON size: 40
  * - ESP32
  */
 
+#include <avr/pgmspace.h>
 #include <AFE-Configuration.h>
 
 /* Includes libraries for debugging in development compilation only */
@@ -263,3 +264,7 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 
 #include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>
+
+#ifdef DEBUG
+#include <AFE-Debug.cpp>
+#endif

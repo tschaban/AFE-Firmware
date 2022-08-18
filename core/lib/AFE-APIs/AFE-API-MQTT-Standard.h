@@ -40,9 +40,7 @@ private:
    * @param  index            device Item Id, default 0 => If there is only one
    * instance of an item (eg one sensor)
    */
-  void subscribeToCommand(const char *topic,
-                          afe_mqtt_standard_device_type_t topicId,
-                          uint8_t index = 0);
+  void subscribeToCommand(const char *topic);
 
   /**
    * @brief Processing common ON / OFF commands
@@ -66,79 +64,12 @@ private:
   boolean publishOnOffState(const char *topic, uint8_t state,
                             boolean sendAsOpenClosed = false);
 
-  /**
-   * @brief Caches all MQTT Topics AFE has subsribed to
-   *
-   */
-
-  MQTT_CMD_TOPICS_CACHE
-  mqttTopicsCache[1
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCH
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_GATES
-#endif
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS
-#endif
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_DHT
-#endif
-#ifdef AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80
-#endif
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0
-#endif
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750
-#endif
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935
-#endif
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS +
-                  AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS
-#endif
-#ifdef AFE_CONFIG_HARDWARE_CLED
-                  + (3 * AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS) /* 3 x topics: cled, brightness, effects */
-#endif
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#ifdef AFE_ESP32
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS
-#else
-                  + 1
-#endif
-#endif
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-                  + AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561
-#endif
-  ];
-
-  /**
-   * @brief Size of the cache that stories MQTT Topics AFE has subsribed to
-   *
-   */
-  uint8_t currentCacheSize = 0;
+  
+/**
+ * @brief stores prepared mqtt message to compare with incoming one
+ * 
+ */
+  char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
 
 public:
   /**

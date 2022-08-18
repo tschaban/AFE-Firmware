@@ -29,7 +29,7 @@ private:
   AFEDataAccess *_Data;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+  AFELED *Led = new AFELED();
 #endif
 
   unsigned long turnOffCounter = 0;
@@ -40,7 +40,6 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   AFEMCP23017Broker *_MCP23017Broker;
   boolean _expanderUsed = false;
-  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   /**

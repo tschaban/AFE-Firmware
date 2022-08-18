@@ -27,11 +27,15 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
       WirelessNetwork.onStationModeGotIP(AFEWiFi::onWifiConnect);
   wifiDisconnectHandler =
       WirelessNetwork.onStationModeDisconnected(AFEWiFi::onWifiDisconnect);
+#ifdef DEBUG
+  wifiAPStationConnectedHandler = WirelessNetwork.onSoftAPModeStationConnected(
+      AFEWiFi::onWiFiAPStationConnected);
+#endif
 #endif
 
-  if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
-    _Data->getConfiguration(&configuration);
-  }
+  // if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
+  _Data->getConfiguration(&configuration);
+  //}
 
   /* Checking if backup configuration exists and setting a flag */
   if (strlen(configuration.ssidBackup) > 0 &&
@@ -52,7 +56,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
 #endif
 
-/* Setting WiFi Radio mode for ESP32 and the TX output power */
+/* Setting WiFi Radio mode for ESP32 and the TX output power
 #if !defined(ESP32)
   if (configuration.radioMode != AFE_NONE) {
     // wifi_set_phy_mode(configuration.radioMode);
@@ -68,6 +72,8 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
   }
 
+*/
+/*
   if (configuration.outputPower != AFE_NONE &&
       configuration.outputPower >=
           AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
@@ -81,8 +87,9 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
            << configuration.outputPower << F("dBm");
 #endif
   }
-#endif
 
+#endif
+*/
 #if defined(DEBUG) && !defined(ESP32)
   Serial << endl
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
@@ -91,20 +98,24 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   if (WiFiMode == AFE_MODE_ACCESS_POINT ||
       WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Starting HotSpot: ");
+    Serial << endl << F("INFO: HotSpot: Starting... ");
 #endif
-    IPAddress apIP(192, 168, 5, 1);
+
     WirelessNetwork.mode(WIFI_AP_STA);
-    WirelessNetwork.softAP("AFE Device");
-    WirelessNetwork.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
-#ifdef AFE_ESP32
-    WirelessNetwork.softAPsetHostname(Device->configuration.name);
-#else
-    WirelessNetwork.hostname(Device->configuration.name);
-#endif
+
+    if (WirelessNetwork.softAPConfig(IPAddress(192, 168, 5, 1),
+                                     IPAddress(192, 168, 5, 200),
+                                     IPAddress(255, 255, 255, 0))) {
+
+      WirelessNetwork.softAP("AFE Device");
 #ifdef DEBUG
-    Serial << F("completed");
+      Serial << endl << F("INFO: HotSpot: Ready");
+      Serial << endl << F("INFO: HotSpot: IP: ") << WirelessNetwork.softAPIP();
+    } else {
+      Serial << endl << F("ERROR: HotSpot: Failed");
 #endif
+    }
+
   } else {
     /* Add additional configuration parameters */
     switchConfiguration();
@@ -435,5 +446,17 @@ void AFEWiFi::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {
   AFEWiFi::eventConnectionLost = true;
   AFEWiFi::isConnected = false;
 }
+
+#ifdef DEBUG
+void AFEWiFi::onWiFiAPStationConnected(
+    const WiFiEventSoftAPModeStationConnected &event) {
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: WiFi: New device connected to HotSpot") << endl
+         << F("INFO: HotSpot: Number of devices connected: ")
+         << WiFi.softAPgetStationNum();
+#endif
+}
+#endif
 
 #endif

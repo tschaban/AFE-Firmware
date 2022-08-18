@@ -22,7 +22,7 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
         Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
 #endif
 
-        _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration->mcp23017.gpio,
+        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
                                                   OUTPUT);
         _expanderUsed = true;
       }
@@ -47,10 +47,10 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 // https://github.com/tschaban/AFE-Firmware/issues/606
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-      Led.addMCP23017Reference(_MCP23017Broker);
+      Led->addMCP23017Reference(_MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      Led.begin(_Data, configuration->ledID);
+      Led->begin(_Data, configuration->ledID);
     }
 
 #endif
@@ -68,7 +68,7 @@ byte AFERelay::get() {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+    state = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
         configuration->mcp23017.gpio);
   } else {
 #endif
@@ -103,7 +103,7 @@ void AFERelay::on() {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+    _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
                                                                      : LOW);
@@ -135,7 +135,7 @@ void AFERelay::on() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.toggle();
+  Led->toggle();
 #endif
 }
 
@@ -154,7 +154,7 @@ void AFERelay::off() {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
+    _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
                                                                      : HIGH);
@@ -185,7 +185,7 @@ void AFERelay::off() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.toggle();
+  Led->toggle();
 #endif
 }
 

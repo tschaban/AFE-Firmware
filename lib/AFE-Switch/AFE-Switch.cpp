@@ -26,10 +26,10 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
       Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
 #endif
 
-      _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration->mcp23017.gpio,
+      _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
                                                 INPUT_PULLUP);
 
-      state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+      state = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
           configuration->mcp23017.gpio);
 
 #ifdef DEBUG
@@ -125,7 +125,7 @@ void AFESwitch::listener() {
     boolean currentState;
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
-      currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
+      currentState = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
           configuration->mcp23017.gpio);
     } else {
 #endif
