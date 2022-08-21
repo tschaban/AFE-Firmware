@@ -343,7 +343,10 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->api.http = root["api"]["http"];
       configuration->api.mqtt = root["api"]["mqtt"];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->api.domoticz = root["api"]["domoticz"] | false;
+
+      JsonVariant exists = root["api"]["domoticz"];
+      configuration->api.domoticz= exists.success() ?  root["api"]["domoticz"] : false;
+
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration->api.domoticz && !configuration->api.http) {
         configuration->api.http = true;
@@ -1445,7 +1448,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
 void AFEDataAccess::createDomoticzConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << F(AFE_CONFIG_FILE_BUFFER_MQTT_BROKER);
+         << F("INFO: Creating file: ") << AFE_CONFIG_FILE_BUFFER_MQTT_BROKER;
 #endif
   DOMOTICZ DomoticzConfiguration;
   DomoticzConfiguration.protocol = 0;

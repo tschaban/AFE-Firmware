@@ -51,7 +51,16 @@ private:
   boolean _initialize = false;
 
   struct HA_DEVICE_CONFIG {
+    /**
+     * @brief Unique ID of the type of the hardware. Require to generate the
+     * hardware item ID in HA
+     *
+     */
     uint8_t id;
+    /**
+     * @brief Hardware item type required to generated item ID in HA
+     * 
+     */
     uint8_t type;
     uint8_t hardwareId;
     char label[AFE_CONFIG_HA_LABEL_SIZE];
@@ -129,6 +138,14 @@ private:
   void publishSwitches(void);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  /**
+   * @brief publishes configuration for all binary sensors
+   *
+   */
+  void publishBinarySensor(void);
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   /**
    * @brief publishes configuration of all analog inputs
@@ -136,7 +153,6 @@ private:
    */
   void publishAnalogInputs(void);
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
-
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   /**

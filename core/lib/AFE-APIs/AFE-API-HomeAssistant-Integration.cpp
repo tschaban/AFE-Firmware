@@ -93,6 +93,10 @@ void AFEAPIHomeAssistantIntegration::publish() {
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   publishTSL2561();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+  publishBinarySensor();
+#endif
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -375,6 +379,40 @@ void AFEAPIHomeAssistantIntegration::publishSwitches(void) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+void AFEAPIHomeAssistantIntegration::publishBinarySensor(void) {
+
+  if (!_initialize) {
+    return;
+  }
+
+  BINARY_SENSOR _configuration;
+  _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_BINARY_SENSOR;
+  sprintf(_deviceConfiguration->deviceClass,
+          AFE_CONFIG_HA_DEVICE_CLASS_BINARY_SENSOR);
+  _deviceConfiguration->entityId =
+      AFE_CONFIG_HA_TYPE_OF_ENTITY_BINARY_SENSOR_OPEN_CLOSED;
+  _deviceConfiguration->hardwareId = AFE_CONFIG_HA_HARDWARE_SENSOR_BINARY;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: HA: Setting/Updating Binary Sensor: ") << i + 1;
+#endif
+
+    _deviceConfiguration->id = i;
+
+    if (i < _Device->configuration.noOfBinarySensors) {
+      _Data->getConfiguration(i, &_configuration);
+      sprintf(_deviceConfiguration->label, "%s: %d", L_BINARY_SENSOR, i + 1);
+      sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
+      publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+    } else {
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(_deviceConfiguration);
+    }
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
+
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEAPIHomeAssistantIntegration::publishSensorDS18B20(void) {
   if (!_initialize) {
@@ -650,7 +688,8 @@ void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
                 AFE_CONFIG_HA_DEVICE_CLASS_HUMIDITY);
         publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
         /* Absolute humidity */
-        _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
+        _deviceConfiguration->type =
+            AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY;
         sprintf(_deviceConfiguration->label, "%s: %s", _configuration.name,
                 L_ABSOLOUTE_HUMIDITY);
         publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -1343,7 +1382,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_GAS_RESISTANCE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
-                      deviceConfiguration->unit);                      
+                      deviceConfiguration->unit);
       }
 #endif // Gas resistance
 

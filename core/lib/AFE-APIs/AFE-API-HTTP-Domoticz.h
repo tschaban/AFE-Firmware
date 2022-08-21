@@ -29,9 +29,9 @@
 class AFEAPIHTTPDomoticz : public AFEAPI {
 
 private:
-  HTTPClient http;
+  HTTPClient *http = new HTTPClient();
   WiFiClient client;
-  DOMOTICZ configuration;
+
   boolean _initialized = false;
 
   char serverURL[AFE_CONFIG_API_DOMOTICZ_URL_LENGTH];

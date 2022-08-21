@@ -703,7 +703,7 @@ void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    if (strcmp(request->name, _DS18B20Sensor[i]->configuration->mqtt.topic) == 0) {
+    if (strcmp(request->name, _DS18B20Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];

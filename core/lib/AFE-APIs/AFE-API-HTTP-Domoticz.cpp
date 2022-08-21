@@ -20,28 +20,29 @@ void AFEAPIHTTPDomoticz::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEAPIHTTPDomoticz::init() {
-  _Data->getConfiguration(&configuration);
+  DOMOTICZ *configuration = new DOMOTICZ;
+  _Data->getConfiguration(configuration);
 
   char _user[45] = {0}; // base64 conversion takes ceil(n/3)*4 size of mem
   char _pass[45] = {0};
   char authorization[20 + sizeof(_user) + sizeof(_pass) + 1] = {0};
 
-  if (configuration.user[0] != AFE_EMPTY_STRING &&
-      configuration.password[0] != AFE_EMPTY_STRING) {
-    rbase64.encode(configuration.user);
+  if (configuration->user[0] != AFE_EMPTY_STRING &&
+      configuration->password[0] != AFE_EMPTY_STRING) {
+    rbase64.encode(configuration->user);
     sprintf(_user, rbase64.result());
-    rbase64.encode(configuration.password);
+    rbase64.encode(configuration->password);
     sprintf(_pass, rbase64.result());
     sprintf(authorization, "&username=%s&password=%s", _user, _pass);
   }
 
-  http.setTimeout(AFE_CONFIG_API_HTTP_TIMEOUT);
+  http->setTimeout(AFE_CONFIG_API_HTTP_TIMEOUT);
 
-  if (strlen(configuration.host) > 0) {
+  if (strlen(configuration->host) > 0) {
     _initialized = true;
     sprintf(serverURL, "%s%s:%d/json.htm?type=command%s",
-            configuration.protocol == 0 ? "http://" : "https://",
-            configuration.host, configuration.port, authorization);
+            configuration->protocol == 0 ? "http://" : "https://",
+            configuration->host, configuration->port, authorization);
   } else {
     serverURL[0] = AFE_EMPTY_STRING;
   }
@@ -63,9 +64,9 @@ boolean AFEAPIHTTPDomoticz::callURL(const String url) {
 #ifdef DEBUG
   Serial << endl << F("INFO: Publishing to Domoticz: ") << url;
 #endif
-  http.begin(client, url);
-  _return = http.GET() == 200 ? true : false;
-  http.end();
+  http->begin(client, url);
+  _return = http->GET() == 200 ? true : false;
+  http->end();
   delay(10);
 #ifdef AFE_CONFIG_HARDWARE_LED
   _Led->off();
@@ -110,7 +111,7 @@ boolean AFEAPIHTTPDomoticz::sendCustomSensorCommand(unsigned int idx,
 void AFEAPIHTTPDomoticz::addClass(AFERelay *Relay) { AFEAPI::addClass(Relay); }
 boolean AFEAPIHTTPDomoticz::publishRelayState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_Relay[id]->configuration.domoticz.idx,
+             ? sendSwitchCommand(_Relay[id]->configuration->domoticz.idx,
                                  _Relay[id]->get() == AFE_RELAY_ON)
              : false;
 }
@@ -122,7 +123,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESwitch *Switch) {
 }
 boolean AFEAPIHTTPDomoticz::publishSwitchState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_Switch[id]->configuration.domoticz.idx,
+             ? sendSwitchCommand(_Switch[id]->configuration->domoticz.idx,
                                  !_Switch[id]->getPhisicalState())
              : false;
 }
@@ -227,7 +228,7 @@ boolean AFEAPIHTTPDomoticz::publishBMx80SensorData(uint8_t id) {
 
   boolean _ret = false;
   if (_initialized) {
-    char value[20]; 
+    char value[20];
     if (_BMx80Sensor[id]->configuration.domoticz.temperature.idx > 0) {
       sprintf(value, "%-.2f", _BMx80Sensor[id]->data.temperature.value);
       sendCustomSensorCommand(
@@ -549,10 +550,10 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorDS18B20 *Sensor) {
 boolean AFEAPIHTTPDomoticz::publishDS18B20SensorData(uint8_t id) {
   boolean _ret = false;
   if (_initialized) {
-    if (_DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
+    if (_DS18B20Sensor[id]->configuration->domoticz.idx > 0) {
       char value[9]; // Max size: -999.999
       sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
-      sendCustomSensorCommand(_DS18B20Sensor[id]->configuration.domoticz.idx,
+      sendCustomSensorCommand(_DS18B20Sensor[id]->configuration->domoticz.idx,
                               value);
       _ret = true;
     }
@@ -720,7 +721,7 @@ void AFEAPIHTTPDomoticz::addClass(AFESensorBinary *Sensor) {
 }
 boolean AFEAPIHTTPDomoticz::publishBinarySensorState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_BinarySensor[id]->configuration.domoticz.idx,
+             ? sendSwitchCommand(_BinarySensor[id]->configuration->domoticz.idx,
                                  _BinarySensor[id]->get() == 0)
              : false;
 }

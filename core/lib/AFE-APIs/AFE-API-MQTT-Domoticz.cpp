@@ -508,14 +508,15 @@ void AFEAPIMQTTDomoticz::addClass(AFERelay *Relay) {
 #endif
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     addIdxToCache(i, AFE_DOMOTICZ_DEVICE_RELAY,
-                  _Relay[i]->configuration.domoticz.idx);
+                  _Relay[i]->configuration->domoticz.idx);
   }
 }
 
 boolean AFEAPIMQTTDomoticz::publishRelayState(uint8_t id) {
-  return enabled ? publishSwitchMessage(&_Relay[id]->configuration.domoticz.idx,
-                                        _Relay[id]->get())
-                 : false;
+  return enabled
+             ? publishSwitchMessage(&_Relay[id]->configuration->domoticz.idx,
+                                    _Relay[id]->get())
+             : false;
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
@@ -527,10 +528,10 @@ void AFEAPIMQTTDomoticz::addClass(AFESwitch *Switch) {
 boolean AFEAPIMQTTDomoticz::publishSwitchState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    if (_Switch[id]->configuration.domoticz.idx > 0) {
+    if (_Switch[id]->configuration->domoticz.idx > 0) {
       char json[AFE_CONFIG_API_JSON_SWITCH_COMMAND_LENGTH];
 
-      generateSwitchMessage(json, _Switch[id]->configuration.domoticz.idx,
+      generateSwitchMessage(json, _Switch[id]->configuration->domoticz.idx,
                             _Switch[id]->getPhisicalState() == 1
                                 ? AFE_SWITCH_OFF
                                 : AFE_SWITCH_ON);
@@ -654,10 +655,10 @@ void AFEAPIMQTTDomoticz::generateDeviceValue(char *json, uint32_t idx,
                                              const char *svalue,
                                              uint16_t nvalue) {
 
-/**
- * @brief {"command":"udevice","idx":999999,"nvalue":,"svalue":""}
- * 
- */
+  /**
+   * @brief {"command":"udevice","idx":999999,"nvalue":,"svalue":""}
+   *
+   */
 
   sprintf(
       json,
@@ -1054,11 +1055,11 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorDS18B20 *Sensor) {
 }
 boolean AFEAPIMQTTDomoticz::publishDS18B20SensorData(uint8_t id) {
   if (enabled) {
-    if (_DS18B20Sensor[id]->configuration.domoticz.idx > 0) {
+    if (_DS18B20Sensor[id]->configuration->domoticz.idx > 0) {
       char json[AFE_CONFIG_API_JSON_DS18B20_COMMAND_LENGTH];
       char value[9];
       sprintf(value, "%-.3f", _DS18B20Sensor[id]->getTemperature());
-      generateDeviceValue(json, _DS18B20Sensor[id]->configuration.domoticz.idx,
+      generateDeviceValue(json, _DS18B20Sensor[id]->configuration->domoticz.idx,
                           value);
       Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
@@ -1240,17 +1241,17 @@ void AFEAPIMQTTDomoticz::addClass(AFESensorBinary *Sensor) {
 
 boolean AFEAPIMQTTDomoticz::publishBinarySensorState(uint8_t id) {
   boolean publishStatus = false;
-  if (enabled)
-    if (_BinarySensor[id]->configuration.domoticz.idx > 0) {
+  if (enabled) {
+    if (_BinarySensor[id]->configuration->domoticz.idx > 0) {
       char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_COMMAND_LENGTH];
 
-      generateSwitchMessage(json, _BinarySensor[id]->configuration.domoticz.idx,
-                            _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF
-                                                          : AFE_SWITCH_ON);
+      generateSwitchMessage(
+          json, _BinarySensor[id]->configuration->domoticz.idx,
+          _BinarySensor[id]->get() == 1 ? AFE_SWITCH_OFF : AFE_SWITCH_ON);
       publishStatus = Mqtt.publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
-}
-return publishStatus;
+  }
+  return publishStatus;
 }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
