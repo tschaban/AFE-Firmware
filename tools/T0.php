@@ -50,7 +50,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 
 
 $targetHardware[0][0] = "esp8266";  // Folder name
-$targetHardware[0][1] = 0;          // AFE_DEVICE_ID
+$targetHardware[0][1] = 0;          // AFE_DEVICE_ID, Look at /core/include/config/devices/AFE-Device.h
 $targetHardware[0][2] = "generic";  // Part of the file
 
 $targetHardware[1][0] = "esp8285";
