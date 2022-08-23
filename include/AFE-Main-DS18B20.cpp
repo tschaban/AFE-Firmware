@@ -12,7 +12,7 @@ void DS18B20SensorEventsListener(void);
 void initializeDS18B20Sensor(void) {
   if (Device->configuration.noOfDS18B20s > 0) {
     for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-      DS18B20Sensor[i].begin(&Data, i);
+      DS18B20Sensor[i].begin(Data, i);
     }
   }
 }
@@ -53,9 +53,9 @@ void DS18B20SensorEventsListener(void) {
               relayStateChanged = true;
             }
             if (relayStateChanged) {
-              MqttAPI.publishRelayState(Regulator[j].configuration.relayId);
+              MqttAPI->publishRelayState(Regulator[j].configuration.relayId);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-              HttpDomoticzAPI.publishRelayState(
+              HttpDomoticzAPI->publishRelayState(
                   Regulator[j].configuration.relayId);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
             }
@@ -74,10 +74,10 @@ void DS18B20SensorEventsListener(void) {
                 Relay[ThermalProtector[j].configuration.relayId].get() ==
                     AFE_RELAY_ON) {
               Relay[ThermalProtector[j].configuration.relayId].off();
-              MqttAPI.publishRelayState(
+              MqttAPI->publishRelayState(
                   ThermalProtector[j].configuration.relayId);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-              HttpDomoticzAPI.publishRelayState(
+              HttpDomoticzAPI->publishRelayState(
                   ThermalProtector[j].configuration.relayId);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
             }
@@ -87,9 +87,9 @@ void DS18B20SensorEventsListener(void) {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
       /* Publishing temperature to MQTT Broker and Domoticz if enabled */
-      MqttAPI.publishDS18B20SensorData(i);
+      MqttAPI->publishDS18B20SensorData(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      HttpDomoticzAPI.publishDS18B20SensorData(i);
+      HttpDomoticzAPI->publishDS18B20SensorData(i);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
     }
   }

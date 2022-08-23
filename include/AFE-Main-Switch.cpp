@@ -15,11 +15,11 @@ void initializeSwitch(void) {
   for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-      Switch[i].addMCP23017Reference(&MCP23017Broker);
+      Switch[i].addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Switch[i].begin(i, &Data, &Led);
+    Switch[i].begin(i, Data, Led);
 #else
     Switch[i].begin(i, &Data);
 #endif
@@ -67,10 +67,10 @@ void processSwitchEvents(void) {
 #endif
 
           Relay[Switch[i].configuration->relayID].toggle();
-          MqttAPI.publishRelayState(Switch[i].configuration->relayID);
+          MqttAPI->publishRelayState(Switch[i].configuration->relayID);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-          HttpDomoticzAPI.publishRelayState(Switch[i].configuration->relayID);
+          HttpDomoticzAPI->publishRelayState(Switch[i].configuration->relayID);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -81,9 +81,9 @@ void processSwitchEvents(void) {
       }
 
       if (Switch[i].isPressed(true)) {
-        MqttAPI.publishSwitchState(i);
+        MqttAPI->publishSwitchState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishSwitchState(i);
+        HttpDomoticzAPI->publishSwitchState(i);
 #endif
       }
     }

@@ -384,7 +384,7 @@ boolean AFEWebServer::generate(boolean upload) {
           PRO_VERSION configuration;
           get(configuration);
           Data->saveConfiguration(&configuration);
-          sprintf(RestAPI->Pro.serial, "%s", configuration.serial);
+          //sprintf(RestAPI->Pro->serial, "%s", configuration.serial);
           sprintf(FirmwarePro->Pro.serial, "%s", configuration.serial);
           FirmwarePro->validate();
           configuration = {0};

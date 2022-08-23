@@ -40,12 +40,12 @@ const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{"
 class AFEJSONRPC {
 private:
   WiFiClient WirelessClient;
-  HTTPClient http;
+  HTTPClient *http = new HTTPClient();
   AFEDevice *Device;
   AFEDataAccess *Data;  
   String message;
   //AsyncPing Pings;
-  PingClass Ping;
+  PingClass *Ping = new PingClass();
   boolean _PingResponded;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -59,8 +59,7 @@ private:
 #endif
 
 public:
-  PRO_VERSION Pro;  
-
+    
   AFEJSONRPC();
 
 #ifdef AFE_CONFIG_HARDWARE_LED

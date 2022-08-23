@@ -16,9 +16,9 @@ void initializeRelay(void) {
 
   for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  Relay[i].addMCP23017Reference(&MCP23017Broker);
+  Relay[i].addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-    Relay[i].begin(&Data, i);
+    Relay[i].begin(Data, i);
     // @TODO T5  does not have to be set for Relay controlling a Gate
     Relay[i].setRelayAfterRestoringPower();
   }
@@ -34,9 +34,9 @@ void relayEventsListener(void) {
     if (Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
       if (Relay[i].autoTurnOff()) {
-        MqttAPI.publishRelayState(i);
+        MqttAPI->publishRelayState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishRelayState(i);
+        HttpDomoticzAPI->publishRelayState(i);
 #endif
       }
 #ifdef AFE_CONFIG_HARDWARE_GATE

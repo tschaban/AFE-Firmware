@@ -33,7 +33,7 @@ void initializeI2CBUS(void) {
     success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
                               I2CBUSConfiguration.frequency);
 #else /* ESP8266 */
-  Data.getConfiguration(&I2CBUSConfiguration);
+  Data->getConfiguration(&I2CBUSConfiguration);
 
 #ifdef DEBUG
   Serial << endl

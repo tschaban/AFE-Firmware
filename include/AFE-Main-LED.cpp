@@ -7,17 +7,17 @@ void initializeLED(void);
 /* --------- Body -----------*/
 
 void initializeLED(void) {
-  uint8_t id = Data.getSystemLedID();
+  uint8_t id = Data->getSystemLedID();
 #ifdef DEBUG
   boolean initialized = false;
 #endif
   if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
     if (Device->configuration.noOfLEDs - 1 >= id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-    Led.addMCP23017Reference(&MCP23017Broker);
+    Led->addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-      if (Led.begin(&Data, id)) {
-        Led.on();
+      if (Led->begin(Data, id)) {
+        Led->on();
 #ifdef DEBUG
         initialized = true;
 #endif

@@ -27,9 +27,9 @@ void BH1750SensorEventsListener(void) {
     for (uint8_t i = 0; i < Device.configuration.noOfBH1750s; i++) {
       BH1750Sensor[i].listener();
       if (BH1750Sensor[i].isReady()) {
-        MqttAPI.publishBH1750SensorData(i);
+        MqttAPI->publishBH1750SensorData(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishBH1750SensorData(i);
+        HttpDomoticzAPI->publishBH1750SensorData(i);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT

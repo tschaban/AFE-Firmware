@@ -22,9 +22,9 @@ void AFEAPI::begin(AFEDataAccess *Data, AFEDevice *Device) {
 void AFEAPI::begin() {
   if (_Device->configuration.api.mqtt) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-    enabled = Mqtt.begin(_Data, _Device, _Led);
+    enabled = Mqtt->begin(_Data, _Device, _Led);
 #else
-    enabled = Mqtt.begin(_Data, _Device);
+    enabled = Mqtt->begin(_Data, _Device);
 #endif
   }
 }

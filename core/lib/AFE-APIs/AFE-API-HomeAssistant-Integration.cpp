@@ -1082,10 +1082,10 @@ void AFEAPIHomeAssistantIntegration::
                      deviceConfiguration->hardwareId, deviceConfiguration->id);
     generateTopic(_topic, deviceConfiguration->entityId, _objectId);
 
-    boolean _retain = _MqttAPI->Mqtt.configuration.retainAll;
-    _MqttAPI->Mqtt.configuration.retainAll = configuration->retainConfiguration;
-    _MqttAPI->Mqtt.publish(_topic, "");
-    _MqttAPI->Mqtt.configuration.retainAll = _retain;
+    boolean _retain = _MqttAPI->Mqtt->configuration->retainAll;
+    _MqttAPI->Mqtt->configuration->retainAll = configuration->retainConfiguration;
+    _MqttAPI->Mqtt->publish(_topic, "");
+    _MqttAPI->Mqtt->configuration->retainAll = _retain;
   }
 }
 
@@ -1589,10 +1589,10 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
 
     _json.toCharArray(_message, sizeof(_message) + 1);
 
-    boolean _retain = _MqttAPI->Mqtt.configuration.retainAll;
-    _MqttAPI->Mqtt.configuration.retainAll = configuration->retainConfiguration;
-    _MqttAPI->Mqtt.publish(_topic, _message);
-    _MqttAPI->Mqtt.configuration.retainAll = _retain;
+    boolean _retain = _MqttAPI->Mqtt->configuration->retainAll;
+    _MqttAPI->Mqtt->configuration->retainAll = configuration->retainConfiguration;
+    _MqttAPI->Mqtt->publish(_topic, _message);
+    _MqttAPI->Mqtt->configuration->retainAll = _retain;
   } else {
 
     removeItemRemovedFromHomeAssistantMQTTDiscovery(deviceConfiguration);

@@ -34,7 +34,6 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #endif
 
   char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
-
   sprintf(_DeviceName, "%s-%s", Device->configuration.name, Device->deviceId);
 
   _Broker->setClientId(_DeviceName);
@@ -51,12 +50,12 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
             configuration->lwt.idx, L_DISCONNECTED);
 
     _Broker->setWill(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, 1,
-                    configuration->retainLWT, _lwtMessage);
+                     configuration->retainLWT, _lwtMessage);
   }
 #else
   if (strlen(configuration->lwt.topic) > 0) {
     _Broker->setWill(configuration->lwt.topic, configuration->qos,
-                    configuration->retainLWT, "disconnected");
+                     configuration->retainLWT, "disconnected");
   }
 #endif
 
@@ -161,7 +160,7 @@ boolean AFEAsyncMQTTClient::publish(const char *topic, const char *message) {
 #endif
     if (strlen(topic) > 0) {
       _publishedId = _Broker->publish(topic, configuration->qos,
-                                     configuration->retainAll, message);
+                                      configuration->retainAll, message);
     }
 #ifdef DEBUG
     else {
@@ -286,8 +285,8 @@ void AFEAsyncMQTTClient::onMqttMessage(
   Serial << endl << F(" : Index         ") << index;
   Serial << endl << F(" : Length        ") << len;
   Serial << endl << F(" : Total         ") << total;
-
 #endif
+
   if (strlen(topic) > AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH) {
 #ifdef DEBUG
     Serial << endl
@@ -306,6 +305,98 @@ void AFEAsyncMQTTClient::onMqttMessage(
     return;
   }
 
+/**
+ * @brief Adding Domotocz MQTT message to the buffer
+ *
+ */
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+
+  /**
+   * @brief Adding standard MQTT message to the buffer
+   *
+   */
+
+  char _content[AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH];
+
+  for (uint16_t i = 0; i < len; i++) {
+    _content[i] = payload[i];
+  }
+  _content[len] = AFE_EMPTY_STRING;
+
+  StaticJsonBuffer<AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH> jsonBuffer;
+  JsonObject &root = jsonBuffer.parseObject(_content);
+
+  if (root.success()) {
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.nvalue = root["nvalue"] | AFE_NONE;
+
+    if (strlen(root["svalue1"] | "") < AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH) {
+      sprintf(AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.svalue,
+              root["svalue1"] | "");
+
+#ifdef DEBUG
+    } else {
+      Serial << endl
+             << F("WARN: MQTT: Incoming SVALUE is: ") << strlen(root["svalue1"])
+             << F(" and it's too long. Max size: ")
+             << AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH
+             << F(". Request not processed");
+#endif
+    }
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.led.brightness = root["Level"];
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.led.color.blue = root["Color"]["b"];
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.led.color.red = root["Color"]["r"];
+    AFEAsyncMQTTClient::messagesBuffer
+        [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+            .command.led.color.green = root["Color"]["g"];
+#endif
+
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Domoticz: IDX: ")
+           << AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.domoticz.idx
+           << F(", NValue: ")
+           << AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.nvalue
+           << F(", SValue: ")
+           << AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.svalue;
+#endif
+
+    AFEAsyncMQTTClient::numberOfMessagesInBuffer++;
+    if (AFEAsyncMQTTClient::numberOfMessagesInBuffer ==
+        AFE_CONFIG_MQTT_MESSAGES_BUFFER) {
+      AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
+    }
+
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: MQTT: Problem with JSON pharsing");
+  }
+#endif
+
+#else
   sprintf(AFEAsyncMQTTClient::messagesBuffer
               [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
                   .topic,
@@ -321,17 +412,13 @@ void AFEAsyncMQTTClient::onMqttMessage(
       [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
           .content[len] = AFE_EMPTY_STRING;
 
-#ifdef DEBUG
-  Serial << endl
-         << F(" : Idx in buffer ")
-         << AFEAsyncMQTTClient::numberOfMessagesInBuffer;
-#endif
-
   AFEAsyncMQTTClient::numberOfMessagesInBuffer++;
   if (AFEAsyncMQTTClient::numberOfMessagesInBuffer ==
       AFE_CONFIG_MQTT_MESSAGES_BUFFER) {
     AFEAsyncMQTTClient::numberOfMessagesInBuffer = 0;
   }
+
+#endif
 }
 
 #ifdef DEBUG

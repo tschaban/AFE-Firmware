@@ -15,41 +15,41 @@ void handleFavicon(void) {}
 
 /* Method handles all HTTP request */
 void handleHTTPRequests(void) {
-  if (!HTTPServer.generate()) {
-    HttpAPI.listener();
+  if (!HTTPServer->generate()) {
+    HttpAPI->listener();
   }
 }
-void handleUpload(void) { HTTPServer.generate(true); }
+void handleUpload(void) { HTTPServer->generate(true); }
 
 void handleOnNotFound(void) {
-  HTTPServer.server.send(404, "text/plain", F(L_404));
+  HTTPServer->server.send(404, "text/plain", F(L_404));
 }
 
 void initializeHTTPServer(void) {
   /* Initializing HTTP HTTPServer */
-  HTTPServer.handle("/", handleHTTPRequests);
-  HTTPServer.handle("/favicon.ico", handleFavicon);
-  HTTPServer.handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
+  HTTPServer->handle("/", handleHTTPRequests);
+  HTTPServer->handle("/favicon.ico", handleFavicon);
+  HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
                                    handleUpload);
-  HTTPServer.onNotFound(handleOnNotFound);
+  HTTPServer->onNotFound(handleOnNotFound);
 #if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI, &Led);
+  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led);
 #elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI, &Led, &WirePort0,
+  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0,
                    &WirePort1);
 #else
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI, &Led, &WirePort0);
+  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0);
 #endif // AFE_ESP32
 #elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI, &WirePort0,
+  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0,
                    &WirePort1);
 #else
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI, &WirePort0);
+  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0);
 #endif // AFE_ESP32
 #else
-  HTTPServer.begin(&Data, Device, &FirmwarePro, &RestAPI);
+  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI);
 #endif
 
 #ifdef DEBUG

@@ -45,9 +45,9 @@ void initializeRainmeter(void) {
 void rainmeterEventsListener(void) {
   if (Device.configuration.noOfRainmeterSensors > 0) {
     if (RainSensor.listener()) {
-      MqttAPI.publishRainSensorData();
+      MqttAPI->publishRainSensorData();
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      HttpDomoticzAPI.publishRainSensorData();
+      HttpDomoticzAPI->publishRainSensorData();
 #endif
     }
   }

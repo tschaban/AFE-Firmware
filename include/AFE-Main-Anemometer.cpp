@@ -45,7 +45,7 @@ void initializeAnemometer(void) {
 void anemometerEventsListener(void) {
   if (Device.configuration.noOfAnemometerSensors > 0) {
     if (AnemometerSensor.listener()) {
-      MqttAPI.publishAnemometerSensorData();
+      MqttAPI->publishAnemometerSensorData();
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       HttpDomoticzAPI.publishAnemometerSensorData();
 #endif

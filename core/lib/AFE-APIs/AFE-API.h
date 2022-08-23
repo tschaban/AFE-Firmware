@@ -103,7 +103,7 @@ private:
   void begin();
 
 public:
-  AFEAsyncMQTTClient Mqtt;
+  AFEAsyncMQTTClient *Mqtt = new AFEAsyncMQTTClient();
   AFEDevice *_Device;
   AFEDataAccess *_Data;
 

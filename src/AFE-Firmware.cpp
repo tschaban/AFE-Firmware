@@ -95,7 +95,7 @@ void setup() {
    * debug purpose
    *
    */
-  unsigned long _reboots = Data.getRebootCounter();
+  unsigned long _reboots = Data->getRebootCounter();
 #ifdef DEBUG
   Serial << endl << F("INFO: Firmware rebooted: ") << _reboots << F(" times");
 #endif
@@ -146,22 +146,11 @@ void setup() {
     Serial << F("YES") << endl
            << F("INFO: FIRMWARE: Checking if firmware should be upgraded?");
 #endif
-    AFEUpgrader *Upgrader = new AFEUpgrader(&Data, Device);
+    AFEUpgrader *Upgrader = new AFEUpgrader(Data, Device);
 
     if (Upgrader->upgraded()) {
-#ifdef DEBUG
-      Serial << endl << F("WARN: FIRMWARE: Up2date. Upgrading...");
-#endif
       Upgrader->upgrade();
-#ifdef DEBUG
-      Serial << endl << F("INFO: FIRMWARE: Upgraded");
-#endif
     }
-#ifdef DEBUG
-    else {
-      Serial << endl << F("INFO: FIRMWARE: up2date");
-    }
-#endif
     delete Upgrader;
     Upgrader = NULL;
 
@@ -184,9 +173,9 @@ void setup() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Network.begin(Device->getMode(), Device, &Data, &Led);
+  Network->begin(Device->getMode(), Device, Data, Led);
 #else
-  Network.begin(Device->getMode(), Device, &Data);
+  Network->begin(Device->getMode(), Device, &Data);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
@@ -196,7 +185,7 @@ void setup() {
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Starting network");
 #endif
-  Network.listener();
+  Network->listener();
 
 
 
@@ -205,16 +194,16 @@ void setup() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  RestAPI.begin(&Data, Device, &Led);
+  RestAPI->begin(Data, Device, Led);
 #else
-  RestAPI.begin(&Data, Device);
+  RestAPI->begin(Data, Device);
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
    * @brief Initializing FirmwarePro
    *
    */
-  FirmwarePro.begin(&Data, &RestAPI);
+  FirmwarePro->begin(Data, RestAPI);
 
   /**
    * @brief Initializing HTTP WebServer
@@ -334,14 +323,14 @@ void setup() {
  */
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.off();
+  Led->off();
   /**
    * @brief If device in configuration mode then it starts LED blinking
    *
    */
   if (Device->getMode() == AFE_MODE_ACCESS_POINT ||
       Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    Led.blinkingOn(100);
+    Led->blinkingOn(100);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
@@ -381,7 +370,7 @@ void loop() {
 
   if (Device->getMode() == AFE_MODE_NORMAL ||
       Device->getMode() == AFE_MODE_CONFIGURATION) {
-    if (Network.connected()) {
+    if (Network->connected()) {
       if (Device->getMode() == AFE_MODE_NORMAL) {
 
         /**
@@ -390,7 +379,7 @@ void loop() {
          *
          */
         if (Device->configuration.api.mqtt) {
-          MqttAPI.listener();
+          MqttAPI->listener();
         }
 
         /**
@@ -398,7 +387,7 @@ void loop() {
          * requests or HTTP API requests if it's turned on
          *
          */
-        HTTPServer.listener();
+        HTTPServer->listener();
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
         contractonEventsListener();
@@ -456,31 +445,31 @@ void loop() {
          * @brief Checking if Key is still valid
          *
          */
-        FirmwarePro.listener();
+        FirmwarePro->listener();
 
       } else { /**
        * @brief Device runs in configuration mode over WiFi
        *
        */
 #ifdef AFE_CONFIG_HARDWARE_LED
-        if (!Led.isBlinking()) {
-          Led.blinkingOn(100);
+        if (!Led->isBlinking()) {
+          Led->blinkingOn(100);
         }
 #endif
 
-        HTTPServer.listener();
+        HTTPServer->listener();
       }
     }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     else {
-      if (Device->getMode() == AFE_MODE_CONFIGURATION && Led.isBlinking()) {
-        Led.blinkingOff();
+      if (Device->getMode() == AFE_MODE_CONFIGURATION && Led->isBlinking()) {
+        Led->blinkingOff();
       }
     }
 #endif
     // yield();
-    Network.listener();
+    Network->listener();
 
     /**
      * @brief Here: Code that will be run no matter if connected or disconnected
@@ -519,7 +508,7 @@ void loop() {
      * @brief Device runs in Access Point mode
      *
      */
-    HTTPServer.listener();
+    HTTPServer->listener();
   }
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
@@ -536,7 +525,7 @@ void loop() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.loop();
+  Led->loop();
 #endif
 
 /**
