@@ -1,6 +1,6 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#if defined(DEBUG)
+#ifdef DEBUG
 
 #define DEBUG_INTERVAL 60
 unsigned long debugStartTime = 0;
@@ -42,9 +42,7 @@ void getFileSystemInfo() {
 void getESPInformation() {
 
 #ifndef AFE_ESP32 /* ESP82xx */
-  Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-         << F("kB: at start");
+  getAvailableMem();
   Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
   Serial << endl << F("INFO: ESP: Real flash size: ");
   if (ESP.getFlashChipRealSize() >= 1048576) {

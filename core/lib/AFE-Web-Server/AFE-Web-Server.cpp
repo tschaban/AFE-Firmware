@@ -79,15 +79,15 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     }
   */
   if (siteConfig->form) {
-    page.concat("<form  method=\"post\" action=\"/?c=");
+    page.concat(F("<form  method=\"post\" action=\"/?c="));
     page.concat(AFE_SERVER_CMD_SAVE);
-    page.concat("&o=");
+    page.concat(F("&o="));
     page.concat(siteConfig->ID);
     if (siteConfig->deviceID >= 0) {
-      page.concat("&i=");
+      page.concat(F("&i="));
       page.concat(siteConfig->deviceID);
     }
-    page.concat("\">");
+    page.concat(F("\">"));
   }
 
   switch (siteConfig->ID) {
@@ -297,11 +297,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 
   if (siteConfig->form) {
     if (siteConfig->formButton) {
-      page.concat("<input type=\"submit\" class=\"b bs\" value=\"");
-      page.concat(L_SAVE);
-      page.concat("\">");
+      page.concat(F("<input type=\"submit\" class=\"b bs\" value=\""));
+      page.concat(F(L_SAVE));
+      page.concat(F("\">"));
     }
-    page.concat("</form>");
+    page.concat(F("</form>"));
   }
 
   return page;
@@ -704,7 +704,7 @@ boolean AFEWebServer::generate(boolean upload) {
       String page;
 /* page.reserve(AFE_MAX_PAGE_SIZE);
 */
-      server.sendHeader("Cache-Control", "no-cache");
+      server.sendHeader(F("Cache-Control"), F("no-cache"));
       server.setContentLength(CONTENT_LENGTH_UNKNOWN);
 
       if (siteConfig.twoColumns) {
@@ -713,7 +713,7 @@ boolean AFEWebServer::generate(boolean upload) {
         Site.generateEmptyMenu(page, siteConfig.rebootTime);
       }
       Site.setAttributes(&page);
-      server.send(200, "text/html", page);
+      server.send(200, F("text/html"), page);
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
@@ -790,7 +790,7 @@ boolean AFEWebServer::generate(boolean upload) {
 
 boolean AFEWebServer::getOptionName() {
   /* Recived HTTP API Command */
-  if (server.hasArg("command")) {
+  if (server.hasArg(F("command"))) {
     /* Constructing command */
     server.arg(F("command"))
         .toCharArray(httpCommand.command, sizeof(httpCommand.command));
@@ -896,10 +896,10 @@ void AFEWebServer::sendJSON(const String &json) {
          << F("-----");
 #endif
 
-  server.sendHeader("Cache-Control", "no-cache");
-  server.sendHeader("Content-Length", String(json.length()));
+  server.sendHeader(F("Cache-Control"), F("no-cache"));
+  server.sendHeader(F("Content-Length"), String(json.length()));
   server.setContentLength(json.length());
-  server.send(200, "application/json", json);
+  server.send(200, F("application/json"), json);
 }
 
 #ifndef AFE_ESP32 /* ESP82xx */
@@ -959,7 +959,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #ifdef DEBUG
   Serial << endl << F("INFO: UPGRADE WAN: Connecting to: api.smartnydom.pl");
 #endif
-  if (WirelessClient.connect("api.smartnydom.pl", 80)) {
+  if (WirelessClient.connect(F("api.smartnydom.pl"), 80)) {
 
 #ifdef DEBUG
     Serial << F("... connected") << endl
@@ -992,8 +992,8 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
       }
 
       /* Expecting reply from the server with HTTP = 200 */
-      if (line.startsWith("HTTP/1.1")) {
-        if (line.indexOf("200") < 0) {
+      if (line.startsWith(F("HTTP/1.1"))) {
+        if (line.indexOf(F("200")) < 0) {
 #ifdef DEBUG
           Serial << endl
                  << F("ERROR: UPGRADE WAN: Got a NONE 200 status code from "
@@ -1007,7 +1007,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 
       if (_success) {
         /* Expeting firmware files size > 0 */
-        if (line.startsWith("content-length: ")) {
+        if (line.startsWith(F("content-length: "))) {
           contentLength =
               atol(getHeaderValue(line, "content-length: ").c_str());
 #ifdef DEBUG
@@ -1024,9 +1024,9 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
       } // Success of content-length
 
       if (_success) {
-        if (line.startsWith("content-type: ")) {
-          if (getHeaderValue(line, "content-type: ") !=
-              "application/octet-stream") {
+        if (line.startsWith(F("content-type: "))) {
+          if (getHeaderValue(line, F("content-type: ")) !=
+              F("application/octet-stream")) {
             _success = false;
             Data->saveWelecomeMessage(L_UPGRADE_WRONG_CONTENT_TYPE);
             break;
@@ -1034,8 +1034,8 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         }
       } // Success of content-type
 
-      if (line.startsWith("content-disposition: attachment; filename=")) {
-        getHeaderValue(line, "content-disposition: attachment; filename=")
+      if (line.startsWith(F("content-disposition: attachment; filename="))) {
+        getHeaderValue(line, F("content-disposition: attachment; filename="))
             .toCharArray(firmwareFileName, AFE_FIRMARE_FILE_NAME_LENGTH);
 #ifdef DEBUG
         Serial << endl

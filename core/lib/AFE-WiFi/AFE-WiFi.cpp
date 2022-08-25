@@ -120,6 +120,9 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
     /* Add additional configuration parameters */
     switchConfiguration();
   }
+#ifdef DEBUG
+  Serial << endl << F("INFO: BOOT: Network initialized");
+#endif
 }
 
 void AFEWiFi::switchConfiguration() {

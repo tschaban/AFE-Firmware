@@ -57,12 +57,6 @@ void setup() {
   SPIFFS.gc();
 #endif
 
-#if defined(DEBUG) && !defined(AFE_ESP32)
-  Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-         << F("kB: File system mounted");
-#endif
-
   Device->begin();
 
 /**
@@ -83,21 +77,18 @@ void setup() {
     } else {
       Device->reboot();
     }
-  }
 #ifdef DEBUG
-  else {
+  } else {
     Serial << F("NO");
-  }
 #endif
-
+  }
   /**
    * @brief saving information how many times firmare has been rebooted. For
    * debug purpose
    *
    */
-  unsigned long _reboots = Data->getRebootCounter();
 #ifdef DEBUG
-  Serial << endl << F("INFO: Firmware rebooted: ") << _reboots << F(" times");
+  Serial << endl << F("INFO: Firmware rebooted: ") << Data->getRebootCounter() << F(" times");
 #endif
 
 /**
@@ -113,7 +104,7 @@ void setup() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-    initializeMCP23017();
+  initializeMCP23017();
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 /**
@@ -161,9 +152,6 @@ void setup() {
        *
        */
       initializeRelay();
-#ifdef DEBUG
-      Serial << endl << F("INFO: BOOT: Relay initialized");
-#endif
     }
 #endif // AFE_CONFIG_HARDWARE_RELAY
   }
@@ -179,15 +167,9 @@ void setup() {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Network initialized");
-#endif
-
-#ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Starting network");
 #endif
   Network->listener();
-
-
 
 /**
  * @brief Initializating REST API
@@ -358,11 +340,9 @@ void setup() {
          << F("############################################################"
               "####"
               "########");
-#ifndef AFE_ESP32
-  Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-         << F("kB: Booting completed");
-#endif
+  getAvailableMem();
+  Serial << F(": Booting completed");
+
 #endif
 }
 

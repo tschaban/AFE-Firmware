@@ -305,10 +305,6 @@ void AFEAsyncMQTTClient::onMqttMessage(
     return;
   }
 
-/**
- * @brief Adding Domotocz MQTT message to the buffer
- *
- */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
   /**
@@ -366,18 +362,17 @@ void AFEAsyncMQTTClient::onMqttMessage(
             .command.led.color.green = root["Color"]["g"];
 #endif
 
-
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Domoticz: IDX: ")
+           << F("INFO: Domoticz command: ") << F(" : IDX: ") << endl
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
                       .command.domoticz.idx
-           << F(", NValue: ")
+           << F(" : NValue: ") << endl
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
                       .command.nvalue
-           << F(", SValue: ")
+           << F(" : SValue: ")
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
                       .command.svalue;
