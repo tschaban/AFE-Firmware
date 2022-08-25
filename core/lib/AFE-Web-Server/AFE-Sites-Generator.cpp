@@ -4499,7 +4499,7 @@ void AFESitesGenerator::addInputFormItem(String &item, const char *type,
     item.concat(F("</span>"));
   }
   if (strcmp(type, "number") == 0) {
-    if (strcmp(min, "?") != 0 && strcmp(max, F("?")) != 0) {
+    if (strcmp(min, "?") != 0 && strcmp(max, "?") != 0) {
       item.concat(F("<span class=\"hint\">"));
       item.concat(F(L_RANGE));
       item.concat(F(" "));
@@ -4533,7 +4533,7 @@ void AFESitesGenerator::_addSelectionFormItem(
   item.replace(F("{{i.h}}"),
                strcmp(hint, AFE_FORM_ITEM_SKIP_PROPERTY) != 0
                    ? "<span class=\"hint\">(" + String(hint) + ")</span>"
-                   : F(""));
+                   : "");
 }
 
 void AFESitesGenerator::addCheckboxFormItem(String &item, const char *name,
