@@ -730,7 +730,7 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    if (strcmp(request->name, _Regulator[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Regulator[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_REGULATOR_DATA_LENGTH];
       boolean sendJSON = true;
@@ -777,7 +777,7 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    if (strcmp(request->name, _ThermalProtector[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _ThermalProtector[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH];
       boolean sendJSON = true;

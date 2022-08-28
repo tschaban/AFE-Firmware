@@ -233,7 +233,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
                  << F("INFO: Domoticz: Found Regulator ID: ") << idxCache[i].id;
           _found = true;
 #endif
-          if (_Regulator[idxCache[i].id]->configuration.enabled !=
+          if (_Regulator[idxCache[i].id]->configuration->enabled !=
               (byte)command.nvalue) {
             if (command.nvalue == AFE_SWITCH_OFF) {
               _Regulator[idxCache[i].id]->off();
@@ -258,7 +258,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
                  << idxCache[i].id;
           _found = true;
 #endif
-          if (_ThermalProtector[idxCache[i].id]->configuration.enabled !=
+          if (_ThermalProtector[idxCache[i].id]->configuration->enabled !=
               (byte)command.nvalue) {
             if (command.nvalue == AFE_SWITCH_OFF) {
               _ThermalProtector[idxCache[i].id]->off();
@@ -1096,7 +1096,7 @@ boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id) {
 #endif
   return enabled
              ? publishSwitchMessage(&_Regulator[id]->configuration->domoticz.idx,
-                                    _Regulator[id]->configuration.enabled)
+                                    _Regulator[id]->configuration->enabled)
              : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -1123,7 +1123,7 @@ boolean AFEAPIMQTTDomoticz::publishThermalProtectorState(uint8_t id) {
 #endif
   return publishSwitchMessage(
       &_ThermalProtector[id]->configuration->domoticz.idx,
-      _ThermalProtector[id]->configuration.enabled);
+      _ThermalProtector[id]->configuration->enabled);
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 

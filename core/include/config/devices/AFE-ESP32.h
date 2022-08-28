@@ -12,5 +12,7 @@
 #define AFE_ESP_FLASH_4MB
 #endif
 
+#define AFE_MAX_RAM 81920
+
 
 #endif // _AFE_devices_ESP32_h

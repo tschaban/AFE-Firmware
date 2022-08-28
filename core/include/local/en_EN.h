@@ -38,6 +38,7 @@
 #define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
 
 /* Menu */
+#define L_USED "used in"
 #define L_HARDWARE "Hardware"
 #define L_FUNCTIONS "Functionalities"
 #define L_FIRMWARE "Firmware"

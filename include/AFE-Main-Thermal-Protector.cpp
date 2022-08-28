@@ -10,9 +10,9 @@ void initializeThermalProtector(void);
 
 /* Initializing regulator */
 void initializeThermalProtector(void) {
-  if (Device.configuration.noOfThermalProtectors > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfThermalProtectors; i++) {
-      ThermalProtector[i].begin(&Data, i);
+  if (Device->configuration.noOfThermalProtectors > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfThermalProtectors; i++) {
+      ThermalProtector[i].begin(Data, i);
     }
   }
 }

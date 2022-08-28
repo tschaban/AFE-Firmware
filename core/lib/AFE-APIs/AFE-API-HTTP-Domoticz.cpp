@@ -568,8 +568,8 @@ void AFEAPIHTTPDomoticz::addClass(AFERegulator *Regulator) {
 }
 boolean AFEAPIHTTPDomoticz::publishRegulatorState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_Regulator[id]->configuration.domoticz.idx,
-                                 _Regulator[id]->configuration.enabled)
+             ? sendSwitchCommand(_Regulator[id]->configuration->domoticz.idx,
+                                 _Regulator[id]->configuration->enabled)
              : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -580,8 +580,8 @@ void AFEAPIHTTPDomoticz::addClass(AFEThermalProtector *Protector) {
 }
 boolean AFEAPIHTTPDomoticz::publishThermalProtectorState(uint8_t id) {
   return _initialized ? sendSwitchCommand(
-                            _ThermalProtector[id]->configuration.domoticz.idx,
-                            _ThermalProtector[id]->configuration.enabled)
+                            _ThermalProtector[id]->configuration->domoticz.idx,
+                            _ThermalProtector[id]->configuration->enabled)
                       : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR

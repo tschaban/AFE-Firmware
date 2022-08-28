@@ -22,7 +22,7 @@ private:
   void enable(void);
 
 public:
-  THERMAL_PROTECTOR configuration;
+  THERMAL_PROTECTOR *configuration = new THERMAL_PROTECTOR;
   boolean turnOff = false;
 
   /* Constructors */

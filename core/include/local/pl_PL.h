@@ -36,6 +36,7 @@
 #define L_COMMNAD_NO_COMMAND "\"Brak komendy\""
 
 /* Menu */
+#define L_USED "wykorzystany w"
 #define L_HARDWARE "Sprzęt"
 #define L_FUNCTIONS "Funkcje"
 #define L_FIRMWARE "Firmware"

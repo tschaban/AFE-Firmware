@@ -51,7 +51,9 @@ void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})</small>"));
+  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})<br>RAM "));
+  page.concat(F(L_USED));
+  page.concat(F(" {{f.r}}%</small>"));
 }
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
@@ -4197,6 +4199,13 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{d}}"), Device->configuration.name);
 
   page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
+
+  char _ramText[7];
+  sprintf(_ramText, "%-.1f",
+          100 -
+              (float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) *
+                  100);
+  page->replace(F("{{f.r}}"), _ramText);
 }
 
 void AFESitesGenerator::openSection(String &page, const char *title,
@@ -4284,11 +4293,11 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
   page.concat(FPSTR(HTTP_ITEM_REGULATOR));
   page.replace(F("{{L.R}}"), F(L_REGULATOR_TURN_ON_IF));
   page.replace(F("{{i.s0}}"), configuration->turnOnAbove == 0
-                               ? F(" selected=\"selected\"")
-                               : F(""));
+                                  ? F(" selected=\"selected\"")
+                                  : F(""));
   page.replace(F("{{i.s1}}"), configuration->turnOnAbove == 1
-                               ? F(" selected=\"selected\"")
-                               : F(""));
+                                  ? F(" selected=\"selected\"")
+                                  : F(""));
   sprintf(_value, "%-.4f", configuration->turnOn);
   page.replace(F("{{i.v}}"), _value);
   page.replace(F("{{i.n}}"), F("ta"));
@@ -4297,11 +4306,11 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
   page.concat(FPSTR(HTTP_ITEM_REGULATOR));
   page.replace(F("{{L.R}}"), F(L_REGULATOR_TURN_OFF_IF));
   page.replace(F("{{i.s0}}"), configuration->turnOffAbove == 0
-                               ? " selected=\"selected\""
-                               : "");
+                                  ? " selected=\"selected\""
+                                  : "");
   page.replace(F("{{i.s1}}"), configuration->turnOffAbove == 1
-                               ? F(" selected=\"selected\"")
-                               : F(""));
+                                  ? F(" selected=\"selected\"")
+                                  : F(""));
   sprintf(_value, "%-.4f", configuration->turnOff);
   page.replace(F("{{i.v}}"), _value);
   page.replace(F("{{i.n}}"), F("tb"));
@@ -4326,8 +4335,8 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
   item.replace(F("{{i.v}}"), F("255"));
   item.replace(F("{{i.l}}"), F(L_NONE));
   item.replace(F("{{i.s}}"), selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                              ? F(" selected=\"selected\"")
-                              : F(""));
+                                 ? F(" selected=\"selected\"")
+                                 : F(""));
 
   for (uint8_t i = 0;
        i < (generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS);
@@ -4335,11 +4344,11 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
     item.replace(F("{{i.v}}"), generatedADCGpios
-                                ? String(pgm_read_byte(GPIOS_ADC + i))
-                                : String(pgm_read_byte(GPIOS + i)));
+                                   ? String(pgm_read_byte(GPIOS_ADC + i))
+                                   : String(pgm_read_byte(GPIOS + i)));
     item.replace(F("{{i.l}}"), generatedADCGpios
-                                ? String(pgm_read_byte(GPIOS_ADC + i))
-                                : String(pgm_read_byte(GPIOS + i)));
+                                   ? String(pgm_read_byte(GPIOS_ADC + i))
+                                   : String(pgm_read_byte(GPIOS + i)));
     item.replace(F("{{i.s}}"),
                  selected == (generatedADCGpios ? pgm_read_byte(GPIOS_ADC + i)
                                                 : pgm_read_byte(GPIOS + i))
@@ -4360,8 +4369,8 @@ void AFESitesGenerator::addListOfMCP23XXXGPIOs(String &item, const char *field,
   item.replace(F("{{i.v}}"), String(AFE_HARDWARE_ITEM_NOT_EXIST));
   item.replace(F("{{i.l}}"), F(L_NONE));
   item.replace(F("{{i.s}}"), selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                              ? F(" selected=\"selected\"")
-                              : F(""));
+                                 ? F(" selected=\"selected\"")
+                                 : F(""));
   char gpioName[3];
 
   for (uint8_t i = 0; i < AFE_NUMBER_OF_MCP23017_GPIOS; i++) {
@@ -4372,8 +4381,8 @@ void AFESitesGenerator::addListOfMCP23XXXGPIOs(String &item, const char *field,
     item.replace(F("{{i.v}}"), String(pgm_read_byte(MCP23017_GPIOS_ID + i)));
     item.replace(F("{{i.l}}"), gpioName);
     item.replace(F("{{i.s}}"), selected == pgm_read_byte(MCP23017_GPIOS_ID + i)
-                                ? F(" selected=\"selected\"")
-                                : F(""));
+                                   ? F(" selected=\"selected\"")
+                                   : F(""));
   }
   item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
 }
@@ -4390,8 +4399,8 @@ void AFESitesGenerator::addMCP23XXXSelection(String &item, const char *field,
   item.replace(F("{{i.v}}"), String(AFE_HARDWARE_ITEM_NOT_EXIST));
   item.replace(F("{{i.l}}"), F(L_NONE));
   item.replace(F("{{i.s}}"), selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                              ? F(" selected=\"selected\"")
-                              : F(""));
+                                 ? F(" selected=\"selected\"")
+                                 : F(""));
 
   for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
 
