@@ -35,7 +35,7 @@ void setup() {
 #endif // ESP32/ESP8266
 
 /**
- * @brief Initializing SPIFFS file system
+ * @brief Initializing file system
  *
  */
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS

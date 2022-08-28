@@ -28,10 +28,10 @@ private:
 
   */
 
-  HPMA115S0_DATA buffer;
+  HPMA115S0_DATA *buffer = new HPMA115S0_DATA;
   boolean _initialized = false;
 
-  AFEUART UART;
+  AFEUART *UART = new AFEUART();
   unsigned long startTime = 0;
 
   boolean _measuremntsON = false;
@@ -41,8 +41,8 @@ private:
   boolean read(boolean expectingACK = false);
 
 public:
-  HPMA115S0 configuration;
-  HPMA115S0_DATA data;
+  HPMA115S0 *configuration = new HPMA115S0;
+  HPMA115S0_DATA *data = new HPMA115S0_DATA;
 
   /* Constructor */
   AFESensorHPMA115S0();

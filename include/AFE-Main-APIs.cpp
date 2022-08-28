@@ -98,13 +98,13 @@ void initializeMQTTAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     if (Device->configuration.noOfAnemometerSensors > 0) {
-      MqttAPI->addClass(&AnemometerSensor);
+      MqttAPI->addClass(AnemometerSensor);
     }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     if (Device->configuration.noOfRainmeterSensors > 0) {
-      MqttAPI->addClass(&RainSensor);
+      MqttAPI->addClass(RainSensor);
     }
 #endif
 
@@ -237,13 +237,13 @@ void initializeHTTPAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     if (Device->configuration.noOfAnemometerSensors > 0) {
-      HttpAPI->addClass(&AnemometerSensor);
+      HttpAPI->addClass(AnemometerSensor);
     }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     if (Device->configuration.noOfRainmeterSensors > 0) {
-      HttpAPI->addClass(&RainSensor);
+      HttpAPI->addClass(RainSensor);
     }
 #endif
 
@@ -377,13 +377,13 @@ void initializeHTTPDomoticzAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
     if (Device->configuration.noOfAnemometerSensors > 0) {
-      HttpDomoticzAPI->addClass(&AnemometerSensor);
+      HttpDomoticzAPI->addClass(AnemometerSensor);
     }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     if (Device->configuration.noOfRainmeterSensors > 0) {
-      HttpDomoticzAPI->addClass(&RainSensor);
+      HttpDomoticzAPI->addClass(RainSensor);
     }
 #endif
 

@@ -23,8 +23,8 @@ private:
   uint16_t temporaryAnalogData = 0;
 
 public:
-  ADCINPUT configuration;
-  ADCINPUT_DATA data;
+  ADCINPUT *configuration = new ADCINPUT;
+  ADCINPUT_DATA *data = new ADCINPUT_DATA;
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
   float batteryPercentage = 0;

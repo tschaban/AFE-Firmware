@@ -11,19 +11,19 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
   _Data = Data;
   _Sensor = Sensor;
   startTime = millis();
-  Data->getConfiguration(&configuration);
-  _Sensor->begin(configuration.sensitiveness);
+  Data->getConfiguration(configuration);
+  _Sensor->begin(configuration->sensitiveness);
   _initialized = true;
 
-  switch (configuration.impulseDistanceUnit) {
+  switch (configuration->impulseDistanceUnit) {
   case AFE_DISTANCE_CENTIMETER:
-    oneImpulseDistanceCM = configuration.impulseDistance;
+    oneImpulseDistanceCM = configuration->impulseDistance;
     break;
   case AFE_DISTANCE_METER:
-    oneImpulseDistanceCM = configuration.impulseDistance * 100;
+    oneImpulseDistanceCM = configuration->impulseDistance * 100;
     break;
   case AFE_DISTANCE_KILOMETER:
-    oneImpulseDistanceCM = configuration.impulseDistance * 1000;
+    oneImpulseDistanceCM = configuration->impulseDistance * 1000;
     break;
   default:
     _initialized = true;
@@ -32,7 +32,7 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
            << F("ERROR: Anemometer sensor NOT initialized. Wrong distance unit "
                 "for "
                 "impulse: ")
-           << configuration.impulseDistanceUnit;
+           << configuration->impulseDistanceUnit;
 #endif
     break;
   }
@@ -41,13 +41,13 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Anemometer sensor initialized and working") << endl
-           << F(" - GPIO: ") << configuration.gpio << endl
-           << F(" - Interval: ") << configuration.interval << endl
-           << F(" - 1 impulse distance: ") << configuration.impulseDistance
+           << F(" - GPIO: ") << configuration->gpio << endl
+           << F(" - Interval: ") << configuration->interval << endl
+           << F(" - 1 impulse distance: ") << configuration->impulseDistance
            << endl
            << F(" - 1 impulse distance unit: ")
-           << configuration.impulseDistanceUnit << endl
-           << F(" - Boucing: ") << configuration.sensitiveness;
+           << configuration->impulseDistanceUnit << endl
+           << F(" - Boucing: ") << configuration->sensitiveness;
 #endif
   }
 
@@ -57,7 +57,7 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
 boolean AFEAnemometer::listener(void) {
   boolean _ret = false;
   if (_initialized) {
-    if ((millis() - startTime >= configuration.interval * 1000)) {
+    if ((millis() - startTime >= configuration->interval * 1000)) {
 
       uint32_t noOfImpulses;
       uint32_t duration;

@@ -6,8 +6,10 @@
 unsigned long debugStartTime = 0;
 
 void debugListener();
-void getAvailableMem(); 
+void getAvailableMem();
+#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
 void getFileSystemInfo();
+#endif
 void getESPInformation();
 
 void debugListener() {
@@ -19,17 +21,19 @@ void debugListener() {
 
   if (time - debugStartTime >= DEBUG_INTERVAL * 1000) {
     getAvailableMem();
+#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
     getFileSystemInfo();
+#endif
     debugStartTime = 0;
   }
 }
 
 void getAvailableMem() {
   Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-         << F("kB");
+         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024 << F("kB");
 }
 
+#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
 void getFileSystemInfo() {
   FSInfo fileSystem;
   SPIFFS.info(fileSystem);
@@ -38,6 +42,7 @@ void getFileSystemInfo() {
          << F("kB from ") << fileSystem.totalBytes / 1024 << F("kB")
          << F(" Max.open files ") << fileSystem.maxOpenFiles;
 }
+#endif
 
 void getESPInformation() {
 

@@ -21,7 +21,7 @@ class AFEMCP23017Broker {
 private:
   TwoWire *_WirePort0;
 #ifdef AFE_ESP32
-  TwoWire _WirePort0;
+  TwoWire *_WirePort1;
 #endif
 
   MCP23XXX configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];

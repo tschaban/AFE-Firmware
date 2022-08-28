@@ -20,8 +20,8 @@ void initializeI2CBUS(void) {
   boolean success = false;
 
 #ifdef AFE_ESP32
-  if (Device.configuration.noOfI2Cs > 0) {
-    Data.getConfiguration(0, &I2CBUSConfiguration);
+  if (Device->configuration.noOfI2Cs > 0) {
+    Data->getConfiguration(0, &I2CBUSConfiguration);
 
 #ifdef DEBUG
     Serial << endl
@@ -59,8 +59,8 @@ void initializeI2CBUS(void) {
 #ifdef AFE_ESP32
   }
 
-  if (Device.configuration.noOfI2Cs > 1) {
-    Data.getConfiguration(1, &I2CBUSConfiguration);
+  if (Device->configuration.noOfI2Cs > 1) {
+    Data->getConfiguration(1, &I2CBUSConfiguration);
 
 #ifdef DEBUG
     Serial << endl

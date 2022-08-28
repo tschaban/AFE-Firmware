@@ -21,7 +21,6 @@
  * - ESP32
  */
 
-#include <avr/pgmspace.h>
 #include <AFE-Configuration.h>
 
 /* Includes libraries for debugging in development compilation only */

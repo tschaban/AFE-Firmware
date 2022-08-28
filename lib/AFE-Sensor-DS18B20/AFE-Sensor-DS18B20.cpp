@@ -8,18 +8,18 @@ AFESensorDS18B20::AFESensorDS18B20(){};
 
 void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   _Data->getConfiguration(id, configuration);
-  WireBUS.begin(configuration->gpio);
-  Sensor.setOneWire(&WireBUS);
-  Sensor.begin();
+  WireBUS->begin(configuration->gpio);
+  Sensor->setOneWire(WireBUS);
+  Sensor->begin();
 
-  if (Sensor.isConnected(configuration->address)) {
+  if (Sensor->isConnected(configuration->address)) {
     _initialized = true;
-     Sensor.setResolution(configuration->resolution);
+     Sensor->setResolution(configuration->resolution);
 #ifdef DEBUG
     char addressTxt[17];
     addressToChar(configuration->address, addressTxt);
     Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] initialized");    
-    Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] resolution: ") << Sensor.getResolution() << F(" bits");
+    Serial << endl << F("INFO: Sensor DS18B20[") << addressTxt << F("] resolution: ") << Sensor->getResolution() << F(" bits");
 
 #endif
   } else {
@@ -47,14 +47,14 @@ float AFESensorDS18B20::getCurrentTemperature() {
       readTimeOut = millis();
     }
 
-    if (Sensor.isConnected(configuration->address)) {
+    if (Sensor->isConnected(configuration->address)) {
 
-      Sensor.requestTemperaturesByAddress(configuration->address);
+      Sensor->requestTemperaturesByAddress(configuration->address);
 
       do {
         temperature = configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                          ? Sensor.getTempC(configuration->address)
-                          : Sensor.getTempF(configuration->address);
+                          ? Sensor->getTempC(configuration->address)
+                          : Sensor->getTempF(configuration->address);
         if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT) {
           break;
         }
@@ -117,10 +117,10 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
   Serial << endl << F("INFO: Scanning for DS18B20 sensors on GPIO: ") << gpio;
   Serial << endl << F(" - Wire Bus initialized");
 #endif
-  Sensor.setOneWire(&WireBUS);
-  WireBUS.begin(gpio);
-  Sensor.begin();
-  numberOfDevicesOnBus = Sensor.getDS18Count();
+  Sensor->setOneWire(WireBUS);
+  WireBUS->begin(gpio);
+  Sensor->begin();
+  numberOfDevicesOnBus = Sensor->getDS18Count();
 #ifdef DEBUG
   Serial << endl
          << F(" - Number of detected DS18B20 sensors: ") << numberOfDevicesOnBus;
@@ -141,7 +141,7 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
     DeviceAddress _address;
 
     for (uint8_t i = 0; i < numberOfDevicesOnBus; i++) {
-      Sensor.getAddress(_address, i);
+      Sensor->getAddress(_address, i);
 
       if (_address[0] != 0) {
         if (i == 0 || (i > 0 && (memcmp(addresses[i - 1], _address,
@@ -162,8 +162,8 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
              << addresses[i][4] << F(":") << addresses[i][5] << F(":")
              << addresses[i][6] << F(":") << addresses[i][7];
 
-      Sensor.requestTemperatures();
-      Serial << endl << F(" - Temperature : ") << Sensor.getTempC(addresses[i]);
+      Sensor->requestTemperatures();
+      Serial << endl << F(" - Temperature : ") << Sensor->getTempC(addresses[i]);
 
 #endif
     }

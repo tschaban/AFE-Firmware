@@ -8,7 +8,7 @@ AFEMCP23017Broker::AFEMCP23017Broker(){};
 
 #ifdef AFE_ESP32
 void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
-                              TwoWire *WirePort0, woWire *WirePort1) {
+                              TwoWire *WirePort0, TwoWire *WirePort1) {
 #else
 void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
                               TwoWire *WirePort0) {
@@ -44,7 +44,7 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
 #endif
 
 #ifdef AFE_ESP32
-      if (begin_I2C(configuration[i].address,
+      if (MCP[i].begin_I2C(configuration[i].address,
                     configuration[i].wirePortId == AFE_CONFIG_HARDWARE_I2C_0
                         ? _WirePort0
                         : _WirePort1))

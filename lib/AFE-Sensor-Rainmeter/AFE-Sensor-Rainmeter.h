@@ -16,9 +16,9 @@
 class AFERainmeter {
 
 public:
-  RAINMETER configuration;
+  RAINMETER *configuration = new RAINMETER;
   
-  RAINMETER_DATA current;
+  RAINMETER_DATA *current = new RAINMETER_DATA;
   float rainLevelLast1Minute = 0;
   float rainLevelLastHour = 0;
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ

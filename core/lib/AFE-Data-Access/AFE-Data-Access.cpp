@@ -3845,7 +3845,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION0
+         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS

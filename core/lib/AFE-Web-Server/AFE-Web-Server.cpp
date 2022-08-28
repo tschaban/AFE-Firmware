@@ -384,7 +384,7 @@ boolean AFEWebServer::generate(boolean upload) {
           PRO_VERSION configuration;
           get(configuration);
           Data->saveConfiguration(&configuration);
-          //sprintf(RestAPI->Pro->serial, "%s", configuration.serial);
+          // sprintf(RestAPI->Pro->serial, "%s", configuration.serial);
           sprintf(FirmwarePro->Pro.serial, "%s", configuration.serial);
           FirmwarePro->validate();
           configuration = {0};
@@ -702,8 +702,8 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 
       String page;
-/* page.reserve(AFE_MAX_PAGE_SIZE);
-*/
+      /* page.reserve(AFE_MAX_PAGE_SIZE);
+      */
       server.sendHeader(F("Cache-Control"), F("no-cache"));
       server.setContentLength(CONTENT_LENGTH_UNKNOWN);
 
@@ -717,8 +717,8 @@ boolean AFEWebServer::generate(boolean upload) {
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: RAM: ")
-             << system_get_free_heap_size() / 1024 << F("kB: header + menu generated");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: header + menu generated");
 #endif
 
       page = "";
@@ -729,10 +729,9 @@ boolean AFEWebServer::generate(boolean upload) {
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: RAM: ")
-             << system_get_free_heap_size() / 1024 << F("kB: content generated");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: content generated");
 #endif
-
 
       page = "";
       Site.generateFooter(page, (Device->getMode() == AFE_MODE_NORMAL ||
@@ -744,26 +743,24 @@ boolean AFEWebServer::generate(boolean upload) {
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: RAM: ")
-             << system_get_free_heap_size() / 1024 << F("kB: footer generated");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: footer generated");
 #endif
-
 
       server.sendContent("");
       page = "";
 
 #if defined(DEBUG) && !defined(ESP32)
       Serial << endl
-             << F("INFO: RAM: ")
-             << system_get_free_heap_size() / 1024 << F("kB: site generated and published");
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: site generated and published");
 #endif
 
-  if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
-       Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-      Device->configuration.timeToAutoLogOff > 0) {
-    howLongInConfigMode = millis();
-  }
-
+      if ((Device->getMode() == AFE_MODE_CONFIGURATION ||
+           Device->getMode() == AFE_MODE_ACCESS_POINT) &&
+          Device->configuration.timeToAutoLogOff > 0) {
+        howLongInConfigMode = millis();
+      }
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
       if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
@@ -959,7 +956,11 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 #ifdef DEBUG
   Serial << endl << F("INFO: UPGRADE WAN: Connecting to: api.smartnydom.pl");
 #endif
+#ifdef AFE_ESP32
+  if (WirelessClient.connect("api.smartnydom.pl", 80)) {
+#else
   if (WirelessClient.connect(F("api.smartnydom.pl"), 80)) {
+#endif
 
 #ifdef DEBUG
     Serial << F("... connected") << endl

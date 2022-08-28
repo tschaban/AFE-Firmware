@@ -22,6 +22,9 @@ void initializeRelay(void) {
     // @TODO T5  does not have to be set for Relay controlling a Gate
     Relay[i].setRelayAfterRestoringPower();
   }
+#ifdef DEBUG
+  Serial << endl << F("INFO: BOOT: Relay initialized");
+#endif
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
@@ -44,9 +47,6 @@ void relayEventsListener(void) {
     }
 #endif
   }
-#ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Relay initialized");
-#endif
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 

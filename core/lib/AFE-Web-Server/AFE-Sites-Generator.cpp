@@ -1981,7 +1981,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   page.concat(FPSTR(HTTP_ITEM_HINT));
-  page.replace("{{i.h}}", F(L_CONTACTRON_SET_SENSITIVENESS));
+  page.replace(F("{{i.h}}"), F(L_CONTACTRON_SET_SENSITIVENESS));
 
   /* Item: bouncing */
   char _number[5];
@@ -2327,9 +2327,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   page.concat(F("<input type=\"submit\" class=\"b bw\" value=\""));
-
   page.concat(F(L_BMEX80_REFRESH_SETTINGS));
-  page.concat(F(""\"><br><br>"));
+  page.concat(F("\"><br><br>"));
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
@@ -4197,7 +4196,7 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{u}}"), F(AFE_API_URL));
   page->replace(F("{{d}}"), Device->configuration.name);
 
-  page->replace("{{s.lang}}", F(L_LANGUAGE_SHORT));
+  page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
 }
 
 void AFESitesGenerator::openSection(String &page, const char *title,
@@ -4315,54 +4314,18 @@ void AFESitesGenerator::addRegulatorControllerItem(String &page,
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-/*void AFESitesGenerator::addListOfGPIOs(String &item,
-                                       const __FlashStringHelper *field,
-                                       uint8_t selected, const char *title,
-                                       ) {
-
-  item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
-  item.replace("{{i.n}}", field);
-  item.replace("{{i.l}}", title);
-  item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
-  item.replace("{{i.l}}", F(L_NONE));
-  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
-                              ? F(" selected=\"selected\"")
-                              : F(""));
-
-  for (uint8_t i = 0;
-       i < generatedADCGpios ? AFE_NUMBER_OF_ADC_GPIOS : AFE_NUMBER_OF_GPIOS;
-       i++) {
-    item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-
-    item.replace("{{i.v}}", String(pgm_read_byte(
-                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
-i)));
-    item.replace("{{i.l}}", String(pgm_read_byte(
-                                (generatedADCGpios ? GPIOS_ADC : GPIOS) +
-i)));
-    item.replace(
-        "{{i.s}}",
-        selected == pgm_read_byte((generatedADCGpios ? GPIOS_ADC : GPIOS) + i)
-            ? F(" selected=\"selected\"")
-            : F(""));
-  }
-  item.concat(FPSTR(HTTP_ITEM_SELECT_CLOSE));
-}
-*/
-
 void AFESitesGenerator::addListOfGPIOs(String &item,
                                        const __FlashStringHelper *field,
                                        uint8_t selected, const char *title,
                                        boolean generatedADCGpios) {
 
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPEN));
-  item.replace("{{i.n}}", field);
-  item.replace("{{i.l}}", title);
+  item.replace(F("{{i.n}}"), field);
+  item.replace(F("{{i.l}}"), title);
   item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
-  item.replace("{{i.v}}", String(AFE_HARDWARE_ITEM_NOT_EXIST));
-  item.replace("{{i.l}}", F(L_NONE));
-  item.replace("{{i.s}}", selected == AFE_HARDWARE_ITEM_NOT_EXIST
+  item.replace(F("{{i.v}}"), F("255"));
+  item.replace(F("{{i.l}}"), F(L_NONE));
+  item.replace(F("{{i.s}}"), selected == AFE_HARDWARE_ITEM_NOT_EXIST
                               ? F(" selected=\"selected\"")
                               : F(""));
 
@@ -4371,13 +4334,13 @@ void AFESitesGenerator::addListOfGPIOs(String &item,
        i++) {
     item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
 
-    item.replace("{{i.v}}", generatedADCGpios
+    item.replace(F("{{i.v}}"), generatedADCGpios
                                 ? String(pgm_read_byte(GPIOS_ADC + i))
                                 : String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.l}}", generatedADCGpios
+    item.replace(F("{{i.l}}"), generatedADCGpios
                                 ? String(pgm_read_byte(GPIOS_ADC + i))
                                 : String(pgm_read_byte(GPIOS + i)));
-    item.replace("{{i.s}}",
+    item.replace(F("{{i.s}}"),
                  selected == (generatedADCGpios ? pgm_read_byte(GPIOS_ADC + i)
                                                 : pgm_read_byte(GPIOS + i))
                      ? F(" selected=\"selected\"")

@@ -25,11 +25,11 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
 void AFEJSONRPC::generateMessage(String &message, const char *method,
                                  const char *params) {
   message = FPSTR(JSONRPC_MESSAGE);
-  message.replace("{{json.method}}", method);
+  message.replace(F("{{json.method}}"), method);
   if (strlen(params) > 0) {
-    message.replace("{{json.params}}", params);
+    message.replace(F("{{json.params}}"), params);
   } else {
-    message.replace("{{json.params}}", F("{}"));
+    message.replace(F("{{json.params}}"), F("{}"));
   }
 
 #ifdef DEBUG
