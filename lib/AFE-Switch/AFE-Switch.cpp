@@ -14,57 +14,31 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data, AFELED *_LED) {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
-  _Data->getConfiguration(id, &configuration);
+  _Data->getConfiguration(id, configuration);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   // If MCP23017 available in the HW, checking if LED connected using MCP23017
-  if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        configuration.mcp23017.address !=
-            AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
-
-      if (_MCP23017ReferenceAdded) {
-
-        _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
-        if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-#ifdef DEBUG
-          Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
-#endif
-
-          _MCP23017Broker->MCP[_MCP23017Id].pinMode(configuration.mcp23017.gpio,
-                                                    INPUT);
-          _MCP23017Broker->MCP[_MCP23017Id].pullUp(configuration.mcp23017.gpio,
-                                                   HIGH);
-
-          state =
-              _MCP23017Broker->MCP[_MCP23017Id].digitalRead(configuration.mcp23017.gpio);
+  if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+        configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
 #ifdef DEBUG
-          Serial
-              << endl
-              << F("INFO: SWITCH: initial state of MCP23017 connecte switch: ")
-              << state;
+      Serial << endl << F("INFO: SWITCH: Initializing with MCP23017");
 #endif
 
-          _expanderUsed = true;
+      _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
+                                                INPUT_PULLUP);
 
-        }
+      state = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
+          configuration->mcp23017.gpio);
+
 #ifdef DEBUG
-        else {
-          Serial << endl
-                 << F("WARN: SWITCH: MCP23017[0x")
-                 << _HEX(configuration.mcp23017.address)
-                 << F("] not found in cache");
-        }
-#endif
-      }
-#ifdef DEBUG
-      else {
-        Serial << endl
-               << F("WARN: SWITCH: Reference to MCP23017 has not been added");
-      }
+      Serial << endl
+             << F("INFO: SWITCH: initial state of MCP23017 connecte switch: ")
+             << state;
 #endif
 
+      _expanderUsed = true;
     }
 #ifdef DEBUG
     else {
@@ -72,20 +46,18 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
     }
 #endif
   } else {
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH_GPIO_DIGIT_INPUT
-  pinMode(configuration.gpio, INPUT);
+    pinMode(configuration->gpio, INPUT);
 #else
-  pinMode(configuration.gpio, INPUT_PULLUP);
+  pinMode(configuration->gpio, INPUT_PULLUP);
 #endif
-  state = digitalRead(configuration.gpio);
+    state = digitalRead(configuration->gpio);
 
-
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   previousState = state;
   phisicallyState = state;
@@ -93,10 +65,9 @@ void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
   _initialized = true;
 }
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFESwitch::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
-  _MCP23017ReferenceAdded = true;
 }
 #endif
 
@@ -152,16 +123,16 @@ boolean AFESwitch::is30s() {
 void AFESwitch::listener() {
   if (_initialized) {
     boolean currentState;
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     if (_expanderUsed) {
-      currentState = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-          configuration.mcp23017.gpio);
+      currentState = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
+          configuration->mcp23017.gpio);
     } else {
 #endif
 
-      currentState = digitalRead(configuration.gpio);
+      currentState = digitalRead(configuration->gpio);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }
 #endif
 
@@ -174,10 +145,10 @@ void AFESwitch::listener() {
       }
 
       if (time - startTime >=
-          configuration.sensitiveness) { // switch prssed, sensitiveness
+          configuration->sensitiveness) { // switch prssed, sensitiveness
                                          // taken into account, processing
                                          // event
-        if (configuration.type == AFE_SWITCH_TYPE_MONO) {
+        if (configuration->type == AFE_SWITCH_TYPE_MONO) {
 
           if (!_pressed) { // This is set only once when switch is pressed
             state = !state;
@@ -189,7 +160,7 @@ void AFESwitch::listener() {
 
           /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds
            */
-          if (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
+          if (configuration->functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
             if (time - startTime >= 35000) {
@@ -236,9 +207,9 @@ void AFESwitch::listener() {
       //  Serial << endl << F("press=") << pressed << F(" _press=") << _pressed;
 
     } else if (currentState == previousState && startTime > 0 &&
-               configuration.type == AFE_SWITCH_TYPE_MONO) {
+               configuration->type == AFE_SWITCH_TYPE_MONO) {
       /* Code only for Mulitifunction switch: pressed for 5 and 10 seconds */
-      if (configuration.functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
+      if (configuration->functionality == AFE_SWITCH_FUNCTIONALITY_MULTI) {
 
         if (time - startTime >= 5000 && time - startTime < 10000) {
           pressed4fiveSeconds = true;

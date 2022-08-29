@@ -1,7 +1,7 @@
 #ifndef _AFE_Webforms_h
 #define _AFE_Webforms_h
 
-#define AFE_MAX_PAGE_SIZE 12000
+#define AFE_MAX_PAGE_SIZE 16000
 
 /* Types of URL requests */
 #define AFE_SERVER_CMD_SAVE 1
@@ -72,5 +72,5 @@
 #define AFE_CONFIG_SITE_FIRMWARE 45
 #define AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION 46
 #define AFE_CONFIG_SITE_INDEX_MONITOR 47
-
+#define AFE_CONFIG_SITE_MCP23XXX 48
 #endif // _AFE_Webforms_h

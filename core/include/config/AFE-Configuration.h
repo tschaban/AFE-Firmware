@@ -12,7 +12,6 @@
 #ifndef _AFE_Configuration_h
 #define _AFE_Configuration_h
 
-
 /* Serial port speed */
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
@@ -421,7 +420,7 @@
  * @brief include MCP23017 configuration parameters
  * 
  */
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <hardwares/AFE-MCP23017.h>
 #endif
 

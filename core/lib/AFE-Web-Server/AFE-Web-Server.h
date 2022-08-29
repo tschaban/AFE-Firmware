@@ -43,7 +43,6 @@
 #include <Streaming.h>
 #endif
 
-
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
   boolean twoColumns = true;
@@ -75,16 +74,28 @@ private:
 #endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_I2C
 
-  // It stores last HTTP API request
+  /**
+   * @brief  It stores last HTTP API request
+   *
+   */
   HTTPCOMMAND httpCommand;
-  // Once HTTP API requet is recieved it's set to true
+  /**
+   * @brief Once HTTP API requet is recieved it's set to true
+   *
+   */
   boolean receivedHTTPCommand = false;
 
-  /* when it's set to true device configuration is refreshed. Required by
-   * generate() method */
+  /**
+   * @brief when it's set to true device configuration is refreshed. Required by
+   * generate() method
+   *
+   */
   boolean _refreshConfiguration = false;
 
-  /* Used to auto-logoff from the config panel */
+  /**
+   * @brief Used to auto-logoff from the config panel
+   *
+   */
   unsigned long howLongInConfigMode = 0;
 
   AFESitesGenerator Site;
@@ -95,7 +106,11 @@ private:
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_LED || AFE_CONFIG_HARDWARE_I2C
 
-  /* Method gets url Option parameter value */
+  /**
+   * @brief Method gets url Option parameter value
+   *
+   * @return boolean
+   */
   boolean getOptionName();
 
   uint8_t getOption();
@@ -103,10 +118,20 @@ private:
   uint8_t getSiteID();
   uint8_t getID();
 
-  /* Generates HTML response (site) */
+  /**
+   * @brief Generates HTML response (site)
+   *
+   * @param  siteConfig       desc
+   * @param  page             desc
+   * @return String
+   */
   String generateSite(AFE_SITE_PARAMETERS *siteConfig, String &page);
 
-  /* Methods get POST data (for saveing) */
+  /**
+   * @brief Methods get POST data (for saveing)
+   *
+   * @param  data             desc
+   */
   void get(DEVICE &data);
   void get(NETWORK &data);
   void get(MQTT &data);
@@ -207,32 +232,33 @@ private:
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-/**
- * @brief Gets RGB LED configuration parameters from HTML form
- * 
- * @param  data Configuration data
- */
+  /**
+   * @brief Gets RGB LED configuration parameters from HTML form
+   *
+   * @param  data Configuration data
+   */
   void get(CLED &data);
 
-/**
- * @brief Gets RGB LED Blinking effect configuration parameters from HTML form
- * 
- * @param  data Configuration data
- */
+  /**
+   * @brief Gets RGB LED Blinking effect configuration parameters from HTML form
+   *
+   * @param  data Configuration data
+   */
   void get(CLED_EFFECT_BLINKING &data);
 
-/**
- * @brief Gets RGB LED Wave effect configuration parameters from HTML form
- * 
- * @param  data Configuration data
- */
+  /**
+   * @brief Gets RGB LED Wave effect configuration parameters from HTML form
+   *
+   * @param  data Configuration data
+   */
   void get(CLED_EFFECT_WAVE &data);
 
-/**
- * @brief Gets RGB LED Fade In/Out effect configuration parameters from HTML form
- * 
- * @param  data Configuration data
- */
+  /**
+   * @brief Gets RGB LED Fade In/Out effect configuration parameters from HTML
+   * form
+   *
+   * @param  data Configuration data
+   */
   void get(CLED_EFFECT_FADE_INOUT &data);
 
 #endif // AFE_CONFIG_HARDWARE_CLED
@@ -240,6 +266,14 @@ private:
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   void get(TSL2561 &data);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+/**
+ * @brief Gets MCP23XXX onfiguration parameters from HTML form
+ *
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  void get(MCP23XXX &data);
+#endif
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
@@ -256,10 +290,10 @@ public:
 
   AFEWebServer();
 
-  /* Method pushes HTML site from WebServer */
-  void publishHTML(const String &page);
-
-/* Method initialize WebServer and Updater server */
+/**
+ * @brief Method initialize WebServer and Updater server
+ *
+ */
 #if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
              AFELED *);
@@ -284,29 +318,52 @@ public:
   void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_LED
-  /* Method inherits global system LED */
+  /**
+   * @brief Method inherits global system LED
+   *
+   */
   void initSystemLED(AFELED *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
-  /* Method listens for HTTP requests */
+  /**
+   * @brief Method listens for HTTP requests
+   *
+   */
   void listener();
 
 #ifdef AFE_ESP32
-  /* Method listens for onNotFound */
+  /**
+   * @brief Method listens for onNotFound
+   *
+   * @param  fn               desc
+   */
   void onNotFound(WebServer::THandlerFunction fn);
 
-  /* Method adds URL for listen */
+  /**
+   * @brief Method adds URL for listen
+   *
+   * @param  uri              desc
+   * @param  handler          desc
+   */
   void handle(const char *uri, WebServer::THandlerFunction handler);
   void handleFirmwareUpgrade(const char *uri,
                              WebServer::THandlerFunction handlerUpgrade,
                              WebServer::THandlerFunction handlerUpload);
 #else // ESP8266
-  /* Method listens for onNotFound */
+  /**
+   * @brief Method listens for onNotFound
+   *
+   * @param  fn               desc
+   */
   void onNotFound(ESP8266WebServer::THandlerFunction fn);
 
-  /* Method adds URL for listen */
+  /**
+   * @brief Method adds URL for listen
+   *
+   * @param  uri              desc
+   * @param  handler          desc
+   */
   void handle(const char *uri, ESP8266WebServer::THandlerFunction handler);
   void handleFirmwareUpgrade(const char *uri,
                              ESP8266WebServer::THandlerFunction handlerUpgrade,
@@ -316,23 +373,34 @@ public:
 
   String getHeaderValue(String header, String headerName);
 
-  /* Method generate HTML side. It reads also data from HTTP requests
-   * arguments
-   * and pass them to Configuration Panel class.
-   * True: site generated
-   * False: HTTP API */
+  /**
+   * @brief Method generate HTML side. It reads also data from HTTP requests
+   * arguments and pass them to Configuration Panel class.
+   * @param  upload           desc
+   * @return boolean True: site generated, False: HTTP API
+   */
+
   boolean generate(boolean upload = false);
 
-  /* Method listens for HTTP API requests. If get True command is in
-   * httpCommand
+  /**
+   * @brief Method listens for HTTP API requests.
+   *
+   * @return boolean If True command is in httpCommand
    */
   boolean httpAPIlistener();
 
-  /* Method reads HTTP API Command */
+  /**
+   * @brief Method reads HTTP API Command
+   *
+   * @return HTTPCOMMAND
+   */
   HTTPCOMMAND getHTTPCommand();
 
-  /* Method pushes JSON response to HTTP API request */
-  // void sendJSON(String json);
+  /**
+   * @brief Method pushes JSON response to HTTP API request
+   *
+   * @param  json             desc
+   */
   void sendJSON(const String &json);
 };
 

@@ -7,22 +7,22 @@ AFESensorHPMA115S0::AFESensorHPMA115S0(){};
 
 void AFESensorHPMA115S0::begin(uint8_t id) {
   AFEDataAccess Data;
-  Data.getConfiguration(id, &configuration);
+  Data.getConfiguration(id, configuration);
 
   /* Opening Serial port */
-  UART.begin();
+  UART->begin();
 
   /* Clean transmit buffer */
-  UART.SerialBus.flush();
+  UART->SerialBus.flush();
   _initialized = true;
 
-  data.pm10 = data.pm25 = buffer.pm10 = buffer.pm25 = 0;
+  data->pm10 = data->pm25 = buffer->pm10 = buffer->pm25 = 0;
 
 #if defined(DEBUG)
   Serial << endl << endl << F("----- HPMA115S0: Initializing -----");
-  Serial << endl << F("Cleaning serial. Size=") << UART.SerialBus.available();
+  Serial << endl << F("Cleaning serial. Size=") << UART->SerialBus.available();
 #endif
-  UART.clean();
+  UART->clean();
 
 #if defined(DEBUG)
   Serial << endl << F("Turning Autosending: OFF");
@@ -32,14 +32,14 @@ void AFESensorHPMA115S0::begin(uint8_t id) {
   sendCommand(commandAutoOFF);
 
 #if defined(DEBUG)
-  Serial << endl << F("Cleaning serial. Size=") << UART.SerialBus.available();
+  Serial << endl << F("Cleaning serial. Size=") << UART->SerialBus.available();
 #endif
 
   /* Clean buffer */
-  UART.clean();
+  UART->clean();
 
   /* Turning on / off the device */
-  if (configuration.timeToMeasure == 0) {
+  if (configuration->timeToMeasure == 0) {
     sendCommand(commandTurnON) ? _measuremntsON = true : _measuremntsON = false;
   } else {
     sendCommand(commandTurnOFF) ? _measuremntsON = true
@@ -61,26 +61,26 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
 #ifdef DEBUG
   Serial << endl
          << F("UART: Size of a data in the buffer =")
-         << UART.SerialBus.available();
+         << UART->SerialBus.available();
 #endif
 
-  // UART.SerialBus.print("UART: Size of a data in the buffer =");
-  // UART.SerialBus.println(UART.SerialBus.available());
+  // UART->SerialBus.print("UART: Size of a data in the buffer =");
+  // UART->SerialBus.println(UART->SerialBus.available());
 
-  /* Wait for a data from UART. Max 1 sec */
-  while (UART.SerialBus.available() == 0 && millis() - start < 1000) {
+  /* Wait for a data from UART-> Max 1 sec */
+  while (UART->SerialBus.available() == 0 && millis() - start < 1000) {
   }
 
 #ifdef DEBUG
-  if (UART.SerialBus.available() > 0) {
+  if (UART->SerialBus.available() > 0) {
     Serial << endl << F("UART Raw data: ");
   }
 #endif
 
-  if (UART.SerialBus.available() > 0) {
+  if (UART->SerialBus.available() > 0) {
 
-    while (UART.SerialBus.available() > 0 && index < responseSize) {
-      responseBuffer[index] = UART.SerialBus.read();
+    while (UART->SerialBus.available() > 0 && index < responseSize) {
+      responseBuffer[index] = UART->SerialBus.read();
 
 #ifdef DEBUG
       Serial << F(" ");
@@ -166,11 +166,11 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
         checkSumToCompare = (65536 - checkSumToCompare) % 256;
 
         if (checkSumToCompare == responseBuffer[counter]) {
-          buffer.pm25 = responseBuffer[3] * 256 + responseBuffer[4];
-          buffer.pm10 = responseBuffer[5] * 256 + responseBuffer[6];
+          buffer->pm25 = responseBuffer[3] * 256 + responseBuffer[4];
+          buffer->pm10 = responseBuffer[5] * 256 + responseBuffer[6];
 #ifdef DEBUG
-          Serial << F(" Success (PM2.5=") << buffer.pm25 << F("ug/m3, ")
-                 << F("PM10=") << buffer.pm10 << F("ug/m3)");
+          Serial << F(" Success (PM2.5=") << buffer->pm25 << F("ug/m3, ")
+                 << F("PM10=") << buffer->pm10 << F("ug/m3)");
 #endif
           return expectingACK ? false : true;
         } else {
@@ -194,11 +194,11 @@ boolean AFESensorHPMA115S0::read(boolean expectingACK) {
 
         if (checkSumToCompare == checksum) {
           // calculate PM values
-          buffer.pm25 = responseBuffer[6] * 256 + responseBuffer[7];
-          buffer.pm10 = responseBuffer[8] * 256 + responseBuffer[9];
+          buffer->pm25 = responseBuffer[6] * 256 + responseBuffer[7];
+          buffer->pm10 = responseBuffer[8] * 256 + responseBuffer[9];
 #ifdef DEBUG
-          Serial << F(" Success (PM2.5=") << buffer.pm25 << F("ug/m3, ")
-                 << F("PM10=") << buffer.pm10 << F("ug/m3)");
+          Serial << F(" Success (PM2.5=") << buffer->pm25 << F("ug/m3, ")
+                 << F("PM10=") << buffer->pm10 << F("ug/m3)");
 #endif
           return expectingACK ? false : true;
         } else {
@@ -227,7 +227,7 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
                                         uint8_t howManyTimesRetry) {
 
   uint8_t counter = 0;
-  UART.send(command);
+  UART->send(command);
   boolean _ret = read(true);
 
 #ifdef DEBUG
@@ -239,8 +239,8 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
   if (!_ret) {
     if (howManyTimesRetry > 0) {
       while (!_ret && counter < howManyTimesRetry) {
-        // UART.send(commandAutoOFF);
-        UART.send(command);
+        // UART->send(commandAutoOFF);
+        UART->send(command);
         _ret = read(true);
         counter++;
       }
@@ -252,7 +252,7 @@ boolean AFESensorHPMA115S0::sendCommand(const uint8_t *command,
 boolean AFESensorHPMA115S0::listener() {
   boolean ready = false;
   if (_initialized) {
-    if ((millis() - startTime >= configuration.interval * 1000) &&
+    if ((millis() - startTime >= configuration->interval * 1000) &&
         _measuremntsON) {
 #if defined(DEBUG)
       Serial << endl << endl << F("----- HPMA115S0: Reading -----");
@@ -260,7 +260,7 @@ boolean AFESensorHPMA115S0::listener() {
 #endif
       startTime = millis();
 
-//      UART.send(commandTurnON);
+//      UART->send(commandTurnON);
 //      read() ? _measuremntsON = true : _measuremntsON = false;
 
 #if defined(DEBUG)
@@ -268,16 +268,16 @@ boolean AFESensorHPMA115S0::listener() {
              << F("Device is: ") << (_measuremntsON ? F("ON") : F("OFF"));
 #endif
 
-      UART.send(commandRead);
+      UART->send(commandRead);
       if (read()) {
-        data.pm25 = buffer.pm25;
-        data.pm10 = buffer.pm10;
-        if (data.pm25 != 0 || data.pm10 != 0) {
-          data.whoPM25Norm = configuration.whoPM25Norm > 0
-                                 ? 100 / configuration.whoPM25Norm * data.pm25
+        data->pm25 = buffer->pm25;
+        data->pm10 = buffer->pm10;
+        if (data->pm25 != 0 || data->pm10 != 0) {
+          data->whoPM25Norm = configuration->whoPM25Norm > 0
+                                 ? 100 / configuration->whoPM25Norm * data->pm25
                                  : 0;
-          data.whoPM10Norm = configuration.whoPM10Norm > 0
-                                 ? 100 / configuration.whoPM10Norm * data.pm10
+          data->whoPM10Norm = configuration->whoPM10Norm > 0
+                                 ? 100 / configuration->whoPM10Norm * data->pm10
                                  : 0;
 
           ready = true;
@@ -285,8 +285,8 @@ boolean AFESensorHPMA115S0::listener() {
       }
 
       /* Put a sensor to a sleep mode */
-      if (configuration.timeToMeasure > 0) {
-        UART.send(commandTurnOFF);
+      if (configuration->timeToMeasure > 0) {
+        UART->send(commandTurnOFF);
         read(true) ? _measuremntsON = false : _measuremntsON = true;
       }
 #if defined(DEBUG)
@@ -297,7 +297,7 @@ boolean AFESensorHPMA115S0::listener() {
     }
     /* Wake up sensor */
     else if (millis() - startTime >=
-                 ((configuration.interval - configuration.timeToMeasure) *
+                 ((configuration->interval - configuration->timeToMeasure) *
                   1000) &&
              !_measuremntsON) {
 
@@ -305,7 +305,7 @@ boolean AFESensorHPMA115S0::listener() {
       Serial << endl << endl << F("----- HPMA115S0: Turning ON -----");
 #endif
       if (!_measuremntsON) {
-        UART.send(commandTurnON);
+        UART->send(commandTurnON);
         read(true) ? _measuremntsON = true : _measuremntsON = false;
       }
 #if defined(DEBUG)
@@ -324,8 +324,8 @@ void AFESensorHPMA115S0::getJSON(char *json) {
             "%.2f,\"unit\":\"%s\"},\"WHO\":{\"PM25\":{\"value\":%.2f,\"unit\":"
             "\"%s\"},\"PM10\":{"
             "\"value\":%.2f,\"unit\":\"%s\"}}}",
-      data.pm25, AFE_UNIT_PARTICLE, data.pm10, AFE_UNIT_PARTICLE,
-      data.whoPM25Norm, AFE_UNIT_PERCENT, data.whoPM10Norm, AFE_UNIT_PERCENT);
+      data->pm25, AFE_UNIT_PARTICLE, data->pm10, AFE_UNIT_PARTICLE,
+      data->whoPM25Norm, AFE_UNIT_PERCENT, data->whoPM10Norm, AFE_UNIT_PERCENT);
 }
 
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0

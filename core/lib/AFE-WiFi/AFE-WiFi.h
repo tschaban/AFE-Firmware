@@ -103,6 +103,8 @@ public:
    */
   WiFiEventHandler wifiConnectHandler;
   WiFiEventHandler wifiDisconnectHandler;
+  WiFiEventHandler wifiAPStationConnectedHandler;
+
 #endif
 
   /* Constructor: no actions */
@@ -188,6 +190,13 @@ public:
    * @param  event            desc
    */
   static void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
+
+#ifdef DEBUG
+  static void
+  onWiFiAPStationConnected(const WiFiEventSoftAPModeStationConnected &event);
+#endif
+
+
 #endif
 };
 

@@ -30,10 +30,10 @@ private:
   unsigned long startTime = 0;
   boolean _initialized = false;
 #ifndef AFE_ESP32 // Sensor doesn't work with current libraries
-  AFESensorBMP180 s1;
+  AFESensorBMP180 *s1 = new AFESensorBMP180();
 #endif // ESP32
-  AFESensorBME280 s2;
-  AFESensorBME680 s6;
+  AFESensorBME280 *s2 = new AFESensorBME280();
+  AFESensorBME680 *s6 = new AFESensorBME680();
 
   void applyCorrections();
 
@@ -44,8 +44,8 @@ private:
 #endif
 
 public:
-  BMEX80 configuration;
-  BMEX80_DATA data;
+  BMEX80 *configuration = new BMEX80;
+  BMEX80_DATA *data = new BMEX80_DATA;
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMEX80();

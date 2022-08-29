@@ -43,8 +43,14 @@ boolean AFEUpgrader::upgraded() {
           AFE_FIRMWARE_API_STANDARD
 #endif
       ) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: FIRMWARE: up2date");
+#endif
     return false;
   } else {
+#ifdef DEBUG
+    Serial << endl << F("WARN: FIRMWARE: Up2date. Upgrading...");
+#endif
     return true;
   }
 }

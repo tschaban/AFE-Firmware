@@ -47,9 +47,9 @@ void gateEventsListener(void) {
     if (Gate[gateId].event()) {
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates.state[gateId] != _gateState) {
-        MqttAPI.publishGateState(gateId);
+        MqttAPI->publishGateState(gateId);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishGateState(gateId);
+        HttpDomoticzAPI->publishGateState(gateId);
 #endif
         GatesCurrentStates.state[gateId] = _gateState;
       }

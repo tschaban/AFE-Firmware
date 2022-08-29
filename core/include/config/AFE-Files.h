@@ -1,6 +1,8 @@
 #ifndef _AFE_files_h
 #define _AFE_files_h
 
+#include <arduino.h>
+
 /* ***************** FILESYSTEM *********************/
 #define AFE_FS_SPIFFS 0
 #define AFE_FS_LITTLEFS 1
@@ -90,6 +92,9 @@
 #define AFE_FILE_CLED_BACKLIGHT_CONFIGURATION "/cfg-cled-backlight-%d.json"
 #define AFE_FILE_TSL2561_CONFIGURATION "/cfg-tls2561-%d.json"
 #define AFE_FILE_REBOOTS_COUNTER "/cfg-reboots_counter.json"
+#define AFE_FILE_MCP23XXX_CONFIGURATION "/cfg-mcp23xxx-%d.json"
+
+//const char AFE_FILE_MCP23XXX_CONFIGURATION[] PROGMEM = "/cfg-mcp23xxx-%d.json";
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ checked
@@ -111,11 +116,11 @@
  * {"ssid":"123456789012345678901234567890123","password":"123456789012345678901234567890123","ssidBackup":"123456789012345678901234567890123","passwordBackup":"12345678901234567890123","isDHCP":1,"ip":"111.111.111.111","gateway":"111.111.111.111","subnet":"111.111.111.111","isDHCPBackup":1,"ipBackup":"111.111.111.111","gatewayBackup":"111.111.111.111","subnetBackup":"111.111.111.111","noConnectionAttempts":110,"waitTimeConnections":111,"waitTimeSeries":115,"noFailuresToSwitchNetwork":112,"radioMode":255,"outputPower":255}
  */
 #define AFE_CONFIG_FILE_BUFFER_NETWORK 764     // AJ checked 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-#define AFE_CONFIG_FILE_BUFFER_LED 124 //  AJ checked
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+#define AFE_CONFIG_FILE_BUFFER_LED 156 //  AJ checked
 #else
-#define AFE_CONFIG_FILE_BUFFER_LED 76         // AJ checked
-#endif                                        // AFE_CONFIG_HARDWARE_MCP23017
+#define AFE_CONFIG_FILE_BUFFER_LED 156         // AJ checked
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #define AFE_CONFIG_FILE_BUFFER_SYSTEM_LED 35  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_RELAY 287      // AJ checked for T6 only
 #define AFE_CONFIG_FILE_BUFFER_RELAY_STATE 46 // AJ checked
@@ -154,5 +159,10 @@
 #define AFE_CONFIG_FILE_BUFFER_TSL2561 290 // AJ Checked
 #define AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT 190 // AJ Checked
 #define AFE_FILE_BUFFER_REBOOTS_COUNTER 43 // AJ Checked
+#define AFE_CONFIG_FILE_BUFFER_MCP23XXX 200 // @TODO T4
+
+
+const char AFE_CONFIG_BODY_NETWORK[] PROGMEM = "{\"ssid\":\"%s\",\"password\":\"%s\",\"ssidBackup\":\"%s\",\"passwordBackup\":\"%s\",\"isDHCP\":%d,\"ip\":\"%s\",\"gateway\":\"%s\",\"subnet\":\"%s\",\"isDHCPBackup\":%d,\"ipBackup\":\"%s\",\"gatewayBackup\":\"%s\",\"subnetBackup\":\"%s\",\"noConnectionAttempts\":%d,\"waitTimeConnections\":%d,\"waitTimeSeries\":%d,\"noFailuresToSwitchNetwork\":%d,\"radioMode\":%d,\"outputPower\":255}";
+
 
 #endif

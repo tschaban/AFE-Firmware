@@ -13,7 +13,7 @@
 #include <AFE-LED.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 #endif
 
@@ -47,15 +47,14 @@ private:
   void begin(uint8_t id, AFEDataAccess *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   AFEMCP23017Broker *_MCP23017Broker;
-  boolean _MCP23017ReferenceAdded = false;
   boolean _expanderUsed = false;
-  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
 public:
-  SWITCH configuration;
+  SWITCH *configuration = new SWITCH;
+
 
   /* Constructors */
   AFESwitch();
@@ -67,7 +66,7 @@ public:
   void begin(uint8_t id, AFEDataAccess *);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 

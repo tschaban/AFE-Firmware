@@ -1,17 +1,25 @@
 /************************************************************************
  * AFE Firmware for devices based on ESP8266/ESP8285/ESP32 chips
  * This code combains AFE Firmware versions:
- *  - T0 and T0 for Shelly-1
+ *  - T0 (Basic version: relay)
  *  - T1 (DS18B20)
  *  - T2 (DHTxx)
- *  - T3 (PIRs)
+ *  - T3 (PIRs) 
  *  - T4 (With expander MCP23017)
  *  - T5 Gate
  *  - T6 Wheater station
+ *  - T7 RGB LED Controller
  *
  * More info: https://afe.smartnydom.pl
  * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
 **************************************************************************/
+
+/**
+ * Work LOG T4
+ * - lokalizacje
+ * - to set fr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual JSON size: 40
+ * - ESP32
+ */
 
 #include <AFE-Configuration.h>
 
@@ -28,21 +36,21 @@
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 
-AFEDataAccess Data;
-AFEFirmwarePro FirmwarePro;
-AFEDevice Device;
-AFEWiFi Network;
-AFEWebServer HTTPServer;
-AFEJSONRPC RestAPI;
+AFEDataAccess *Data = new AFEDataAccess();
+AFEFirmwarePro *FirmwarePro = new AFEFirmwarePro();
+AFEDevice *Device = new AFEDevice();
+AFEWiFi *Network = new AFEWiFi();
+AFEWebServer *HTTPServer = new AFEWebServer();
+AFEJSONRPC *RestAPI = new AFEJSONRPC();
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
-AFEMCP23017Broker MCP23017Broker;
+AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
-AFELED Led;
+AFELED *Led = new AFELED();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
@@ -73,7 +81,7 @@ AFEAnalogInput AnalogInput;
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Gate.h>
 AFEGate Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
-GATES_CURRENT_STATE GatesCurrentStates;
+GATES_CURRENT_STATE *GatesCurrentStates = new GATES_CURRENT_STATE;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
@@ -135,14 +143,14 @@ AFESensorHPMA115S0 HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <AFE-Sensor-Anemometer.h>
-AFEImpulseCatcher WindImpulse;
-AFEAnemometer AnemometerSensor;
+AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher();
+AFEAnemometer *AnemometerSensor = new AFEAnemometer();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #include <AFE-Sensor-Rainmeter.h>
-AFEImpulseCatcher RainImpulse;
-AFERainmeter RainSensor;
+AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher();
+AFERainmeter *RainSensor = new AFERainmeter();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -152,9 +160,6 @@ AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
-#ifdef DEBUG
-
-#endif
 
 #include <AFE-Main-APIs.cpp>
 
@@ -162,7 +167,7 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #include <AFE-Main-I2C.cpp>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-Main-MCP23017.cpp>
 #endif
 
@@ -244,7 +249,6 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 
 #if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
 #include <AFE-I2C-Scanner.h>
-AFEI2CScanner I2CScanner;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
@@ -252,9 +256,11 @@ AFEI2CScanner I2CScanner;
 AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#include <AFE-Sensor-Binary.h>
-#endif
 
 #include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>
+
+
+#ifdef DEBUG
+#include <AFE-Debug.cpp>
+#endif

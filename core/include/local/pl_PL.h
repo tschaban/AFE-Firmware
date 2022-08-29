@@ -36,6 +36,7 @@
 #define L_COMMNAD_NO_COMMAND "\"Brak komendy\""
 
 /* Menu */
+#define L_USED "wykorzystany w"
 #define L_HARDWARE "Sprzęt"
 #define L_FUNCTIONS "Funkcje"
 #define L_FIRMWARE "Firmware"
@@ -131,6 +132,7 @@
 #define L_DEVICE_NUMBER_OF_I2CS "Ilość portów I2C"
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Ilość czujników TSL2561"
 #define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
+#define L_DEVICE_NUMBER_OF_MCP23XXX "Ilość rozszerzeń MCP23xxx"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -561,13 +563,14 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 /* MCP32017 */
 #define L_MCP23017_CONNECTION "Podłączenie"
-#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_LED_CONNECTION "LED może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23107_LED_ADDITIONAL_SETTINGS "Dodatkowe ustawienia"
-#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_RELAY_CONNECTION "Przekaźnik może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23017_RELAY_TRIGGERED "Wyzwalanie przekaźnika"
-#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23017"
+#define L_MCP23017_SWITCH_CONNECTION "Przycisk może zostać podłączony bezpośrednio do GPIO lub przez ekspander MCP23XXX"
 #define L_MCP23017_CONNECTION_VIA_MCP "Podłączenie przez MCP23017 (GPIO powyżej musi zostać ustawione na BRAK)"
 
+#define L_MCP23017_EXTENSION "Rozszerzenie GPIO MCP23XXX"
 
 /* PN532 */
 

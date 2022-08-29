@@ -20,7 +20,7 @@
 class AFESensorTSL2561 {
 
 private:
-  Adafruit_TSL2561_Unified tls2561;
+  Adafruit_TSL2561_Unified *tls2561 = new Adafruit_TSL2561_Unified();
 
   boolean ready = false;
   boolean _initialized = false;
@@ -34,7 +34,7 @@ private:
 #endif
 
 public:
-  TSL2561 configuration;
+  TSL2561 *configuration = new TSL2561;
   /* Sensor's data */
   uint32_t illuminance = 0;
   uint16_t broadband, ir;

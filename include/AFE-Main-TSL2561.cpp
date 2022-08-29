@@ -9,8 +9,8 @@ void TSL2561SensorEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeTSL2561Sensor(void) {
-  if (Device.configuration.noOfTSL2561s > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfTSL2561s; i++) {
+  if (Device->configuration.noOfTSL2561s > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfTSL2561s; i++) {
 #ifdef AFE_ESP32
       TSL2561Sensor[i].begin(i, &WirePort0, &WirePort1);
 #else
@@ -22,16 +22,16 @@ void initializeTSL2561Sensor(void) {
 
 /* Main code for processing sesnor */
 void TSL2561SensorEventsListener(void) {
-  if (Device.configuration.noOfTSL2561s > 0) {
+  if (Device->configuration.noOfTSL2561s > 0) {
     /* Sensor: listener */
-    for (uint8_t i = 0; i < Device.configuration.noOfTSL2561s; i++) {
+    for (uint8_t i = 0; i < Device->configuration.noOfTSL2561s; i++) {
       if (TSL2561Sensor[i].listener()) {
-        MqttAPI.publishTSL2561SensorData(i);
+        MqttAPI->publishTSL2561SensorData(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishTSL2561SensorData(i);
+        HttpDomoticzAPI->publishTSL2561SensorData(i);
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-        if (Device.configuration.effectDeviceLight) {
+        if (Device->configuration.effectDeviceLight) {
           if (CLEDStrip.lightSensorType ==
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TSL2561) {
             CLEDStrip.backlightEffect(

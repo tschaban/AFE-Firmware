@@ -43,7 +43,8 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
+         << F("INFO: Opening file: ") << F(AFE_FILE_WELCOME_MESSAGE)
+         << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -61,7 +62,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
     message = "";
 #ifdef DEBUG
     Serial << endl
-           << F("ERROR: File: ") << AFE_FILE_WELCOME_MESSAGE
+           << F("ERROR: File: ") << F(AFE_FILE_WELCOME_MESSAGE)
            << F(" not opened");
 #endif
   }
@@ -76,7 +77,8 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_WELCOME_MESSAGE << F(" ... ");
+         << F("INFO: Opening file: ") << F(AFE_FILE_WELCOME_MESSAGE)
+         << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -97,129 +99,10 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: File ") << AFE_FILE_WELCOME_MESSAGE
+           << F("ERROR: File ") << F(AFE_FILE_WELCOME_MESSAGE)
            << F(" not opened for writing");
   }
 #endif
-}
-
-/**
- * @brief Reads the device UID
- *
- * @return const String
- */
-const String AFEDataAccess::getDeviceUID() {
-  String uid;
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_UID << F(" ... ");
-#endif
-
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_UID, "r");
-#else
-  File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "r");
-#endif
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: JSON: ");
-#endif
-
-    size_t size = configFile.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE_UID> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-
-    if (root.success()) {
-#ifdef DEBUG
-      root.printTo(Serial);
-#endif
-      uid = root.get<char *>("uid");
-#ifdef DEBUG
-      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_UID, jsonBuffer.size());
-#endif
-    }
-#ifdef DEBUG
-    else {
-      Serial << F("ERROR: JSON not pharsed");
-    }
-#endif
-
-    configFile.close();
-  }
-
-#ifdef DEBUG
-  else {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_DEVICE_UID
-           << F(" not opened");
-  }
-#endif
-  return uid;
-}
-
-/**
- * @brief Saves the devicde UID
- *
- * @param  uid              Device unique identyfier
- */
-void AFEDataAccess::saveDeviceUID(const char *uid) {
-#ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_UID << F(" ... ");
-#endif
-
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_UID, "w");
-#else
-  File configFile = SPIFFS.open(AFE_FILE_DEVICE_UID, "w");
-#endif
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: Writing JSON: ");
-#endif
-
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE_UID> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    root["uid"] = uid;
-    root.printTo(configFile);
-
-#ifdef DEBUG
-    root.printTo(Serial);
-#endif
-    configFile.close();
-
-#ifdef DEBUG
-    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE_UID, jsonBuffer.size());
-#endif
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("ERROR: failed to open file for writing");
-  }
-#endif
-}
-
-/**
- * @brief Creates and saves device unique identyfier
- *
- */
-void AFEDataAccess::createDeviceUIDFile() {
-#ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_UID;
-#endif
-
-  byte m[6];
-  char uid[18];
-  WiFi.macAddress(m);
-  sprintf(uid, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
-          m[2]);
-  saveDeviceUID(uid);
 }
 
 void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
@@ -271,7 +154,7 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_PRO_VERSION_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_PRO_VERSION_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -279,7 +162,7 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_PRO_VERSION_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_PRO_VERSION_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -331,7 +214,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_PASSWORD_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_PASSWORD_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -373,7 +256,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_PASSWORD_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_PASSWORD_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -381,7 +264,7 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_PASSWORD_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_PASSWORD_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -419,7 +302,7 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
 void AFEDataAccess::createPasswordConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_PASSWORD_CONFIGURATION;
+         << F("INFO: Creating file: ") << F(AFE_FILE_PASSWORD_CONFIGURATION);
 #endif
   PASSWORD PasswordConfiguration;
   PasswordConfiguration.protect = false;
@@ -431,7 +314,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_DEVICE_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -460,7 +343,10 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->api.http = root["api"]["http"];
       configuration->api.mqtt = root["api"]["mqtt"];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->api.domoticz = root["api"]["domoticz"] | false;
+
+      JsonVariant exists = root["api"]["domoticz"];
+      configuration->api.domoticz= exists.success() ?  root["api"]["domoticz"] : false;
+
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration->api.domoticz && !configuration->api.http) {
         configuration->api.http = true;
@@ -588,6 +474,11 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           root["noOfI2Cs"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->noOfMCP23xxx =
+          root["noOfMCP23xxx"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif
+
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE, jsonBuffer.size());
 #endif
@@ -604,8 +495,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_DEVICE_CONFIGURATION
-           << F(" not opened");
+           << F("ERROR: Configuration file: ")
+           << F(AFE_FILE_DEVICE_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -614,7 +505,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_DEVICE_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -728,6 +619,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
     root["noOfCLEDs"] = configuration->noOfCLEDs;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+    root["noOfMCP23xxx"] = configuration->noOfMCP23xxx;
+#endif
+
     root.printTo(configFile);
 
 #ifdef DEBUG
@@ -745,8 +640,11 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
   }
 #endif
 
-// Removing connection between relay and a gate, if exists reseting changing the
-// number of gates
+/**
+ * @brief Removing connection between relay and a gate, if exists reseting
+ * changing the number of gates
+ *
+ */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   if (configuration->noOfGates < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES) {
     GATE _Gate;
@@ -773,7 +671,8 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 }
 void AFEDataAccess::createDeviceConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_DEVICE_CONFIGURATION;
+  Serial << endl
+         << F("INFO: Creating file: ") << F(AFE_FILE_DEVICE_CONFIGURATION);
 #endif
   DEVICE configuration;
   sprintf(configuration.name, "AFE-Device");
@@ -885,6 +784,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   configuration.noOfI2Cs = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  configuration.noOfMCP23xxx = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif
+
   saveConfiguration(&configuration);
 }
 
@@ -892,7 +795,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_FIRMWARE_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_FIRMWARE_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -936,7 +839,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_FIRMWARE_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_FIRMWARE_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -944,7 +847,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_FIRMWARE_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_FIRMWARE_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -983,7 +886,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 void AFEDataAccess::createFirmwareConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_FIRMWARE_CONFIGURATION;
+         << F("INFO: Creating file: ") << F(AFE_FILE_FIRMWARE_CONFIGURATION);
 #endif
   FIRMWARE firmwareConfiguration;
   sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
@@ -1011,7 +914,7 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_MODE << F(" ... ");
+         << F("INFO: Opening file: ") << F(AFE_FILE_DEVICE_MODE) << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LITTLEFS.open(AFE_FILE_DEVICE_MODE, "r");
@@ -1051,7 +954,7 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_DEVICE_MODE
+           << F("ERROR: Configuration file: ") << F(AFE_FILE_DEVICE_MODE)
            << F(" not opened");
   }
 #endif
@@ -1061,7 +964,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DEVICE_MODE << F(" ... ");
+         << F("INFO: Opening file: ") << F(AFE_FILE_DEVICE_MODE) << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1101,7 +1004,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_NETWORK_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_NETWORK_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1114,66 +1017,75 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
     Serial << F("success") << endl << F("INFO: JSON: ");
 #endif
-
+  
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+
     if (root.success()) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration->ssid, root["ssid"]);
-      sprintf(configuration->password, root["password"]);
+      sprintf(configuration->ssid, root["ssid"] | "");
+      sprintf(configuration->password, root["password"] | "");
       sprintf(configuration->ssidBackup, root["ssidBackup"] | "");
       sprintf(configuration->passwordBackup, root["passwordBackup"] | "");
-      configuration->isDHCP = root["isDHCP"];
+      configuration->isDHCP = root["isDHCP"].as<int>();
       sprintf(configuration->ip, root["ip"]);
       sprintf(configuration->gateway, root["gateway"]);
       sprintf(configuration->subnet, root["subnet"]);
 
       JsonVariant exists = root["isDHCPBackup"];
-      configuration->isDHCPBackup =
-          exists.success() ? root["isDHCPBackup"] : true;
+      configuration->isDHCPBackup = exists.success() ? root["isDHCPBackup"] : 1;
 
       sprintf(configuration->ipBackup, root["ipBackup"] | "");
       sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
       sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
-      configuration->noConnectionAttempts = root["noConnectionAttempts"];
-      configuration->waitTimeConnections = root["waitTimeConnections"];
-      configuration->waitTimeSeries = root["waitTimeSeries"];
+      configuration->noConnectionAttempts =
+          root["noConnectionAttempts"].as<int>();
+      configuration->waitTimeConnections =
+          root["waitTimeConnections"].as<int>();
+      configuration->waitTimeSeries = root["waitTimeSeries"].as<int>();
       configuration->noFailuresToSwitchNetwork =
           root["noFailuresToSwitchNetwork"] |
           AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
 #if !defined(ESP32)
-      configuration->radioMode =
-          root["radioMode"] | AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+      exists = root["radioMode"];
+      configuration->radioMode = exists.success()
+                                     ? root["radioMode"].as<int>()
+                                     : AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+
       exists = root["outputPower"];
       configuration->outputPower =
           exists.success() ? root["outputPower"].as<float>()
                            : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
 #endif
 
-#ifdef DEBUG
-      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
-#endif
     }
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
+      
     }
 #endif
+
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
+#endif
+
     configFile.close();
   }
 
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_NETWORK_CONFIGURATION
-           << F(" not opened");
+           << F("ERROR: Configuration file: ")
+           << F(AFE_FILE_NETWORK_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -1181,7 +1093,7 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_NETWORK_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_NETWORK_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -1216,19 +1128,41 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
     root["noFailuresToSwitchNetwork"] =
         configuration->noFailuresToSwitchNetwork;
 #if !defined(ESP32)
-    root["radioMode"] = configuration->radioMode;
     root["outputPower"] = configuration->outputPower;
+    root["radioMode"] = configuration->radioMode;
+
 #endif
 
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
 #endif
-    configFile.close();
 
-#ifdef DEBUG
-    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
-#endif
+    /*
+     char body[AFE_CONFIG_FILE_BUFFER_NETWORK];
+     strcpy_P(body, AFE_CONFIG_BODY_NETWORK);
+
+     sprintf(body, body, configuration->ssid, configuration->password,
+             configuration->ssidBackup, configuration->passwordBackup,
+             configuration->isDHCP, configuration->ip, configuration->gateway,
+             configuration->subnet, configuration->isDHCPBackup,
+             configuration->ipBackup, configuration->gatewayBackup,
+             configuration->subnetBackup, configuration->noConnectionAttempts,
+             configuration->waitTimeConnections, configuration->waitTimeSeries,
+             configuration->noFailuresToSwitchNetwork,
+     configuration->radioMode);
+
+     //"{\"ssid\":\"%s\",\"password\":\"%s\",\"ssidBackup\":\"%s\",\"passwordBackup\":\"%s\",\"isDHCP\":%d,\"ip\":\"%s\",\"gateway\":\"%s\",\"subnet\":\"%s\",\"isDHCPBackup\":%d,\"ipBackup\":\"%s\",\"gatewayBackup\":\"%s\",\"subnetBackup\":\"%s\",\"noConnectionAttempts\":%d,\"waitTimeConnections\":%d,\"waitTimeSeries\":%d,\"noFailuresToSwitchNetwork\":%d,\"radioMode\":%d,\"outputPower\":%d}"
+
+     configFile.print(body);
+
+     */
+    configFile.close();
+    /*
+    #ifdef DEBUG
+        printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
+    #endif
+     */
   }
 #ifdef DEBUG
   else {
@@ -1239,7 +1173,7 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 void AFEDataAccess::createNetworkConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_NETWORK_CONFIGURATION;
+         << F("INFO: Creating file: ") << F(AFE_FILE_NETWORK_CONFIGURATION);
 #endif
 
   NETWORK configuration;
@@ -1273,7 +1207,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_MQTT_BROKER_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_MQTT_BROKER_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -1334,7 +1268,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_MQTT_BROKER_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_MQTT_BROKER_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -1342,7 +1276,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_MQTT_BROKER_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_MQTT_BROKER_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -1393,7 +1327,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
 void AFEDataAccess::createMQTTConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_MQTT_BROKER_CONFIGURATION;
+         << F("INFO: Creating file: ") << F(AFE_FILE_MQTT_BROKER_CONFIGURATION);
 #endif
   MQTT configuration;
   /* MQTT Default config */
@@ -1419,7 +1353,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DOMOTICZ_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_DOMOTICZ_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1466,7 +1400,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
   else {
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_DOMOTICZ_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_DOMOTICZ_CONFIGURATION) << F(" not opened");
   }
 #endif
 }
@@ -1474,7 +1408,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_DOMOTICZ_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_DOMOTICZ_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1530,8 +1464,8 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION
-         << F(" ... ");
+         << F("INFO: Opening file: ")
+         << F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION) << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1581,7 +1515,7 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #ifdef DEBUG
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_HOME_ASSISTANT_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION) << F(" not opened");
 #endif
   }
   return _ret;
@@ -1590,8 +1524,8 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION
-         << F(" ... ");
+         << F("INFO: Opening file: ")
+         << F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION) << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LITTLEFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
@@ -1630,7 +1564,8 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 void AFEDataAccess::createHomeAssistantConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_HOME_ASSISTANT_CONFIGURATION;
+         << F("INFO: Creating file: ")
+         << F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION);
 #endif
   HOME_ASSISTANT_CONFIG configuration;
   configuration.addingComponents =
@@ -1682,8 +1617,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 
       configuration->gpio = root["gpio"];
       configuration->changeToOppositeValue = root["changeToOppositeValue"];
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -1737,11 +1672,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
     root["gpio"] = configuration->gpio;
     root["changeToOppositeValue"] = configuration->changeToOppositeValue;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1805,11 +1740,10 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  LEDConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  LEDConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
 #ifdef DEBUG
@@ -1825,11 +1759,11 @@ void AFEDataAccess::createLEDConfigurationFile(uint8_t id) {
   LEDConfiguration.changeToOppositeValue = false;
   LEDConfiguration.gpio = AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   LEDConfiguration.mcp23017.address =
       AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Creating file: cfg-led-") << id << F(".json");
@@ -1841,7 +1775,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
   uint8_t id = 0;
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Opening file: ") << AFE_FILE_SYSTEM_LED_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_SYSTEM_LED_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -1892,7 +1826,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_SYSTEM_LED_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_SYSTEM_LED_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -1930,7 +1864,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
 void AFEDataAccess::createSystemLedIDConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_SYSTEM_LED_CONFIGURATION;
+         << F("INFO: Creating file: ") << F(AFE_FILE_SYSTEM_LED_CONFIGURATION);
 #endif
   saveSystemLedID(0);
 }
@@ -1999,8 +1933,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       configuration->ledID = root["ledID"];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -2061,11 +1995,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -2110,11 +2044,10 @@ void AFEDataAccess::createRelayConfigurationFile() {
   RelayConfiguration.triggerSignal =
       AFE_CONFIG_HARDWARE_RELAY_DEFAULT_SIGNAL_TRIGGER;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  RelayConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  RelayConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   RelayConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 /* SONOFF Basic v1 */
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
@@ -2385,13 +2318,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
 #ifdef DEBUG
-
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SWITCH, jsonBuffer.size());
 #endif
     }
@@ -2445,11 +2377,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -2490,11 +2422,10 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.functionality =
       AFE_HARDWARE_SWITCH_0_DEFAULT_FUNCTIONALITY;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  SwitchConfiguration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  SwitchConfiguration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   SwitchConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
   saveConfiguration(0, &SwitchConfiguration);
 
@@ -2770,7 +2701,7 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
 
 void AFEDataAccess::createADCInputConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_ADC_CONFIGURATION;
+  Serial << endl << F("INFO: Creating file: ") << F(AFE_FILE_ADC_CONFIGURATION);
 #endif
   ADCINPUT AnalogInputConfiguration;
   AnalogInputConfiguration.gpio = AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_GPIO;
@@ -3914,7 +3845,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_UART_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION)
          << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3956,7 +3887,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_UART_CONFIGURATION
+           << F("ERROR: Configuration file: ") << F(AFE_FILE_UART_CONFIGURATION)
            << F(" not opened");
   }
 #endif
@@ -3965,7 +3896,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_UART_CONFIGURATION
+         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION)
          << F(" ... ");
 #endif
 
@@ -4001,7 +3932,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 }
 void AFEDataAccess::createSerialConfigurationFile() {
 #ifdef DEBUG
-  Serial << endl << F("INFO: Creating file: ") << AFE_FILE_UART_CONFIGURATION;
+  Serial << endl
+         << F("INFO: Creating file: ") << F(AFE_FILE_UART_CONFIGURATION);
 #endif
   SERIALPORT configuration;
   configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
@@ -4072,7 +4004,7 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_I2C_CONFIGURATION
+           << F("ERROR: Configuration file: ") << F(AFE_FILE_I2C_CONFIGURATION)
            << F(" not opened");
   }
 #endif
@@ -5003,7 +4935,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
   Serial << endl
          << endl
          << F("INFO: Opening file: ")
-         << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << F(" ... ");
+         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5061,7 +4993,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #ifdef DEBUG
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" not opened");
 #endif
   }
   return _ret;
@@ -5072,7 +5004,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
   Serial << endl
          << endl
          << F("INFO: Opening file: ")
-         << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION << F(" ... ");
+         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5120,7 +5052,7 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Creating file: ")
-         << AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION;
+         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION);
 #endif
   ANEMOMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
@@ -5149,8 +5081,8 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION
-         << F(" ... ");
+         << F("INFO: Opening file: ")
+         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" ... ");
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
@@ -5202,7 +5134,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
     Serial << endl
            << F("ERROR: Configuration file: ")
-           << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION << F(" not opened");
+           << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" not opened");
 #endif
   }
 
@@ -5213,8 +5145,8 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION
-         << F(" ... ");
+         << F("INFO: Opening file: ")
+         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" ... ");
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5260,7 +5192,7 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Creating file: ")
-         << AFE_FILE_RAINMETER_SENSOR_CONFIGURATION;
+         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION);
 #endif
   RAINMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
@@ -5343,8 +5275,8 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #ifdef DEBUG
   else {
     Serial << endl
-           << F("ERROR: Configuration file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
-           << F(" not opened");
+           << F("ERROR: Configuration file: ")
+           << F(AFE_FILE_RAINMETER_SENSOR_DATA) << F(" not opened");
   }
 #endif
 }
@@ -5352,7 +5284,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #ifdef DEBUG
   Serial << endl
          << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
+         << F("INFO: Opening file: ") << F(AFE_FILE_RAINMETER_SENSOR_DATA)
          << F(" ... ");
 #endif
 
@@ -5410,7 +5342,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_RAINMETER_SENSOR_DATA;
+         << F("INFO: Creating file: ") << F(AFE_FILE_RAINMETER_SENSOR_DATA);
 #endif
   RAINMETER_DATA data;
   data.index1h = 0;
@@ -5483,8 +5415,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
       sprintf(configuration->mqtt.topic, root["MQTTTopic"] | "");
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-      configuration->mcp23017.address = root["mcp23017"]["address"];
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      configuration->mcp23017.id = root["mcp23017"]["id"];
       configuration->mcp23017.gpio = root["mcp23017"]["gpio"];
 #endif
 
@@ -5543,11 +5475,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     root["MQTTTopic"] = configuration->mqtt.topic;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     JsonObject &mcp23017 = root.createNestedObject("mcp23017");
-    mcp23017["address"] = configuration->mcp23017.address;
+    mcp23017["id"] = configuration->mcp23017.id;
     mcp23017["gpio"] = configuration->mcp23017.gpio;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -5582,11 +5514,10 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
   configuration.internalPullUp =
       AFE_HARDWARE_BINARY_SENSOR_DEFAULT_INTERNAL_PULLUP_RESISTOR;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-  configuration.mcp23017.address =
-      AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  configuration.mcp23017.id = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6680,7 +6611,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 void AFEDataAccess::createCLEDBacklightConfigurationFile() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Creating file: ") << AFE_FILE_CLED_BACKLIGHT_CONFIGURATION;
+         << F("INFO: Creating file: ")
+         << F(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION);
 #endif
   CLED_BACKLIGHT data;
 
@@ -6738,15 +6670,22 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 
       sprintf(configuration->name, root["name"] | "");
-      configuration->sensitiveness = root["sensitiveness"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
-      configuration->interval = root["interval"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
-      configuration->gain = root["gain"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
+      configuration->sensitiveness =
+          root["sensitiveness"] |
+          AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_SENSITIVENESS;
+      configuration->interval =
+          root["interval"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
+      configuration->gain =
+          root["gain"] | AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_GAIN;
 
 #ifdef AFE_ESP32
-      configuration->wirePortId = root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+      configuration->wirePortId =
+          root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-      configuration->i2cAddress = root["i2cAddress"] | AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+      configuration->i2cAddress =
+          root["i2cAddress"] |
+          AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.ir.idx =
           root["domoticz"]["ir"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -6868,6 +6807,131 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
+  boolean _ret = true;
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MCP23XXX> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["name"] | "");
+      configuration->address = root["address"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_ESP32
+      configuration->wirePortId =
+          root["wirePortId"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#ifdef DEBUG
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MCP23XXX, jsonBuffer.size());
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+
+  return _ret;
+}
+
+void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MCP23XXX> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+
+    root["name"] = configuration->name;
+    root["address"] = configuration->address;
+
+#ifdef AFE_ESP32
+    root["wirePortId"] = configuration->wirePortId;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createMCP23XXXConfigurationFile() {
+  MCP23XXX configuration;
+  configuration.address = AFE_HARDWARE_ITEM_NOT_EXIST;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017; i++) {
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: Creating file: cfg-mcp23xxx-") << i << F(".json");
+#endif
+
+    sprintf(configuration.name, "MCP23XXX-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif
 
 unsigned long AFEDataAccess::getRebootCounter(boolean increase) {
   unsigned long _ret = 1;

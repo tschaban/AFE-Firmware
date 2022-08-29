@@ -43,9 +43,9 @@ void contractonEventsListener() {
       }
 #endif
 
-        MqttAPI.publishContactronState(i);
+        MqttAPI->publishContactronState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishContactronState(i);
+        HttpDomoticzAPI->publishContactronState(i);
 #endif
     }
   }

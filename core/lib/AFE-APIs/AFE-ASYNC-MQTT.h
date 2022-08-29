@@ -29,13 +29,8 @@
 class AFEAsyncMQTTClient {
 
 private:
-  AsyncMqttClient _Broker;
+  AsyncMqttClient *_Broker = new AsyncMqttClient();
 
-  /**
-   * @brief stores Device MQTT Client Id
-   *
-   */
-  char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
@@ -50,7 +45,7 @@ private:
  * @return uint8_t 
  */
   uint8_t getRSSI();
-  char _lwtMessage[AFE_CONFIG_API_MQTT_LWT_MESSAGE_LENGTH];
+  
 #endif
 
 
@@ -71,12 +66,13 @@ public:
    * @brief storeis latest received MQTT Message
    *
    */
+  
   static MQTT_MESSAGE messagesBuffer[AFE_CONFIG_MQTT_MESSAGES_BUFFER];
   static uint8_t numberOfMessagesInBuffer;
   uint8_t messageProcessed = 0;
   MQTT_MESSAGE message;
 
-  MQTT configuration;
+  MQTT *configuration = new MQTT;
 
   /**
    * @brief Construct a new AFEAsyncMQTTClient object

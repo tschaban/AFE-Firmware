@@ -281,7 +281,7 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
      */
     if (_Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-      if (strcmp(request->name, _Relay[i]->configuration.name) == 0) {
+      if (strcmp(request->name, _Relay[i]->configuration->name) == 0) {
         deviceNotExist = false;
         /* Checking if command: on */
         if (strcmp(request->command, "on") == 0) {
@@ -403,7 +403,7 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 #ifdef AFE_ESP32
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strcmp(request->name, _AnalogInput[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _AnalogInput[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
@@ -470,7 +470,7 @@ void AFEAPIHTTP::addClass(AFESensorBMEX80 *Sensor) {
 void AFEAPIHTTP::processBMEX80(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    if (strcmp(request->name, _BMx80Sensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _BMx80Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH];
@@ -497,7 +497,7 @@ void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    if (strcmp(request->name, _BH1750Sensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _BH1750Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];
@@ -525,7 +525,7 @@ void AFEAPIHTTP::processTSL2561(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
-    if (strcmp(request->name, _TSL2561Sensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _TSL2561Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_TSL2561_DATA_LENGTH];
@@ -551,7 +551,7 @@ void AFEAPIHTTP::addClass(AFESensorHPMA115S0 *Sensor) {
 void AFEAPIHTTP::processHPMA115S0(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    if (strcmp(request->name, _HPMA115S0Sensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _HPMA115S0Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH];
@@ -703,7 +703,7 @@ void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    if (strcmp(request->name, _DS18B20Sensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _DS18B20Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
@@ -730,7 +730,7 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    if (strcmp(request->name, _Regulator[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Regulator[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_REGULATOR_DATA_LENGTH];
       boolean sendJSON = true;
@@ -777,7 +777,7 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    if (strcmp(request->name, _ThermalProtector[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _ThermalProtector[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH];
       boolean sendJSON = true;
@@ -851,7 +851,7 @@ void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    if (strcmp(request->name, _BinarySensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _BinarySensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];
@@ -1015,13 +1015,13 @@ void AFEAPIHTTP::sendOnOffStatus(HTTPCOMMAND *request, boolean status,
 void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
   String respond;
   respond.concat(FPSTR(JSON_RESPONSE));
-  respond.replace("{{device.type}}", request->device);
-  respond.replace("{{device.name}}",
+  respond.replace(F("{{device.type}}"), request->device);
+  respond.replace(F("{{device.name}}"),
                   strlen(request->name) > 0 ? request->name : "");
-  respond.replace("{{request.command}}",
+  respond.replace(F("{{request.command}}"),
                   strlen(request->command) > 0 ? request->command : "");
-  respond.replace("{{response.data}}", strlen(value) > 0 ? value : "\"\"");
-  respond.replace("{{response.status}}", status ? "success" : "error");
+  respond.replace(F("{{response.data}}"),
+                  strlen(value) > 0 ? value : "\"\"");
+  respond.replace(F("{{response.status}}"), status ? F("success") : F("error"));
   _HTTP->sendJSON(respond);
 }
-

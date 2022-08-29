@@ -19,11 +19,11 @@
 class AFESensorBME280 {
 
 private:
-  Adafruit_BME280 bme;
+  Adafruit_BME280 *bme = new Adafruit_BME280();
 
 public:
-  BMEX80 *configuration;
-  BMEX80_DATA data;
+  BMEX80 *configuration = new BMEX80;
+  BMEX80_DATA *data = new BMEX80_DATA;
   
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME280();

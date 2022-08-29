@@ -86,11 +86,15 @@ struct DEVICE {
   uint8_t noOfCLEDs;
   boolean effectDeviceLight;
 #endif
-
-
 #ifdef AFE_CONFIG_HARDWARE_I2C
   uint8_t noOfI2Cs;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  uint8_t noOfMCP23xxx;
+#endif
+
+
+
 };
 
 #ifdef T0_CONFIG

@@ -19,15 +19,15 @@ class AFESensorDS18B20 {
 
 private:
   AFEDataAccess *Data;
-  OneWire WireBUS;
-  DallasTemperature Sensor;
+  OneWire *WireBUS = new OneWire();
+  DallasTemperature *Sensor = new DallasTemperature();
   boolean _initialized = false;
   unsigned long startTime = 0;
   unsigned long readTimeOut = 0;
   float currentTemperature = DEVICE_DISCONNECTED_C;
 
 public:
-  DS18B20 configuration;
+  DS18B20 *configuration = new DS18B20;
 
   AFESensorDS18B20();
 

@@ -110,6 +110,7 @@
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_ANEMOMETER 10
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_RAINMETER 11
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_TSL2561 12
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_BINARY 13
 
 
 /**
@@ -149,11 +150,11 @@
 /**
  * @brief Home assistant Device Classes
  * https://www.home-assistant.io/integrations/sensor/#device-class
+ * https://www.home-assistant.io/integrations/binary_sensor/#device-class 4 Binary sensot
  */
 
 #define AFE_CONFIG_HA_DEVICE_CLASS_NONE "None"
 #define AFE_CONFIG_HA_DEVICE_CLASS_RELAY "switch"
-#define AFE_CONFIG_HA_DEVICE_CLASS_SWITCH AFE_CONFIG_HA_DEVICE_CLASS_RELAY
 #define AFE_CONFIG_HA_DEVICE_CLASS_VOLTAGE "voltage"
 #define AFE_CONFIG_HA_DEVICE_CLASS_OPENING "opening"
 #define AFE_CONFIG_HA_DEVICE_CLASS_MOVING "moving"
@@ -167,6 +168,8 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM10 "pm10"
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM25 "pm25"
 #define AFE_CONFIG_HA_DEVICE_CLASS_BATTERY "battery"
+#define AFE_CONFIG_HA_DEVICE_CLASS_SWITCH AFE_CONFIG_HA_DEVICE_CLASS_NONE
+#define AFE_CONFIG_HA_DEVICE_CLASS_BINARY_SENSOR AFE_CONFIG_HA_DEVICE_CLASS_OPENING 
 
 
 

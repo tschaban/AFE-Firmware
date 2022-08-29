@@ -11,42 +11,20 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
   if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
     _Data = Data;
-    _Data->getConfiguration(_id, &configuration);
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+    _Data->getConfiguration(_id, configuration);
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     // If MCP23017 available in the HW, checking if LED connected using MCP23017
-    if (configuration.gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
-      if (configuration.mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
-          configuration.mcp23017.address !=
-              AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS) {
+    if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
-        if (_MCP23017ReferenceAdded) {
-
-          _MCP23017Id = _MCP23017Broker->getId(configuration.mcp23017.address);
-          if (_MCP23017Id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 #ifdef DEBUG
-            Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
+        Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
 #endif
 
-            _MCP23017Broker->MCP[_MCP23017Id].pinMode(
-                configuration.mcp23017.gpio, OUTPUT);
-            _expanderUsed = true;
-          }
-#ifdef DEBUG
-          else {
-            Serial << endl
-                   << F("WARN: RELAY: MCP23017[0x")
-                   << _HEX(configuration.mcp23017.address)
-                   << F("] not found in cache");
-          }
-#endif
-        }
-#ifdef DEBUG
-        else {
-          Serial << endl
-                 << F("WARN: RELAY: Reference to MCP23017 has not been added");
-        }
-#endif
-
+        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
+                                                  OUTPUT);
+        _expanderUsed = true;
       }
 #ifdef DEBUG
       else {
@@ -54,60 +32,58 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
       }
 #endif
     } else {
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      pinMode(configuration.gpio, OUTPUT);
+      pinMode(configuration->gpio, OUTPUT);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     }
-#endif // AFE_CONFIG_HARDWARE_MCP23017
-
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (configuration->ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
 // @TODO this code doesn't check if the LED is actually set in Device
 // config
 // https://github.com/tschaban/AFE-Firmware/issues/606
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
-      Led.addMCP23017Reference(_MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      Led->addMCP23017Reference(_MCP23017Broker);
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      Led.begin(_Data, configuration.ledID);
+      Led->begin(_Data, configuration->ledID);
     }
 
 #endif
   }
 }
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFERelay::addMCP23017Reference(AFEMCP23017Broker *MCP23017Broker) {
   _MCP23017Broker = MCP23017Broker;
-  _MCP23017ReferenceAdded = true;
 }
 #endif
 
 byte AFERelay::get() {
   byte state;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    state = _MCP23017Broker->MCP[_MCP23017Id].digitalRead(
-        configuration.mcp23017.gpio);
+    state = _MCP23017Broker->MCP[configuration->mcp23017.id].digitalRead(
+        configuration->mcp23017.gpio);
   } else {
 #endif
 
-    state = digitalRead(configuration.gpio);
+    state = digitalRead(configuration->gpio);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 
   return state == HIGH
-             ? (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+             ? (configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                     ? AFE_RELAY_ON
                     : AFE_RELAY_OFF)
-             : (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+             : (configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                     ? AFE_RELAY_OFF
                     : AFE_RELAY_ON);
 }
@@ -117,7 +93,7 @@ void AFERelay::on() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Relay: ON, Trigger by ")
-         << (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+         << (configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                  ? F("HIGH")
                  : F("LOW"))
          << F(" signal");
@@ -125,25 +101,25 @@ void AFERelay::on() {
 
 // if (get() == AFE_RELAY_OFF) {
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
-        configuration.mcp23017.gpio,
-        configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
+    _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
+        configuration->mcp23017.gpio,
+        configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
                                                                      : LOW);
   } else {
 #endif
 
-    digitalWrite(configuration.gpio,
-                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+    digitalWrite(configuration->gpio,
+                 configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                      ? HIGH
                      : LOW);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 
-  if (configuration.timeToOff >
+  if (configuration->timeToOff >
       0) { // Start counter if relay should be automatically turned off
     turnOffCounter = millis();
   }
@@ -159,7 +135,7 @@ void AFERelay::on() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.toggle();
+  Led->toggle();
 #endif
 }
 
@@ -168,7 +144,7 @@ void AFERelay::off() {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: Relay: OFF, Trigger by ")
-         << (configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+         << (configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                  ? F("HIGH")
                  : F("LOW"))
          << F(" signal");
@@ -176,25 +152,25 @@ void AFERelay::off() {
 
 // if (get() == AFE_RELAY_ON) {
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   if (_expanderUsed) {
-    _MCP23017Broker->MCP[_MCP23017Id].digitalWrite(
-        configuration.mcp23017.gpio,
-        configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
+    _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
+        configuration->mcp23017.gpio,
+        configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
                                                                      : HIGH);
   } else {
 #endif
 
-    digitalWrite(configuration.gpio,
-                 configuration.triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
+    digitalWrite(configuration->gpio,
+                 configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH
                      ? LOW
                      : HIGH);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   }
 #endif
 
-  if (configuration.timeToOff >
+  if (configuration->timeToOff >
       0) { // Start counter if relay should be automatically turned off
     turnOffCounter = millis();
   }
@@ -209,7 +185,7 @@ void AFERelay::off() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led.toggle();
+  Led->toggle();
 #endif
 }
 
@@ -223,16 +199,16 @@ void AFERelay::toggle() {
 }
 
 void AFERelay::setRelayAfterRestoringPower() {
-  setRelayAfterRestore(configuration.state.powerOn);
+  setRelayAfterRestore(configuration->state.powerOn);
 }
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 boolean AFERelay::setRelayAfterRestoringMQTTConnection() {
-  if (configuration.state.MQTTConnected ==
+  if (configuration->state.MQTTConnected ==
       5) { // request state from MQTT Broker
     return false;
   } else {
-    setRelayAfterRestore(configuration.state.MQTTConnected);
+    setRelayAfterRestore(configuration->state.MQTTConnected);
     return true;
   }
 }
@@ -265,9 +241,9 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 boolean AFERelay::autoTurnOff() {
-  if (configuration.timeToOff > 0 &&
+  if (configuration->timeToOff > 0 &&
       millis() - turnOffCounter >=
-          configuration.timeToOff * (timerUnitInSeconds ? 1000 : 1) &&
+          configuration->timeToOff * (timerUnitInSeconds ? 1000 : 1) &&
       get() == AFE_RELAY_ON) {
     off();
     return true;
@@ -279,16 +255,16 @@ boolean AFERelay::autoTurnOff() {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_CONTROL_AUTOONOFF_TIME
 void AFERelay::setTimer(float timer) {
-  if (configuration.timeToOff > 0) {
+  if (configuration->timeToOff > 0) {
     turnOffCounter = millis();
   } else {
-    configuration.timeToOff = timer;
+    configuration->timeToOff = timer;
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PIR
-void AFERelay::clearTimer() { configuration.timeToOff = 0; }
+void AFERelay::clearTimer() { configuration->timeToOff = 0; }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE

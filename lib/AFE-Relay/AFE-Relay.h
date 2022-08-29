@@ -14,7 +14,7 @@
 #include <AFE-LED.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 #endif
 
@@ -29,7 +29,7 @@ private:
   AFEDataAccess *_Data;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED Led;
+  AFELED *Led = new AFELED();
 #endif
 
   unsigned long turnOffCounter = 0;
@@ -37,15 +37,17 @@ private:
   boolean timerUnitInSeconds = true;
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   AFEMCP23017Broker *_MCP23017Broker;
-  boolean _MCP23017ReferenceAdded = false;
   boolean _expanderUsed = false;
-  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-  /* Method set relay state after power restore or connection to MQTT is
-   * established */
+  /**
+   * @brief Method set relay state after power restore or connection to MQTT is
+   * established
+   *
+   * @param  option           desc
+   */
 
   void setRelayAfterRestore(uint8_t option);
 
@@ -53,7 +55,7 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
-  RELAY configuration;
+  RELAY *configuration = new RELAY;
 
   /**
    * @brief Construct a new AFERelay object
@@ -68,14 +70,13 @@ public:
    */
   void begin(AFEDataAccess *, uint8_t id);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 
   /**
    * @brief Method sets relay state after device is turned on / power is
-   * restored / or
-     * after device has been crash
+   * restored / or after device has been crash
    *
    */
   void setRelayAfterRestoringPower();
@@ -83,21 +84,14 @@ public:
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
   /**
    * @brief Method sets relay state after device is connected / reconnected to
-   * MQTT
-   * Broker. It returns TRUE if relay state has been set, false it relay state
-   * should be manged through MQTT Broker
+   * MQTT Broker. It returns TRUE if relay state has been set, false it relay
+   * state should be manged through MQTT Broker
    *
    * @return boolean
    */
   boolean setRelayAfterRestoringMQTTConnection();
 #endif
 
-  /**
-   * @brief Method: Returns AFE_RELAY_OFF if relay is OFF, AFE_RELAY_ON if relay
-   * is ON
-   *
-   * @return byte
-   */
   byte get();
 
   /**
@@ -146,11 +140,9 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /**
-   * @brief It sets unit of relay to auto turn off timer. Possible options: true
-   * -
-   * secods, false - miliseconds
+   * @brief It sets unit of relay to auto turn off timer. 
    *
-   * @param  value            desc
+   * @param  value           true secods, false - miliseconds
    */
   void setTimerUnitToSeconds(boolean value);
 #endif

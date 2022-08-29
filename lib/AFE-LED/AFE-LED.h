@@ -15,7 +15,7 @@
 #include <Streaming.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 #endif
 
@@ -27,23 +27,21 @@ private:
   unsigned long _interval;
   unsigned long _previousMillis = 0;
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   AFEMCP23017Broker *_MCP23017Broker;
-  boolean _MCP23017ReferenceAdded = false;
   boolean _expanderUsed = false;
-  uint8_t _MCP23017Id = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
   /* Method turns on/off LED */
   void set(uint8_t state);
 
 public:
-  LED configuration;
+  LED *configuration = new LED;
   /* Constructor */
   AFELED();
   boolean begin(AFEDataAccess *, uint8_t id);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
 

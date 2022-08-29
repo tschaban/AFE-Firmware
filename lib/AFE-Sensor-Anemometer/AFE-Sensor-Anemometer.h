@@ -18,7 +18,7 @@
 class AFEAnemometer {
 
 public:
-  ANEMOMETER configuration;
+  ANEMOMETER *configuration = new ANEMOMETER; 
   float lastSpeedMS =
       0; // used by HTTPs API - stores and gets the lastest value by HTTP API
   float lastSpeedKMH =

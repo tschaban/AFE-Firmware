@@ -11,8 +11,8 @@ void HPMA115S0SensorEventsListener(void);
 
 /* Initializing sensor */
 void initializeHPMA115S0Sensor(void) {
-  if (Device.configuration.noOfHPMA115S0s > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfHPMA115S0s; i++) {
       HPMA115S0Sensor[i].begin(i);
     }
   }
@@ -20,12 +20,12 @@ void initializeHPMA115S0Sensor(void) {
 
 /* Main code for processing sesnor */
 void HPMA115S0SensorEventsListener(void) {
-  if (Device.configuration.noOfHPMA115S0s > 0) {
-    for (uint8_t i = 0; i < Device.configuration.noOfHPMA115S0s; i++) {
+  if (Device->configuration.noOfHPMA115S0s > 0) {
+    for (uint8_t i = 0; i < Device->configuration.noOfHPMA115S0s; i++) {
       if (HPMA115S0Sensor[i].listener()) {
-        MqttAPI.publishHPMA115S0SensorData(i);
+        MqttAPI->publishHPMA115S0SensorData(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        HttpDomoticzAPI.publishHPMA115S0SensorData(i);
+        HttpDomoticzAPI->publishHPMA115S0SensorData(i);
 #endif
       }
     }

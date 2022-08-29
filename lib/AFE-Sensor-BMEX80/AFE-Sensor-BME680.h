@@ -9,9 +9,10 @@
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-I2C-Structure.h>
 #include <EEPROM.h>
+#include <Wire.h>
 #include <arduino.h>
 #include <bsec.h>
-#include <Wire.h>
+
 
 //#include <bsec_serialized_configurations_iaq.h>
 //#include "config/generic_33v_3s_4d/bsec_serialized_configurations_iaq.h"
@@ -26,7 +27,7 @@
 class AFESensorBME680 {
 
 private:
-  Bsec Bme;
+  Bsec *Bme = new Bsec();
 
   const uint8_t bsec_config_iaq[454] = {
       0,   8,   4,   1,   61,  0,   0,   0,   0,   0,   0,   0,   174, 1,   0,
@@ -67,23 +68,19 @@ private:
   uint8_t bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
   uint16_t stateUpdateCounter = 0;
 
-  boolean dataInBuffer = false;
-  BMEX80_DATA data;
-
 #ifdef DEBUG
   void checkBmeStatus();
 #endif
 
 public:
-  BMEX80 *configuration;
+  BMEX80 *configuration = new BMEX80;
+  BMEX80_DATA *data = new BMEX80_DATA;
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
   boolean begin(BMEX80 *, TwoWire *WirePort);
   boolean read();
-
-  void get(BMEX80_DATA &_data);
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80

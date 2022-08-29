@@ -17,7 +17,7 @@ boolean AFESensorBMP180::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
     Serial << endl << F("INFO: Address: 0x") << _HEX(configuration->i2cAddress);
 #endif
     boolean ret =
-        bme.begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, _wirePort);
+        bme->begin(configuration->i2cAddress, BMP085_ULTRAHIGHRES, _wirePort);
     return ret;
   } else {
 #ifdef DEBUG
@@ -31,8 +31,8 @@ boolean AFESensorBMP180::read() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Sensor: BMP180");
 #endif
-  data.temperature.value = bme.readTemperature();
-  data.pressure.value = bme.readPressure() / 100.0;
+  data->temperature.value = bme->readTemperature();
+  data->pressure.value = bme->readPressure() / 100.0;
 
   return true;
 }

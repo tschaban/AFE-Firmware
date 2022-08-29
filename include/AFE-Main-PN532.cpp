@@ -114,9 +114,9 @@ void PN532EventsListener() {
                 Relay[MiFareCard[j].configuration.relayId].toggle();
                 break;
               }
-              MqttAPI.publishRelayState(MiFareCard[j].configuration.relayId);
+              MqttAPI->publishRelayState(MiFareCard[j].configuration.relayId);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-              HttpDomoticzAPI.publishRelayState(
+              HttpDomoticzAPI->publishRelayState(
                   MiFareCard[j].configuration.relayId);
 #endif
               actionTaken = true;
@@ -131,7 +131,7 @@ void PN532EventsListener() {
         }
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-        MqttAPI.publishPN532SensorData(i);
+        MqttAPI->publishPN532SensorData(i);
 #endif
       }
       break;
@@ -153,10 +153,10 @@ void PN532EventsListener() {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         for (uint8_t idxId = 0; idxId < AFE_HARDWARE_PN532_TAG_SIZE; idxId++) {
 
-          MqttAPI.publishMiFareCardState(j, idxId, MiFareCard[j].state,
+          MqttAPI->publishMiFareCardState(j, idxId, MiFareCard[j].state,
                                          PN532Sensor[i].tag.block[idxId].value);
 
-          HttpDomoticzAPI.publishMiFareCardState(
+          HttpDomoticzAPI->publishMiFareCardState(
               j, idxId, MiFareCard[j].state,
               PN532Sensor[i].tag.block[idxId].value);
 
@@ -167,7 +167,7 @@ void PN532EventsListener() {
 #endif
         }
 #else
-        MqttAPI.publishMiFareCardState(j, MiFareCard[j].state);
+        MqttAPI->publishMiFareCardState(j, MiFareCard[j].state);
 #endif
       }
     }

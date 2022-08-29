@@ -21,7 +21,7 @@ private:
   void enable(void);
 
 public:
-  REGULATOR configuration;
+  REGULATOR *configuration = new REGULATOR;
   /* Keeps what should be the state of controlled device: false = off, true =
  * on */
   byte deviceState;

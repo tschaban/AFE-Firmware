@@ -18,8 +18,8 @@ boolean AFEDefaults::set(void) {
 #endif
 
   if (Data->formatFileSystem()) {
-    Data->createDeviceUIDFile();
 
+    Data->saveWelecomeMessage("");
 #ifdef AFE_CONFIG_HARDWARE_GATE
     Data->createGateConfigurationFile();
 #endif
@@ -132,6 +132,10 @@ boolean AFEDefaults::set(void) {
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
     Data->createTSL2561SensorConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+    Data->createMCP23XXXConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
     _ret = true;
   }

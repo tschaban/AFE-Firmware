@@ -14,8 +14,8 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device, AFELED *_Led) {
 void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
   Data = _Data;
   Device = _Device;
-  Data->getConfiguration(&Pro);
-  message.reserve(AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE);
+  ;
+  message.reserve(AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE); // @TODO is this well estimated
 
 #ifdef DEBUG
   Serial << endl << F("INFO: API REST: Initialized");
@@ -25,11 +25,11 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
 void AFEJSONRPC::generateMessage(String &message, const char *method,
                                  const char *params) {
   message = FPSTR(JSONRPC_MESSAGE);
-  message.replace("{{json.method}}", method);
+  message.replace(F("{{json.method}}"), method);
   if (strlen(params) > 0) {
-    message.replace("{{json.params}}", params);
+    message.replace(F("{{json.params}}"), params);
   } else {
-    message.replace("{{json.params}}", F("{}"));
+    message.replace(F("{{json.params}}"), F("{}"));
   }
 
 #ifdef DEBUG
@@ -73,57 +73,60 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
     unsigned long resposneTime = millis();
 
-    http.begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL);
-    http.addHeader("Content-Type", "application/json");
-    http.addHeader("afe-did", Device->deviceId);
-    if (strlen(Pro.serial) > 0) {
-      http.addHeader("afe-key", Pro.serial);
+    PRO_VERSION *Pro = new PRO_VERSION;
+    Data->getConfiguration(Pro);
+
+    http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL);
+    http->addHeader("Content-Type", "application/json");
+    http->addHeader("afe-did", Device->deviceId);
+    if (strlen(Pro->serial) > 0) {
+      http->addHeader("afe-key", Pro->serial);
     }
     sprintf(_text, "%d", AFE_FIRMWARE_TYPE);
-    http.addHeader("afe-type", _text);
-    http.addHeader("afe-version", AFE_FIRMWARE_VERSION);
+    http->addHeader("afe-type", _text);
+    http->addHeader("afe-version", AFE_FIRMWARE_VERSION);
     sprintf(_text, "%d", AFE_DEVICE_TYPE_ID);
-    http.addHeader("afe-hid", _text);
-    http.addHeader("afe-lang", L_LANGUAGE_SHORT);
+    http->addHeader("afe-hid", _text);
+    http->addHeader("afe-lang", L_LANGUAGE_SHORT);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    http.addHeader("afe-api", "D");
+    http->addHeader("afe-api", "D");
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT    
-    http.addHeader("afe-api", "H");
+    http->addHeader("afe-api", "H");
 #else
-    http.addHeader("afe-api", "S");
+    http->addHeader("afe-api", "S");
 #endif
 
 #if defined(ESP8285)
-    http.addHeader("afe-chip", "8285");
+    http->addHeader("afe-chip", "8285");
 #elif defined(ESP8266)
-    http.addHeader("afe-chip", "8266");
+    http->addHeader("afe-chip", "8266");
 #else
-    http.addHeader("afe-chip", "32");
+    http->addHeader("afe-chip", "32");
 #endif
 
 #if defined(AFE_ESP_FLASH_4MB)
-    http.addHeader("afe-size", "4");
+    http->addHeader("afe-size", "4");
 #elif defined(AFE_ESP_FLASH_2MBB)
-    http.addHeader("afe-size", "2");
+    http->addHeader("afe-size", "2");
 #else
-    http.addHeader("afe-size", "1");
+    http->addHeader("afe-size", "1");
 #endif
 
 #ifdef DEBUG
-    http.addHeader("afe-debug", "1");
+    http->addHeader("afe-debug", "1");
 #else
-    http.addHeader("afe-debug", "0");
+    http->addHeader("afe-debug", "0");
 #endif
 
-    _httpCode = http.POST(message);
+    _httpCode = http->POST(message);
 #ifdef DEBUG
     Serial << endl
            << F("INFO: API REST: Response code: ") << _httpCode << F(", time: ")
            << millis() - resposneTime << F("msec.");
 #endif
     if (_httpCode == HTTP_CODE_OK) {
-      response = http.getString();
+      response = http->getString();
 #ifdef DEBUG
       Serial << endl
              << F("INFO: API REST: Response reply: ") << response
@@ -154,7 +157,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     }
 #ifdef DEBUG
     else {
-      response = http.getString();
+      response = http->getString();
 
       Serial << endl
              << F("INFO: API REST: Response reply code: ") << _httpCode
@@ -164,7 +167,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 //      response = "";
     }
 #endif
-    http.end();
+    http->end();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     Led->off();
@@ -187,6 +190,14 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     Serial << endl << F("ERROR: API REST: No access to WAN");
 #endif
   }
+
+
+#if defined(DEBUG) && !defined(AFE_ESP32)
+      Serial << endl
+             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+             << F("kB: JSON returned");
+#endif
+
   return _httpCode;
 }
 
@@ -199,14 +210,14 @@ void AFEJSONRPC::checkAccessToWAN(void) {
 
   IPAddress ip;
   ip.fromString(AFE_WAN_ACCSSS_HOST);
-  _PingResponded = Ping.ping(ip, AFE_WAN_ACCSSS_PINGS);
+  _PingResponded = Ping->ping(ip, AFE_WAN_ACCSSS_PINGS);
 
 #ifdef DEBUG
 
   Serial << endl
          << F(" - ") << (_PingResponded ? F("connected to WAN")
                                         : F("NOT connected to WAN"));
-  Serial << endl << F(" - average time: ") << Ping.averageTime();
+  Serial << endl << F(" - average time: ") << Ping->averageTime();
 #endif
 
   /*

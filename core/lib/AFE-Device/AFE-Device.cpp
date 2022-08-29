@@ -7,7 +7,11 @@ AFEDevice::AFEDevice() {}
 void AFEDevice::begin() {
   deviceMode = Data.getDeviceMode();
   Data.getConfiguration(&configuration);
-  Data.getDeviceUID().toCharArray(deviceId, AFE_CONFIG_DEVICE_ID_SIZE);
+  byte m[6];
+  WiFi.macAddress(m);
+  sprintf(deviceId, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
+          m[2]);
+
 }
 
 void AFEDevice::reboot(uint8_t mode) {

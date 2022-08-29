@@ -5,12 +5,12 @@
 
 #include <AFE-Configuration.h>
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23017
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-I2C-Scanner.h>
-#include <Adafruit_MCP23017.h>
+#include <Adafruit_MCP23X17.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -19,27 +19,45 @@
 class AFEMCP23017Broker {
 
 private:
-  MCP23017_CACHE _cache[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
-  uint8_t _currentCacheIndex = 0;
-  I2CPORT _I2C;
-  AFEI2CScanner _I2CScanner;
+  TwoWire *_WirePort0;
+#ifdef AFE_ESP32
+  TwoWire *_WirePort1;
+#endif
 
-  /* Adds to item to the cache */
-  void add(uint8_t address);
+  MCP23XXX configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
 public:
-  Adafruit_MCP23017 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23017];
+  Adafruit_MCP23X17 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
-  /* Constructors */
+  /**
+   * @brief Construct a new AFEMCP23017Broker object
+   * 
+   */
   AFEMCP23017Broker();
 
-  /* Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
-   * connected
-   * to MCP */
-  void begin(AFEDataAccess *, AFEDevice *);
+#ifdef AFE_ESP32
+  /**
+   * @brief Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
+   * connected to MCP
+   *
+   * @param  Data             reference to database
+   * @param  WirePort0        reference to WirePort0
+   * @param  WirePort1        reference to WirePort1
+   */
+  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0,
+             TwoWire *WirePort1);
+#else
+  /**
+   * @brief Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
+   * connected to MCP
+   *
+   * @param  Data             reference to database
+   * @param  WirePort0        reference to WirePort0
+   */
+  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0);
+#endif
 
-  /* Gets ID of the MCP based on it's address. Used for caching */
-  uint8_t getId(uint8_t address);
+
 };
-#endif // AFE_CONFIG_HARDWARE_MCP23017
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #endif // _AFE_MCP23107_Broker_h
