@@ -1046,10 +1046,14 @@ void AFESitesGenerator::siteSystemLED(String &page) {
 void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   RELAY configuration;
   Data->getConfiguration(id, &configuration);
-
   char _number[9];
   char _text[23];
   sprintf(_text, "%s #%d", L_RELAY, id + 1);
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
   openSection(page, _text, F(""));
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -1453,8 +1457,11 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   SWITCH configuration;
-  Data->getConfiguration(id, &configuration);
   char text[25];
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;

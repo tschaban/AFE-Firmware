@@ -5,9 +5,10 @@
 
 AFESensorBMP180::AFESensorBMP180(){};
 
-boolean AFESensorBMP180::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
+boolean AFESensorBMP180::begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data) {
 
   configuration = _configuration;
+  data = _data;
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Sensor type: BMP180");

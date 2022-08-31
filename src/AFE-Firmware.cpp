@@ -2,11 +2,13 @@
 
 void setup() {
 
-  boolean _success = false;
-
+boolean _success = false;
+  
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
+
+  
 
   Serial << endl
          << endl

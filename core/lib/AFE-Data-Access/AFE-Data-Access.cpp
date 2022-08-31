@@ -345,7 +345,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
       JsonVariant exists = root["api"]["domoticz"];
-      configuration->api.domoticz= exists.success() ?  root["api"]["domoticz"] : false;
+      configuration->api.domoticz =
+          exists.success() ? root["api"]["domoticz"] : false;
 
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration->api.domoticz && !configuration->api.http) {
@@ -1017,13 +1018,12 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
     Serial << F("success") << endl << F("INFO: JSON: ");
 #endif
-  
+
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-
 
     if (root.success()) {
 #ifdef DEBUG
@@ -1070,7 +1070,6 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
-      
     }
 #endif
 
@@ -1872,8 +1871,9 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[20];
+boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
+  boolean _ret = false;
+  char fileName[sizeof(AFE_FILE_RELAY_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1941,6 +1941,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY, jsonBuffer.size());
 #endif
+      _ret = true;
     }
 #ifdef DEBUG
     else {
@@ -2275,8 +2276,9 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[21];
+boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
+  boolean _ret = false;
+  char fileName[sizeof(AFE_FILE_SWITCH_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2303,7 +2305,6 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
       configuration->gpio = root["gpio"].as<int>();
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
@@ -2326,13 +2327,13 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SWITCH, jsonBuffer.size());
 #endif
+      _ret = true;
     }
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
   }
 
@@ -2342,7 +2343,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
+  return _ret;
 }
+
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
   char fileName[21];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);

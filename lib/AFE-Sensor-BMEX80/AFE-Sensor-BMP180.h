@@ -23,15 +23,15 @@ class AFESensorBMP180 {
 
 private:
   Adafruit_BMP085 *bme = new Adafruit_BMP085();
-
+  BMEX80_DATA *data = new BMEX80_DATA;
 public:
   BMEX80 *configuration = new BMEX80;
-  BMEX80_DATA *data = new BMEX80_DATA;
+  
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBMP180();
 
-  boolean begin(BMEX80 *, TwoWire *);
+  boolean begin(BMEX80 *, TwoWire *, BMEX80_DATA *);
 
   boolean read();
 

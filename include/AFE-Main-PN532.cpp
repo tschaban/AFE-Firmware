@@ -32,7 +32,7 @@ void initializePN532Sensor() {
   if (Device.configuration.noOfPN532Sensors > 0 &&
       Device.configuration.effectPN532) {
     /* Changing the CLED Effect to listening mode */
-    CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+    CLEDStrip->effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                        AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -61,12 +61,12 @@ void PN532EventsListener() {
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
         /* Changing the CLED Effect card detected, but not authorized yet */
         if (Device.configuration.effectPN532) {
-          CLEDStrip.setCustomEffectColor(
+          CLEDStrip->setCustomEffectColor(
               AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
               AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE,
               AFE_CONFIG_HARDWARE_CLED_COLOR_MIFARE_UNAUTHORIZE);
 
-          CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+          CLEDStrip->effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                              AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -78,10 +78,10 @@ void PN532EventsListener() {
             /* Changing the CLED Effect color to authorized */
             if (Device.configuration.effectPN532) {
 
-              CLEDStrip.setCustomEffectColor(
+              CLEDStrip->setCustomEffectColor(
                   AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                   AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE,
-                  CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE]
+                  CLEDStrip->effects.effect[AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE]
                       .color);
             }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
@@ -140,7 +140,7 @@ void PN532EventsListener() {
     case AFE_HARDWARE_PN532_LISTENER_EVENT_PROCESSING_FINISHED:
       if (Device.configuration.effectPN532) {
         /* Changing the CLED Effect to listening mode */
-        CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+        CLEDStrip->effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                            AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
       }
       break;

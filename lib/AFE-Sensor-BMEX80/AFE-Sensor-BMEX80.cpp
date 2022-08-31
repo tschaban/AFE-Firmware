@@ -31,13 +31,13 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
 #endif
 
     if (configuration->type == AFE_BME680_SENSOR) {
-      _initialized = s6->begin(configuration, _WirePort);
+      _initialized = s6->begin(configuration, _WirePort, data);
     } else if (configuration->type == AFE_BME280_SENSOR ||
                configuration->type == AFE_BMP280_SENSOR) {
-      _initialized = s2->begin(configuration, _WirePort);
+      _initialized = s2->begin(configuration, _WirePort, data);
 #ifndef AFE_ESP32
     } else if (configuration->type == AFE_BMP180_SENSOR) {
-      _initialized = s1->begin(configuration, _WirePort);
+      _initialized = s1->begin(configuration, _WirePort, data);
 #endif // AFE_ESP32
     } else {
       _initialized = false;
@@ -69,10 +69,6 @@ void AFESensorBMEX80::listener() {
     unsigned long time = millis();
     boolean readStatus = false;
 
-    if (configuration->type == AFE_BME680_SENSOR) {
-      readStatus = s6->read();
-    }
-
     if (startTime == 0) { // starting timer. used for switch sensitiveness
       startTime = time;
     }
@@ -85,7 +81,18 @@ void AFESensorBMEX80::listener() {
              << F("--------") << F(" Reading sensor data ") << F("--------");
 #endif
 
-      if (configuration->type != AFE_BME680_SENSOR) {
+      if (configuration->type == AFE_BME680_SENSOR) {
+        /**
+         * @brief Reading Bosch BME680 Sensor
+         * 
+         */
+        readStatus = s6->read();
+      } else if (configuration->type != AFE_BME680_SENSOR) {
+        /**
+         * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
+         * 
+         */
+
 #ifdef AFE_ESP32
         readStatus = s2->read();
 #else  // ESP8266
@@ -97,18 +104,20 @@ void AFESensorBMEX80::listener() {
       }
 
       if (readStatus) {
-
-        if (configuration->type == AFE_BME680_SENSOR) {
-          data = s6->data;
-        } else {
-#ifdef AFE_ESP32
-          data = s2->data;
-#else  // ESP8266
-          data = configuration->type == AFE_BME280_SENSOR || AFE_BMP280_SENSOR
-                     ? s2->data
-                     : s1->data;
-#endif // ESP32/ESP8266
-        }
+        /*&
+                if (configuration->type == AFE_BME680_SENSOR) {
+                  data = s6->data;
+                } else {
+        #ifdef AFE_ESP32
+                  data = s2->data;
+        #else  // ESP8266
+                  data = configuration->type == AFE_BME280_SENSOR ||
+        AFE_BMP280_SENSOR
+                             ? s2->data
+                             : s1->data;
+        #endif // ESP32/ESP8266
+                }
+                */
         applyCorrections();
         ready = true;
 
@@ -153,7 +162,8 @@ void AFESensorBMEX80::listener() {
 }
 
 void AFESensorBMEX80::getJSON(char *json) {
-  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH> jsonBuffer;
+
+  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.createObject();
 
   JsonObject &temperature = root.createNestedObject("temperature");
@@ -175,7 +185,10 @@ void AFESensorBMEX80::getJSON(char *json) {
   relativePressure["value"] = data->relativePressure.value;
   relativePressure["unit"] = pressure["unit"];
 
-  /* Not applicable for BMP180 Sensor */
+  /**
+   * @brief Not applicable for BMP280/BMP180 Sensor
+   * 
+   */
   if (configuration->type != AFE_BMP180_SENSOR &&
       configuration->type != AFE_BMP280_SENSOR) {
     char _perception[90]; // Max size of dewPointPerception from lang.pack
@@ -260,9 +273,11 @@ void AFESensorBMEX80::getJSON(char *json) {
    * @brief There is a conversion to the real JSON string size. Workaround as
    * ASyncMQTTCrashes with larger strings crashes @TODO T6 investigate the
    * problem furhter
+   * It looks it actually ArduinJSON crases. Same case for HTTP API
    *
    */
   root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH);
+  
 }
 
 void AFESensorBMEX80::applyCorrections() {

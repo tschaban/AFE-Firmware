@@ -783,32 +783,39 @@ boolean AFEWebServer::generate(boolean upload) {
   return _ret;
 }
 
-/* Methods related to the url request */
+/**
+ * @brief Methods related to the url request
+ * If command recieved than receivedHTTPCommand flag is set which is then
+ * checked by the HTTPRequstsListener
+ *
+ */
+
+// http://192.168.2.83/?device=BMEX80&name=BMP280&command=get
 
 boolean AFEWebServer::getOptionName() {
   /* Recived HTTP API Command */
   if (server.hasArg(F("command"))) {
     /* Constructing command */
     server.arg(F("command"))
-        .toCharArray(httpCommand.command, sizeof(httpCommand.command));
+        .toCharArray(httpAPICommand->command, sizeof(httpAPICommand->command));
     if (server.arg(F("device"))) {
       server.arg(F("device"))
-          .toCharArray(httpCommand.device, sizeof(httpCommand.device));
+          .toCharArray(httpAPICommand->device, sizeof(httpAPICommand->device));
     } else {
-      memset(httpCommand.device, 0, sizeof httpCommand.device);
+      memset(httpAPICommand->device, 0, sizeof httpAPICommand->device);
     }
     if (server.arg(F("name"))) {
-      server.arg(F("name")).toCharArray(httpCommand.name,
-                                        sizeof(httpCommand.name));
+      server.arg(F("name")).toCharArray(httpAPICommand->name,
+                                        sizeof(httpAPICommand->name));
     } else {
-      memset(httpCommand.name, 0, sizeof httpCommand.name);
+      memset(httpAPICommand->name, 0, sizeof httpAPICommand->name);
     }
 
     if (server.arg(F("source"))) {
       server.arg(F("source"))
-          .toCharArray(httpCommand.source, sizeof(httpCommand.source));
+          .toCharArray(httpAPICommand->source, sizeof(httpAPICommand->source));
     } else {
-      memset(httpCommand.source, 0, sizeof httpCommand.source);
+      memset(httpAPICommand->source, 0, sizeof httpAPICommand->source);
     }
     receivedHTTPCommand = true;
   }
@@ -854,11 +861,13 @@ uint8_t AFEWebServer::getOption() {
   }
 }
 
-/* Server methods */
-
-HTTPCOMMAND AFEWebServer::getHTTPCommand() {
-  receivedHTTPCommand = false;
-  return httpCommand;
+boolean AFEWebServer::httpAPIlistener() {
+  if (receivedHTTPCommand) {
+    receivedHTTPCommand = false;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void AFEWebServer::listener() {
@@ -880,8 +889,6 @@ void AFEWebServer::listener() {
     }
   }
 }
-
-boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::sendJSON(const String &json) {
 

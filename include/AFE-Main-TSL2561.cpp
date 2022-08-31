@@ -32,9 +32,9 @@ void TSL2561SensorEventsListener(void) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         if (Device->configuration.effectDeviceLight) {
-          if (CLEDStrip.lightSensorType ==
+          if (CLEDStrip->lightSensorType ==
               AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_SENSOR_TYPE_TSL2561) {
-            CLEDStrip.backlightEffect(
+            CLEDStrip->backlightEffect(
                 AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT_ID,
                 TSL2561Sensor[i].illuminance);
           }

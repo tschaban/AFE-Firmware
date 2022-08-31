@@ -1174,7 +1174,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
           value, (uint8_t)_DHTSensor[id]->absoluteHumidity(
                      _DHTSensor[id]->currentTemperature,
                      _DHTSensor[id]->currentHumidity,
-                     _DHTSensor[id]->configuration.temperature.unit ==
+                     _DHTSensor[id]->configuration->temperature.unit ==
                          AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
@@ -1185,7 +1185,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
               _DHTSensor[id]->heatIndex(
                   _DHTSensor[id]->currentTemperature,
                   _DHTSensor[id]->currentHumidity,
-                  _DHTSensor[id]->configuration.temperature.unit ==
+                  _DHTSensor[id]->configuration->temperature.unit ==
                       AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       generateDeviceValue(
           json, _DHTSensor[id]->configuration->domoticz.heatIndex.idx, value);
@@ -1198,7 +1198,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
               _DHTSensor[id]->dewPoint(
                   _DHTSensor[id]->currentTemperature,
                   _DHTSensor[id]->currentHumidity,
-                  _DHTSensor[id]->configuration.temperature.unit ==
+                  _DHTSensor[id]->configuration->temperature.unit ==
                       AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       generateDeviceValue(
           json, _DHTSensor[id]->configuration->domoticz.dewPoint.idx, value);
@@ -1210,7 +1210,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
       char _perception[22]; // Max size of Perception from lang.pack
       byte _perceptionId = _DHTSensor[id]->perception(
           _DHTSensor[id]->currentTemperature, _DHTSensor[id]->currentHumidity,
-          _DHTSensor[id]->configuration.temperature.unit ==
+          _DHTSensor[id]->configuration->temperature.unit ==
               AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_perception,
                (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
@@ -1227,7 +1227,7 @@ boolean AFEAPIMQTTDomoticz::publishDHTSensorData(uint8_t id) {
       ComfortState comfortStatus;
       _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
                               _DHTSensor[id]->currentHumidity,
-                              _DHTSensor[id]->configuration.temperature.unit ==
+                              _DHTSensor[id]->configuration->temperature.unit ==
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
       generateDeviceValue(

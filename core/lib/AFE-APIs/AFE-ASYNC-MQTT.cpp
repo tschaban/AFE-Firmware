@@ -33,7 +33,6 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->onPublish(AFEAsyncMQTTClient::onMqttPublish);
 #endif
 
-  char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
   sprintf(_DeviceName, "%s-%s", Device->configuration.name, Device->deviceId);
 
   _Broker->setClientId(_DeviceName);

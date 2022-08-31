@@ -164,17 +164,17 @@ void eventsListener(void) {
   if (Device->getMode() == AFE_MODE_NORMAL && Device->configuration.api.mqtt) {
     if (MqttAPI->Mqtt->connected()) {
 
+      MqttAPI->subscribe();
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: EVENT: MQTT Connected: truggered");
-  #endif
+      Serial << endl << F("INFO: EVENT: MQTT Connected: triggered");
+#endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-/**
- * @brief Publishing device configuration to Home Assistant
- * 
- */
+      /**
+       * @brief Publishing device configuration to Home Assistant
+       *
+       */
       AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI =
           new AFEAPIHomeAssistantIntegration(Data, Device, MqttAPI);
       HomeAssistantDiscoveryAPI->publish();
@@ -182,7 +182,6 @@ void eventsListener(void) {
       HomeAssistantDiscoveryAPI = NULL;
 #endif
 
-      MqttAPI->subscribe();
       MqttAPI->synchronize();
     }
   }

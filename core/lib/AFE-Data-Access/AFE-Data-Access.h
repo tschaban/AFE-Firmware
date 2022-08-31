@@ -92,7 +92,7 @@ public:
   void createPasswordConfigurationFile();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  void getConfiguration(uint8_t id, RELAY *);
+  boolean getConfiguration(uint8_t id, RELAY *);
   void saveConfiguration(uint8_t id, RELAY *);
   void createRelayConfigurationFile();
   boolean getRelayState(uint8_t id);
@@ -101,7 +101,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  void getConfiguration(uint8_t id, SWITCH *);
+  boolean getConfiguration(uint8_t id, SWITCH *);
   void saveConfiguration(uint8_t id, SWITCH *);
   void createSwitchConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_SWITCH

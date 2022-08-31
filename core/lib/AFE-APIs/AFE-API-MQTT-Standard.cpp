@@ -204,21 +204,21 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    subscribeToCommand(_Regulator[i]->configuration.mqtt.topic);
+    subscribeToCommand(_Regulator[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Thermal protector */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    subscribeToCommand(_ThermalProtector[i]->configuration.mqtt.topic);
+    subscribeToCommand(_ThermalProtector[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Subscribe: DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    subscribeToCommand(_DHTSensor[i]->configuration.mqtt.topic);
+    subscribeToCommand(_DHTSensor[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -901,8 +901,8 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
   return enabled ? publishOnOffState(
-                       _Regulator[id]->configuration.mqtt.topic,
-                       _Regulator[id]->configuration.enabled ? AFE_ON : AFE_OFF)
+                       _Regulator[id]->configuration->mqtt.topic,
+                       _Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
                  : false;
 }
 
@@ -935,8 +935,8 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
   return enabled ? publishOnOffState(
-                       _ThermalProtector[id]->configuration.mqtt.topic,
-                       _ThermalProtector[id]->configuration.enabled ? AFE_ON
+                       _ThermalProtector[id]->configuration->mqtt.topic,
+                       _ThermalProtector[id]->configuration->enabled ? AFE_ON
                                                                     : AFE_OFF)
                  : false;
 }
@@ -988,7 +988,7 @@ boolean AFEAPIMQTTStandard::publishDHTSensorData(uint8_t id) {
     char message[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
     _DHTSensor[id]->getJSON(message);
     publishStatus =
-        Mqtt->publish(_DHTSensor[id]->configuration.mqtt.topic, message);
+        Mqtt->publish(_DHTSensor[id]->configuration->mqtt.topic, message);
   }
   return publishStatus;
 }

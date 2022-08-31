@@ -35,8 +35,8 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
 void AFEAPIHTTP::listener() {
   if (enabled) {
     if (_HTTP->httpAPIlistener()) {
-      HTTPCOMMAND request = _HTTP->getHTTPCommand();
-      processRequest(&request);
+      processRequest(_HTTP->httpAPICommand);      
+      Serial << endl << " end";
     }
   }
 }
@@ -261,6 +261,9 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef DEBUG
   Serial << endl << F("INFO: HTTP Server: Request processed");
 #endif
+
+Serial << endl << "6";
+
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -824,7 +827,7 @@ void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    if (strcmp(request->name, _DHTSensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _DHTSensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];

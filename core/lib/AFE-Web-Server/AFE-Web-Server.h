@@ -75,11 +75,6 @@ private:
 #endif // AFE_CONFIG_HARDWARE_I2C
 
   /**
-   * @brief  It stores last HTTP API request
-   *
-   */
-  HTTPCOMMAND httpCommand;
-  /**
    * @brief Once HTTP API requet is recieved it's set to true
    *
    */
@@ -288,6 +283,14 @@ public:
   ESP8266WebServer server;
 #endif // ESP32/ESP8266
 
+
+  /**
+   * @brief  It stores last HTTP API request
+   *
+   */
+  HTTPCOMMAND *httpAPICommand = new HTTPCOMMAND;
+
+
   AFEWebServer();
 
 /**
@@ -385,16 +388,9 @@ public:
   /**
    * @brief Method listens for HTTP API requests.
    *
-   * @return boolean If True command is in httpCommand
+   * @return boolean If True command is in httpAPICommand
    */
   boolean httpAPIlistener();
-
-  /**
-   * @brief Method reads HTTP API Command
-   *
-   * @return HTTPCOMMAND
-   */
-  HTTPCOMMAND getHTTPCommand();
 
   /**
    * @brief Method pushes JSON response to HTTP API request

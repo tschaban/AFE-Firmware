@@ -5,8 +5,9 @@
 
 AFESensorBME280::AFESensorBME280(){};
 
-boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort) {
+boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data) {
   configuration = _configuration;
+  data = _data;
 
 
   if (configuration->i2cAddress != 0) {

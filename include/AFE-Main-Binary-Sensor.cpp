@@ -35,22 +35,22 @@ void binarySensorEventsListener(void) {
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
       /* Changing the CLED Effect card detected, but not authorized yet */
       if (Device->configuration.effectPN532) {
-        if (CLEDStrip._currentEffect ==
+        if (CLEDStrip->_currentEffect ==
             AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT) {
           if (BinarySensor[i].get()) {
-            CLEDStrip.setCustomEffectColor(
+            CLEDStrip->setCustomEffectColor(
                 AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                 AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT,
-                CLEDStrip.effects.effect[AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT]
+                CLEDStrip->effects.effect[AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT]
                     .color);
 
           } else {
-            CLEDStrip.setCustomEffectColor(
+            CLEDStrip->setCustomEffectColor(
                 AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                 AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT,
                 AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_COLOR);
           }
-          CLEDStrip.effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
+          CLEDStrip->effectOn(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                              AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
         }
       }

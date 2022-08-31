@@ -8,25 +8,25 @@ AFESensorDHT::AFESensorDHT() {}
 void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Data = _Data;
 
-  Data->getConfiguration(id, &configuration);
+  Data->getConfiguration(id, configuration);
 
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: DHT: Initializing...GPIO: ") << configuration.gpio
-         << F(", Type: DHT") << configuration.type;
+         << F("INFO: DHT: Initializing...GPIO: ") << configuration->gpio
+         << F(", Type: DHT") << configuration->type;
 #endif
 
-  dht.setup(configuration.gpio,
-            configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO
+  dht->setup(configuration->gpio,
+            configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO
                 ? DHTesp::AUTO_DETECT
-                : configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11
+                : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11
                       ? DHTesp::DHT11
-                      : configuration.type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22
+                      : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22
                             ? DHTesp::DHT22
-                            : configuration.type ==
+                            : configuration->type ==
                                       AFE_CONFIG_HARDWARE_DHT_TYPE_AM2302
                                   ? DHTesp::AM2302
-                                  : configuration.type ==
+                                  : configuration->type ==
                                             AFE_CONFIG_HARDWARE_DHT_TYPE_RHT03
                                         ? DHTesp::RHT03
                                         : DHTesp::AUTO_DETECT);
@@ -48,28 +48,28 @@ boolean AFESensorDHT::listener() {
       startTime = time;
     }
 
-    if (time - startTime >= configuration.interval * 1000) {
+    if (time - startTime >= configuration->interval * 1000) {
 
 #ifdef DEBUG
       Serial << endl << F("INFO: DHT: Reading data from the sensor...");
 #endif
 
-      float _humidity = dht.getHumidity();
-      float _temperature = dht.getTemperature();
+      float _humidity = dht->getHumidity();
+      float _temperature = dht->getTemperature();
 
       if (!isnan(_humidity) && !isnan(_temperature)) {
 
-        if (configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
-          _temperature = dht.toFahrenheit(_temperature);
+        if (configuration->temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
+          _temperature = dht->toFahrenheit(_temperature);
         }
 
         // applying corrections
-        _temperature += configuration.temperature.correction;
-        _humidity += configuration.humidity.correction;
+        _temperature += configuration->temperature.correction;
+        _humidity += configuration->humidity.correction;
 
         _ready = true;
 
-        if (configuration.sendOnlyChanges) {
+        if (configuration->sendOnlyChanges) {
           if (_temperature == currentTemperature &&
               _humidity == currentHumidity) {
             _ready = false;
@@ -110,7 +110,7 @@ void AFESensorDHT::getJSON(char *json) {
   char _perception[90]; // Max size of dewPointPerception from lang.pack
   strcpy_P(_perception, (char *)pgm_read_dword(&(dewPointPerception[perception(
                             currentTemperature, currentHumidity,
-                            configuration.temperature.unit ==
+                            configuration->temperature.unit ==
                                 AFE_TEMPERATURE_UNIT_FAHRENHEIT)])));
 
 
@@ -118,7 +118,7 @@ void AFESensorDHT::getJSON(char *json) {
   ComfortState comfortStatus;
   float _comfortRatio = comfort(
       comfortStatus, currentTemperature, currentHumidity,
-      configuration.temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
+      configuration->temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT);
   strcpy_P(_comfort, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
 
   sprintf(json, "{\"temperature\":{\"value\":%.1f,\"unit\":\"%s\"},"
@@ -130,24 +130,24 @@ void AFESensorDHT::getJSON(char *json) {
                 "2f,\"unit\":"
                 "\"%%\",\"description\":\"%s\"}}",
           currentTemperature,
-          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+          configuration->temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
                                                                          : "F",
           currentHumidity,
           absoluteHumidity(currentTemperature, currentHumidity,
-                           configuration.temperature.unit ==
+                           configuration->temperature.unit ==
                                AFE_TEMPERATURE_UNIT_FAHRENHEIT),
           heatIndex(currentTemperature, currentHumidity,
-                    configuration.temperature.unit ==
+                    configuration->temperature.unit ==
                         AFE_TEMPERATURE_UNIT_FAHRENHEIT),
-          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+          configuration->temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
                                                                          : "F",
           dewPoint(currentTemperature, currentHumidity,
-                   configuration.temperature.unit ==
+                   configuration->temperature.unit ==
                        AFE_TEMPERATURE_UNIT_FAHRENHEIT),
-          configuration.temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
+          configuration->temperature.unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C"
                                                                          : "F",
           perception(currentTemperature, currentHumidity,
-                     configuration.temperature.unit ==
+                     configuration->temperature.unit ==
                          AFE_TEMPERATURE_UNIT_FAHRENHEIT),
           _perception, comfortStatus, _comfortRatio, _comfort);
 
