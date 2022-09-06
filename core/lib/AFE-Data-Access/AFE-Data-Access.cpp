@@ -823,19 +823,19 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       sprintf(configuration->version, root["version"]);
 
-#ifdef DEBUG
-      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
-#endif
     }
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
-  }
 
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
+#endif
+
+  }
 #ifdef DEBUG
   else {
     Serial << endl
@@ -1881,18 +1881,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-
-  // if (!LITTLEFS.exists(fileName)) {
-  //    createRelayConfigurationFile(id);
-  // }
-
   File configFile = LITTLEFS.open(fileName, "r");
 #else
-
-  //  if (!SPIFFS.exists(fileName)) {
-  //    createRelayConfigurationFile(id);
-  //  }
-
   File configFile = SPIFFS.open(fileName, "r");
 #endif
 
@@ -1958,6 +1948,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
+  return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
   char fileName[20];

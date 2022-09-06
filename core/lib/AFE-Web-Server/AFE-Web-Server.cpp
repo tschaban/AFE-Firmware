@@ -793,33 +793,40 @@ boolean AFEWebServer::generate(boolean upload) {
 // http://192.168.2.83/?device=BMEX80&name=BMP280&command=get
 
 boolean AFEWebServer::getOptionName() {
-  /* Recived HTTP API Command */
-  if (server.hasArg(F("command"))) {
-    /* Constructing command */
-    server.arg(F("command"))
-        .toCharArray(httpAPICommand->command, sizeof(httpAPICommand->command));
-    if (server.arg(F("device"))) {
-      server.arg(F("device"))
-          .toCharArray(httpAPICommand->device, sizeof(httpAPICommand->device));
-    } else {
-      memset(httpAPICommand->device, 0, sizeof httpAPICommand->device);
-    }
-    if (server.arg(F("name"))) {
-      server.arg(F("name")).toCharArray(httpAPICommand->name,
-                                        sizeof(httpAPICommand->name));
-    } else {
-      memset(httpAPICommand->name, 0, sizeof httpAPICommand->name);
-    }
 
-    if (server.arg(F("source"))) {
-      server.arg(F("source"))
-          .toCharArray(httpAPICommand->source, sizeof(httpAPICommand->source));
-    } else {
-      memset(httpAPICommand->source, 0, sizeof httpAPICommand->source);
+  /**
+   * @brief HTTP API works only in AFE operating mode
+   *
+   */
+  if (Device->getMode() == AFE_MODE_NORMAL) {
+    if (server.hasArg(F("command"))) {
+      server.arg(F("command"))
+          .toCharArray(httpAPICommand->command,
+                       sizeof(httpAPICommand->command));
+      if (server.arg(F("device"))) {
+        server.arg(F("device"))
+            .toCharArray(httpAPICommand->device,
+                         sizeof(httpAPICommand->device));
+      } else {
+        memset(httpAPICommand->device, 0, sizeof httpAPICommand->device);
+      }
+      if (server.arg(F("name"))) {
+        server.arg(F("name")).toCharArray(httpAPICommand->name,
+                                          sizeof(httpAPICommand->name));
+      } else {
+        memset(httpAPICommand->name, 0, sizeof httpAPICommand->name);
+      }
+
+      if (server.arg(F("source"))) {
+        server.arg(F("source"))
+            .toCharArray(httpAPICommand->source,
+                         sizeof(httpAPICommand->source));
+      } else {
+        memset(httpAPICommand->source, 0, sizeof httpAPICommand->source);
+      }
+      receivedHTTPCommand = true;
     }
-    receivedHTTPCommand = true;
   }
-
   return receivedHTTPCommand;
 }
 

@@ -493,7 +493,7 @@ const char comfort_Unknown[] PROGMEM      = "?";
 const char comfort_TooHumid[] PROGMEM     = "Za wilgotno";
 const char comfort_HotAndHumid[] PROGMEM  = "Gorąco i wilgotno";
 const char comfort_ColdAndHumid[] PROGMEM = "Zimno i wilgotno";
-const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
+const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_Unknown,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
 #endif
 
 

@@ -165,7 +165,7 @@ boolean _success = false;
 #ifdef AFE_CONFIG_HARDWARE_LED
   Network->begin(Device->getMode(), Device, Data, Led);
 #else
-  Network->begin(Device->getMode(), Device, &Data);
+  Network->begin(Device->getMode(), Device, Data);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG

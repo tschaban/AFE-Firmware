@@ -35,8 +35,7 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
 void AFEAPIHTTP::listener() {
   if (enabled) {
     if (_HTTP->httpAPIlistener()) {
-      processRequest(_HTTP->httpAPICommand);      
-      Serial << endl << " end";
+      processRequest(_HTTP->httpAPICommand);
     }
   }
 }
@@ -261,9 +260,6 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 #ifdef DEBUG
   Serial << endl << F("INFO: HTTP Server: Request processed");
 #endif
-
-Serial << endl << "6";
-
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -1023,8 +1019,7 @@ void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
                   strlen(request->name) > 0 ? request->name : "");
   respond.replace(F("{{request.command}}"),
                   strlen(request->command) > 0 ? request->command : "");
-  respond.replace(F("{{response.data}}"),
-                  strlen(value) > 0 ? value : "\"\"");
+  respond.replace(F("{{response.data}}"), strlen(value) > 0 ? value : "\"\"");
   respond.replace(F("{{response.status}}"), status ? F("success") : F("error"));
   _HTTP->sendJSON(respond);
 }

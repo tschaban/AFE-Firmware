@@ -21,7 +21,7 @@ void initializeSwitch(void) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     Switch[i].begin(i, Data, Led);
 #else
-    Switch[i].begin(i, &Data);
+    Switch[i].begin(i, Data);
 #endif
   }
 #ifdef DEBUG

@@ -14,8 +14,8 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device, AFELED *_Led) {
 void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
   Data = _Data;
   Device = _Device;
-  ;
-  message.reserve(AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE); // @TODO is this well estimated
+  message.reserve(
+      AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE); // @TODO is this well estimated
 
 #ifdef DEBUG
   Serial << endl << F("INFO: API REST: Initialized");
@@ -76,7 +76,17 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     PRO_VERSION *Pro = new PRO_VERSION;
     Data->getConfiguration(Pro);
 
-    http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL);
+    WiFiClient WirelessClient;
+
+    if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
+
+#ifdef DEBUG
+      Serial << endl << "INFO: API REST: Connected to the api server";
+    } else {
+      Serial << endl << "ERROR: API REST: NOT connected to the api server";
+#endif
+    }
+
     http->addHeader("Content-Type", "application/json");
     http->addHeader("afe-did", Device->deviceId);
     if (strlen(Pro->serial) > 0) {
@@ -91,7 +101,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     http->addHeader("afe-api", "D");
-#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT    
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
     http->addHeader("afe-api", "H");
 #else
     http->addHeader("afe-api", "S");
@@ -120,6 +130,7 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 #endif
 
     _httpCode = http->POST(message);
+
 #ifdef DEBUG
     Serial << endl
            << F("INFO: API REST: Response code: ") << _httpCode << F(", time: ")
@@ -136,13 +147,14 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
       const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 60;
       DynamicJsonBuffer jsonBuffer(capacity);
       //   StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE> jsonBuffer;
-       
+
       JsonObject &root = jsonBuffer.parseObject(response);
 #ifdef DEBUG
       Serial << endl
              << F("INFO: API REST: JSON Buffer size: ") << capacity
              << F(", actual JSON size: ") << jsonBuffer.size();
-      if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity < jsonBuffer.size() + 10) {
+      if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity <
+          jsonBuffer.size() + 10) {
         Serial << endl << F("WARN: API REST: Too small buffer size");
       }
 #endif
@@ -163,8 +175,6 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
              << F("INFO: API REST: Response reply code: ") << _httpCode
              << F(", content: ") << response << F(", Size: ")
              << response.length();
-
-//      response = "";
     }
 #endif
     http->end();
@@ -191,11 +201,10 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 #endif
   }
 
-
 #if defined(DEBUG) && !defined(AFE_ESP32)
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB: JSON returned");
+  Serial << endl
+         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+         << F("kB: JSON returned");
 #endif
 
   return _httpCode;
