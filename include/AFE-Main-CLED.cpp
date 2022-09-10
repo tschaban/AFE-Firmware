@@ -9,7 +9,7 @@ void CLedEventsListener(void);
 
 void initializeCLed(void) {  
   if (Device->configuration.noOfCLEDs > 0) {
-    CLEDStrip->begin(Data);
+    CLEDStrip->begin(Data,Device);
   }
 };
 

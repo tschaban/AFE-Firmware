@@ -1642,6 +1642,10 @@ void AFEWebServer::get(SWITCH &data) {
   data.relayID = server.arg(F("r")).length() > 0 ? server.arg(F("r")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  data.rgbLedID = server.arg(F("l")).length() > 0 ? server.arg(F("l")).toInt()
+                                                 : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
@@ -2742,6 +2746,15 @@ void AFEWebServer::get(CLED &data) {
   data.off.brightness = server.arg(F("fl")).length() > 0
                             ? server.arg(F("fl")).toInt()
                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
+
+  data.on.changeTime = server.arg(F("ot")).length() > 0
+                           ? server.arg(F("ot")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
+  data.off.changeTime = server.arg(F("ft")).length() > 0
+                            ? server.arg(F("ft")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
 
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));

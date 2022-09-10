@@ -403,7 +403,7 @@ void AFEAPIHomeAssistantIntegration::publishBinarySensor(void) {
 
     if (i < _Device->configuration.noOfBinarySensors) {
       _Data->getConfiguration(i, &_configuration);
-      sprintf(_deviceConfiguration->label, "%s: %d", L_BINARY_SENSOR, i + 1);
+      sprintf(_deviceConfiguration->label, "%s", _configuration.name);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
     } else {

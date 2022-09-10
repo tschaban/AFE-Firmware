@@ -127,49 +127,13 @@ DOMOTICZ_MQTT_COMMAND AFEAPIMQTTDomoticz::getCommand() {
   command.nvalue = Mqtt->message.command.nvalue;
   sprintf(command.svalue, Mqtt->message.command.svalue);
 
-  /*
-  char json[strlen(Mqtt->message.content)];
-  sprintf(json, Mqtt->message.content);
-
-  StaticJsonBuffer<AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH> jsonBuffer;
-  JsonObject &root = jsonBuffer.parseObject(json);
-
-  if (root.success()) {
-    command.domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-    command.nvalue = root["nvalue"] | AFE_NONE;
-    if (strlen(root["svalue1"] | "") < AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH) {
-      sprintf(command.svalue, root["svalue1"] | "");
-
-#ifdef DEBUG
-    } else {
-      Serial << endl
-             << F("WARN: Domoticz: Incoming SVALUE is: ")
-             << strlen(root["svalue1"]) << F(" and it's too long. Max size: ")
-             << AFE_CONFIG_MQTT_CMD_SVALUE_LENGTH
-             << F(". Request not processed");
-#endif
-    }
-
 #ifdef AFE_CONFIG_HARDWARE_CLED
-    command.led.brightness = root["Level"];
-    command.led.color.blue = root["Color"]["b"];
-    command.led.color.red = root["Color"]["r"];
-    command.led.color.green = root["Color"]["g"];
+  command.led.brightness = Mqtt->message.command.led.brightness;
+  command.led.color.blue = Mqtt->message.command.led.color.blue;
+  command.led.color.red = Mqtt->message.command.led.color.red;
+  command.led.color.green = Mqtt->message.command.led.color.green;
 #endif
 
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: Domoticz: IDX: ") << command.domoticz.idx
-           << F(", NValue: ") << command.nvalue << F(", SValue: ")
-           << command.svalue;
-#endif
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("ERROR: Domoticz: Problem with JSON pharsing");
-  }
-#endif
-*/
   return command;
 }
 
@@ -627,10 +591,10 @@ void AFEAPIMQTTDomoticz::publishBatteryMeterValues(uint8_t id) {
   if (enabled) {
     char json[AFE_CONFIG_API_JSON_BATTERYMETER_COMMAND_LENGTH];
     char value[8];
-    if (_AnalogInput[id]->configuration.battery.domoticz.idx > 0) {
+    if (_AnalogInput[id]->configuration->battery.domoticz.idx > 0) {
       sprintf(value, "%-.3f", _AnalogInput[id]->batteryPercentage);
       generateDeviceValue(
-          json, _AnalogInput[id]->configuration.battery.domoticz.idx, value);
+          json, _AnalogInput[id]->configuration->battery.domoticz.idx, value);
       Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
   }
@@ -749,7 +713,8 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
         sprintf(value, "%d", _BMx80Sensor[id]->convertHumidyStatusDomoticz(
                                  _BMx80Sensor[id]->data->humidity.value));
         generateDeviceValue(
-            json, _BMx80Sensor[id]->configuration->domoticz.absoluteHumidity.idx,
+            json,
+            _BMx80Sensor[id]->configuration->domoticz.absoluteHumidity.idx,
             value, (uint8_t)_BMx80Sensor[id]->absoluteHumidity(
                        _BMx80Sensor[id]->data->temperature.value,
                        _BMx80Sensor[id]->data->humidity.value,
@@ -762,7 +727,8 @@ boolean AFEAPIMQTTDomoticz::publishBMx80SensorData(uint8_t id) {
       if (_BMx80Sensor[id]->configuration->domoticz.dewPoint.idx > 0) {
         sprintf(value, "%-.2f", _BMx80Sensor[id]->data->dewPoint.value);
         generateDeviceValue(
-            json, _BMx80Sensor[id]->configuration->domoticz.dewPoint.idx, value);
+            json, _BMx80Sensor[id]->configuration->domoticz.dewPoint.idx,
+            value);
         Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
       }
 
@@ -871,17 +837,17 @@ boolean AFEAPIMQTTDomoticz::publishHPMA115S0SensorData(uint8_t id) {
     if (_HPMA115S0Sensor[id]->configuration->domoticz.pm10.idx > 0) {
 
       sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data->pm10);
-      generateDeviceValue(json,
-                          _HPMA115S0Sensor[id]->configuration->domoticz.pm10.idx,
-                          value, _HPMA115S0Sensor[id]->data->pm10);
+      generateDeviceValue(
+          json, _HPMA115S0Sensor[id]->configuration->domoticz.pm10.idx, value,
+          _HPMA115S0Sensor[id]->data->pm10);
       Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
 
     if (_HPMA115S0Sensor[id]->configuration->domoticz.pm25.idx > 0) {
       sprintf(value, "%-.1f", _HPMA115S0Sensor[id]->data->pm25);
-      generateDeviceValue(json,
-                          _HPMA115S0Sensor[id]->configuration->domoticz.pm25.idx,
-                          value, _HPMA115S0Sensor[id]->data->pm25);
+      generateDeviceValue(
+          json, _HPMA115S0Sensor[id]->configuration->domoticz.pm25.idx, value,
+          _HPMA115S0Sensor[id]->data->pm25);
       Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
     }
     if (_HPMA115S0Sensor[id]->configuration->domoticz.whoPM10Norm.idx > 0) {
@@ -1094,10 +1060,10 @@ boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id) {
          << F("INFO: Publishing regulator: ") << id << F(", IDX: ")
          << idxCache[id].domoticz.idx << F(" state");
 #endif
-  return enabled
-             ? publishSwitchMessage(&_Regulator[id]->configuration->domoticz.idx,
-                                    _Regulator[id]->configuration->enabled)
-             : false;
+  return enabled ? publishSwitchMessage(
+                       &_Regulator[id]->configuration->domoticz.idx,
+                       _Regulator[id]->configuration->enabled)
+                 : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 

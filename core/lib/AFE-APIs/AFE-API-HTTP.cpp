@@ -433,7 +433,7 @@ void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
 #ifdef AFE_ESP32
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strcmp(request->name, _AnalogInput[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _AnalogInput[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];

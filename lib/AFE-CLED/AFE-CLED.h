@@ -52,10 +52,12 @@ private:
     CLED_PARAMETERS off;
     CLED_PARAMETERS on;
     CLED_EFFECT_CONFIG effect;
+    uint8_t slowChangeTargetBrightness;
   };
 
   boolean _initialized = false;
   AFEDataAccess *_Data;
+  AFEDevice *_Device;
 
   /**
    * @brief it stories each led color and its brightness
@@ -73,6 +75,7 @@ private:
    */
   void _turnOnOff(uint8_t stripId, boolean state,
                   boolean disableEffects = false);
+
 
   /**
    * @brief Set Color for all leds in the strip. It uses last set brightness
@@ -108,6 +111,17 @@ private:
    */
   void _setColor(uint8_t stripId, CLED_RGB color, uint8_t brightness);
 
+
+  /**
+   * @brief methods required in the main loop to enable effects
+   * 
+   * @param  stripId          ID strip to deactivate an effect on
+   */
+  void effectBlinkingListener(uint8_t stripId);
+  void effectFadeInOutListener(uint8_t stripId);
+  void effectWaveListener(uint8_t stripId);
+  void effectSlowBrightness(uint8_t stripId);
+
 public:
   /**
    * @brief Strip LED configuration parameters
@@ -142,6 +156,7 @@ public:
    */
   CLED_CURRENT_STATE currentState[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
 
+
   /**
    * @brief Construct a new AFECLED object
    *
@@ -154,7 +169,7 @@ public:
    * @param  Data             Reference to data access API
    * @return boolean          True: when succesfully initialized
    */
-  boolean begin(AFEDataAccess *Data);
+  boolean begin(AFEDataAccess *Data, AFEDevice *Device);
 
   /**
    * @brief Turns ON LED strip: color and brightness from the configuration file
@@ -237,15 +252,6 @@ public:
  */
   void deactivateEffect(uint8_t stripId, boolean setToOff = true);
   
-  /**
-   * @brief methods required in the main loop to enable effects
-   * 
-   * @param  stripId          ID strip to deactivate an effect on
-   */
-  void effectBlinkingListener(uint8_t stripId);
-  void effectFadeInOutListener(uint8_t stripId);
-  void effectWaveListener(uint8_t stripId);
-
   /**
    * @brief returns true is LED strip changed from ON->OFF or from OFF->ON
    *

@@ -9,7 +9,7 @@ AFESensorBMEX80::AFESensorBMEX80(){};
 void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
                             TwoWire *WirePort1) {
   AFEDataAccess Data;
-  Data.getConfiguration(id, &configuration);
+  Data.getConfiguration(id, configuration);
   begin(id, configuration->wirePortId == 0 ? WirePort0 : WirePort1);
 
 
@@ -57,8 +57,6 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
          << (_initialized ? F("Found") : F("NOT found: check wiring"));
   Serial << endl << F("--------------------------------------") << endl;
 #endif
-
-  Serial << endl << "######## " << dewPoint(38.25,18.51);
 
 }
 

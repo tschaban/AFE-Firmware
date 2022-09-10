@@ -240,7 +240,9 @@
 #define L_SWITCH_SYSTEM_BUTTON "System button"
 #define L_SWITCH_CONTROL_RELAY "Controlling only the relay"
 #define L_SWITCH_CONTROL_GATE "Controlling only the gate"
+#define L_SWITCH_CONTROL_RGB_LED "RGB LED"
 #define L_SWITCH_RELAY_CONTROLLED "Controls relay"
+#define L_SWITCH_RGB_LED_CONTROLLED "Controls RGB LED"
 #define L_SWITCH_TYPE "Type"
 #define L_SWITCH_MONOSTABLE "Monostable"
 #define L_SWITCH_BISTABLE "Bistable"
@@ -638,6 +640,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "How long keep this state"
+
+#define L_CLED_SLOW_START_TIME "Slow on timeout"
+#define L_CLED_SLOW_STOP_TIME "Slow off timeout"
 
 #define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"

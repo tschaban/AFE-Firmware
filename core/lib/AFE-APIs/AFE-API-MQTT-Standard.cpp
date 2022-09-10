@@ -373,103 +373,299 @@ void AFEAPIMQTTStandard::listener() {
 #endif
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef DEBUG
+    Serial << endl << F(" - is CLED? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
+      if (strlen(_CLED->configuration[i].cled.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _CLED->configuration[i].cled.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processCLED(&i);
+          return;
+        }
+
+        sprintf(mqttCommandTopic, "%s/brightness/cmd",
+                _CLED->configuration[i].cled.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processCLEDBrigtness(&i);
+          return;
+        }
+      }
+
+      if (strlen(_CLED->configuration[i].effect.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _CLED->configuration[i].effect.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processCLEDEffect(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#ifdef DEBUG
+    Serial << endl << F(" - is BH1750? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
+      if (strlen(_BH1750Sensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _BH1750Sensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processBH1750(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_BH1750
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#ifdef DEBUG
+    Serial << endl << F(" - is BMX80? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
+      if (strlen(_BMx80Sensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _BMx80Sensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processBMEX80(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_BMEX80
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef DEBUG
+    Serial << endl << F(" - is ANEMOMETER? : ");
+#endif
+    if (_Device->configuration.noOfAnemometerSensors > 0) {
+      if (strlen(_AnemometerSensor->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _AnemometerSensor->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processAnemometerSensor();
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#ifdef DEBUG
+    Serial << endl << F(" - is RAINMETER? : ");
+#endif
+    if (_Device->configuration.noOfRainmeterSensors>1) {
+      if (strlen(_RainmeterSensor->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _RainmeterSensor->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processRainSensor();
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_RAINMETER
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#ifdef DEBUG
+    Serial << endl << F(" - is HPMA115S0? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
+      if (strlen(_HPMA115S0Sensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _HPMA115S0Sensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processHPMA115S0(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_HPMA115S0
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef DEBUG
+    Serial << endl << F(" - is REGULATOR? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
+      if (strlen(_Regulator[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Regulator[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processRegulator(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#ifdef DEBUG
+    Serial << endl << F(" - is THERMAL PROTECTOR? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
+      if (strlen(_ThermalProtector[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _ThermalProtector[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processThermalProtector(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#ifdef DEBUG
+    Serial << endl << F(" - is DHT? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
+      if (strlen(_DHTSensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _DHTSensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processDHT(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_DHT
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#ifdef DEBUG
+    Serial << endl << F(" - is TSL2561? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
+      if (strlen(_TSL2561Sensor[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _TSL2561Sensor[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processTSL2561(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#ifdef DEBUG
+    Serial << endl << F(" - is Gate? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+      if (strlen(_Gate[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Gate[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processGate(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_GATE
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#ifdef DEBUG
+    Serial << endl << F(" - is Contactron? : ");
+#endif
+    for (uint8_t i = 0; i < _Device->configuration.noOfContractors; i++) {
+      if (strlen(_Contactron[i]->configuration->mqtt.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Contactron[i]->configuration->mqtt.topic);
+        if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
+#ifdef DEBUG
+          Serial << F("Yes");
+#endif
+          processContactron(&i);
+          return;
+        }
+      }
+    }
+#ifdef DEBUG
+    Serial << F("No");
+#endif
+#endif // AFE_CONFIG_HARDWARE_CONTACTRON
+
 #ifdef DEBUG
     Serial << F(" - Topic NOT defined in this device");
 #endif
   }
 }
 
-/*
-void AFEAPIMQTTStandard::listener() {
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-        case AFE_MQTT_DEVICE_BH1750:
-          processBH1750(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_BH1750
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-        case AFE_MQTT_DEVICE_BMX80:
-          processBMEX80(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_BMEX80
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-        case AFE_MQTT_DEVICE_AS3935:
-          processAS3935(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_AS3935
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-        case AFE_MQTT_DEVICE_ANEMOMETER:
-          processAnemometerSensor();
-          break;
-#endif // AFE_CONFIG_HARDWARE_ANEMOMETER
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-        case AFE_MQTT_DEVICE_RAINMETER:
-          processRainSensor();
-          break;
-#endif // AFE_CONFIG_HARDWARE_RAINMETER
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-        case AFE_MQTT_DEVICE_HPMA115S0:
-          processHPMA115S0(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_HPMA115S0
-#ifdef AFE_CONFIG_HARDWARE_GATE
-        case AFE_MQTT_DEVICE_GATE:
-          processGate(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_GATE
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-        case AFE_MQTT_DEVICE_CONTACTRON:
-          processContactron(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_CONTACTRON
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-        case AFE_MQTT_DEVICE_REGULATOR:
-          processRegulator(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-        case AFE_MQTT_DEVICE_THERMAL_PROTECTOR:
-          processThermalProtector(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#ifdef AFE_CONFIG_HARDWARE_DHT
-        case AFE_MQTT_DEVICE_DHT:
-          processDHT(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_DHT
-#ifdef AFE_CONFIG_HARDWARE_CLED
-        case AFE_MQTT_DEVICE_CLED:
-          processCLED(&mqttTopicsCache[i].id);
-          break;
-        case AFE_MQTT_DEVICE_CLED_EFFECTS:
-          processCLEDEffect(&mqttTopicsCache[i].id);
-          break;
-        case AFE_MQTT_DEVICE_CLED_BRIGHTNESS:
-          processCLEDBrigtness(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_CLED
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-        case AFE_MQTT_DEVICE_TSL2561:
-          processTSL2561(&mqttTopicsCache[i].id);
-          break;
-#endif // AFE_CONFIG_HARDWARE_TSL2561
-        default:
-#ifdef DEBUG
-          Serial << endl
-                 << F("ERROR: Device type ") << mqttTopicsCache[i].type
-                 << F(" not found");
-#endif
-          break;
-        }
-
-        break;
-      }
-    }
-  }
-}
-*/
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   return enabled ? publishOnOffState(
@@ -593,8 +789,8 @@ boolean AFEAPIMQTTStandard::publishBatteryMeterValues(uint8_t id) {
   if (enabled) {
     char message[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
     _AnalogInput[id]->getBatteryMeterJSON(message);
-    _ret = Mqtt->publish(_AnalogInput[id]->configuration.battery.mqtt.topic,
-                        message);
+    _ret = Mqtt->publish(_AnalogInput[id]->configuration->battery.mqtt.topic,
+                         message);
   }
   return _ret;
 }
@@ -900,10 +1096,11 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
-  return enabled ? publishOnOffState(
-                       _Regulator[id]->configuration->mqtt.topic,
-                       _Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
-                 : false;
+  return enabled
+             ? publishOnOffState(
+                   _Regulator[id]->configuration->mqtt.topic,
+                   _Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
+             : false;
 }
 
 void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
@@ -937,7 +1134,7 @@ boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
   return enabled ? publishOnOffState(
                        _ThermalProtector[id]->configuration->mqtt.topic,
                        _ThermalProtector[id]->configuration->enabled ? AFE_ON
-                                                                    : AFE_OFF)
+                                                                     : AFE_OFF)
                  : false;
 }
 
@@ -1292,8 +1489,7 @@ boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
 
 /**** Private methods ****/
 
-void AFEAPIMQTTStandard::subscribeToCommand(
-    const char *topic) {
+void AFEAPIMQTTStandard::subscribeToCommand(const char *topic) {
   if (strlen(topic) > 0) {
     char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
     sprintf(mqttCommandTopic, "%s/cmd", topic);

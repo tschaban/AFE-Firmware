@@ -13,6 +13,7 @@
 #define AFE_SWITCH_FUNCTIONALITY_NONE 0  // do nothing
 #define AFE_SWITCH_FUNCTIONALITY_MULTI 1 // System switch and relay control
 #define AFE_SWITCH_FUNCTIONALITY_RELAY 2 // Relay control only
+#define AFE_SWITCH_FUNCTIONALITY_RGBLED 3 // RGB LED
 
 /* Switche bouncing */
 #define AFE_HARDWARE_SWITCH_DEFAULT_BOUNCING 50 // Bouncing for switch in miliseconds

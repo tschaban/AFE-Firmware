@@ -23,6 +23,7 @@ struct CLED_HSB {
 struct CLED_PARAMETERS {
   CLED_RGB color;
   uint8_t brightness;
+  uint16_t changeTime;
 };
 
 #endif // AFE_CONFIG_HARDWARE_CLED

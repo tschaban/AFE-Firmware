@@ -234,7 +234,9 @@
 #define L_SWITCH_SYSTEM_BUTTON "Przycisk systemowy"
 #define L_SWITCH_CONTROL_RELAY "Tylko sterowanie przekaźnikiem"
 #define L_SWITCH_CONTROL_GATE "Tylko sterowanie bramą"
+#define L_SWITCH_CONTROL_RGB_LED "RGB LED"
 #define L_SWITCH_RELAY_CONTROLLED "Steruje przekaźnikiem"
+#define L_SWITCH_RGB_LED_CONTROLLED "Steruje RGB LED"
 #define L_SWITCH_TYPE "Typ"
 #define L_SWITCH_MONOSTABLE "Monostabilny"
 #define L_SWITCH_BISTABLE "Bistabilny"
@@ -656,6 +658,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_CLED_MQTT_ON_OFF_TOPIC "Temat Wł/Wył"
 #define L_CLED_MQTT_EFFECTS_TOPIC "Temat efektów"
+
+#define L_CLED_SLOW_START_TIME "Wolne włącznie"
+#define L_CLED_SLOW_STOP_TIME "Wolne wyłączenie"
 
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska RGB LED: WS281x. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość diod w pasku LED"

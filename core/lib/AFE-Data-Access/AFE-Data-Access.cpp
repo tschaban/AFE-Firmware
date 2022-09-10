@@ -2303,6 +2303,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->relayID = root["relayID"];
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      JsonVariant exists = root["rgbLedID"];
+      configuration->rgbLedID =
+          exists.success() ? root["rgbLedID"] : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 
@@ -2365,6 +2370,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     root["relayID"] = configuration->relayID;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    root["rgbLedID"] = configuration->rgbLedID;
+#endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -2405,6 +2413,11 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.relayID = 0;
 #endif
 #endif // AFE_CONFIG_HARDWARE_RELAY
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  SwitchConfiguration.rgbLedID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -5884,18 +5897,46 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
       configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
       configuration->off.brightness = root["off"]["l"].as<int>();
 
+      JsonVariant exists = root["on"]["t"];
+      configuration->on.changeTime =
+          exists.success() ? root["on"]["t"].as<int>()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
+      exists = root["off"]["t"];
+      configuration->off.changeTime =
+          exists.success() ? root["off"]["t"].as<int>()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
       sprintf(configuration->name, root["name"]);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->cled.idx = root["cIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration->effect.idx = root["eIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      exists = root["cIdx"];
+      configuration->cled.idx =
+          exists.success() ? root["cIdx"] : AFE_DOMOTICZ_DEFAULT_IDX;
+      exists = root["eIdx"];
+      configuration->effect.idx =
+          exists.success() ? root["eIdx"] : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration->cled.topic, root["cMqttTopic"] | "");
-      sprintf(configuration->effect.topic, root["eMqttTopic"] | "");
+      exists = root["cMqttTopic"];
+      if (exists.success()) {
+        sprintf(configuration->cled.topic, root["cMqttTopic"]);
+      } else {
+        configuration->cled.topic[0] = AFE_EMPTY_STRING;
+      }
+
+      exists = root["eMqttTopic"];
+      if (exists.success()) {
+        sprintf(configuration->effect.topic, root["eMqttTopic"]);
+      } else {
+        configuration->effect.topic[0] = AFE_EMPTY_STRING;
+      }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+      exists = root["bConversion"];
       configuration->brightnessConversion =
-          root["bConversion"] |
-          AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
+          exists.success()
+              ? root["bConversion"]
+              : AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
 #endif
 
 #endif
@@ -5951,10 +5992,12 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     cOn["g"] = configuration->on.color.green;
     cOn["b"] = configuration->on.color.blue;
     on["l"] = configuration->on.brightness;
+    on["t"] = configuration->on.changeTime;
     cOff["r"] = configuration->off.color.red;
     cOff["g"] = configuration->off.color.green;
     cOff["b"] = configuration->off.color.blue;
     off["l"] = configuration->off.brightness;
+    off["t"] = configuration->off.changeTime;
 
     root["name"] = configuration->name;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -5993,11 +6036,13 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
-
+  configuration.on.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
   configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
+
   configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
+  configuration.off.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
   configuration.off.brightness =
       AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
 

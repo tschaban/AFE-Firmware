@@ -16,6 +16,9 @@ struct SWITCH {
 #ifdef AFE_CONFIG_HARDWARE_RELAY  
   uint8_t relayID;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  uint8_t rgbLedID;
+#endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

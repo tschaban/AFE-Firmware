@@ -1490,6 +1490,12 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 #endif // defined(AFE_CONFIG_HARDWARE_RELAY) ||
        // defined(AFE_CONFIG_HARDWARE_GATE)
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  addSelectOptionFormItem(page, L_SWITCH_CONTROL_RGB_LED, "3",
+                          configuration.functionality ==
+                              AFE_SWITCH_FUNCTIONALITY_RGBLED);
+#endif // AFE_CONFIG_HARDWARE_CLED
+
   addSelectFormItemClose(page);
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
@@ -1536,6 +1542,28 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
 #endif // // defined(AFE_CONFIG_HARDWARE_RELAY) ||
        // defined(AFE_CONFIG_HARDWARE_GATE)
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+
+  addSelectFormItemOpen(page, F("l"), F(L_SWITCH_RGB_LED_CONTROLLED));
+  addSelectOptionFormItem(page, L_NONE, "255", configuration.rgbLedID ==
+                                                   AFE_HARDWARE_ITEM_NOT_EXIST);
+
+  CLED rgbLedConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfCLEDs; i++) {
+    page += F("<option value=\"");
+    page += i;
+    page += F("\"");
+    page += configuration.rgbLedID == i ? F(" selected=\"selected\"") : F("");
+    page += F(">");
+    Data->getConfiguration(i, &rgbLedConfiguration);
+    sprintf(text, "%d: %s", i + 1, rgbLedConfiguration.name);
+    page.concat(text);
+    page += F("</option>");
+  }
+  addSelectFormItemClose(page);
+
+#endif // AFE_CONFIG_HARDWARE_CLED
 
   addSelectFormItemOpen(page, F("m"), F(L_SWITCH_TYPE));
   addSelectOptionFormItem(page, L_SWITCH_MONOSTABLE, "0",
@@ -3902,6 +3930,12 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    ,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
+  sprintf(_number, "%d", configuration.on.changeTime);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ot",
+                   L_CLED_SLOW_START_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "0", "60000", "1", L_MILISECONDS, false);
+
+
   closeSection(page);
 
   openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
@@ -3913,6 +3947,11 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   sprintf(_number, "%d", configuration.off.brightness);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_BRIGHTNESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
+
+  sprintf(_number, "%d", configuration.off.changeTime);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft", L_CLED_SLOW_STOP_TIME,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "60000",
+                   "1", L_MILISECONDS, false);
 
   closeSection(page);
 
