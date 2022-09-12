@@ -573,7 +573,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_RELAY_TRIGGERED "Relay triggered by"
 #define L_MCP23017_SWITCH_CONNECTION "Switch can be connected directly to ESP's GPIO or through MCP23017 expander"
 #define L_MCP23017_CONNECTION_VIA_MCP "If connection is made via MCP23017 (GPIO above must be set to NONE)"
-
+#define L_MCP23017_EXTENSION "MCP23XXX GPIOs extension"
 
 /* PN532 */
 

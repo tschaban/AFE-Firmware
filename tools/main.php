@@ -4,9 +4,9 @@
 /* Set this before run */
 
 $type = "6";
-$version = "3.5.0.B3";
-$language = "pl";
-$development = true;
+$version = "3.5.0";
+$language = "en";
+$development = false;
 
 
 /**
