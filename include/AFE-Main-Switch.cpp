@@ -115,14 +115,17 @@ void processSwitchEvents(void) {
                  << Switch[i].configuration->rgbLedID;
 #endif
 
-            CLEDStrip->toggle(Switch[i].configuration->rgbLedID,true);
-            MqttAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
+          CLEDStrip->toggle(Switch[i].configuration->rgbLedID, true);
+          MqttAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-            HttpDomoticzAPI->publishCLEDState(
-                Switch[i].configuration->rgbLedID);
-#endif
+/**
+ * @brief HTTP API for Domoticz is nos supported in T7 version for RGB LED
+ *
 
+HttpDomoticzAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
+   */
+#endif
         }
 
 #endif // AFE_CONFIG_HARDWARE_CLED

@@ -1252,12 +1252,6 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
   char _command[strlen(Mqtt->message.content) + 1];
 
   sprintf(_command, "%s", Mqtt->message.content);
-/*
-  for (uint16_t i = 0; i < Mqtt->message.length; i++) {
-    _command[i] = (char)Mqtt->message.content[i];
-  }
-  _command[Mqtt->message.length] = AFE_EMPTY_STRING;
-*/
 
 #ifdef DEBUG
   Serial << _command;

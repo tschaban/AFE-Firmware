@@ -631,9 +631,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_BRIGHTNESS "Jasność"
 #define L_CLED_COLOR_RGB "Kolor"
 #define L_CLED_CONFIGURATION "Konfiguracja RGB LED"
-#define L_CLED_ONOFF_CONFIGURATION "Konfiguracja wł/wył"
-#define L_CLED_ONOFF_CONFIGURATION_ON "RGB LED włączony"
-#define L_CLED_ONOFF_CONFIGURATION_OFF "RGB LED wyłączony"
+#define L_CLED_ONOFF_CONFIGURATION_ON "Włączony LED"
+#define L_CLED_ONOFF_CONFIGURATION_OFF "Wyłączony LED"
 #define L_CLED_EFFECTS_CONFIGURATION "Konfiguracja efektów świetlnych"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "Jak długo utrzymywać stan"
@@ -659,8 +658,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_MQTT_ON_OFF_TOPIC "Temat Wł/Wył"
 #define L_CLED_MQTT_EFFECTS_TOPIC "Temat efektów"
 
-#define L_CLED_SLOW_START_TIME "Wolne włącznie"
-#define L_CLED_SLOW_STOP_TIME "Wolne wyłączenie"
+#define L_CLED_SLOW_START_TIME "Czas miękkiego włącznie"
+#define L_CLED_SLOW_STOP_TIME "Czas miękkiego wyłączenie"
 
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska RGB LED: WS281x. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość diod w pasku LED"

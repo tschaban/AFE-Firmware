@@ -5888,14 +5888,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
       configuration->gpio = root["gpio"].as<int>();
       configuration->ledNumbers = root["ledNumbers"].as<int>();
+      
       configuration->on.color.red = root["on"]["c"]["r"].as<int>();
       configuration->on.color.green = root["on"]["c"]["g"].as<int>();
       configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
       configuration->on.brightness = root["on"]["l"].as<int>();
-      configuration->off.color.red = root["off"]["c"]["r"].as<int>();
-      configuration->off.color.green = root["off"]["c"]["g"].as<int>();
-      configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
-      configuration->off.brightness = root["off"]["l"].as<int>();
 
       JsonVariant exists = root["on"]["t"];
       configuration->on.changeTime =
@@ -5985,7 +5982,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     JsonObject &on = root.createNestedObject("on");
     JsonObject &cOn = on.createNestedObject("c");
     JsonObject &off = root.createNestedObject("off");
-    JsonObject &cOff = off.createNestedObject("c");
     root["gpio"] = configuration->gpio;
     root["ledNumbers"] = configuration->ledNumbers;
     cOn["r"] = configuration->on.color.red;
@@ -5993,10 +5989,6 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     cOn["b"] = configuration->on.color.blue;
     on["l"] = configuration->on.brightness;
     on["t"] = configuration->on.changeTime;
-    cOff["r"] = configuration->off.color.red;
-    cOff["g"] = configuration->off.color.green;
-    cOff["b"] = configuration->off.color.blue;
-    off["l"] = configuration->off.brightness;
     off["t"] = configuration->off.changeTime;
 
     root["name"] = configuration->name;
@@ -6038,14 +6030,7 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
   configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
-
-  configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-  configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-  configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
   configuration.off.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
-  configuration.off.brightness =
-      AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
-
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.cled.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.effect.idx = AFE_DOMOTICZ_DEFAULT_IDX;

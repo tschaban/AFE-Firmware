@@ -93,11 +93,11 @@ private:
    */
 
   CLED_EFFECT_SLOW_CHANGE_CONFIG
-      _slowEffectParams[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  _slowEffectParams[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
   void _effectSlowChange(uint8_t stripId);
-  
   void _runSlowChange(uint8_t stripId, boolean state,
                       boolean disableEffects = false);
+  void _addSlowChangeStep(uint8_t &next, uint8_t from, float step, unsigned long increment);
 
   /**
    * @brief Set Color for all leds in the strip. It uses last set brightness
@@ -138,10 +138,9 @@ private:
    *
    * @param  stripId          ID strip to deactivate an effect on
    */
-  void effectBlinkingListener(uint8_t stripId);
-  void effectFadeInOutListener(uint8_t stripId);
-  void effectWaveListener(uint8_t stripId);
-  void effectSlowBrightness(uint8_t stripId);
+  void _effectBlinkingListener(uint8_t stripId);
+  void _effectFadeInOutListener(uint8_t stripId);
+  void _effectWaveListener(uint8_t stripId);
 
 public:
   /**
@@ -227,25 +226,6 @@ public:
    * @param  disableEffects   if true methods disables effects
    */
   void off(uint8_t stripId, boolean disableEffects = false);
-
-  /**
-   * @brief Turns Off LED strip
-   *
-   * @param  stripId          ID of the LED Strip
-   * @param  color            Color RGB
-   * @param  disableEffects   if true methods disables effects
-   */
-  void off(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
-
-  /**
-   * @brief Turns Off LED strip
-   *
-   * @param  stripId          ID of the LED Strip
-   * @param  ledConfig        Color RGB + brightness
-   * @param  disableEffects   if true methods disables effects
-   */
-  void off(uint8_t stripId, CLED_PARAMETERS ledConfig,
-           boolean disableEffects = false);
 
   /**
    * @brief method turns on/off strip, it can disable or change color

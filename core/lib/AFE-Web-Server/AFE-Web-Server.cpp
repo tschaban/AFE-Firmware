@@ -2727,25 +2727,9 @@ void AFEWebServer::get(CLED &data) {
                            ? server.arg(F("ob")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
-  data.off.color.red = server.arg(F("fr")).length() > 0
-                           ? server.arg(F("fr")).toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
-  data.off.color.green = server.arg(F("fg")).length() > 0
-                             ? server.arg(F("fg")).toInt()
-                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
-  data.off.color.blue = server.arg(F("fb")).length() > 0
-                            ? server.arg(F("fb")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
   data.on.brightness = server.arg(F("ol")).length() > 0
                            ? server.arg(F("ol")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
-
-  data.off.brightness = server.arg(F("fl")).length() > 0
-                            ? server.arg(F("fl")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
 
   data.on.changeTime = server.arg(F("ot")).length() > 0
                            ? server.arg(F("ot")).toInt()

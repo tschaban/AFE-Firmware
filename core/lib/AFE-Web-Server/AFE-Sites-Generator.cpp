@@ -3936,26 +3936,14 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    "0", "60000", "1", L_MILISECONDS, false);
 
 
-  closeSection(page);
-
-  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
-
-  /* Item: Off Led color */
-  addCLEDColorItem(page, &configuration.off.color, "f", F(L_CLED_COLOR_RGB));
-
-  /* Item: Off brightness */
-  sprintf(_number, "%d", configuration.off.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_BRIGHTNESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
-
   sprintf(_number, "%d", configuration.off.changeTime);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft", L_CLED_SLOW_STOP_TIME,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "60000",
-                   "1", L_MILISECONDS, false);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft",
+                   L_CLED_SLOW_STOP_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "0", "60000", "1", L_MILISECONDS, false);
 
   closeSection(page);
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.cled.idx);
@@ -4150,7 +4138,7 @@ void AFESitesGenerator::addCLEDColorItem(String &item, CLED_RGB *color,
                                          const char *labelPrefix,
                                          const __FlashStringHelper *label) {
   char _label[strlen(labelPrefix) + 1];
-  char _color[3];
+  char _color[4];
   item.concat(FPSTR(HTTP_ITEM_CLED_COLOR_RGB));
   item.replace(F("{{i.l}}"), label);
   item.replace(F("{{i.r}}"), FPSTR(HTTP_ITEM_CLED_COLOR_RGB_COLOR));

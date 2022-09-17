@@ -3,10 +3,10 @@
 
 /* Set this before run */
 
-$type = "6";
-$version = "3.5.0";
-$language = "en";
-$development = false;
+$type = "7";
+$version = "3.5.0.B4";
+$language = "pl";
+$development = true;
 
 
 /**

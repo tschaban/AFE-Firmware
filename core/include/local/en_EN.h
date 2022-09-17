@@ -641,8 +641,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "How long keep this state"
 
-#define L_CLED_SLOW_START_TIME "Slow on timeout"
-#define L_CLED_SLOW_STOP_TIME "Slow off timeout"
+#define L_CLED_SLOW_START_TIME "Soft on timeout"
+#define L_CLED_SLOW_STOP_TIME "Soft off timeout"
 
 #define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"
