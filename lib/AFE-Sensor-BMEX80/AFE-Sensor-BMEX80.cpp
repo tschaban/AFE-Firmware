@@ -254,6 +254,14 @@ void AFESensorBMEX80::getJSON(char *json) {
         root.createNestedObject("breathVocEquivalent");
     JsonObject &gasResistance = root.createNestedObject("gasResistance");
 
+    breathVocEquivalent["value"] = data->breathVocEquivalent.value;
+    breathVocEquivalent["unit"] = "?";
+    breathVocEquivalent["accuracy"] = data->breathVocEquivalent.accuracy;
+
+    gasResistance["value"] = data->gasResistance.value;
+    gasResistance["unit"] = "kOm";
+
+
     iaq["value"] = data->iaq.value;
     iaq["rating"] = data->iaq.rating;
     iaq["accuracy"] = data->iaq.accuracy;
@@ -267,12 +275,8 @@ void AFESensorBMEX80::getJSON(char *json) {
     co2Equivalent["rating"] = data->co2Equivalent.rating;
     co2Equivalent["accuracy"] = data->co2Equivalent.accuracy;
 
-    breathVocEquivalent["value"] = data->breathVocEquivalent.value;
-    breathVocEquivalent["unit"] = "?";
-    breathVocEquivalent["accuracy"] = data->breathVocEquivalent.accuracy;
+//{"temperature":{"value":20.76112,"unit":"C","correction":0},"pressure":{"value":1004.08,"unit":"hPa","correction":0},"relativePressure":{"value":1012.219,"unit":"hPa"},"dewPoint":{"value":12.63424,"unit":"C"},"humidity":{"value":59.61296,"unit":"%H","correction":0,"rating":1},"absoluteHumidity":{"value":10.76806,"unit":"%H"},"heatIndex":{"value":20.44935,"unit":"C"},"perception":{"value":1,"description":"Bardzo komfortowo"},"comfort":{"value":2,"ratio":99.31985,"unit":"%","description":"Za zimno"},"iaq":{"value":25,"rating":1,"accuracy":0},"staticIaq":{},"co2Equivalent":{},"breathVocEquivalent":{"value":0.5,"unit":"?","accuracy":0},"gasResistance":{"value":42.212,"unit":"kOm"}}
 
-    gasResistance["value"] = data->gasResistance.value;
-    gasResistance["unit"] = "kOm";
   }
   /**
    * @brief There is a conversion to the real JSON string size. Workaround as
