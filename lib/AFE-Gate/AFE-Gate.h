@@ -22,8 +22,9 @@ class AFEGate {
 public:
   /* Via this class there is access to contactrons */
   AFEContactron Contactron[2];
-  GATE configuration;
-
+  GATE *configuration = new GATE;
+    
+  
   /* Constructors */
   AFEGate();
 
@@ -59,7 +60,7 @@ private:
   uint8_t gateId;                  // ID of the gate
   uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
   boolean _event = false;
-  AFERelay GateRelay;
+  AFERelay *GateRelay;
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

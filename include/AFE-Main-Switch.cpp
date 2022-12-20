@@ -65,17 +65,17 @@ void processSwitchEvents(void) {
            * Gate
            *
            */
-          if (Relay[Switch[i].configuration.relayID].gateId !=
+          if (Relay[Switch[i].configuration->relayID].gateId !=
               AFE_HARDWARE_ITEM_NOT_EXIST) {
-            if (Relay[Switch[i].configuration.relayID].gateId <=
+            if (Relay[Switch[i].configuration->relayID].gateId <=
                 Device->configuration.noOfGates) {
 
 #ifdef DEBUG
               Serial << endl
                      << F("INFO: Relay is assigned to a gate: ")
-                     << Relay[Switch[i].configuration.relayID].gateId;
+                     << Relay[Switch[i].configuration->relayID].gateId;
 #endif
-              Gate[Relay[Switch[i].configuration.relayID].gateId].toggle();
+              Gate[Relay[Switch[i].configuration->relayID].gateId].toggle();
             }
           } else {
 #endif

@@ -641,7 +641,7 @@ void AFEAPIHTTP::addClass(AFEGate *Item) {
 void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    if (strcmp(request->name, _Gate[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Gate[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_GATE_DATA_LENGTH];
       if (strcmp(request->command, "toggle") == 0) {
@@ -675,7 +675,7 @@ void AFEAPIHTTP::addClass(AFEContactron *Item) {
 void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    if (strcmp(request->name, _Contactron[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Contactron[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH];

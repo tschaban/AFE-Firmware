@@ -524,7 +524,7 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
 
 boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
-  return _initialized ? sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
+  return _initialized ? sendSwitchCommand(_Gate[id]->configuration->domoticz.idx,
                                           _Gate[id]->get() == AFE_GATE_OPEN)
                       : false;
 }
@@ -537,7 +537,7 @@ void AFEAPIHTTPDomoticz::addClass(AFEContactron *Item) {
 
 boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_Contactron[id]->configuration.domoticz.idx,
+             ? sendSwitchCommand(_Contactron[id]->configuration->domoticz.idx,
                                  _Contactron[id]->get() == AFE_CONTACTRON_OPEN)
              : false;
 }

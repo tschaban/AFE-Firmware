@@ -183,14 +183,14 @@ void AFEAPIMQTTStandard::subscribe() {
 /* Subscribe: Contactron */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    subscribeToCommand(_Contactron[i]->configuration.mqtt.topic);
+    subscribeToCommand(_Contactron[i]->configuration->mqtt.topic);
   }
 #endif
 
 /* Subscribe: Gate */
 #ifdef AFE_CONFIG_HARDWARE_GATE
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    subscribeToCommand(_Gate[i]->configuration.mqtt.topic);
+    subscribeToCommand(_Gate[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -379,8 +379,7 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
       if (strlen(_CLED->configuration[i].cled.topic) > 0) {
-        sprintf(mqttCommandTopic, "%s/cmd",
-                _CLED->configuration[i].cled.topic);
+        sprintf(mqttCommandTopic, "%s/cmd", _CLED->configuration[i].cled.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -488,7 +487,7 @@ void AFEAPIMQTTStandard::listener() {
 #ifdef DEBUG
     Serial << endl << F(" - is RAINMETER? : ");
 #endif
-    if (_Device->configuration.noOfRainmeterSensors>1) {
+    if (_Device->configuration.noOfRainmeterSensors > 1) {
       if (strlen(_RainmeterSensor->configuration->mqtt.topic) > 0) {
         sprintf(mqttCommandTopic, "%s/cmd",
                 _RainmeterSensor->configuration->mqtt.topic);
@@ -622,8 +621,7 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
       if (strlen(_Gate[i]->configuration->mqtt.topic) > 0) {
-        sprintf(mqttCommandTopic, "%s/cmd",
-                _Gate[i]->configuration->mqtt.topic);
+        sprintf(mqttCommandTopic, "%s/cmd", _Gate[i]->configuration->mqtt.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -642,7 +640,7 @@ void AFEAPIMQTTStandard::listener() {
 #ifdef DEBUG
     Serial << endl << F(" - is Contactron? : ");
 #endif
-    for (uint8_t i = 0; i < _Device->configuration.noOfContractors; i++) {
+    for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
       if (strlen(_Contactron[i]->configuration->mqtt.topic) > 0) {
         sprintf(mqttCommandTopic, "%s/cmd",
                 _Contactron[i]->configuration->mqtt.topic);
@@ -1011,7 +1009,8 @@ void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Processing Gate ID: ") << *id;
 #endif
-  if ((char)Mqtt->message.content[0] == 't' && Mqtt->message.length == 6) {
+
+  if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_TOGGLE) == 0) {
     _Gate[*id]->toggle();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishGateState(*id);
@@ -1026,9 +1025,9 @@ void AFEAPIMQTTStandard::processGate(uint8_t *id) {
 boolean AFEAPIMQTTStandard::publishGateState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    if (strlen(_Gate[id]->configuration.mqtt.topic) > 0) {
+    if (strlen(_Gate[id]->configuration->mqtt.topic) > 0) {
       char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(mqttStateTopic, "%s/state", _Gate[id]->configuration.mqtt.topic);
+      sprintf(mqttStateTopic, "%s/state", _Gate[id]->configuration->mqtt.topic);
       uint8_t _state = _Gate[id]->get();
       publishStatus = Mqtt->publish(
           mqttStateTopic, _state == AFE_GATE_OPEN
@@ -1061,7 +1060,7 @@ void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 
 boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
   // TODO T5 - check if works as in previous version
-  return enabled ? publishOnOffState(_Contactron[id]->configuration.mqtt.topic,
+  return enabled ? publishOnOffState(_Contactron[id]->configuration->mqtt.topic,
                                      _Contactron[id]->get(), true)
                  : false;
 }
