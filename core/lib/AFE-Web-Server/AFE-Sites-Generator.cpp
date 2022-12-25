@@ -4194,7 +4194,7 @@ void AFESitesGenerator::setAttributes(String *page) {
 
 #if defined(AFE_ESP_FLASH_4MB)
   page->replace(F("{{f.s}}"), F("4Mb"));
-#elif defined(AFE_ESP_FLASH_2MBB)
+#elif defined(AFE_ESP_FLASH_2MB)
   page->replace(F("{{f.s}}"), F("2Mb"));
 #else
   page->replace(F("{{f.s}}"), F("1Mb"));

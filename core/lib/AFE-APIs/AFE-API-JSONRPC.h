@@ -39,7 +39,8 @@ const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{"
 
 class AFEJSONRPC {
 private:
-  HTTPClient *http = new HTTPClient();
+  WiFiClient WirelessClient;
+  HTTPClient *http = new HTTPClient();  
   AFEDevice *Device;
   AFEDataAccess *Data;  
   String message;

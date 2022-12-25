@@ -76,60 +76,125 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
     PRO_VERSION *Pro = new PRO_VERSION;
     Data->getConfiguration(Pro);
 
-    WiFiClient WirelessClient;
+    
 
-    if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
+    // if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
+    if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_SERVER,
+                    AFE_CONFIG_JSONRPC_REST_API_SERVER_PORT,
+                    AFE_CONFIG_JSONRPC_REST_API_SERVER_URI, true)) {
+
+      http->setTimeout(AFE_CONFIG_JSONRPC_JSON_TIMEOUT);
+      http->setReuse(true);
 
 #ifdef DEBUG
-      Serial << endl << "INFO: API REST: Connected to the api server";
+      Serial << endl << F("INFO: API REST: Connected to the api server");
     } else {
-      Serial << endl << "ERROR: API REST: NOT connected to the api server";
+      Serial << endl << F("ERROR: API REST: NOT connected to the api server");
 #endif
     }
 
+#ifdef DEBUG
+    Serial << endl << F("INFO: API REST: Setting header:");
+#endif
+
     http->addHeader("Content-Type", "application/json");
     http->addHeader("afe-did", Device->deviceId);
+    
+#ifdef DEBUG
+    Serial << endl << F(" : afe-did: ") << Device->deviceId;
+#endif
+
     if (strlen(Pro->serial) > 0) {
       http->addHeader("afe-key", Pro->serial);
+#ifdef DEBUG
+      Serial << endl << F(" : afe-key: ") << Pro->serial;
+#endif
     }
     sprintf(_text, "%d", AFE_FIRMWARE_TYPE);
     http->addHeader("afe-type", _text);
+#ifdef DEBUG
+    Serial << endl << F(" : afe-type: ") << _text;
+#endif
     http->addHeader("afe-version", AFE_FIRMWARE_VERSION);
+#ifdef DEBUG
+    Serial << endl << F(" : afe-version: ") << AFE_FIRMWARE_VERSION;
+#endif
     sprintf(_text, "%d", AFE_DEVICE_TYPE_ID);
     http->addHeader("afe-hid", _text);
+#ifdef DEBUG
+    Serial << endl << F(" : afe-hid: ") << AFE_DEVICE_TYPE_ID;
+#endif
     http->addHeader("afe-lang", L_LANGUAGE_SHORT);
+#ifdef DEBUG
+    Serial << endl << F(" : afe-lang: ") << L_LANGUAGE_SHORT;
+#endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     http->addHeader("afe-api", "D");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-api: D");
+#endif
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
     http->addHeader("afe-api", "H");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-api: H");
+#endif
 #else
     http->addHeader("afe-api", "S");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-api: S");
+#endif
 #endif
 
 #if defined(ESP8285)
     http->addHeader("afe-chip", "8285");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-chip: 8285");
+#endif
 #elif defined(ESP8266)
     http->addHeader("afe-chip", "8266");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-chip: 8286");
+#endif
 #else
     http->addHeader("afe-chip", "32");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-chip: 32");
+#endif
 #endif
 
 #if defined(AFE_ESP_FLASH_4MB)
     http->addHeader("afe-size", "4");
-#elif defined(AFE_ESP_FLASH_2MBB)
+#ifdef DEBUG
+    Serial << endl << F(" : afe-size: 4");
+#endif
+#elif defined(AFE_ESP_FLASH_2MB)
     http->addHeader("afe-size", "2");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-size: 2");
+#endif
 #else
     http->addHeader("afe-size", "1");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-size: 1");
+#endif
 #endif
 
 #ifdef DEBUG
     http->addHeader("afe-debug", "1");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-debug: 1");
+#endif
 #else
     http->addHeader("afe-debug", "0");
+#ifdef DEBUG
+    Serial << endl << F(" : afe-debug: 0");
+#endif
 #endif
 
     _httpCode = http->POST(message);
+
+
 
 #ifdef DEBUG
     Serial << endl
@@ -172,7 +237,8 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
       response = http->getString();
 
       Serial << endl
-             << F("INFO: API REST: Response reply code: ") << _httpCode
+             << F("INFO: API REST: Response reply code: ") << _httpCode << " "
+             << (_httpCode < 0 ? http->errorToString(_httpCode) : "")
              << F(", content: ") << response << F(", Size: ")
              << response.length();
     }

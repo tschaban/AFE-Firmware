@@ -1,8 +1,12 @@
 #ifndef _AFE_Hardware_JSONRPC_h
 #define _AFE_Hardware_JSONRPC_h
 
-#define AFE_CONFIG_JSONRPC_REST_API_URL "http://api.smartnydom.pl/rest/"
-#define AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL "http://api.smartnydom.pl/download/"
+#define AFE_CONFIG_JSONRPC_REST_API_URL "https://api.smartnydom.pl/rest/"
+#define AFE_CONFIG_JSONRPC_REST_API_SERVER "api.smartnydom.pl"
+#define AFE_CONFIG_JSONRPC_REST_API_SERVER_PORT 80
+#define AFE_CONFIG_JSONRPC_REST_API_SERVER_URI "/rest"
+
+#define AFE_CONFIG_JSONRPC_DOWNLOAD_API_URL "https://api.smartnydom.pl/download/"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME "get-welcome-message"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION "check-version"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO "check-pro"
@@ -14,5 +18,7 @@
 #define AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE "get-firmware-upgrade-message"
 #define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 200
 #define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE 380
+#define AFE_CONFIG_JSONRPC_JSON_TIMEOUT 3000 // Response timeout in msec
+
 
 #endif // _AFE_Hardware_JSONRPC_h
