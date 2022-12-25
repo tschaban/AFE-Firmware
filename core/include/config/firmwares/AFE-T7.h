@@ -1,8 +1,24 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.5.0"
+#define AFE_FIRMWARE_VERSION "3.5.0.B5"
 #define AFE_FIRMWARE_TYPE 7
+
+/* GPIOs of SmartnyDom Sterownik 
+System LED: 22
+RGB LED 1: 13
+RGB LED 2: 14
+Switch 1: 26 (Zle oznakowanie na płytce)
+Switch 2: 25 (zle oznakowanie na płytce)
+
+
+
+
+
+*/
+
+
+
 
 /* Hardware */
 /* Common hardware for all versions */

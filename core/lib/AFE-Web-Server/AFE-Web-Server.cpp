@@ -783,36 +783,50 @@ boolean AFEWebServer::generate(boolean upload) {
   return _ret;
 }
 
-/* Methods related to the url request */
+/**
+ * @brief Methods related to the url request
+ * If command recieved than receivedHTTPCommand flag is set which is then
+ * checked by the HTTPRequstsListener
+ *
+ */
+
+// http://192.168.2.83/?device=BMEX80&name=BMP280&command=get
 
 boolean AFEWebServer::getOptionName() {
-  /* Recived HTTP API Command */
-  if (server.hasArg(F("command"))) {
-    /* Constructing command */
-    server.arg(F("command"))
-        .toCharArray(httpCommand.command, sizeof(httpCommand.command));
-    if (server.arg(F("device"))) {
-      server.arg(F("device"))
-          .toCharArray(httpCommand.device, sizeof(httpCommand.device));
-    } else {
-      memset(httpCommand.device, 0, sizeof httpCommand.device);
-    }
-    if (server.arg(F("name"))) {
-      server.arg(F("name")).toCharArray(httpCommand.name,
-                                        sizeof(httpCommand.name));
-    } else {
-      memset(httpCommand.name, 0, sizeof httpCommand.name);
-    }
 
-    if (server.arg(F("source"))) {
-      server.arg(F("source"))
-          .toCharArray(httpCommand.source, sizeof(httpCommand.source));
-    } else {
-      memset(httpCommand.source, 0, sizeof httpCommand.source);
+  /**
+   * @brief HTTP API works only in AFE operating mode
+   *
+   */
+  if (Device->getMode() == AFE_MODE_NORMAL) {
+    if (server.hasArg(F("command"))) {
+      server.arg(F("command"))
+          .toCharArray(httpAPICommand->command,
+                       sizeof(httpAPICommand->command));
+      if (server.arg(F("device"))) {
+        server.arg(F("device"))
+            .toCharArray(httpAPICommand->device,
+                         sizeof(httpAPICommand->device));
+      } else {
+        memset(httpAPICommand->device, 0, sizeof httpAPICommand->device);
+      }
+      if (server.arg(F("name"))) {
+        server.arg(F("name")).toCharArray(httpAPICommand->name,
+                                          sizeof(httpAPICommand->name));
+      } else {
+        memset(httpAPICommand->name, 0, sizeof httpAPICommand->name);
+      }
+
+      if (server.arg(F("source"))) {
+        server.arg(F("source"))
+            .toCharArray(httpAPICommand->source,
+                         sizeof(httpAPICommand->source));
+      } else {
+        memset(httpAPICommand->source, 0, sizeof httpAPICommand->source);
+      }
+      receivedHTTPCommand = true;
     }
-    receivedHTTPCommand = true;
   }
-
   return receivedHTTPCommand;
 }
 
@@ -854,11 +868,13 @@ uint8_t AFEWebServer::getOption() {
   }
 }
 
-/* Server methods */
-
-HTTPCOMMAND AFEWebServer::getHTTPCommand() {
-  receivedHTTPCommand = false;
-  return httpCommand;
+boolean AFEWebServer::httpAPIlistener() {
+  if (receivedHTTPCommand) {
+    receivedHTTPCommand = false;
+    return true;
+  } else {
+    return false;
+  }
 }
 
 void AFEWebServer::listener() {
@@ -880,8 +896,6 @@ void AFEWebServer::listener() {
     }
   }
 }
-
-boolean AFEWebServer::httpAPIlistener() { return receivedHTTPCommand; }
 
 void AFEWebServer::sendJSON(const String &json) {
 
@@ -1626,6 +1640,10 @@ void AFEWebServer::get(SWITCH &data) {
   data.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : 0;
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   data.relayID = server.arg(F("r")).length() > 0 ? server.arg(F("r")).toInt()
+                                                 : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  data.rgbLedID = server.arg(F("l")).length() > 0 ? server.arg(F("l")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -2709,25 +2727,18 @@ void AFEWebServer::get(CLED &data) {
                            ? server.arg(F("ob")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
 
-  data.off.color.red = server.arg(F("fr")).length() > 0
-                           ? server.arg(F("fr")).toInt()
-                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
-  data.off.color.green = server.arg(F("fg")).length() > 0
-                             ? server.arg(F("fg")).toInt()
-                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
-  data.off.color.blue = server.arg(F("fb")).length() > 0
-                            ? server.arg(F("fb")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-
   data.on.brightness = server.arg(F("ol")).length() > 0
                            ? server.arg(F("ol")).toInt()
                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
 
-  data.off.brightness = server.arg(F("fl")).length() > 0
-                            ? server.arg(F("fl")).toInt()
-                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
+  data.on.changeTime = server.arg(F("ot")).length() > 0
+                           ? server.arg(F("ot")).toInt()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
+  data.off.changeTime = server.arg(F("ft")).length() > 0
+                            ? server.arg(F("ft")).toInt()
+                            : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
 
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));

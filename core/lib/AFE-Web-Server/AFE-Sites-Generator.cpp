@@ -1046,10 +1046,14 @@ void AFESitesGenerator::siteSystemLED(String &page) {
 void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   RELAY configuration;
   Data->getConfiguration(id, &configuration);
-
   char _number[9];
   char _text[23];
   sprintf(_text, "%s #%d", L_RELAY, id + 1);
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
   openSection(page, _text, F(""));
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -1453,8 +1457,11 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   SWITCH configuration;
-  Data->getConfiguration(id, &configuration);
   char text[25];
+
+  if (!Data->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   GATE gateConfiguration;
@@ -1482,6 +1489,12 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                               AFE_SWITCH_FUNCTIONALITY_RELAY);
 #endif // defined(AFE_CONFIG_HARDWARE_RELAY) ||
        // defined(AFE_CONFIG_HARDWARE_GATE)
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  addSelectOptionFormItem(page, L_SWITCH_CONTROL_RGB_LED, "3",
+                          configuration.functionality ==
+                              AFE_SWITCH_FUNCTIONALITY_RGBLED);
+#endif // AFE_CONFIG_HARDWARE_CLED
 
   addSelectFormItemClose(page);
 
@@ -1529,6 +1542,28 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
 #endif // // defined(AFE_CONFIG_HARDWARE_RELAY) ||
        // defined(AFE_CONFIG_HARDWARE_GATE)
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+
+  addSelectFormItemOpen(page, F("l"), F(L_SWITCH_RGB_LED_CONTROLLED));
+  addSelectOptionFormItem(page, L_NONE, "255", configuration.rgbLedID ==
+                                                   AFE_HARDWARE_ITEM_NOT_EXIST);
+
+  CLED rgbLedConfiguration;
+  for (uint8_t i = 0; i < Device->configuration.noOfCLEDs; i++) {
+    page += F("<option value=\"");
+    page += i;
+    page += F("\"");
+    page += configuration.rgbLedID == i ? F(" selected=\"selected\"") : F("");
+    page += F(">");
+    Data->getConfiguration(i, &rgbLedConfiguration);
+    sprintf(text, "%d: %s", i + 1, rgbLedConfiguration.name);
+    page.concat(text);
+    page += F("</option>");
+  }
+  addSelectFormItemClose(page);
+
+#endif // AFE_CONFIG_HARDWARE_CLED
 
   addSelectFormItemOpen(page, F("m"), F(L_SWITCH_TYPE));
   addSelectOptionFormItem(page, L_SWITCH_MONOSTABLE, "0",
@@ -3895,21 +3930,20 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    ,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
 
+  sprintf(_number, "%d", configuration.on.changeTime);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ot",
+                   L_CLED_SLOW_START_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "0", "60000", "1", L_MILISECONDS, false);
+
+
+  sprintf(_number, "%d", configuration.off.changeTime);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft",
+                   L_CLED_SLOW_STOP_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                   "0", "60000", "1", L_MILISECONDS, false);
+
   closeSection(page);
 
-  openSection(page, F(L_CLED_ONOFF_CONFIGURATION_OFF), F(""));
-
-  /* Item: Off Led color */
-  addCLEDColorItem(page, &configuration.off.color, "f", F(L_CLED_COLOR_RGB));
-
-  /* Item: Off brightness */
-  sprintf(_number, "%d", configuration.off.brightness);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "fl", L_CLED_BRIGHTNESS,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "255", "1");
-
-  closeSection(page);
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.cled.idx);
@@ -4104,7 +4138,7 @@ void AFESitesGenerator::addCLEDColorItem(String &item, CLED_RGB *color,
                                          const char *labelPrefix,
                                          const __FlashStringHelper *label) {
   char _label[strlen(labelPrefix) + 1];
-  char _color[3];
+  char _color[4];
   item.concat(FPSTR(HTTP_ITEM_CLED_COLOR_RGB));
   item.replace(F("{{i.l}}"), label);
   item.replace(F("{{i.r}}"), FPSTR(HTTP_ITEM_CLED_COLOR_RGB_COLOR));
@@ -4160,7 +4194,7 @@ void AFESitesGenerator::setAttributes(String *page) {
 
 #if defined(AFE_ESP_FLASH_4MB)
   page->replace(F("{{f.s}}"), F("4Mb"));
-#elif defined(AFE_ESP_FLASH_2MBB)
+#elif defined(AFE_ESP_FLASH_2MB)
   page->replace(F("{{f.s}}"), F("2Mb"));
 #else
   page->replace(F("{{f.s}}"), F("1Mb"));

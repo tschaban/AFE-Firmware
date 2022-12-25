@@ -1,7 +1,7 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.5.0"
+#define AFE_FIRMWARE_VERSION "3.5.3"
 #define AFE_FIRMWARE_TYPE 6
 
 /**
@@ -16,7 +16,7 @@
  * @brief Functionalities & Hardware : ECS Wheater station
  * 
  */
-#elif !(defined(AFE_DEVICE_iECS_WHEATER_STATION_20) || defined(AFE_DEVICE_iECS_WHEATER_STATION_21))
+#elif defined(AFE_DEVICE_iECS_WHEATER_STATION_20) || defined(AFE_DEVICE_iECS_WHEATER_STATION_21)
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #define AFE_CONFIG_FUNCTIONALITY_ADC
@@ -32,6 +32,7 @@
  * 
  */
 #else
+
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
 #define AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 #define AFE_CONFIG_FUNCTIONALITY_ADC
@@ -43,6 +44,7 @@
 #define AFE_CONFIG_HARDWARE_RAINMETER
 #define AFE_CONFIG_HARDWARE_DS18B20
 #define AFE_CONFIG_HARDWARE_DHT
+
 #endif
 
 

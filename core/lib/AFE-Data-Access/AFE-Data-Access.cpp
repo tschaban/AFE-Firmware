@@ -345,7 +345,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
       JsonVariant exists = root["api"]["domoticz"];
-      configuration->api.domoticz= exists.success() ?  root["api"]["domoticz"] : false;
+      configuration->api.domoticz =
+          exists.success() ? root["api"]["domoticz"] : false;
 
       /* HTTP API must be ON when Domoticz is ON */
       if (configuration->api.domoticz && !configuration->api.http) {
@@ -822,19 +823,19 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
       sprintf(configuration->version, root["version"]);
 
-#ifdef DEBUG
-      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
-#endif
     }
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
-  }
 
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FIRMWARE, jsonBuffer.size());
+#endif
+
+  }
 #ifdef DEBUG
   else {
     Serial << endl
@@ -1017,13 +1018,12 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
     Serial << F("success") << endl << F("INFO: JSON: ");
 #endif
-  
+
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-
 
     if (root.success()) {
 #ifdef DEBUG
@@ -1070,7 +1070,6 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
-      
     }
 #endif
 
@@ -1872,8 +1871,9 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
-  char fileName[20];
+boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
+  boolean _ret = false;
+  char fileName[sizeof(AFE_FILE_RELAY_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1881,18 +1881,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-
-  // if (!LITTLEFS.exists(fileName)) {
-  //    createRelayConfigurationFile(id);
-  // }
-
   File configFile = LITTLEFS.open(fileName, "r");
 #else
-
-  //  if (!SPIFFS.exists(fileName)) {
-  //    createRelayConfigurationFile(id);
-  //  }
-
   File configFile = SPIFFS.open(fileName, "r");
 #endif
 
@@ -1941,6 +1931,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RELAY, jsonBuffer.size());
 #endif
+      _ret = true;
     }
 #ifdef DEBUG
     else {
@@ -1957,6 +1948,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
+  return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
   char fileName[20];
@@ -2275,8 +2267,9 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
-  char fileName[21];
+boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
+  boolean _ret = false;
+  char fileName[sizeof(AFE_FILE_SWITCH_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -2303,13 +2296,17 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-
       configuration->gpio = root["gpio"].as<int>();
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
       configuration->functionality = root["functionality"];
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->relayID = root["relayID"];
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+      JsonVariant exists = root["rgbLedID"];
+      configuration->rgbLedID =
+          exists.success() ? root["rgbLedID"] : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
@@ -2326,13 +2323,13 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_SWITCH, jsonBuffer.size());
 #endif
+      _ret = true;
     }
 #ifdef DEBUG
     else {
       Serial << F("ERROR: JSON not pharsed");
     }
 #endif
-
     configFile.close();
   }
 
@@ -2342,7 +2339,9 @@ void AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
            << F("ERROR: Configuration file: ") << fileName << F(" not opened");
   }
 #endif
+  return _ret;
 }
+
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
   char fileName[21];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
@@ -2370,6 +2369,9 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
     root["functionality"] = configuration->functionality;
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     root["relayID"] = configuration->relayID;
+#endif
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    root["rgbLedID"] = configuration->rgbLedID;
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
@@ -2411,6 +2413,11 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.relayID = 0;
 #endif
 #endif // AFE_CONFIG_HARDWARE_RELAY
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  SwitchConfiguration.rgbLedID = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif // AFE_CONFIG_HARDWARE_CLED
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   SwitchConfiguration.domoticz.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
@@ -5881,27 +5888,52 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
       configuration->gpio = root["gpio"].as<int>();
       configuration->ledNumbers = root["ledNumbers"].as<int>();
+      
       configuration->on.color.red = root["on"]["c"]["r"].as<int>();
       configuration->on.color.green = root["on"]["c"]["g"].as<int>();
       configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
       configuration->on.brightness = root["on"]["l"].as<int>();
-      configuration->off.color.red = root["off"]["c"]["r"].as<int>();
-      configuration->off.color.green = root["off"]["c"]["g"].as<int>();
-      configuration->off.color.blue = root["off"]["c"]["b"].as<int>();
-      configuration->off.brightness = root["off"]["l"].as<int>();
+
+      JsonVariant exists = root["on"]["t"];
+      configuration->on.changeTime =
+          exists.success() ? root["on"]["t"].as<int>()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
+
+      exists = root["off"]["t"];
+      configuration->off.changeTime =
+          exists.success() ? root["off"]["t"].as<int>()
+                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
 
       sprintf(configuration->name, root["name"]);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      configuration->cled.idx = root["cIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration->effect.idx = root["eIdx"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+      exists = root["cIdx"];
+      configuration->cled.idx =
+          exists.success() ? root["cIdx"] : AFE_DOMOTICZ_DEFAULT_IDX;
+      exists = root["eIdx"];
+      configuration->effect.idx =
+          exists.success() ? root["eIdx"] : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-      sprintf(configuration->cled.topic, root["cMqttTopic"] | "");
-      sprintf(configuration->effect.topic, root["eMqttTopic"] | "");
+      exists = root["cMqttTopic"];
+      if (exists.success()) {
+        sprintf(configuration->cled.topic, root["cMqttTopic"]);
+      } else {
+        configuration->cled.topic[0] = AFE_EMPTY_STRING;
+      }
+
+      exists = root["eMqttTopic"];
+      if (exists.success()) {
+        sprintf(configuration->effect.topic, root["eMqttTopic"]);
+      } else {
+        configuration->effect.topic[0] = AFE_EMPTY_STRING;
+      }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
+      exists = root["bConversion"];
       configuration->brightnessConversion =
-          root["bConversion"] |
-          AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
+          exists.success()
+              ? root["bConversion"]
+              : AFE_CONFIG_HARDWARE_CLED_DEFAULT_BRIGHTNESS_CONVERSION;
 #endif
 
 #endif
@@ -5950,17 +5982,14 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
     JsonObject &on = root.createNestedObject("on");
     JsonObject &cOn = on.createNestedObject("c");
     JsonObject &off = root.createNestedObject("off");
-    JsonObject &cOff = off.createNestedObject("c");
     root["gpio"] = configuration->gpio;
     root["ledNumbers"] = configuration->ledNumbers;
     cOn["r"] = configuration->on.color.red;
     cOn["g"] = configuration->on.color.green;
     cOn["b"] = configuration->on.color.blue;
     on["l"] = configuration->on.brightness;
-    cOff["r"] = configuration->off.color.red;
-    cOff["g"] = configuration->off.color.green;
-    cOff["b"] = configuration->off.color.blue;
-    off["l"] = configuration->off.brightness;
+    on["t"] = configuration->on.changeTime;
+    off["t"] = configuration->off.changeTime;
 
     root["name"] = configuration->name;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -5999,14 +6028,9 @@ void AFEDataAccess::createCLEDConfigurationFile() {
   configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
-
+  configuration.on.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
   configuration.on.brightness = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_BRIGHTNESS;
-  configuration.off.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-  configuration.off.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-  configuration.off.color.blue = AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_COLOR;
-  configuration.off.brightness =
-      AFE_CONFIG_HARDWARE_CLED_DEFAULT_OFF_BRIGHTNESS;
-
+  configuration.off.changeTime = AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.cled.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.effect.idx = AFE_DOMOTICZ_DEFAULT_IDX;

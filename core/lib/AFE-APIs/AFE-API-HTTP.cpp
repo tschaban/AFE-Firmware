@@ -35,8 +35,7 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
 void AFEAPIHTTP::listener() {
   if (enabled) {
     if (_HTTP->httpAPIlistener()) {
-      HTTPCOMMAND request = _HTTP->getHTTPCommand();
-      processRequest(&request);
+      processRequest(_HTTP->httpAPICommand);
     }
   }
 }
@@ -434,7 +433,7 @@ void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
 #ifdef AFE_ESP32
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strcmp(request->name, _AnalogInput[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _AnalogInput[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
@@ -642,7 +641,7 @@ void AFEAPIHTTP::addClass(AFEGate *Item) {
 void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    if (strcmp(request->name, _Gate[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Gate[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_GATE_DATA_LENGTH];
       if (strcmp(request->command, "toggle") == 0) {
@@ -676,7 +675,7 @@ void AFEAPIHTTP::addClass(AFEContactron *Item) {
 void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    if (strcmp(request->name, _Contactron[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _Contactron[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH];
@@ -824,7 +823,7 @@ void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
   for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    if (strcmp(request->name, _DHTSensor[i]->configuration.name) == 0) {
+    if (strcmp(request->name, _DHTSensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
@@ -1020,8 +1019,7 @@ void AFEAPIHTTP::send(HTTPCOMMAND *request, boolean status, const char *value) {
                   strlen(request->name) > 0 ? request->name : "");
   respond.replace(F("{{request.command}}"),
                   strlen(request->command) > 0 ? request->command : "");
-  respond.replace(F("{{response.data}}"),
-                  strlen(value) > 0 ? value : "\"\"");
+  respond.replace(F("{{response.data}}"), strlen(value) > 0 ? value : "\"\"");
   respond.replace(F("{{response.status}}"), status ? F("success") : F("error"));
   _HTTP->sendJSON(respond);
 }

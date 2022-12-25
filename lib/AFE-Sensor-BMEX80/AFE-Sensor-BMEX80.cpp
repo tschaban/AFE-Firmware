@@ -9,8 +9,12 @@ AFESensorBMEX80::AFESensorBMEX80(){};
 void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
                             TwoWire *WirePort1) {
   AFEDataAccess Data;
-  Data.getConfiguration(id, &configuration);
+  Data.getConfiguration(id, configuration);
   begin(id, configuration->wirePortId == 0 ? WirePort0 : WirePort1);
+
+
+
+
 }
 #endif // AFE_ESP32
 
@@ -31,13 +35,13 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
 #endif
 
     if (configuration->type == AFE_BME680_SENSOR) {
-      _initialized = s6->begin(configuration, _WirePort);
+      _initialized = s6->begin(configuration, _WirePort, data);
     } else if (configuration->type == AFE_BME280_SENSOR ||
                configuration->type == AFE_BMP280_SENSOR) {
-      _initialized = s2->begin(configuration, _WirePort);
+      _initialized = s2->begin(configuration, _WirePort, data);
 #ifndef AFE_ESP32
     } else if (configuration->type == AFE_BMP180_SENSOR) {
-      _initialized = s1->begin(configuration, _WirePort);
+      _initialized = s1->begin(configuration, _WirePort, data);
 #endif // AFE_ESP32
     } else {
       _initialized = false;
@@ -53,6 +57,7 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
          << (_initialized ? F("Found") : F("NOT found: check wiring"));
   Serial << endl << F("--------------------------------------") << endl;
 #endif
+
 }
 
 boolean AFESensorBMEX80::isReady() {
@@ -69,10 +74,6 @@ void AFESensorBMEX80::listener() {
     unsigned long time = millis();
     boolean readStatus = false;
 
-    if (configuration->type == AFE_BME680_SENSOR) {
-      readStatus = s6->read();
-    }
-
     if (startTime == 0) { // starting timer. used for switch sensitiveness
       startTime = time;
     }
@@ -85,7 +86,18 @@ void AFESensorBMEX80::listener() {
              << F("--------") << F(" Reading sensor data ") << F("--------");
 #endif
 
-      if (configuration->type != AFE_BME680_SENSOR) {
+      if (configuration->type == AFE_BME680_SENSOR) {
+        /**
+         * @brief Reading Bosch BME680 Sensor
+         * 
+         */
+        readStatus = s6->read();
+      } else if (configuration->type != AFE_BME680_SENSOR) {
+        /**
+         * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
+         * 
+         */
+
 #ifdef AFE_ESP32
         readStatus = s2->read();
 #else  // ESP8266
@@ -97,18 +109,20 @@ void AFESensorBMEX80::listener() {
       }
 
       if (readStatus) {
-
-        if (configuration->type == AFE_BME680_SENSOR) {
-          data = s6->data;
-        } else {
-#ifdef AFE_ESP32
-          data = s2->data;
-#else  // ESP8266
-          data = configuration->type == AFE_BME280_SENSOR || AFE_BMP280_SENSOR
-                     ? s2->data
-                     : s1->data;
-#endif // ESP32/ESP8266
-        }
+        /*&
+                if (configuration->type == AFE_BME680_SENSOR) {
+                  data = s6->data;
+                } else {
+        #ifdef AFE_ESP32
+                  data = s2->data;
+        #else  // ESP8266
+                  data = configuration->type == AFE_BME280_SENSOR ||
+        AFE_BMP280_SENSOR
+                             ? s2->data
+                             : s1->data;
+        #endif // ESP32/ESP8266
+                }
+                */
         applyCorrections();
         ready = true;
 
@@ -153,7 +167,8 @@ void AFESensorBMEX80::listener() {
 }
 
 void AFESensorBMEX80::getJSON(char *json) {
-  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH> jsonBuffer;
+
+  StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.createObject();
 
   JsonObject &temperature = root.createNestedObject("temperature");
@@ -175,7 +190,10 @@ void AFESensorBMEX80::getJSON(char *json) {
   relativePressure["value"] = data->relativePressure.value;
   relativePressure["unit"] = pressure["unit"];
 
-  /* Not applicable for BMP180 Sensor */
+  /**
+   * @brief Not applicable for BMP280/BMP180 Sensor
+   * 
+   */
   if (configuration->type != AFE_BMP180_SENSOR &&
       configuration->type != AFE_BMP280_SENSOR) {
     char _perception[90]; // Max size of dewPointPerception from lang.pack
@@ -236,6 +254,14 @@ void AFESensorBMEX80::getJSON(char *json) {
         root.createNestedObject("breathVocEquivalent");
     JsonObject &gasResistance = root.createNestedObject("gasResistance");
 
+    breathVocEquivalent["value"] = data->breathVocEquivalent.value;
+    breathVocEquivalent["unit"] = "?";
+    breathVocEquivalent["accuracy"] = data->breathVocEquivalent.accuracy;
+
+    gasResistance["value"] = data->gasResistance.value;
+    gasResistance["unit"] = "kOm";
+
+
     iaq["value"] = data->iaq.value;
     iaq["rating"] = data->iaq.rating;
     iaq["accuracy"] = data->iaq.accuracy;
@@ -249,20 +275,18 @@ void AFESensorBMEX80::getJSON(char *json) {
     co2Equivalent["rating"] = data->co2Equivalent.rating;
     co2Equivalent["accuracy"] = data->co2Equivalent.accuracy;
 
-    breathVocEquivalent["value"] = data->breathVocEquivalent.value;
-    breathVocEquivalent["unit"] = "?";
-    breathVocEquivalent["accuracy"] = data->breathVocEquivalent.accuracy;
+//{"temperature":{"value":20.76112,"unit":"C","correction":0},"pressure":{"value":1004.08,"unit":"hPa","correction":0},"relativePressure":{"value":1012.219,"unit":"hPa"},"dewPoint":{"value":12.63424,"unit":"C"},"humidity":{"value":59.61296,"unit":"%H","correction":0,"rating":1},"absoluteHumidity":{"value":10.76806,"unit":"%H"},"heatIndex":{"value":20.44935,"unit":"C"},"perception":{"value":1,"description":"Bardzo komfortowo"},"comfort":{"value":2,"ratio":99.31985,"unit":"%","description":"Za zimno"},"iaq":{"value":25,"rating":1,"accuracy":0},"staticIaq":{},"co2Equivalent":{},"breathVocEquivalent":{"value":0.5,"unit":"?","accuracy":0},"gasResistance":{"value":42.212,"unit":"kOm"}}
 
-    gasResistance["value"] = data->gasResistance.value;
-    gasResistance["unit"] = "kOm";
   }
   /**
    * @brief There is a conversion to the real JSON string size. Workaround as
    * ASyncMQTTCrashes with larger strings crashes @TODO T6 investigate the
    * problem furhter
+   * It looks it actually ArduinJSON crases. Same case for HTTP API
    *
    */
   root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH);
+  
 }
 
 void AFESensorBMEX80::applyCorrections() {

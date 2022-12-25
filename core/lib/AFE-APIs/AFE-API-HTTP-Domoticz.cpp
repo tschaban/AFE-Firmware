@@ -524,7 +524,7 @@ void AFEAPIHTTPDomoticz::publishRainSensorData() {
 void AFEAPIHTTPDomoticz::addClass(AFEGate *Item) { AFEAPI::addClass(Item); }
 
 boolean AFEAPIHTTPDomoticz::publishGateState(uint8_t id) {
-  return _initialized ? sendSwitchCommand(_Gate[id]->configuration.domoticz.idx,
+  return _initialized ? sendSwitchCommand(_Gate[id]->configuration->domoticz.idx,
                                           _Gate[id]->get() == AFE_GATE_OPEN)
                       : false;
 }
@@ -537,7 +537,7 @@ void AFEAPIHTTPDomoticz::addClass(AFEContactron *Item) {
 
 boolean AFEAPIHTTPDomoticz::publishContactronState(uint8_t id) {
   return _initialized
-             ? sendSwitchCommand(_Contactron[id]->configuration.domoticz.idx,
+             ? sendSwitchCommand(_Contactron[id]->configuration->domoticz.idx,
                                  _Contactron[id]->get() == AFE_CONTACTRON_OPEN)
              : false;
 }
@@ -595,84 +595,84 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
   if (_initialized) {
     char value[15];
     /* Temperature */
-    if (_DHTSensor[id]->configuration.domoticz.temperature.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.temperature.idx > 0) {
       sprintf(value, "%-.1f", _DHTSensor[id]->currentTemperature);
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.temperature.idx, value);
+          _DHTSensor[id]->configuration->domoticz.temperature.idx, value);
       _ret = true;
     }
 
     /* Humidity */
-    if (_DHTSensor[id]->configuration.domoticz.humidity.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.humidity.idx > 0) {
       sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
                                _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.humidity.idx, value,
+          _DHTSensor[id]->configuration->domoticz.humidity.idx, value,
           (uint8_t)_DHTSensor[id]->currentHumidity);
       _ret = true;
     }
 
     /* Absolute Humidity */
-    if (_DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.absoluteHumidity.idx > 0) {
       sprintf(value, "%d", _DHTSensor[id]->convertHumidyStatusDomoticz(
                                _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.absoluteHumidity.idx, value,
+          _DHTSensor[id]->configuration->domoticz.absoluteHumidity.idx, value,
           (uint8_t)_DHTSensor[id]->absoluteHumidity(
               _DHTSensor[id]->currentTemperature,
               _DHTSensor[id]->currentHumidity,
-              _DHTSensor[id]->configuration.temperature.unit ==
+              _DHTSensor[id]->configuration->temperature.unit ==
                   AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       _ret = true;
     }
 
     /* DewPoint */
-    if (_DHTSensor[id]->configuration.domoticz.dewPoint.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.dewPoint.idx > 0) {
       sprintf(value, "%-.2f",
               _DHTSensor[id]->dewPoint(
                   _DHTSensor[id]->currentTemperature,
                   _DHTSensor[id]->currentHumidity,
-                  _DHTSensor[id]->configuration.temperature.unit ==
+                  _DHTSensor[id]->configuration->temperature.unit ==
                       AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.dewPoint.idx, value);
+          _DHTSensor[id]->configuration->domoticz.dewPoint.idx, value);
       _ret = true;
     }
 
     /* HeatIndex */
-    if (_DHTSensor[id]->configuration.domoticz.heatIndex.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.heatIndex.idx > 0) {
       sprintf(value, "%-.2f",
               _DHTSensor[id]->heatIndex(
                   _DHTSensor[id]->currentTemperature,
                   _DHTSensor[id]->currentHumidity,
-                  _DHTSensor[id]->configuration.temperature.unit ==
+                  _DHTSensor[id]->configuration->temperature.unit ==
                       AFE_TEMPERATURE_UNIT_FAHRENHEIT));
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.heatIndex.idx, value);
+          _DHTSensor[id]->configuration->domoticz.heatIndex.idx, value);
       _ret = true;
     }
 
     /* Temperature & Humidity */
-    if (_DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.temperatureHumidity.idx > 0) {
       sprintf(value, "%-.1f;%-.1f;%-d", _DHTSensor[id]->currentTemperature,
               _DHTSensor[id]->currentHumidity,
               _DHTSensor[id]->convertHumidyStatusDomoticz(
                   _DHTSensor[id]->currentHumidity));
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.temperatureHumidity.idx,
+          _DHTSensor[id]->configuration->domoticz.temperatureHumidity.idx,
           value);
       _ret = true;
     }
 
     /* Comfort */
-    if (_DHTSensor[id]->configuration.domoticz.comfort.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.comfort.idx > 0) {
       ComfortState comfortStatus;
       char _charText[100]; // Max size of Comfort,Perception from lang.pack +
                            // %20 instead of space
       String _stringText;
       _DHTSensor[id]->comfort(comfortStatus, _DHTSensor[id]->currentTemperature,
                               _DHTSensor[id]->currentHumidity,
-                              _DHTSensor[id]->configuration.temperature.unit ==
+                              _DHTSensor[id]->configuration->temperature.unit ==
                                   AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_charText, (char *)pgm_read_dword(&(Comfort[comfortStatus])));
 
@@ -682,19 +682,19 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
       _stringText.toCharArray(_charText, sizeof(_charText));
 
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.comfort.idx, _charText,
+          _DHTSensor[id]->configuration->domoticz.comfort.idx, _charText,
           _DHTSensor[id]->convertComfortDomoticz(comfortStatus));
       _ret = true;
     }
 
     /* Perception */
-    if (_DHTSensor[id]->configuration.domoticz.perception.idx > 0) {
+    if (_DHTSensor[id]->configuration->domoticz.perception.idx > 0) {
       char _charText[100]; // Max size of Comfort,Perception from lang.pack +
                            // %20 instead of space
       String _stringText;
       byte _perceptionId = _DHTSensor[id]->perception(
           _DHTSensor[id]->currentTemperature, _DHTSensor[id]->currentHumidity,
-          _DHTSensor[id]->configuration.temperature.unit ==
+          _DHTSensor[id]->configuration->temperature.unit ==
               AFE_TEMPERATURE_UNIT_FAHRENHEIT);
       strcpy_P(_charText,
                (char *)pgm_read_dword(&(dewPointPerception[_perceptionId])));
@@ -705,7 +705,7 @@ boolean AFEAPIHTTPDomoticz::publishDHTSensorData(uint8_t id) {
       _stringText.toCharArray(_charText, sizeof(_charText));
 
       sendCustomSensorCommand(
-          _DHTSensor[id]->configuration.domoticz.perception.idx, _charText,
+          _DHTSensor[id]->configuration->domoticz.perception.idx, _charText,
           _DHTSensor[id]->convertPerceptionDomoticz(_perceptionId));
       _ret = true;
     }

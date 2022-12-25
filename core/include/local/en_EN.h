@@ -240,7 +240,9 @@
 #define L_SWITCH_SYSTEM_BUTTON "System button"
 #define L_SWITCH_CONTROL_RELAY "Controlling only the relay"
 #define L_SWITCH_CONTROL_GATE "Controlling only the gate"
+#define L_SWITCH_CONTROL_RGB_LED "RGB LED"
 #define L_SWITCH_RELAY_CONTROLLED "Controls relay"
+#define L_SWITCH_RGB_LED_CONTROLLED "Controls RGB LED"
 #define L_SWITCH_TYPE "Type"
 #define L_SWITCH_MONOSTABLE "Monostable"
 #define L_SWITCH_BISTABLE "Bistable"
@@ -498,7 +500,7 @@ const char comfort_Unknown[] PROGMEM      = "?";
 const char comfort_TooHumid[] PROGMEM     = "Too humid";
 const char comfort_HotAndHumid[] PROGMEM  = "Hot and humid";
 const char comfort_ColdAndHumid[] PROGMEM = "Cold and humid";
-const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
+const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_Unknown,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
 #endif
 
 
@@ -571,7 +573,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_MCP23017_RELAY_TRIGGERED "Relay triggered by"
 #define L_MCP23017_SWITCH_CONNECTION "Switch can be connected directly to ESP's GPIO or through MCP23017 expander"
 #define L_MCP23017_CONNECTION_VIA_MCP "If connection is made via MCP23017 (GPIO above must be set to NONE)"
-
+#define L_MCP23017_EXTENSION "MCP23XXX GPIOs extension"
 
 /* PN532 */
 
@@ -638,6 +640,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_EFFECTS_CONFIGURATION "Effects' configurations"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "How long keep this state"
+
+#define L_CLED_SLOW_START_TIME "Soft on timeout"
+#define L_CLED_SLOW_STOP_TIME "Soft off timeout"
 
 #define L_CLED_EFFECT_BLINKING_CONFIGURATION "Blinking effect"
 #define L_CLED_EFFECT_FADE_IN_OUT_CONFIGURATION "Fade In/Out effect"

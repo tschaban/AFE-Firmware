@@ -8,14 +8,14 @@ void CLedEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeCLed(void) {  
-  if (Device.configuration.noOfCLEDs > 0) {
-    CLEDStrip.begin(&Data);
+  if (Device->configuration.noOfCLEDs > 0) {
+    CLEDStrip->begin(Data,Device);
   }
 };
 
 void CLedEventsListener(void) {
-  if (Device.configuration.noOfCLEDs > 0) {
-    CLEDStrip.loop();
+  if (Device->configuration.noOfCLEDs > 0) {
+    CLEDStrip->loop();
   }
 };
 

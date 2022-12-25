@@ -10,48 +10,48 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
                           AFEDataAccess *_Data) {
   Data = _Data;
   Device = _Device;
-  Data->getConfiguration(id, &configuration);
-  pinMode(configuration.gpio, INPUT_PULLUP);
+  Data->getConfiguration(id, configuration);
+  pinMode(configuration->gpio, INPUT_PULLUP);
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON_GPIO_DIGIT_INPUT
-  pinMode(configuration.gpio, INPUT);
+  pinMode(configuration->gpio, INPUT);
 #else
-  pinMode(configuration.gpio, INPUT_PULLUP);
+  pinMode(configuration->gpio, INPUT_PULLUP);
 #endif
 
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  if (configuration.ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed.begin(Data, configuration.ledID);
+  if (configuration->ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    ContactronLed->begin(Data, configuration->ledID);
   }
 #endif
   _initialized = true;
 }
 
 boolean AFEContactron::get() {
-  boolean currentState = digitalRead(configuration.gpio);
+  boolean currentState = digitalRead(configuration->gpio);
   boolean _return;
-  if (configuration.type == AFE_CONTACTRON_NO) {
+  if (configuration->type == AFE_CONTACTRON_NO) {
     if (currentState) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      ContactronLed.on();
+      ContactronLed->on();
 #endif
       _return = AFE_OPEN;
     } else {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      ContactronLed.off();
+      ContactronLed->off();
 #endif
       _return = AFE_CLOSED;
     }
   } else {
     if (currentState) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      ContactronLed.off();
+      ContactronLed->off();
 #endif
       _return = AFE_CLOSED;
     } else {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      ContactronLed.on();
+      ContactronLed->on();
 #endif
       _return = AFE_OPEN;
     }
@@ -71,7 +71,7 @@ boolean AFEContactron::changed() {
 
 void AFEContactron::listener() {
   if (_initialized) {
-    boolean currentState = digitalRead(configuration.gpio);
+    boolean currentState = digitalRead(configuration->gpio);
     unsigned long time = millis();
 
     if (currentState != state) { // contactron stage changed
@@ -80,7 +80,7 @@ void AFEContactron::listener() {
         startTime = time;
       }
 
-      if (time - startTime >= configuration.bouncing) {
+      if (time - startTime >= configuration->bouncing) {
         state = currentState;
         _changed = true;
       }

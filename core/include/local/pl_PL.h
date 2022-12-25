@@ -234,7 +234,9 @@
 #define L_SWITCH_SYSTEM_BUTTON "Przycisk systemowy"
 #define L_SWITCH_CONTROL_RELAY "Tylko sterowanie przekaźnikiem"
 #define L_SWITCH_CONTROL_GATE "Tylko sterowanie bramą"
+#define L_SWITCH_CONTROL_RGB_LED "RGB LED"
 #define L_SWITCH_RELAY_CONTROLLED "Steruje przekaźnikiem"
+#define L_SWITCH_RGB_LED_CONTROLLED "Steruje RGB LED"
 #define L_SWITCH_TYPE "Typ"
 #define L_SWITCH_MONOSTABLE "Monostabilny"
 #define L_SWITCH_BISTABLE "Bistabilny"
@@ -493,7 +495,7 @@ const char comfort_Unknown[] PROGMEM      = "?";
 const char comfort_TooHumid[] PROGMEM     = "Za wilgotno";
 const char comfort_HotAndHumid[] PROGMEM  = "Gorąco i wilgotno";
 const char comfort_ColdAndHumid[] PROGMEM = "Zimno i wilgotno";
-const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
+const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold,comfort_Unknown,comfort_TooDry,comfort_HotAndDry,comfort_ColdAndDry,comfort_Unknown,comfort_TooHumid,comfort_HotAndHumid,comfort_ColdAndHumid};
 #endif
 
 
@@ -629,9 +631,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_CLED_BRIGHTNESS "Jasność"
 #define L_CLED_COLOR_RGB "Kolor"
 #define L_CLED_CONFIGURATION "Konfiguracja RGB LED"
-#define L_CLED_ONOFF_CONFIGURATION "Konfiguracja wł/wył"
-#define L_CLED_ONOFF_CONFIGURATION_ON "RGB LED włączony"
-#define L_CLED_ONOFF_CONFIGURATION_OFF "RGB LED wyłączony"
+#define L_CLED_ONOFF_CONFIGURATION_ON "Włączony LED"
+#define L_CLED_ONOFF_CONFIGURATION_OFF "Wyłączony LED"
 #define L_CLED_EFFECTS_CONFIGURATION "Konfiguracja efektów świetlnych"
 #define L_CLED_EFFECTS_URL "<a href=\"/?o={{u.u}}&i={{u.i}}\">{{u.l}}</a>"
 #define L_CLED_TIMEOUT "Jak długo utrzymywać stan"
@@ -656,6 +657,9 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 
 #define L_CLED_MQTT_ON_OFF_TOPIC "Temat Wł/Wył"
 #define L_CLED_MQTT_EFFECTS_TOPIC "Temat efektów"
+
+#define L_CLED_SLOW_START_TIME "Czas miękkiego włącznie"
+#define L_CLED_SLOW_STOP_TIME "Czas miękkiego wyłączenie"
 
 #define L_CLEDS_HINT "Ta wersja firmware nie umożliwia zmianę GPIO paska RGB LED: WS281x. Pasek musi zostać podłączony jak poniżej"
 #define L_CLED_NUMBER_OF_LEDS "Ilość diod w pasku LED"

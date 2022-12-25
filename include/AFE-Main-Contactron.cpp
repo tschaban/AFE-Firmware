@@ -15,8 +15,8 @@ void initializeContracton() {
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Initializing contractons");
 #endif
-  for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
-    Contactron[i].begin(i, &Device, &Data);
+  for (uint8_t i = 0; i < Device->configuration.noOfContactrons; i++) {
+    Contactron[i].begin(i, Device, Data);
 #ifdef DEBUG
     Serial << endl << F("INFO: BOOT: Contactron: ") << i << F(" initialized");
 #endif
@@ -25,7 +25,7 @@ void initializeContracton() {
 
 /* Method processes Contactron's related events */
 void contractonEventsListener() {
-  for (uint8_t i = 0; i < Device.configuration.noOfContactrons; i++) {
+  for (uint8_t i = 0; i < Device->configuration.noOfContactrons; i++) {
     Contactron[i].listener();
     if (Contactron[i].changed()) {
 #ifdef DEBUG

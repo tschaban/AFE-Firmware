@@ -37,7 +37,10 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   _Data->getConfiguration(&configuration);
   //}
 
-  /* Checking if backup configuration exists and setting a flag */
+  /**
+   * @brief Checking if backup configuration exists and setting a flag
+   *
+   */
   if (strlen(configuration.ssidBackup) > 0 &&
       strcmp(configuration.ssidBackup, AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID) !=
           0 &&
@@ -56,7 +59,11 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
 #endif
 
-/* Setting WiFi Radio mode for ESP32 and the TX output power
+/**
+ * @brief Setting WiFi Radio mode for ESP32 and the TX output power
+ *
+ */
+
 #if !defined(ESP32)
   if (configuration.radioMode != AFE_NONE) {
     // wifi_set_phy_mode(configuration.radioMode);
@@ -72,8 +79,6 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
   }
 
-*/
-/*
   if (configuration.outputPower != AFE_NONE &&
       configuration.outputPower >=
           AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN &&
@@ -89,7 +94,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   }
 
 #endif
-*/
+
 #if defined(DEBUG) && !defined(ESP32)
   Serial << endl
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
@@ -130,16 +135,6 @@ void AFEWiFi::switchConfiguration() {
   noOfFailures = 0;
   WirelessNetwork.persistent(false);
   WirelessNetwork.disconnect(true);
-  if (WirelessNetwork.hostname(Device->configuration.name)) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Hostname set to: ") << Device->configuration.name;
-  } else {
-    Serial << endl
-           << F("ERROR: WIFI: Hostname NOT set: ")
-           << Device->configuration.name;
-#endif
-  }
 
 #ifndef AFE_ESP32
   WirelessNetwork.setSleepMode(WIFI_NONE_SLEEP);
@@ -147,85 +142,106 @@ void AFEWiFi::switchConfiguration() {
   WiFi.setSleep(false);
 #endif
 
-  /* Setting Fixed IP for Primary Configuration if set */
-  if (isPrimaryConfiguration && !configuration.isDHCP) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Setting fixed IP (") << configuration.ip
-           << F(")  address for primary WiFi "
-                "configuration");
-#endif
-    IPAddress ip;
-    if (!ip.fromString(configuration.ip)) {
-#ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI IP address: ")
-             << configuration.ip;
-#endif
-    }
-    IPAddress gateway;
-    if (!gateway.fromString(configuration.gateway)) {
-#ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI gateway address: ")
-             << configuration.gateway;
-#endif
-    }
-    IPAddress subnet;
-    if (!subnet.fromString(configuration.subnet)) {
-#ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI subnet address: ")
-             << configuration.subnet;
-#endif
-    }
 
-    WirelessNetwork.config(ip, gateway, subnet);
+            /**
+             * @brief Setting Fixed IP for Primary Configuration if set
+             *
+             */
+            if (isPrimaryConfiguration && !configuration.isDHCP) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Fixed IP set");
+              Serial << endl
+                     << F("INFO: WIFI: Setting fixed IP (") << configuration.ip
+                     << F(")  address for primary WiFi "
+                          "configuration");
 #endif
-  } else if ((isPrimaryConfiguration && configuration.isDHCP) ||
-             (!isPrimaryConfiguration && configuration.isDHCPBackup)) {
-    WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
-                           (uint32_t)0x00000000);
-  } else if (!isPrimaryConfiguration && !configuration.isDHCPBackup) {
+              IPAddress ip;
+              if (!ip.fromString(configuration.ip)) {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Setting fixed IP (") << configuration.ipBackup
-           << F(") address for backup WiFi "
-                "configuration");
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI IP address: ")
+                       << configuration.ip;
+#endif
+              }
+              IPAddress gateway;
+              if (!gateway.fromString(configuration.gateway)) {
+#ifdef DEBUG
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI gateway address: ")
+                       << configuration.gateway;
+#endif
+              }
+              IPAddress subnet;
+              if (!subnet.fromString(configuration.subnet)) {
+#ifdef DEBUG
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI subnet address: ")
+                       << configuration.subnet;
+#endif
+              }
+
+              WirelessNetwork.config(ip, gateway, subnet);
+#ifdef DEBUG
+              Serial << endl << F("INFO: WIFI: Fixed IP set");
+#endif
+            }
+            /**
+             * @brief set IPs to 0 for configuration over DHCP
+             *
+             */
+
+            else if ((isPrimaryConfiguration && configuration.isDHCP) ||
+                     (!isPrimaryConfiguration && configuration.isDHCPBackup)) {
+              WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
+                                     (uint32_t)0x00000000);
+            }
+
+            /**
+             * @brief Setting fixed IP for backup WiFi configurations
+             *
+             */
+            else if (!isPrimaryConfiguration && !configuration.isDHCPBackup) {
+#ifdef DEBUG
+              Serial << endl
+                     << F("INFO: WIFI: Setting fixed IP (")
+                     << configuration.ipBackup << F(") address for backup WiFi "
+                                                    "configuration");
 #endif
 
-    IPAddress ip;
-    if (!ip.fromString(configuration.ipBackup)) {
+              IPAddress ip;
+              if (!ip.fromString(configuration.ipBackup)) {
 #ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI IP address: ")
-             << configuration.ipBackup;
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI IP address: ")
+                       << configuration.ipBackup;
 #endif
-    }
-    IPAddress gateway;
-    if (!gateway.fromString(configuration.gatewayBackup)) {
+              }
+              IPAddress gateway;
+              if (!gateway.fromString(configuration.gatewayBackup)) {
 #ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI gateway address: ")
-             << configuration.gatewayBackup;
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI gateway address: ")
+                       << configuration.gatewayBackup;
 #endif
-    }
-    IPAddress subnet;
-    if (!subnet.fromString(configuration.subnetBackup)) {
+              }
+              IPAddress subnet;
+              if (!subnet.fromString(configuration.subnetBackup)) {
 #ifdef DEBUG
-      Serial << endl
-             << F("ERROR: WIFI: Problem with WIFI subnet address: ")
-             << configuration.subnetBackup;
+                Serial << endl
+                       << F("ERROR: WIFI: Problem with WIFI subnet address: ")
+                       << configuration.subnetBackup;
 #endif
-    }
+              }
 
-    WirelessNetwork.config(ip, gateway, subnet);
+              IPAddress dns1(8, 8, 8, 8);
+              IPAddress dns2(8, 8, 4, 4);
+
+              WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Fixed IP set");
+              Serial << endl << F("INFO: WIFI: Fixed IP set");
 #endif
-  } /* Endif: Setting Fixed IP for Primary Configuration if set */
+            } /* Endif: Setting Fixed IP for Primary Configuration if set */
+
+
 
   WirelessNetwork.mode(WIFI_STA);
 
@@ -351,7 +367,10 @@ void AFEWiFi::listener() {
               << configuration.waitTimeSeries << F("sec.");
 #endif
 
-          /* Switching configurations */
+          /**
+           * @brief Switching configurations
+           *
+           */
           if (isBackupConfigurationSet) {
             noOfFailures++;
             if (noOfFailures == configuration.noFailuresToSwitchNetwork) {

@@ -31,10 +31,10 @@ private:
 
   unsigned long startTime = 0;
 
-  DHTesp dht;
+  DHTesp *dht = new DHTesp();
 
 public:
-  DHT configuration;
+  DHT *configuration = new DHT;
 
 
   float currentTemperature;

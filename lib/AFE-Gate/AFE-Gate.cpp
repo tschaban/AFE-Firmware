@@ -15,15 +15,15 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
   Data = _Data;
 
   gateId = id;
-  Data->getConfiguration(gateId,&configuration);
+  Data->getConfiguration(gateId,configuration);
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Initializing the gate's relay: ") << configuration.relayId;
+         << F("INFO: Initializing the gate's relay: ") << configuration->relayId;
 #endif
-  if (configuration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    GateRelay.begin(Data,configuration.relayId);
-    GateRelay.setTimerUnitToSeconds(false);
-    GateRelay.gateId = id;
+  if (configuration->relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    GateRelay->begin(Data,configuration->relayId);
+    GateRelay->setTimerUnitToSeconds(false);
+    GateRelay->gateId = id;
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: Initializing the gate's ") << id << F(", contactrons");
@@ -32,9 +32,9 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
   /* How many contactrons monitors the gate. Default 0 set in class init
    */
 
-  if (configuration.contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) {
+  if (configuration->contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) {
     numberOfContractons = 2;
-  } else if (configuration.contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST) {
+  } else if (configuration->contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST) {
     numberOfContractons = 1;
   }
 
@@ -45,7 +45,7 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
 
   for (uint8_t i = 0; i < numberOfContractons; i++) {
-    Contactron[i].begin(configuration.contactron.id[i], _Device, _Data);
+    Contactron[i].begin(configuration->contactron.id[i], _Device, _Data);
   }
 
 
@@ -58,7 +58,7 @@ void AFEGate::toggle() {
 #ifdef DEBUG
   Serial << endl << F("INFO: Toggling gate");
 #endif
-  GateRelay.on();
+  GateRelay->on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractons == 0) {
     Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN
@@ -77,18 +77,18 @@ uint8_t AFEGate::getGateStateBasedOnContractons() {
     if (_state[0] == AFE_CONTACTRON_OPEN) {
       if (numberOfContractons == 2) {
         gateState = _state[1] == AFE_CONTACTRON_OPEN
-                        ? configuration.states.state[0]
-                        : configuration.states.state[1];
+                        ? configuration->states.state[0]
+                        : configuration->states.state[1];
       } else {
-        gateState = configuration.states.state[0];
+        gateState = configuration->states.state[0];
       }
     } else if (_state[0] == AFE_CONTACTRON_CLOSED) {
       if (numberOfContractons == 2) {
         gateState = _state[1] == AFE_CONTACTRON_OPEN
-                        ? configuration.states.state[2]
-                        : configuration.states.state[3];
+                        ? configuration->states.state[2]
+                        : configuration->states.state[3];
       } else {
-        gateState = configuration.states.state[3];
+        gateState = configuration->states.state[3];
       }
     }
   }
@@ -107,12 +107,12 @@ uint8_t AFEGate::get() {
 uint8_t AFEGate::getNoOfContactrons() { return numberOfContractons; }
 
 uint8_t AFEGate::getContactronId(uint8_t index) {
-  return configuration.contactron.id[index];
+  return configuration->contactron.id[index];
 }
 
 boolean AFEGate::event() {
 
-  GateRelay.autoTurnOff();
+  GateRelay->autoTurnOff();
 
   if (_event) {
     _event = false;

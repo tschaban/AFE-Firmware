@@ -1,7 +1,7 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/
 
   --------------------------------------------------------------
-  Few methods take and customized based on the DHTesp library
+  Few methods taken and customized based on the DHTesp library
   Information about: DHTesp library
   DHT Temperature & Humidity Sensor library for Arduino & ESP32.
   https://github.com/beegee-tokyo/arduino-DHTesp
@@ -29,11 +29,11 @@ enum ComfortState {
   Comfort_TooHot = 1,
   Comfort_TooCold = 2,
   Comfort_TooDry = 4,
+  Comfort_HotAndDry = 5,
+  Comfort_ColdAndDry = 6,
   Comfort_TooHumid = 8,
   Comfort_HotAndHumid = 9,
-  Comfort_HotAndDry = 5,
-  Comfort_ColdAndHumid = 10,
-  Comfort_ColdAndDry = 6
+  Comfort_ColdAndHumid = 10
 };
 
 // References https://en.wikipedia.org/wiki/Dew_point ==> Relationship to human

@@ -8,7 +8,6 @@
 #include <AFE-MQTT-Structure.h>
 #include <AsyncMqttClient.h>
 
-
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <WiFiClient.h>
 #if AFE_LANGUAGE == 0
@@ -30,24 +29,22 @@ class AFEAsyncMQTTClient {
 
 private:
   AsyncMqttClient *_Broker = new AsyncMqttClient();
-
+  char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *_Led;
   unsigned long _ledStartTime = 0;
 #endif
-  
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-/**
- * @brief Returns RSSI level in DOmoticz Range 
- * 
- * @return uint8_t 
- */
+  /**
+   * @brief Returns RSSI level in DOmoticz Range
+   *
+   * @return uint8_t
+   */
   uint8_t getRSSI();
-  
-#endif
 
+#endif
 
 public:
   /**
@@ -66,7 +63,7 @@ public:
    * @brief storeis latest received MQTT Message
    *
    */
-  
+
   static MQTT_MESSAGE messagesBuffer[AFE_CONFIG_MQTT_MESSAGES_BUFFER];
   static uint8_t numberOfMessagesInBuffer;
   uint8_t messageProcessed = 0;

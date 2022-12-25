@@ -40,6 +40,17 @@ private:
     uint8_t integer;
   };
 
+  struct CLED_EFFECT_SLOW_CHANGE_CONFIG {
+    boolean running = false;
+    boolean state = false;
+    unsigned long timer;
+    float stepRed;
+    float stepGreen;
+    float stepBlue;
+    float stepBrightness;
+    CLED_PARAMETERS startFrom;
+  };
+
   /**
    * @brief data structure that keeps current state and other information
    * releated to a LED strip
@@ -52,10 +63,12 @@ private:
     CLED_PARAMETERS off;
     CLED_PARAMETERS on;
     CLED_EFFECT_CONFIG effect;
+    uint8_t slowChangeTargetBrightness;
   };
 
   boolean _initialized = false;
   AFEDataAccess *_Data;
+  AFEDevice *_Device;
 
   /**
    * @brief it stories each led color and its brightness
@@ -73,6 +86,18 @@ private:
    */
   void _turnOnOff(uint8_t stripId, boolean state,
                   boolean disableEffects = false);
+
+  /**
+   * @brief Effect slow change
+   *
+   */
+
+  CLED_EFFECT_SLOW_CHANGE_CONFIG
+  _slowEffectParams[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS];
+  void _effectSlowChange(uint8_t stripId);
+  void _runSlowChange(uint8_t stripId, boolean state,
+                      boolean disableEffects = false);
+  void _addSlowChangeStep(uint8_t &next, uint8_t from, float step, unsigned long increment);
 
   /**
    * @brief Set Color for all leds in the strip. It uses last set brightness
@@ -107,6 +132,15 @@ private:
    * @param  brightness       brightness
    */
   void _setColor(uint8_t stripId, CLED_RGB color, uint8_t brightness);
+
+  /**
+   * @brief methods required in the main loop to enable effects
+   *
+   * @param  stripId          ID strip to deactivate an effect on
+   */
+  void _effectBlinkingListener(uint8_t stripId);
+  void _effectFadeInOutListener(uint8_t stripId);
+  void _effectWaveListener(uint8_t stripId);
 
 public:
   /**
@@ -154,7 +188,7 @@ public:
    * @param  Data             Reference to data access API
    * @return boolean          True: when succesfully initialized
    */
-  boolean begin(AFEDataAccess *Data);
+  boolean begin(AFEDataAccess *Data, AFEDevice *Device);
 
   /**
    * @brief Turns ON LED strip: color and brightness from the configuration file
@@ -187,64 +221,36 @@ public:
 
   /**
    * @brief Turns Off LED strip
-   * 
+   *
    * @param  stripId          ID of the LED Strip
    * @param  disableEffects   if true methods disables effects
    */
   void off(uint8_t stripId, boolean disableEffects = false);
 
   /**
-   * @brief Turns Off LED strip
-   * 
-   * @param  stripId          ID of the LED Strip
-   * @param  color            Color RGB
-   * @param  disableEffects   if true methods disables effects
-   */
-  void off(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
-  
-  /**
-   * @brief Turns Off LED strip
-   * 
-   * @param  stripId          ID of the LED Strip
-   * @param  ledConfig        Color RGB + brightness
-   * @param  disableEffects   if true methods disables effects
-   */
-  void off(uint8_t stripId, CLED_PARAMETERS ledConfig,
-           boolean disableEffects = false);
-
-  /**
    * @brief method turns on/off strip, it can disable or change color
-   * 
+   *
    * @param  stripId          ID of the LED Strip
    * @param  disableEffects   if true methods disables effects
    */
   void toggle(uint8_t stripId, boolean disableEffects = false);
   void toggle(uint8_t stripId, CLED_RGB color, boolean disableEffects = false);
 
-/**
- * @brief method activate effect
- * 
- * @param  stripId          ID strip to activate an effect on
- * @param  effectId         effect id, ifs in AFE-RGB-LED.h
- */
-  void activateEffect(uint8_t stripId, uint8_t effectId);
-  
-/**
- * @brief method deactivates effects
- * 
- * @param  stripId          ID strip to deactivate an effect on
- * @param  setToOff         if true it turns off leds strip
- */
-  void deactivateEffect(uint8_t stripId, boolean setToOff = true);
-  
   /**
-   * @brief methods required in the main loop to enable effects
-   * 
-   * @param  stripId          ID strip to deactivate an effect on
+   * @brief method activate effect
+   *
+   * @param  stripId          ID strip to activate an effect on
+   * @param  effectId         effect id, ifs in AFE-RGB-LED.h
    */
-  void effectBlinkingListener(uint8_t stripId);
-  void effectFadeInOutListener(uint8_t stripId);
-  void effectWaveListener(uint8_t stripId);
+  void activateEffect(uint8_t stripId, uint8_t effectId);
+
+  /**
+   * @brief method deactivates effects
+   *
+   * @param  stripId          ID strip to deactivate an effect on
+   * @param  setToOff         if true it turns off leds strip
+   */
+  void deactivateEffect(uint8_t stripId, boolean setToOff = true);
 
   /**
    * @brief returns true is LED strip changed from ON->OFF or from OFF->ON

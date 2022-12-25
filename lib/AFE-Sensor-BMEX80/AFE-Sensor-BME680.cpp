@@ -5,10 +5,12 @@
 
 AFESensorBME680::AFESensorBME680(){};
 
-boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort) {
+boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80_DATA *_data) {
 #ifdef DEBUG
   Serial << endl << F("INFO: Initializing: Sensor type: BME680");
 #endif
+
+  data = _data;
 
   EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
 #ifdef DEBUG

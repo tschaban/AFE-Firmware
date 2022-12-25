@@ -76,8 +76,11 @@ float AFESensorsCommon::dewPoint(float temperature, float humidity,
 
 float AFESensorsCommon::heatIndex(double temperature, double humidity,
                                   boolean fahrenheit) {
-  /* Based on formula:
-   * https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml */
+  /**
+   * @brief  Based on formula:
+   * https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+   * 
+   */
 
   double _temp = fahrenheit ? temperature : celsiusToFerenheit(temperature);
 
@@ -86,7 +89,10 @@ float AFESensorsCommon::heatIndex(double temperature, double humidity,
   HI = 0.5 * (_temp + 61.0 + ((_temp - 68.0) * 1.2) + (humidity * 0.094));
 
   if (HI >= 80) {
-    // Full regression needed
+    /**
+     * @brief Full regression needed
+     * 
+     */
     HI = -42.379 + 2.04901523 * _temp + 10.14333127 * humidity -
          0.22475541 * _temp * humidity - 0.00683783 * pow(_temp, 2) -
          0.05481717 * pow(humidity, 2) + 0.00122874 * pow(_temp, 2) * humidity +
@@ -105,8 +111,11 @@ float AFESensorsCommon::heatIndex(double temperature, double humidity,
 
 float AFESensorsCommon::absoluteHumidity(float temperature, float humidity,
                                          boolean fahrenheit) {
-  // Calculate the absolute humidity in g/m³
-  // https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
+  /**
+   * @brief Calculate the absolute humidity in g/m³
+   * https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
+   * 
+   */
 
   float _temperature =
       fahrenheit ? ferenheitToCelsius(temperature) : temperature;
@@ -127,27 +136,28 @@ float AFESensorsCommon::absoluteHumidity(float temperature, float humidity,
 byte AFESensorsCommon::perception(float temperature, float humidity,
                                   boolean fahrenheit) {
 
-  /* Computing human perception from dew point
-           reference: https://en.wikipedia.org/wiki/Dew_point ==> Relationship
-     to human comfort
-           reference: Horstmeyer, Steve (2006-08-15). "Relative
-     Humidity....Relative to What? The Dew Point Temperature...a better
-     approach". Steve Horstmeyer, Meteorologist, WKRC TV, Cincinnati, Ohio, USA.
-     Retrieved 2009-08-20.
-           Using table
-           Return value Dew point    Human perception[6]
-              7         Over 26 °C   Severely high, even deadly for asthma
-     related illnesses
-              6         24–26 °C     Extremely uncomfortable, oppressive
-              5         21–24 °C     Very humid, quite uncomfortable
-              4         18–21 °C     Somewhat uncomfortable for most people at
-     upper edge
-              3         16–18 °C     OK for most, but all perceive the humidity
-     at upper edge
-              2         13–16 °C     Comfortable
-              1         10–12 °C     Very comfortable
-              0         Under 10 °C  A bit dry for some
-  */
+  /**
+   * @brief  Computing human perception from dew point reference:
+   https://en.wikipedia.org/wiki/Dew_point ==> Relationship to human comfort
+   reference Horstmeyer, Steve (2006-08-15)
+   "Relative Humidity....Relative to What? The Dew Point Temperature...a
+   better approach". Steve Horstmeyer, Meteorologist, WKRC TV, Cincinnati, Ohio,
+   USA. Retrieved 2009-08-20.
+             Using table
+             Return value Dew point    Human perception[6]
+                7         Over 26 °C   Severely high, even deadly for asthma
+   related illnesses
+                6         24–26 °C     Extremely uncomfortable, oppressive
+                5         21–24 °C     Very humid, quite uncomfortable
+                4         18–21 °C     Somewhat uncomfortable for most people at
+   upper edge
+                3         16–18 °C     OK for most, but all perceive the
+   humidity at upper edge
+                2         13–16 °C     Comfortable
+                1         10–12 °C     Very comfortable
+                0         Under 10 °C  A bit dry for some
+
+   */
 
   float _temperature =
       fahrenheit ? ferenheitToCelsius(temperature) : temperature;
@@ -293,8 +303,11 @@ byte AFESensorsCommon::convertHumidyStatusDomoticz(float humidity) {
 #if defined(AFE_CONFIG_PRESSURE) && defined(AFE_CONFIG_TEMPERATURE)
 float AFESensorsCommon::relativePressure(float pressure, float alt,
                                          float temperature) {
-  /* Based on the formula:
-   * http://stacjepogody.waw.pl/index.php/topic,4.msg4.html#msg4 */
+  /**
+   * @brief Based on the formula:
+   * http://stacjepogody.waw.pl/index.php/topic,4.msg4.html#msg4
+   * 
+   */
   return pressure +
          (alt /
           ((8000 *
@@ -341,4 +354,4 @@ afe_co2_ratings_t AFESensorsCommon::co2Rating(uint16_t co2) {
   }
 }
 
-#endif // FE_CONFIG_HARDWARE_BMEX80
+#endif // AFE_CONFIG_HARDWARE_BMEX80

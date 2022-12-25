@@ -55,7 +55,7 @@ AFELED *Led = new AFELED();
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-CLED.h>
-AFECLED CLEDStrip;
+AFECLED *CLEDStrip = new AFECLED();
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 

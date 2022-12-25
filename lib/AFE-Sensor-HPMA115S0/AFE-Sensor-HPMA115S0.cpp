@@ -322,10 +322,10 @@ void AFESensorHPMA115S0::getJSON(char *json) {
   sprintf(
       json, "{\"PM25\":{\"value\":%.2f,\"unit\":\"%s\"},\"PM10\":{\"value\":"
             "%.2f,\"unit\":\"%s\"},\"WHO\":{\"PM25\":{\"value\":%.2f,\"unit\":"
-            "\"%s\"},\"PM10\":{"
-            "\"value\":%.2f,\"unit\":\"%s\"}}}",
+            "\"%%\"},\"PM10\":{"
+            "\"value\":%.2f,\"unit\":\"%%\"}}}",
       data->pm25, AFE_UNIT_PARTICLE, data->pm10, AFE_UNIT_PARTICLE,
-      data->whoPM25Norm, AFE_UNIT_PERCENT, data->whoPM10Norm, AFE_UNIT_PERCENT);
+      data->whoPM25Norm, data->whoPM10Norm);
 }
 
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0

@@ -21,7 +21,7 @@
 class AFEContactron {
 
 public:
-  CONTACTRON configuration;
+  CONTACTRON *configuration = new CONTACTRON;
 
   // ID of the GATE the contactron is assigned to. 255 None.
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -54,7 +54,7 @@ private:
 
   unsigned long startTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED ContactronLed;
+  AFELED *ContactronLed;
 #endif
 };
 

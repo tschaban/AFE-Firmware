@@ -67,6 +67,7 @@ private:
 
   uint8_t bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
   uint16_t stateUpdateCounter = 0;
+  BMEX80_DATA *data = new BMEX80_DATA;
 
 #ifdef DEBUG
   void checkBmeStatus();
@@ -74,12 +75,12 @@ private:
 
 public:
   BMEX80 *configuration = new BMEX80;
-  BMEX80_DATA *data = new BMEX80_DATA;
+  
 
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME680();
 
-  boolean begin(BMEX80 *, TwoWire *WirePort);
+  boolean begin(BMEX80 *, TwoWire *WirePort, BMEX80_DATA *_data );
   boolean read();
 };
 

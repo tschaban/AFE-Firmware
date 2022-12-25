@@ -254,7 +254,7 @@ private:
   void publishCLEDStates(uint8_t id, boolean fromDomoticz);
 #else
   void publishCLEDStates(uint8_t id);
-#endif;
+#endif
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 

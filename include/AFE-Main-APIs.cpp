@@ -163,7 +163,7 @@ void initializeMQTTAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     if (Device->configuration.noOfCLEDs > 0 ) {
-      MqttAPI->addClass(&CLEDStrip);
+      MqttAPI->addClass(CLEDStrip);
     }
 #endif
 
@@ -303,7 +303,7 @@ void initializeHTTPAPI(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
     if (Device->configuration.noOfCLEDs > 0 ) {
-      HttpAPI->addClass(&CLEDStrip);
+      HttpAPI->addClass(CLEDStrip);
     }
 #endif
 

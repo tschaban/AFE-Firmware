@@ -2,11 +2,13 @@
 
 void setup() {
 
-  boolean _success = false;
-
+boolean _success = false;
+  
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
+
+  
 
   Serial << endl
          << endl
@@ -163,7 +165,7 @@ void setup() {
 #ifdef AFE_CONFIG_HARDWARE_LED
   Network->begin(Device->getMode(), Device, Data, Led);
 #else
-  Network->begin(Device->getMode(), Device, &Data);
+  Network->begin(Device->getMode(), Device, Data);
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
