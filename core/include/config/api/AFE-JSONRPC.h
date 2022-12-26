@@ -20,5 +20,4 @@
 #define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE 380
 #define AFE_CONFIG_JSONRPC_JSON_TIMEOUT 3000 // Response timeout in msec
 
-
 #endif // _AFE_Hardware_JSONRPC_h

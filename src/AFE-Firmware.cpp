@@ -2,13 +2,11 @@
 
 void setup() {
 
-boolean _success = false;
-  
+  boolean _success = false;
+
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-
-  
 
   Serial << endl
          << endl
@@ -89,8 +87,9 @@ boolean _success = false;
    * debug purpose
    *
    */
+  unsigned long _counter = Data->getRebootCounter();
 #ifdef DEBUG
-  Serial << endl << F("INFO: Firmware rebooted: ") << Data->getRebootCounter() << F(" times");
+  Serial << endl << F("INFO: Firmware rebooted: ") << _counter << F(" times");
 #endif
 
 /**

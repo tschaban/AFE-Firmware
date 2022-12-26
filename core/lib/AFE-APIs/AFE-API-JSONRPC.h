@@ -47,7 +47,7 @@ private:
   //AsyncPing Pings;
   PingClass *Ping = new PingClass();
   boolean _PingResponded;
-
+  
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
 #endif
@@ -59,6 +59,8 @@ private:
 #endif
 
 public:
+
+  boolean isStableConnection = true;
     
   AFEJSONRPC();
 

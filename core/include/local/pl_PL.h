@@ -108,6 +108,9 @@
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
 #define L_INDEX_DONATION "Wsparcie"
 
+/* JSON RPC API */
+#define L_JSON_RPC_API "Niestabilne połączenie z serwerem AFE Firmware. Brak możliwości sprawdzania i aktualizacji firmware przez Internet oraz aktywacji AFE Pro"
+
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
 #define L_DEVICE_SECTION_INFO "Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako nazwa hotspot'a urządzenia"

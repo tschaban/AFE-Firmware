@@ -19,6 +19,7 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
 
 #ifdef DEBUG
   Serial << endl << F("INFO: API REST: Initialized");
+
 #endif
 }
 
@@ -58,221 +59,235 @@ int AFEJSONRPC::sent(boolean &response, const char *method) {
 }
 
 int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
-
   int _httpCode = HTTP_CODE_INTERNAL_SERVER_ERROR;
-  response = "";
 
-  if (accessToWAN()) {
+  //  if (Device->configuration.api.jsonRPC) {
 
-    char _text[3];
-    generateMessage(message, method, params);
+  if (isStableConnection) {
+
+    response = "";
+
+    if (accessToWAN()) {
+
+      char _text[3];
+      generateMessage(message, method, params);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led->on();
+      Led->on();
 #endif
 
-    unsigned long resposneTime = millis();
+      unsigned long resposneTime = millis();
 
-    PRO_VERSION *Pro = new PRO_VERSION;
-    Data->getConfiguration(Pro);
+      PRO_VERSION *Pro = new PRO_VERSION;
+      Data->getConfiguration(Pro);
 
-    
+      // if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
+      if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_SERVER,
+                      AFE_CONFIG_JSONRPC_REST_API_SERVER_PORT,
+                      AFE_CONFIG_JSONRPC_REST_API_SERVER_URI, true)) {
 
-    // if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
-    if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_SERVER,
-                    AFE_CONFIG_JSONRPC_REST_API_SERVER_PORT,
-                    AFE_CONFIG_JSONRPC_REST_API_SERVER_URI, true)) {
-
-      http->setTimeout(AFE_CONFIG_JSONRPC_JSON_TIMEOUT);
-      http->setReuse(true);
+        http->setTimeout(AFE_CONFIG_JSONRPC_JSON_TIMEOUT);
+        http->setReuse(true);
 
 #ifdef DEBUG
-      Serial << endl << F("INFO: API REST: Connected to the api server");
-    } else {
-      Serial << endl << F("ERROR: API REST: NOT connected to the api server");
+        Serial << endl << F("INFO: API REST: Connected to the api server");
+      } else {
+        Serial << endl << F("ERROR: API REST: NOT connected to the api server");
 #endif
-    }
+      }
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: API REST: Setting header:");
+      Serial << endl << F("INFO: API REST: Setting header:");
 #endif
 
-    http->addHeader("Content-Type", "application/json");
-    http->addHeader("afe-did", Device->deviceId);
-    
+      http->addHeader("Content-Type", "application/json");
+      http->addHeader("afe-did", Device->deviceId);
+
 #ifdef DEBUG
-    Serial << endl << F(" : afe-did: ") << Device->deviceId;
+      Serial << endl << F(" : afe-did: ") << Device->deviceId;
 #endif
 
-    if (strlen(Pro->serial) > 0) {
-      http->addHeader("afe-key", Pro->serial);
+      if (strlen(Pro->serial) > 0) {
+        http->addHeader("afe-key", Pro->serial);
 #ifdef DEBUG
-      Serial << endl << F(" : afe-key: ") << Pro->serial;
+        Serial << endl << F(" : afe-key: ") << Pro->serial;
 #endif
-    }
-    sprintf(_text, "%d", AFE_FIRMWARE_TYPE);
-    http->addHeader("afe-type", _text);
+      }
+      sprintf(_text, "%d", AFE_FIRMWARE_TYPE);
+      http->addHeader("afe-type", _text);
 #ifdef DEBUG
-    Serial << endl << F(" : afe-type: ") << _text;
+      Serial << endl << F(" : afe-type: ") << _text;
 #endif
-    http->addHeader("afe-version", AFE_FIRMWARE_VERSION);
+      http->addHeader("afe-version", AFE_FIRMWARE_VERSION);
 #ifdef DEBUG
-    Serial << endl << F(" : afe-version: ") << AFE_FIRMWARE_VERSION;
+      Serial << endl << F(" : afe-version: ") << AFE_FIRMWARE_VERSION;
 #endif
-    sprintf(_text, "%d", AFE_DEVICE_TYPE_ID);
-    http->addHeader("afe-hid", _text);
+      sprintf(_text, "%d", AFE_DEVICE_TYPE_ID);
+      http->addHeader("afe-hid", _text);
 #ifdef DEBUG
-    Serial << endl << F(" : afe-hid: ") << AFE_DEVICE_TYPE_ID;
+      Serial << endl << F(" : afe-hid: ") << AFE_DEVICE_TYPE_ID;
 #endif
-    http->addHeader("afe-lang", L_LANGUAGE_SHORT);
+      http->addHeader("afe-lang", L_LANGUAGE_SHORT);
 #ifdef DEBUG
-    Serial << endl << F(" : afe-lang: ") << L_LANGUAGE_SHORT;
+      Serial << endl << F(" : afe-lang: ") << L_LANGUAGE_SHORT;
 #endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    http->addHeader("afe-api", "D");
+      http->addHeader("afe-api", "D");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-api: D");
+      Serial << endl << F(" : afe-api: D");
 #endif
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-    http->addHeader("afe-api", "H");
+      http->addHeader("afe-api", "H");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-api: H");
+      Serial << endl << F(" : afe-api: H");
 #endif
 #else
-    http->addHeader("afe-api", "S");
+      http->addHeader("afe-api", "S");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-api: S");
+      Serial << endl << F(" : afe-api: S");
 #endif
 #endif
 
 #if defined(ESP8285)
-    http->addHeader("afe-chip", "8285");
+      http->addHeader("afe-chip", "8285");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-chip: 8285");
+      Serial << endl << F(" : afe-chip: 8285");
 #endif
 #elif defined(ESP8266)
-    http->addHeader("afe-chip", "8266");
+      http->addHeader("afe-chip", "8266");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-chip: 8286");
+      Serial << endl << F(" : afe-chip: 8286");
 #endif
 #else
-    http->addHeader("afe-chip", "32");
+      http->addHeader("afe-chip", "32");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-chip: 32");
+      Serial << endl << F(" : afe-chip: 32");
 #endif
 #endif
 
 #if defined(AFE_ESP_FLASH_4MB)
-    http->addHeader("afe-size", "4");
+      http->addHeader("afe-size", "4");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-size: 4");
+      Serial << endl << F(" : afe-size: 4");
 #endif
 #elif defined(AFE_ESP_FLASH_2MB)
-    http->addHeader("afe-size", "2");
+      http->addHeader("afe-size", "2");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-size: 2");
+      Serial << endl << F(" : afe-size: 2");
 #endif
 #else
-    http->addHeader("afe-size", "1");
+      http->addHeader("afe-size", "1");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-size: 1");
+      Serial << endl << F(" : afe-size: 1");
 #endif
 #endif
 
 #ifdef DEBUG
-    http->addHeader("afe-debug", "1");
+      http->addHeader("afe-debug", "1");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-debug: 1");
+      Serial << endl << F(" : afe-debug: 1");
 #endif
 #else
-    http->addHeader("afe-debug", "0");
+      http->addHeader("afe-debug", "0");
 #ifdef DEBUG
-    Serial << endl << F(" : afe-debug: 0");
+      Serial << endl << F(" : afe-debug: 0");
 #endif
 #endif
 
-    _httpCode = http->POST(message);
+      _httpCode = http->POST(message);
 
-
-
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: API REST: Response code: ") << _httpCode << F(", time: ")
-           << millis() - resposneTime << F("msec.");
-#endif
-    if (_httpCode == HTTP_CODE_OK) {
-      response = http->getString();
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: API REST: Response reply: ") << response
-             << F(", Size: ") << response.length();
+             << F("INFO: API REST: Response code: ") << _httpCode
+             << F(", time: ") << millis() - resposneTime << F("msec.");
+#endif
+      if (_httpCode == HTTP_CODE_OK) {
+        response = http->getString();
+#ifdef DEBUG
+        Serial << endl
+               << F("INFO: API REST: Response reply: ") << response
+               << F(", Size: ") << response.length();
 
 #endif
-      const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 60;
-      DynamicJsonBuffer jsonBuffer(capacity);
-      //   StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE> jsonBuffer;
+        const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + 60;
+        DynamicJsonBuffer jsonBuffer(capacity);
+        //   StaticJsonBuffer<AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE> jsonBuffer;
 
-      JsonObject &root = jsonBuffer.parseObject(response);
+        JsonObject &root = jsonBuffer.parseObject(response);
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: API REST: JSON Buffer size: ") << capacity
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity <
-          jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: API REST: Too small buffer size");
+        Serial << endl
+               << F("INFO: API REST: JSON Buffer size: ") << capacity
+               << F(", actual JSON size: ") << jsonBuffer.size();
+        if (/*AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE*/ capacity <
+            jsonBuffer.size() + 10) {
+          Serial << endl << F("WARN: API REST: Too small buffer size");
+        }
+#endif
+        if (!root.success()) {
+#ifdef DEBUG
+          Serial << endl << F("ERROR: API REST: JSON Parsing error");
+#endif
+          response = "";
+        } else {
+          response = root["result"] | "";
+        }
+      }
+#ifdef DEBUG
+      else {
+        response = http->getString();
+
+        Serial << endl
+               << F("WARN: API REST: Response reply code: ") << _httpCode << " "
+               << (_httpCode < 0 ? http->errorToString(_httpCode) : "")
+               << F(", content: ") << response << F(", Size: ")
+               << response.length();
+
+        if (_httpCode == -1 &&  (millis() - resposneTime) > 2000) {
+          isStableConnection = false;
+#ifdef DEBUG
+          Serial << endl
+                 << F("WARN: API REST: Connection to the API server is not "
+                      "stable. Turning it OFF");
+#endif
+        }
       }
 #endif
-      if (!root.success()) {
-#ifdef DEBUG
-        Serial << endl << F("ERROR: API REST: JSON Parsing error");
-#endif
-        response = "";
-      } else {
-        response = root["result"] | "";
-      }
-    }
-#ifdef DEBUG
-    else {
-      response = http->getString();
-
-      Serial << endl
-             << F("INFO: API REST: Response reply code: ") << _httpCode << " "
-             << (_httpCode < 0 ? http->errorToString(_httpCode) : "")
-             << F(", content: ") << response << F(", Size: ")
-             << response.length();
-    }
-#endif
-    http->end();
+      http->end();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Led->off();
+      Led->off();
 #endif
 
-    /* If too long response checking if there is still an access to the interent
-     */
-    if (millis() - resposneTime > AFE_WAN_ACCSSS_TIMEOUT) {
+      /* If too long response checking if there is still an access to the
+       * interent
+       */
+      if (millis() - resposneTime > AFE_WAN_ACCSSS_TIMEOUT) {
 #ifdef DEBUG
-      Serial << endl
-             << F("WARN: API REST: Too long response: ")
-             << ((millis() - resposneTime) / 1000)
-             << F("s. checking access to the WAN");
+        Serial << endl
+               << F("WARN: API REST: Too long response: ")
+               << ((millis() - resposneTime) / 1000)
+               << F("s. checking access to the WAN");
 #endif
-      accessToWAN();
+        accessToWAN();
+      }
+
+    } else {
+#ifdef DEBUG
+      Serial << endl << F("ERROR: API REST: No access to WAN");
+#endif
     }
 
-  } else {
+#if defined(DEBUG) && !defined(AFE_ESP32)
+    Serial << endl
+           << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
+           << F("kB: JSON returned");
+#endif
 #ifdef DEBUG
-    Serial << endl << F("ERROR: API REST: No access to WAN");
+  } else {
+    Serial << endl << F("WARN: API REST: API is off as not stable");
 #endif
   }
-
-#if defined(DEBUG) && !defined(AFE_ESP32)
-  Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-         << F("kB: JSON returned");
-#endif
-
   return _httpCode;
 }
 

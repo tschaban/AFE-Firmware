@@ -34,8 +34,11 @@
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
 #define L_404 "AFE FIRMWARE: Error 404: Page doesn't exist"
 #define L_COMMNAD_NO_COMMAND "\"No command\""
-
 #define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
+
+
+/* JSON RPC API */
+#define L_JSON_RPC_API "Unstable connection to the AFE Firmware server. There is no possibility to check and update the firmware over the Internet and to activate AFE Pro"
 
 /* Menu */
 #define L_USED "used in"

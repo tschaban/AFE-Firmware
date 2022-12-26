@@ -109,7 +109,7 @@
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 41  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ checked
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ checked
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ checked  @TODO 3.6.0 added additional param
 #define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145    // AJ checked
 /**
  * @brief JSON for Network 

@@ -373,7 +373,7 @@ void AFESitesGenerator::siteDevice(String &page) {
       page.replace(F("{{I}}"), _HtmlResponse);
     }
 
-    if (RestAPI->accessToWAN()) {
+    if (RestAPI->accessToWAN() && RestAPI->isStableConnection) {
 
       RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (_HtmlResponse.length() > 0) {
@@ -396,9 +396,14 @@ void AFESitesGenerator::siteDevice(String &page) {
         page.replace(F("{{I}}"), _HtmlResponse);
       }
       // yield(); // @TODO removed with T7
-
-      closeMessageSection(page);
     }
+
+    if (!RestAPI->isStableConnection) {
+      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+      page.replace(F("{{I}}"), F(L_JSON_RPC_API));
+    }
+
+    closeMessageSection(page);
   }
 
   /* Section: Device name */
@@ -3111,7 +3116,8 @@ void AFESitesGenerator::siteUpgrade(String &page) {
 
   openMessageSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
 
-  if (RestAPI->accessToWAN()) {
+  if (RestAPI->accessToWAN() && RestAPI->isStableConnection) {
+
 
     /**
      * @brief Get info if there is available firmware to upgrade
@@ -3320,16 +3326,22 @@ void AFESitesGenerator::siteProKey(String &page) {
 
   if (RestAPI->accessToWAN()) {
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
-    if (_HtmlResponse.length() > 0) {
+    if (!RestAPI->isStableConnection) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace(F("{{I}}"), _HtmlResponse);
-    }
+      page.replace(F("{{I}}"), F(L_JSON_RPC_API));
+    } else {
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_PRO_OWNER);
-    if (_HtmlResponse.length() > 0) {
-      page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-      page.replace(F("{{I}}"), _HtmlResponse);
+      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+      if (_HtmlResponse.length() > 0) {
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace(F("{{I}}"), _HtmlResponse);
+      }
+
+      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_PRO_OWNER);
+      if (_HtmlResponse.length() > 0) {
+        page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+        page.replace(F("{{I}}"), _HtmlResponse);
+      }
     }
 
   } else {
@@ -3935,15 +3947,14 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
                    L_CLED_SLOW_START_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                    "0", "60000", "1", L_MILISECONDS, false);
 
-
   sprintf(_number, "%d", configuration.off.changeTime);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft",
-                   L_CLED_SLOW_STOP_TIME, _number, AFE_FORM_ITEM_SKIP_PROPERTY,
-                   "0", "60000", "1", L_MILISECONDS, false);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ft", L_CLED_SLOW_STOP_TIME,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "60000", "1",
+                   L_MILISECONDS, false);
 
   closeSection(page);
 
-  #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.cled.idx);
