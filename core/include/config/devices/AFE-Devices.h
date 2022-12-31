@@ -88,6 +88,11 @@
 #define AFE_DEVICE_TYPE_NAME "T6 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 16
 
+#elif defined(AFE_T6_CUSTOM_E2)
+#define AFE_DEVICE_MANUFACTURER "Espressif Systems"
+#define AFE_DEVICE_TYPE_NAME "T6 E2 Custom"
+#define AFE_DEVICE_TYPE_ID 17
+
 #elif defined(AFE_T1_CUSTOM_E1)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "T1 E1 Custom"

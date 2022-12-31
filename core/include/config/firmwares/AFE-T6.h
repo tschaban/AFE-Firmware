@@ -1,7 +1,7 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.5.3"
+#define AFE_FIRMWARE_VERSION "3.6.0.b0"
 #define AFE_FIRMWARE_TYPE 6
 
 /**
@@ -9,7 +9,7 @@
  * 
  */
  
-#if defined(AFE_T6_CUSTOM_E1)
+#if defined(AFE_T6_CUSTOM_E1) || defined(AFE_T6_CUSTOM_E2)
 #define AFE_CONFIG_HARDWARE_DS18B20
 
 /**
@@ -68,7 +68,7 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS 2
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES 3
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS 2
-#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80 1
+#define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80 2
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561 1
@@ -100,7 +100,7 @@
 
 /**
  * @brief Max number of hardware items per specyfic hardware device
- * E1: Custome verstion
+ * E1: Custome version
  * 
  */
 #elif defined(AFE_T6_CUSTOM_E1)
@@ -109,6 +109,19 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80 1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_I2C 1
+
+/**
+ * @brief Max number of hardware items per specyfic hardware device
+ * E1: Custome version
+ * 
+ */
+#elif defined(AFE_T6_CUSTOM_E2)
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20 8
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS 1
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80 2
+#define AFE_CONFIG_HARDWARE_NUMBER_OF_I2C 1
+
 
 /**
  * @brief Max number of hardware items per specyfic hardware device
@@ -161,6 +174,18 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20 12
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C 1
+/**
+ * @brief Default values for hardware items per specyfic hardware device
+ * E1 Custome version
+ * 
+ */
+#elif defined(AFE_T6_CUSTOM_E2)
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_SWITCHES 1
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_LEDS 1
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20 0
+#define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C 1
+
 /**
  * @brief Default values for hardware items per specyfic hardware device
  * Generic version

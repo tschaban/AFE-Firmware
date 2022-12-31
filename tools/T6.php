@@ -15,7 +15,8 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 ### AFE_DEVICE_ID ###
 
 0 ESP Generic
-15 E1
+16 E1
+17 E2
 22 ECS v2.0
 22 ECS v2.1
 30 ESP32 30Pins
@@ -29,6 +30,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 3  : ESP32-30p
 4  : ESP32-38p
 5  : E1
+6  : E2
 
 
 */
@@ -62,6 +64,11 @@ $index++;
 $targetHardware[$index][0] = "esp8266";
 $targetHardware[$index][1] = 16; 
 $targetHardware[$index][2] = "e1";
+
+$index++;
+$targetHardware[$index][0] = "esp8266";
+$targetHardware[$index][1] = 17; 
+$targetHardware[$index][2] = "e2";
 
 
 
@@ -125,6 +132,16 @@ $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/b
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 5;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+// Standard API E2
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e2-standard/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 6;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
@@ -222,6 +239,16 @@ $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
+// Domoticz API E2
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e2-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 6;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
 
 // Domoticz API ESP32
 
@@ -308,7 +335,6 @@ $sourceFolder[$index]["api"] = $targetAPI[2];
 
 // Home Assistant API E1
 
-
 $index++;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e1-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
@@ -317,6 +343,15 @@ $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
+// Home Assistant API E2
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e2-ha/firmware.bin";
+$sourceFolder[$index]["chip"] = 8266;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 6;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[2];
 
 // Home Assistant API ESP32
 
