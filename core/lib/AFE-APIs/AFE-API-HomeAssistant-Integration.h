@@ -18,9 +18,11 @@
 #include <AFE-API-MQTT-Standard.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
+#include <AFE-Firmware.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-Site-components.h>
 #include <ArduinoJson.h>
+
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <hardwares/AFE-RGB-LED.h>
@@ -42,6 +44,7 @@ private:
   AFEDataAccess *_Data;
   AFEDevice *_Device;
   AFEAPIMQTTStandard *_MqttAPI;
+  AFEFirmware *_Firmware;
 
   HOME_ASSISTANT_CONFIG *configuration = new HOME_ASSISTANT_CONFIG;
 
@@ -59,7 +62,7 @@ private:
     uint8_t id;
     /**
      * @brief Hardware item type required to generated item ID in HA
-     * 
+     *
      */
     uint8_t type;
     uint8_t hardwareId;
@@ -72,9 +75,16 @@ private:
     char unit[AFE_CONFIG_ATTRIBUTE_SIZE_UNIT];
     char deviceClass[AFE_CONFIG_HA_DEVICE_TYPE_SIZE];
     uint8_t entityId;
+    char entityCategory[sizeof("diagnostic")];
   };
 
   HA_DEVICE_CONFIG *_deviceConfiguration = new HA_DEVICE_CONFIG;
+
+  /**
+   * @brief Resets deviceConfiguration variable
+   *
+   */
+  void resetDeviceConfiguration(void);
 
   /**
    * @brief generates HA object ID
@@ -234,13 +244,37 @@ private:
   void publishTSL2561(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  /**
+   * @brief publishes gate
+   *
+   */
+  void publishGate(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  /**
+   * @brief publishes contracton
+   *
+   */
+  void publishContactron(void);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_CHECK_FIRMWARE_VERSION
+  /**
+   * @brief publishes firmware version
+   *
+   */
+  void publishFirmwareVersion(void);
+#endif
+
 public:
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object
    *
    */
-  AFEAPIHomeAssistantIntegration(AFEDataAccess *Data, AFEDevice *Device,
-                                 AFEAPIMQTTStandard *MqttAPI);
+  AFEAPIHomeAssistantIntegration(AFEDataAccess *, AFEDevice *,
+                                 AFEAPIMQTTStandard *, AFEFirmware *);
 
   /**
    * @brief method to be called to initialize the

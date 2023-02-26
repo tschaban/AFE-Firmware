@@ -1,0 +1,115 @@
+/**
+ * @file
+ * @author Tschaban-A (github@adrian.czabanowski.com)
+ * @brief R
+ * @version 3.6.0
+ * @date 2023-02-24
+ *
+ * @copyright AFE Firmware @2023
+ *
+ */
+#ifndef _AFE_FIRMWARE_EVENT_h
+#define _AFE_FIRMWARE_EVENT_h
+
+#include <AFE-Configuration.h>
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-API-HTTP-Domoticz.h>
+#include <AFE-API-MQTT-Domoticz.h>
+#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+#include <AFE-API-HomeAssistant-Integration.h>
+#endif
+#include <AFE-API-MQTT-Standard.h>
+#endif
+
+#include <AFE-API-JSONRPC.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Device.h>
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
+#include <AFE-Firmware.h>
+#include <AFE-WiFi.h>
+
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
+class AFEEvent {
+
+private:
+  struct EVENT_TIMER {
+    unsigned long oneMinute;
+    uint8_t oneHour;
+    uint8_t oneDay;
+  };
+
+  AFEDataAccess *_Data;
+  AFEDevice *_Device;
+  AFEWiFi *_Network;
+  AFEJSONRPC *_RestAPI;
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED *_Led;
+#endif
+  AFEFirmware *_Firmware;
+
+  EVENT_TIMER *timer = new EVENT_TIMER;
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  AFEAPIMQTTDomoticz *_MqttAPI;
+  AFEAPIHTTPDomoticz *_HttpDomoticzAPI;
+#else
+  AFEAPIMQTTStandard *_MqttAPI;
+#endif
+
+  void conenctedToNetwork(void);
+  void disconnectedFromNetwork(void);
+  void connectedToMQTTBroker(void);
+  void disconnectedFromMQTTBroker(void);
+  void checkingFirmwareVersion(void);
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+  void publishMQTTHADiscoveryConfiguration(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *,
+             AFEFirmware *);
+#endif
+
+public:
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFEEvent(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *, AFELED *,
+           AFEFirmware *, AFEAPIMQTTDomoticz *, AFEAPIHTTPDomoticz *);
+#else
+  AFEEvent(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *, AFEFirmware *,
+           AFEAPIMQTTDomoticz *, AFEAPIHTTPDomoticz *);
+#endif
+
+#else
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFEEvent(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *, AFELED *,
+           AFEFirmware *, AFEAPIMQTTStandard *);
+#else
+  AFEEvent(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *, AFEFirmware *,
+           AFEAPIMQTTStandard *);
+#endif
+
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *, AFELED *,
+             AFEFirmware *);
+#else
+  void begin(AFEDataAccess *, AFEDevice *, AFEWiFi *, AFEJSONRPC *,
+             AFEFirmware *);
+#endif
+
+  void listener(void);
+};
+
+#endif //_AFE_FIRMWARE_EVENT_h

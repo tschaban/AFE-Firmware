@@ -18,7 +18,6 @@ private:
 
 public:
   DEVICE configuration;
-  char deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
 
   /* This param is set by Upgrade class, if the frmware has been upgraded. It's
    * used to show a message in the config panel */

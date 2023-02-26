@@ -13,6 +13,8 @@
 #define L_FIRMWARE_NAME "for Shelly-1"
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "for Sonoff Basic"
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+#define L_FIRMWARE_NAME "Sonoff Mini Extreme R4"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "Basic version"
 #elif defined(T1_CONFIG)
@@ -178,12 +180,15 @@
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 #define L_NETWORK_RADIO_MODE "Radio Mode: 802.11"
 #define L_NETWORK_OUTPUT_POWER "Transmit power (dBm)"
+#define L_NETWORK_DEFAULT_DNS1 "Default: 8.8.8.8"
+#define L_NETWORK_DEFAULT_DNS2 "Default: 8.8.4.4"
 
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
 #define L_MQTT_IDX_LWT "LWT's IDX"
 #define L_MQTT_TOPIC_LWT "LWT's Topic"
+#define L_MQTT_TOPIC_STATUS "Firmware monitoring Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 #define L_MQTT_TIMEOUT "Timeout"
@@ -707,8 +712,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Version {{f.v}} (Build:{{f.b}})"
-#define L_FIRMWARE_VERSION_DATE "Compilation date: {{f.k}}"
+#define L_FIRMWARE_VERSION "Version {{f.v}} (Build:{{f.b}} {{f.k}})"
+#define L_FIRMWARE_LATEST_VERSION "Latest version {{f.u}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
 #define L_FIRMWARE_API "API: {{f.a}}"
@@ -726,4 +731,3 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_WIFI_RSSI_80 "Not Good"
 #define L_WIFI_RSSI_90 "Unusable"
 #endif // _LANG_EN_h
-

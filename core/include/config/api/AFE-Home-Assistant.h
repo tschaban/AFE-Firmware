@@ -24,6 +24,7 @@
 #define AFE_CONFIG_MQTT_CMD_MESSAGE_LENGTH 113 // {"color":{"red":255,"green":250,"blue":255}  AJ estimated with buffer
 
 
+/* @TODO, same is in MQTT Standard, so it's not redundant. Potential for refactoring. Low prior */
 #define AFE_CONFIG_MQTT_COMMAND_ON "on"
 #define AFE_CONFIG_MQTT_COMMAND_OFF "off"
 #define AFE_CONFIG_MQTT_COMMAND_TOGGLE "toggle"
@@ -91,12 +92,15 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H 36
 #define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_PERCENT 37
 #define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_VOLT 38
+#define AFE_CONFIG_HA_ITEM_GATE 39
+#define AFE_CONFIG_HA_ITEM_FIRMWARE_STATUS 40
 
 /**
  * @brief Hardware Ids required to generated ObjectId
  * 
  */
 
+#define AFE_CONFIG_HA_HARDWARE_NONE AFE_NONE
 #define AFE_CONFIG_HA_HARDWARE_RELAY 0
 #define AFE_CONFIG_HA_HARDWARE_SWITCH 1
 #define AFE_CONFIG_HA_HARDWARE_CLED 2
@@ -111,6 +115,18 @@
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_RAINMETER 11
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_TSL2561 12
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_BINARY 13
+#define AFE_CONFIG_HA_HARDWARE_GATE 14
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_CONTACTRON 15
+
+
+/**
+ * @brief Entity categories
+ * 
+ */
+
+#define AFE_CONFIG_HA_ENTITY_CATEGORY_NONE "None"
+#define AFE_CONFIG_HA_ENTITY_CATEGORY_CONFIG "config"
+
 
 
 /**
@@ -126,10 +142,11 @@
  * Max at this stage: MQTT_TOPIC_LENGTH_64/binary_sensor/AFE_CONFIG_HA_OBJECT_ID_SIZE/config
   */
 #define AFE_CONFIG_HA_PUBLISH_TOPIC_SIZE AFE_CONFIG_HA_OBJECT_ID_SIZE+64+22
-
+  
 
 /**
  * @brief Device types 
+ * Docs for HA MQTT HA Autodiscovery: https://www.home-assistant.io/integrations/
  * 
  */
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SWITCH 0
@@ -143,6 +160,19 @@
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_SELECT_NAME "select"
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT 5
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_LIGHT_NAME "light"
+/**
+ * @brief Cover definition
+ * https://www.home-assistant.io/integrations/cover.mqtt/
+ * 
+ */
+#define AFE_CONFIG_HA_TYPE_OF_ENTITY_COVER 6
+#define AFE_CONFIG_HA_TYPE_OF_ENTITY_COVER_NAME "cover"
+/**
+ * @brief https://www.home-assistant.io/integrations/update.mqtt/
+ * 
+ */
+#define AFE_CONFIG_HA_TYPE_OF_ENTITY_UPDATE 7   
+#define AFE_CONFIG_HA_TYPE_OF_ENTITY_UPDATE_NAME "update"
 
 
 #define AFE_CONFIG_HA_TYPE_OF_ENTITY_UNKNOWN "unknown"
@@ -170,6 +200,10 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_BATTERY "battery"
 #define AFE_CONFIG_HA_DEVICE_CLASS_SWITCH AFE_CONFIG_HA_DEVICE_CLASS_NONE
 #define AFE_CONFIG_HA_DEVICE_CLASS_BINARY_SENSOR AFE_CONFIG_HA_DEVICE_CLASS_OPENING 
+#define AFE_CONFIG_HA_DEVICE_CLASS_DOOR "door"
+#define AFE_CONFIG_HA_DEVICE_CLASS_GARAGE "garage"
+#define AFE_CONFIG_HA_DEVICE_CLASS_GATE "gate"
+#define AFE_CONFIG_HA_DEVICE_CLASS_FIRMWARE "firmware"
 
 
 
@@ -181,6 +215,98 @@
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL "total"
 #define AFE_CONFIG_HA_STATE_CLASS_TOTAL_INCREASING "total_increasing"
 
+
+const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
+    "{\"device\":{\"ids\":\"{{d.i}}\",\"hw_version\":\"{{d.c}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
+     "\"name\":\"{{d.n}}\",\"via_device\":\"{{d.i}}\",\"mdl\":\"{{d.h}}\",\"configuration_url\":\"http://{{d.u}}\"},"
+    "\"uniq_id\":\"{{i.i}}\",\"name\":\"{{i.n}}\"{{ret}}{{b.a}}{{bst}}{{"
+    "bsp}}{{bct}}{{bcp}}{{sen}}{{bdo}}{{rgb}}{{opt}}{{bdc}}{{bec}},\"enabled_by_default\":true}";
+
+
+const char HA_MQTT_DISCOVERY_JSON_FIRMWARE_UPDATE_VALUE_TEMPLATE[] PROGMEM =
+",\"val_tpl\":\"{{{'installed_version':value_json.fw.iv,'latest_version':value_json.fw.lv,'title':value_json.fw.t,'release_url':value_json.fw.ru,'entity_picture':value_json.fw.i,'release_summary':value_json.fw.rs}|to_json}}\"";
+
+const char HA_MQTT_DISCOVERY_JSON_ENTITY_CATEGORY[] PROGMEM = ",\"entity_category\":\"{{ec}}\"";
+
+const char HA_MQTT_DISCOVERY_JSON_AVAILABILITY[] PROGMEM =
+    ",\"availability_topic\":\"{{a.t}}\",\"payload_available\":\"connected\","
+    "\"payload_not_available\":\"disconnected\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_STATE_TOPIC[] PROGMEM =
+    ",\"stat_t\":\"{{i.t}}/state\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_STATE_ON_OFF[] PROGMEM =
+    ",\"stat_on\":\"on\",\"stat_off\":\"off\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_COMMAND_TOPIC[] PROGMEM =
+    ",\"cmd_t\":\"{{i.t}}/cmd\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_PAYLOAD_ON_OFF[] PROGMEM =
+    ",\"pl_on\":\"on\",\"pl_off\":\"off\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_COMMAND_OPEN_CLOSED[] PROGMEM =
+    ",\"payload_on\":\"closed\",\"payload_off\":\"open\"";
+
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+const char HA_MQTT_DISCOVERY_JSON_COMMAND_OPEN_CLOSE_STOP[] PROGMEM =
+    ",\"payload_open\":\"toggle\",\"payload_close\":\"toggle\",\"payload_stop\":\"toggle\"";    
+
+
+const char HA_MQTT_DISCOVERY_JSON_STATES_GATE[] PROGMEM =
+    ",\"state_closed\":\"closed\",\"state_open\":\"open\",\"state_opening\":\"partiallyOpen\"";
+
+#endif 
+
+
+
+const char HA_MQTT_DISCOVERY_JSON_SENSOR_COMMON[] PROGMEM =
+    ",\"val_tpl\":\"{{s.vt}}\",\"stat_t\":\"{{i.t}}\","
+    "\"unit_of_meas\":\"{{s.u}}\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_DEVICE_CLASS[] PROGMEM =
+    ",\"device_class\":\"{{s.dc}}\"";
+
+
+const char HA_MQTT_DISCOVERY_JSON_RETAIN_FLAG[] PROGMEM = ",\"ret\":{{r.f}}";
+
+
+
+/**
+ * @brief RGB LED specyfic configuration tags
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_CLED
+
+const char HA_MQTT_DISCOVERY_JSON_STATE_VALUE_TEMPLATE[] PROGMEM=
+    ",\"stat_val_tpl\":\"{{value_json.state}}\"";
+
+
+ 
+const char HA_MQTT_DISCOVERY_JSON_PAYLOAD_TEMPLATE[] PROGMEM =
+    ",\"pl_on\":\"{\\\"command\\\":\\\"on\\\"}\",\"pl_off\":\"{\\\"command\\\":"
+    "\\\"off\\\"}\"";
+
+const char HA_MQTT_DISCOVERY_JSON_OPTIONS[] PROGMEM = ",\"options\":[{{o.o}}]";
+
+
+const char HA_MQTT_DISCOVERY_JSON_RGB_LIGHT[] PROGMEM =
+    ",\"rgb_cmd_t\":\"{{i.t}}/cmd\",\"rgb_stat_t\":\"{{i.t}}/"
+    "state\",\"rgb_val_tpl\":\"{{value_json.color.red}},{{value_json.color."
+    "green}},{{value_json.color.blue"
+    "}}\",\"rgb_cmd_tpl\":\"{\\\"color\\\":{\\\"red\\\":{{red}},\\\"green\\\":{"
+    "{green}},\\\"blue\\\":{{blue}}}}\",\"on_cmd_type\":\"last\",\"bri_scl\":"
+    "{{bsc}},\"bri_val_tpl\":\"{{value_json.brightness}}\",\"bri_stat_t\":\"{{"
+    "i.t}}/state\",\"bri_cmd_t\":\"{{i.t}}{{i.ts}}/cmd\"";
+const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
+
+#endif
 
 /**
  * @brief HA Configuratio JSON items
@@ -197,69 +323,7 @@
 #define HA_MQTT_DISCOVERY_TAG_SET_BODY_OPTIONS "{{bdo}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_SENSOR "{{sen}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB "{{rgb}}"
-
-
-
-const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
-    "{\"device\":{\"ids\":\"{{d.i}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
-    "\"name\":\"{{d.n}}\",\"via_device\":\"{{d.i}}\",\"mdl\":\"{{d.h}}\"},"
-    "\"uniq_id\":\"{{i.i}}\",\"name\":\"{{i.n}}\"{{ret}}{{b.a}}{{bst}}{{"
-    "bsp}}{{bct}}{{bcp}}{{sen}}{{bdo}}{{rgb}}{{opt}}{{bdc}}}";
-
-const char HA_MQTT_DISCOVERY_JSON_AVAILABILITY[] PROGMEM =
-    ",\"avty\":{\"topic\":\"{{a.t}}\",\"payload_available\":\"connected\","
-    "\"payload_not_available\":\"disconnected\"}";
-
-const char HA_MQTT_DISCOVERY_JSON_STATE_TOPIC[] PROGMEM =
-    ",\"stat_t\":\"{{i.t}}/state\"";
-
-const char HA_MQTT_DISCOVERY_JSON_STATE_ON_OFF[] PROGMEM =
-    ",\"stat_on\":\"on\",\"stat_off\":\"off\"";
-
-const char HA_MQTT_DISCOVERY_JSON_COMMAND_TOPIC[] PROGMEM =
-    ",\"cmd_t\":\"{{i.t}}/cmd\"";
-
-const char HA_MQTT_DISCOVERY_JSON_PAYLOAD_ON_OFF[] PROGMEM =
-    ",\"pl_on\":\"on\",\"pl_off\":\"off\"";
-
-const char HA_MQTT_DISCOVERY_JSON_COMMAND_OPEN_CLOSED[] PROGMEM =
-    ",\"pl_on\":\"closed\",\"pl_off\":\"open\"";
-
-const char HA_MQTT_DISCOVERY_JSON_SENSOR_COMMON[] PROGMEM =
-    ",\"val_tpl\":\"{{s.vt}}\",\"stat_t\":\"{{i.t}}\","
-    "\"unit_of_meas\":\"{{s.u}}\"";
-
-const char HA_MQTT_DISCOVERY_JSON_DEVICE_CLASS[] PROGMEM =
-    ",\"dev_cla\":\"{{s.dc}}\"";
-
-const char HA_MQTT_DISCOVERY_JSON_RETAIN_FLAG[] PROGMEM = ",\"ret\":{{r.f}}";
-/**
- * @brief RGB LED specyfic configuration tags
- * 
- */
-#ifdef AFE_CONFIG_HARDWARE_CLED
-
-const char HA_MQTT_DISCOVERY_JSON_STATE_VALUE_TEMPLATE[] PROGMEM =
-    ",\"stat_val_tpl\":\"{{value_json.state}}\"";
-
-const char HA_MQTT_DISCOVERY_JSON_PAYLOAD_TEMPLATE[] PROGMEM =
-    ",\"pl_on\":\"{\\\"command\\\":\\\"on\\\"}\",\"pl_off\":\"{\\\"command\\\":"
-    "\\\"off\\\"}\"";
-
-const char HA_MQTT_DISCOVERY_JSON_OPTIONS[] PROGMEM = ",\"options\":[{{o.o}}]";
-
-const char HA_MQTT_DISCOVERY_JSON_RGB_LIGHT[] PROGMEM =
-    ",\"rgb_cmd_t\":\"{{i.t}}/cmd\",\"rgb_stat_t\":\"{{i.t}}/"
-    "state\",\"rgb_val_tpl\":\"{{value_json.color.red}},{{value_json.color."
-    "green}},{{value_json.color.blue"
-    "}}\",\"rgb_cmd_tpl\":\"{\\\"color\\\":{\\\"red\\\":{{red}},\\\"green\\\":{"
-    "{green}},\\\"blue\\\":{{blue}}}}\",\"on_cmd_type\":\"last\",\"bri_scl\":"
-    "{{bsc}},\"bri_val_tpl\":\"{{value_json.brightness}}\",\"bri_stat_t\":\"{{"
-    "i.t}}/state\",\"bri_cmd_t\":\"{{i.t}}{{i.ts}}/cmd\"";
-
-const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
-#endif
-
+#define HA_MQTT_DISCOVERY_TAG_SET_ENTITY_CATEGORY "{{bec}}"
 
 
 
@@ -273,6 +337,8 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #define HA_MQTT_DISCOVERY_TAG_DEVICE_MANUFACTURER "{{d.m}}"
 #define HA_MQTT_DISCOVERY_TAG_DEVICE_NAME "{{d.n}}" 
 #define HA_MQTT_DISCOVERY_TAG_DEVICE_HARDWARE "{{d.h}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_HARDWARE_CHIP "{{d.c}}"
+#define HA_MQTT_DISCOVERY_TAG_DEVICE_CONFIGURAION_URL "{{d.u}}"
 #define HA_MQTT_DISCOVERY_TAG_UNIQUE_ID "{{i.i}}"
 #define HA_MQTT_DISCOVERY_TAG_NAME "{{i.n}}" 
 #define HA_MQTT_DISCOVERY_TAG_STATE_TEMPLATE "{{i.t}}"
@@ -285,6 +351,8 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #define HA_MQTT_DISCOVERY_TAG_OPTIMISTIC "{{opt}}"
 #define HA_MQTT_DISCOVERY_TAG_LIGHT_BRIGHTNESS "{{bsc}}"
 #define HA_MQTT_DISCOVERY_TAG_LIGHT_TOPIC_SUFIX "{{i.ts}}"
+#define HA_MQTT_DISCOVERY_TAG_ENTITY_CATEGORY "{{ec}}"
+
 
 
 /**
@@ -337,3 +405,58 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 
 
 #endif // _AFE_Hardware_api_home_assistant_h
+
+
+/** Gate
+{
+  "device": {
+    "identifiers": "9424B9d-7Ed6D67e",
+    "sw_version": "AFE Firmware T5-3.6.0.B5",
+    "manufacturer": "Espressif Systems",
+    "name": "T5-ESP32",
+    "via_device": "9424B9d-7Ed6D67e",
+    "model": "ESP32 30Pins",
+    "hw_version": "ESP8266"
+  },
+  "unique_id": "9424B9d-7Ed6D67e-14390",
+  "name": "G1",
+  "retain": false,
+  "availability_topic": "t5/lwt",
+  "payload_available": "connected",
+  "payload_not_available": "disconnected",
+  "state_topic": "t5/gate/state",
+  "state_closed": "closed",
+  "state_open": "open",
+  "state_opening": "partiallyOpen",
+  "command_topic": "t5/gate/cmd",
+  "payload_open": "toggle",
+  "payload_close": "toggle",
+  "payload_stop": "toggle",
+  "device_class": "gate",
+  "enabled_by_default": true
+}
+
+*/
+
+
+/** Firmware update ,
+{
+  "device": {
+    "identifiers": "9424B9d-7Ed6D67e",
+    "sw_version": "AFE Firmware T5-3.6.0.B5",
+    "manufacturer": "Espressif Systems",
+    "name": "T5-ESP32",
+    "via_device": "9424B9d-7Ed6D67e",
+    "model": "ESP32 30Pins",
+    "hw_version": "ESP8266",
+    "configuration_url": "http://192.168.2.55"
+  },
+  "unique_id": "9424B9d-7Ed6D67e-40",
+  "retain": false,
+  "device_class": "firmware",
+  "name": "Firmware",
+  "state_topic": "AFE/9424B9d-7Ed6D67e/state",
+  "value_template" : "{{{'installed_version':value_json.fw.iv,'latest_version':value_json.fw.lv,'title':value_json.fw.t,'release_url':value_json.fw.ru,'entity_picture':value_json.fw.i,'release_summary':value_json.fw.rs}|to_json}}",
+  "entity_category":"config"
+}
+    */

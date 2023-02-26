@@ -64,11 +64,10 @@ private:
   boolean publishOnOffState(const char *topic, uint8_t state,
                             boolean sendAsOpenClosed = false);
 
-  
-/**
- * @brief stores prepared mqtt message to compare with incoming one
- * 
- */
+  /**
+   * @brief stores prepared mqtt message to compare with incoming one
+   *
+   */
   char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
 
 public:
@@ -78,7 +77,7 @@ public:
    */
   AFEAPIMQTTStandard();
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
+  void begin(AFEDataAccess *, AFEDevice *,  AFELED *);
 #else
   void begin(AFEDataAccess *, AFEDevice *);
 #endif // AFE_CONFIG_HARDWARE_LED

@@ -6,7 +6,7 @@ AFEWebServer::AFEWebServer() {}
 
 #if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
                          AFELED *_Led) {
   SystemLED = _Led;
   begin(_Data, _Device, _FirmwarePro, _RestAPI);
@@ -14,7 +14,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 #elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
                          AFELED *_Led, TwoWire *_WirePort0,
                          TwoWire *_WirePort1) {
   SystemLED = _Led;
@@ -24,7 +24,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 }
 #else
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
                          AFELED *_Led, TwoWire *_WirePort0) {
   SystemLED = _Led;
   WirePort0 = _WirePort0;
@@ -34,7 +34,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 #elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
                          TwoWire *_WirePort0, TwoWire *_WirePort1) {
   WirePort0 = _WirePort0;
   WirePort1 = _WirePort1;
@@ -42,7 +42,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 }
 #else
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
                          TwoWire *_WirePort0) {
   WirePort0 = _WirePort0;
   begin(_Data, _Device, _FirmwarePro, _RestAPI);
@@ -51,7 +51,7 @@ void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
 #endif // AFE_CONFIG_HARDWARE_LED  AFE_CONFIG_HARDWARE_I2C
 
 void AFEWebServer::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                         AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI) {
+                         AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI) {
   server.begin(80);
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
@@ -385,7 +385,7 @@ boolean AFEWebServer::generate(boolean upload) {
           get(configuration);
           Data->saveConfiguration(&configuration);
           // sprintf(RestAPI->Pro->serial, "%s", configuration.serial);
-          sprintf(FirmwarePro->Pro.serial, "%s", configuration.serial);
+          sprintf(FirmwarePro->pro->serial, "%s", configuration.serial);
           FirmwarePro->validate();
           configuration = {0};
         } else if (siteConfig.ID == AFE_CONFIG_SITE_MQTT) {
@@ -1387,66 +1387,100 @@ void AFEWebServer::get(DEVICE &data) {
 void AFEWebServer::get(NETWORK &data) {
 
   if (server.arg(F("s")).length() > 0) {
-    server.arg(F("s")).toCharArray(data.ssid, sizeof(data.ssid));
+    server.arg(F("s")).toCharArray(data.primary.ssid,
+                                   sizeof(data.primary.ssid));
   } else {
-    data.ssid[0] = AFE_EMPTY_STRING;
+    data.primary.ssid[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("sb")).length() > 0) {
-    server.arg(F("sb")).toCharArray(data.ssidBackup, sizeof(data.ssidBackup));
+    server.arg(F("sb")).toCharArray(data.secondary.ssid,
+                                    sizeof(data.secondary.ssid));
   } else {
-    data.ssidBackup[0] = AFE_EMPTY_STRING;
+    data.secondary.ssid[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("p")).length() > 0) {
-    server.arg(F("p")).toCharArray(data.password, sizeof(data.password));
+    server.arg(F("p")).toCharArray(data.primary.password,
+                                   sizeof(data.primary.password));
   } else {
-    data.password[0] = AFE_EMPTY_STRING;
+    data.primary.password[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("pb")).length() > 0) {
-    server.arg(F("pb")).toCharArray(data.passwordBackup,
-                                    sizeof(data.passwordBackup));
+    server.arg(F("pb")).toCharArray(data.secondary.password,
+                                    sizeof(data.secondary.password));
   } else {
-    data.passwordBackup[0] = AFE_EMPTY_STRING;
+    data.secondary.password[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i1")).length() > 0) {
-    server.arg(F("i1")).toCharArray(data.ip, sizeof(data.ip));
+    server.arg(F("i1")).toCharArray(data.primary.ip, sizeof(data.primary.ip));
   } else {
-    data.ip[0] = AFE_EMPTY_STRING;
+    data.primary.ip[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i2")).length() > 0) {
-    server.arg(F("i2")).toCharArray(data.gateway, sizeof(data.gateway));
+    server.arg(F("i2")).toCharArray(data.primary.gateway,
+                                    sizeof(data.primary.gateway));
   } else {
-    data.gateway[0] = AFE_EMPTY_STRING;
+    data.primary.gateway[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i3")).length() > 0) {
-    server.arg(F("i3")).toCharArray(data.subnet, sizeof(data.subnet));
+    server.arg(F("i3")).toCharArray(data.primary.subnet,
+                                    sizeof(data.primary.subnet));
   } else {
-    data.subnet[0] = AFE_EMPTY_STRING;
+    data.primary.subnet[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg(F("i4")).length() > 0) {
+    server.arg(F("i4")).toCharArray(data.primary.dns1,
+                                    sizeof(data.primary.dns1));
+  } else {
+    data.primary.dns1[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg(F("i5")).length() > 0) {
+    server.arg(F("i5")).toCharArray(data.primary.dns2,
+                                    sizeof(data.primary.dns2));
+  } else {
+    data.primary.dns2[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i1b")).length() > 0) {
-    server.arg(F("i1b")).toCharArray(data.ipBackup, sizeof(data.ipBackup));
+    server.arg(F("i1b")).toCharArray(data.secondary.ip,
+                                     sizeof(data.secondary.ip));
   } else {
-    data.ipBackup[0] = AFE_EMPTY_STRING;
+    data.secondary.ip[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i2b")).length() > 0) {
-    server.arg(F("i2b")).toCharArray(data.gatewayBackup,
-                                     sizeof(data.gatewayBackup));
+    server.arg(F("i2b")).toCharArray(data.secondary.gateway,
+                                     sizeof(data.secondary.gateway));
   } else {
-    data.gatewayBackup[0] = AFE_EMPTY_STRING;
+    data.secondary.gateway[0] = AFE_EMPTY_STRING;
   }
 
   if (server.arg(F("i3b")).length() > 0) {
-    server.arg(F("i3b")).toCharArray(data.subnetBackup,
-                                     sizeof(data.subnetBackup));
+    server.arg(F("i3b")).toCharArray(data.secondary.subnet,
+                                     sizeof(data.secondary.subnet));
   } else {
-    data.subnetBackup[0] = AFE_EMPTY_STRING;
+    data.secondary.subnet[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg(F("i4b")).length() > 0) {
+    server.arg(F("i4b")).toCharArray(data.secondary.dns1,
+                                     sizeof(data.secondary.dns1));
+  } else {
+    data.secondary.dns1[0] = AFE_EMPTY_STRING;
+  }
+
+  if (server.arg(F("i5b")).length() > 0) {
+    server.arg(F("i5b")).toCharArray(data.secondary.dns2,
+                                     sizeof(data.secondary.dns2));
+  } else {
+    data.secondary.dns2[0] = AFE_EMPTY_STRING;
   }
 
   data.noConnectionAttempts =
@@ -1467,8 +1501,8 @@ void AFEWebServer::get(NETWORK &data) {
           ? server.arg(F("fs")).toInt()
           : AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 
-  data.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
-  data.isDHCPBackup = server.arg(F("db")).length() > 0 ? true : false;
+  data.primary.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
+  data.secondary.isDHCP = server.arg(F("db")).length() > 0 ? true : false;
 
 #if !defined(ESP32)
   data.radioMode = server.arg(F("r")).length() > 0
@@ -1512,11 +1546,20 @@ void AFEWebServer::get(MQTT &data) {
   data.lwt.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
+  
   if (server.arg(F("t0")).length() > 0) {
     server.arg(F("t0")).toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
   } else {
     data.lwt.topic[0] = AFE_EMPTY_STRING;
   }
+
+  if (server.arg(F("t1")).length() > 0) {
+    server.arg(F("t1")).toCharArray(data.status.topic, sizeof(data.status.topic));
+  } else {
+    data.status.topic[0] = AFE_EMPTY_STRING;
+  }
+
+
 #endif
 
   data.retainLWT = server.arg(F("rl")).length() > 0 ? true : false;
@@ -1644,7 +1687,7 @@ void AFEWebServer::get(SWITCH &data) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CLED
   data.rgbLedID = server.arg(F("l")).length() > 0 ? server.arg(F("l")).toInt()
-                                                 : AFE_HARDWARE_ITEM_NOT_EXIST;
+                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.domoticz.idx =
@@ -2739,7 +2782,6 @@ void AFEWebServer::get(CLED &data) {
                             ? server.arg(F("ft")).toInt()
                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
 
-
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
   } else {
@@ -2904,7 +2946,7 @@ void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
-
+/* @TODO T5
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
   CLEDData.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt()
@@ -2956,6 +2998,8 @@ void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
   }
 }
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+*/
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

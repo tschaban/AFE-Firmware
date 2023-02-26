@@ -621,7 +621,8 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
       if (strlen(_Gate[i]->configuration->mqtt.topic) > 0) {
-        sprintf(mqttCommandTopic, "%s/cmd", _Gate[i]->configuration->mqtt.topic);
+        sprintf(mqttCommandTopic, "%s/cmd",
+                _Gate[i]->configuration->mqtt.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -663,7 +664,6 @@ void AFEAPIMQTTStandard::listener() {
 #endif
   }
 }
-
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   return enabled ? publishOnOffState(
@@ -1059,10 +1059,11 @@ void AFEAPIMQTTStandard::processContactron(uint8_t *id) {
 }
 
 boolean AFEAPIMQTTStandard::publishContactronState(uint8_t id) {
-  // TODO T5 - check if works as in previous version
-  return enabled ? publishOnOffState(_Contactron[id]->configuration->mqtt.topic,
-                                     _Contactron[id]->get(), true)
-                 : false;
+  return enabled
+             ? publishOnOffState(
+                   _Contactron[id]->configuration->mqtt.topic,
+                   _Contactron[id]->get() == AFE_OPEN ? AFE_OFF : AFE_ON, true)
+             : false;
 }
 #endif //  AFE_CONFIG_HARDWARE_CONTACTRON
 

@@ -98,7 +98,14 @@
 
 /* Configuration files, JSON Buffers.  */
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_UID 46   // AJ checked
-#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 385 // AJ checked
+
+/**
+ * @brief JSON for MQTT Broker
+ * {"host":"12345678901234567890123456789011","ip":"255.255.255.255","port":65222,"user":"12345678901234567890123456789011","password":"1234567890123456789012345678901112345678901234567890123456789011","lwt":"12345678901234567890123456789011123456789012345678901234567890111","s":"12345678901234567890123456789011123456789012345678901234567890111","retainAll":false,"retainLWT":false,"qos":1}
+ * 
+ */
+
+#define AFE_CONFIG_FILE_BUFFER_MQTT_BROKER 524 //  AJ checked
 #define AFE_CONFIG_FILE_BUFFER_DOMOTICZ 404 // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_BH1750 221      // AJ checked
 #ifdef AFE_ESP32
@@ -109,13 +116,18 @@
 #define AFE_CONFIG_FILE_BUFFER_DEVICE_MODE 41  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_PRO_VERSION 78  // AJ checked
 #define AFE_CONFIG_FILE_BUFFER_PASSWORD 72     // AJ checked
-#define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ checked  @TODO 3.6.0 added additional param
-#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 145    // AJ checked
+#define AFE_CONFIG_FILE_BUFFER_DEVICE 712      // AJ checked
+/**
+ * @brief JSON for Firmware version
+ * {"type":0,"api":0,"version":"1234567890","latest_version":"1234567890"}
+ */
+
+#define AFE_CONFIG_FILE_BUFFER_FIRMWARE 134  // AJ checked
 /**
  * @brief JSON for Network 
- * {"ssid":"123456789012345678901234567890123","password":"123456789012345678901234567890123","ssidBackup":"123456789012345678901234567890123","passwordBackup":"12345678901234567890123","isDHCP":1,"ip":"111.111.111.111","gateway":"111.111.111.111","subnet":"111.111.111.111","isDHCPBackup":1,"ipBackup":"111.111.111.111","gatewayBackup":"111.111.111.111","subnetBackup":"111.111.111.111","noConnectionAttempts":110,"waitTimeConnections":111,"waitTimeSeries":115,"noFailuresToSwitchNetwork":112,"radioMode":255,"outputPower":255}
+ * {"ssid":"12345678901234567890123456789011","password":"12345678901234567890123456789011","isDHCP":0,"ip":"192.168.112.164","gateway":"192.168.112.254","subnet":"255.255.255.111","dns1":"612.179.111.161","dns2":"621.179.111.162","ssidBackup":"12345678901234567890123456789011","passwordBackup":"12345678901234567890123456789011","isDHCPBackup":1,"ipBackup":"111.111.111.111","gatewayBackup":"111.111.111.111","subnetBackup":"111.111.111.111","dns1Backup":"111.111.111.111","dns2Backup":"111.111.111.111","noConnectionAttempts":110,"waitTimeConnections":111,"waitTimeSeries":115,"noFailuresToSwitchNetwork":112}
  */
-#define AFE_CONFIG_FILE_BUFFER_NETWORK 764     // AJ checked 
+#define AFE_CONFIG_FILE_BUFFER_NETWORK 868     // AJ checked 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #define AFE_CONFIG_FILE_BUFFER_LED 156 //  AJ checked
 #else

@@ -23,6 +23,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 6 Sonoff Touch 1G
 7 Sonoff Touch 2G
 8 Sonoff Touch 3G
+18 Sonoff Mini Extreme R4
 20 Shelly 1
 21 iECS Gate Controller v2
 22 iECS Weather Station v2
@@ -45,6 +46,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 7  : Sonoff Touch 1
 8  : Sonoff Touch 2
 9  : Sonoff Touch 3
+10 : Sonoff Mini Extreme R4
 
 */
 
@@ -88,6 +90,11 @@ $targetHardware[8][2] = "sonoff-touch-g2";
 $targetHardware[9][0] = "sonoff";
 $targetHardware[9][1] = 8;
 $targetHardware[9][2] = "sonoff-touch-g3";
+
+$targetHardware[10][0] = "sonoff";
+$targetHardware[10][1] = 18;
+$targetHardware[10][2] = "sonoff-mini-r4";
+
 
 $folderStructure[0] = $targetFolder;
 $folderStructure[1] = $targetFolder."/".$targetLanguage;
@@ -184,6 +191,14 @@ $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/b
 $sourceFolder[$index]["chip"] = 8285;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[1];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_32_Sonoff-Mini-R4-generic/firmware.bin";
+$sourceFolder[$index]["chip"] = 32;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 10;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
@@ -328,6 +343,14 @@ $sourceFolder[$index]["hardware"] = 9;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_32_Sonoff-Mini-R4-domoticz/firmware.bin";
+$sourceFolder[$index]["chip"] = 32;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 10;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[0];
+
 // Domoticz API Shelly
 
 $index++;
@@ -466,6 +489,14 @@ $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/b
 $sourceFolder[$index]["chip"] = 8285;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 9;
+$sourceFolder[$index]["debug"] = false;
+$sourceFolder[$index]["api"] = $targetAPI[2];
+
+$index++;
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_32_Sonoff-Mini-R4-ha/firmware.bin";
+$sourceFolder[$index]["chip"] = 32;
+$sourceFolder[$index]["size"] = 4;
+$sourceFolder[$index]["hardware"] = 10;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 

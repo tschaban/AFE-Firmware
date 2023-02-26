@@ -18,6 +18,7 @@
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-PASSWORD-Structure.h>
 #include <AFE-PRO-VERSION-Structure.h>
+#include <AFE-Global-Objects-structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Structure.h>

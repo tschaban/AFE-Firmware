@@ -76,7 +76,7 @@ public:
   AFEAPIMQTTDomoticz();
   void begin(AFEDataAccess *, AFEDevice *);
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *Led);
+  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
 #endif
 
   /* Subscribe domoticz topic in MQTT Broker */

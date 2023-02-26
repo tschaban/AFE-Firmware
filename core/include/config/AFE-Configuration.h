@@ -44,10 +44,29 @@
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
 /**
+ * @brief include configuration related to network configuration
+ * 
+ */
+#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 20
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME 1
+#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
+#define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
+#define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
+#define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.primary.ssid) + 30 // _(Sygnał: Bardzo dobry)
+#define AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE AFE_NONE
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER AFE_NONE
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN 0
+#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
+#define AFE_CONFIG_NETWORK_DEFAULT_DNS1 "8.8.8.8"
+#define AFE_CONFIG_NETWORK_DEFAULT_DNS2 "8.8.4.4"
+
+
+/**
  * @brief params related checking if a device has an access to the Internet
  * 
  */
-#define AFE_WAN_ACCSSS_HOST "8.8.8.8"
+
+#define AFE_WAN_ACCSSS_HOST AFE_CONFIG_NETWORK_DEFAULT_DNS1
 #define AFE_WAN_ACCSSS_PINGS 1
 #define AFE_WAN_ACCSSS_TIMEOUT 3000 // performs check if access to the network longer than this time in ms
 
@@ -167,20 +186,7 @@
  */
 #include <AFE-Webforms.h>
 
-/**
- * @brief include configuration related to network configuration
- * 
- */
-#define AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS 20
-#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME 1
-#define AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES 20
-#define AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER 2
-#define AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID "<nOOn>"
-#define AFE_CONFIG_NETWORK_SSID_LABEL_SIZE sizeof(configuration.ssid) + 30 // _(Sygnał: Bardzo dobry)
-#define AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE AFE_NONE
-#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER AFE_NONE
-#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MIN 0
-#define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
+
 
 /* ***************** HARDWARE: Config and defaults *********************/
 
@@ -446,5 +452,20 @@
  * 
  */
 #include <api/AFE-JSONRPC.h>
+
+/**
+ * @brief include Firmware check/update config
+ * 
+ */
+#ifdef AFE_CONFIG_FUNCTIONALITY_CHECK_FIRMWARE_VERSION
+#include <functionalities/AFE-Firmware-Update.h>
+#endif
+
+/**
+  * @brief include configuration for functionalities
+ * 
+ */
+#include <functionalities/AFE-Events.h>
+
 
 #endif // _AFE_Configuration_h

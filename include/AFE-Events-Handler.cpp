@@ -1,22 +1,15 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 /* ---------Headers ---------*/
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
 void eventsListener(void) {
   /* Event: connected to WiFi*/
   if (Network->eventConnected()) {
-#ifdef DEBUG
-    Serial << endl << F("INFO: EVENT: Connected to WiFi triggered");
-#endif
-
-    /* Checking Access to WAN */
-    RestAPI->checkAccessToWAN();
 
     /* Actions to run only on Normal mode */
     if (Device->getMode() == AFE_MODE_NORMAL) {
 
-/* ################## HTTP DOMOTICZ ################### */
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       /* Sendings hardware values to Domoticz */
 
       if (Device->configuration.api.domoticz) {
@@ -141,7 +134,6 @@ void eventsListener(void) {
         Led->off();
 #endif
       }
-#endif /* Domoticz  */
 
 #ifdef DEBUG
       Serial << endl
@@ -150,39 +142,9 @@ void eventsListener(void) {
 
     } // if (Device->getMode() == AFE_MODE_NORMAL) {
 
+    _RestAPI->checkAccessToWAN();
+
   } /* End of Network->eventConnected() */
-
-  /* Event: disconnected form WiFi */
-  if (Network->eventDisconnected()) {
-#ifdef DEBUG
-    Serial << endl << F("INFO: EVENTS: Diconnected from WiFi");
-#endif
-    RestAPI->setNoWANAccess();
-  }
-
-  /* Event: connected to MQTT API */
-  if (Device->getMode() == AFE_MODE_NORMAL && Device->configuration.api.mqtt) {
-    if (MqttAPI->Mqtt->connected()) {
-
-      MqttAPI->subscribe();
-
-#ifdef DEBUG
-      Serial << endl << F("INFO: EVENT: MQTT Connected: triggered");
-#endif
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-      /**
-       * @brief Publishing device configuration to Home Assistant
-       *
-       */
-      AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI =
-          new AFEAPIHomeAssistantIntegration(Data, Device, MqttAPI);
-      HomeAssistantDiscoveryAPI->publish();
-      delete HomeAssistantDiscoveryAPI;
-      HomeAssistantDiscoveryAPI = NULL;
-#endif
-
-      MqttAPI->synchronize();
-    }
-  }
 }
+
+#endif /* Domoticz  */

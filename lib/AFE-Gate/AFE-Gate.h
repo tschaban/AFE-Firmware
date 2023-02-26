@@ -60,7 +60,7 @@ private:
   uint8_t gateId;                  // ID of the gate
   uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
   boolean _event = false;
-  AFERelay *GateRelay;
+  AFERelay *GateRelay = new AFERelay();
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

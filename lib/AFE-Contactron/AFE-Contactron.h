@@ -33,7 +33,7 @@ public:
   void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Method returns contactorn state */
-  boolean get();
+  byte get();
 
   /* Method returns true if cotactron state ahs changed */
   boolean changed();
@@ -54,7 +54,7 @@ private:
 
   unsigned long startTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *ContactronLed;
+  AFELED *ContactronLed = new AFELED();
 #endif
 };
 

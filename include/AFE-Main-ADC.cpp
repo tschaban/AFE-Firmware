@@ -9,7 +9,7 @@ void analogInputEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeADC(void) {
-  if (FirmwarePro->Pro.valid) {
+  if (FirmwarePro->pro->valid) {
 #ifdef AFE_ESP32
     for (uint8_t i = 0; i < Device->configuration.noOfAnalogInputs; i++) {
       AnalogInput[i].begin(i);

@@ -6,7 +6,7 @@
 #include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Firmware-Pro.h>
+#include <AFE-Firmware.h>
 #include <AFE-Sites-Generator.h>
 
 #ifdef AFE_ESP32
@@ -59,7 +59,7 @@ class AFEWebServer {
 
 private:
   AFEDevice *Device;
-  AFEFirmwarePro *FirmwarePro;
+  AFEFirmware *FirmwarePro;
   AFEDataAccess *Data;
   AFEJSONRPC *RestAPI;
 
@@ -98,7 +98,7 @@ private:
   boolean upgradeSuccess = false;
 
 #if defined(AFE_CONFIG_HARDWARE_LED) || defined(AFE_CONFIG_HARDWARE_I2C)
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_LED || AFE_CONFIG_HARDWARE_I2C
 
   /**
@@ -298,27 +298,27 @@ public:
  *
  */
 #if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              AFELED *);
 #elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
   void begin(AFEDataAccess *_Data, AFEDevice *_Device,
-             AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI, AFELED *_Led,
+             AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI, AFELED *_Led,
              TwoWire *_WirePort0, TwoWire *_WirePort1);
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              AFELED *, TwoWire *);
 #endif // AFE_ESP32
 #elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              TwoWire *, TwoWire *);
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              TwoWire *);
 #endif // AFE_ESP32
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED

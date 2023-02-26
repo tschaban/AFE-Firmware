@@ -46,7 +46,7 @@ private:
   String message;
   //AsyncPing Pings;
   PingClass *Ping = new PingClass();
-  boolean _PingResponded;
+  boolean _PingResponded = false;
   
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;

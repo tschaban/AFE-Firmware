@@ -6,7 +6,7 @@
 #include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Firmware-Pro.h>
+#include <AFE-Firmware.h>
 #include <AFE-Site-components.h>
 
 #ifdef AFE_ESP32
@@ -55,8 +55,7 @@ class AFESitesGenerator {
 private:
   AFEDataAccess *Data;
   AFEDevice *Device;
-  FIRMWARE Firmware;
-  AFEFirmwarePro *FirmwarePro;
+  AFEFirmware *FirmwarePro;
   AFEJSONRPC *RestAPI;
 
   String _HtmlResponse;
@@ -68,7 +67,7 @@ private:
 #else  // ESP8266
   TwoWire *WirePort0;
 #endif // ESP32/ESP8266
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
   void generateHeader(String &page, uint16_t redirect);
@@ -273,14 +272,14 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              TwoWire *, TwoWire *);
 #else  // ESP8266
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
              TwoWire *);
 #endif // ESP32/ESP8266
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 /**

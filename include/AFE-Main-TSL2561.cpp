@@ -30,6 +30,8 @@ void TSL2561SensorEventsListener(void) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI->publishTSL2561SensorData(i);
 #endif
+
+/* @TODO T5 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         if (Device->configuration.effectDeviceLight) {
           if (CLEDStrip->lightSensorType ==
@@ -40,6 +42,7 @@ void TSL2561SensorEventsListener(void) {
           }
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT         
+*/
       }
     }
   }

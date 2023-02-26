@@ -7,6 +7,7 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 #include <AFE-Defaults.h>
+#include <AFE-Firmware.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -14,10 +15,10 @@
 
 class AFEUpgrader {
 
-private:
-  FIRMWARE FirmwareConfiguration;
+private:  
   AFEDataAccess *Data;
   AFEDevice *Device;
+  AFEFirmware *Firmware;
 
   /* Upgrades configuration files structure after firmware type change */
   void upgradeFirmwarType();
@@ -49,7 +50,7 @@ private:
 
 public:
   /* Constructor */
-  AFEUpgrader(AFEDataAccess *, AFEDevice *);
+  AFEUpgrader(AFEDataAccess *, AFEDevice *, AFEFirmware *);
 
   /* Checks if firmware has been upgraded */
   boolean upgraded();

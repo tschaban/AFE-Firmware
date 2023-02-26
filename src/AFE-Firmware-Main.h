@@ -4,7 +4,7 @@
  *  - T0 (Basic version: relay)
  *  - T1 (DS18B20)
  *  - T2 (DHTxx)
- *  - T3 (PIRs) 
+ *  - T3 (PIRs)
  *  - T4 (With expander MCP23017)
  *  - T5 Gate
  *  - T6 Wheater station
@@ -17,11 +17,13 @@
 /**
  * Work LOG T4
  * - lokalizacje
- * - to set fr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual JSON size: 40
+ * - to set fr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual
+ * JSON size: 40
  * - ESP32
  */
 
 #include <AFE-Configuration.h>
+
 
 /* Includes libraries for debugging in development compilation only */
 #ifdef DEBUG
@@ -31,17 +33,26 @@
 #include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-Firmware-Pro.h>
+#include <AFE-Firmware.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
 #include <AFE-WiFi.h>
 
 AFEDataAccess *Data = new AFEDataAccess();
-AFEFirmwarePro *FirmwarePro = new AFEFirmwarePro();
+AFEFirmware *FirmwarePro = new AFEFirmware();
 AFEDevice *Device = new AFEDevice();
 AFEWiFi *Network = new AFEWiFi();
 AFEWebServer *HTTPServer = new AFEWebServer();
 AFEJSONRPC *RestAPI = new AFEJSONRPC();
+
+#include <AFE-API-HTTP.h>
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-API-HTTP-Domoticz.h>
+#include <AFE-API-MQTT-Domoticz.h>
+#else // Standards and Home Assistant API
+#include <AFE-API-MQTT-Standard.h>
+#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
@@ -57,7 +68,6 @@ AFELED *Led = new AFELED();
 #include <AFE-CLED.h>
 AFECLED *CLEDStrip = new AFECLED();
 #endif // AFE_CONFIG_HARDWARE_CLED
-
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-Relay.h>
@@ -160,7 +170,6 @@ AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
 AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
-
 #include <AFE-Main-APIs.cpp>
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
@@ -256,11 +265,42 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #endif
 
-
-#include <AFE-Events-Handler.cpp>
 #include <AFE-Main-HTTPServer.cpp>
 
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-Events-Handler.cpp>
+#endif
 
 #ifdef DEBUG
 #include <AFE-Debug.cpp>
 #endif
+
+#include <AFE-Global-Object.h>
+AFEGlobalObject *Object = new AFEGlobalObject();
+
+#include <AFE-Event.h>
+AFEEvent *Event = new AFEEvent();
+/*
+#ifdef AFE_CONFIG_HARDWARE_LED
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+AFEEvent *Event = new AFEEvent(Data, Device, Network, RestAPI, Led, FirmwarePro,
+                               MqttAPI, HttpDomoticzAPI);
+#else
+AFEEvent *Event =
+    new AFEEvent(Data, Device, Network, RestAPI, Led, FirmwarePro, MqttAPI);
+#endif
+
+#else
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+AFEEvent *Event = new AFEEvent(Data, Device, Network, RestAPI, FirmwarePro,
+                               MqttAPI, HttpDomoticzAPI);
+#else
+AFEEvent *Event =
+    new AFEEvent(Data, Device, Network, RestAPI, FirmwarePro, MqttAPI);
+#endif
+
+#endif
+
+*/

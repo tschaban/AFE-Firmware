@@ -43,7 +43,7 @@ void initializeHTTPServer(void) {
 #endif // AFE_ESP32
 #elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
-  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0,
+  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, &WirePort0,
                    &WirePort1);
 #else
   HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0);

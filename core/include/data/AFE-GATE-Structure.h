@@ -29,7 +29,7 @@ struct GATE {
   uint8_t switchId; // Switch ID - triggering the gate
   GATE_CONTACTRONS contactron;
   GATE_STATES states;
-  char name[17];
+  char name[33];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz; // IDX for gate state
   DOMOTICZ_BASIC_CONFIG domoticzControl; // IDX for gate controll

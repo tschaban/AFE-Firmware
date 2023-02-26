@@ -3,6 +3,7 @@
 #include "AFE-ASYNC-MQTT.h"
 
 boolean AFEAsyncMQTTClient::eventConnected = false;
+boolean AFEAsyncMQTTClient::eventDisconnected = false;
 boolean AFEAsyncMQTTClient::isConnected = false;
 
 MQTT_MESSAGE
@@ -32,8 +33,9 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->onUnsubscribe(AFEAsyncMQTTClient::onMqttUnsubscribe);
   _Broker->onPublish(AFEAsyncMQTTClient::onMqttPublish);
 #endif
-
-  sprintf(_DeviceName, "%s-%s", Device->configuration.name, Device->deviceId);
+  char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
+  Data->getDeviceID(_deviceId);
+  sprintf(_DeviceName, "%s-%s", Device->configuration.name, _deviceId);
 
   _Broker->setClientId(_DeviceName);
   _Broker->setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
@@ -123,18 +125,26 @@ boolean AFEAsyncMQTTClient::listener() {
   } else {
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: Connecting to MQTT Broker");
-#endif
+#endif    
     _Broker->connect();
   }
 
   return _ret;
 }
 
-boolean AFEAsyncMQTTClient::connected() {
+boolean AFEAsyncMQTTClient::connectedEvent() {
   boolean returnValue = AFEAsyncMQTTClient::eventConnected;
   if (returnValue) {
     publishConnected();
     AFEAsyncMQTTClient::eventConnected = false;
+  }
+  return returnValue;
+}
+
+boolean AFEAsyncMQTTClient::disconnectedEvent() {
+  boolean returnValue = AFEAsyncMQTTClient::eventDisconnected;
+  if (returnValue) {
+    AFEAsyncMQTTClient::eventDisconnected = false;
   }
   return returnValue;
 }
@@ -227,8 +237,9 @@ void AFEAsyncMQTTClient::onMqttConnect(bool sessionPresent) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Connected to MQTT Broker");
 #endif
-  AFEAsyncMQTTClient::eventConnected = true;
   AFEAsyncMQTTClient::isConnected = true;
+  AFEAsyncMQTTClient::eventConnected = true;
+  AFEAsyncMQTTClient::eventDisconnected = false;  
 }
 
 void AFEAsyncMQTTClient::onMqttDisconnect(
@@ -236,7 +247,7 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 
   if (AFEAsyncMQTTClient::isConnected) {
 #ifdef DEBUG
-    Serial << endl << F("ERROR: MQTT: Problem connecting to MQTT Broker : ");
+    Serial << endl << F("WARN: MQTT: Disconnected from MQTT Broker : ");
 
     switch ((uint8_t)reason) {
     case 0:
@@ -265,7 +276,9 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
       break;
     }
 #endif
-    AFEAsyncMQTTClient::isConnected = false;
+    AFEAsyncMQTTClient::isConnected = false;    
+    AFEAsyncMQTTClient::eventConnected = false;
+    AFEAsyncMQTTClient::eventDisconnected = true;
   }
 }
 

@@ -13,24 +13,14 @@ void initializeGate(void) {
   for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
     Gate[i].begin(i, Device, Data);
     GatesCurrentStates->state[i] = AFE_GATE_UNKNOWN;
-    /* Assigning Gate ID to a relay */
-    if (Gate[i].configuration->relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
-        Device->configuration.noOfRelays >= Gate[i].configuration->relayId + 1) {
-      Relay[Gate[i].configuration->relayId].gateId = i;
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: GATE: For a RelayID: ") << Gate[i].configuration->relayId
-             << F(" setting GateID: ") << i;
-#endif
-    }
 
     /* Assigning Gate ID to a contactron */
     for (uint8_t j = 0; j < Gate[i].getNoOfContactrons(); j++) {
       Contactron[Gate[i].getContactronId(j)].gateId = i;
 #ifdef DEBUG
       Serial << endl
-             << F("INFO: GATE: For a ContactronID: ") << Gate[i].getContactronId(j)
-             << F(" setting GateID: ") << i;
+             << F("INFO: GATE: For a ContactronID: ")
+             << Gate[i].getContactronId(j) << F(" setting GateID: ") << i;
 #endif
     }
 

@@ -1,0 +1,123 @@
+#include <AFE-Configuration.h>
+
+/* Includes libraries for debugging in development compilation only */
+#ifdef DEBUG
+#include <Streaming.h>
+#endif
+
+#include <AFE-API-JSONRPC.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Device.h>
+#include <AFE-Firmware.h>
+#include <AFE-Upgrader.h>
+#include <AFE-Web-Server.h>
+#include <AFE-WiFi.h>
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+#include <AFE-MCP23017-Broker.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED.h>
+#endif 
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#include <AFE-Relay.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#include <AFE-Switch.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+#include <AFE-Analog-Input.h>
+#ifdef AFE_ESP32
+#else
+#endif
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <AFE-Gate.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#include <AFE-Contactron.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Regulator.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Thermal-Protector.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+#include <AFE-Sensor-DS18B20.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+#include <AFE-Sensor-DHT.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+#include <AFE-Sensor-BH1750.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+#include <AFE-Sensor-TSL2561.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+#include <AFE-Sensor-BMEX80.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#include <AFE-Sensor-Binary.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+#include <AFE-Sensor-HPMA115S0.h>
+#endif
+
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) ||                                 \
+    defined(AFE_CONFIG_HARDWARE_RAINMETER)
+#include <AFE-Impulse-Catcher.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#include <AFE-Sensor-Anemometer.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#include <AFE-Sensor-Rainmeter.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+#include <AFE-Sensor-PN532.h>
+#include <AFE-MiFare-Card.h>
+#endif
+
+#if defined(DEBUG) && defined(AFE_CONFIG_HARDWARE_I2C)
+#include <AFE-I2C-Scanner.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+#include <AFE-Sensor-AS3935.h>
+#endif
+
+#include <AFE-API-HTTP.h>
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-API-HTTP-Domoticz.h>
+#include <AFE-API-MQTT-Domoticz.h>
+#else // Standards and Home Assistant API
+#include <AFE-API-MQTT-Standard.h>
+#endif
+
+#include <AFE-Global-Object.h>
+#include <AFE-Event.h>

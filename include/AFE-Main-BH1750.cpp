@@ -32,6 +32,7 @@ void BH1750SensorEventsListener(void) {
         HttpDomoticzAPI->publishBH1750SensorData(i);
 #endif
 
+/* @TODO T5 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
         if (Device->configuration.effectDeviceLight) {
           if (CLEDStrip->lightSensorType ==
@@ -42,6 +43,7 @@ void BH1750SensorEventsListener(void) {
           }
         }
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+*/
       }
     }
   }

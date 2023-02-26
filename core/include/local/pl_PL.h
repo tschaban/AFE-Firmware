@@ -13,6 +13,8 @@
 #define L_FIRMWARE_NAME "dla Shelly-1"
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "dla Sonoff Basic"
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+#define L_FIRMWARE_NAME "Sonoff Mini Extreme R4"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "Wersja podstawowa"
 #elif defined(T1_CONFIG)
@@ -172,11 +174,15 @@
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
 #define L_NETWORK_RADIO_MODE "Tryb Radio 802.11"
 #define L_NETWORK_OUTPUT_POWER "Moc nadawania (dBm)"
+#define L_NETWORK_DEFAULT_DNS1 "Domyślnie: 8.8.8.8"
+#define L_NETWORK_DEFAULT_DNS2 "Domyślnie: 8.8.4.4"
+
 
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
 #define L_MQTT_TOPIC_LWT "Temat wiadomości LWT"
+#define L_MQTT_TOPIC_STATUS "Temat wiadomości monitorujących firmware"
 #define L_MQTT_IDX_LWT "IDX dla wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
@@ -677,14 +683,16 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_PUBLISHING "Publikować/aktualizować konfiguracje urządzenia?"
 #define L_HA_UPDATE_REMOVE "Usuwać nieaktualne konfiguracje?"
 #define L_HA_RETAIN_CONFIGURATION "Pamiętać konfigurację przez MQTT Broker"
+#define L_HA_RETAIN_CONFIGURATION "Pamiętać konfigurację przez MQTT Broker"
  
+
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
 #define L_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
 #define L_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Wersja {{f.v}} (Build:{{f.b}})"
-#define L_FIRMWARE_VERSION_DATE "Kompilacja z dnia: {{f.k}}"
+#define L_FIRMWARE_VERSION "Zainstalowana wersja {{f.v}} (Build:{{f.b}} {{f.k}})"
+#define L_FIRMWARE_LATEST_VERSION "Najnowsza wersja: {{f.u}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
 #define L_FIRMWARE_API "API: {{f.a}}"

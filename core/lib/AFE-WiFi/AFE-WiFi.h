@@ -137,7 +137,7 @@ public:
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
-   * @brief Return TRUE if device is connected to WiFi Acces Point
+   * @brief Return TRUE if device is connected to WiFi Access Point
    *
    * @return boolean
    */

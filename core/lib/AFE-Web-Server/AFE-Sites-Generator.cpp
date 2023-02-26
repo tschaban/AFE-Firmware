@@ -3,30 +3,27 @@
 AFESitesGenerator::AFESitesGenerator() {}
 
 void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmwarePro *_FirmwarePro,
-                              AFEJSONRPC *_RestAPI) {
+                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI) {
   Device = _Device;
   FirmwarePro = _FirmwarePro;
   Data = _Data;
   RestAPI = _RestAPI;
-  Data->getConfiguration(&Firmware);
   _HtmlResponse.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
 }
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
 void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmwarePro *_FirmwarePro,
-                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0,
-                              TwoWire *_WirePort1) {
+                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                              TwoWire *_WirePort0, TwoWire *_WirePort1) {
   WirePort0 = _WirePort0;
   WirePort1 = _WirePort1;
   begin(_Data, _Device, _FirmwarePro, _RestAPI);
 }
 #else
 void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmwarePro *_FirmwarePro,
-                              AFEJSONRPC *_RestAPI, TwoWire *_WirePort0) {
+                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
+                              TwoWire *_WirePort0) {
   WirePort0 = _WirePort0;
   begin(_Data, _Device, _FirmwarePro, _RestAPI);
 }
@@ -297,7 +294,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
     addMenuItem(page, F(L_LED_SYSTEM), AFE_CONFIG_SITE_SYSTEM_LED);
   }
 #endif
-
+/* @TODO T5
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
   if (Device->configuration.effectPN532 &&
       Device->configuration.noOfPN532Sensors > 0) {
@@ -305,6 +302,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
                 AFE_CONFIG_SITE_CLED_PN532_SENSOR);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+*/
 
 /* PN532 */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -477,7 +475,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef T4_CONFIG // Functionality is PRO for T4
-  _itemDisabled = !FirmwarePro->Pro.valid;
+  _itemDisabled = !FirmwarePro->pro->valid;
 #else
   _itemDisabled = false;
 #endif
@@ -503,7 +501,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #if defined(AFE_CONFIG_HARDWARE_BH1750) || defined(AFE_CONFIG_HARDWARE_TSL2561)
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
-  _itemDisabled = !FirmwarePro->Pro.valid;
+  _itemDisabled = !FirmwarePro->pro->valid;
 #else
   _itemDisabled = false;
 #endif
@@ -524,7 +522,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
-  _itemDisabled = !FirmwarePro->Pro.valid;
+  _itemDisabled = !FirmwarePro->pro->valid;
 #else
   _itemDisabled = false;
 #endif
@@ -538,7 +536,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
                         Device->configuration.noOfAS3935s, F("a3"),
                         F(L_DEVICE_NUMBER_OF_AS3935_SENSORS),
-                        !FirmwarePro->Pro.valid);
+                        !FirmwarePro->pro->valid);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
@@ -568,13 +566,13 @@ void AFESitesGenerator::siteDevice(String &page) {
   /* Number of ADC Inputs */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS,
                         Device->configuration.noOfAnalogInputs, F("ad"),
-                        F(L_DEVICE_NUMBER_OF_ADC), !FirmwarePro->Pro.valid);
+                        F(L_DEVICE_NUMBER_OF_ADC), !FirmwarePro->pro->valid);
 #else
   addCheckboxFormItem(
       page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",
       Device->configuration.isAnalogInput,
-      (!FirmwarePro->Pro.valid ? L_PRO_VERSION : AFE_FORM_ITEM_SKIP_PROPERTY),
-      !FirmwarePro->Pro.valid);
+      (!FirmwarePro->pro->valid ? L_PRO_VERSION : AFE_FORM_ITEM_SKIP_PROPERTY),
+      !FirmwarePro->pro->valid);
 #endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
@@ -630,25 +628,25 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
-/* Section: lights effects */
-#if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) ||               \
-    defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
-  openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-  addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
-                      Device->configuration.effectDeviceLight);
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+  /* @TODO T5
+  #if defined(AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT) || \
+      defined(AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT)
+    openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
+  #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+    addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
+                        Device->configuration.effectDeviceLight);
+  #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
-#ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  if (Device->configuration.noOfPN532Sensors > 0) {
-    addCheckboxFormItem(page, "e1", L_CLED_PN532_EFFECTS, "1",
-                        Device->configuration.effectPN532);
-  }
-#endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+  #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
+    if (Device->configuration.noOfPN532Sensors > 0) {
+      addCheckboxFormItem(page, "e1", L_CLED_PN532_EFFECTS, "1",
+                          Device->configuration.effectPN532);
+    }
+  #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
-  closeSection(page);
-#endif
-
+    closeSection(page);
+  #endif
+  */
   /* Section: APIs */
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
 
@@ -683,7 +681,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
   char _ip[18];
   char _int[4];
   int numberOfNetworks = 0;
-  char _ssid[sizeof(configuration.ssid)];
+  char _ssid[sizeof(configuration.primary.ssid)];
   char _ssidLabel[AFE_CONFIG_NETWORK_SSID_LABEL_SIZE];
   Data->getConfiguration(&configuration);
 
@@ -722,12 +720,12 @@ void AFESitesGenerator::siteNetwork(String &page) {
                                 : WiFi.RSSI(i) >= -80 ? L_WIFI_RSSI_80
                                                       : L_WIFI_RSSI_90);
         addSelectOptionFormItem(page, _ssidLabel, _ssid,
-                                strcmp(_ssid, configuration.ssid) == 0);
+                                strcmp(_ssid, configuration.primary.ssid) == 0);
       }
     } else {
       addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
                               strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
-                                     configuration.ssid) == 0);
+                                     configuration.primary.ssid) == 0);
     }
 
     page.concat(F("</select>"));
@@ -739,12 +737,12 @@ void AFESitesGenerator::siteNetwork(String &page) {
 #ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   } else {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "s", L_NETWORK_SSID,
-                     configuration.ssid, "32");
+                     configuration.primary.ssid, "32");
   }
 #endif // AFE_ESP32
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "p", L_PASSWORD,
-                   configuration.password, "32");
+                   configuration.primary.password, "32");
 
   WiFi.macAddress().toCharArray(_ip, 18);
 
@@ -757,13 +755,17 @@ void AFESitesGenerator::siteNetwork(String &page) {
   /* Section: DHCP or Fixed IP */
   openSection(page, F(L_NETWORK_DEVICE_IP), F(L_NETWORK_DEVICE_IP_INFO));
   addCheckboxFormItem(page, "d", L_NETWORK_DHCP_ENABLED, "1",
-                      configuration.isDHCP);
+                      configuration.primary.isDHCP);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i1", L_IP_ADDRESS,
-                   configuration.ip);
+                   configuration.primary.ip);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i2", L_NETWORK_GATEWAY,
-                   configuration.gateway);
+                   configuration.primary.gateway);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3", L_NETWORK_SUBNET,
-                   configuration.subnet);
+                   configuration.primary.subnet);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i4", "DNS1",
+                   configuration.primary.dns1);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i5", "DNS2",
+                   configuration.primary.dns2);
 
   closeSection(page);
 
@@ -783,7 +785,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
 
     addSelectOptionFormItem(page, L_NETWOK_NONE_BACKUP_SSID, L_NONE,
                             strcmp(AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID,
-                                   configuration.ssidBackup) == 0);
+                                   configuration.secondary.ssid) == 0);
     if (numberOfNetworks > 0) {
       for (int i = 0; i < numberOfNetworks; i++) {
         WiFi.SSID(i).toCharArray(_ssid, sizeof(_ssid));
@@ -798,28 +800,33 @@ void AFESitesGenerator::siteNetwork(String &page) {
                                 : WiFi.RSSI(i) >= -80 ? L_WIFI_RSSI_80
                                                       : L_WIFI_RSSI_90);
         addSelectOptionFormItem(page, _ssidLabel, _ssid,
-                                strcmp(_ssid, configuration.ssidBackup) == 0);
+                                strcmp(_ssid, configuration.secondary.ssid) ==
+                                    0);
       }
     }
     addSelectFormItemClose(page);
 #ifdef AFE_ESP32 /* @TODO ESP32 problem with scanning for WiFi on ESP32 */
   } else {
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "sb", L_NETWORK_SSID,
-                     configuration.ssidBackup, "32");
+                     configuration.secondary.ssid, "32");
   }
 #endif // AFE_ESP32
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_PASSWORD, "pb", L_PASSWORD,
-                   configuration.passwordBackup, "32");
+                   configuration.secondary.password, "32");
 
   addCheckboxFormItem(page, "db", L_NETWORK_DHCP_ENABLED, "1",
-                      configuration.isDHCPBackup);
+                      configuration.secondary.isDHCP);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i1b", L_IP_ADDRESS,
-                   configuration.ipBackup);
+                   configuration.secondary.ip);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i2b", L_NETWORK_GATEWAY,
-                   configuration.gatewayBackup);
+                   configuration.secondary.gateway);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i3b", L_NETWORK_SUBNET,
-                   configuration.subnetBackup);
+                   configuration.secondary.subnet);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i4b", "DNS1",
+                   configuration.secondary.dns1);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "i5b", "DNS2",
+                   configuration.secondary.dns2);
   closeSection(page);
 
   /* Section: Advanced settings */
@@ -922,6 +929,12 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
                    AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
   closeSection(page);
 #else
+
+  openSection(page, F(L_MQTT_TOPIC_STATUS), F(L_MQTT_TOPIC_EMPTY));
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t1", L_MQTT_TOPIC,
+                   configuration.status.topic, "64");
+  closeSection(page);
+
   openSection(page, F(L_MQTT_TOPIC_LWT), F(L_MQTT_TOPIC_EMPTY));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t0", L_MQTT_TOPIC,
                    configuration.lwt.topic, "64");
@@ -2011,7 +2024,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
 
   /* Item: name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                   configuration.name, "16");
+                   configuration.name, "32");
 
   /* Item: type */
   addSelectFormItemOpen(page, F("y"), F(L_SWITCH_TYPE));
@@ -2074,7 +2087,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
   /* Item: Gate name */
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
-                   gateConfiguration.name, "16");
+                   gateConfiguration.name, "32");
 
   /* Item: relay */
   char _relayName[20];
@@ -3118,7 +3131,6 @@ void AFESitesGenerator::siteUpgrade(String &page) {
 
   if (RestAPI->accessToWAN() && RestAPI->isStableConnection) {
 
-
     /**
      * @brief Get info if there is available firmware to upgrade
      *
@@ -3364,7 +3376,7 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_FIRMWARE_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace(F("{{I}}"), F(L_FIRMWARE_VERSION_DATE));
+  page.replace(F("{{I}}"), F(L_FIRMWARE_LATEST_VERSION));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_ESP_CHIP));
 #ifndef AFE_ESP32
@@ -3392,8 +3404,8 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_FIRMWARE_DEVICE_ID));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace(F("{{I}}"), FirmwarePro->Pro.valid ? F(L_FIRMWARE_PRO_YES)
-                                                  : F(L_FIRMWARE_PRO_NO));
+  page.replace(F("{{I}}"), FirmwarePro->pro->valid ? F(L_FIRMWARE_PRO_YES)
+                                                   : F(L_FIRMWARE_PRO_NO));
 
   closeMessageSection(page);
 
@@ -3591,7 +3603,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 
 void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
-  if (!FirmwarePro->Pro.valid) {
+  if (!FirmwarePro->pro->valid) {
     if (id > AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION - 1) {
       addInformationItem(page, F(L_MIFARE_CARD_NONE_PRO));
       return;
@@ -4219,21 +4231,24 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{f.e}}"), F("8266"));
 #endif
 
-  FirmwarePro->Pro.valid ? page->replace(F("{{f.p}}"), F(L_YES))
-                         : page->replace(F("{{f.p}}"), F(L_NO));
+  FirmwarePro->pro->valid ? page->replace(F("{{f.p}}"), F(L_YES))
+                          : page->replace(F("{{f.p}}"), F(L_NO));
 
 #ifdef AFE_T1_CUSTOM_E2
-  char _version[sizeof(Firmware.version) + 6];
-  sprintf(_version, "%s %s", Firmware.version, "MEGA");
+  char _version[sizeof(FirmwarePro->version->installed_version) + 6];
+  sprintf(_version, "%s %s", FirmwarePro->version->installed_version, "MEGA");
   page->replace(F("{{f.v}}"), _version);
 #else
-  page->replace(F("{{f.v}}"), Firmware.version);
+  page->replace(F("{{f.v}}"), FirmwarePro->version->installed_version);
 #endif
+  page->replace(F("{{f.u}}"), FirmwarePro->version->latest_version);
 
-  page->replace(F("{{f.t}}"), String(Firmware.type));
+  page->replace(F("{{f.t}}"), String(FirmwarePro->version->type));
   page->replace(F("{{f.d}}"), F(AFE_DEVICE_TYPE_NAME));
 
-  page->replace(F("{{f.n}}"), Device->deviceId);
+  char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
+  Data->getDeviceID(_deviceId);
+  page->replace(F("{{f.n}}"), _deviceId);
   page->replace(F("{{f.l}}"), F(L_LANGUAGE_SHORT));
   page->replace(F("{{f.h}}"), String(AFE_DEVICE_TYPE_ID));
   page->replace(F("{{f.b}}"), String(AFE_VERSION_BUILD_NUMBER));

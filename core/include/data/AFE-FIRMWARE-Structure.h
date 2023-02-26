@@ -6,9 +6,10 @@
 #include <arduino.h>
 
 struct FIRMWARE {
-  char version[10];
+  char installed_version[10];
   uint8_t type;
   uint8_t api;
+  char latest_version[10];
 };
 
 #endif

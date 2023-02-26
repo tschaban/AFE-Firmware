@@ -1,7 +1,7 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#ifndef _AFE_Firmware_Pro_h
-#define _AFE_Firmware_Pro_h
+#ifndef _AFE_Firmware_h
+#define _AFE_Firmware_h
 
 #include <AFE-Data-Access.h>
 #include <AFE-API-JSONRPC.h>
@@ -10,7 +10,7 @@
 #include <Streaming.h>
 #endif
 
-class AFEFirmwarePro {
+class AFEFirmware {
 
 private:
   AFEDataAccess *Data;
@@ -19,16 +19,18 @@ private:
   unsigned long minutes = 0;
 
 public:
-  PRO_VERSION Pro;
+  PRO_VERSION *pro = new PRO_VERSION;
+  FIRMWARE *version = new FIRMWARE;
 
   /* Constructor */
-  AFEFirmwarePro();
+  AFEFirmware();
 
   void begin(AFEDataAccess *, AFEJSONRPC *);
 
   /* Checking if the key is still valid */
-  void validate();
-  void listener();
+  void validate(void);
+  void listener(void);
+  void getLatestFirmwareVersion(void);
 };
 
 #endif

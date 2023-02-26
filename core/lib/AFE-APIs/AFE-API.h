@@ -101,6 +101,7 @@
 class AFEAPI {
 private:
   void begin();
+  
 
 public:
   AFEAsyncMQTTClient *Mqtt = new AFEAsyncMQTTClient();
@@ -115,7 +116,7 @@ public:
   AFEAPI();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
+  void begin(AFEDataAccess *, AFEDevice *,  AFELED *);
 #else
   void begin(AFEDataAccess *, AFEDevice *);
 #endif

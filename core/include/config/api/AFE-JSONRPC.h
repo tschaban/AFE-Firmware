@@ -16,7 +16,16 @@
 #define AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT "get-footer-message"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_FOOTER_SECTION "get-footer-section"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE "get-firmware-upgrade-message"
-#define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 200
+#define AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION "get-latest-firmware-version"
+#define AFE_CONFIG_JSONRPC_REST_METHOD_GET_JSON_LATEST_FIRMWARE_VERSION "get-json-latest-firmware-version"
+
+
+/**
+ * @brief JSON REST API calls
+ * {"jsonrpc":"2.0","method":"12345678901234567890123456789012345678901234567890","params":"","id":1}
+ * 
+ */
+#define AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE 155 // @TODO its best estimatiion
 #define AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE 380
 #define AFE_CONFIG_JSONRPC_JSON_TIMEOUT 3000 // Response timeout in msec
 

@@ -1,4 +1,4 @@
-#include "AFE-Firmware.h"
+#include "AFE-Firmware-Main.h"
 
 void setup() {
 
@@ -45,7 +45,8 @@ void setup() {
 #endif
 #ifdef DEBUG
   if (_success) {
-    Serial << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
+    Serial << endl
+           << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
                 "collection operation on SPIFFS");
   } else {
     Serial << endl << F("WARN: FILES SYSTEM: Not mounted") << endl;
@@ -122,6 +123,22 @@ void setup() {
   }
 #endif // AFE_CONFIG_HARDWARE_CLED
 
+/**
+ * @brief Initializating REST API
+ *
+ */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  RestAPI->begin(Data, Device, Led);
+#else
+  RestAPI->begin(Data, Device);
+#endif // AFE_CONFIG_HARDWARE_LED
+
+  /**
+   * @brief Initializing Firmware Pro and generic config
+   *
+   */
+  FirmwarePro->begin(Data, RestAPI);
+
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
@@ -138,7 +155,7 @@ void setup() {
     Serial << F("YES") << endl
            << F("INFO: FIRMWARE: Checking if firmware should be upgraded?");
 #endif
-    AFEUpgrader *Upgrader = new AFEUpgrader(Data, Device);
+    AFEUpgrader *Upgrader = new AFEUpgrader(Data, Device, FirmwarePro);
 
     if (Upgrader->upgraded()) {
       Upgrader->upgrade();
@@ -171,22 +188,6 @@ void setup() {
   Serial << endl << F("INFO: BOOT: Starting network");
 #endif
   Network->listener();
-
-/**
- * @brief Initializating REST API
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_LED
-  RestAPI->begin(Data, Device, Led);
-#else
-  RestAPI->begin(Data, Device);
-#endif // AFE_CONFIG_HARDWARE_LED
-
-  /**
-   * @brief Initializing FirmwarePro
-   *
-   */
-  FirmwarePro->begin(Data, RestAPI);
 
   /**
    * @brief Initializing HTTP WebServer
@@ -345,6 +346,22 @@ void setup() {
   Serial << F(": Booting completed");
 
 #endif
+
+  Object->Core->Data = Data;
+  Object->Core->Device = Device;
+  Object->Core->Network = Network;
+  Object->Core->RestAPI = RestAPI;
+  Object->Core->Firmware = FirmwarePro;
+  Object->Core->MqttAPI = MqttAPI;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  Object->Core->HttpDomoticzAPI = HttpDomoticzAPI;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Object->Hardware->SystemLed = Led;
+#endif
+
+  Event->begin(Object);
 }
 
 void loop() {
@@ -477,12 +494,14 @@ void loop() {
 #endif
     }
 
-    /**
-     * @brief Trigger actions triggered by WiFi: connected/disconnected or MQTT
-     * Connected
-     *
-     */
+/**
+ * @brief Processing various events
+ *
+ */
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     eventsListener();
+#endif
+    Event->listener();
 
   } else {
     /**

@@ -1,17 +1,7 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include <AFE-API-HTTP.h>
-#include <AFE-Configuration.h>
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-#include <AFE-API-HTTP-Domoticz.h>
-#include <AFE-API-MQTT-Domoticz.h>
-#else // Standards and Home Assistant API
-#include <AFE-API-MQTT-Standard.h>
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-#include <AFE-API-HomeAssistant-Integration.h>
-#endif
-#endif
+#include <AFE-Configuration.h>
 
 /* ---------Headers ---------*/
 

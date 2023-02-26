@@ -310,6 +310,13 @@ void AFEDataAccess::createPasswordConfigurationFile() {
   saveConfiguration(&PasswordConfiguration);
 }
 
+void AFEDataAccess::getDeviceID(char *id) {
+  byte m[6];
+  WiFi.macAddress(m);
+  sprintf(id, "%X%x%X%x-%X%x%X%x", m[0], m[5], m[1], m[4], m[2], m[3], m[3],
+          m[2]);
+}
+
 void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
   Serial << endl
@@ -821,7 +828,11 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
 #endif
       configuration->type = root["type"].as<int>();
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
-      sprintf(configuration->version, root["version"]);
+      sprintf(configuration->installed_version, root["version"]);
+
+      JsonVariant exists = root["latest_version"];
+      sprintf(configuration->latest_version,
+              (exists.success() ? root["latest_version"] : root["version"]));
 
     }
 #ifdef DEBUG
@@ -867,7 +878,8 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
     JsonObject &root = jsonBuffer.createObject();
     root["type"] = configuration->type;
     root["api"] = configuration->api;
-    root["version"] = configuration->version;
+    root["version"] = configuration->installed_version;
+    root["latest_version"] = configuration->latest_version;
     root.printTo(configFile);
 #ifdef DEBUG
     root.printTo(Serial);
@@ -890,7 +902,8 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
          << F("INFO: Creating file: ") << F(AFE_FILE_FIRMWARE_CONFIGURATION);
 #endif
   FIRMWARE firmwareConfiguration;
-  sprintf(firmwareConfiguration.version, AFE_FIRMWARE_VERSION);
+  sprintf(firmwareConfiguration.installed_version, AFE_FIRMWARE_VERSION);
+  sprintf(firmwareConfiguration.latest_version, AFE_FIRMWARE_VERSION);
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
   firmwareConfiguration.api = AFE_FIRMWARE_API;
   saveConfiguration(&firmwareConfiguration);
@@ -899,7 +912,14 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
 void AFEDataAccess::saveFirmwareVersion(const char *version) {
   FIRMWARE configuration;
   getConfiguration(&configuration);
-  sprintf(configuration.version, version);
+  sprintf(configuration.installed_version, version);
+  saveConfiguration(&configuration);
+}
+
+void AFEDataAccess::saveLatestFirmwareVersion(const char *version) {
+  FIRMWARE configuration;
+  getConfiguration(&configuration);
+  sprintf(configuration.latest_version, version);
   saveConfiguration(&configuration);
 }
 
@@ -1030,21 +1050,40 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration->ssid, root["ssid"] | "");
-      sprintf(configuration->password, root["password"] | "");
-      sprintf(configuration->ssidBackup, root["ssidBackup"] | "");
-      sprintf(configuration->passwordBackup, root["passwordBackup"] | "");
-      configuration->isDHCP = root["isDHCP"].as<int>();
-      sprintf(configuration->ip, root["ip"]);
-      sprintf(configuration->gateway, root["gateway"]);
-      sprintf(configuration->subnet, root["subnet"]);
+      sprintf(configuration->primary.ssid, root["ssid"] | "");
+      sprintf(configuration->primary.password, root["password"] | "");
+      sprintf(configuration->secondary.ssid, root["ssidBackup"] | "");
+      sprintf(configuration->secondary.password, root["passwordBackup"] | "");
 
+      configuration->primary.isDHCP = root["isDHCP"].as<int>();
       JsonVariant exists = root["isDHCPBackup"];
-      configuration->isDHCPBackup = exists.success() ? root["isDHCPBackup"] : 1;
+      configuration->secondary.isDHCP =
+          exists.success() ? root["isDHCPBackup"] : 1;
 
-      sprintf(configuration->ipBackup, root["ipBackup"] | "");
-      sprintf(configuration->gatewayBackup, root["gatewayBackup"] | "");
-      sprintf(configuration->subnetBackup, root["subnetBackup"] | "");
+      sprintf(configuration->primary.ip, root["ip"]);
+      sprintf(configuration->primary.gateway, root["gateway"]);
+      sprintf(configuration->primary.subnet, root["subnet"]);
+
+      sprintf(configuration->secondary.ip, root["ipBackup"] | "");
+      sprintf(configuration->secondary.gateway, root["gatewayBackup"] | "");
+      sprintf(configuration->secondary.subnet, root["subnetBackup"] | "");
+
+      exists = root["dns1"];
+      sprintf(configuration->primary.dns1,
+              root["dns1"] | AFE_CONFIG_NETWORK_DEFAULT_DNS1);
+
+      exists = root["dns2"];
+      sprintf(configuration->primary.dns2,
+              root["dns2"] | AFE_CONFIG_NETWORK_DEFAULT_DNS2);
+
+      exists = root["dns1Backup"];
+      sprintf(configuration->secondary.dns1,
+              root["dns1Backup"] | AFE_CONFIG_NETWORK_DEFAULT_DNS1);
+
+      exists = root["dns2Backup"];
+      sprintf(configuration->secondary.dns2,
+              root["dns2Backup"] | AFE_CONFIG_NETWORK_DEFAULT_DNS2);
+
       configuration->noConnectionAttempts =
           root["noConnectionAttempts"].as<int>();
       configuration->waitTimeConnections =
@@ -1109,18 +1148,33 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
-    root["ssid"] = configuration->ssid;
-    root["password"] = configuration->password;
-    root["ssidBackup"] = configuration->ssidBackup;
-    root["passwordBackup"] = configuration->passwordBackup;
-    root["isDHCP"] = configuration->isDHCP;
-    root["ip"] = configuration->ip;
-    root["gateway"] = configuration->gateway;
-    root["subnet"] = configuration->subnet;
-    root["isDHCPBackup"] = configuration->isDHCPBackup;
-    root["ipBackup"] = configuration->ipBackup;
-    root["gatewayBackup"] = configuration->gatewayBackup;
-    root["subnetBackup"] = configuration->subnetBackup;
+
+    /**
+     * @brief Primary network configuration
+     *
+     */
+    root["ssid"] = configuration->primary.ssid;
+    root["password"] = configuration->primary.password;
+    root["isDHCP"] = configuration->primary.isDHCP;
+    root["ip"] = configuration->primary.ip;
+    root["gateway"] = configuration->primary.gateway;
+    root["subnet"] = configuration->primary.subnet;
+    root["dns1"] = configuration->primary.dns1;
+    root["dns2"] = configuration->primary.dns2;
+    /**
+     * @brief Secondary network configuration
+     *
+     */
+
+    root["ssidBackup"] = configuration->secondary.ssid;
+    root["passwordBackup"] = configuration->secondary.password;
+    root["isDHCPBackup"] = configuration->secondary.isDHCP;
+    root["ipBackup"] = configuration->secondary.ip;
+    root["gatewayBackup"] = configuration->secondary.gateway;
+    root["subnetBackup"] = configuration->secondary.subnet;
+    root["dns1Backup"] = configuration->secondary.dns1;
+    root["dns2Backup"] = configuration->secondary.dns2;
+
     root["noConnectionAttempts"] = configuration->noConnectionAttempts;
     root["waitTimeConnections"] = configuration->waitTimeConnections;
     root["waitTimeSeries"] = configuration->waitTimeSeries;
@@ -1177,18 +1231,24 @@ void AFEDataAccess::createNetworkConfigurationFile() {
 
   NETWORK configuration;
   /* Network default config */
-  configuration.ssid[0] = AFE_EMPTY_STRING;
-  configuration.password[0] = AFE_EMPTY_STRING;
-  configuration.ssidBackup[0] = AFE_EMPTY_STRING;
-  configuration.passwordBackup[0] = AFE_EMPTY_STRING;
-  configuration.isDHCP = true;
-  configuration.ip[0] = AFE_EMPTY_STRING;
-  configuration.gateway[0] = AFE_EMPTY_STRING;
-  configuration.subnet[0] = AFE_EMPTY_STRING;
-  configuration.isDHCPBackup = true;
-  configuration.ipBackup[0] = AFE_EMPTY_STRING;
-  configuration.gatewayBackup[0] = AFE_EMPTY_STRING;
-  configuration.subnetBackup[0] = AFE_EMPTY_STRING;
+  configuration.primary.ssid[0] = AFE_EMPTY_STRING;
+  configuration.primary.password[0] = AFE_EMPTY_STRING;
+  configuration.primary.isDHCP = true;
+  configuration.primary.ip[0] = AFE_EMPTY_STRING;
+  configuration.primary.gateway[0] = AFE_EMPTY_STRING;
+  configuration.primary.subnet[0] = AFE_EMPTY_STRING;
+  configuration.primary.dns1[0] = AFE_EMPTY_STRING;
+  configuration.primary.dns2[0] = AFE_EMPTY_STRING;
+
+  configuration.secondary.ssid[0] = AFE_EMPTY_STRING;
+  configuration.secondary.password[0] = AFE_EMPTY_STRING;
+  configuration.secondary.isDHCP = true;
+  configuration.secondary.ip[0] = AFE_EMPTY_STRING;
+  configuration.secondary.gateway[0] = AFE_EMPTY_STRING;
+  configuration.secondary.subnet[0] = AFE_EMPTY_STRING;
+  configuration.secondary.dns1[0] = AFE_EMPTY_STRING;
+  configuration.secondary.dns2[0] = AFE_EMPTY_STRING;
+
   configuration.noConnectionAttempts =
       AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
   configuration.waitTimeConnections = AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
@@ -1240,6 +1300,17 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
       configuration->lwt.idx = root["lwt"] | AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       sprintf(configuration->lwt.topic, root["lwt"] | "");
+
+      JsonVariant exists = root["s"];
+      if (exists.success()) {
+        sprintf(configuration->status.topic, root["s"]);
+      } else {
+        char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
+        getDeviceID(_deviceId);
+        sprintf(configuration->status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC, _deviceId);
+      }
+
+
 #endif
 
       configuration->retainLWT =
@@ -1301,6 +1372,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     root["lwt"] = configuration->lwt.idx;
 #else
     root["lwt"] = configuration->lwt.topic;
+    root["s"] = configuration->status.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
     root["retainAll"] = configuration->retainAll;
@@ -1339,6 +1411,9 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   configuration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   configuration.lwt.topic[0] = AFE_EMPTY_STRING;
+  char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
+  getDeviceID(_deviceId);
+  sprintf(configuration.status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC, _deviceId);
 #endif
 
   configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
@@ -2077,6 +2152,15 @@ void AFEDataAccess::createRelayConfigurationFile() {
   saveRelayState(3, false);
 #endif
   saveConfiguration(3, &RelayConfiguration);
+  index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
+/* SONOFF Mini Extreme R4 */
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+  RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
+  sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
+#ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
+  saveRelayState(0, false);
+#endif
+  saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
 /* SONOFF Touch 1G */
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
@@ -3059,7 +3143,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
 #endif // iECS
 
 #if defined(AFE_DEVICE_SHELLY_1)
-  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
+  ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_X_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C1");
   saveConfiguration(0, &ContactronConfiguration);
   //  so not to create additional for Shelly-1
@@ -5888,7 +5972,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
       configuration->gpio = root["gpio"].as<int>();
       configuration->ledNumbers = root["ledNumbers"].as<int>();
-      
+
       configuration->on.color.red = root["on"]["c"]["r"].as<int>();
       configuration->on.color.green = root["on"]["c"]["g"].as<int>();
       configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
@@ -6489,7 +6573,7 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
     saveConfiguration(i, &configuration);
   }
 }
-
+/* @TODO T5
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_BACKLIGHT *configuration) {
@@ -6660,6 +6744,7 @@ void AFEDataAccess::createCLEDBacklightConfigurationFile() {
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+*/
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561

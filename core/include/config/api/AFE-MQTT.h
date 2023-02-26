@@ -18,4 +18,19 @@
 #define AFE_CONFIG_MQTT_MESSAGES_BUFFER 4
 #endif
 
+#define AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC "AFE/%s"
+
+const char MQTT_STATUS_FIRMWARE_JSON_TEMPLATE[] PROGMEM = 
+"{\"fw\":{\"iv\":\"{{v}}\",\"lv\":\"{{l}}\",\"t\":\"{{t}}\",\"ru\":\"{{u}}\",\"rs\":\"{{s}}\",\"i\":\"{{i}}\"}}";
+
+
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_INSTALLED_VERSION  "{{v}}"
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_LATEST_VERSION  "{{l}}"
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_TITLE  "{{t}}"
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_RELEASE_URL  "{{u}}"
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_RELEASE_SUMMARY  "{{s}}"
+#define MQTT_STATUS_FIRMWARE_JSON_TAG_ICON  "{{i}}"
+
+
+
 #endif // _AFE_Hardware_mqtt_bus_h

@@ -18,6 +18,12 @@
 #include <AFE-MCP23017-Broker.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#include <AFE-Device.h>
+#include <AFE-GATE-Structure.h>
+
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -30,6 +36,10 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led = new AFELED();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  AFEDevice *_Device;
 #endif
 
   unsigned long turnOffCounter = 0;
@@ -51,6 +61,10 @@ private:
 
   void setRelayAfterRestore(uint8_t option);
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void begin(AFEDataAccess *, uint8_t id);
+#endif
+
 public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -63,12 +77,16 @@ public:
    */
   AFERelay();
 
-  /**
-   * @brief Method: initiates relay
-   *
-   * @param  id               desc
-   */
+/**
+ * @brief Method: initiates relay
+ *
+ * @param  id               desc
+ */
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  void begin(AFEDataAccess *, AFEDevice *, uint8_t id);
+#else
   void begin(AFEDataAccess *, uint8_t id);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);
@@ -140,7 +158,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /**
-   * @brief It sets unit of relay to auto turn off timer. 
+   * @brief It sets unit of relay to auto turn off timer.
    *
    * @param  value           true secods, false - miliseconds
    */

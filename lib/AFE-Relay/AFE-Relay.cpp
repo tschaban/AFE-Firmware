@@ -6,14 +6,54 @@
 
 AFERelay::AFERelay() {}
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+void AFERelay::begin(AFEDataAccess *Data, AFEDevice *Device, uint8_t id) {
+  _Device = Device;
+  begin(Data, id);
+}
+#endif
+
 void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
+#ifdef DEBUG
+  Serial << endl << F("INFO: RELAY: Initializing Relay");
+#endif
+
   _id = id;
   if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
     _Data = Data;
     _Data->getConfiguration(_id, configuration);
+
+#ifdef DEBUG
+    Serial << endl
+           << F("INFO: RELAY: Checking if Relay is assigned to control a gate");
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    GATE *_gateConfiguration = new GATE;
+    gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
+    for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
+      _Data->getConfiguration(i, _gateConfiguration);
+      if (_gateConfiguration->relayId == _id) {
+        gateId = _id;
+#ifdef DEBUG
+        Serial << endl << F(" : controls gate: ") << i + 1;
+#endif
+        break;
+      }
+    }
+
+#ifdef DEBUG
+    if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+      Serial << endl << F(" : it doesn't control a gate");
+    }
+#endif
+
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-    // If MCP23017 available in the HW, checking if LED connected using MCP23017
+    // If MCP23017 available in the HW, checking if LED connected using
+    // MCP23017
     if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
       if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
           configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -22,8 +62,8 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
         Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
 #endif
 
-        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
-                                                  OUTPUT);
+        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(
+            configuration->mcp23017.gpio, OUTPUT);
         _expanderUsed = true;
       }
 #ifdef DEBUG
@@ -106,7 +146,7 @@ void AFERelay::on() {
     _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
-                                                                     : LOW);
+                                                                      : LOW);
   } else {
 #endif
 
@@ -157,7 +197,7 @@ void AFERelay::off() {
     _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
-                                                                     : HIGH);
+                                                                      : HIGH);
   } else {
 #endif
 
