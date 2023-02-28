@@ -60,7 +60,148 @@ void AFEEvent::listener(void) {
  *
  */
 
-void AFEEvent::conenctedToNetwork(void) {}
+void AFEEvent::conenctedToNetwork(void) {
+
+// Update HTTP states for Domoticz HTTP API
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  if (Object->Core->Device->getMode() == AFE_MODE_NORMAL) {
+    if (Object->Core->Device->configuration.api.domoticz) {
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Domoticz HTTP API boot actions triggering");
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+      Object->Core->SystemLed->on();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current gate state to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Object->Core->Device->configuration.noOfGates;
+           i++) {
+        Object->Core->HttpDomoticzAPI->publishGateState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of contactrons to "
+                  "Domoticz");
+#endif
+      for (uint8_t i = 0;
+           i < Object->Core->Device->configuration.noOfContactrons; i++) {
+        Object->Core->HttpDomoticzAPI->publishContactronState(i);
+        lastPublishedContactronState[i] = Object->Hardware->Contactron[i].get();
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+#ifdef DEBUG
+      Serial
+          << endl
+          << F("INFO: EVENTS: Sending current state of switches to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Object->Core->Device->configuration.noOfSwitches;
+           i++) {
+        Object->Core->HttpDomoticzAPI->publishSwitchState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of binary sensors to "
+                  "Domoticz");
+#endif
+      for (uint8_t i = 0;
+           i < Object->Core->Device->configuration.noOfBinarySensors; i++) {
+        Object->Core->HttpDomoticzAPI->publishBinarySensorState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of RGB LEDs "
+                  "Domoticz");
+#endif
+      for (uint8_t i = 0; i < Object->Core->Device->configuration.noOfCLEDs;
+           i++) {
+        //     Object->Core->HttpDomoticzAPI->publishCLEDState(i);
+        //     Object->Core->HttpDomoticzAPI->publishCLEDEffectState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of regulator to "
+                  "Domoticz");
+#endif
+      for (uint8_t i = 0;
+           i < Object->Core->Device->configuration.noOfRegulators; i++) {
+        Object->Core->HttpDomoticzAPI->publishRegulatorState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of regulator to "
+                  "Domoticz");
+#endif
+      for (uint8_t i = 0;
+           i < Object->Core->Device->configuration.noOfThermalProtectors; i++) {
+        Object->Core->HttpDomoticzAPI->publishThermalProtectorState(i);
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: EVENTS: Sending current state of relays to Domoticz");
+#endif
+      for (uint8_t i = 0; i < Object->Core->Device->configuration.noOfRelays;
+           i++) {
+#ifdef AFE_CONFIG_HARDWARE_GATE
+        /* For the Relay assigned to a gate code below is not needed for
+         * execution
+         */
+        if (Object->Hardware->Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+#endif
+          Object->Core->HttpDomoticzAPI->publishRelayState(i);
+#ifdef AFE_CONFIG_HARDWARE_GATE
+          /* Closing the condition for skipping relay if assigned to a gate */
+        }
+#ifdef DEBUG
+        else {
+          Serial << endl
+                 << F("INFO: EVENTS: Excluding relay: ") << i
+                 << F(" as it's assigned to a Gate: ")
+                 << Object->Hardware->Relay[i].gateId;
+        }
+#endif
+#endif
+      }
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+      Object->Core->SystemLed->off();
+#endif
+    }
+
+#ifdef DEBUG
+    Serial << endl << F("INFO: EVENTS: Post WiFi Connection actions completed");
+#endif
+  }
+#endif
+  // Checing access to WAN
+  Object->Core->RestAPI->checkAccessToWAN();
+}
 
 void AFEEvent::disconnectedFromNetwork(void) {
 #ifdef DEBUG
