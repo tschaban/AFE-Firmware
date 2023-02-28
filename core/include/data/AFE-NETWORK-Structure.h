@@ -3,7 +3,7 @@
 #ifndef _AFE_NETWORK_Structure_h
 #define _AFE_NETWORK_Structure_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct NETWORK_SETTING {
   char ssid[33];

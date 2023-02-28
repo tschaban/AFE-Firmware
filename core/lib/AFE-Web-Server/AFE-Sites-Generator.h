@@ -1,7 +1,7 @@
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>

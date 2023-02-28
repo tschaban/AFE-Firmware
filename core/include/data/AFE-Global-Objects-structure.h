@@ -4,6 +4,6 @@
 #define _AFE_Global_Objects_Structure_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #endif

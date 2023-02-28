@@ -1,6 +1,6 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include "AFE-Wifi.h"
+#include "AFE-WiFi.h"
 
 boolean AFEWiFi::eventConnectionEstablished = false;
 boolean AFEWiFi::isConnected = false;

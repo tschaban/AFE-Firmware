@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CLED
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct CLED_RGB {
   uint8_t red;

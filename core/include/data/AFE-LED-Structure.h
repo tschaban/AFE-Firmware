@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_LED
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct LED {
   uint8_t gpio;

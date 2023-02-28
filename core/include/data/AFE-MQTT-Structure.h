@@ -4,7 +4,7 @@
 #define _AFE_MQTT_Structure_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>

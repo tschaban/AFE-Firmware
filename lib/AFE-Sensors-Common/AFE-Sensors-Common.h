@@ -17,7 +17,7 @@
 #define _AFE_Sensors_Common_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 #ifdef DEBUG
 #include <Streaming.h>
 #endif

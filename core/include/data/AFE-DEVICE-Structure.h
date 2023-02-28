@@ -2,7 +2,7 @@
 #define _AFE_DEVICE_Structure_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 struct AFE_DEVICE_API {
   boolean http;

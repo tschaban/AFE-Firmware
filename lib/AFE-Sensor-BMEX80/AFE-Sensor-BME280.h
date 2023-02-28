@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-BMEX80-Sensor-Structure.h>
 #include <AFE-I2C-Structure.h>
 #include <Adafruit_BME280.h>

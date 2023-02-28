@@ -3,7 +3,7 @@
 #ifndef _AFE_API_JSONRPC_h
 #define _AFE_API_JSONRPC_h
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
 #ifdef AFE_CONFIG_HARDWARE_LED

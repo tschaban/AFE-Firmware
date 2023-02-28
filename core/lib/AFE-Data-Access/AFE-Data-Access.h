@@ -7,7 +7,7 @@
 #include <AFE-Data-Structures.h>
 #include <ArduinoJson.h>
 #include <IPAddress.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #ifdef AFE_ESP32
 #include <LITTLEFS.h>

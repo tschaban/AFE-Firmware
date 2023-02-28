@@ -21,7 +21,7 @@
 #include <Update.h>
 #else /* ESP8266 */
 #include <WiFiUdp.h>
-#include <esp8266httpupdate.h>
+#include <ESP8266HTTPClient.h>
 #endif // ESP32/ESP8266
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 

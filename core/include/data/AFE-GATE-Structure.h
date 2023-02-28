@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_GATE
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>

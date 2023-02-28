@@ -12,7 +12,7 @@
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
-#include <arduino.h>
+#include <Arduino.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
