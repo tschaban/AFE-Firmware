@@ -34,7 +34,7 @@ void AFEEvent::listener(void) {
     timer->oneDay++;
   }
 
-  /* Events triggered every 1h  */
+  /* Events triggered every 24hrs  */
   if (timer->oneDay > AFE_EVENTS_ONE_DAY) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENT: Trigger: 24hr");
@@ -44,11 +44,16 @@ void AFEEvent::listener(void) {
 
   /* Instant triggered events */
 
+  if (Object->Core->Network->eventConnected()) {
+    conenctedToNetwork();
+  }
+
   if (Object->Core->Network->eventDisconnected()) {
     disconnectedFromNetwork();
   }
 
   if (Object->Core->Network->connected()) {
+
     connectedToMQTTBroker();
   }
 
@@ -72,7 +77,7 @@ void AFEEvent::conenctedToNetwork(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Object->Core->SystemLed->on();
+      Object->Hardware->SystemLed->on();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -95,7 +100,8 @@ void AFEEvent::conenctedToNetwork(void) {
       for (uint8_t i = 0;
            i < Object->Core->Device->configuration.noOfContactrons; i++) {
         Object->Core->HttpDomoticzAPI->publishContactronState(i);
-        lastPublishedContactronState[i] = Object->Hardware->Contactron[i].get();
+        //..lastPublishedContactronState[i] =
+        //Object->Hardware->Contactron[i]->get();
       }
 #endif
 
@@ -171,7 +177,7 @@ void AFEEvent::conenctedToNetwork(void) {
         /* For the Relay assigned to a gate code below is not needed for
          * execution
          */
-        if (Object->Hardware->Relay[i].gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+        if (Object->Hardware->Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
           Object->Core->HttpDomoticzAPI->publishRelayState(i);
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -182,7 +188,7 @@ void AFEEvent::conenctedToNetwork(void) {
           Serial << endl
                  << F("INFO: EVENTS: Excluding relay: ") << i
                  << F(" as it's assigned to a Gate: ")
-                 << Object->Hardware->Relay[i].gateId;
+                 << Object->Hardware->Relay[i]->gateId;
         }
 #endif
 #endif
@@ -190,7 +196,7 @@ void AFEEvent::conenctedToNetwork(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Object->Core->SystemLed->off();
+      Object->Hardware->SystemLed->off();
 #endif
     }
 

@@ -97,7 +97,7 @@ GATES_CURRENT_STATE *GatesCurrentStates = new GATES_CURRENT_STATE;
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 #include <AFE-Contactron.h>
 AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
+//byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -267,10 +267,6 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 
 #include <AFE-Main-HTTPServer.cpp>
 
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-#include <AFE-Events-Handler.cpp>
-#endif
-
 #ifdef DEBUG
 #include <AFE-Debug.cpp>
 #endif
@@ -280,27 +276,3 @@ AFEGlobalObject *Object = new AFEGlobalObject();
 
 #include <AFE-Event.h>
 AFEEvent *Event = new AFEEvent();
-/*
-#ifdef AFE_CONFIG_HARDWARE_LED
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-AFEEvent *Event = new AFEEvent(Data, Device, Network, RestAPI, Led, FirmwarePro,
-                               MqttAPI, HttpDomoticzAPI);
-#else
-AFEEvent *Event =
-    new AFEEvent(Data, Device, Network, RestAPI, Led, FirmwarePro, MqttAPI);
-#endif
-
-#else
-
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-AFEEvent *Event = new AFEEvent(Data, Device, Network, RestAPI, FirmwarePro,
-                               MqttAPI, HttpDomoticzAPI);
-#else
-AFEEvent *Event =
-    new AFEEvent(Data, Device, Network, RestAPI, FirmwarePro, MqttAPI);
-#endif
-
-#endif
-
-*/

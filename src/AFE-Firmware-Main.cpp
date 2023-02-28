@@ -361,6 +361,12 @@ void setup() {
   Object->Hardware->SystemLed = Led;
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+    Object->Hardware->Relay[i] = &Relay[i];
+  }
+#endif
+
   Event->begin(Object);
 }
 
@@ -494,13 +500,11 @@ void loop() {
 #endif
     }
 
-/**
- * @brief Processing various events
- *
- */
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    eventsListener();
-#endif
+    /**
+     * @brief Processing various events
+     *
+     */
+
     Event->listener();
 
   } else {
