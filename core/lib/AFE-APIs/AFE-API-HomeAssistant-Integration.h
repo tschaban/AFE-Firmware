@@ -14,15 +14,12 @@
 #include <AFE-Configuration.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+#include <AFE-Firmware.h>
 
 #include <AFE-API-MQTT-Standard.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
-#include <AFE-Firmware.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-Site-components.h>
 #include <ArduinoJson.h>
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <hardwares/AFE-RGB-LED.h>
@@ -41,10 +38,8 @@
 class AFEAPIHomeAssistantIntegration {
 
 private:
-  AFEDataAccess *_Data;
-  AFEDevice *_Device;
-  AFEAPIMQTTStandard *_MqttAPI;
-  AFEFirmware *_Firmware;
+  AFEFirmware *Firmware;
+  AFEAPIMQTTStandard *MqttAPI;
 
   HOME_ASSISTANT_CONFIG *configuration = new HOME_ASSISTANT_CONFIG;
 
@@ -260,21 +255,19 @@ private:
   void publishContactron(void);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_CHECK_FIRMWARE_VERSION
   /**
    * @brief publishes firmware version
    *
    */
   void publishFirmwareVersion(void);
-#endif
 
 public:
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object
    *
    */
-  AFEAPIHomeAssistantIntegration(AFEDataAccess *, AFEDevice *,
-                                 AFEAPIMQTTStandard *, AFEFirmware *);
+  AFEAPIHomeAssistantIntegration(AFEFirmware *_Firmware,
+                                 AFEAPIMQTTStandard *_MqttAPI);
 
   /**
    * @brief method to be called to initialize the

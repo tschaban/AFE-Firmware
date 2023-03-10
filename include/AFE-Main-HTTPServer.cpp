@@ -32,24 +32,15 @@ void initializeHTTPServer(void) {
   HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
                                    handleUpload);
   HTTPServer->onNotFound(handleOnNotFound);
-#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led);
-#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#if !defined(AFE_CONFIG_HARDWARE_I2C)
+  HTTPServer->begin(FirmwarePro);
+#else 
 #ifdef AFE_ESP32
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0,
+  HTTPServer->begin(FirmwarePro, &WirePort0,
                    &WirePort1);
 #else
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0);
+  HTTPServer->begin(FirmwarePro, &WirePort0);
 #endif // AFE_ESP32
-#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
-#ifdef AFE_ESP32
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, &WirePort0,
-                   &WirePort1);
-#else
-  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0);
-#endif // AFE_ESP32
-#else
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI);
 #endif
 
 #ifdef DEBUG

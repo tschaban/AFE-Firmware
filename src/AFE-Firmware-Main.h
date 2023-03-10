@@ -30,39 +30,30 @@
 #include <Streaming.h>
 #endif
 
-#include <AFE-API-JSONRPC.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
+//#include <AFE-API-JSONRPC.h>
+//#include <AFE-Data-Access.h>
+//#include <AFE-Device.h>
 #include <AFE-Firmware.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
-#include <AFE-WiFi.h>
+//#include <AFE-WiFi.h>
 
-AFEDataAccess *Data = new AFEDataAccess();
+//AFEDataAccess *Data = new AFEDataAccess();
 AFEFirmware *FirmwarePro = new AFEFirmware();
-AFEDevice *Device = new AFEDevice();
-AFEWiFi *Network = new AFEWiFi();
+//AFEDevice *Device = new AFEDevice();
+//AFEWiFi *Network = new AFEWiFi();
 AFEWebServer *HTTPServer = new AFEWebServer();
-AFEJSONRPC *RestAPI = new AFEJSONRPC();
-
-#include <AFE-API-HTTP.h>
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-#include <AFE-API-HTTP-Domoticz.h>
-#include <AFE-API-MQTT-Domoticz.h>
-#else // Standards and Home Assistant API
-#include <AFE-API-MQTT-Standard.h>
-#endif
-
+//AFEJSONRPC *RestAPI = new AFEJSONRPC();
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-AFELED *Led = new AFELED();
-#endif
+//#ifdef AFE_CONFIG_HARDWARE_LED
+//#include <AFE-LED.h>
+//AFELED *Led = new AFELED();
+//#endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-CLED.h>
@@ -180,9 +171,9 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #include <AFE-Main-MCP23017.cpp>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-Main-LED.cpp>
-#endif
+//#ifdef AFE_CONFIG_HARDWARE_LED
+//#include <AFE-Main-LED.cpp>
+//#endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-Main-CLED.cpp>
@@ -270,9 +261,6 @@ AFESensorAS3935 AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
 #ifdef DEBUG
 #include <AFE-Debug.cpp>
 #endif
-
-#include <AFE-Global-Object.h>
-AFEGlobalObject *Object = new AFEGlobalObject();
 
 #include <AFE-Event.h>
 AFEEvent *Event = new AFEEvent();

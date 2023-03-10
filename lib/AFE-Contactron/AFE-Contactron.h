@@ -5,10 +5,8 @@
 
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-
+#include <AFE-Firmware.h>
 #include <AFE-CONTACTRON-Structure.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
@@ -30,7 +28,7 @@ public:
   AFEContactron();
 
   /* Initialize. Must be run per each Gate object */
-  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
+  void begin(uint8_t id, AFEFirmware *);
 
   /* Method returns contactorn state */
   byte get();
@@ -45,8 +43,7 @@ public:
   void getJSON(char *json);
 
 private:
-  AFEDevice *Device;
-  AFEDataAccess *Data;
+  AFEFirmware *Firmware;
 
   boolean _initialized = false;
   boolean state;            // It stores actual contactron state

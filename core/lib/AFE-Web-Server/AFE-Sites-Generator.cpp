@@ -2,30 +2,23 @@
 
 AFESitesGenerator::AFESitesGenerator() {}
 
-void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI) {
-  Device = _Device;
-  FirmwarePro = _FirmwarePro;
-  Data = _Data;
-  RestAPI = _RestAPI;
+void AFESitesGenerator::begin(AFEFirmware *_Firmware) {
+  Firmware = _Firmware;
   _HtmlResponse.reserve(AFE_CONFIG_JSONRPC_JSON_RESPONSE_SIZE);
 }
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
-void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
-                              TwoWire *_WirePort0, TwoWire *_WirePort1) {
+void AFESitesGenerator::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0,
+                              TwoWire *_WirePort1) {
   WirePort0 = _WirePort0;
   WirePort1 = _WirePort1;
-  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+  begin(_Firmware);
 }
 #else
-void AFESitesGenerator::begin(AFEDataAccess *_Data, AFEDevice *_Device,
-                              AFEFirmware *_FirmwarePro, AFEJSONRPC *_RestAPI,
-                              TwoWire *_WirePort0) {
+void AFESitesGenerator::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0) {
   WirePort0 = _WirePort0;
-  begin(_Data, _Device, _FirmwarePro, _RestAPI);
+  begin(_Firmware);
 }
 #endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -59,7 +52,7 @@ void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
-  Device->begin();
+  Firmware->Device->begin();
   generateMenuHeader(page, redirect);
   page.concat(F("<ul class=\"lst\">"));
 
@@ -74,7 +67,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
   addMenuItem(page, F(L_NETWORK), AFE_CONFIG_SITE_NETWORK);
 
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     addMenuItem(page, F(L_MQTT_BROKER), AFE_CONFIG_SITE_MQTT);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
@@ -84,7 +77,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz) {
+  if (Firmware->Device->configuration.api.domoticz) {
     addMenuItem(page, F(L_DOMOTICZ_SERVER), AFE_CONFIG_SITE_DOMOTICZ);
   }
 #endif // Domoticz
@@ -92,9 +85,9 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 /* I2C */
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
-  if (Device->configuration.noOfI2Cs > 0) {
+  if (Firmware->Device->configuration.noOfI2Cs > 0) {
     addMenuHeaderItem(page, F("I2C"));
-    addMenuSubItem(page, "Port", Device->configuration.noOfI2Cs,
+    addMenuSubItem(page, "Port", Firmware->Device->configuration.noOfI2Cs,
                    AFE_CONFIG_SITE_I2C);
   }
 #else
@@ -106,7 +99,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 #ifdef AFE_CONFIG_HARDWARE_UART
 /* Don't show it if HPMA115SO sensor is not added to the device */
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  if (Device->configuration.noOfHPMA115S0s > 0) {
+  if (Firmware->Device->configuration.noOfHPMA115S0s > 0) {
 #endif
     addMenuItem(page, F("UART"), AFE_CONFIG_SITE_UART);
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -118,154 +111,159 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   page.replace(F("{{m.h}}"), F(L_HARDWARE));
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  if (Device->configuration.noOfMCP23xxx > 0) {
+  if (Firmware->Device->configuration.noOfMCP23xxx > 0) {
     addMenuHeaderItem(page, F("MCP23XXX"));
-    addMenuSubItem(page, "MCP23XXX", Device->configuration.noOfMCP23xxx,
+    addMenuSubItem(page, "MCP23XXX",
+                   Firmware->Device->configuration.noOfMCP23xxx,
                    AFE_CONFIG_SITE_MCP23XXX);
   }
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  if (Device->configuration.noOfLEDs > 0) {
+  if (Firmware->Device->configuration.noOfLEDs > 0) {
     addMenuHeaderItem(page, F(L_LEDS));
-    addMenuSubItem(page, "LED", Device->configuration.noOfLEDs,
+    addMenuSubItem(page, "LED", Firmware->Device->configuration.noOfLEDs,
                    AFE_CONFIG_SITE_LED);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  if (Device->configuration.noOfCLEDs) {
+  if (Firmware->Device->configuration.noOfCLEDs) {
     addMenuHeaderItem(page, F(L_CLEDS));
-    addMenuSubItem(page, L_CLED_STRIP, Device->configuration.noOfCLEDs,
+    addMenuSubItem(page, L_CLED_STRIP,
+                   Firmware->Device->configuration.noOfCLEDs,
                    AFE_CONFIG_SITE_CLED);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  if (Device->configuration.noOfGates > 0) {
+  if (Firmware->Device->configuration.noOfGates > 0) {
     addMenuHeaderItem(page, F(L_GATE_CONFIGURATION));
-    addMenuSubItem(page, L_GATE, Device->configuration.noOfGates,
+    addMenuSubItem(page, L_GATE, Firmware->Device->configuration.noOfGates,
                    AFE_CONFIG_SITE_GATE);
   }
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 /* Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  if (Device->configuration.noOfRelays > 0) {
+  if (Firmware->Device->configuration.noOfRelays > 0) {
 
     addMenuHeaderItem(page, F(L_RELAYS_CONFIGURATION));
-    addMenuSubItem(page, L_RELAY, Device->configuration.noOfRelays,
+    addMenuSubItem(page, L_RELAY, Firmware->Device->configuration.noOfRelays,
                    AFE_CONFIG_SITE_RELAY);
   }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  if (Device->configuration.noOfSwitches > 0) {
+  if (Firmware->Device->configuration.noOfSwitches > 0) {
     addMenuHeaderItem(page, F(L_BUTTONS_SWITCHES));
-    addMenuSubItem(page, L_SWITCH, Device->configuration.noOfSwitches,
+    addMenuSubItem(page, L_SWITCH, Firmware->Device->configuration.noOfSwitches,
                    AFE_CONFIG_SITE_SWITCH);
   }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  if (Device->configuration.noOfBinarySensors > 0) {
+  if (Firmware->Device->configuration.noOfBinarySensors > 0) {
     addMenuHeaderItem(page, F(L_BINARY_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBinarySensors,
+    addMenuSubItem(page, L_SENSOR,
+                   Firmware->Device->configuration.noOfBinarySensors,
                    AFE_CONFIG_SITE_BINARY_SENSOR);
   }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 /* Contactrons and Gate */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  if (Device->configuration.noOfContactrons > 0) {
+  if (Firmware->Device->configuration.noOfContactrons > 0) {
     addMenuHeaderItem(page, F(L_CONTACTRONS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfContactrons,
+    addMenuSubItem(page, L_SENSOR,
+                   Firmware->Device->configuration.noOfContactrons,
                    AFE_CONFIG_SITE_CONTACTRON);
   }
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 /* Sensor DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  if (Device->configuration.noOfDS18B20s > 0) {
+  if (Firmware->Device->configuration.noOfDS18B20s > 0) {
 
     addMenuHeaderItem(page, F(L_DS18B20_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfDS18B20s,
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfDS18B20s,
                    AFE_CONFIG_SITE_DS18B20);
   }
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 /* Sensor DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  if (Device->configuration.noOfDHTs > 0) {
+  if (Firmware->Device->configuration.noOfDHTs > 0) {
     addMenuHeaderItem(page, F("DHT"));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfDHTs,
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfDHTs,
                    AFE_CONFIG_SITE_DHT);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  if (Device->configuration.noOfBMEX80s > 0) {
+  if (Firmware->Device->configuration.noOfBMEX80s > 0) {
     addMenuHeaderItem(page, F(L_BMEX80_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBMEX80s,
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfBMEX80s,
                    AFE_CONFIG_SITE_BMEX80);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  if (Device->configuration.noOfBH1750s > 0) {
+  if (Firmware->Device->configuration.noOfBH1750s > 0) {
 
     addMenuHeaderItem(page, F(L_BH1750_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfBH1750s,
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfBH1750s,
                    AFE_CONFIG_SITE_BH1750);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  if (Device->configuration.noOfTSL2561s > 0) {
+  if (Firmware->Device->configuration.noOfTSL2561s > 0) {
 
     addMenuHeaderItem(page, F(L_TSL2561_SENSORS));
-    addMenuSubItem(page, L_SENSOR, Device->configuration.noOfTSL2561s,
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfTSL2561s,
                    AFE_CONFIG_SITE_TSL2561);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   /* This is hardcoded for one sensor */
-  if (Device->configuration.noOfHPMA115S0s > 0) {
+  if (Firmware->Device->configuration.noOfHPMA115S0s > 0) {
     addMenuHeaderItem(page, F(L_PARTICLE_SENSORS));
     addMenuSubItem(page, L_HPMA115S0_SENSOR,
-                   Device->configuration.noOfHPMA115S0s,
+                   Firmware->Device->configuration.noOfHPMA115S0s,
                    AFE_CONFIG_SITE_HPMA115S0);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  if (Device->configuration.noOfAnemometerSensors > 0) {
+  if (Firmware->Device->configuration.noOfAnemometerSensors > 0) {
     addMenuItem(page, F(L_ANEMOMETER_SENSOR),
                 AFE_CONFIG_SITE_ANEMOMETER_SENSOR);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  if (Device->configuration.noOfRainmeterSensors > 0) {
+  if (Firmware->Device->configuration.noOfRainmeterSensors > 0) {
     addMenuItem(page, F(L_RAINMETER), AFE_CONFIG_SITE_RAINMETER_SENSOR);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  if (Device->configuration.noOfAS3935s > 0) {
+  if (Firmware->Device->configuration.noOfAS3935s > 0) {
     addMenuItem(page, F(L_AS3935_SENSOR), AFE_CONFIG_SITE_AS3935);
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-  if (Device->configuration.noOfPN532Sensors > 0) {
+  if (Firmware->Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(L_PN532_SENSOR), AFE_CONFIG_SITE_PN532_SENSOR);
   }
 
-  if (Device->configuration.noOfMiFareCards > 0) {
+  if (Firmware->Device->configuration.noOfMiFareCards > 0) {
     addMenuHeaderItem(page, F(L_MIFARE_CARDS));
-    addMenuSubItem(page, L_MIFARE, Device->configuration.noOfMiFareCards,
+    addMenuSubItem(page, L_MIFARE,
+                   Firmware->Device->configuration.noOfMiFareCards,
                    AFE_CONFIG_SITE_MIFARE_CARDS);
   }
 
@@ -273,13 +271,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #ifdef AFE_ESP32
-  if (Device->configuration.noOfAnalogInputs > 0) {
+  if (Firmware->Device->configuration.noOfAnalogInputs > 0) {
     addMenuHeaderItem(page, F(L_ANALOG_INPUT));
-    addMenuSubItem(page, L_ADC_INPUT, Device->configuration.noOfAnalogInputs,
+    addMenuSubItem(page, L_ADC_INPUT,
+                   Firmware->Device->configuration.noOfAnalogInputs,
                    AFE_CONFIG_SITE_ANALOG_INPUT);
   }
 #else
-  if (Device->configuration.isAnalogInput) {
+  if (Firmware->Device->configuration.isAnalogInput) {
     addMenuItem(page, F(L_ANALOG_INPUT), AFE_CONFIG_SITE_ANALOG_INPUT);
   }
 #endif // AFE_ESP32
@@ -290,14 +289,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 /* System LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  if (Device->configuration.noOfLEDs > 0) {
+  if (Firmware->Device->configuration.noOfLEDs > 0) {
     addMenuItem(page, F(L_LED_SYSTEM), AFE_CONFIG_SITE_SYSTEM_LED);
   }
 #endif
 /* @TODO T5
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-  if (Device->configuration.effectPN532 &&
-      Device->configuration.noOfPN532Sensors > 0) {
+  if (Firmware->Device->configuration.effectPN532 &&
+      Firmware->Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(L_CLED_EFFECT_PN532_SENSOR),
                 AFE_CONFIG_SITE_CLED_PN532_SENSOR);
   }
@@ -306,7 +305,7 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 /* PN532 */
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-  if (Device->configuration.noOfPN532Sensors > 0) {
+  if (Firmware->Device->configuration.noOfPN532Sensors > 0) {
     addMenuItem(page, F(L_PN532_MIFARE_ADMIN),
                 AFE_CONFIG_SITE_PN532_SENSOR_ADMIN);
   }
@@ -314,19 +313,20 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 
 /* Regulator */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  if (Device->configuration.noOfRegulators > 0) {
+  if (Firmware->Device->configuration.noOfRegulators > 0) {
     addMenuHeaderItem(page, F(L_REGULATORS));
-    addMenuSubItem(page, L_REGULATOR, Device->configuration.noOfRegulators,
+    addMenuSubItem(page, L_REGULATOR,
+                   Firmware->Device->configuration.noOfRegulators,
                    AFE_CONFIG_SITE_REGULATOR);
   }
 #endif
 
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  if (Device->configuration.noOfThermalProtectors > 0) {
+  if (Firmware->Device->configuration.noOfThermalProtectors > 0) {
     addMenuHeaderItem(page, F(L_THERMAL_PROTECTORS));
     addMenuSubItem(page, L_THERMAL_PROTECTOR,
-                   Device->configuration.noOfThermalProtectors,
+                   Firmware->Device->configuration.noOfThermalProtectors,
                    AFE_CONFIG_SITE_THERMAL_PROTECTOR);
   }
 #endif
@@ -361,9 +361,9 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
 void AFESitesGenerator::siteDevice(String &page) {
   boolean _itemDisabled = false;
 
-  Data->getWelcomeMessage(_HtmlResponse);
+  Firmware->API->Flash->getWelcomeMessage(_HtmlResponse);
 
-  if (_HtmlResponse.length() > 0 || RestAPI->accessToWAN()) {
+  if (_HtmlResponse.length() > 0 || Firmware->API->REST->accessToWAN()) {
     openMessageSection(page, F("Firmware"), F(""));
 
     if (_HtmlResponse.length() > 0) {
@@ -371,24 +371,27 @@ void AFESitesGenerator::siteDevice(String &page) {
       page.replace(F("{{I}}"), _HtmlResponse);
     }
 
-    if (RestAPI->accessToWAN() && RestAPI->isStableConnection) {
+    if (Firmware->API->REST->accessToWAN() &&
+        Firmware->API->REST->isStableConnection) {
 
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+      Firmware->API->REST->sent(_HtmlResponse,
+                                AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
       }
       // yield(); // @TODO removed with T7
 
-      RestAPI->sent(_HtmlResponse,
-                    AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+      Firmware->API->REST->sent(_HtmlResponse,
+                                AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
       }
       // yield(); // @TODO removed with T7
 
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+      Firmware->API->REST->sent(_HtmlResponse,
+                                AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
@@ -396,7 +399,7 @@ void AFESitesGenerator::siteDevice(String &page) {
       // yield(); // @TODO removed with T7
     }
 
-    if (!RestAPI->isStableConnection) {
+    if (!Firmware->API->REST->isStableConnection) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), F(L_JSON_RPC_API));
     }
@@ -407,7 +410,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   /* Section: Device name */
   openSection(page, F(L_DEVICE), F(L_DEVICE_SECTION_INFO));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_DEVICE_NAME,
-                   Device->configuration.name, "16");
+                   Firmware->Device->configuration.name, "16");
   closeSection(page);
 
   /* Section: Hardware */
@@ -417,104 +420,104 @@ void AFESitesGenerator::siteDevice(String &page) {
 /* I2C */
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_I2C,
-                        Device->configuration.noOfI2Cs, F("ii"),
+                        Firmware->Device->configuration.noOfI2Cs, F("ii"),
                         F(L_DEVICE_NUMBER_OF_I2CS));
 #endif
 
 /* MCP23017 */
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX,
-                        Device->configuration.noOfMCP23xxx, F("e"),
+                        Firmware->Device->configuration.noOfMCP23xxx, F("e"),
                         F(L_DEVICE_NUMBER_OF_MCP23XXX));
 #endif
 
 /* LED */
 #ifdef AFE_CONFIG_HARDWARE_LED
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_LEDS,
-                        Device->configuration.noOfLEDs, F("l"),
+                        Firmware->Device->configuration.noOfLEDs, F("l"),
                         F(L_DEVICE_NUMBER_OF_LEDS));
 #endif
 
 /* CLED */
 #ifdef AFE_CONFIG_HARDWARE_CLED
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS,
-                        Device->configuration.noOfCLEDs, F("cl"),
+                        Firmware->Device->configuration.noOfCLEDs, F("cl"),
                         F(L_DEVICE_NUMBER_OF_CLEDS));
 #endif
 
 /* Contactrons */
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS,
-                        Device->configuration.noOfContactrons, F("co"),
-                        F(L_DEVICE_NUMBER_OF_CONTACTRONS));
+                        Firmware->Device->configuration.noOfContactrons,
+                        F("co"), F(L_DEVICE_NUMBER_OF_CONTACTRONS));
 
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   /* Relay */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS,
-                        Device->configuration.noOfRelays, F("r"),
+                        Firmware->Device->configuration.noOfRelays, F("r"),
                         F(L_DEVICE_NUMBER_OF_RELAYS));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   /* Switch */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES,
-                        Device->configuration.noOfSwitches, F("s"),
+                        Firmware->Device->configuration.noOfSwitches, F("s"),
                         F(L_DEVICE_NUMBER_OF_SWITCHES));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   /* Binary sensor */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS,
-                        Device->configuration.noOfBinarySensors, F("b"),
-                        F(L_DEVICE_NUMBER_OF_BINARY_SENSORS));
+                        Firmware->Device->configuration.noOfBinarySensors,
+                        F("b"), F(L_DEVICE_NUMBER_OF_BINARY_SENSORS));
 #endif
 
 /* DS18B20 */
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef T4_CONFIG // Functionality is PRO for T4
-  _itemDisabled = !FirmwarePro->pro->valid;
+  _itemDisabled = Firmware->Configuration->Pro->valid;
 #else
   _itemDisabled = false;
 #endif
 
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20,
-                        Device->configuration.noOfDS18B20s, F("ds"),
+                        Firmware->Device->configuration.noOfDS18B20s, F("ds"),
                         F(L_DEVICE_NUMBER_OF_DS18B20_SENSORS), _itemDisabled);
 #endif
 
 /* DHT */
 #ifdef AFE_CONFIG_HARDWARE_DHT
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_DHT,
-                        Device->configuration.noOfDHTs, F("dh"),
+                        Firmware->Device->configuration.noOfDHTs, F("dh"),
                         F(L_DHT_SENSORS));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0,
-                        Device->configuration.noOfHPMA115S0s, F("hp"),
+                        Firmware->Device->configuration.noOfHPMA115S0s, F("hp"),
                         F(L_DEVICE_NUMBER_OF_HPMA115S0_SENSORS));
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_BH1750) || defined(AFE_CONFIG_HARDWARE_TSL2561)
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
-  _itemDisabled = !FirmwarePro->pro->valid;
+  _itemDisabled = !Firmware->Configuration->Pro->valid;
 #else
   _itemDisabled = false;
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_BH1750)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750,
-                        Device->configuration.noOfBH1750s, F("bh"),
+                        Firmware->Device->configuration.noOfBH1750s, F("bh"),
                         F(L_DEVICE_NUMBER_OF_BH1750_SENSORS), _itemDisabled);
 #endif
 
 #if defined(AFE_CONFIG_HARDWARE_TSL2561)
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561,
-                        Device->configuration.noOfTSL2561s, F("tl"),
+                        Firmware->Device->configuration.noOfTSL2561s, F("tl"),
                         F(L_DEVICE_NUMBER_OF_TSL2561_SENSORS), _itemDisabled);
 #endif
 #endif
@@ -522,41 +525,41 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef T5_CONFIG // Functionality is PRO for T5
-  _itemDisabled = !FirmwarePro->pro->valid;
+  _itemDisabled = !Firmware->Configuration->Pro->valid;
 #else
   _itemDisabled = false;
 #endif
 
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80,
-                        Device->configuration.noOfBMEX80s, F("b6"),
+                        Firmware->Device->configuration.noOfBMEX80s, F("b6"),
                         F(L_DEVICE_NUMBER_OF_BMEX80_SENSORS), _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935,
-                        Device->configuration.noOfAS3935s, F("a3"),
+                        Firmware->Device->configuration.noOfAS3935s, F("a3"),
                         F(L_DEVICE_NUMBER_OF_AS3935_SENSORS),
-                        !FirmwarePro->pro->valid);
+                        !Firmware->Configuration->Pro->valid);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ANEMOMETER_SENSORS,
-                        Device->configuration.noOfAnemometerSensors, F("w"),
-                        F(L_ANEMOMETER_SENSOR));
+                        Firmware->Device->configuration.noOfAnemometerSensors,
+                        F("w"), F(L_ANEMOMETER_SENSOR));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
-                        Device->configuration.noOfRainmeterSensors, F("d"),
-                        F(L_RAINMETER));
+                        Firmware->Device->configuration.noOfRainmeterSensors,
+                        F("d"), F(L_RAINMETER));
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS,
-                        Device->configuration.noOfPN532Sensors, F("ck"),
-                        F(L_DEVICE_NUMBER_OF_PN532_SENSORS));
+                        Firmware->Device->configuration.noOfPN532Sensors,
+                        F("ck"), F(L_DEVICE_NUMBER_OF_PN532_SENSORS));
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS,
-                        Device->configuration.noOfMiFareCards, F("f"),
+                        Firmware->Device->configuration.noOfMiFareCards, F("f"),
                         F(L_DEVICE_NUMBER_OF_MIFARE_CARDS));
 #endif
 
@@ -565,27 +568,29 @@ void AFESitesGenerator::siteDevice(String &page) {
 #ifdef AFE_ESP32
   /* Number of ADC Inputs */
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS,
-                        Device->configuration.noOfAnalogInputs, F("ad"),
-                        F(L_DEVICE_NUMBER_OF_ADC), !FirmwarePro->pro->valid);
+                        Firmware->Device->configuration.noOfAnalogInputs,
+                        F("ad"), F(L_DEVICE_NUMBER_OF_ADC),
+                        !Firmware->Configuration->Pro->valid);
 #else
-  addCheckboxFormItem(
-      page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",
-      Device->configuration.isAnalogInput,
-      (!FirmwarePro->pro->valid ? L_PRO_VERSION : AFE_FORM_ITEM_SKIP_PROPERTY),
-      !FirmwarePro->pro->valid);
+  addCheckboxFormItem(page, "ad", L_DEVICE_DO_MEASURE_ADC, "1",
+                      Firmware->Device->configuration.isAnalogInput,
+                      (!Firmware->Configuration->Pro->valid
+                           ? L_PRO_VERSION
+                           : AFE_FORM_ITEM_SKIP_PROPERTY),
+                      !Firmware->Configuration->Pro->valid);
 #endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #if defined(T3_CONFIG)
   itemsNumber = 0;
-  for (uint8_t i = 0; i < sizeof(Device->configuration.isPIR); i++) {
-    if (Device->configuration.isPIR[i]) {
+  for (uint8_t i = 0; i < sizeof(Firmware->Device->configuration.isPIR); i++) {
+    if (Firmware->Device->configuration.isPIR[i]) {
       itemsNumber++;
     }
   }
 
   body += addListOfHardwareItem(
-      sizeof(Device->configuration.isPIR), itemsNumber, "p",
+      sizeof(Firmware->Device->configuration.isPIR), itemsNumber, "p",
       language == 0 ? "Ilość czujników PIR" : "Number of PIRs");
 #endif
 
@@ -593,7 +598,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   closeSection(page);
   openSection(page, F(L_DEVICE_CONTROLLED_GATES), F(""));
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_GATES,
-                        Device->configuration.noOfGates, F("g"),
+                        Firmware->Device->configuration.noOfGates, F("g"),
                         F(L_DEVICE_NUMBER_OF_CONTROLLED_GATES));
 #endif
 
@@ -601,7 +606,7 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-  if (Device->configuration.noOfRelays > 0) {
+  if (Firmware->Device->configuration.noOfRelays > 0) {
 
 #if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||                             \
     defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
@@ -610,15 +615,15 @@ void AFESitesGenerator::siteDevice(String &page) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS,
-                          Device->configuration.noOfRegulators, F("re"),
-                          F(L_DEVICE_NUMBER_OF_REGULATORS));
+                          Firmware->Device->configuration.noOfRegulators,
+                          F("re"), F(L_DEVICE_NUMBER_OF_REGULATORS));
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
     addListOfHardwareItem(page,
                           AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS,
-                          Device->configuration.noOfThermalProtectors, F("tp"),
-                          F(L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS));
+                          Firmware->Device->configuration.noOfThermalProtectors,
+                          F("tp"), F(L_DEVICE_NUMBER_OF_THERMAL_PROTECTORS));
 #endif
     closeSection(page);
 #endif // defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||
@@ -634,13 +639,13 @@ void AFESitesGenerator::siteDevice(String &page) {
     openSection(page, F(L_CLED_LIGHT_EFFECTS), F(""));
   #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
     addCheckboxFormItem(page, "e0", L_CLED_DEVICE_BACKLIGHT, "1",
-                        Device->configuration.effectDeviceLight);
+                        Firmware->Device->configuration.effectDeviceLight);
   #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 
   #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
-    if (Device->configuration.noOfPN532Sensors > 0) {
+    if (Firmware->Device->configuration.noOfPN532Sensors > 0) {
       addCheckboxFormItem(page, "e1", L_CLED_PN532_EFFECTS, "1",
-                          Device->configuration.effectPN532);
+                          Firmware->Device->configuration.effectPN532);
     }
   #endif // AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
 
@@ -651,19 +656,19 @@ void AFESitesGenerator::siteDevice(String &page) {
   openSection(page, F(L_DEVICE_CONTROLLING), F(L_DEVICE_CONTROLLING_INFO));
 
   addCheckboxFormItem(page, "h", "HTTP API", "1",
-                      Device->configuration.api.http);
+                      Firmware->Device->configuration.api.http);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   addRadioButtonFormItem(page, "m", "Domoticz HTTP API", "1",
-                         Device->configuration.api.domoticz);
+                         Firmware->Device->configuration.api.domoticz);
   addRadioButtonFormItem(page, "m", "Domoticz MQTT API", "2",
-                         Device->configuration.api.mqtt);
+                         Firmware->Device->configuration.api.mqtt);
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   addCheckboxFormItem(page, "m", "Home Assistant MQTT API", "1",
-                      Device->configuration.api.mqtt);
+                      Firmware->Device->configuration.api.mqtt);
 #else
   addCheckboxFormItem(page, "m", "MQTT API", "1",
-                      Device->configuration.api.mqtt);
+                      Firmware->Device->configuration.api.mqtt);
 #endif
 
   closeSection(page);
@@ -672,7 +677,7 @@ void AFESitesGenerator::siteDevice(String &page) {
   openSection(page, F(L_DEVICE_AUTOLOGOUT_TITLE),
               F(L_DEVICE_AUTOLOGOUT_DESCRIPTION));
   addCheckboxFormItem(page, "al", L_ENABLED, "1",
-                      Device->configuration.timeToAutoLogOff > 0);
+                      Firmware->Device->configuration.timeToAutoLogOff > 0);
   closeSection(page);
 }
 
@@ -683,7 +688,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
   int numberOfNetworks = 0;
   char _ssid[sizeof(configuration.primary.ssid)];
   char _ssidLabel[AFE_CONFIG_NETWORK_SSID_LABEL_SIZE];
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
 
   /* Section: WiFi selection, user and password */
   openSection(page, F(L_NETWORK_CONFIGURATION),
@@ -876,7 +881,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
 
 void AFESitesGenerator::siteMQTTBroker(String &page) {
   MQTT configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
 
   /* Section: MQTT Broker configuration */
   openSection(page, F("MQTT Broker"), F(L_MQTT_CONFIGURATION_INFO));
@@ -953,7 +958,7 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFESitesGenerator::siteDomoticzServer(String &page) {
   DOMOTICZ configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
 
   openSection(page, F(L_DOMOTICZ_CONFIGURATION),
               F(L_DOMOTICZ_CONFIGURATION_INFO));
@@ -984,7 +989,7 @@ void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
 
   HOME_ASSISTANT_CONFIG configuration;
 
-  if (!Data->getConfiguration(&configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(&configuration)) {
     addFileNotFound(page);
   }
 
@@ -1001,7 +1006,7 @@ void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
 
   closeSection(page);
 
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_HA_DISCOVERY_TOPIC), F(""));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.discovery.topic, "64");
@@ -1012,7 +1017,7 @@ void AFESitesGenerator::siteHomeAssistantDiscoveryConfiguration(String &page) {
 
 void AFESitesGenerator::sitePassword(String &page) {
   PASSWORD configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
   openSection(page, F(L_PASSWORD_SET_PASSWORD_TO_PANEL), F(""));
   addCheckboxFormItem(page, "r", L_PASSWORD_PROTECT_BY_PASSWORD, "1",
                       configuration.protect);
@@ -1027,7 +1032,7 @@ void AFESitesGenerator::sitePassword(String &page) {
 void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   char title[8];
   LED configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   sprintf(title, "LED: #%d", id + 1);
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   openSection(page, title, F(L_MCP23017_LED_CONNECTION));
@@ -1038,7 +1043,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   addListOfGPIOs(page, F("g"), configuration.gpio);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  if (Device->configuration.noOfMCP23xxx > 0) {
+  if (Firmware->Device->configuration.noOfMCP23xxx > 0) {
     addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
     addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
     addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
@@ -1053,7 +1058,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
 }
 
 void AFESitesGenerator::siteSystemLED(String &page) {
-  uint8_t configuration = Data->getSystemLedID();
+  uint8_t configuration = Firmware->API->Flash->getSystemLedID();
   openSection(page, F(L_LED_SYSTEM), F(L_LED_SYSTEM_INFO));
   addLEDSelectionItem(page, configuration);
   closeSection(page);
@@ -1063,12 +1068,12 @@ void AFESitesGenerator::siteSystemLED(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   RELAY configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char _number[9];
   char _text[23];
   sprintf(_text, "%s #%d", L_RELAY, id + 1);
 
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -1079,7 +1084,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
   GATE gateConfiguration;
   boolean isGateRelay = false;
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
-    Data->getConfiguration(i, &gateConfiguration);
+    Firmware->API->Flash->getConfiguration(i, &gateConfiguration);
     if (gateConfiguration.relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
         gateConfiguration.relayId == id) {
       isGateRelay = true;
@@ -1147,7 +1152,7 @@ void AFESitesGenerator::siteRelay(String &page, uint8_t id) {
                             configuration.state.powerOn == 4);
     addSelectFormItemClose(page);
 
-    if (Device->configuration.api.mqtt) {
+    if (Firmware->Device->configuration.api.mqtt) {
 
       addSelectFormItemOpen(page, F("mc"), F(L_RELAY_DEFAULT_MQTT_CONNECTED));
       addSelectOptionFormItem(page, L_RELAY_NO_ACTION, "0",
@@ -1250,7 +1255,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   RELAY relayConfiguration;
   char text[30];
   char value[4];
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 
   openSection(page, F(L_REGULATOR), F(""));
 
@@ -1265,8 +1270,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
       page, L_NONE, value,
       configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
 
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
-    Data->getConfiguration(i, &relayConfiguration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
+    Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
     sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1283,8 +1288,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   DS18B20 ds18b20Configuration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-    Data->getConfiguration(i, &ds18b20Configuration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDS18B20s; i++) {
+    Firmware->API->Flash->getConfiguration(i, &ds18b20Configuration);
     sprintf(text, "DS18B20 %d: %s", i + 1, ds18b20Configuration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1294,8 +1299,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   DHT DHTConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
-    Data->getConfiguration(i, &DHTConfiguration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
+    Firmware->API->Flash->getConfiguration(i, &DHTConfiguration);
     sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1361,7 +1366,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   addRegulatorControllerItem(page, &configuration);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
@@ -1372,7 +1378,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_REGULATOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -1388,7 +1394,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   RELAY relayConfiguration;
   char text[30];
   char value[4];
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 
   openSection(page, F(L_THERMAL_PROTECTORS),
               F(L_THERMAL_PROTECTOR_AUTOMATIC_SWITCHING_OFF));
@@ -1402,8 +1408,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
       page, L_NONE, value,
       configuration.relayId == AFE_HARDWARE_ITEM_NOT_EXIST ? true : false);
 
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
-    Data->getConfiguration(i, &relayConfiguration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
+    Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
     sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1419,8 +1425,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   DS18B20 ds18b20Configuration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDS18B20s; i++) {
-    Data->getConfiguration(i, &ds18b20Configuration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDS18B20s; i++) {
+    Firmware->API->Flash->getConfiguration(i, &ds18b20Configuration);
     sprintf(text, "DS18B20 %d: %s", i + 1, ds18b20Configuration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1430,8 +1436,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
   DHT DHTConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
-    Data->getConfiguration(i, &DHTConfiguration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
+    Firmware->API->Flash->getConfiguration(i, &DHTConfiguration);
     sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
@@ -1451,7 +1457,8 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
@@ -1462,7 +1469,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_THERMAL_PROTECTOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -1477,7 +1484,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   SWITCH configuration;
   char text[25];
 
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -1526,7 +1533,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   uint8_t relayIsForGate;
 #endif
   RELAY relayConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
     page += F("<option value=\"");
     page += i;
     page += F("\"");
@@ -1534,8 +1541,8 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
     page += F(">");
 #ifdef AFE_CONFIG_HARDWARE_GATE
     relayIsForGate = false;
-    for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
-      Data->getConfiguration(j, &gateConfiguration);
+    for (uint8_t j = 0; j < Firmware->Device->configuration.noOfGates; j++) {
+      Firmware->API->Flash->getConfiguration(j, &gateConfiguration);
       if (i == gateConfiguration.relayId) {
         page += F(L_GATE);
         page += F(": ");
@@ -1545,12 +1552,12 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
       }
     }
     if (!relayIsForGate) {
-      Data->getConfiguration(i, &relayConfiguration);
+      Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
       sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
       page.concat(text);
     }
 #else
-    Data->getConfiguration(i, &relayConfiguration);
+    Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
     sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
     page.concat(text);
 #endif
@@ -1568,13 +1575,13 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
                                                    AFE_HARDWARE_ITEM_NOT_EXIST);
 
   CLED rgbLedConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfCLEDs; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfCLEDs; i++) {
     page += F("<option value=\"");
     page += i;
     page += F("\"");
     page += configuration.rgbLedID == i ? F(" selected=\"selected\"") : F("");
     page += F(">");
-    Data->getConfiguration(i, &rgbLedConfiguration);
+    Firmware->API->Flash->getConfiguration(i, &rgbLedConfiguration);
     sprintf(text, "%d: %s", i + 1, rgbLedConfiguration.name);
     page.concat(text);
     page += F("</option>");
@@ -1627,7 +1634,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   DS18B20Addresses _addresses;
   uint8_t numberOfFoundSensors;
   DS18B20 configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char _number[13];
 
   openSection(page, F(L_DS18B20_SENSOR), F(""));
@@ -1703,7 +1710,8 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x", "IDX", _number,
@@ -1714,7 +1722,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_DS18B20_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -1730,7 +1738,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
   AFESensorDHT _Sensor;
   DHT configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char _number[13];
   char _text[13];
 
@@ -1803,7 +1811,8 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
 
     sprintf(_number, "%d", configuration.domoticz.temperature.idx);
@@ -1857,7 +1866,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_DHT_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "m", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -1870,8 +1879,8 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
 #if defined(T3_CONFIG)
 String AFESitesGenerator::sitePIR(uint8_t id) {
-  PIR configuration = Data->getPIRConfiguration(id);
-  DEVICE device = Data->getConfiguration();
+  PIR configuration = Firmware->API->Flash->getPIRConfiguration(id);
+  DEVICE device = Firmware->API->Flash->getConfiguration();
 
   String body = "<fieldset>";
   char field[13];
@@ -1914,7 +1923,7 @@ String AFESitesGenerator::sitePIR(uint8_t id) {
   body += (configuration.ledId == 9 ? "selected=\"selected\"" : "");
   body += ">Brak</option>";
   for (uint8_t i = 0; i < 5; i++) {
-    if (Device->configuration.isLED[i]) {
+    if (Firmware->Device->configuration.isLED[i]) {
       body += "<option value=\"";
       body += i;
       body += "\" ";
@@ -1948,7 +1957,7 @@ String AFESitesGenerator::sitePIR(uint8_t id) {
   body += (configuration.relayId == 9 ? "selected=\"selected\"" : "");
   body += ">Brak</option>";
   for (uint8_t i = 0; i < 4; i++) {
-    if (Device->configuration.isRelay[i]) {
+    if (Firmware->Device->configuration.isRelay[i]) {
       body += "<option value=\"";
       body += i;
       body += "\" ";
@@ -1991,7 +2000,7 @@ String AFESitesGenerator::sitePIR(uint8_t id) {
 
   String page = openSection(title, "", body);
 
-  if (Device->configuration.api.domoticz) {
+  if (Firmware->Device->configuration.api.domoticz) {
     body = "<fieldset><div class=\"cf\"><label>IDX</label><input name=\"x";
     body += id;
     body += "\" type=\"number\" step=\"1\" min=\"0\" max=\"999999\"  value=\"";
@@ -2014,7 +2023,7 @@ String AFESitesGenerator::sitePIR(uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
   CONTACTRON configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char title[23];
   sprintf(title, "%s #%d", L_CONTACTRON, id + 1);
   openSection(page, title, F(""));
@@ -2054,7 +2063,8 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
 #endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
 
     char _idx[7];
@@ -2067,7 +2077,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_CONTACTRON_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2080,7 +2090,7 @@ void AFESitesGenerator::siteContactron(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
 void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   GATE gateConfiguration;
-  Data->getConfiguration(id, &gateConfiguration);
+  Firmware->API->Flash->getConfiguration(id, &gateConfiguration);
   CONTACTRON contactronConfiguration[2];
 
   openSection(page, F(L_GATE_CONFIGURATION), F(""));
@@ -2100,8 +2110,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
                           gateConfiguration.relayId ==
                               AFE_HARDWARE_ITEM_NOT_EXIST);
 
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
-    Data->getConfiguration(i, &relayConfiguration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
+    Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
 
     if (relayConfiguration.name[0] == '\0') {
       sprintf(_relayName, "%d: %s", i + 1, L_RELAY);
@@ -2116,7 +2126,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   /* Item: contactron 1 */
-  if (Device->configuration.noOfContactrons > 0) {
+  if (Firmware->Device->configuration.noOfContactrons > 0) {
     addGateContactronsListItem(page, F("c1"),
                                gateConfiguration.contactron.id[0]);
   }
@@ -2124,7 +2134,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   /* If there is more than a one contactron connected, add option to assigne
    * it to the gate */
 
-  if (Device->configuration.noOfContactrons > 1) {
+  if (Firmware->Device->configuration.noOfContactrons > 1) {
     /* Item: contactron 2 */
     addGateContactronsListItem(page, F("c2"),
                                gateConfiguration.contactron.id[1]);
@@ -2134,7 +2144,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
   /* Add section of Gate states configuration is there is at least one
    * contactron connected to the device and assigned to the Gate */
-  if (Device->configuration.noOfContactrons > 0) {
+  if (Firmware->Device->configuration.noOfContactrons > 0) {
 
     uint8_t numberOfContractons = 0;
     if (gateConfiguration.contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -2156,8 +2166,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 
       for (uint8_t i = 0; i < numberOfContractons; i++) {
 
-        Data->getConfiguration(gateConfiguration.contactron.id[i],
-                               &contactronConfiguration[i]);
+        Firmware->API->Flash->getConfiguration(
+            gateConfiguration.contactron.id[i], &contactronConfiguration[i]);
       }
 
       page.concat(F("<fieldset>"));
@@ -2246,11 +2256,12 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
   }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
 
-    if (Device->configuration.api.mqtt) {
+    if (Firmware->Device->configuration.api.mqtt) {
       sprintf(_idx, "%d", gateConfiguration.domoticzControl.idx);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "z", "IDX Start/Stop",
                        _idx, AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -2267,7 +2278,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_GATE_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      gateConfiguration.mqtt.topic, "64");
@@ -2280,7 +2291,7 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
   HPMA115S0 configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   openSection(page, F(L_HPMA115S0_SENSOR), F(""));
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
@@ -2314,7 +2325,8 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.pm10.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x1", "IDX PM10", _number,
@@ -2339,7 +2351,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_HPMA115S0_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2353,7 +2365,7 @@ void AFESitesGenerator::siteHPMA115S0Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
   char _number[7];
   BMEX80 configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 
   openSection(page, F(L_BMEX80_SENSOR), F(""));
 
@@ -2441,7 +2453,8 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
     closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+    if (Firmware->Device->configuration.api.domoticz ||
+        Firmware->Device->configuration.api.mqtt) {
       openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
       sprintf(_number, "%d", configuration.domoticz.temperature.idx);
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "i1", L_TEMPERATURE_IDX,
@@ -2555,7 +2568,7 @@ void AFESitesGenerator::siteBMEX80Sensor(String &page, uint8_t id) {
       closeSection(page);
     }
 #else
-    if (Device->configuration.api.mqtt) {
+    if (Firmware->Device->configuration.api.mqtt) {
       openSection(page, F(L_BMEX80_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
       addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                        configuration.mqtt.topic, "64");
@@ -2571,7 +2584,7 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 
   BH1750_CONFIG configuration;
 
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -2617,7 +2630,8 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
@@ -2627,7 +2641,7 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_BH1750_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2641,7 +2655,7 @@ void AFESitesGenerator::siteBH1750Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
 
   TSL2561 configuration;
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -2692,7 +2706,8 @@ void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.illuminance.idx);
     addInputFormItem(
@@ -2712,7 +2727,7 @@ void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_TSL2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2726,7 +2741,7 @@ void AFESitesGenerator::siteTSL2561Sensor(String &page, uint8_t id) {
 // String AFESitesGenerator::siteAS3935Sensor(uint8_t id) {
 void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
   AS3935 configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char _number[2];
 
   openSection(page, F(L_AS3935_SENSOR), F(""));
@@ -2813,7 +2828,8 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.domoticz.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d", "IDX", _number,
@@ -2823,7 +2839,7 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_AS3935_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2837,7 +2853,7 @@ void AFESitesGenerator::siteAS3935Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteAnemometerSensor(String &page) {
 
   ANEMOMETER configuration;
-  if (!Data->getConfiguration(&configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(&configuration)) {
     addFileNotFound(page);
   }
 
@@ -2888,7 +2904,8 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
@@ -2899,7 +2916,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2912,7 +2929,7 @@ void AFESitesGenerator::siteAnemometerSensor(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFESitesGenerator::siteRainmeterSensor(String &page) {
   RAINMETER configuration;
-  if (!Data->getConfiguration(&configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(&configuration)) {
     addFileNotFound(page);
   }
 
@@ -2937,7 +2954,8 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
                    "ml/m2");
   closeSection(page);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
@@ -2947,7 +2965,7 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -2962,11 +2980,11 @@ void AFESitesGenerator::siteRainmeterSensor(String &page) {
 #ifdef AFE_ESP32
 void AFESitesGenerator::siteADCInput(String &page, uint8_t id) {
   ADCINPUT configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 #else
 void AFESitesGenerator::siteADCInput(String &page) {
   ADCINPUT configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
 #endif // AFE_ESP32
 
   openSection(page, F(L_ANALOG_INPUT), F(""));
@@ -3011,7 +3029,8 @@ void AFESitesGenerator::siteADCInput(String &page) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   char _idx[7];
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_idx, "%d", configuration.domoticz.raw);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "x0", L_ADC_IDX_RAW_DATA,
@@ -3071,7 +3090,7 @@ void AFESitesGenerator::siteADCInput(String &page) {
 #ifdef AFE_CONFIG_HARDWARE_UART
 void AFESitesGenerator::siteUARTBUS(String &page) {
   SERIALPORT configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
   openSection(page, F("UART"), F(""));
   addListOfGPIOs(page, F("r"), configuration.RXD, "GPIO RXD");
   addListOfGPIOs(page, F("t"), configuration.TXD, "GPIO TXD");
@@ -3088,9 +3107,9 @@ void AFESitesGenerator::siteI2CBUS(String &page)
 {
   I2CPORT configuration;
 #ifdef AFE_ESP32
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 #else
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
 #endif
   openSection(page, F("I2C"), F(""));
   addListOfGPIOs(page, F("a"), configuration.SDA, "GPIO SDA");
@@ -3129,13 +3148,15 @@ void AFESitesGenerator::siteUpgrade(String &page) {
 
   openMessageSection(page, F(L_UPGRADE_VIA_WAN), F(L_UPGRADE_VIA_WAN_HINT));
 
-  if (RestAPI->accessToWAN() && RestAPI->isStableConnection) {
+  if (Firmware->API->REST->accessToWAN() &&
+      Firmware->API->REST->isStableConnection) {
 
     /**
      * @brief Get info if there is available firmware to upgrade
      *
      */
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), _HtmlResponse);
@@ -3145,8 +3166,8 @@ void AFESitesGenerator::siteUpgrade(String &page) {
      * @brief Get a message before upgrading to available firmware version
      *
      */
-    RestAPI->sent(_HtmlResponse,
-                  AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), _HtmlResponse);
@@ -3156,8 +3177,8 @@ void AFESitesGenerator::siteUpgrade(String &page) {
      * @brief Generate upgrade button if firmware available
      *
      */
-    RestAPI->sent(_HtmlResponse,
-                  AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID);
+    Firmware->API->REST->sent(
+        _HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_ID);
 
     if (_HtmlResponse.length() > 0) {
       page.concat(F("<br><br><form method=\"post\" action=\"/?o=35\"><input "
@@ -3255,7 +3276,7 @@ void AFESitesGenerator::siteExit(String &page, uint8_t configMode) {
 
 void AFESitesGenerator::siteConnecting(String &page) {
   NETWORK configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
   openMessageSection(page, F(L_NETWORK_ALMOST), F(""));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_DEVICE_CONNECTS));
@@ -3270,24 +3291,27 @@ void AFESitesGenerator::siteConnecting(String &page) {
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
 
   char _text[42];
-  sprintf(_text, "%s: %s", L_DEVICE, Device->configuration.name);
+  sprintf(_text, "%s: %s", L_DEVICE, Firmware->Device->configuration.name);
   openMessageSection(page, _text, F(""));
 
-  if (RestAPI->accessToWAN()) {
+  if (Firmware->API->REST->accessToWAN()) {
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_WELCOME);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), _HtmlResponse);
     }
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_LATEST_VERSION);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), _HtmlResponse);
     }
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
     if (_HtmlResponse.length() > 0) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), _HtmlResponse);
@@ -3323,8 +3347,9 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page.concat(F("\" /></div></form>"));
   closeSection(page);
 
-  if (RestAPI->accessToWAN()) {
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
+  if (Firmware->API->REST->accessToWAN()) {
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
     if (_HtmlResponse.length() > 0) {
       page.concat(_HtmlResponse);
     }
@@ -3333,23 +3358,25 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
 
 void AFESitesGenerator::siteProKey(String &page) {
   PRO_VERSION configuration;
-  Data->getConfiguration(&configuration);
+  Firmware->API->Flash->getConfiguration(&configuration);
   openMessageSection(page, F(L_PRO_VERSION), F(""));
 
-  if (RestAPI->accessToWAN()) {
+  if (Firmware->API->REST->accessToWAN()) {
 
-    if (!RestAPI->isStableConnection) {
+    if (!Firmware->API->REST->isStableConnection) {
       page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
       page.replace(F("{{I}}"), F(L_JSON_RPC_API));
     } else {
 
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
+      Firmware->API->REST->sent(_HtmlResponse,
+                                AFE_CONFIG_JSONRPC_REST_METHOD_CHECK_PRO);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
       }
 
-      RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_PRO_OWNER);
+      Firmware->API->REST->sent(_HtmlResponse,
+                                AFE_CONFIG_JSONRPC_REST_METHOD_PRO_OWNER);
       if (_HtmlResponse.length() > 0) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
@@ -3369,7 +3396,7 @@ void AFESitesGenerator::siteProKey(String &page) {
 }
 
 void AFESitesGenerator::siteFirmware(String &page, boolean details) {
-  char _numberToText[12];
+  char _numberToText[17];
   openMessageSection(page, F(L_FIRMWAR_YOUR_CURRENT_FIRMWARE), F(""));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_FIRMWARE_TYPE));
@@ -3404,16 +3431,24 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_FIRMWARE_DEVICE_ID));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-  page.replace(F("{{I}}"), FirmwarePro->pro->valid ? F(L_FIRMWARE_PRO_YES)
-                                                   : F(L_FIRMWARE_PRO_NO));
+  page.replace(F("{{I}}"), Firmware->Configuration->Pro->valid
+                               ? F(L_FIRMWARE_PRO_YES)
+                               : F(L_FIRMWARE_PRO_NO));
 
   closeMessageSection(page);
 
   if (details) {
     openMessageSection(page, F(L_ADDITIONAL_INFORMATION), F(""));
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_OPERATING_TIME));
+    sprintf(_numberToText, "%dm:%dd:%dg:%dm", Firmware->timer->months,
+            Firmware->timer->days, Firmware->timer->hours,
+            Firmware->timer->minutes);
+    page.replace(F("{{x}}"), _numberToText);
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
     page.replace(F("{{I}}"), F(L_REBOOTS_NUMBER));
-    sprintf(_numberToText, "%lu", Data->getRebootCounter(false));
+    sprintf(_numberToText, "%lu",
+            Firmware->API->Flash->getRebootCounter(false));
     page.replace(F("{{x}}"), _numberToText);
 
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
@@ -3437,7 +3472,7 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   BINARY_SENSOR configuration;
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
   char text[19];
 
   sprintf(text, "%s #%d", L_BINARY_SENSOR, id + 1);
@@ -3494,7 +3529,8 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     sprintf(_idx, "%d", configuration.domoticz.idx);
@@ -3505,7 +3541,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_BINARY_SENSOR_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -3519,7 +3555,7 @@ void AFESitesGenerator::siteBinarySensor(String &page, uint8_t id) {
 void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
   PN532_SENSOR configuration;
   char _number[6];
-  Data->getConfiguration(0, &configuration);
+  Firmware->API->Flash->getConfiguration(0, &configuration);
 
   openSection(page, F(L_PN532_SENSOR), F(""));
 
@@ -3592,7 +3628,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 #endif
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_PN532_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -3603,7 +3639,7 @@ void AFESitesGenerator::sitePN532Sensor(String &page, uint8_t id) {
 
 void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 
-  if (!FirmwarePro->pro->valid) {
+  if (!Firmware->Configuration->Pro->valid) {
     if (id > AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION - 1) {
       addInformationItem(page, F(L_MIFARE_CARD_NONE_PRO));
       return;
@@ -3618,7 +3654,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
 #endif
 
   char text[20];
-  Data->getConfiguration(id, &configuration);
+  Firmware->API->Flash->getConfiguration(id, &configuration);
 
   openSection(page, F(L_MIFARE_CARD), F(""));
 
@@ -3640,7 +3676,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   uint8_t relayIsForGate;
 #endif
   RELAY relayConfiguration;
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
     page += F("<option value=\"");
     page += i;
     page += F("\"");
@@ -3648,8 +3684,8 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
     page += ">";
 #ifdef AFE_CONFIG_HARDWARE_GATE
     relayIsForGate = false;
-    for (uint8_t j = 0; j < Device->configuration.noOfGates; j++) {
-      Data->getConfiguration(j, &gateConfiguration);
+    for (uint8_t j = 0; j < Firmware->Device->configuration.noOfGates; j++) {
+      Firmware->API->Flash->getConfiguration(j, &gateConfiguration);
       if (i == gateConfiguration.relayId) {
         page += F(L_GATE);
         page += F(": ");
@@ -3659,12 +3695,12 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
       }
     }
     if (!relayIsForGate) {
-      Data->getConfiguration(i, &relayConfiguration);
+      Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
       sprintf(text, "%s: %s", L_RELAY, relayConfiguration.name);
       page.concat(text);
     }
 #else
-    Data->getConfiguration(i, &relayConfiguration);
+    Firmware->API->Flash->getConfiguration(i, &relayConfiguration);
     sprintf(text, "%d: %s", i + 1, relayConfiguration.name);
     page.concat(text);
 #endif
@@ -3711,7 +3747,8 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     char _idx[7];
     char _name[3];
@@ -3740,7 +3777,7 @@ void AFESitesGenerator::siteMiFareCard(String &page, uint8_t id) {
     closeSection(page);
   }
 #else
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_MIFARE_CARD_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
@@ -3909,7 +3946,7 @@ void AFESitesGenerator::sitePN532SensorAdmin(String &page, uint8_t id) {
 void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   CLED configuration;
 
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -3967,7 +4004,8 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   closeSection(page);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
     sprintf(_number, "%d", configuration.cled.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "cd", L_CLED_ON_OFF_IDX,
@@ -3983,7 +4021,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
   }
 #else
 
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, F(L_CLED_MQTT_TOPIC), F(""));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "ct",
                      L_CLED_MQTT_ON_OFF_TOPIC, configuration.cled.topic, "64");
@@ -4016,7 +4054,7 @@ void AFESitesGenerator::siteCLED(String &page, uint8_t id) {
 void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
   CLED_EFFECT_BLINKING configuration;
 
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -4066,7 +4104,7 @@ void AFESitesGenerator::siteCLEDEffectBlinking(String &page, uint8_t id) {
 
 void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
   CLED_EFFECT_WAVE configuration;
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
   char _number[10];
@@ -4102,7 +4140,7 @@ void AFESitesGenerator::siteCLEDEffectWave(String &page, uint8_t id) {
 
 void AFESitesGenerator::siteCLEDEffectFadeInOut(String &page, uint8_t id) {
   CLED_EFFECT_FADE_INOUT configuration;
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
   char _number[10];
@@ -4187,9 +4225,10 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 
   page.concat(F("</div></div>"));
 
-  if (RestAPI->accessToWAN()) {
+  if (Firmware->API->REST->accessToWAN()) {
 
-    RestAPI->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_FOOTER_SECTION);
+    Firmware->API->REST->sent(_HtmlResponse,
+                              AFE_CONFIG_JSONRPC_REST_METHOD_FOOTER_SECTION);
     if (_HtmlResponse.length() > 0) {
       page.concat(_HtmlResponse);
     }
@@ -4201,7 +4240,7 @@ void AFESitesGenerator::generateFooter(String &page, boolean extended) {
 void AFESitesGenerator::setAttributes(String *page) {
 
   page->replace(F("{{A}}"),
-                RestAPI->accessToWAN()
+                Firmware->API->REST->accessToWAN()
                     ? F("<img style=\"opacity:.4\" "
                         "src=\"{{u}}/images/"
                         "afe-logo.png\"><br>")
@@ -4231,23 +4270,26 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{f.e}}"), F("8266"));
 #endif
 
-  FirmwarePro->pro->valid ? page->replace(F("{{f.p}}"), F(L_YES))
-                          : page->replace(F("{{f.p}}"), F(L_NO));
+  Firmware->Configuration->Pro->valid ? page->replace(F("{{f.p}}"), F(L_YES))
+                                      : page->replace(F("{{f.p}}"), F(L_NO));
 
 #ifdef AFE_T1_CUSTOM_E2
-  char _version[sizeof(FirmwarePro->version->installed_version) + 6];
-  sprintf(_version, "%s %s", FirmwarePro->version->installed_version, "MEGA");
+  char
+      _version[sizeof(Firmware->Configuration->Version->installed_version) + 6];
+  sprintf(_version, "%s %s",
+          Firmware->Configuration->Version->installed_version, "MEGA");
   page->replace(F("{{f.v}}"), _version);
 #else
-  page->replace(F("{{f.v}}"), FirmwarePro->version->installed_version);
+  page->replace(F("{{f.v}}"),
+                Firmware->Configuration->Version->installed_version);
 #endif
-  page->replace(F("{{f.u}}"), FirmwarePro->version->latest_version);
+  page->replace(F("{{f.u}}"), Firmware->Configuration->Version->latest_version);
 
-  page->replace(F("{{f.t}}"), String(FirmwarePro->version->type));
+  page->replace(F("{{f.t}}"), String(Firmware->Configuration->Version->type));
   page->replace(F("{{f.d}}"), F(AFE_DEVICE_TYPE_NAME));
 
   char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
-  Data->getDeviceID(_deviceId);
+  Firmware->API->Flash->getDeviceID(_deviceId);
   page->replace(F("{{f.n}}"), _deviceId);
   page->replace(F("{{f.l}}"), F(L_LANGUAGE_SHORT));
   page->replace(F("{{f.h}}"), String(AFE_DEVICE_TYPE_ID));
@@ -4256,7 +4298,7 @@ void AFESitesGenerator::setAttributes(String *page) {
 
   page->replace(F("{{n}}"), F(L_AFE_FIRMWARE));
   page->replace(F("{{u}}"), F(AFE_API_URL));
-  page->replace(F("{{d}}"), Device->configuration.name);
+  page->replace(F("{{d}}"), Firmware->Device->configuration.name);
 
   page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
 
@@ -4462,11 +4504,11 @@ void AFESitesGenerator::addMCP23XXXSelection(String &item, const char *field,
                                  ? F(" selected=\"selected\"")
                                  : F(""));
 
-  for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfMCP23xxx; i++) {
 
     char _mcpId[2];
 
-    if (Data->getConfiguration(i, _mcp)) {
+    if (Firmware->API->Flash->getConfiguration(i, _mcp)) {
       if (_mcp->address != 0) {
         sprintf(_mcpId, "%d", i);
         item.concat(FPSTR(HTTP_ITEM_SELECT_OPTION));
@@ -4658,7 +4700,7 @@ void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
   addSelectOptionFormItem(item, L_NONE, "255",
                           wirePortId == AFE_HARDWARE_ITEM_NOT_EXIST);
   char _label[8];
-  for (uint8_t i = 0; i < Device->configuration.noOfI2Cs; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfI2Cs; i++) {
     sprintf(_label, "Port: %d", i + 1);
     sprintf(_number, "%d", i);
     addSelectOptionFormItem(item, _label, _number, wirePortId == i);
@@ -4723,8 +4765,9 @@ void AFESitesGenerator::addGateContactronsListItem(
   addSelectOptionFormItem(item, L_NONE, _id,
                           contactronId == AFE_HARDWARE_ITEM_NOT_EXIST);
 
-  for (uint8_t i = 0; i < Device->configuration.noOfContactrons; i++) {
-    Data->getConfiguration(i, &configuration);
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfContactrons;
+       i++) {
+    Firmware->API->Flash->getConfiguration(i, &configuration);
 
     if (configuration.name[0] == '\0') {
       sprintf(_name, "%d: %s", i + 1, L_CONTACTRON);
@@ -4746,7 +4789,7 @@ void AFESitesGenerator::addLEDSelectionItem(String &item, uint8_t id) {
   sprintf(_id, "%d", AFE_HARDWARE_ITEM_NOT_EXIST);
   addSelectOptionFormItem(item, L_NONE, _id, id == AFE_HARDWARE_ITEM_NOT_EXIST);
 
-  for (uint8_t i = 0; i < Device->configuration.noOfLEDs; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfLEDs; i++) {
     sprintf(_label, "%d", i + 1);
     sprintf(_id, "%d", i);
     addSelectOptionFormItem(item, _label, _id, id == i);
@@ -4759,7 +4802,7 @@ void AFESitesGenerator::addLEDSelectionItem(String &item, uint8_t id) {
 void AFESitesGenerator::siteMCP23XXX(String &page, uint8_t id) {
 
   MCP23XXX configuration;
-  if (!Data->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
     addFileNotFound(page);
   }
 
@@ -4818,7 +4861,8 @@ void AFESitesGenerator::addAPIsSection(String &page,
                                        const __FlashStringHelper *info,
                                        const char *label, uint32_t *idx) {
 
-  if (Device->configuration.api.domoticz || Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
     char _number[10];
     openSection(page, header, info);
     sprintf(_number, "%d", *idx);
@@ -4835,7 +4879,7 @@ void AFESitesGenerator::addAPIsSection(String &page,
                                        const __FlashStringHelper *info,
                                        const char *label, const char *topic) {
 
-  if (Device->configuration.api.mqtt) {
+  if (Firmware->Device->configuration.api.mqtt) {
     openSection(page, header, info);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", label, topic, "64");
     closeSection(page);

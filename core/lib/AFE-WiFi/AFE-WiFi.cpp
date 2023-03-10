@@ -9,16 +9,15 @@ boolean AFEWiFi::eventConnectionLost = true;
 AFEWiFi::AFEWiFi() {}
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data,
+void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data,
                     AFELED *_LED) {
   Led = _LED;
-  begin(mode, _Device, _Data);
+  begin(_Device, _Data);
 }
 #endif
 
-void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
+void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
   Device = _Device;
-  WiFiMode = mode;
 
 #ifdef AFE_ESP32
   WirelessNetwork.onEvent(AFEWiFi::onWiFiEvent);
@@ -33,7 +32,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
 #endif
 
-  // if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
+  // if (Device->getMode() == AFE_MODE_NORMAL || Device->getMode() == AFE_MODE_CONFIGURATION) {
   _Data->getConfiguration(&configuration);
 //}
 
@@ -75,7 +74,7 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
   } /* Endif: Checking if backup configuration exists and setting a flag */
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
+  Serial << endl << F("INFO: WIFI: Device is in mode: ") << Device->getMode();
 #endif
 
 /**
@@ -104,7 +103,6 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
       configuration.outputPower <=
           AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX) {
     WirelessNetwork.setOutputPower(configuration.outputPower);
-
 #ifdef DEBUG
     Serial << endl
            << F("INFO: WIFI: Setting TX Output power to : ")
@@ -119,8 +117,8 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
          << WirelessNetwork.getPhyMode();
 #endif
-  if (WiFiMode == AFE_MODE_ACCESS_POINT ||
-      WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
+  if (Device->getMode() == AFE_MODE_ACCESS_POINT ||
+      Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HotSpot: Starting... ");
 #endif
@@ -296,8 +294,8 @@ void AFEWiFi::switchConfiguration() {
 }
 
 void AFEWiFi::listener() {
-  if (!(WiFiMode == AFE_MODE_ACCESS_POINT ||
-        WiFiMode == AFE_MODE_NETWORK_NOT_SET)) {
+  if (!(Device->getMode() == AFE_MODE_ACCESS_POINT ||
+        Device->getMode() == AFE_MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
       if (sleepMode) {
         if (millis() - sleepStartTime >= configuration.waitTimeSeries * 1000) {

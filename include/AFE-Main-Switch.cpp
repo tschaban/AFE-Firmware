@@ -12,17 +12,13 @@ void switchEventsListener(void);
 
 /* Initializing Switches */
 void initializeSwitch(void) {
-  for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
+  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     Switch[i].addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-    Switch[i].begin(i, Data, Led);
-#else
-    Switch[i].begin(i, Data);
-#endif
+    Switch[i].begin(i, FirmwarePro);
   }
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: Switch(es) initialized");
@@ -35,8 +31,8 @@ void initializeSwitch(void) {
  */
 void processSwitchEvents(void) {
 
-  if (Device->getMode() == AFE_MODE_NORMAL) {
-    for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
+  if (FirmwarePro->Device->getMode() == AFE_MODE_NORMAL) {
+    for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
       /**
        * @brief One of the switches has been shortly pressed and there is
        * assigned functionaity to it
@@ -50,7 +46,7 @@ void processSwitchEvents(void) {
 #ifdef AFE_CONFIG_HARDWARE_RELAY
         if (Switch[i].configuration->relayID != AFE_HARDWARE_ITEM_NOT_EXIST &&
             Switch[i].configuration->relayID + 1 <=
-                Device->configuration.noOfRelays) {
+                FirmwarePro->Device->configuration.noOfRelays) {
 
 #ifdef DEBUG
           Serial << endl
@@ -68,7 +64,7 @@ void processSwitchEvents(void) {
           if (Relay[Switch[i].configuration->relayID].gateId !=
               AFE_HARDWARE_ITEM_NOT_EXIST) {
             if (Relay[Switch[i].configuration->relayID].gateId <=
-                Device->configuration.noOfGates) {
+                FirmwarePro->Device->configuration.noOfGates) {
 
 #ifdef DEBUG
               Serial << endl
@@ -148,7 +144,7 @@ void switchEventsListener(void) {
    * @brief Listens for switch events
    *
    */
-  for (uint8_t i = 0; i < Device->configuration.noOfSwitches; i++) {
+  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
     Switch[i].listener();
 
     /**
@@ -158,16 +154,16 @@ void switchEventsListener(void) {
     if (Switch[i].configuration->functionality ==
         AFE_SWITCH_FUNCTIONALITY_MULTI) {
       if (Switch[i].is10s()) {
-        Device->getMode() == AFE_MODE_NORMAL
-            ? Device->reboot(AFE_MODE_ACCESS_POINT)
-            : Device->reboot(AFE_MODE_NORMAL);
+        FirmwarePro->Device->getMode() == AFE_MODE_NORMAL
+            ? FirmwarePro->Device->reboot(AFE_MODE_ACCESS_POINT)
+            : FirmwarePro->Device->reboot(AFE_MODE_NORMAL);
       } else if (Switch[i].is5s()) {
-        Device->getMode() == AFE_MODE_NORMAL
-            ? Device->reboot(AFE_MODE_CONFIGURATION)
-            : Device->reboot(AFE_MODE_NORMAL);
+        FirmwarePro->Device->getMode() == AFE_MODE_NORMAL
+            ? FirmwarePro->Device->reboot(AFE_MODE_CONFIGURATION)
+            : FirmwarePro->Device->reboot(AFE_MODE_NORMAL);
       } else if (Switch[i].is30s()) {
-        Device->setDevice();
-        Device->reboot(AFE_MODE_ACCESS_POINT);
+        FirmwarePro->Device->setDevice();
+        FirmwarePro->Device->reboot(AFE_MODE_ACCESS_POINT);
       }
     }
   }

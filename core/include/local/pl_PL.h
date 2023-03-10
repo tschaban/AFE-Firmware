@@ -699,6 +699,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_PRO_YES "Wersja Pro: Tak"
 #define L_FIRMWARE_PRO_NO "Wersja Pro: Nie"
 #define L_ADDITIONAL_INFORMATION "Informacje dodatkowe"
+#define L_OPERATING_TIME "Czas pracy {{x}}"
 #define L_REBOOTS_NUMBER "Firmware restartowany {{x}} razy"
 #define L_WIFI_RSSI "Wskaźnik siły odbieranego sygnału WiFi {{x}} dBm ({{t}})"
 #define L_WIFI_SIGNAL "Sygnał"

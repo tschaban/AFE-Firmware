@@ -20,8 +20,8 @@ void initializeI2CBUS(void) {
   boolean success = false;
 
 #ifdef AFE_ESP32
-  if (Device->configuration.noOfI2Cs > 0) {
-    Data->getConfiguration(0, &I2CBUSConfiguration);
+  if (FirmwarePro->Device->configuration.noOfI2Cs > 0) {
+    FirmwarePro->API->Flash->getConfiguration(0, &I2CBUSConfiguration);
 
 #ifdef DEBUG
     Serial << endl
@@ -33,7 +33,7 @@ void initializeI2CBUS(void) {
     success = WirePort0.begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL,
                               I2CBUSConfiguration.frequency);
 #else /* ESP8266 */
-  Data->getConfiguration(&I2CBUSConfiguration);
+  FirmwarePro->API->Flash->getConfiguration(&I2CBUSConfiguration);
 
 #ifdef DEBUG
   Serial << endl
@@ -59,8 +59,8 @@ void initializeI2CBUS(void) {
 #ifdef AFE_ESP32
   }
 
-  if (Device->configuration.noOfI2Cs > 1) {
-    Data->getConfiguration(1, &I2CBUSConfiguration);
+  if (FirmwarePro->Device->configuration.noOfI2Cs > 1) {
+    FirmwarePro->API-Flash->getConfiguration(1, &I2CBUSConfiguration);
 
 #ifdef DEBUG
     Serial << endl

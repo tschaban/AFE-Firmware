@@ -2,21 +2,18 @@
 
 #include "AFE-Upgrader.h"
 
-AFEUpgrader::AFEUpgrader(AFEDataAccess *_Data, AFEDevice *_Device, AFEFirmware *_Firmware) {
-  Data = _Data;
-  Device = _Device;
-  Firmware = _Firmware;
-  
+AFEUpgrader::AFEUpgrader(AFEFirmware *_Firmware) {
+  Firmware = _Firmware;  
 }
 
 /* It returns true if firmware has been upgraded */
 boolean AFEUpgrader::upgraded() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Firmware version (stored) T") << Firmware->version->type
-         << F("-") << Firmware->version->installed_version << F("-");
+         << F("INFO: Firmware version (stored) T") << Firmware->Configuration->Version->type
+         << F("-") << Firmware->Configuration->Version->installed_version << F("-");
 
-  switch (Firmware->version->api) {
+  switch (Firmware->Configuration->Version->api) {
   case AFE_FIRMWARE_API_STANDARD:
     Serial << F("Standard");
     break;
@@ -33,9 +30,9 @@ boolean AFEUpgrader::upgraded() {
 
 #endif
 
-  if (strcmp(Firmware->version->installed_version, AFE_FIRMWARE_VERSION) == 0 &&
-      Firmware->version->type == AFE_FIRMWARE_TYPE &&
-      Firmware->version->api ==
+  if (strcmp(Firmware->Configuration->Version->installed_version, AFE_FIRMWARE_VERSION) == 0 &&
+      Firmware->Configuration->Version->type == AFE_FIRMWARE_TYPE &&
+      Firmware->Configuration->Version->api ==
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
           AFE_FIRMWARE_API_DOMOTICZ
 #elif defined(AFE_CONFIG_API_HOME_ASSISTANT_ENABLED)
@@ -59,30 +56,30 @@ boolean AFEUpgrader::upgraded() {
 /* It kicks-off firmware upgrade */
 void AFEUpgrader::upgrade() {
   /* Upgraded version from one T to other T */
-  if (Firmware->version->type != AFE_FIRMWARE_TYPE) {
+  if (Firmware->Configuration->Version->type != AFE_FIRMWARE_TYPE) {
 #ifdef DEBUG
     Serial << endl << F("INFO: Upgrading Firmware type");
 #endif
     upgradeFirmwarType();
-    Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
+    Firmware->Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
     /* Upgrade from one version to other within the same T */
-  } else if (strcmp(Firmware->version->installed_version, AFE_FIRMWARE_VERSION) != 0) {
+  } else if (strcmp(Firmware->Configuration->Version->installed_version, AFE_FIRMWARE_VERSION) != 0) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Upgrading Firmware T") << AFE_FIRMWARE_TYPE
-           << F(" from version: ") << Firmware->version->installed_version << F(" to ")
+           << F(" from version: ") << Firmware->Configuration->Version->installed_version << F(" to ")
            << AFE_FIRMWARE_VERSION;
 #endif
     updateFirmwareVersion();
-    Device->upgraded = AFE_UPGRADE_VERSION;
+    Firmware->Device->upgraded = AFE_UPGRADE_VERSION;
   }
 
   /* Checking if in addition there has been API version change */
-  if (Firmware->version->api != AFE_FIRMWARE_API) {
+  if (Firmware->Configuration->Version->api != AFE_FIRMWARE_API) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Firmware API version upgraded") << F(" from version: ")
-           << Firmware->version->api << F(" to ") << AFE_FIRMWARE_API;
+           << Firmware->Configuration->Version->api << F(" to ") << AFE_FIRMWARE_API;
 #endif
     updateFirmwareAPIVersion();
   }
@@ -111,14 +108,15 @@ void AFEUpgrader::upgradeFirmwarType() {
 #endif
 
   /* Reading current data */
-  Data->getConfiguration(&networkConfiguration);
-  Data->getConfiguration(&mqttConfiguration);
+  
+  Firmware->API->Flash->getConfiguration(&networkConfiguration);
+  Firmware->API->Flash->getConfiguration(&mqttConfiguration);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  Data->getConfiguration(&domoticzCofiguration);
+  Firmware->API->Flash->getConfiguration(&domoticzCofiguration);
 #endif
-  Data->getConfiguration(&proConfiguration);
-  Data->getConfiguration(&passwordConiguration);
-  deviceState = Data->getDeviceMode();
+  Firmware->API->Flash->getConfiguration(&proConfiguration);
+  Firmware->API->Flash->getConfiguration(&passwordConiguration);
+  deviceState = Firmware->API->Flash->getDeviceMode();
 
 #ifdef DEBUG
   Serial << endl << F("INFO: UPGRADE: Creating default configuration");
@@ -133,14 +131,14 @@ void AFEUpgrader::upgradeFirmwarType() {
 #endif
 
   /* Restoring core configuration */
-  Data->saveConfiguration(&networkConfiguration);
-  Data->saveConfiguration(&mqttConfiguration);
+  Firmware->API->Flash->saveConfiguration(&networkConfiguration);
+  Firmware->API->Flash->saveConfiguration(&mqttConfiguration);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  Data->saveConfiguration(&domoticzCofiguration);
+  Firmware->API->Flash->saveConfiguration(&domoticzCofiguration);
 #endif
-  Data->saveConfiguration(&proConfiguration);
-  Data->saveConfiguration(&passwordConiguration);
-  Data->saveDeviceMode(deviceState);
+  Firmware->API->Flash->saveConfiguration(&proConfiguration);
+  Firmware->API->Flash->saveConfiguration(&passwordConiguration);
+  Firmware->API->Flash->saveDeviceMode(deviceState);
 }
 
 void AFEUpgrader::updateFirmwareVersion() {
@@ -149,33 +147,33 @@ void AFEUpgrader::updateFirmwareVersion() {
 
 /* Upgrade to version T0-2.0.3 */
 #ifdef T0_CONFIG
-  if (strcmp(Firmware->version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.0.1") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.0.2") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.2") == 0) {
     upgradeToT0V210();
   }
 #endif // T0_CONFIG
 
 #ifdef T5_CONFIG
-  if (strcmp(Firmware->version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.0.1") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.2.0.B1") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0.B1") == 0) {
     upgradeToT5V220();
   }
 #endif // T5_CONFIG
 
 #ifdef T6_CONFIG
-  if (strcmp(Firmware->version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.1.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.2.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.2.1") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.2.2") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.1.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.1") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.2") == 0) {
     upgradeToT6V230();
   }
 
-  if (strcmp(Firmware->version->installed_version, "2.3.0") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.3.1") == 0 ||
-      strcmp(Firmware->version->installed_version, "2.3.1.E1") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.3.0") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1") == 0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1.E1") == 0) {
     upgradeToT6V250();
   }
 
@@ -183,19 +181,19 @@ void AFEUpgrader::updateFirmwareVersion() {
 
 #endif // !ESP32
 
-  Data->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
+  Firmware->API->Flash->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
 }
 
 void AFEUpgrader::updateFirmwareAPIVersion() {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   /* Checking if there is Domoticz server configuration file */
-  if (!Data->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
-    Data->createDomoticzConfigurationFile();
+  if (!Firmware->API->Flash->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
+    Firmware->API->Flash->createDomoticzConfigurationFile();
   }
 #endif
 
-  Data->saveFirmwareAPIVersion();
+  Firmware->API->Flash->saveFirmwareAPIVersion();
 }
 
 #ifndef AFE_ESP32
@@ -206,7 +204,7 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 void AFEUpgrader::upgradeToT0V210() {
 
   DEVICE newDevice;
-  DEVICE_T0_200 oldDevice = Data->getDeviceT0v200Configuration();
+  DEVICE_T0_200 oldDevice = Firmware->API->Flash->getDeviceT0v200Configuration();
   uint8_t counter = 0;
 
   // Copy data from old structure to new structure
@@ -244,7 +242,7 @@ void AFEUpgrader::upgradeToT0V210() {
 #endif
 
   // Save to new JSON structure configuration file
-  Data->saveConfiguration(&newDevice);
+  Firmware->API->Flash->saveConfiguration(&newDevice);
 }
 
 #endif // T0_CONFIG
@@ -254,15 +252,15 @@ void AFEUpgrader::upgradeToT5V220() {
 
 // It will do nothing for ESP8266 1MB - sensors are e
 #if defined(AFE_CONFIG_HARDWARE_BMEX80) || defined(AFE_CONFIG_HARDWARE_BH1750)
-  Data->createI2CConfigurationFile();
+  Firmware->API->Flash->createI2CConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  Data->createBMEX80SensorConfigurationFile();
+  Firmware->API->Flash->createBMEX80SensorConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  Data->createBH1750SensorConfigurationFile();
+  Firmware->API->Flash->createBH1750SensorConfigurationFile();
 #endif
 }
 
@@ -271,23 +269,23 @@ void AFEUpgrader::upgradeToT5V220() {
 #ifdef T6_CONFIG
 void AFEUpgrader::upgradeToT6V230() {
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  Data->createAnemometerSensorConfigurationFile();
+  Firmware->API->Flash->createAnemometerSensorConfigurationFile();
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  Data->createRainmeterSensorConfigurationFile();
-  Data->createRainmeterSensorDataConfigurationFile();
+  Firmware->API->Flash->createRainmeterSensorConfigurationFile();
+  Firmware->API->Flash->createRainmeterSensorDataConfigurationFile();
 #endif
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-  Data->createADCInputConfigurationFile();
+  Firmware->API->Flash->createADCInputConfigurationFile();
 #endif
 }
 
 void AFEUpgrader::upgradeToT6V250() {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  Data->createDS18B20SensorConfigurationFile();
+  Firmware->API->Flash->createDS18B20SensorConfigurationFile();
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  Data->createDHTSensorConfigurationFile();
+  Firmware->API->Flash->createDHTSensorConfigurationFile();
 #endif
 }
 

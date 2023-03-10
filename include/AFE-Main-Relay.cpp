@@ -14,16 +14,12 @@ void relayEventsListener(void);
 
 void initializeRelay(void) {
 
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     Relay[i].addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    Relay[i].begin(Data, Device, i);
-#else
-    Relay[i].begin(Data, i);
-#endif
+    Relay[i].begin(FirmwarePro, i);
 
 /* Setting relay state after restoring power is not required when the relay is
  * assigned to a gate*/
@@ -50,7 +46,7 @@ void initializeRelay(void) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY_AUTOONOFF
 /* Method checks if any relay should be automatically turned off */
 void relayEventsListener(void) {
-  for (uint8_t i = 0; i < Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
     /* For the Relay assigned to a gate listener is not needed. Skipping such
      * relays. Auto turn-off is called out in the gate event listener */

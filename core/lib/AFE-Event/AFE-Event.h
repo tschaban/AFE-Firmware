@@ -2,7 +2,17 @@
 #define _AFE_FIRMWARE_EVENT_h
 
 #include <AFE-Configuration.h>
-#include <AFE-Global-Object.h>
+#include <AFE-Firmware.h>
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+#include <AFE-API-HTTP-Domoticz.h>
+#include <AFE-API-MQTT-Domoticz.h>
+#else
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+#include <AFE-API-HomeAssistant-Integration.h>
+#endif
+#include <AFE-API-MQTT-Standard.h>
+#endif
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -11,21 +21,20 @@
 class AFEEvent {
 
 private:
-  AFEGlobalObject *Object;
+  AFEFirmware *Firmware;
 
-  struct EVENT_TIMER {
-    unsigned long oneMinute;
-    uint8_t oneHour;
-    uint8_t oneDay;
-  };
-
-  EVENT_TIMER *timer = new EVENT_TIMER;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  AFEAPIMQTTDomoticz *MqttAPI;
+  AFEAPIHTTPDomoticz *HttpDomoticzAPI;
+#else
+  AFEAPIMQTTStandard *MqttAPI;
+#endif
 
   void conenctedToNetwork(void);
   void disconnectedFromNetwork(void);
   void connectedToMQTTBroker(void);
   void disconnectedFromMQTTBroker(void);
-  void checkingFirmwareVersion(void);
+  void publishFirmwareVersion(void);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   void publishMQTTHADiscoveryConfiguration(void);
@@ -33,7 +42,16 @@ private:
 
 public:
   AFEEvent();
-  void begin(AFEGlobalObject *);
+
+public:
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  void begin(AFEFirmware *, AFEAPIMQTTDomoticz *, AFEAPIHTTPDomoticz *);
+#else
+  void begin(AFEFirmware *, AFEAPIMQTTStandard *);
+#endif
+
+  void begin(AFEFirmware *);
+
   void listener(void);
 };
 

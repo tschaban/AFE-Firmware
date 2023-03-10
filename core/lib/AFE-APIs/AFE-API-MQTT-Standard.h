@@ -28,7 +28,8 @@ struct CLED_COMMAND {
 class AFEAPIMQTTStandard : public AFEAPI {
 
 private:
-  void processRequest();
+  
+  //void processRequest();
 
   /**
    * @brief formats MQTT topic and subscribes to MQTT Broker for command

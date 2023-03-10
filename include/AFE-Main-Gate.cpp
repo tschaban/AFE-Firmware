@@ -10,8 +10,8 @@ void gateEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeGate(void) {
-  for (uint8_t i = 0; i < Device->configuration.noOfGates; i++) {
-    Gate[i].begin(i, Device, Data);
+  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfGates; i++) {
+    Gate[i].begin(i, FirmwarePro);
     GatesCurrentStates->state[i] = AFE_GATE_UNKNOWN;
 
     /* Assigning Gate ID to a contactron */
@@ -33,7 +33,7 @@ void initializeGate(void) {
 /* Method processes gate related events */
 void gateEventsListener(void) {
   uint8_t _gateState;
-  for (uint8_t gateId = 0; gateId < Device->configuration.noOfGates; gateId++) {
+  for (uint8_t gateId = 0; gateId < FirmwarePro->Device->configuration.noOfGates; gateId++) {
     if (Gate[gateId].event()) {
       _gateState = Gate[gateId].get();
       if (GatesCurrentStates->state[gateId] != _gateState) {

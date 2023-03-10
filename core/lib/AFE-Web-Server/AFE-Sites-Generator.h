@@ -1,13 +1,10 @@
 #ifndef _AFE_Sites_Generator_h
 #define _AFE_Sites_Generator_h
 
-#include <Arduino.h>
-
-#include <AFE-API-JSONRPC.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
 #include <AFE-Firmware.h>
 #include <AFE-Site-components.h>
+#include <Arduino.h>
+
 
 #ifdef AFE_ESP32
 #include <WiFi.h>
@@ -53,11 +50,7 @@
 class AFESitesGenerator {
 
 private:
-  AFEDataAccess *Data;
-  AFEDevice *Device;
-  AFEFirmware *FirmwarePro;
-  AFEJSONRPC *RestAPI;
-
+  AFEFirmware *Firmware;
   String _HtmlResponse;
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
@@ -67,7 +60,7 @@ private:
 #else  // ESP8266
   TwoWire *WirePort0;
 #endif // ESP32/ESP8266
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
+  void begin(AFEFirmware *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
   void generateHeader(String &page, uint16_t redirect);
@@ -182,7 +175,8 @@ private:
                              boolean disabled = false);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  void addListOfMCP23XXXGPIOs(String &item, const char *field, uint8_t selected);
+  void addListOfMCP23XXXGPIOs(String &item, const char *field,
+                              uint8_t selected);
 
   void addMCP23XXXSelection(String &item, const char *field, uint8_t selected);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
@@ -245,7 +239,6 @@ private:
    */
   void addInformationItem(String &item, const __FlashStringHelper *information);
 
-
 #ifdef AFE_CONFIG_HARDWARE_CLED
   /**
    * @brief Adds url item (<a> html tag) to the list group. openMessageSection
@@ -266,29 +259,28 @@ private:
 public:
   /**
    * @brief Construct a new AFESitesGenerator object
-   * 
+   *
    */
   AFESitesGenerator();
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
-             TwoWire *, TwoWire *);
+  void begin(AFEFirmware *, TwoWire *, TwoWire *);
 #else  // ESP8266
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *,
-             TwoWire *);
+  void begin(AFEFirmware *, TwoWire *);
 #endif // ESP32/ESP8266
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmware *, AFEJSONRPC *);
+  void begin(AFEFirmware *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
-/**
- * @brief Method generates site header with menu. When redirect param is diff than 0
-    then it will redirect page to main page after redirect param time (in sec)
- * 
- * @param  page             desc
- * @param  redirect         desc
- */
+  /**
+   * @brief Method generates site header with menu. When redirect param is diff
+   than 0
+      then it will redirect page to main page after redirect param time (in sec)
+   *
+   * @param  page             desc
+   * @param  redirect         desc
+   */
   void generateMenuHeader(String &page, uint16_t redirect = 0);
   void generateMenu(String &page, uint16_t redirect = 0);
   void generateEmptyMenu(String &page, uint16_t redirect = 0);
@@ -303,19 +295,17 @@ public:
    */
   void generateFooter(String &page, boolean extended = false);
 
-
   /**
  * @brief replace all {{attributes}}
- * 
+ *
  * @param  page             site with replaced attributes
  */
   void setAttributes(String *page);
 
-
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   /**
    * @brief These methods generates firmware upgrade sections
-   * 
+   *
    * @param  page             desc
    */
   void siteUpgrade(String &page);
@@ -346,22 +336,20 @@ public:
   /**
    * @brief Site: Firmware version
    *
-   * @param  page             
+   * @param  page
    */
 
-/**
- * @brief Site: Firmware version
- * 
- * @param  page             return string with the site
- * @param  details          add additional information to the site
- */
+  /**
+   * @brief Site: Firmware version
+   *
+   * @param  page             return string with the site
+   * @param  details          add additional information to the site
+   */
   void siteFirmware(String &page, boolean details = false);
-
-
 
   /**
    * @brief All following methods generates configuration sections
-   * 
+   *
    * @param  page             desc
    */
   void siteDevice(String &page);
@@ -485,12 +473,8 @@ public:
   void siteTSL2561Sensor(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
-
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void siteMCP23XXX(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-
-
-
 };
 #endif // _AFE_Sites_Generator_h

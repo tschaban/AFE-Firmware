@@ -6,14 +6,7 @@
 
 AFERelay::AFERelay() {}
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-void AFERelay::begin(AFEDataAccess *Data, AFEDevice *Device, uint8_t id) {
-  _Device = Device;
-  begin(Data, id);
-}
-#endif
-
-void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
+void AFERelay::begin(AFEFirmware *_Firmware, uint8_t id) {
 #ifdef DEBUG
   Serial << endl << F("INFO: RELAY: Initializing Relay");
 #endif
@@ -21,8 +14,8 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
   _id = id;
   if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
-    _Data = Data;
-    _Data->getConfiguration(_id, configuration);
+    Firmware = _Firmware;
+    Firmware->API->Flash->getConfiguration(_id, configuration);
 
 #ifdef DEBUG
     Serial << endl
@@ -32,8 +25,8 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
     GATE *_gateConfiguration = new GATE;
     gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
-    for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-      _Data->getConfiguration(i, _gateConfiguration);
+    for (uint8_t i = 0; i < Firmware->Device->configuration.noOfGates; i++) {
+      Firmware->API->Flash->getConfiguration(i, _gateConfiguration);
       if (_gateConfiguration->relayId == _id) {
         gateId = _id;
 #ifdef DEBUG
@@ -90,7 +83,7 @@ void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
       Led->addMCP23017Reference(_MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      Led->begin(_Data, configuration->ledID);
+      Led->begin(Firmware->API->Flash, configuration->ledID);
     }
 
 #endif
@@ -168,10 +161,10 @@ void AFERelay::on() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    _Data->saveRelayState(_id, AFE_RELAY_ON);
+    Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_ON);
   };
 #else
-  _Data->saveRelayState(_id, AFE_RELAY_ON);
+  Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_ON);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -218,10 +211,10 @@ void AFERelay::off() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    _Data->saveRelayState(_id, AFE_RELAY_OFF);
+    Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_OFF);
   };
 #else
-  _Data->saveRelayState(_id, AFE_RELAY_OFF);
+  Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_OFF);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -273,9 +266,9 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 2) {
     on();
   } else if (option == 3) {
-    _Data->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
+    Firmware->API->Flash->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
   } else if (option == 4) {
-    _Data->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
+    Firmware->API->Flash->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
   }
 }
 

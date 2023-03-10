@@ -9,8 +9,8 @@ void BMX80SensorEventsListener(void);
 /* --------- Body -----------*/
 
 void initializeBMX80Sensor(void) {
-  if (Device->configuration.noOfBMEX80s > 0) {
-    for (uint8_t i = 0; i < Device->configuration.noOfBMEX80s; i++) {
+  if (FirmwarePro->Device->configuration.noOfBMEX80s > 0) {
+    for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfBMEX80s; i++) {
 #ifdef AFE_ESP32
       BMEX80Sensor[i].begin(i, &WirePort0, &WirePort1);
 #else
@@ -21,8 +21,8 @@ void initializeBMX80Sensor(void) {
 }
 
 void BMX80SensorEventsListener(void) {
-  if (Device->configuration.noOfBMEX80s > 0) {
-    for (uint8_t i = 0; i < Device->configuration.noOfBMEX80s; i++) {
+  if (FirmwarePro->Device->configuration.noOfBMEX80s > 0) {
+    for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfBMEX80s; i++) {
       BMEX80Sensor[i].listener();
       if (BMEX80Sensor[i].isReady()) {
         MqttAPI->publishBMx80SensorData(i);

@@ -2,25 +2,20 @@
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 
-AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(
-    AFEDataAccess *Data, AFEDevice *Device, AFEAPIMQTTStandard *MqttAPI,
-    AFEFirmware *Firmware) {
+AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(AFEFirmware *_Firmware, AFEAPIMQTTStandard *_MqttAPI) {
 #ifdef DEBUG
   Serial << endl << F("INFO: HA: Initializing Home Assistant Discovery");
 #endif
-
-  _Data = Data;
-  _Data->getConfiguration(configuration);
+  Firmware = _Firmware;
+  Firmware->API->Flash->getConfiguration(configuration);
 
   if (strlen(configuration->discovery.topic) > 0 &&
       (configuration->addingComponents || configuration->removeingComponents)) {
     _initialize = true;
-    _Device = Device;
-    _MqttAPI = MqttAPI;
-    _Firmware = Firmware;
+    MqttAPI = _MqttAPI;
     sprintf(_firmwareName, "AFE Firmware T%d-%s", AFE_FIRMWARE_TYPE,
-            _Firmware->version->installed_version);
-    _Data->getConfiguration(&_mqttConfiguration);
+            Firmware->Configuration->Version->installed_version);
+    Firmware->API->Flash->getConfiguration(&_mqttConfiguration);
   }
 #ifdef DEBUG
   else {
@@ -123,7 +118,7 @@ void AFEAPIHomeAssistantIntegration::publishFirmwareVersion(void) {
 
   sprintf(_deviceConfiguration->label, "%s", F(L_FIRMWARE));
   sprintf(_deviceConfiguration->mqtt.topic,
-          _MqttAPI->Mqtt->configuration->status.topic);
+          MqttAPI->Mqtt->configuration->status.topic);
   publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
 }
 
@@ -147,8 +142,8 @@ void AFEAPIHomeAssistantIntegration::publishRelays(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfRelays) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfRelays) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration->label, _configuration.name);
 
@@ -182,14 +177,14 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfCLEDs) {
+    if (i < Firmware->Device->configuration.noOfCLEDs) {
 
       /**
        * @brief Preparing and publishing RGB LED On/Off
        *
        */
 
-      _Data->getConfiguration(i, &configurationCLED);
+      Firmware->API->Flash->getConfiguration(i, &configurationCLED);
 
       sprintf(_deviceConfiguration->mqtt.topic, configurationCLED.cled.topic);
       sprintf(_deviceConfiguration->label, configurationCLED.name);
@@ -206,9 +201,9 @@ void AFEAPIHomeAssistantIntegration::publishCLEDs(void) {
        * @brief Preparing and publishing RGB LED Effects
        *
        */
-      _Data->getConfiguration(i, &configurationEffectBlinkng);
-      _Data->getConfiguration(i, &configurationEffectFadeInOut);
-      _Data->getConfiguration(i, &configurationEffectWave);
+      Firmware->API->Flash->getConfiguration(i, &configurationEffectBlinkng);
+      Firmware->API->Flash->getConfiguration(i, &configurationEffectFadeInOut);
+      Firmware->API->Flash->getConfiguration(i, &configurationEffectWave);
       sprintf(_deviceConfiguration->options, "\"%s\",\"%s\",\"%s\",\"%s\"",
               AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF,
               configurationEffectBlinkng.name,
@@ -255,18 +250,18 @@ void AFEAPIHomeAssistantIntegration::publishAnalogInputs(void) {
     _deviceConfiguration->id = i;
 
 #ifdef AFE_ESP32
-    if (i < _Device->configuration.noOfAnalogInputs) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfAnalogInputs) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Analog Input: ") << i + 1;
 #endif
 
 #else // ESP8266
-    if (_Device->configuration.isAnalogInput) {
+    if (Firmware->Device->configuration.isAnalogInput) {
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Analog Input");
 #endif
-      _Data->getConfiguration(&_configuration);
+      Firmware->API->Flash->getConfiguration(&_configuration);
 #endif // ESP32/ESP8266
 
       sprintf(_deviceConfiguration->deviceClass,
@@ -395,8 +390,8 @@ void AFEAPIHomeAssistantIntegration::publishSwitches(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfSwitches) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfSwitches) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->label, "%s: %d", L_SWITCH, i + 1);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -429,8 +424,8 @@ void AFEAPIHomeAssistantIntegration::publishBinarySensor(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfBinarySensors) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfBinarySensors) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->label, "%s", _configuration.name);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -457,8 +452,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDS18B20(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfDS18B20s) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfDS18B20s) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating DS18B20: ") << i + 1;
 #endif
@@ -495,8 +490,8 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfDHTs) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfDHTs) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating DHT: ") << i + 1;
 #endif
@@ -590,8 +585,8 @@ void AFEAPIHomeAssistantIntegration::publishThermalProtector(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfThermalProtectors) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfThermalProtectors) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration->label, _configuration.name);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -620,8 +615,8 @@ void AFEAPIHomeAssistantIntegration::publishRegulator(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfRegulators) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfRegulators) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       sprintf(_deviceConfiguration->label, _configuration.name);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -645,8 +640,8 @@ void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfBMEX80s) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfBMEX80s) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Bosch sesnor: ") << i + 1;
 #endif
@@ -841,8 +836,8 @@ void AFEAPIHomeAssistantIntegration::publishBH1750(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfBH1750s) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfBH1750s) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating BH1750: ") << i + 1;
 #endif
@@ -870,8 +865,8 @@ void AFEAPIHomeAssistantIntegration::publishHPMA115S0(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfHPMA115S0s) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfHPMA115S0s) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating HPMA115S0: ") << i + 1;
 #endif
@@ -934,8 +929,8 @@ void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfAnemometerSensors) {
-      _Data->getConfiguration(&_configuration);
+    if (i < Firmware->Device->configuration.noOfAnemometerSensors) {
+      Firmware->API->Flash->getConfiguration(&_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Anemometer: ") << i + 1;
 #endif
@@ -978,8 +973,8 @@ void AFEAPIHomeAssistantIntegration::publishRainmeter(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfRainmeterSensors) {
-      _Data->getConfiguration(&_configuration);
+    if (i < Firmware->Device->configuration.noOfRainmeterSensors) {
+      Firmware->API->Flash->getConfiguration(&_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating Rainmeter: ") << i + 1;
 #endif
@@ -1036,8 +1031,8 @@ void AFEAPIHomeAssistantIntegration::publishTSL2561(void) {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561; i++) {
     _deviceConfiguration->id = i;
-    if (i < _Device->configuration.noOfTSL2561s) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfTSL2561s) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
 #ifdef DEBUG
       Serial << endl << F("INFO: HA: Setting/Updating TSL2561: ") << i + 1;
 #endif
@@ -1084,8 +1079,8 @@ void AFEAPIHomeAssistantIntegration::publishGate(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfGates) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfGates) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->label, "%s", _configuration.name);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -1116,8 +1111,8 @@ void AFEAPIHomeAssistantIntegration::publishContactron(void) {
 
     _deviceConfiguration->id = i;
 
-    if (i < _Device->configuration.noOfContactrons) {
-      _Data->getConfiguration(i, &_configuration);
+    if (i < Firmware->Device->configuration.noOfContactrons) {
+      Firmware->API->Flash->getConfiguration(i, &_configuration);
       sprintf(_deviceConfiguration->label, "%s", _configuration.name);
       sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
@@ -1135,7 +1130,7 @@ void AFEAPIHomeAssistantIntegration::generateObjectId(char *objectId,
                                                       uint8_t hardwareId,
                                                       uint8_t id) {
   char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
-  _Data->getDeviceID(_deviceId);
+  Firmware->API->Flash->getDeviceID(_deviceId);
   sprintf(objectId, "%s-%d%d%d", _deviceId, hardwareId, deviceClassId, id);
 }
 
@@ -1180,11 +1175,11 @@ void AFEAPIHomeAssistantIntegration::
                      deviceConfiguration->hardwareId, deviceConfiguration->id);
     generateTopic(_topic, deviceConfiguration->entityId, _objectId);
 
-    boolean _retain = _MqttAPI->Mqtt->configuration->retainAll;
-    _MqttAPI->Mqtt->configuration->retainAll =
+    boolean _retain = MqttAPI->Mqtt->configuration->retainAll;
+    MqttAPI->Mqtt->configuration->retainAll =
         configuration->retainConfiguration;
-    _MqttAPI->Mqtt->publish(_topic, "");
-    _MqttAPI->Mqtt->configuration->retainAll = _retain;
+    MqttAPI->Mqtt->publish(_topic, "");
+    MqttAPI->Mqtt->configuration->retainAll = _retain;
   }
 }
 
@@ -1705,13 +1700,13 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_CONFIGURAION_URL),
                   WiFi.localIP().toString());
     char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
-    _Data->getDeviceID(_deviceId);
+    Firmware->API->Flash->getDeviceID(_deviceId);
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_ID), _deviceId);
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_SOFTWARE), _firmwareName);
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_MANUFACTURER),
                   AFE_DEVICE_MANUFACTURER);
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_NAME),
-                  _Device->configuration.name);
+                  Firmware->Device->configuration.name);
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_DEVICE_HARDWARE),
                   F(AFE_DEVICE_TYPE_NAME));
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIQUE_ID), _objectId);
@@ -1741,11 +1736,11 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
 
     _json.toCharArray(_message, sizeof(_message) + 1);
 
-    boolean _retain = _MqttAPI->Mqtt->configuration->retainAll;
-    _MqttAPI->Mqtt->configuration->retainAll =
+    boolean _retain = MqttAPI->Mqtt->configuration->retainAll;
+    MqttAPI->Mqtt->configuration->retainAll =
         configuration->retainConfiguration;
-    _MqttAPI->Mqtt->publish(_topic, _message);
-    _MqttAPI->Mqtt->configuration->retainAll = _retain;
+    MqttAPI->Mqtt->publish(_topic, _message);
+    MqttAPI->Mqtt->configuration->retainAll = _retain;
   } else {
 
     removeItemRemovedFromHomeAssistantMQTTDiscovery(deviceConfiguration);

@@ -3,6 +3,13 @@ Flash: 564504
 RAM: 41168
 
 T5 - ESP8266, 4MB, HA
-Flash: 561984, 543744
-RAM: 41192, 40200
+RAM:   [=====     ]  49.1% (used 40232 bytes from 81920 bytes)
+Flash: [=====     ]  52.3% (used 546372 bytes from 1044464 bytes)
  
+
+T0 Dev
+RAM:   [====      ]  42.1% (used 34492 bytes from 81920 bytes)
+Flash: [====      ]  43.2% (used 451396 bytes from 1044464 bytes)
+
+RAM:   [====      ]  41.8% (used 34236 bytes from 81920 bytes)    
+Flash: [====      ]  39.4% (used 411480 bytes from 1044464 bytes) 

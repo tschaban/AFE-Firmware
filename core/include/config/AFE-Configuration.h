@@ -79,12 +79,6 @@
 #define AFE_FIRMWARE_API_HOME_ASSISTANT 2
 
 /**
- * @brief frequecny to check it the key is valid in minutes
- * 
- */
-#define AFE_KEY_FREQUENCY_VALIDATION 60
-
-/**
  * @brief standard default values for not used devices and empty string
  * 
  */
@@ -92,6 +86,15 @@
 #define AFE_NONE AFE_HARDWARE_ITEM_NOT_EXIST
 #define AFE_EMPTY_STRING '\0'
 
+/**
+ * @brief Timers
+ * 
+ */
+
+#define AFE_TIMER_ONE_MINUTE 60000 // in milseconds
+#define AFE_TIMER_ONE_HOUR 59 // minutes
+#define AFE_TIMER_ONE_DAY 23 // hours
+#define AFE_TIMER_ONE_MONTH 29 // days
 
 /**
  * @brief different binary default values
@@ -460,12 +463,5 @@
 #ifdef AFE_CONFIG_FUNCTIONALITY_CHECK_FIRMWARE_VERSION
 #include <functionalities/AFE-Firmware-Update.h>
 #endif
-
-/**
-  * @brief include configuration for functionalities
- * 
- */
-#include <functionalities/AFE-Events.h>
-
 
 #endif // _AFE_Configuration_h

@@ -6,11 +6,9 @@
 
 AFEContactron::AFEContactron(){};
 
-void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
-                          AFEDataAccess *_Data) {
-  Data = _Data;
-  Device = _Device;
-  Data->getConfiguration(id, configuration);
+void AFEContactron::begin(uint8_t id, AFEFirmware*_Firmware) {
+  Firmware = _Firmware;
+  Firmware->API->Flash->getConfiguration(id, configuration);
   pinMode(configuration->gpio, INPUT_PULLUP);
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON_GPIO_DIGIT_INPUT
@@ -21,7 +19,7 @@ void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (configuration->ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed->begin(Data, configuration->ledID);
+    ContactronLed->begin(Firmware->API->Flash, configuration->ledID);
   }
 #endif
   _initialized = true;

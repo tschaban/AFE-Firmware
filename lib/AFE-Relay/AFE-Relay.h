@@ -4,42 +4,37 @@
 #define _AFE_Relay_h
 
 #include <AFE-Configuration.h>
+#include <AFE-Firmware.h>
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-
-#include <AFE-Data-Access.h>
 #include <AFE-MQTT-Structure.h>
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-#include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
+#endif
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
 #endif
 
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
+
+
 class AFERelay {
 
 private:
   uint8_t _id;
-  AFEDataAccess *_Data;
+  AFEFirmware *Firmware;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led = new AFELED();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  AFEDevice *_Device;
 #endif
 
   unsigned long turnOffCounter = 0;
@@ -61,10 +56,6 @@ private:
 
   void setRelayAfterRestore(uint8_t option);
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  void begin(AFEDataAccess *, uint8_t id);
-#endif
-
 public:
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -82,11 +73,7 @@ public:
  *
  * @param  id               desc
  */
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  void begin(AFEDataAccess *, AFEDevice *, uint8_t id);
-#else
-  void begin(AFEDataAccess *, uint8_t id);
-#endif
+  void begin(AFEFirmware *, uint8_t id);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);

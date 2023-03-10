@@ -98,7 +98,6 @@ void AFEAPIMQTTStandard::subscribe() {
 
 /* Subscribe: Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-
   for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
     subscribeToCommand(_Relay[i]->configuration->mqtt.topic);
   }
@@ -664,6 +663,8 @@ void AFEAPIMQTTStandard::listener() {
 #endif
   }
 }
+
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 boolean AFEAPIMQTTStandard::publishRelayState(uint8_t id) {
   return enabled ? publishOnOffState(
