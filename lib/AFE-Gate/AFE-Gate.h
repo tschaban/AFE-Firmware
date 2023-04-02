@@ -6,9 +6,11 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
-#include <Arduino.h>
+#include <arduino.h>
 
 #include <AFE-Contactron.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 #include <AFE-GATE-Structure.h>
 #include <AFE-Relay.h>
 #ifdef DEBUG
@@ -27,7 +29,7 @@ public:
   AFEGate();
 
   /* Initializing gate */
-  void begin(uint8_t id, AFEFirmware *);
+  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Triggering gate state changed and saving it's new value if there is not
    * contactrons */
@@ -52,12 +54,13 @@ public:
   void getJSON(char *json);
 
 private:
-  AFEFirmware *Firmware;
+  AFEDevice *Device;
+  AFEDataAccess *Data;
 
   uint8_t gateId;                  // ID of the gate
   uint8_t numberOfContractons = 0; // Number of Contractons assigned to a gate
   boolean _event = false;
-  AFERelay *GateRelay = new AFERelay();
+  AFERelay *GateRelay;
 
   /* Returns gate state based on contactron state */
   uint8_t getGateStateBasedOnContractons();

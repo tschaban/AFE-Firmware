@@ -6,9 +6,11 @@
 
 AFEContactron::AFEContactron(){};
 
-void AFEContactron::begin(uint8_t id, AFEFirmware*_Firmware) {
-  Firmware = _Firmware;
-  Firmware->API->Flash->getConfiguration(id, configuration);
+void AFEContactron::begin(uint8_t id, AFEDevice *_Device,
+                          AFEDataAccess *_Data) {
+  Data = _Data;
+  Device = _Device;
+  Data->getConfiguration(id, configuration);
   pinMode(configuration->gpio, INPUT_PULLUP);
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON_GPIO_DIGIT_INPUT
@@ -17,17 +19,18 @@ void AFEContactron::begin(uint8_t id, AFEFirmware*_Firmware) {
   pinMode(configuration->gpio, INPUT_PULLUP);
 #endif
 
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   if (configuration->ledID != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    ContactronLed->begin(Firmware->API->Flash, configuration->ledID);
+    ContactronLed->begin(Data, configuration->ledID);
   }
 #endif
   _initialized = true;
 }
 
-byte AFEContactron::get() {
-  byte currentState = digitalRead(configuration->gpio);
-  byte _return;
+boolean AFEContactron::get() {
+  boolean currentState = digitalRead(configuration->gpio);
+  boolean _return;
   if (configuration->type == AFE_CONTACTRON_NO) {
     if (currentState) {
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -53,6 +56,7 @@ byte AFEContactron::get() {
       _return = AFE_OPEN;
     }
   }
+
   return _return;
 }
 
@@ -89,7 +93,7 @@ void AFEContactron::listener() {
 
 void AFEContactron::getJSON(char *json) {
   sprintf(json, "{\"state\":\":%s\"}",
-          (get() == AFE_OPEN ? (AFE_OPEN_LABEL) : (AFE_CLOSED_LABEL)));
+          (get() == AFE_OPEN ? F(AFE_OPEN_LABEL) : F(AFE_CLOSED_LABEL)));
 }
 
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON

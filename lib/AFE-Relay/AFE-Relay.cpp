@@ -6,47 +6,14 @@
 
 AFERelay::AFERelay() {}
 
-void AFERelay::begin(AFEFirmware *_Firmware, uint8_t id) {
-#ifdef DEBUG
-  Serial << endl << F("INFO: RELAY: Initializing Relay");
-#endif
-
+void AFERelay::begin(AFEDataAccess *Data, uint8_t id) {
   _id = id;
   if (_id != AFE_HARDWARE_ITEM_NOT_EXIST) {
 
-    Firmware = _Firmware;
-    Firmware->API->Flash->getConfiguration(_id, configuration);
-
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: RELAY: Checking if Relay is assigned to control a gate");
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    GATE *_gateConfiguration = new GATE;
-    gateId = AFE_HARDWARE_ITEM_NOT_EXIST;
-    for (uint8_t i = 0; i < Firmware->Device->configuration.noOfGates; i++) {
-      Firmware->API->Flash->getConfiguration(i, _gateConfiguration);
-      if (_gateConfiguration->relayId == _id) {
-        gateId = _id;
-#ifdef DEBUG
-        Serial << endl << F(" : controls gate: ") << i + 1;
-#endif
-        break;
-      }
-    }
-
-#ifdef DEBUG
-    if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-      Serial << endl << F(" : it doesn't control a gate");
-    }
-#endif
-
-#endif
-
+    _Data = Data;
+    _Data->getConfiguration(_id, configuration);
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-    // If MCP23017 available in the HW, checking if LED connected using
-    // MCP23017
+    // If MCP23017 available in the HW, checking if LED connected using MCP23017
     if (configuration->gpio == AFE_HARDWARE_ITEM_NOT_EXIST) {
       if (configuration->mcp23017.gpio != AFE_HARDWARE_ITEM_NOT_EXIST &&
           configuration->mcp23017.id != AFE_HARDWARE_ITEM_NOT_EXIST) {
@@ -55,8 +22,8 @@ void AFERelay::begin(AFEFirmware *_Firmware, uint8_t id) {
         Serial << endl << F("INFO: RELAY: Initializing with MCP23017");
 #endif
 
-        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(
-            configuration->mcp23017.gpio, OUTPUT);
+        _MCP23017Broker->MCP[configuration->mcp23017.id].pinMode(configuration->mcp23017.gpio,
+                                                  OUTPUT);
         _expanderUsed = true;
       }
 #ifdef DEBUG
@@ -83,7 +50,7 @@ void AFERelay::begin(AFEFirmware *_Firmware, uint8_t id) {
       Led->addMCP23017Reference(_MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-      Led->begin(Firmware->API->Flash, configuration->ledID);
+      Led->begin(_Data, configuration->ledID);
     }
 
 #endif
@@ -139,7 +106,7 @@ void AFERelay::on() {
     _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? HIGH
-                                                                      : LOW);
+                                                                     : LOW);
   } else {
 #endif
 
@@ -161,10 +128,10 @@ void AFERelay::on() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_ON);
+    _Data->saveRelayState(_id, AFE_RELAY_ON);
   };
 #else
-  Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_ON);
+  _Data->saveRelayState(_id, AFE_RELAY_ON);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -190,7 +157,7 @@ void AFERelay::off() {
     _MCP23017Broker->MCP[configuration->mcp23017.id].digitalWrite(
         configuration->mcp23017.gpio,
         configuration->triggerSignal == AFE_RELAY_SIGNAL_TRIGGER_HIGH ? LOW
-                                                                      : HIGH);
+                                                                     : HIGH);
   } else {
 #endif
 
@@ -211,10 +178,10 @@ void AFERelay::off() {
 #ifdef AFE_CONFIG_HARDWARE_GATE
   /* For the Relay assigned to a gate state is saved conditionally */
   if (gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
-    Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_OFF);
+    _Data->saveRelayState(_id, AFE_RELAY_OFF);
   };
 #else
-  Firmware->API->Flash->saveRelayState(_id, AFE_RELAY_OFF);
+  _Data->saveRelayState(_id, AFE_RELAY_OFF);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -266,9 +233,9 @@ void AFERelay::setRelayAfterRestore(uint8_t option) {
   } else if (option == 2) {
     on();
   } else if (option == 3) {
-    Firmware->API->Flash->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
+    _Data->getRelayState(_id) == AFE_RELAY_ON ? on() : off();
   } else if (option == 4) {
-    Firmware->API->Flash->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
+    _Data->getRelayState(_id) == AFE_RELAY_ON ? off() : on();
   }
 }
 

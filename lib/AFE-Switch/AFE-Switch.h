@@ -7,13 +7,14 @@
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 
-#include <AFE-Firmware.h>
+#include <AFE-Data-Access.h>
+#ifdef AFE_CONFIG_HARDWARE_LED
+#include <AFE-LED.h>
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 #endif
-
-
 
 class AFESwitch {
 
@@ -40,25 +41,34 @@ private:
   boolean pressed4thirteenSeconds = false;
   boolean _pressed4thirteenSeconds = false;
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED *Led;
+  void begin(uint8_t id, AFEDataAccess *);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   AFEMCP23017Broker *_MCP23017Broker;
   boolean _expanderUsed = false;
 #endif
 
-  AFEFirmware *Firmware;
-
 public:
   SWITCH *configuration = new SWITCH;
+
 
   /* Constructors */
   AFESwitch();
 
 /* Init switch */
-  void begin(uint8_t id, AFEFirmware *);
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void begin(uint8_t id, AFEDataAccess *, AFELED *);
+#else
+  void begin(uint8_t id, AFEDataAccess *);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void addMCP23017Reference(AFEMCP23017Broker *);
 #endif
+
 
   /* Method: returns TRUE if state of the switch is pressed. It does not mean it
    * has to be pressed physically (applicable for BiStable switch types */

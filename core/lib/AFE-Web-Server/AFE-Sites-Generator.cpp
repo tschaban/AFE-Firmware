@@ -249,6 +249,14 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
   }
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  if (Firmware->Device->configuration.noOfFS3000s > 0) {
+    addMenuHeaderItem(page, F(L_FS3000_SENSORS));
+    addMenuSubItem(page, L_SENSOR, Firmware->Device->configuration.noOfFS3000s,
+                   AFE_CONFIG_SITE_FS3000);
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   if (Firmware->Device->configuration.noOfAS3935s > 0) {
     addMenuItem(page, F(L_AS3935_SENSOR), AFE_CONFIG_SITE_AS3935);
@@ -552,6 +560,12 @@ void AFESitesGenerator::siteDevice(String &page) {
   addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_RAINMETER_SENSORS,
                         Firmware->Device->configuration.noOfRainmeterSensors,
                         F("d"), F(L_RAINMETER));
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  addListOfHardwareItem(page, AFE_CONFIG_HARDWARE_NUMBER_OF_FS3000,
+                        Firmware->Device->configuration.noOfFS3000s, F("f3"),
+                        F(L_DEVICE_NUMBER_OF_FS3000_SENSORS), _itemDisabled);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
@@ -4823,6 +4837,95 @@ void AFESitesGenerator::siteMCP23XXX(String &page, uint8_t id) {
   closeSection(page);
 }
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+void AFESitesGenerator::siteFS3000(String &page, uint8_t id) {
+
+  FS3000_CONFIG configuration;
+  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
+    addFileNotFound(page);
+  }
+
+  openSection(page, F(L_FS3000_SENSOR), F(""));
+
+/* Item: I2C Address selection */
+#ifdef AFE_ESP32
+  addDeviceI2CAddressSelectionItem(page, configuration.wirePortId,
+                                   configuration.i2cAddress);
+#else
+  addDeviceI2CAddressSelectionItem(page, configuration.i2cAddress);
+#endif
+
+  /* Item: name of the sensor */
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
+                   configuration.name, "16");
+
+  /* Item: interval */
+  char _number[7];
+  sprintf(_number, "%d", configuration.interval);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "f", L_MEASURMENTS_INTERVAL,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "86400", "1",
+                   L_SECONDS);
+
+  /* Item: range */
+  sprintf(_number, "%d", configuration.range);
+  addSelectFormItemOpen(page, F("rg"), F(L_RANGE));
+  addSelectOptionFormItem(page, L_FS3000_RANGE_7, "0",
+                          configuration.range ==
+                              AFE_CONFIG_HARDWARE_FS3000_RANGE_7_MPS);
+  addSelectOptionFormItem(page, L_FS3000_RANGE_15, "1",
+                          configuration.range ==
+                              AFE_CONFIG_HARDWARE_FS3000_RANGE_15_MPS);
+  addSelectFormItemClose(page);
+
+  addInformationItem(page, F(L_FS3000_IDX_M3H));
+  
+  sprintf(_number, "%d", configuration.r);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "re", L_FS3000_R,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "100000", "1",
+                   L_MILIMETERS);
+
+
+
+  closeSection(page);
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  if (Firmware->Device->configuration.api.domoticz ||
+      Firmware->Device->configuration.api.mqtt) {
+    openSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0));
+    sprintf(_number, "%d", configuration.domoticz.raw.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d1", L_FS3000_IDX_RAW,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.meterPerSecond.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d2", L_FS3000_IDX_MS,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.milesPerHour.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d3", L_FS3000_IDX_MILH,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+    sprintf(_number, "%d", configuration.domoticz.meter3PerSecond.idx);
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d4", L_FS3000_IDX_M3H,
+                     _number, AFE_FORM_ITEM_SKIP_PROPERTY,
+                     AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
+                     AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
+
+    closeSection(page);
+  }
+#else
+  if (Firmware->Device->configuration.api.mqtt) {
+    openSection(page, F(L_TSL2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
+                     configuration.mqtt.topic, "64");
+    closeSection(page);
+  }
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+}
+#endif // AFE_CONFIG_HARDWARE_FS3000
 
 void AFESitesGenerator::addFileNotFound(String &page) {
   openSection(page, F(L_ATTENTION), F(""));

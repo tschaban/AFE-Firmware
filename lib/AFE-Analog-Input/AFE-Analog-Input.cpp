@@ -6,11 +6,13 @@
 
 AFEAnalogInput::AFEAnalogInput(){};
 #ifdef AFE_ESP32
-void AFEAnalogInput::begin(uint8_t id, AFEFirmware *_Firmware) {
-  _Firmware->API->Flash->getConfiguration(id, configuration);
+void AFEAnalogInput::begin(uint8_t id) {
+  AFEDataAccess Data;
+  Data.getConfiguration(id, configuration);
 #else  // ESP8266
-void AFEAnalogInput::begin(AFEFirmware *_Firmware) {
-  _Firmware->API->Flash->getConfiguration(configuration);
+void AFEAnalogInput::begin() {
+  AFEDataAccess Data;
+  Data.getConfiguration(configuration);
 #endif // AFE_ESP32
 
   _initialized = true;
@@ -63,10 +65,9 @@ void AFEAnalogInput::listener() {
         data->percent = (float)data->raw * 100 / 1024;
         data->voltage = (double)(configuration->maxVCC * data->raw / 1024);
         if (configuration->divider.Rb > 0) {
-          data->voltageCalculated =
-              (data->voltage *
-               (configuration->divider.Ra + configuration->divider.Rb)) /
-              configuration->divider.Rb;
+          data->voltageCalculated = (data->voltage * (configuration->divider.Ra +
+                                                    configuration->divider.Rb)) /
+                                   configuration->divider.Rb;
         } else {
           data->voltageCalculated = data->voltage;
         }
@@ -74,8 +75,7 @@ void AFEAnalogInput::listener() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
         if (data->voltageCalculated >= configuration->battery.maxVoltage) {
           batteryPercentage = 100;
-        } else if (data->voltageCalculated <=
-                   configuration->battery.minVoltage) {
+        } else if (data->voltageCalculated <= configuration->battery.minVoltage) {
           batteryPercentage = 0;
         } else if (configuration->battery.maxVoltage -
                        configuration->battery.minVoltage >
@@ -96,8 +96,7 @@ void AFEAnalogInput::listener() {
                << F(" - Analog value = ") << data->raw << endl
                << F(" - Percent = ") << data->percent << endl
                << F(" - Voltage = ") << data->voltage << endl
-               << F(" - VoltageCalculated = ") << data->voltageCalculated
-               << endl
+               << F(" - VoltageCalculated = ") << data->voltageCalculated << endl
                << F(" - Sampling time = ")
                << millis() - startTime - configuration->interval * 1000
                << F("msec.");

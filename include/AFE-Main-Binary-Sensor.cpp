@@ -4,29 +4,14 @@
 
 /* ---------Headers ---------*/
 
-void initializeBinarySensor(void);
 void binarySensorEventsListener(void);
 
 /* --------- Body -----------*/
 
-/* Initializing Binary Sensor */
-void initializeBinarySensor(void) {
-  for (uint8_t i = 0; i < Device->configuration.noOfBinarySensors; i++) {
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-   BinarySensor[i].addMCP23017Reference(MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23XXX
-    BinarySensor[i].begin(i, Data);
-  }
-#ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Binary sensors initialized");
-#endif
-}
-
 void binarySensorEventsListener(void) {
   /* Listens for sensor events */
-  for (uint8_t i = 0; i < Device->configuration.noOfBinarySensors; i++) {
-    if (BinarySensor[i].listener()) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfBinarySensors; i++) {
+    if (Hardware->BinarySensor[i]->listener()) {
       MqttAPI->publishBinarySensorState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       HttpDomoticzAPI->publishBinarySensorState(i);
@@ -35,10 +20,10 @@ void binarySensorEventsListener(void) {
 /* @TODO T5 
 #ifdef AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT
       // Changing the CLED Effect card detected, but not authorized yet 
-      if (Device->configuration.effectPN532) {
+      if (Firmware->Device->configuration.effectPN532) {
         if (CLEDStrip->_currentEffect ==
             AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT) {
-          if (BinarySensor[i].get()) {
+          if (Hardware->BinarySensor[i]->get()) {
             CLEDStrip->setCustomEffectColor(
                 AFE_CONFIG_HARDWARE_CLED_ACCESS_CONTROL_EFFECT_ID,
                 AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT,

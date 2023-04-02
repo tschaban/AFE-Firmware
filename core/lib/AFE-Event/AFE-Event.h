@@ -3,6 +3,7 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-API-HTTP-Domoticz.h>
@@ -21,13 +22,14 @@
 class AFEEvent {
 
 private:
-  AFEFirmware *Firmware;
+  AFEFirmware *_Firmware;
+  AFEHardware *_Hardware;
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  AFEAPIMQTTDomoticz *MqttAPI;
-  AFEAPIHTTPDomoticz *HttpDomoticzAPI;
+  AFEAPIMQTTDomoticz *_MqttAPI;
+  AFEAPIHTTPDomoticz *_HttpDomoticzAPI;
 #else
-  AFEAPIMQTTStandard *MqttAPI;
+  AFEAPIMQTTStandard *_MqttAPI;
 #endif
 
   void conenctedToNetwork(void);
@@ -45,12 +47,13 @@ public:
 
 public:
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  void begin(AFEFirmware *, AFEAPIMQTTDomoticz *, AFEAPIHTTPDomoticz *);
+  void begin(AFEFirmware *, AFEHardware *, AFEAPIMQTTDomoticz *,
+             AFEAPIHTTPDomoticz *);
 #else
-  void begin(AFEFirmware *, AFEAPIMQTTStandard *);
+  void begin(AFEFirmware *, AFEHardware *, AFEAPIMQTTStandard *);
 #endif
 
-  void begin(AFEFirmware *);
+  void begin(AFEFirmware *, AFEHardware *);
 
   void listener(void);
 };

@@ -80,13 +80,14 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: MQTT Configuration") << endl
-         << F("INFO: Host: ") << configuration->host << endl
-         << F("INFO: IP: ") << configuration->ip << endl
-         << F("INFO: Port: ") << configuration->port << endl
+         << F(" : Device ID: ") << _DeviceName << endl
+         << F(" : Host: ") << configuration->host << endl
+         << F(" : IP: ") << configuration->ip << endl
+         << F(" : Port: ") << configuration->port << endl
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-         << F("INFO: LWT IDX: ") << configuration->lwt.idx;
+         << F(" : LWT IDX: ") << configuration->lwt.idx;
 #else
-         << F("INFO: LWT Topic: ") << configuration->lwt.topic;
+         << F(" : LWT Topic: ") << configuration->lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif
   return _isConfigured;
@@ -125,7 +126,7 @@ boolean AFEAsyncMQTTClient::listener() {
   } else {
 #ifdef DEBUG
     Serial << endl << F("INFO: MQTT: Connecting to MQTT Broker");
-#endif    
+#endif
     _Broker->connect();
   }
 
@@ -239,7 +240,7 @@ void AFEAsyncMQTTClient::onMqttConnect(bool sessionPresent) {
 #endif
   AFEAsyncMQTTClient::isConnected = true;
   AFEAsyncMQTTClient::eventConnected = true;
-  AFEAsyncMQTTClient::eventDisconnected = false;  
+  AFEAsyncMQTTClient::eventDisconnected = false;
 }
 
 void AFEAsyncMQTTClient::onMqttDisconnect(
@@ -276,7 +277,7 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
       break;
     }
 #endif
-    AFEAsyncMQTTClient::isConnected = false;    
+    AFEAsyncMQTTClient::isConnected = false;
     AFEAsyncMQTTClient::eventConnected = false;
     AFEAsyncMQTTClient::eventDisconnected = true;
   }
@@ -377,13 +378,9 @@ void AFEAsyncMQTTClient::onMqttMessage(
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Domoticz command: ") << F(" : IDX: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer
-                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-                      .command.domoticz.idx
+           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.domoticz.idx
            << F(" : NValue: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer
-                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-                      .command.nvalue
+           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.nvalue
            << F(" : SValue: ")
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]

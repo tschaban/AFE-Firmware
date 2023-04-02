@@ -6,9 +6,15 @@
 
 AFESwitch::AFESwitch(){};
 
-void AFESwitch::begin(uint8_t id, AFEFirmware *_Firmware) {
-  Firmware = _Firmware;
-  Firmware->API->Flash->getConfiguration(id, configuration);
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data, AFELED *_LED) {
+  Led = _LED;
+  begin(id, _Data);
+}
+#endif // AFE_CONFIG_HARDWARE_LED
+
+void AFESwitch::begin(uint8_t id, AFEDataAccess *_Data) {
+  _Data->getConfiguration(id, configuration);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   // If MCP23017 available in the HW, checking if LED connected using MCP23017
@@ -158,14 +164,14 @@ void AFESwitch::listener() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
             if (time - startTime >= 35000) {
-              Firmware->Hardware->SystemLed->blink(50);
+              Led->blink(50);
               delay(50);
             }
 #endif
             if (time - startTime >= 30000 && !_pressed4thirteenSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 3; i++) {
-                Firmware->Hardware->SystemLed->blink(200);
+                Led->blink(200);
                 delay(200);
               }
 #endif
@@ -175,7 +181,7 @@ void AFESwitch::listener() {
             if (time - startTime >= 10000 && !_pressed4tenSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
               for (uint8_t i = 0; i < 2; i++) {
-                Firmware->Hardware->SystemLed->blink(200);
+                Led->blink(200);
                 delay(200);
               }
 #endif
@@ -184,7 +190,7 @@ void AFESwitch::listener() {
 
             if (time - startTime >= 5000 && !_pressed4fiveSeconds) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-              Firmware->Hardware->SystemLed->blink(200);
+              Led->blink(200);
 #endif
               _pressed4fiveSeconds = true;
             }

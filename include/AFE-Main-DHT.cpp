@@ -3,19 +3,10 @@
 
 /* ---------Headers ---------*/
 
-void initializeDHTSensor(void);
 void DHTSensorEventsListener(void);
 
 /* --------- Body -----------*/
 
-/* Initializing sensor */
-void initializeDHTSensor(void) {
-  if (Device->configuration.noOfDHTs > 0) {
-    for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
-      DHTSensor[i].begin(Data, i);
-    }
-  }
-}
 
 /* Main code for processing sesnor */
 void DHTSensorEventsListener(void) {
@@ -25,58 +16,58 @@ void DHTSensorEventsListener(void) {
   boolean relayStateChanged;
 #endif
 
-  for (uint8_t i = 0; i < Device->configuration.noOfDHTs; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
 
-    if (DHTSensor[i].listener()) {
+    if (Hardware->DHTSensor[i]->listener()) {
 
 /* Thermostat */
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
       relayStateChanged = false;
-      for (uint8_t j = 0; j < Device->configuration.noOfRegulators; j++) {
+      for (uint8_t j = 0; j < Firmware->Device->configuration.noOfRegulators; j++) {
         if (Regulator[j].configuration->sensorId == i) {
 
           float _value = 0;
 
           switch (Regulator[j].configuration->controllingParameter) {
           case AFE_FUNCTIONALITY_REGULATOR_CP_TEMPERATURE:
-            _value = DHTSensor[i].currentTemperature;
+            _value = Firmware->DHTSensor[i]->currentTemperature;
             break;
           case AFE_FUNCTIONALITY_REGULATOR_CP_HEAT_INDEX:
-            _value = DHTSensor[i].heatIndex(
-                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
-                DHTSensor[i].configuration->temperature.unit ==
+            _value = Firmware->DHTSensor[i]->heatIndex(
+                Hardware->DHTSensor[i]->currentTemperature, Hardware->DHTSensor[i]->currentHumidity,
+                Hardware->DHTSensor[i]->configuration->temperature.unit ==
                     AFE_TEMPERATURE_UNIT_FAHRENHEIT);
             break;
           case AFE_FUNCTIONALITY_REGULATOR_CP_HUMIDITY:
-            _value = DHTSensor[i].currentHumidity;
+            _value = Hardware->DHTSensor[i]->currentHumidity;
             break;
           case AFE_FUNCTIONALITY_REGULATOR_CP_ABSOLOUTE_HUMIDITY:
-            _value = DHTSensor[i].absoluteHumidity(
-                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
-                DHTSensor[i].configuration->temperature.unit ==
+            _value = Hardware->DHTSensor[i]->absoluteHumidity(
+                Hardware->DHTSensor[i]->currentTemperature, Hardware->DHTSensor[i]->currentHumidity,
+                Hardware->DHTSensor[i]->configuration->temperature.unit ==
                     AFE_TEMPERATURE_UNIT_FAHRENHEIT);
             break;
           case AFE_FUNCTIONALITY_REGULATOR_CP_DEW_POINT:
-            _value = DHTSensor[i].dewPoint(
-                DHTSensor[i].currentTemperature, DHTSensor[i].currentHumidity,
-                DHTSensor[i].configuration->temperature.unit ==
+            _value = Hardware->DHTSensor[i]->dewPoint(
+                Hardware->DHTSensor[i]->currentTemperature, Hardware->DHTSensor[i]->currentHumidity,
+                Hardware->DHTSensor[i]->configuration->temperature.unit ==
                     AFE_TEMPERATURE_UNIT_FAHRENHEIT);
             break;
           default:
-            _value = DHTSensor[i].currentTemperature;
+            _value = Hardware->DHTSensor[i]->currentTemperature;
             break;
           }
 
           if (Regulator[j].listener(_value)) {
             if (Regulator[j].deviceState &&
-                Relay[Regulator[j].configuration->relayId].get() ==
+                Hardware->Relay[Regulator[j].configuration->relayId]->get() ==
                     AFE_RELAY_OFF) {
-              Relay[Regulator[j].configuration->relayId].on();
+              Hardware->Relay[Regulator[j].configuration->relayId]->on();
               relayStateChanged = true;
             } else if (!Regulator[j].deviceState &&
-                       Relay[Regulator[j].configuration->relayId].get() ==
+                       Hardware->Relay[Regulator[j].configuration->relayId]->get() ==
                            AFE_RELAY_ON) {
-              Relay[Regulator[j].configuration->relayId].off();
+              Hardware->Relay[Regulator[j].configuration->relayId]->off();
               relayStateChanged = true;
             }
             if (relayStateChanged) {
@@ -94,14 +85,14 @@ void DHTSensorEventsListener(void) {
 
 /* Thermal protection */
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-      for (uint8_t j = 0; j < Device->configuration.noOfThermalProtectors; j++) {
+      for (uint8_t j = 0; j < Firmware->Device->configuration.noOfThermalProtectors; j++) {
         if (ThermalProtector[j].configuration->enabled) {
           if (ThermalProtector[j].configuration->sensorId == i) {
-            if (ThermalProtector[j].listener(DHTSensor[i].currentTemperature)) {
+            if (ThermalProtector[j].listener(Firmware->Hardware[i]->currentTemperature)) {
               if (ThermalProtector[j].turnOff &&
-                  Relay[ThermalProtector[j].configuration->relayId].get() ==
+                  Hardware->Relay[ThermalProtector[j].configuration->relayId]->get() ==
                       AFE_RELAY_ON) {
-                Relay[ThermalProtector[j].configuration->relayId].off();
+                Hardware->Relay[ThermalProtector[j].configuration->relayId]->off();
                 MqttAPI->publishRelayState(
                     ThermalProtector[j].configuration->relayId);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ

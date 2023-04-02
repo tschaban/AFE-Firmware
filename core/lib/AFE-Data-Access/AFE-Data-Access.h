@@ -287,5 +287,12 @@ public:
   void saveConfiguration(uint8_t id, MCP23XXX *);
   void createMCP23XXXConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  boolean getConfiguration(uint8_t id, FS3000_CONFIG *);
+  void saveConfiguration(uint8_t id, FS3000_CONFIG *);
+  void createFS3000SensorConfigurationFile();
+#endif
+
 };
 #endif // _AFE_Data_Access_h

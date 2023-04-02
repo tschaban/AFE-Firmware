@@ -6,9 +6,10 @@
 #include <AFE-Configuration.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-
-#include <AFE-API.h>
+#include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
 #include <ArduinoJson.h>
+#include <AFE-ASYNC-MQTT.h>
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -20,10 +21,15 @@
 #include <Streaming.h>
 #endif
 
-class AFEAPIMQTTDomoticz : public AFEAPI {
+class AFEAPIMQTTDomoticz {
 
 private:
+  AFEFirmware *_Firmware;
+  AFEHardware *_Hardware;
+  /* Is API enabled, set in begin() */
+  boolean enabled = false;
   /* Generates switch update JSON */
+
   void generateSwitchMessage(char *json, uint32_t idx, boolean relayState);
 
   /* Generates custome sensor JSON */
@@ -72,12 +78,10 @@ private:
 #endif
 
 public:
+  AFEAsyncMQTTClient *Mqtt = new AFEAsyncMQTTClient();
   /* Constructor: it sets all necessary parameters */
   AFEAPIMQTTDomoticz();
-  void begin(AFEDataAccess *, AFEDevice *);
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
-#endif
+  void begin(AFEFirmware *, AFEHardware *);
 
   /* Subscribe domoticz topic in MQTT Broker */
   void subscribe();
@@ -90,17 +94,14 @@ public:
   void listener();
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  virtual void addClass(AFERelay *);
   boolean publishRelayState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-  virtual void addClass(AFESwitch *);
   boolean publishSwitchState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-  virtual void addClass(AFEAnalogInput *);
 #ifdef AFE_ESP32
   void publishADCValues(uint8_t id);
 #else  // ESP32
@@ -117,83 +118,67 @@ public:
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  virtual void addClass(AFESensorBMEX80 *);
-  boolean publishBMx80SensorData(uint8_t id);
+  boolean publishBoschBMSensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  virtual void addClass(AFESensorHPMA115S0 *);
   boolean publishHPMA115S0SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-  virtual void addClass(AFESensorBH1750 *);
   boolean publishBH1750SensorData(uint8_t id);
 #endif //  AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-  virtual void addClass(AFESensorAS3935 *);
   boolean publishAS3935SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  virtual void addClass(AFEAnemometer *);
   void publishAnemometerSensorData();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  virtual void addClass(AFERainmeter *);
   void publishRainSensorData();
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  virtual void addClass(AFEGate *);
   boolean publishGateState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  virtual void addClass(AFEContactron *);
   boolean publishContactronState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-  virtual void addClass(AFESensorDS18B20 *);
   boolean publishDS18B20SensorData(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  virtual void addClass(AFERegulator *);
   boolean publishRegulatorState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  virtual void addClass(AFEThermalProtector *);
   boolean publishThermalProtectorState(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  virtual void addClass(AFESensorDHT *);
   boolean publishDHTSensorData(uint8_t id);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  virtual void addClass(AFESensorBinary *);
   boolean publishBinarySensorState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-  virtual void addClass(AFEMiFareCard *);
   boolean publishMiFareCardState(uint8_t id, uint8_t tagId, uint8_t state,
                                  const char *user);
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-  virtual void addClass(AFESensorTSL2561 *);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif //  AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  virtual void addClass(AFECLED *);
   boolean publishCLEDState(uint8_t id);
   boolean publishCLEDColorState(uint8_t id);
   boolean publishCLEDEffectsState(uint8_t id);

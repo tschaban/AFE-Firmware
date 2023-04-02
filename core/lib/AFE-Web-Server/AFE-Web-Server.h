@@ -253,6 +253,10 @@ private:
   void get(MCP23XXX &data);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void get(FS3000_CONFIG &data);
+#endif
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
   boolean upgradeOTAWAN(uint16_t firmwareId);

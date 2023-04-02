@@ -30,18 +30,9 @@ void initializeHTTPServer(void) {
   HTTPServer->handle("/", handleHTTPRequests);
   HTTPServer->handle("/favicon.ico", handleFavicon);
   HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
-                                   handleUpload);
+                                    handleUpload);
   HTTPServer->onNotFound(handleOnNotFound);
-#if !defined(AFE_CONFIG_HARDWARE_I2C)
-  HTTPServer->begin(FirmwarePro);
-#else 
-#ifdef AFE_ESP32
-  HTTPServer->begin(FirmwarePro, &WirePort0,
-                   &WirePort1);
-#else
-  HTTPServer->begin(FirmwarePro, &WirePort0);
-#endif // AFE_ESP32
-#endif
+  HTTPServer->begin(Firmware);
 
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: HTTP Server initialized");

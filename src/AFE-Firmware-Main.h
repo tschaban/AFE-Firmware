@@ -24,72 +24,32 @@
 
 #include <AFE-Configuration.h>
 
-
 /* Includes libraries for debugging in development compilation only */
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
 
-//#include <AFE-API-JSONRPC.h>
-//#include <AFE-Data-Access.h>
-//#include <AFE-Device.h>
 #include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
 #include <AFE-Upgrader.h>
 #include <AFE-Web-Server.h>
-//#include <AFE-WiFi.h>
 
-//AFEDataAccess *Data = new AFEDataAccess();
-AFEFirmware *FirmwarePro = new AFEFirmware();
-//AFEDevice *Device = new AFEDevice();
-//AFEWiFi *Network = new AFEWiFi();
+AFEFirmware *Firmware = new AFEFirmware();
 AFEWebServer *HTTPServer = new AFEWebServer();
-//AFEJSONRPC *RestAPI = new AFEJSONRPC();
+AFEHardware *Hardware = new AFEHardware(Firmware);
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Broker.h>
 AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker();
 #endif
 
-//#ifdef AFE_CONFIG_HARDWARE_LED
-//#include <AFE-LED.h>
-//AFELED *Led = new AFELED();
-//#endif
-
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-CLED.h>
 AFECLED *CLEDStrip = new AFECLED();
 #endif // AFE_CONFIG_HARDWARE_CLED
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#include <AFE-Relay.h>
-AFERelay Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_SWITCH
-#include <AFE-Switch.h>
-AFESwitch Switch[AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES];
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#include <AFE-Analog-Input.h>
-#ifdef AFE_ESP32
-AFEAnalogInput AnalogInput[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS];
-#else
-AFEAnalogInput AnalogInput;
-#endif // AFE_ESP32
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-#include <AFE-Gate.h>
-AFEGate Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
-GATES_CURRENT_STATE *GatesCurrentStates = new GATES_CURRENT_STATE;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#include <AFE-Contactron.h>
-AFEContactron Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-//byte lastPublishedContactronState[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-#endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #include <AFE-Regulator.h>
@@ -102,57 +62,7 @@ AFEThermalProtector
     ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-#include <AFE-Sensor-DS18B20.h>
-AFESensorDS18B20 DS18B20Sensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20];
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_DHT
-#include <AFE-Sensor-DHT.h>
-AFESensorDHT DHTSensor[AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-#include <AFE-Sensor-BH1750.h>
-AFESensorBH1750 BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-#include <AFE-Sensor-TSL2561.h>
-AFESensorTSL2561 TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-#include <AFE-Sensor-BMEX80.h>
-AFESensorBMEX80 BMEX80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#include <AFE-Sensor-Binary.h>
-AFESensorBinary BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-HPMA115S0.h>
-AFESensorHPMA115S0 HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
-#endif
-
-#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) ||                                 \
-    defined(AFE_CONFIG_HARDWARE_RAINMETER)
-#include <AFE-Impulse-Catcher.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-#include <AFE-Sensor-Anemometer.h>
-AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher();
-AFEAnemometer *AnemometerSensor = new AFEAnemometer();
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-#include <AFE-Sensor-Rainmeter.h>
-AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher();
-AFERainmeter *RainSensor = new AFERainmeter();
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
@@ -163,17 +73,11 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 
 #include <AFE-Main-APIs.cpp>
 
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <AFE-Main-I2C.cpp>
-#endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-Main-MCP23017.cpp>
 #endif
 
-//#ifdef AFE_CONFIG_HARDWARE_LED
-//#include <AFE-Main-LED.cpp>
-//#endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-Main-CLED.cpp>
@@ -242,6 +146,11 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #include <AFE-Main-Anemometer.cpp>
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+#include <AFE-Main-FS3000.cpp>
+#endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Main-PN532.cpp>

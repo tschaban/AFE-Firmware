@@ -15,7 +15,6 @@
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 #include <AFE-Firmware.h>
-
 #include <AFE-API-MQTT-Standard.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-Site-components.h>
@@ -38,8 +37,8 @@
 class AFEAPIHomeAssistantIntegration {
 
 private:
-  AFEFirmware *Firmware;
-  AFEAPIMQTTStandard *MqttAPI;
+  AFEFirmware *_Firmware;
+  AFEAPIMQTTStandard *_MqttAPI;
 
   HOME_ASSISTANT_CONFIG *configuration = new HOME_ASSISTANT_CONFIG;
 

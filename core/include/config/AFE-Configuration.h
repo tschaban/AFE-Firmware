@@ -388,6 +388,14 @@
 #endif
 
 /**
+ * @brief include FS3000 sensor configuration parameters
+ * 
+ */
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+#include <sensors/AFE-FS3000.h>
+#endif
+
+/**
  * @brief common configuration parameters for sensors
  * 
  */

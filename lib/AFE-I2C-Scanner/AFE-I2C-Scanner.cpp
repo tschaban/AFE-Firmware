@@ -117,21 +117,21 @@ const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
     //return F("MCP23017,MCP23008,PCF8574,LCD16x2,DigoleDisplay");
     return F("MCP23017");
   else if (deviceAddress == 0x28)
-    return F("BNO055,EM7180,CAP1188");
+    return F("FS3000");
   else if (deviceAddress == 0x29)
-    return F("TSL2561,VL6180,TSL2561,TSL2591,BNO055,CAP1188");
+    return F("TSL25xx,VL6180,BNO055,CAP1188");
   else if (deviceAddress == 0x2A)
     return F("SGTL5000,CAP1188");
   else if (deviceAddress == 0x2B)
     return F("CAP1188");
   else if (deviceAddress == 0x2C)
-    return F("MCP44XX ePot");
+    return F("MCP44XX");
   else if (deviceAddress == 0x2D)
-    return F("MCP44XX ePot");
+    return F("MCP44XX");
   else if (deviceAddress == 0x2E)
-    return F("MCP44XX ePot");
+    return F("MCP44XX");
   else if (deviceAddress == 0x2F)
-    return F("MCP44XX ePot");
+    return F("MCP44XX");
   else if (deviceAddress == 0x38)
     return F("RA8875,FT6206");
   else if (deviceAddress == 0x39)

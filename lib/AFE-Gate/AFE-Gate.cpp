@@ -5,29 +5,28 @@
 
 AFEGate::AFEGate(){};
 
-void AFEGate::begin(uint8_t id, AFEFirmware *_Firmware) {
+void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Initializing the Gate: ") << id;
 #endif
 
-  Firmware = _Firmware;
-  gateId = id;
+  Device = _Device;
+  Data = _Data;
 
-  Firmware->API->Flash->getConfiguration(gateId, configuration);
+  gateId = id;
+  Data->getConfiguration(gateId,configuration);
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Initializing the gate's relay: ")
-         << configuration->relayId;
+         << F("INFO: Initializing the gate's relay: ") << configuration->relayId;
 #endif
   if (configuration->relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    GateRelay->begin(Firmware, configuration->relayId);
+    GateRelay->begin(Data,configuration->relayId);
     GateRelay->setTimerUnitToSeconds(false);
     GateRelay->gateId = id;
   }
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Initializing the gate's ") << gateId << F(", contactrons");
+  Serial << endl << F("INFO: Initializing the gate's ") << id << F(", contactrons");
 #endif
 
   /* How many contactrons monitors the gate. Default 0 set in class init
@@ -46,8 +45,9 @@ void AFEGate::begin(uint8_t id, AFEFirmware *_Firmware) {
 #endif
 
   for (uint8_t i = 0; i < numberOfContractons; i++) {
-    Contactron[i].begin(configuration->contactron.id[i], Firmware);
+    Contactron[i].begin(configuration->contactron.id[i], _Device, _Data);
   }
+
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Gate Initialization completed");
@@ -61,7 +61,7 @@ void AFEGate::toggle() {
   GateRelay->on();
   // Setting Gate state manually is possible only if there is no contactrons
   if (numberOfContractons == 0) {
-    Firmware->API->Flash->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN
+    Data->saveGateState(gateId, get() == AFE_GATE_CLOSED ? AFE_GATE_OPEN
                                                          : AFE_GATE_CLOSED);
     _event = true;
   }
@@ -98,7 +98,7 @@ uint8_t AFEGate::getGateStateBasedOnContractons() {
 uint8_t AFEGate::get() {
   if (numberOfContractons ==
       0) { // If there is not contactorns then get gate state from EEPROM
-    return Firmware->API->Flash->getGateState(gateId);
+    return Data->getGateState(gateId);
   } else { // Get gate state based on contactrons
     return getGateStateBasedOnContractons();
   }

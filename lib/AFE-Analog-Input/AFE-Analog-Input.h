@@ -6,7 +6,8 @@
 #include <AFE-Configuration.h>
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#include <AFE-Firmware.h>
+
+#include <AFE-Data-Access.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -34,9 +35,9 @@ public:
 
 /* Initialized analog input using configuration parameters */
 #ifdef AFE_ESP32
-  void begin(uint8_t id, AFEFirmware *_Firmware);
+  void begin(uint8_t id);
 #else  // ESP8266
-  void begin(AFEFirmware *_Firmware);
+  void begin();
 #endif // AFE_ESP32
 
   /* Returns values from Analog Input */

@@ -72,6 +72,7 @@
 #define L_PASSWORD "Hasło"
 #define L_SECONDS "sekundy"
 #define L_MILISECONDS "milisekundy"
+#define L_MILIMETERS "milimetrów"
 #define L_IP_ADDRESS "Adres IP"
 #define L_NONE "Brak"
 #define L_NAME "Nazwa"
@@ -138,6 +139,7 @@
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Ilość czujników TSL2561"
 #define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
 #define L_DEVICE_NUMBER_OF_MCP23XXX "Ilość rozszerzeń MCP23xxx"
+#define L_DEVICE_NUMBER_OF_FS3000_SENSORS "Ilość czujników FS3000"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -441,6 +443,19 @@
 #define L_TSL2561_GAIN_BROADBAND "IDX Światło widzialne"
 #define L_TSL2561_GAIN_IR "IDX Podczerwień"
 #define L_ILUMINANCE "Natężenie światła"
+
+/* FS3000 */
+#define L_FS3000_SENSOR "Czujnik FS3000"
+#define L_FS3000_SENSORS "Czujniki FS3000"
+#define L_FS3000_MQTT_TOPIC "Temat MQTT czujnika FS3000"
+#define L_FS3000_RANGE_7 "0-7 m/s"
+#define L_FS3000_RANGE_15 "0-15 m/s"
+#define L_FS3000_IDX_RAW "IDX Dane surowe"
+#define L_FS3000_IDX_MS "IDX m/s"
+#define L_FS3000_IDX_MILH "IDX mil/h"
+#define L_FS3000_IDX_M3H "IDX m3/h"
+#define L_FS3000_R "Promień"
+#define L_FS3000_IDX_M3H "Promień otworu do przeliczania przepływu w m3/h. Jeśli 0 to przepływ powietrza nie będzie przeliczany"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"

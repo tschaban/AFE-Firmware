@@ -4,26 +4,11 @@
 
 /* ---------Headers ---------*/
 
-void initializeSwitch(void);
 void processSwitchEvents(void);
 void switchEventsListener(void);
 
 /* --------- Body -----------*/
 
-/* Initializing Switches */
-void initializeSwitch(void) {
-  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
-
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-    Switch[i].addMCP23017Reference(MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23XXX
-
-    Switch[i].begin(i, FirmwarePro);
-  }
-#ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Switch(es) initialized");
-#endif
-}
 
 /**
  * @brief Method processes Switch related events
@@ -31,27 +16,27 @@ void initializeSwitch(void) {
  */
 void processSwitchEvents(void) {
 
-  if (FirmwarePro->Device->getMode() == AFE_MODE_NORMAL) {
-    for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
+  if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+    for (uint8_t i = 0; i < Firmware->Device->configuration.noOfSwitches; i++) {
       /**
        * @brief One of the switches has been shortly pressed and there is
        * assigned functionaity to it
        *
        */
 
-      if (Switch[i].isPressed() &&
-          Switch[i].configuration->functionality !=
+      if (Hardware->Switch[i]->isPressed() &&
+          Hardware->Switch[i]->configuration->functionality !=
               AFE_SWITCH_FUNCTIONALITY_NONE) {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-        if (Switch[i].configuration->relayID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-            Switch[i].configuration->relayID + 1 <=
-                FirmwarePro->Device->configuration.noOfRelays) {
+        if (Hardware->Switch[i]->configuration->relayID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+            Hardware->Switch[i]->configuration->relayID + 1 <=
+                Firmware->Device->configuration.noOfRelays) {
 
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: Switch pressed with assigned Relay: ")
-                 << Switch[i].configuration->relayID;
+                 << Hardware->Switch[i]->configuration->relayID;
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -61,27 +46,27 @@ void processSwitchEvents(void) {
            * Gate
            *
            */
-          if (Relay[Switch[i].configuration->relayID].gateId !=
+          if (Hardware->Relay[Hardware->Switch[i]->configuration->relayID]->gateId !=
               AFE_HARDWARE_ITEM_NOT_EXIST) {
-            if (Relay[Switch[i].configuration->relayID].gateId <=
-                FirmwarePro->Device->configuration.noOfGates) {
+            if (Hardware->Relay[Hardware->Switch[i]->configuration->relayID]->gateId <=
+                Firmware->Device->configuration.noOfGates) {
 
 #ifdef DEBUG
               Serial << endl
                      << F("INFO: Relay is assigned to a gate: ")
-                     << Relay[Switch[i].configuration->relayID].gateId;
+                     << Hardware->Relay[Hardware->Switch[i]->configuration->relayID]->gateId;
 #endif
-              Gate[Relay[Switch[i].configuration->relayID].gateId].toggle();
+              Hardware->Gate[Hardware->Relay[Hardware->Switch[i]->configuration->relayID]->gateId]->toggle();
             }
           } else {
 #endif
 
-            Relay[Switch[i].configuration->relayID].toggle();
-            MqttAPI->publishRelayState(Switch[i].configuration->relayID);
+            Hardware->Relay[Hardware->Switch[i]->configuration->relayID]->toggle();
+            MqttAPI->publishRelayState(Hardware->Switch[i]->configuration->relayID);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
             HttpDomoticzAPI->publishRelayState(
-                Switch[i].configuration->relayID);
+                Hardware->Switch[i]->configuration->relayID);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -101,25 +86,25 @@ void processSwitchEvents(void) {
          * @brief Processing switch short press assigned to RGB LED
          *
          */
-        if (Switch[i].configuration->rgbLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
-            Switch[i].configuration->rgbLedID + 1 <=
+        if (Hardware->Switch[i]->configuration->rgbLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
+            Hardware->Switch[i]->configuration->rgbLedID + 1 <=
                 Device->configuration.noOfCLEDs) {
 
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: Switch pressed with assigned RGB LED: ")
-                 << Switch[i].configuration->rgbLedID;
+                 << Hardware->Switch[i]->configuration->rgbLedID;
 #endif
 
-          CLEDStrip->toggle(Switch[i].configuration->rgbLedID, true);
-          MqttAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
+          CLEDStrip->toggle(Hardware->Switch[i]->configuration->rgbLedID, true);
+          MqttAPI->publishCLEDState(Hardware->Switch[i]->configuration->rgbLedID);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 /**
  * @brief HTTP API for Domoticz is nos supported in T7 version for RGB LED
  *
 
-HttpDomoticzAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
+HttpDomoticzAPI->publishCLEDState(Hardware->Switch[i]->configuration->rgbLedID);
    */
 #endif
         }
@@ -128,7 +113,7 @@ HttpDomoticzAPI->publishCLEDState(Switch[i].configuration->rgbLedID);
 
       } // Switch is pressed
 
-      if (Switch[i].isPressed(true)) {
+      if (Hardware->Switch[i]->isPressed(true)) {
         MqttAPI->publishSwitchState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         HttpDomoticzAPI->publishSwitchState(i);
@@ -144,26 +129,26 @@ void switchEventsListener(void) {
    * @brief Listens for switch events
    *
    */
-  for (uint8_t i = 0; i < FirmwarePro->Device->configuration.noOfSwitches; i++) {
-    Switch[i].listener();
 
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfSwitches; i++) {
+    Hardware->Switch[i]->listener();
     /**
      * @brief One of the Multifunction switches pressed for 10 seconds
      *
      */
-    if (Switch[i].configuration->functionality ==
+    if (Hardware->Switch[i]->configuration->functionality ==
         AFE_SWITCH_FUNCTIONALITY_MULTI) {
-      if (Switch[i].is10s()) {
-        FirmwarePro->Device->getMode() == AFE_MODE_NORMAL
-            ? FirmwarePro->Device->reboot(AFE_MODE_ACCESS_POINT)
-            : FirmwarePro->Device->reboot(AFE_MODE_NORMAL);
-      } else if (Switch[i].is5s()) {
-        FirmwarePro->Device->getMode() == AFE_MODE_NORMAL
-            ? FirmwarePro->Device->reboot(AFE_MODE_CONFIGURATION)
-            : FirmwarePro->Device->reboot(AFE_MODE_NORMAL);
-      } else if (Switch[i].is30s()) {
-        FirmwarePro->Device->setDevice();
-        FirmwarePro->Device->reboot(AFE_MODE_ACCESS_POINT);
+      if (Hardware->Switch[i]->is10s()) {
+        Firmware->Device->getMode() == AFE_MODE_NORMAL
+            ? Firmware->Device->reboot(AFE_MODE_ACCESS_POINT)
+            : Firmware->Device->reboot(AFE_MODE_NORMAL);
+      } else if (Hardware->Switch[i]->is5s()) {
+        Firmware->Device->getMode() == AFE_MODE_NORMAL
+            ? Firmware->Device->reboot(AFE_MODE_CONFIGURATION)
+            : Firmware->Device->reboot(AFE_MODE_NORMAL);
+      } else if (Hardware->Switch[i]->is30s()) {
+        Firmware->Device->setDevice();
+        Firmware->Device->reboot(AFE_MODE_ACCESS_POINT);
       }
     }
   }

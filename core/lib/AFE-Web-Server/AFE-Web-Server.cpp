@@ -259,6 +259,11 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteMCP23XXX(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  case AFE_CONFIG_SITE_FS3000:
+    Site.siteFS3000(page, siteConfig->deviceID);
+    break;
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
   }
 
   if (siteConfig->form) {
@@ -612,6 +617,15 @@ boolean AFEWebServer::generate(boolean upload) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
         else if (siteConfig.ID == AFE_CONFIG_SITE_MCP23XXX) {
           MCP23XXX configuration;
+          get(configuration);
+          Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
+                                                  &configuration);
+          configuration = {0};
+        }
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+        else if (siteConfig.ID == AFE_CONFIG_SITE_FS3000) {
+          FS3000_CONFIG configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
@@ -1373,6 +1387,11 @@ void AFEWebServer::get(DEVICE &data) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   data.noOfMCP23xxx =
       server.arg(F("e")).length() > 0 ? server.arg(F("e")).toInt() : 0;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  data.noOfFS3000s =
+      server.arg(F("f3")).length() > 0 ? server.arg(F("f3")).toInt() : 0;
 #endif
 
   data.timeToAutoLogOff =
@@ -3060,6 +3079,64 @@ void AFEWebServer::get(MCP23XXX &data) {
 
   data.address = server.arg(F("a")).length() > 0 ? server.arg(F("a")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
+
+  if (server.arg(F("n")).length() > 0) {
+    server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
+  } else {
+    data.name[0] = AFE_EMPTY_STRING;
+  }
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+void AFEWebServer::get(FS3000_CONFIG &data) {
+
+#if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
+  data.wirePortId = server.arg(F("wr")).length() > 0
+                        ? server.arg(F("wr")).toInt()
+                        : AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+  data.i2cAddress =
+      server.arg(F("a")).length() > 0 ? server.arg(F("a")).toInt() : 0;
+
+  data.interval = server.arg(F("f")).length() > 0
+                      ? server.arg(F("f")).toInt()
+                      : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_INTERVAL;
+
+  data.range = server.arg(F("rg")).length() > 0
+                   ? server.arg(F("rg")).toInt()
+                   : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_RANGE;
+
+  data.r = server.arg(F("re")).length() > 0
+                   ? server.arg(F("re")).toInt()
+                   : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_R;
+
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  data.domoticz.raw.idx = server.arg(F("d1")).length() > 0
+                              ? server.arg(F("d1")).toInt()
+                              : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.meterPerSecond.idx = server.arg(F("d2")).length() > 0
+                                         ? server.arg(F("d2")).toInt()
+                                         : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.milesPerHour.idx = server.arg(F("d3")).length() > 0
+                                       ? server.arg(F("d3")).toInt()
+                                       : AFE_DOMOTICZ_DEFAULT_IDX;
+
+  data.domoticz.meter3PerSecond.idx = server.arg(F("d4")).length() > 0
+                                          ? server.arg(F("d4")).toInt()
+                                          : AFE_DOMOTICZ_DEFAULT_IDX;
+
+#else
+  if (server.arg(F("t")).length() > 0) {
+    server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
+  } else {
+    data.mqtt.topic[0] = AFE_EMPTY_STRING;
+  }
+#endif
 
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));

@@ -324,6 +324,9 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
          << F("INFO: Opening file: ") << F(AFE_FILE_DEVICE_CONFIGURATION)
          << F(" ... ");
 #endif
+
+  JsonVariant exists;
+
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #else
@@ -344,6 +347,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
+
       sprintf(configuration->name, root["name"]);
       configuration->timeToAutoLogOff =
           root["timeToAutoLogOff"] | AFE_AUTOLOGOFF_DEFAULT_TIME;
@@ -351,7 +355,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->api.mqtt = root["api"]["mqtt"];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
-      JsonVariant exists = root["api"]["domoticz"];
+      exists = root["api"]["domoticz"];
       configuration->api.domoticz =
           exists.success() ? root["api"]["domoticz"] : false;
 
@@ -485,6 +489,14 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       configuration->noOfMCP23xxx =
           root["noOfMCP23xxx"] | AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+      exists = root["noOfFS3000s"];
+      configuration->noOfFS3000s =
+          exists.success()
+              ? root["noOfFS3000s"]
+              : 1; // AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000 @TODO 3.6.0
 #endif
 
 #ifdef DEBUG
@@ -629,6 +641,10 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     root["noOfMCP23xxx"] = configuration->noOfMCP23xxx;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+    root["noOfFS3000s"] = configuration->noOfFS3000s;
 #endif
 
     root.printTo(configFile);
@@ -794,6 +810,10 @@ void AFEDataAccess::createDeviceConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   configuration.noOfMCP23xxx = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MCP23XXX;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  configuration.noOfFS3000s = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000;
 #endif
 
   saveConfiguration(&configuration);
@@ -1307,9 +1327,9 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
       } else {
         char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
         getDeviceID(_deviceId);
-        sprintf(configuration->status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC, _deviceId);
+        sprintf(configuration->status.topic,
+                AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC, _deviceId);
       }
-
 
 #endif
 
@@ -1413,7 +1433,8 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   configuration.lwt.topic[0] = AFE_EMPTY_STRING;
   char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
   getDeviceID(_deviceId);
-  sprintf(configuration.status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC, _deviceId);
+  sprintf(configuration.status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC,
+          _deviceId);
 #endif
 
   configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
@@ -7041,6 +7062,179 @@ void AFEDataAccess::createMCP23XXXConfigurationFile() {
   }
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+boolean AFEDataAccess::getConfiguration(uint8_t id,
+                                        FS3000_CONFIG *configuration) {
+  boolean _ret = true;
+  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_FS3000_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "r");
+#else
+  File configFile = SPIFFS.open(fileName, "r");
+#endif
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: JSON: ");
+#endif
+
+    size_t size = configFile.size();
+    std::unique_ptr<char[]> buf(new char[size]);
+    configFile.readBytes(buf.get(), size);
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FS3000> jsonBuffer;
+    JsonObject &root = jsonBuffer.parseObject(buf.get());
+
+    if (root.success()) {
+#ifdef DEBUG
+      root.printTo(Serial);
+#endif
+
+      sprintf(configuration->name, root["n"] | "");
+      configuration->range =
+          root["rg"] | AFE_CONFIG_HARDWARE_FS3000_DEFAULT_RANGE;
+      configuration->r = root["r"] | AFE_CONFIG_HARDWARE_FS3000_DEFAULT_R;
+
+      configuration->interval =
+          root["i"] | AFE_CONFIG_HARDWARE_FS3000_DEFAULT_INTERVAL;
+
+#ifdef AFE_ESP32
+      configuration->wirePortId = root["w"] | AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+      configuration->i2cAddress =
+          root["a"] | AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+      configuration->domoticz.raw.idx =
+          root["d"]["1"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.meterPerSecond.idx =
+          root["d"]["2"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.milesPerHour.idx =
+          root["d"]["3"] | AFE_DOMOTICZ_DEFAULT_IDX;
+      configuration->domoticz.meter3PerSecond.idx =
+          root["d"]["4"] | AFE_DOMOTICZ_DEFAULT_IDX;
+
+#else
+      sprintf(configuration->mqtt.topic, root["t"] | "");
+#endif
+
+#ifdef DEBUG
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FS3000, jsonBuffer.size());
+#endif
+    } else {
+      _ret = false;
+#ifdef DEBUG
+      Serial << F("ERROR: JSON not pharsed");
+#endif
+    }
+    configFile.close();
+  } else {
+    _ret = false;
+#ifdef DEBUG
+    Serial << endl
+           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#endif
+  }
+
+  return _ret;
+}
+void AFEDataAccess::saveConfiguration(uint8_t id,
+                                      FS3000_CONFIG *configuration) {
+  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)];
+  sprintf(fileName, AFE_FILE_FS3000_CONFIGURATION, id);
+
+#ifdef DEBUG
+  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File configFile = LITTLEFS.open(fileName, "w");
+#else
+  File configFile = SPIFFS.open(fileName, "w");
+#endif
+
+  if (configFile) {
+#ifdef DEBUG
+    Serial << F("success") << endl << F("INFO: Writing JSON: ");
+#endif
+
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FS3000> jsonBuffer;
+    JsonObject &root = jsonBuffer.createObject();
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+    JsonObject &domoticz = root.createNestedObject("d");
+#endif
+
+    root["n"] = configuration->name;
+    root["rg"] = configuration->range;
+    root["r"] = configuration->r;
+    root["i"] = configuration->interval;
+
+#ifdef AFE_ESP32
+    root["w"] = configuration->wirePortId;
+#endif
+
+    root["a"] = configuration->i2cAddress;
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+    domoticz["1"] = configuration->domoticz.raw.idx;
+    domoticz["2"] = configuration->domoticz.meterPerSecond.idx;
+    domoticz["3"] = configuration->domoticz.milesPerHour.idx;
+    domoticz["4"] = configuration->domoticz.meter3PerSecond.idx;
+#else
+    root["t"] = configuration->mqtt.topic;
+#endif
+
+    root.printTo(configFile);
+#ifdef DEBUG
+    root.printTo(Serial);
+#endif
+    configFile.close();
+
+#ifdef DEBUG
+    printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FS3000, jsonBuffer.size());
+#endif
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: failed to open file for writing");
+  }
+#endif
+}
+void AFEDataAccess::createFS3000SensorConfigurationFile() {
+  FS3000_CONFIG configuration;
+  configuration.interval = AFE_CONFIG_HARDWARE_FS3000_DEFAULT_INTERVAL;
+  configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
+  configuration.range = AFE_CONFIG_HARDWARE_FS3000_DEFAULT_RANGE;
+  configuration.r = AFE_CONFIG_HARDWARE_FS3000_DEFAULT_R;
+
+#ifdef AFE_ESP32
+  configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
+#endif
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+  configuration.domoticz.raw.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.meterPerSecond.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.milesPerHour.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.meter3PerSecond.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+#else
+  configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
+#endif
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Creating file: cfg-fs3000-") << i << F(".json");
+#endif
+
+    sprintf(configuration.name, "FS3000-%d", i + 1);
+    saveConfiguration(i, &configuration);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_FS3000
 
 unsigned long AFEDataAccess::getRebootCounter(boolean increase) {
   unsigned long _ret = 1;

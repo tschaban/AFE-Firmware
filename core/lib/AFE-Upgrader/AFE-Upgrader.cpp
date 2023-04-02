@@ -2,16 +2,14 @@
 
 #include "AFE-Upgrader.h"
 
-AFEUpgrader::AFEUpgrader(AFEFirmware *_Firmware) {
-  Firmware = _Firmware;  
-}
+AFEUpgrader::AFEUpgrader(AFEFirmware *_Firmware) { Firmware = _Firmware; }
 
-/* It returns true if firmware has been upgraded */
-boolean AFEUpgrader::upgraded() {
+void AFEUpgrader::upgraded() {
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Firmware version (stored) T") << Firmware->Configuration->Version->type
-         << F("-") << Firmware->Configuration->Version->installed_version << F("-");
+         << F("INFO: UPGRADE: Current firmware version: T")
+         << Firmware->Configuration->Version->type << F("-")
+         << Firmware->Configuration->Version->installed_version << F("-");
 
   switch (Firmware->Configuration->Version->api) {
   case AFE_FIRMWARE_API_STANDARD:
@@ -30,7 +28,8 @@ boolean AFEUpgrader::upgraded() {
 
 #endif
 
-  if (strcmp(Firmware->Configuration->Version->installed_version, AFE_FIRMWARE_VERSION) == 0 &&
+  if (strcmp(Firmware->Configuration->Version->installed_version,
+             AFE_FIRMWARE_VERSION) == 0 &&
       Firmware->Configuration->Version->type == AFE_FIRMWARE_TYPE &&
       Firmware->Configuration->Version->api ==
 #if defined(AFE_CONFIG_API_DOMOTICZ_ENABLED)
@@ -42,53 +41,50 @@ boolean AFEUpgrader::upgraded() {
 #endif
       ) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: FIRMWARE: up2date");
+    Serial << endl << F("INFO: UPGRADE: up2date");
 #endif
-    return false;
   } else {
 #ifdef DEBUG
-    Serial << endl << F("WARN: FIRMWARE: Up2date. Upgrading...");
+    Serial << endl << F("WARN: UPGRADE: Up2date. Upgrading...");
 #endif
-    return true;
-  }
-}
 
-/* It kicks-off firmware upgrade */
-void AFEUpgrader::upgrade() {
-  /* Upgraded version from one T to other T */
-  if (Firmware->Configuration->Version->type != AFE_FIRMWARE_TYPE) {
+    /* Upgraded version from one T to other T */
+    if (Firmware->Configuration->Version->type != AFE_FIRMWARE_TYPE) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Upgrading Firmware type");
+      Serial << endl << F("INFO: UPGRADE: Upgrading Firmware type");
 #endif
-    upgradeFirmwarType();
-    Firmware->Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
-    /* Upgrade from one version to other within the same T */
-  } else if (strcmp(Firmware->Configuration->Version->installed_version, AFE_FIRMWARE_VERSION) != 0) {
+      upgradeFirmwarType();
+
+      /* Upgrade from one version to other within the same T */
+    } else if (strcmp(Firmware->Configuration->Version->installed_version,
+                      AFE_FIRMWARE_VERSION) != 0) {
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: UPGRADE: Upgrading Firmware T") << AFE_FIRMWARE_TYPE
+             << F(" from version: ")
+             << Firmware->Configuration->Version->installed_version << F(" to ")
+             << AFE_FIRMWARE_VERSION;
+#endif
+      updateFirmwareVersion();
+    }
+
+    /* Checking if in addition there has been API version change */
+    if (Firmware->Configuration->Version->api != AFE_FIRMWARE_API) {
+#ifdef DEBUG
+      Serial << endl
+             << F("INFO: UPGRADE: Firmware API version upgraded")
+             << F(" from version: ") << Firmware->Configuration->Version->api
+             << F(" to ") << AFE_FIRMWARE_API;
+#endif
+      updateFirmwareAPIVersion();
+    }
+
 #ifdef DEBUG
     Serial << endl
-           << F("INFO: Upgrading Firmware T") << AFE_FIRMWARE_TYPE
-           << F(" from version: ") << Firmware->Configuration->Version->installed_version << F(" to ")
-           << AFE_FIRMWARE_VERSION;
+           << F("INFO UPGRADE: Upgrade to version ") << AFE_FIRMWARE_VERSION
+           << F(" completed");
 #endif
-    updateFirmwareVersion();
-    Firmware->Device->upgraded = AFE_UPGRADE_VERSION;
   }
-
-  /* Checking if in addition there has been API version change */
-  if (Firmware->Configuration->Version->api != AFE_FIRMWARE_API) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: Firmware API version upgraded") << F(" from version: ")
-           << Firmware->Configuration->Version->api << F(" to ") << AFE_FIRMWARE_API;
-#endif
-    updateFirmwareAPIVersion();
-  }
-
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO Upgrade to version ") << AFE_FIRMWARE_VERSION
-         << F(" completed");
-#endif
 }
 
 void AFEUpgrader::upgradeFirmwarType() {
@@ -103,12 +99,12 @@ void AFEUpgrader::upgradeFirmwarType() {
 
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: upgrading firmware type.") << endl
+         << F("INFO: UPGRADE: Upgrading firmware type.") << endl
          << F("INFO: UPGRADE: Reading core configuration");
 #endif
 
   /* Reading current data */
-  
+
   Firmware->API->Flash->getConfiguration(&networkConfiguration);
   Firmware->API->Flash->getConfiguration(&mqttConfiguration);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -123,8 +119,10 @@ void AFEUpgrader::upgradeFirmwarType() {
 #endif
 
   /* Setting the device from scratch */
-  AFEDefaults Defaults;
-  Defaults.set();
+  AFEDefaults *Defaults = new AFEDefaults();
+  Defaults->set();
+  delete Defaults;
+  Defaults = NULL;
 
 #ifdef DEBUG
   Serial << endl << F("INFO: UPGRADE: Restoring core configuration");
@@ -139,6 +137,10 @@ void AFEUpgrader::upgradeFirmwarType() {
   Firmware->API->Flash->saveConfiguration(&proConfiguration);
   Firmware->API->Flash->saveConfiguration(&passwordConiguration);
   Firmware->API->Flash->saveDeviceMode(deviceState);
+
+  /* Used to show up message in the firmware HTTP site*/
+  Firmware->Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
+  Firmware->API->Flash->getConfiguration(Firmware->Configuration->Version);
 }
 
 void AFEUpgrader::updateFirmwareVersion() {
@@ -147,33 +149,47 @@ void AFEUpgrader::updateFirmwareVersion() {
 
 /* Upgrade to version T0-2.0.3 */
 #ifdef T0_CONFIG
-  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.0.2") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.2") ==
+          0) {
     upgradeToT0V210();
   }
 #endif // T0_CONFIG
 
 #ifdef T5_CONFIG
-  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0.B1") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0.B1") ==
+          0) {
     upgradeToT5V220();
   }
 #endif // T5_CONFIG
 
 #ifdef T6_CONFIG
-  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.1.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.2.1") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.2.2") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.1.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.1") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.2.2") ==
+          0) {
     upgradeToT6V230();
   }
 
-  if (strcmp(Firmware->Configuration->Version->installed_version, "2.3.0") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1") == 0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1.E1") == 0) {
+  if (strcmp(Firmware->Configuration->Version->installed_version, "2.3.0") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1") ==
+          0 ||
+      strcmp(Firmware->Configuration->Version->installed_version, "2.3.1.E1") ==
+          0) {
     upgradeToT6V250();
   }
 
@@ -182,6 +198,8 @@ void AFEUpgrader::updateFirmwareVersion() {
 #endif // !ESP32
 
   Firmware->API->Flash->saveFirmwareVersion(AFE_FIRMWARE_VERSION);
+  Firmware->Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
+  Firmware->API->Flash->getConfiguration(Firmware->Configuration->Version);
 }
 
 void AFEUpgrader::updateFirmwareAPIVersion() {
@@ -194,6 +212,8 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 #endif
 
   Firmware->API->Flash->saveFirmwareAPIVersion();
+  Firmware->Device->upgraded = AFE_UPGRADE_VERSION_TYPE;
+  Firmware->API->Flash->getConfiguration(Firmware->Configuration->Version);
 }
 
 #ifndef AFE_ESP32
@@ -204,7 +224,8 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 void AFEUpgrader::upgradeToT0V210() {
 
   DEVICE newDevice;
-  DEVICE_T0_200 oldDevice = Firmware->API->Flash->getDeviceT0v200Configuration();
+  DEVICE_T0_200 oldDevice =
+      Firmware->API->Flash->getDeviceT0v200Configuration();
   uint8_t counter = 0;
 
   // Copy data from old structure to new structure

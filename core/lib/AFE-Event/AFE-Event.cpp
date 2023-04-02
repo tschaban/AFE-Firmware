@@ -3,88 +3,93 @@
 AFEEvent::AFEEvent() {}
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-void AFEEvent::begin(AFEFirmware *_Firmware, AFEAPIMQTTDomoticz *_MqttAPI,
-                     AFEAPIHTTPDomoticz *_HttpDomoticzAPI) {
-  MqttAPI = _MqttAPI;
-  HttpDomoticzAPI = _HttpDomoticzAPI;
-  begin(_Firmware);
+void AFEEvent::begin(AFEFirmware *Firmware, AFEHardware *Hardware,
+                     AFEAPIMQTTDomoticz *MqttAPI,
+                     AFEAPIHTTPDomoticz *HttpDomoticzAPI) {
+  _MqttAPI = MqttAPI;
+  _HttpDomoticzAPI = HttpDomoticzAPI;
+  begin(Firmware, Hardware);
 }
 #else
-void AFEEvent::begin(AFEFirmware *_Firmware, AFEAPIMQTTStandard *_MqttAPI) {
-  MqttAPI = _MqttAPI;
-  begin(_Firmware);
+void AFEEvent::begin(AFEFirmware *Firmware, AFEHardware *Hardware,
+                     AFEAPIMQTTStandard *MqttAPI) {
+  _MqttAPI = MqttAPI;
+  begin(Firmware, Hardware);
 }
 #endif
 
-void AFEEvent::begin(AFEFirmware *_Firmware) { Firmware = _Firmware; }
+void AFEEvent::begin(AFEFirmware *Firmware, AFEHardware *Hardware) {
+  _Firmware = Firmware;
+  _Hardware = Hardware;
+}
 
 void AFEEvent::listener(void) {
   /* Events triggered every 1m  */
-  if (millis() - Firmware->timer->miliseconds >= AFE_TIMER_ONE_MINUTE) {
+  if (millis() - _Firmware->timer->miliseconds >= AFE_TIMER_ONE_MINUTE) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENT: Trigger: 1m");
 #endif
-    Firmware->timer->miliseconds = millis();
-    Firmware->timer->minutes++;
+    _Firmware->timer->miliseconds = millis();
+    _Firmware->timer->minutes++;
   }
 
   /* Events triggered every 1h  */
-  if (Firmware->timer->minutes > AFE_TIMER_ONE_HOUR) {
+  if (_Firmware->timer->minutes > AFE_TIMER_ONE_HOUR) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENT: Trigger: 1hr");
 #endif
-    Firmware->timer->minutes = 0;
-    Firmware->timer->hours++;
+    _Firmware->timer->minutes = 0;
+    _Firmware->timer->hours++;
   }
 
   /* Events triggered every 24hrs  */
-  if (Firmware->timer->hours > AFE_TIMER_ONE_DAY) {
+  if (_Firmware->timer->hours > AFE_TIMER_ONE_DAY) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENT: Trigger: 24hr");
 #endif
 
-    if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+    if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
       /* Check if firmware up2date */
-      if (Firmware->API->Network->connected()) {
-        Firmware->checkFirmwareVersion();
+      if (_Firmware->API->Network->connected()) {
+        _Firmware->checkFirmwareVersion();
       }
-      /* Publish Firmware version to MQTT Broker */
+      /* Publish _Firmware version to MQTT Broker */
       publishFirmwareVersion();
       /* Checking if AFE Key is valid */
-      Firmware->validateProVersion();
+      _Firmware->validateProVersion();
     }
 
-    Firmware->timer->hours = 0;
-    Firmware->timer->days++;
+    _Firmware->timer->hours = 0;
+    _Firmware->timer->days++;
   }
 
   /* Events triggered every 1 month  */
-  if (Firmware->timer->days > AFE_TIMER_ONE_MONTH) {
+  if (_Firmware->timer->days > AFE_TIMER_ONE_MONTH) {
 #ifdef DEBUG
     Serial << endl << F("INFO: EVENT: Trigger: 30d");
 #endif
 
-    Firmware->timer->days = 0;
-    Firmware->timer->months++;
+    _Firmware->timer->days = 0;
+    _Firmware->timer->months++;
   }
 
   /* Instant triggered events */
 
-  if (Firmware->API->Network->eventConnected()) {
+  if (_Firmware->API->Network->eventConnected()) {
     conenctedToNetwork();
     /* Checking if AFE Key is valid */
-    Firmware->validateProVersion();
+    _Firmware->validateProVersion();
   }
 
-  if (Firmware->API->Network->eventDisconnected()) {
+  if (_Firmware->API->Network->eventDisconnected()) {
     disconnectedFromNetwork();
   }
 
-  if (Firmware->API->Network->connected()) {
+  if (_Firmware->API->Network->connected()) {
     connectedToMQTTBroker();
   }
-
   disconnectedFromMQTTBroker();
+
 }
 
 /**
@@ -96,15 +101,15 @@ void AFEEvent::conenctedToNetwork(void) {
 
 // Update HTTP states for Domoticz HTTP API
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
-    if (Firmware->Device->configuration.api.domoticz) {
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+    if (_Firmware->Device->configuration.api.domoticz) {
 #ifdef DEBUG
       Serial << endl
              << F("INFO: EVENTS: Domoticz HTTP API boot actions triggering");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Firmware->Hardware->SystemLed->on();
+      _Firmware->Hardware->SystemLed->on();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -112,7 +117,7 @@ void AFEEvent::conenctedToNetwork(void) {
       Serial << endl
              << F("INFO: EVENTS: Sending current gate state to Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfGates; i++) {
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfGates; i++) {
         _HttpDomoticzAPI->publishGateState(i);
       }
 #endif
@@ -123,10 +128,11 @@ void AFEEvent::conenctedToNetwork(void) {
              << F("INFO: EVENTS: Sending current state of contactrons to "
                   "Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfContactrons;
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfContactrons;
            i++) {
         _HttpDomoticzAPI->publishContactronState(i);
-        lastPublishedContactronState[i] = Contactron[i]->get();
+        _Hardware->lastPublishedContactronState[i] =
+            _Hardware->Contactron[i]->get();
       }
 #endif
 
@@ -136,7 +142,7 @@ void AFEEvent::conenctedToNetwork(void) {
           << endl
           << F("INFO: EVENTS: Sending current state of switches to Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfSwitches;
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfSwitches;
            i++) {
         _HttpDomoticzAPI->publishSwitchState(i);
       }
@@ -148,8 +154,8 @@ void AFEEvent::conenctedToNetwork(void) {
              << F("INFO: EVENTS: Sending current state of binary sensors to "
                   "Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfBinarySensors;
-           i++) {
+      for (uint8_t i = 0;
+           i < _Firmware->Device->configuration.noOfBinarySensors; i++) {
         _HttpDomoticzAPI->publishBinarySensorState(i);
       }
 #endif
@@ -160,7 +166,7 @@ void AFEEvent::conenctedToNetwork(void) {
              << F("INFO: EVENTS: Sending current state of RGB LEDs "
                   "Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfCLEDs; i++) {
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
         _HttpDomoticzAPI->publishCLEDState(i);
         _HttpDomoticzAPI->publishCLEDEffectState(i);
       }
@@ -172,7 +178,7 @@ void AFEEvent::conenctedToNetwork(void) {
              << F("INFO: EVENTS: Sending current state of regulator to "
                   "Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRegulators;
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRegulators;
            i++) {
         _HttpDomoticzAPI->publishRegulatorState(i);
       }
@@ -185,7 +191,7 @@ void AFEEvent::conenctedToNetwork(void) {
                   "Domoticz");
 #endif
       for (uint8_t i = 0;
-           i < Firmware->Device->configuration.noOfThermalProtectors; i++) {
+           i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
         _HttpDomoticzAPI->publishThermalProtectorState(i);
       }
 #endif
@@ -195,12 +201,13 @@ void AFEEvent::conenctedToNetwork(void) {
       Serial << endl
              << F("INFO: EVENTS: Sending current state of relays to Domoticz");
 #endif
-      for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++) {
+      for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRelays;
+           i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
         /* For the Relay assigned to a gate code below is not needed for
          * execution
          */
-        if (Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+        if (_Hardware->Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
           _HttpDomoticzAPI->publishRelayState(i);
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -210,7 +217,8 @@ void AFEEvent::conenctedToNetwork(void) {
         else {
           Serial << endl
                  << F("INFO: EVENTS: Excluding relay: ") << i
-                 << F(" as it's assigned to a Gate: ") << Relay[i]->gateId;
+                 << F(" as it's assigned to a Gate: ")
+                 << _Hardware->Relay[i]->gateId;
         }
 #endif
 #endif
@@ -218,7 +226,7 @@ void AFEEvent::conenctedToNetwork(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Firmware->Hardware->SystemLed->off();
+      _Firmware->Hardware->SystemLed->off();
 #endif
     }
 
@@ -228,7 +236,7 @@ void AFEEvent::conenctedToNetwork(void) {
   }
 #endif
   // Checing access to WAN
-  Firmware->API->REST->checkAccessToWAN();
+  _Firmware->API->REST->checkAccessToWAN();
 }
 
 void AFEEvent::disconnectedFromNetwork(void) {
@@ -236,47 +244,47 @@ void AFEEvent::disconnectedFromNetwork(void) {
   Serial << endl << F("INFO: EVENT: Network disconnected: triggered");
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->on();
+  _Firmware->Hardware->SystemLed->on();
 #endif
-  Firmware->API->REST->setNoWANAccess();
+  _Firmware->API->REST->setNoWANAccess();
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->off();
+  _Firmware->Hardware->SystemLed->off();
 #endif
 }
 
 void AFEEvent::connectedToMQTTBroker(void) {
   /* Event: connected to MQTT API */
-  if (Firmware->Device->getMode() == AFE_MODE_NORMAL &&
-      Firmware->Device->configuration.api.mqtt) {
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL &&
+      _Firmware->Device->configuration.api.mqtt) {
 
-    if (MqttAPI->Mqtt->connectedEvent()) {
+    if (_MqttAPI->Mqtt->connectedEvent()) {
 #ifdef DEBUG
       Serial << endl << F("INFO: EVENT: MQTT Connected: triggered");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Firmware->Hardware->SystemLed->on();
+      _Firmware->Hardware->SystemLed->on();
 #endif
-      MqttAPI->subscribe();
+      _MqttAPI->subscribe();
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
       publishMQTTHADiscoveryConfiguration();
 #endif
 
-      MqttAPI->synchronize();
+      _MqttAPI->synchronize();
 
-    /* Publish Firmware version to MQTT Broker */
-    publishFirmwareVersion();
-  }
+      /* Publish _Firmware version to MQTT Broker */
+      publishFirmwareVersion();
+    }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Firmware->Hardware->SystemLed->off();
+    _Firmware->Hardware->SystemLed->off();
 #endif
-    }
+  }
 }
 
 void AFEEvent::disconnectedFromMQTTBroker(void) {
-  if (MqttAPI->Mqtt->disconnectedEvent()) {
+  if (_MqttAPI->Mqtt->disconnectedEvent()) {
 #ifdef DEBUG
     Serial << endl
            << F("INFO: EVENT: MQTT Disconnected: triggered") << endl
@@ -284,27 +292,27 @@ void AFEEvent::disconnectedFromMQTTBroker(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Firmware->Hardware->SystemLed->on();
+    _Firmware->Hardware->SystemLed->on();
 #endif
-    MqttAPI->Mqtt->_Broker->disconnect(true);
+    _MqttAPI->Mqtt->_Broker->disconnect(true);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Firmware->Hardware->SystemLed->off();
+    _Firmware->Hardware->SystemLed->off();
 #endif
   }
 }
 
 void AFEEvent::publishFirmwareVersion(void) {
-  if (strlen(MqttAPI->Mqtt->configuration->status.topic) > 0) {
+  if (strlen(_MqttAPI->Mqtt->configuration->status.topic) > 0) {
     String _json;
-    Firmware->API->REST->sent(
+    _Firmware->API->REST->sent(
         _json, AFE_CONFIG_JSONRPC_REST_METHOD_GET_JSON_LATEST_FIRMWARE_VERSION);
     if (_json.length() > 0) {
       char _topic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-      sprintf(_topic, "%s/state", MqttAPI->Mqtt->configuration->status.topic);
+      sprintf(_topic, "%s/state", _MqttAPI->Mqtt->configuration->status.topic);
       char _message[_json.length() + 50];
       _json.toCharArray(_message, _json.length());
-      MqttAPI->Mqtt->publish(_topic, _message);
+      _MqttAPI->Mqtt->publish(_topic, _message);
     }
   }
 }
@@ -317,7 +325,7 @@ void AFEEvent::publishFirmwareVersion(void) {
 void AFEEvent::publishMQTTHADiscoveryConfiguration(void) {
 
   AFEAPIHomeAssistantIntegration *HomeAssistantDiscoveryAPI =
-      new AFEAPIHomeAssistantIntegration(Firmware, MqttAPI);
+      new AFEAPIHomeAssistantIntegration(_Firmware, _MqttAPI);
   HomeAssistantDiscoveryAPI->publish();
   delete HomeAssistantDiscoveryAPI;
   HomeAssistantDiscoveryAPI = NULL;

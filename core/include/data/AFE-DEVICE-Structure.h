@@ -92,6 +92,9 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   uint8_t noOfMCP23xxx;
 #endif
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  uint8_t noOfFS3000s;
+#endif
 };
 
 #ifdef T0_CONFIG

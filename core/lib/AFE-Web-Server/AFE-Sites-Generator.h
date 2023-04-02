@@ -476,5 +476,10 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void siteMCP23XXX(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void siteFS3000(String &page, uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_FS3000
+
 };
 #endif // _AFE_Sites_Generator_h

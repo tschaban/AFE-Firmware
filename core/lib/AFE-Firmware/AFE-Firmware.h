@@ -3,14 +3,19 @@
 #ifndef _AFE_Firmware_h
 #define _AFE_Firmware_h
 
+#include <AFE-API-JSONRPC.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-
-#include <AFE-API-JSONRPC.h>
 #include <AFE-WiFi.h>
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <AFE-I2C-Scanner.h>
+#include <Wire.h>
+
 #endif
 
 #ifdef DEBUG
@@ -34,11 +39,22 @@ public:
     AFEWiFi *Network = new AFEWiFi();
     AFEJSONRPC *REST = new AFEJSONRPC();
     AFEDataAccess *Flash = new AFEDataAccess();
+#ifdef AFE_CONFIG_HARDWARE_I2C
+    AFEI2CScanner *I2CScanner = new AFEI2CScanner();
+#endif
   };
 
   struct GLOBAL_HARDWARE_OBJECTS {
 #ifdef AFE_CONFIG_HARDWARE_LED
     AFELED *SystemLed = new AFELED();
+#endif
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef AFE_ESP32
+    TwoWire *WirePort0 = new TwoWire(0);
+    TwoWire *WirePort1 = new TwoWire(1);
+#else
+    TwoWire *WirePort0 = new TwoWire();
+#endif
 #endif
   };
 
@@ -77,6 +93,9 @@ public:
   void initializeSystemLED(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void initializeIIC(void);
+#endif
 };
 
 #endif

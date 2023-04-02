@@ -5,12 +5,14 @@
 
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#include <AFE-Firmware.h>
+
 #include <AFE-CONTACTRON-Structure.h>
+#include <AFE-Data-Access.h>
+#include <AFE-Device.h>
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
-#include <Arduino.h>
+#include <arduino.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -28,10 +30,10 @@ public:
   AFEContactron();
 
   /* Initialize. Must be run per each Gate object */
-  void begin(uint8_t id, AFEFirmware *);
+  void begin(uint8_t id, AFEDevice *, AFEDataAccess *);
 
   /* Method returns contactorn state */
-  byte get();
+  boolean get();
 
   /* Method returns true if cotactron state ahs changed */
   boolean changed();
@@ -43,7 +45,8 @@ public:
   void getJSON(char *json);
 
 private:
-  AFEFirmware *Firmware;
+  AFEDevice *Device;
+  AFEDataAccess *Data;
 
   boolean _initialized = false;
   boolean state;            // It stores actual contactron state
@@ -51,7 +54,7 @@ private:
 
   unsigned long startTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *ContactronLed = new AFELED();
+  AFELED *ContactronLed;
 #endif
 };
 
