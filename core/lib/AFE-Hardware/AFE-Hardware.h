@@ -18,6 +18,10 @@
 #include <AFE-LED.h>
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+#include <AFE-CLED.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-Analog-Input.h>
 #endif
@@ -94,6 +98,10 @@ private:
   void initADC(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  void initRGBLED(void);
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_GATE
   void initGate(void);
 #endif
@@ -150,6 +158,10 @@ public:
   AFEAnalogInput *AnalogInput;
 #endif // AFE_ESP32
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  AFECLED *RGBLEDStrip = new AFECLED();
+#endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   AFEGate *Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];

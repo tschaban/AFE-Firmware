@@ -3126,7 +3126,7 @@ void AFEWebServer::get(FS3000_CONFIG &data) {
                                        ? server.arg(F("d3")).toInt()
                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
-  data.domoticz.meter3PerSecond.idx = server.arg(F("d4")).length() > 0
+  data.domoticz.meters3PerHour.idx = server.arg(F("d4")).length() > 0
                                           ? server.arg(F("d4")).toInt()
                                           : AFE_DOMOTICZ_DEFAULT_IDX;
 

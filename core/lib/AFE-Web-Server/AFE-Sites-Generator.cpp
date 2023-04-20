@@ -4878,7 +4878,7 @@ void AFESitesGenerator::siteFS3000(String &page, uint8_t id) {
                               AFE_CONFIG_HARDWARE_FS3000_RANGE_15_MPS);
   addSelectFormItemClose(page);
 
-  addInformationItem(page, F(L_FS3000_IDX_M3H));
+  addInformationItem(page, F(L_FS3000_R_HINT));
   
   sprintf(_number, "%d", configuration.r);
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "re", L_FS3000_R,
@@ -4908,7 +4908,7 @@ void AFESitesGenerator::siteFS3000(String &page, uint8_t id) {
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
                      AFE_DOMOTICZ_IDX_MAX_FORM_DEFAULT, "1");
-    sprintf(_number, "%d", configuration.domoticz.meter3PerSecond.idx);
+    sprintf(_number, "%d", configuration.domoticz.meters3PerHour.idx);
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "d4", L_FS3000_IDX_M3H,
                      _number, AFE_FORM_ITEM_SKIP_PROPERTY,
                      AFE_DOMOTICZ_IDX_MIN_FORM_DEFAULT,
@@ -4918,12 +4918,12 @@ void AFESitesGenerator::siteFS3000(String &page, uint8_t id) {
   }
 #else
   if (Firmware->Device->configuration.api.mqtt) {
-    openSection(page, F(L_TSL2561_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
+    openSection(page, F(L_FS3000_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY));
     addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "t", L_MQTT_TOPIC,
                      configuration.mqtt.topic, "64");
     closeSection(page);
   }
-#endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+#endif // AFE_CONFIG_API_DOMOTICZ_ENABL
 }
 #endif // AFE_CONFIG_HARDWARE_FS3000
 

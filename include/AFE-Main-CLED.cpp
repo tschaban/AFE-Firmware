@@ -2,20 +2,13 @@
 
 /* ---------Headers ---------*/
 
-void initializeCLed(void);
-void CLedEventsListener(void);
+void RGBLEDEventsListener(void);
 
 /* --------- Body -----------*/
 
-void initializeCLed(void) {  
-  if (Device->configuration.noOfCLEDs > 0) {
-    CLEDStrip->begin(Data,Device);
-  }
-};
-
-void CLedEventsListener(void) {
-  if (Device->configuration.noOfCLEDs > 0) {
-    CLEDStrip->loop();
+void RGBLEDEventsListener(void) {
+  if (Firmware->Device->configuration.noOfCLEDs > 0) {
+    Hardware->RGBLEDStrip->loop();
   }
 };
 

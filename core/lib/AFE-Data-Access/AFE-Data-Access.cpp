@@ -496,7 +496,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       configuration->noOfFS3000s =
           exists.success()
               ? root["noOfFS3000s"]
-              : 1; // AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000 @TODO 3.6.0
+              : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000;
 #endif
 
 #ifdef DEBUG
@@ -7116,7 +7116,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
           root["d"]["2"] | AFE_DOMOTICZ_DEFAULT_IDX;
       configuration->domoticz.milesPerHour.idx =
           root["d"]["3"] | AFE_DOMOTICZ_DEFAULT_IDX;
-      configuration->domoticz.meter3PerSecond.idx =
+      configuration->domoticz.meters3PerHour.idx =
           root["d"]["4"] | AFE_DOMOTICZ_DEFAULT_IDX;
 
 #else
@@ -7184,7 +7184,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
     domoticz["1"] = configuration->domoticz.raw.idx;
     domoticz["2"] = configuration->domoticz.meterPerSecond.idx;
     domoticz["3"] = configuration->domoticz.milesPerHour.idx;
-    domoticz["4"] = configuration->domoticz.meter3PerSecond.idx;
+    domoticz["4"] = configuration->domoticz.meters3PerHour.idx;
 #else
     root["t"] = configuration->mqtt.topic;
 #endif
@@ -7220,7 +7220,7 @@ void AFEDataAccess::createFS3000SensorConfigurationFile() {
   configuration.domoticz.raw.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.meterPerSecond.idx = AFE_DOMOTICZ_DEFAULT_IDX;
   configuration.domoticz.milesPerHour.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-  configuration.domoticz.meter3PerSecond.idx = AFE_DOMOTICZ_DEFAULT_IDX;
+  configuration.domoticz.meters3PerHour.idx = AFE_DOMOTICZ_DEFAULT_IDX;
 #else
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif

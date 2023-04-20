@@ -91,6 +91,7 @@
 #define L_NO "No"
 #define L_SENSOR "Sensor"
 #define L_DISTANCE_UNIT "Distance unit"
+#define L_MILIMETERS "Millimeters"
 #define L_CM "Centimeter"
 #define L_M "Meter"
 #define L_KM "Kilometers"
@@ -143,6 +144,7 @@
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Number of TSL2561's sensors"  
 #define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
 #define L_DEVICE_NUMBER_OF_MCP23XXX "Number of MCP23xxx extensions"
+#define L_DEVICE_NUMBER_OF_FS3000_SENSORS "Number of FS3000"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -152,7 +154,7 @@
 #define L_DEVICE_DOMOTICZ_VERSION_410 "4.10x or older"
 #define L_DEVICE_DOMOTICZ_VERSION_2020 "2020.x or newer"
 #define L_DEVICE_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
-#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
+#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min of idle time in the configuration panel"
 
 
 /* Form: network configuration */
@@ -445,6 +447,20 @@
 #define L_TSL2561_GAIN_BROADBAND "IDX Broadband"
 #define L_TSL2561_GAIN_IR "IDX Infrared"
 #define L_ILUMINANCE "Illuminance"
+
+/* FS3000 */
+#define L_FS3000_SENSOR "FS3000 Sensor"
+#define L_FS3000_SENSORS "FS3000 Sensors"
+#define L_FS3000_MQTT_TOPIC "FS3000 Sensor's MQTT Topic"
+#define L_FS3000_RANGE_7 "0-7 m/s"
+#define L_FS3000_RANGE_15 "0-15 m/s"
+#define L_FS3000_IDX_RAW "IDX raw values"
+#define L_FS3000_IDX_MS "IDX m/s"
+#define L_FS3000_IDX_MILH "IDX mil/h"
+#define L_FS3000_IDX_M3H "IDX m3/h"
+#define L_FS3000_R "Radius"
+#define L_FS3000_R_HINT "The radius of the hole to convert the air flow into m3/h. If it's set to 0, the air flow will not be calculated"
+
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"

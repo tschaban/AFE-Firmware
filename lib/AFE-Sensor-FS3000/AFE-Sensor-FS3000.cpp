@@ -9,8 +9,6 @@ AFESensorFS3000::AFESensorFS3000(){};
 boolean AFESensorFS3000::begin(uint8_t id, AFEDataAccess *Data) {
   Data->getConfiguration(id, configuration);
 
-  configuration->r = 50; // @TODO 3.6.0
-
   if (_fs3000->begin()) {
     _fs3000->setRange(configuration->range);
     _initialized = true;
@@ -25,7 +23,7 @@ boolean AFESensorFS3000::begin(uint8_t id, AFEDataAccess *Data) {
   return _initialized;
 }
 
-// wzor PI * R(m)2 * 3600 * Predkosc meter per second
+// wzor PI * R(mm/1000)2 * 3600 * Predkosc meter per second
 
 boolean AFESensorFS3000::listener(void) {
   boolean _ret = false;
@@ -42,15 +40,15 @@ boolean AFESensorFS3000::listener(void) {
       data->metersPerSecond = _fs3000->readMetersPerSecond();
       data->milesPerHour = _fs3000->readMilesPerHour();
 
-      data->meters3PerSecond = configuration->r > 0
+      data->meters3PerHour = configuration->r > 0
                                    ? ((float)AFE_CONFIG_PI_NUMBER *
-                                      sq((float)configuration->r / (float)100) *
+                                      sq((float)configuration->r / (float)1000) *
                                       (float)3600 * data->metersPerSecond)
                                    : 0;
 #ifdef DEBUG
       Serial << endl << F(" : ") << data->raw << F(" raw");
       Serial << endl << F(" : ") << data->metersPerSecond << F(" m/s");
-      Serial << endl << F(" : ") << data->meters3PerSecond << F(" m3/h");
+      Serial << endl << F(" : ") << data->meters3PerHour << F(" m3/h");
       Serial << endl << F(" : ") << data->milesPerHour << F(" mil/h");
 #endif
 
@@ -67,7 +65,7 @@ void AFESensorFS3000::getJSON(char *json) {
                 "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
                 "\"value\":%.3f,\"unit\":\"%s\"}]}",
           data->raw, data->metersPerSecond, F(AFE_UNIT_MS), data->milesPerHour,
-          F(AFE_UNIT_MILH), data->meters3PerSecond, F(AFE_UNIT_M3H));
+          F(AFE_UNIT_MILH), data->meters3PerHour, F(AFE_UNIT_M3H));
 }
 
 #endif // AFE_CONFIG_HARDWARE_FS3000

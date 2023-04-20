@@ -43,13 +43,6 @@ AFEHardware *Hardware = new AFEHardware(Firmware);
 AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-#include <AFE-CLED.h>
-AFECLED *CLEDStrip = new AFECLED();
-#endif // AFE_CONFIG_HARDWARE_CLED
-
-
-
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #include <AFE-Regulator.h>

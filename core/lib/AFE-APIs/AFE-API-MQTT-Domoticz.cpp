@@ -819,7 +819,8 @@ boolean AFEAPIMQTTDomoticz::publishBoschBMSensorData(uint8_t id) {
       }
 
       /* Comfort */
-      if (_Hardware->BMEX80Sensor[id]->configuration->domoticz.comfort.idx > 0) {
+      if (_Hardware->BMEX80Sensor[id]->configuration->domoticz.comfort.idx >
+          0) {
         char _comfort[80]; // Max size of Comfort from lang.pack
         ComfortState comfortStatus;
         _Hardware->BMEX80Sensor[id]->comfort(
@@ -1308,5 +1309,51 @@ boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
 }
 
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+boolean AFEAPIMQTTDomoticz::publishFS3000SensorData(uint8_t id) {
+  if (enabled) {
+    char json[AFE_CONFIG_API_JSON_FS3000_COMMAND_LENGTH];
+    char value[20]; // 0;N;999999.99;0;?;?
+    if (_Hardware->FS3000Sensor[id]
+            ->configuration->domoticz.meterPerSecond.idx > 0) {
+      sprintf(value, "0;N;%-.3f;0;?;?",
+              10 * _Hardware->FS3000Sensor[id]->data->metersPerSecond);
+      generateDeviceValue(json,
+                          _Hardware->FS3000Sensor[id]
+                              ->configuration->domoticz.meterPerSecond.idx,
+                          value);
+      Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_Hardware->FS3000Sensor[id]->configuration->domoticz.raw.idx > 0) {
+      sprintf(value, "%d", _Hardware->FS3000Sensor[id]->data->raw);
+      generateDeviceValue(
+          json, _Hardware->FS3000Sensor[id]->configuration->domoticz.raw.idx,
+          value);
+      Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+    if (_Hardware->FS3000Sensor[id]
+            ->configuration->domoticz.meters3PerHour.idx > 0) {
+      sprintf(value, "%-.3f",
+              _Hardware->FS3000Sensor[id]->data->meters3PerHour);
+      generateDeviceValue(json,
+                          _Hardware->FS3000Sensor[id]
+                              ->configuration->domoticz.meters3PerHour.idx,
+                          value);
+      Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+        if (_Hardware->FS3000Sensor[id]
+            ->configuration->domoticz.milesPerHour.idx > 0) {
+      sprintf(value, "%-.3f",
+              _Hardware->FS3000Sensor[id]->data->milesPerHour);
+      generateDeviceValue(json,
+                          _Hardware->FS3000Sensor[id]
+                              ->configuration->domoticz.milesPerHour.idx,
+                          value);
+      Mqtt->publish(AFE_CONFIG_API_DOMOTICZ_TOPIC_IN, json);
+    }
+  }
+}
+#endif //  AFE_CONFIG_HARDWARE_FS3000
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

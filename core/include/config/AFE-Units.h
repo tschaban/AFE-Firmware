@@ -19,6 +19,7 @@
 #define AFE_UNIT_MM24H "mm/24h"
 #define AFE_UNIT_MILH "mil/h"
 #define AFE_UNIT_M3H "m3/h"
+#define AFE_UNIT_RAW "raw"
 
 #define AFE_CONFIG_ATTRIBUTE_SIZE_UNIT 7
 

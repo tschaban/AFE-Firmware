@@ -2,8 +2,7 @@
 #define _AFE_Hardware_FS3000_h
 
 #define AFE_CONFIG_PI_NUMBER 3.141592
-#define AFE_CONFIG_API_JSON_FS3000_DATA_LENGTH 500 // @TODO 3.6.0
-
+#define AFE_CONFIG_API_JSON_FS3000_DATA_LENGTH 157 // {"fs3000":[{"value":999999,"unit":"raw"},{"value":999999.999,"unit":"m/s"},{"value":999999.999,"unit":"mil/h"},{"value":999999.999,"unit":"m3/h"}]}
 #define AFE_CONFIG_HARDWARE_FS3000_RANGE_7_MPS 0
 #define AFE_CONFIG_HARDWARE_FS3000_RANGE_15_MPS 1
 
@@ -14,3 +13,5 @@
 
 
 #endif // _AFE_Hardware_rainmeter_h
+
+

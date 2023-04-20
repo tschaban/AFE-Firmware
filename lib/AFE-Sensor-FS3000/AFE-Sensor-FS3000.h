@@ -21,7 +21,7 @@ public:
     uint16_t raw;
     float metersPerSecond;
     float milesPerHour;
-    float meters3PerSecond;
+    float meters3PerHour;
   };
 
   FS3000_CONFIG *configuration = new FS3000_CONFIG;
@@ -39,7 +39,6 @@ public:
   boolean listener(void);
 
 private:
-  
   FS3000 *_fs3000 = new FS3000();
   boolean _initialized = false;
   unsigned long _startTime = 0;

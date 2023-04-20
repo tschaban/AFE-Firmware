@@ -126,6 +126,11 @@ private:
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void processFS3000(HTTPCOMMAND *);
+#endif // AFE_CONFIG_HARDWARE_FS3000
+
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
   /**
   * @brief Method creates and sends On/Off response

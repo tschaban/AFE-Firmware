@@ -2,7 +2,8 @@
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
 
-AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(AFEFirmware *Firmware, AFEAPIMQTTStandard *MqttAPI) {
+AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(
+    AFEFirmware *Firmware, AFEAPIMQTTStandard *MqttAPI) {
 #ifdef DEBUG
   Serial << endl << F("INFO: HA: Initializing Home Assistant Discovery");
 #endif
@@ -86,6 +87,10 @@ void AFEAPIHomeAssistantIntegration::publish() {
   publishAnemometer();
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  publishFS3000();
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   publishTSL2561();
 #endif
@@ -109,11 +114,11 @@ void AFEAPIHomeAssistantIntegration::publishFirmwareVersion(void) {
   }
   resetDeviceConfiguration();
   _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FIRMWARE_STATUS;
-  sprintf(_deviceConfiguration->deviceClass,"%s",
+  sprintf(_deviceConfiguration->deviceClass, "%s",
           F(AFE_CONFIG_HA_DEVICE_CLASS_FIRMWARE));
   _deviceConfiguration->entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_UPDATE;
 
-  sprintf(_deviceConfiguration->entityCategory,"%s",
+  sprintf(_deviceConfiguration->entityCategory, "%s",
           F(AFE_CONFIG_HA_ENTITY_CATEGORY_CONFIG));
 
   sprintf(_deviceConfiguration->label, "%s", F(L_FIRMWARE));
@@ -959,6 +964,67 @@ void AFEAPIHomeAssistantIntegration::publishAnemometer(void) {
 }
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+/**
+ * @brief publishes FS3000
+ *
+ */
+void AFEAPIHomeAssistantIntegration::publishFS3000(void) {
+  if (!_initialize) {
+    return;
+  }
+  FS3000_CONFIG _configuration;
+  _deviceConfiguration->entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
+  sprintf(_deviceConfiguration->deviceClass, AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+  _deviceConfiguration->hardwareId = AFE_CONFIG_HA_HARDWARE_SENSOR_FS3000;
+
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_FS3000; i++) {
+
+    _deviceConfiguration->id = i;
+
+    if (i < _Firmware->Device->configuration.noOfFS3000s) {
+      _Firmware->API->Flash->getConfiguration(i, &_configuration);
+#ifdef DEBUG
+      Serial << endl << F("INFO: HA: Setting/Updating FS3000: ") << i + 1;
+#endif
+
+      sprintf(_deviceConfiguration->label, _configuration.name);
+      sprintf(_deviceConfiguration->mqtt.topic, _configuration.mqtt.topic);
+
+      /* raw */
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_RAW;
+      sprintf(_deviceConfiguration->unit, AFE_UNIT_RAW);
+      publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+
+      /* m/s */
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_MS;
+      sprintf(_deviceConfiguration->unit, AFE_UNIT_MS);
+      publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+
+      /* mil/h */
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_MILH;
+      sprintf(_deviceConfiguration->unit, AFE_UNIT_MILH);
+      publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+
+      /* m3/h */
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_M3H;
+      sprintf(_deviceConfiguration->unit, AFE_UNIT_M3H);
+      publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+
+    } else {
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_RAW;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(_deviceConfiguration);
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_MS;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(_deviceConfiguration);
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_MILH;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(_deviceConfiguration);
+      _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FS3000_M3H;
+      removeItemRemovedFromHomeAssistantMQTTDiscovery(_deviceConfiguration);
+    }
+  }
+}
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 void AFEAPIHomeAssistantIntegration::publishRainmeter(void) {
   if (!_initialize) {
@@ -1587,6 +1653,36 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                       deviceConfiguration->unit);
       }
 #endif // Anemometer m/s
+
+#if defined(AFE_CONFIG_HARDWARE_FS3000)
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_RAW) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_RAW));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_MS) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MS));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_MILH) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MILH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+
+      else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_M3H) {
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
+                      F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_M3H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
+                      deviceConfiguration->unit);
+      }
+#endif // FS3000 m/s
 
 #if defined(AFE_CONFIG_HARDWARE_RAINMETER)
       else if (deviceConfiguration->type ==

@@ -254,6 +254,15 @@ private:
   void publishContactron(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  /**
+   * @brief publishes FS3000
+   *
+   */
+  void publishFS3000(void);
+#endif
+
+
   /**
    * @brief publishes firmware version
    *

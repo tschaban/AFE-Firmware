@@ -9,6 +9,12 @@ void AFEHardware::initPriorityHardwareItems(void) {
   Serial << endl << F("INFO: HARDWARE: Starting priortized hardware items");
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_CLED
+  if (_Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT) {
+    initRGBLED();
+  }
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
     initRelay();
@@ -29,57 +35,46 @@ void AFEHardware::initHardwareItems(void) {
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
     initADC();
 #endif
-    /*
-    #ifdef AFE_CONFIG_HARDWARE_GATE
-        initGate();
-    #endif
 
-    #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-        initContactron();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    initGate();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_TSL2561
-        initTSL2562();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    initContactron();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_BH1750
-        initBH1750();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    initTSL2562();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_BMEX80
-        initBMX80();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    initBH1750();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-        initBinarySensor();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    initBMX80();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_DS18B20
-        initDS18B20();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    initBinarySensor();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_DHT
-        initDHT();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    initDS18B20();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-        initHPMA115S0();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    initDHT();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-        initAnemometer();
-    #endif
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+    initHPMA115S0();
+#endif
 
-    #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-        initRainmeter();
-    #endif
-      */
-
-    #ifdef AFE_CONFIG_HARDWARE_FS3000
-        initFS3000();
-    #endif
-
-     
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+    initFS3000();
+#endif
   }
 }
 
@@ -152,6 +147,14 @@ void AFEHardware::initADC(void) {
       AnalogInput->begin();
     }
 #endif
+  }
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+void AFEHardware::initRGBLED(void) {
+  if (_Firmware->Device->configuration.noOfCLEDs > 0) {
+    RGBLEDStrip->begin(_Firmware->API->Flash, _Firmware->Device);
   }
 }
 #endif
@@ -295,6 +298,7 @@ void AFEHardware::initHPMA115S0(void) {
   }
 }
 #endif
+
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
 void AFEHardware::initFS3000(void) {

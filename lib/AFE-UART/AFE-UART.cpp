@@ -9,11 +9,11 @@ void AFEUART::begin() {
   AFEDataAccess Data;
   SERIALPORT configuration;
   Data.getConfiguration(&configuration);
-
+/*
     void begin(uint32_t baud, SoftwareSerialConfig config,
         int8_t rxPin, int8_t txPin, bool invert,
         int bufCapacity = 64, int isrBufCapacity = 0);
-
+*/
   SerialBus.begin(9600,SWSERIAL_8N1,configuration.RXD,configuration.TXD,false,64);
   //SerialBus.init(configuration.RXD, configuration.TXD, false, 64,9600);
   SerialBus.println();

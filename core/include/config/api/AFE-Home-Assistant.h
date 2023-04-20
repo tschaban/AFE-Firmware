@@ -94,6 +94,10 @@
 #define AFE_CONFIG_HA_ITEM_SENSOR_BATTERYMETER_VOLT 38
 #define AFE_CONFIG_HA_ITEM_GATE 39
 #define AFE_CONFIG_HA_ITEM_FIRMWARE_STATUS 40
+#define AFE_CONFIG_HA_ITEM_FS3000_MS 41
+#define AFE_CONFIG_HA_ITEM_FS3000_MILH 42
+#define AFE_CONFIG_HA_ITEM_FS3000_M3H 43
+#define AFE_CONFIG_HA_ITEM_FS3000_RAW 44
 
 /**
  * @brief Hardware Ids required to generated ObjectId
@@ -117,6 +121,7 @@
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_BINARY 13
 #define AFE_CONFIG_HA_HARDWARE_GATE 14
 #define AFE_CONFIG_HA_HARDWARE_SENSOR_CONTACTRON 15
+#define AFE_CONFIG_HA_HARDWARE_SENSOR_FS3000 16
 
 
 /**
@@ -396,6 +401,11 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 //#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H "{{value_json.rainmeter[?(@.unit=='mm/12h')].value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[3].value}}"
 //#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H "{{value_json.rainmeter[?(@.unit=='mm/24h')].value}}"
+
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_RAW "{{value_json.fs3000[0].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MS "{{value_json.fs3000[1].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MILH "{{value_json.fs3000[2].value}}"
+#define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_M3H "{{value_json.fs3000[3].value}}"
 
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_PERCENT "{{value_json.batterymeter[0].value}}"
 #define HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_VOLT "{{value_json.batterymeter[1].value}}"

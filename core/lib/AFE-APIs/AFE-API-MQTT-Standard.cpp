@@ -250,14 +250,14 @@ void AFEAPIMQTTStandard::subscribe() {
   char _brightnessTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
   for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
 
-    subscribeToCommand(_CLED->configuration[i].cled.topic);
+    subscribeToCommand(_Hardware->RGBLEDStrip->configuration[i].cled.topic);
 
-    sprintf(_brightnessTopic, "%s%s", _CLED->configuration[i].cled.topic,
+    sprintf(_brightnessTopic, "%s%s", _Hardware->RGBLEDStrip->configuration[i].cled.topic,
             AFE_CONFIG_HARDWARE_CLED_BRIGHTNESS_CMD_TOPIC_SUFIX);
 
     subscribeToCommand(_brightnessTopic);
 
-    subscribeToCommand(_CLED->configuration[i].effect.topic);
+    subscribeToCommand(_Hardware->RGBLEDStrip->configuration[i].effect.topic);
   }
 
 #endif
@@ -404,8 +404,8 @@ void AFEAPIMQTTStandard::listener() {
     Serial << endl << F(" - is CLED? : ");
 #endif
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
-      if (strlen(_CLED->configuration[i].cled.topic) > 0) {
-        sprintf(mqttCommandTopic, "%s/cmd", _CLED->configuration[i].cled.topic);
+      if (strlen(_Hardware->RGBLEDStrip->configuration[i].cled.topic) > 0) {
+        sprintf(mqttCommandTopic, "%s/cmd", _Hardware->RGBLEDStrip->configuration[i].cled.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -415,7 +415,7 @@ void AFEAPIMQTTStandard::listener() {
         }
 
         sprintf(mqttCommandTopic, "%s/brightness/cmd",
-                _CLED->configuration[i].cled.topic);
+                _Hardware->RGBLEDStrip->configuration[i].cled.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -425,9 +425,9 @@ void AFEAPIMQTTStandard::listener() {
         }
       }
 
-      if (strlen(_CLED->configuration[i].effect.topic) > 0) {
+      if (strlen(_Hardware->RGBLEDStrip->configuration[i].effect.topic) > 0) {
         sprintf(mqttCommandTopic, "%s/cmd",
-                _CLED->configuration[i].effect.topic);
+                _Hardware->RGBLEDStrip->configuration[i].effect.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           Serial << F("Yes");
@@ -1372,18 +1372,18 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
 #ifdef DEBUG
       Serial << endl << F("INFO: CLED: Processing ON");
 #endif
-      _CLED->on(*id, true);
+      _Hardware->RGBLEDStrip->on(*id, true);
     } else if (strcmp(_state, "off") == 0) {
 #ifdef DEBUG
       Serial << endl << F("INFO: CLED: Processing OFF");
 #endif
-      _CLED->off(*id, false);
+      _Hardware->RGBLEDStrip->off(*id, false);
     } else {
       _color.color.blue = root["color"]["blue"];
       _color.color.green = root["color"]["green"];
       _color.color.red = root["color"]["red"];
       _color.brightness =
-          root["brightness"] | _CLED->currentState[*id].on.brightness;
+          root["brightness"] | _Hardware->RGBLEDStrip->currentState[*id].on.brightness;
 
 #ifdef DEBUG
       Serial << endl
@@ -1400,18 +1400,18 @@ void AFEAPIMQTTStandard::processCLED(uint8_t *id) {
 
       if (_color.color.blue == 0 && _color.color.green == 0 &&
           _color.color.red == 0) {
-        _CLED->off(*id, false);
+        _Hardware->RGBLEDStrip->off(*id, false);
       } else {
-        _CLED->on(*id, _color, true, true);
+        _Hardware->RGBLEDStrip->on(*id, _color, true, true);
       }
     }
   }
 
   if (_success) {
-    if (_CLED->isStateUpdated(*id)) {
+    if (_Hardware->RGBLEDStrip->isStateUpdated(*id)) {
       publishCLEDState(*id);
     }
-    if (_CLED->isEffectStateUpdated(*id)) {
+    if (_Hardware->RGBLEDStrip->isEffectStateUpdated(*id)) {
       publishCLEDEffectsState(*id);
     }
   }
@@ -1437,24 +1437,24 @@ _command[Mqtt->message.length] = AFE_EMPTY_STRING;
 #endif
 
   if (strcmp(_command, AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF) == 0) {
-    _CLED->deactivateEffect(*id);
-  } else if (strcmp(_command, _CLED->configurationEffectBlinking[*id].name) ==
+    _Hardware->RGBLEDStrip->deactivateEffect(*id);
+  } else if (strcmp(_command, _Hardware->RGBLEDStrip->configurationEffectBlinking[*id].name) ==
              0) {
-    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
-  } else if (strcmp(_command, _CLED->configurationEffectFadeInOut[*id].name) ==
+    _Hardware->RGBLEDStrip->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
+  } else if (strcmp(_command, _Hardware->RGBLEDStrip->configurationEffectFadeInOut[*id].name) ==
              0) {
-    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
-  } else if (strcmp(_command, _CLED->configurationEffectWave[*id].name) == 0) {
-    _CLED->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
+    _Hardware->RGBLEDStrip->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT);
+  } else if (strcmp(_command, _Hardware->RGBLEDStrip->configurationEffectWave[*id].name) == 0) {
+    _Hardware->RGBLEDStrip->activateEffect(*id, AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE);
   } else {
     _success = false;
   }
 
   if (_success) {
-    if (_CLED->isEffectStateUpdated(*id)) {
+    if (_Hardware->RGBLEDStrip->isEffectStateUpdated(*id)) {
       publishCLEDEffectsState(*id);
     }
-    if (_CLED->isStateUpdated(*id)) {
+    if (_Hardware->RGBLEDStrip->isStateUpdated(*id)) {
       publishCLEDState(*id);
     }
   }
@@ -1479,23 +1479,23 @@ _command[Mqtt->message.length] = AFE_EMPTY_STRING;
   Serial << _command;
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
-  uint8_t _brightness = _CLED->convertBrightnessFromAPI(*id, atof(_command));
+  uint8_t _brightness = _Hardware->RGBLEDStrip->convertBrightnessFromAPI(*id, atof(_command));
 #else
   uint8_t _brightness = atoi(_command);
 #endif // AFE_FIRMWARE_API_STANDARD
 
   if (_brightness > 0) {
-    CLED_PARAMETERS _color = _CLED->currentState[*id].on;
+    CLED_PARAMETERS _color = _Hardware->RGBLEDStrip->currentState[*id].on;
     _color.brightness = _brightness;
-    _CLED->on(*id, _color, true, true);
+    _Hardware->RGBLEDStrip->on(*id, _color, true, true);
   } else {
-    _CLED->off(*id, true);
+    _Hardware->RGBLEDStrip->off(*id, true);
   }
 
-  if (_CLED->isStateUpdated(*id)) {
+  if (_Hardware->RGBLEDStrip->isStateUpdated(*id)) {
     publishCLEDState(*id);
   }
-  if (_CLED->isEffectStateUpdated(*id)) {
+  if (_Hardware->RGBLEDStrip->isEffectStateUpdated(*id)) {
     publishCLEDEffectsState(*id);
   }
 }
@@ -1503,21 +1503,21 @@ _command[Mqtt->message.length] = AFE_EMPTY_STRING;
 boolean AFEAPIMQTTStandard::publishCLEDEffectsState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    if (strlen(_CLED->configuration[id].effect.topic) > 0) {
+    if (strlen(_Hardware->RGBLEDStrip->configuration[id].effect.topic) > 0) {
       char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
       sprintf(mqttStateTopic, "%s/state",
-              _CLED->configuration[id].effect.topic);
+              _Hardware->RGBLEDStrip->configuration[id].effect.topic);
       publishStatus = Mqtt->publish(
           mqttStateTopic,
-          _CLED->currentState[id].effect.id ==
+          _Hardware->RGBLEDStrip->currentState[id].effect.id ==
                   AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
-              ? _CLED->configurationEffectBlinking[id].name
-              : _CLED->currentState[id].effect.id ==
+              ? _Hardware->RGBLEDStrip->configurationEffectBlinking[id].name
+              : _Hardware->RGBLEDStrip->currentState[id].effect.id ==
                         AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
-                    ? _CLED->configurationEffectFadeInOut[id].name
-                    : _CLED->currentState[id].effect.id ==
+                    ? _Hardware->RGBLEDStrip->configurationEffectFadeInOut[id].name
+                    : _Hardware->RGBLEDStrip->currentState[id].effect.id ==
                               AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE
-                          ? _CLED->configurationEffectWave[id].name
+                          ? _Hardware->RGBLEDStrip->configurationEffectWave[id].name
                           : AFE_CONFIG_HARDWARE_CLED_EFFECT_CMD_OFF);
     }
   }
@@ -1527,41 +1527,41 @@ boolean AFEAPIMQTTStandard::publishCLEDEffectsState(uint8_t id) {
 boolean AFEAPIMQTTStandard::publishCLEDState(uint8_t id) {
   boolean publishStatus = false;
   if (enabled) {
-    if (strlen(_CLED->configuration[id].cled.topic) > 0) {
+    if (strlen(_Hardware->RGBLEDStrip->configuration[id].cled.topic) > 0) {
       char mqttStateTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
       char _message[AFE_CONFIG_HARDWARE_CLED_STATE_JSON_LENGTH];
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
       sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
                         "\"blue\":%d},\"brightness\":%.2f}",
-              _CLED->currentState[id].state ? "on" : "off",
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.red
-                  : _CLED->currentState[id].off.color.red,
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.green
-                  : _CLED->currentState[id].off.color.green,
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.blue
-                  : _CLED->currentState[id].off.color.blue,
-              _CLED->convertBrigtnessToAPI(
-                  id, _CLED->currentState[id].config.brightness));
+              _Hardware->RGBLEDStrip->currentState[id].state ? "on" : "off",
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.red
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.red,
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.green
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.green,
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.blue
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.blue,
+              _Hardware->RGBLEDStrip->convertBrigtnessToAPI(
+                  id, _Hardware->RGBLEDStrip->currentState[id].config.brightness));
 #else
       sprintf(_message, "{\"state\":\"%s\",\"color\":{\"red\":%d,\"green\":%d,"
                         "\"blue\":%d},\"brightness\":%d}",
-              _CLED->currentState[id].state ? "on" : "off",
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.red
-                  : _CLED->currentState[id].off.color.red,
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.green
-                  : _CLED->currentState[id].off.color.green,
-              _CLED->currentState[id].state
-                  ? _CLED->currentState[id].on.color.blue
-                  : _CLED->currentState[id].off.color.blue,
-              _CLED->currentState[id].config.brightness);
+              _Hardware->RGBLEDStrip->currentState[id].state ? "on" : "off",
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.red
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.red,
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.green
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.green,
+              _Hardware->RGBLEDStrip->currentState[id].state
+                  ? _Hardware->RGBLEDStrip->currentState[id].on.color.blue
+                  : _Hardware->RGBLEDStrip->currentState[id].off.color.blue,
+              _Hardware->RGBLEDStrip->currentState[id].config.brightness);
 #endif
-      sprintf(mqttStateTopic, "%s/state", _CLED->configuration[id].cled.topic);
+      sprintf(mqttStateTopic, "%s/state", _Hardware->RGBLEDStrip->configuration[id].cled.topic);
       publishStatus = Mqtt->publish(mqttStateTopic, _message);
     }
   }

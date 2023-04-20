@@ -146,6 +146,7 @@ boolean AFEAsyncMQTTClient::disconnectedEvent() {
   boolean returnValue = AFEAsyncMQTTClient::eventDisconnected;
   if (returnValue) {
     AFEAsyncMQTTClient::eventDisconnected = false;
+    _Broker->disconnect(true);
   }
   return returnValue;
 }

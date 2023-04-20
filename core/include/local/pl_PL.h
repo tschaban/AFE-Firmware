@@ -455,7 +455,7 @@
 #define L_FS3000_IDX_MILH "IDX mil/h"
 #define L_FS3000_IDX_M3H "IDX m3/h"
 #define L_FS3000_R "Promień"
-#define L_FS3000_IDX_M3H "Promień otworu do przeliczania przepływu w m3/h. Jeśli 0 to przepływ powietrza nie będzie przeliczany"
+#define L_FS3000_R_HINT "Promień otworu do przeliczania przepływu w m3/h. Jeśli 0 to przepływ powietrza nie będzie przeliczany"
 
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"

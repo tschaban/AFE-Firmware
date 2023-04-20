@@ -80,12 +80,6 @@ void setup() {
   Firmware->initializeSystemLED();
 #endif // AFE_CONFIG_HARDWARE_LED
 
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT) {
-    initializeCLEDFirmware->Hardware->SystemLed();
-  }
-#endif // AFE_CONFIG_HARDWARE_CLED
-
 #ifdef DEBUG
   Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
 #endif
@@ -305,6 +299,7 @@ void loop() {
         FS3000SensorEventsListener();
 #endif
 
+
 /**
  * @brief Listenings and processing PN532 events
  *
@@ -360,7 +355,7 @@ void loop() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-      CLedEventsListener();
+      RGBLEDEventsListener();
 #endif
     }
 

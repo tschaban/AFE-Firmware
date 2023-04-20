@@ -88,7 +88,7 @@ void processSwitchEvents(void) {
          */
         if (Hardware->Switch[i]->configuration->rgbLedID != AFE_HARDWARE_ITEM_NOT_EXIST &&
             Hardware->Switch[i]->configuration->rgbLedID + 1 <=
-                Device->configuration.noOfCLEDs) {
+                Firmware->Device->configuration.noOfCLEDs) {
 
 #ifdef DEBUG
           Serial << endl
@@ -96,7 +96,7 @@ void processSwitchEvents(void) {
                  << Hardware->Switch[i]->configuration->rgbLedID;
 #endif
 
-          CLEDStrip->toggle(Hardware->Switch[i]->configuration->rgbLedID, true);
+          Hardware->RGBLEDStrip->toggle(Hardware->Switch[i]->configuration->rgbLedID, true);
           MqttAPI->publishCLEDState(Hardware->Switch[i]->configuration->rgbLedID);
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ

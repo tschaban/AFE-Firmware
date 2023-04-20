@@ -133,11 +133,11 @@ void AFESensorBH1750::listener() {
       if (configuration->mode >= BH1750::ONE_TIME_HIGH_RES_MODE) {
 
         bh1750->configure(configuration->mode == BH1750::ONE_TIME_HIGH_RES_MODE
-                             ? BH1750::ONE_TIME_HIGH_RES_MODE
-                             : configuration->mode ==
-                                       BH1750::ONE_TIME_HIGH_RES_MODE_2
-                                   ? BH1750::ONE_TIME_HIGH_RES_MODE_2
-                                   : BH1750::ONE_TIME_LOW_RES_MODE);
+                              ? BH1750::ONE_TIME_HIGH_RES_MODE
+                              : configuration->mode ==
+                                        BH1750::ONE_TIME_HIGH_RES_MODE_2
+                                    ? BH1750::ONE_TIME_HIGH_RES_MODE_2
+                                    : BH1750::ONE_TIME_LOW_RES_MODE);
       }
     }
   }

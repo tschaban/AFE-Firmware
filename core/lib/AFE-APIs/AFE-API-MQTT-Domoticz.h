@@ -183,6 +183,10 @@ public:
   boolean publishCLEDColorState(uint8_t id);
   boolean publishCLEDEffectsState(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  boolean publishFS3000SensorData(uint8_t id);
+#endif //  AFE_CONFIG_HARDWARE_FS3000
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
