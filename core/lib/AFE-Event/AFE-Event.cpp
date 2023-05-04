@@ -160,6 +160,7 @@ void AFEEvent::conenctedToNetwork(void) {
       }
 #endif
 
+/* Not implemented for Dmoticz HTTP 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #ifdef DEBUG
       Serial << endl
@@ -171,6 +172,7 @@ void AFEEvent::conenctedToNetwork(void) {
         _HttpDomoticzAPI->publishCLEDEffectState(i);
       }
 #endif
+*/
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef DEBUG

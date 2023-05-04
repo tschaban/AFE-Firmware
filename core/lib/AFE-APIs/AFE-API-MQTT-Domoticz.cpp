@@ -69,10 +69,10 @@ void AFEAPIMQTTDomoticz::begin(AFEFirmware *Firmware, AFEHardware *Hardware) {
 #endif
 
   for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_Hardware->CLED,
-                  _Hardware->CLED->configuration[i].cled.idx);
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_Hardware->CLED_EFFECT,
-                  _Hardware->CLED->configuration[i].effect.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED,
+                  _Hardware->RGBLEDStrip->configuration[i].cled.idx);
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_CLED_EFFECT,
+                  _Hardware->RGBLEDStrip->configuration[i].effect.idx);
   }
 #endif
 }
@@ -169,8 +169,8 @@ void AFEAPIMQTTDomoticz::synchronize() {
     Serial << endl << F("INFO: Synchronizing CLEDs: ") << i;
 #endif
 
-    publishSetColorMessage(&_Hardware->CLED->configuration[i].cled.idx,
-                           &_Hardware->CLED->currentState[i].on);
+    publishSetColorMessage(&_Hardware->RGBLEDStrip->configuration[i].cled.idx,
+                           &_Hardware->RGBLEDStrip->currentState[i].on);
     publishCLEDState(i);
     publishCLEDEffectsState(i);
   }
@@ -304,14 +304,14 @@ void AFEAPIMQTTDomoticz::processRequest() {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-        case AFE_DOMOTICZ_DEVICE_Hardware->CLED:
+        case AFE_DOMOTICZ_DEVICE_CLED:
 #ifdef DEBUG
           Serial << endl
                  << F("INFO: Domoticz: Found CLED ID: ") << idxCache[i].id;
           _found = true;
 #endif
 
-          if (_Hardware->CLED->currentState[idxCache[i].id].state !=
+          if (_Hardware->RGBLEDStrip->currentState[idxCache[i].id].state !=
               (byte)command.nvalue) {
 
             boolean _success = true;
@@ -322,27 +322,27 @@ void AFEAPIMQTTDomoticz::processRequest() {
             switch (command.nvalue) {
             /* Turn OFF */
             case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_OFF:
-              _Hardware->CLED->off(idxCache[i].id, true);
+              _Hardware->RGBLEDStrip->off(idxCache[i].id, true);
               break;
             /* Turn ON */
             case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_ON:
-              _Hardware->CLED->on(idxCache[i].id, true);
+              _Hardware->RGBLEDStrip->on(idxCache[i].id, true);
               break;
             /* Turn ON: full brightness */
             case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_FULL_LIGHT:
               command.led.brightness =
                   AFE_CONFIG_HARDWARE_CLED_LIGHT_LEVEL_FULL_LIGHT;
               command.led.color =
-                  _Hardware->CLED->currentState[idxCache[i].id].on.color;
-              _Hardware->CLED->on(idxCache[i].id, command.led, true, true);
+                  _Hardware->RGBLEDStrip->currentState[idxCache[i].id].on.color;
+              _Hardware->RGBLEDStrip->on(idxCache[i].id, command.led, true, true);
               break;
             /* Turn ON: night brightness */
             case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_NIGHT_LIGHT:
               command.led.brightness =
                   AFE_CONFIG_HARDWARE_CLED_LIGHT_LEVEL_NIGHT_LIGHT;
               command.led.color =
-                  _Hardware->CLED->currentState[idxCache[i].id].on.color;
-              _Hardware->CLED->on(idxCache[i].id, command.led, true, true);
+                  _Hardware->RGBLEDStrip->currentState[idxCache[i].id].on.color;
+              _Hardware->RGBLEDStrip->on(idxCache[i].id, command.led, true, true);
               break;
             /* Turn ON or OFF depending on new brightness level */
             case AFE_CONFIG_HARDWARE_CLED_DOMOTICZ_NVALUE_BRIGHTNESS:
@@ -350,10 +350,10 @@ void AFEAPIMQTTDomoticz::processRequest() {
                 command.led.brightness *=
                     AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
                 command.led.color =
-                    _Hardware->CLED->currentState[idxCache[i].id].on.color;
-                _Hardware->CLED->on(idxCache[i].id, command.led, true, true);
+                    _Hardware->RGBLEDStrip->currentState[idxCache[i].id].on.color;
+                _Hardware->RGBLEDStrip->on(idxCache[i].id, command.led, true, true);
               } else {
-                _Hardware->CLED->off(idxCache[i].id, false);
+                _Hardware->RGBLEDStrip->off(idxCache[i].id, false);
               }
               break;
             /* Turn ON or OFF depending on brightness level and changing the
@@ -362,9 +362,9 @@ void AFEAPIMQTTDomoticz::processRequest() {
               if (command.led.brightness > 0) {
                 command.led.brightness *=
                     AFE_CONFIG_HARDWARE_CLED_MAX_BRIGHTNESS / 100;
-                _Hardware->CLED->on(idxCache[i].id, command.led, true, true);
+                _Hardware->RGBLEDStrip->on(idxCache[i].id, command.led, true, true);
               } else {
-                _Hardware->CLED->off(idxCache[i].id, false);
+                _Hardware->RGBLEDStrip->off(idxCache[i].id, false);
               }
               break;
             /* Command not recognized */
@@ -383,10 +383,10 @@ void AFEAPIMQTTDomoticz::processRequest() {
              *
              */
             if (_success) {
-              if (_Hardware->CLED->isStateUpdated(idxCache[i].id)) {
+              if (_Hardware->RGBLEDStrip->isStateUpdated(idxCache[i].id)) {
                 publishCLEDColorState(idxCache[i].id);
               }
-              if (_Hardware->CLED->isEffectStateUpdated(idxCache[i].id)) {
+              if (_Hardware->RGBLEDStrip->isEffectStateUpdated(idxCache[i].id)) {
                 publishCLEDEffectsState(idxCache[i].id);
               }
             }
@@ -398,7 +398,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
           }
 #endif
           break;
-        case AFE_DOMOTICZ_DEVICE_Hardware->CLED_EFFECT:
+        case AFE_DOMOTICZ_DEVICE_CLED_EFFECT:
 
 #ifdef DEBUG
           Serial << endl
@@ -406,7 +406,7 @@ void AFEAPIMQTTDomoticz::processRequest() {
                  << idxCache[i].id;
           _found = true;
 #endif
-          _Hardware->CLED->activateEffect(idxCache[i].id, atoi(command.svalue));
+          _Hardware->RGBLEDStrip->activateEffect(idxCache[i].id, atoi(command.svalue));
           publishCLEDEffectsState(idxCache[i].id);
           if (atoi(command.svalue) != AFE_CONFIG_HARDWARE_CLED_EFFECT_NONE) {
             publishCLEDState(idxCache[i].id);
@@ -1287,24 +1287,24 @@ boolean AFEAPIMQTTDomoticz::publishMiFareCardState(uint8_t id, uint8_t tagId,
 #ifdef AFE_CONFIG_HARDWARE_CLED
 boolean AFEAPIMQTTDomoticz::publishCLEDState(uint8_t id) {
   return enabled ? publishSwitchMessage(
-                       &_Hardware->CLED->configuration[id].cled.idx,
-                       _Hardware->CLED->currentState[id].state)
+                       &_Hardware->RGBLEDStrip->configuration[id].cled.idx,
+                       _Hardware->RGBLEDStrip->currentState[id].state)
                  : false;
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDColorState(uint8_t id) {
   return enabled ? publishSetColorMessage(
-                       &_Hardware->CLED->configuration[id].cled.idx,
-                       _Hardware->CLED->currentState[id].state
-                           ? &_Hardware->CLED->currentState[id].on
-                           : &_Hardware->CLED->currentState[id].off)
+                       &_Hardware->RGBLEDStrip->configuration[id].cled.idx,
+                       _Hardware->RGBLEDStrip->currentState[id].state
+                           ? &_Hardware->RGBLEDStrip->currentState[id].on
+                           : &_Hardware->RGBLEDStrip->currentState[id].off)
                  : false;
 }
 
 boolean AFEAPIMQTTDomoticz::publishCLEDEffectsState(uint8_t id) {
   return enabled ? publishSetLevelMessage(
-                       &_Hardware->CLED->configuration[id].effect.idx,
-                       &_Hardware->CLED->currentState[id].effect.id)
+                       &_Hardware->RGBLEDStrip->configuration[id].effect.idx,
+                       &_Hardware->RGBLEDStrip->currentState[id].effect.id)
                  : false;
 }
 

@@ -851,7 +851,7 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
             _Hardware->RGBLEDStrip->currentState[i].state ? AFE_ON : AFE_OFF);
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-          if (_Hardware->CLED->isEffectStateUpdated(i)) {
+          if (_Hardware->RGBLEDStrip->isEffectStateUpdated(i)) {
             //_MqttAPI->publishCLEDEffectsState(id);
             //   _HttpAPIDomoticz->publishCLEDEffectState(i);
           }
@@ -907,7 +907,7 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           // publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
-          if (_Hardware->CLED->isStateUpdated(i)) {
+          if (_Hardware->RGBLEDStrip->isStateUpdated(i)) {
             //    _HttpAPIDomoticz->publishCLEDState(i);
           }
 #else
@@ -925,7 +925,7 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
-  if (_Hardware->CLED->isStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isStateUpdated(id)) {
     _MqttAPI->publishCLEDState(id);
 
     /* RGB LED are not supported in HTTP Domoticz API
@@ -934,7 +934,7 @@ void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
         }
     */
   }
-  if (_Hardware->CLED->isEffectStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isEffectStateUpdated(id)) {
     _MqttAPI->publishCLEDEffectsState(id);
     /* RGB LED are not supported in HTTP Domoticz API
     if (!fromDomoticz) {
